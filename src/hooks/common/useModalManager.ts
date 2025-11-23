@@ -5,24 +5,24 @@ import { useState, useCallback } from "react";
  * Generic hook for managing multiple modal states with standardized open/close patterns
  * Can be used across different components that need to manage multiple modals
  */
-export const useModalManager = (initialModals = {}) => {
-  const [modals, setModals] = useState(initialModals);
+export const useModalManager = (initialModals: Record<string, boolean> = {}) => {
+  const [modals, setModals] = useState<Record<string, boolean>>(initialModals);
 
-  const openModal = useCallback((modalName) => {
+  const openModal = useCallback((modalName: string) => {
     setModals((prev) => ({ ...prev, [modalName]: true }));
   }, []);
 
-  const closeModal = useCallback((modalName) => {
+  const closeModal = useCallback((modalName: string) => {
     setModals((prev) => ({ ...prev, [modalName]: false }));
   }, []);
 
-  const toggleModal = useCallback((modalName) => {
+  const toggleModal = useCallback((modalName: string) => {
     setModals((prev) => ({ ...prev, [modalName]: !prev[modalName] }));
   }, []);
 
   const closeAllModals = useCallback(() => {
     setModals((prev) => {
-      const closedModals = {};
+      const closedModals: Record<string, boolean> = {};
       for (const key in prev) {
         closedModals[key] = false;
       }
@@ -31,7 +31,7 @@ export const useModalManager = (initialModals = {}) => {
   }, []);
 
   const isModalOpen = useCallback(
-    (modalName) => {
+    (modalName: string) => {
       return Boolean(modals[modalName]);
     },
     [modals]

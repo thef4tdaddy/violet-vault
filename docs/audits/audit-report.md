@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | 0 |
-| TypeScript Errors | 40 | 0 |
-| TypeScript Strict Mode Errors | 2118 | -6 |
+| ESLint Issues | 6 | +2 |
+| TypeScript Errors | 41 | +1 |
+| TypeScript Strict Mode Errors | 2106 | -12 |
 
-*Last updated: 2025-11-23 13:44:40 UTC*
+*Last updated: 2025-11-23 13:56:37 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
@@ -35,8 +36,8 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 3 | `no-undef` |
 | 3 | `max-lines-per-function` |
-| 1 | `no-undef` |
 
 ### Detailed Lint Report
 ```
@@ -44,6 +45,8 @@
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:10:26 - 1 - 'NodeJS' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:46:17 - 1 - 'React' is not defined. (no-undef)
 ```
 
 ## Typecheck Audit
@@ -58,6 +61,7 @@
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/bills/useBillManager.ts`
 - 2 errors in `src/components/layout/MainLayout.tsx`
+- 1 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
@@ -66,7 +70,7 @@
 |---|---|
 | 18 | `TS2322` |
 | 15 | `TS2345` |
-| 4 | `TS2339` |
+| 5 | `TS2339` |
 | 1 | `TS2741` |
 | 1 | `TS2719` |
 | 1 | `TS2352` |
@@ -168,6 +172,7 @@ src/hooks/debts/useDebts.ts(195,20): error TS2339: Property 'name' does not exis
 src/hooks/debts/useDebts.ts(196,20): error TS2339: Property 'type' does not exist on type '{ id?: string; status: string; author?: string; }'.
 src/hooks/debts/useDebts.ts(197,30): error TS2339: Property 'currentBalance' does not exist on type '{ id?: string; status: string; author?: string; }'.
 src/hooks/debts/useDebts.ts(198,28): error TS2339: Property 'interestRate' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/mobile/useFABBehavior.ts(76,39): error TS2339: Property 'focus' does not exist on type 'Element'.
 src/hooks/transactions/useTransactionImport.ts(78,61): error TS2345: Argument of type 'ImportData' is not assignable to parameter of type 'unknown[] | { data?: unknown[]; }'.
   Type 'ImportData' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
 src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '{ amount: number; }[]'.
@@ -280,9 +285,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 7 errors in `src/hooks/sharing/useBudgetJoining.ts`
 - 7 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
-- 7 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 7 errors in `src/hooks/debts/useDebtManagement.ts`
-- 7 errors in `src/hooks/common/useModalManager.ts`
 - 7 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 7 errors in `src/components/transactions/import/FieldMapper.tsx`
 - 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
@@ -473,6 +476,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
+- 2 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/common/useTransactionArchiving.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
@@ -608,14 +612,14 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 621 | `TS7006` |
+| 611 | `TS7006` |
 | 609 | `TS7031` |
-| 185 | `TS2345` |
-| 148 | `TS2322` |
-| 128 | `TS2339` |
+| 186 | `TS2345` |
+| 147 | `TS2322` |
+| 129 | `TS2339` |
 | 112 | `TS18046` |
 | 64 | `TS7005` |
-| 57 | `TS7053` |
+| 54 | `TS7053` |
 | 50 | `TS18048` |
 | 39 | `TS7034` |
 | 37 | `TS18047` |
@@ -2319,14 +2323,6 @@ src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not e
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
 src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
-src/hooks/common/useModalManager.ts(11,34): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(15,35): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(19,36): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(20,51): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-src/hooks/common/useModalManager.ts(27,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/hooks/common/useModalManager.ts(34,6): error TS7006: Parameter 'modalName' implicitly has an 'any' type.
-src/hooks/common/useModalManager.ts(35,22): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
 src/hooks/common/useNetworkStatus.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/common/useNetworkStatus.ts(11,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/common/useNetworkStatus.ts(11,43): error TS7006: Parameter 'state' implicitly has an 'any' type.
@@ -2416,13 +2412,9 @@ src/hooks/layout/usePaycheckOperations.ts(66,23): error TS18046: 'error' is of t
 src/hooks/layout/usePaycheckOperations.ts(67,21): error TS18046: 'error' is of type 'unknown'.
 src/hooks/mobile/useBottomNavigation.ts(132,20): error TS7006: Parameter 'itemKey' implicitly has an 'any' type.
 src/hooks/mobile/useBottomNavigation.ts(133,20): error TS7006: Parameter 'key' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(8,23): error TS7006: Parameter 'callback' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(13,6): error TS7006: Parameter 'event' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(15,7): error TS2322: Type 'Timeout' is not assignable to type 'null'.
-src/hooks/mobile/useFABBehavior.ts(43,32): error TS7006: Parameter 'isExpanded' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(43,44): error TS7006: Parameter 'setExpanded' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(43,57): error TS7006: Parameter 'containerRef' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(45,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/hooks/mobile/useFABBehavior.ts(76,39): error TS2339: Property 'focus' does not exist on type 'Element'.
+src/hooks/mobile/useFABBehavior.ts(127,50): error TS2345: Argument of type 'RefObject<null>' is not assignable to parameter of type 'RefObject<HTMLElement>'.
+  Type 'null' is not assignable to type 'HTMLElement'.
 src/hooks/mobile/useFABSmartPositioning.ts(13,9): error TS7034: Variable 'resizeTimeout' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/mobile/useFABSmartPositioning.ts(17,20): error TS7005: Variable 'resizeTimeout' implicitly has an 'any' type.
 src/hooks/mobile/useFABSmartPositioning.ts(60,20): error TS7005: Variable 'resizeTimeout' implicitly has an 'any' type.
