@@ -93,7 +93,7 @@ export class UIStateService {
         interactions: this.getVisibleInteractions(),
       };
     } catch (error) {
-      logger.warn("Error collecting UI state", error);
+      logger.warn("Error collecting UI state", { error });
       return {
         modals: [],
         drawers: [],
@@ -143,7 +143,7 @@ export class UIStateService {
 
       return modals;
     } catch (error) {
-      logger.debug("Error getting active modals", error);
+      logger.debug("Error getting active modals", { error });
       return [];
     }
   }
@@ -175,7 +175,7 @@ export class UIStateService {
 
       return drawers;
     } catch (error) {
-      logger.debug("Error getting active drawers", error);
+      logger.debug("Error getting active drawers", { error });
       return [];
     }
   }
@@ -207,7 +207,7 @@ export class UIStateService {
 
       return tabs;
     } catch (error) {
-      logger.debug("Error getting active tabs", error);
+      logger.debug("Error getting active tabs", { error });
       return [];
     }
   }
@@ -238,7 +238,7 @@ export class UIStateService {
 
       return forms;
     } catch (error) {
-      logger.debug("Error getting active forms", error);
+      logger.debug("Error getting active forms", { error });
       return [];
     }
   }
@@ -268,7 +268,7 @@ export class UIStateService {
 
       return buttons;
     } catch (error) {
-      logger.debug("Error getting button states", error);
+      logger.debug("Error getting button states", { error });
       return [];
     }
   }
@@ -302,7 +302,7 @@ export class UIStateService {
 
       return inputs;
     } catch (error) {
-      logger.debug("Error getting input states", error);
+      logger.debug("Error getting input states", { error });
       return [];
     }
   }
@@ -335,7 +335,7 @@ export class UIStateService {
 
       return loadingStates;
     } catch (error) {
-      logger.debug("Error getting loading states", error);
+      logger.debug("Error getting loading states", { error });
       return [];
     }
   }
@@ -376,7 +376,7 @@ export class UIStateService {
 
       return interactions;
     } catch (error) {
-      logger.debug("Error getting visible interactions", error);
+      logger.debug("Error getting visible interactions", { error });
       return [];
     }
   }

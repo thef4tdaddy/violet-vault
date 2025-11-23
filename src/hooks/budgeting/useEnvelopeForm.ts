@@ -10,6 +10,14 @@ import {
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
+interface UseEnvelopeFormProps {
+  envelope?: Record<string, unknown> | null;
+  existingEnvelopes?: Record<string, unknown>[];
+  onSave: (data: unknown) => Promise<void>;
+  onClose: () => void;
+  currentUser?: { userName: string };
+}
+
 /**
  * Custom hook for managing envelope form state and operations
  * Handles form validation, calculations, and envelope transformations
@@ -20,7 +28,7 @@ const useEnvelopeForm = ({
   onSave,
   onClose,
   currentUser = { userName: "User" },
-}) => {
+}: UseEnvelopeFormProps) => {
   // Form state
   const [formData, setFormData] = useState(createDefaultEnvelopeForm());
   const [errors, setErrors] = useState({});
@@ -30,7 +38,8 @@ const useEnvelopeForm = ({
   // Initialize form data when envelope changes
   useEffect(() => {
     if (envelope) {
-      const formDataFromEnvelope = transformEnvelopeToForm(envelope);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const formDataFromEnvelope = transformEnvelopeToForm(envelope as any);
       setFormData(formDataFromEnvelope);
       setIsDirty(false);
     } else {
@@ -62,7 +71,8 @@ const useEnvelopeForm = ({
         // Handle special cases for dependent fields
         if (field === "envelopeType") {
           // Validate type change compatibility
-          const compatibility = validateEnvelopeTypeChange(String(value), envelope);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const compatibility = validateEnvelopeTypeChange(String(value), envelope as any);
           if (!compatibility.isValid) {
             setErrors((prevErrors) => ({
               ...prevErrors,
@@ -82,14 +92,19 @@ const useEnvelopeForm = ({
   );
 
   // Batch form update
-  const updateFormData = useCallback((updates) => {
+  const updateFormData = useCallback((updates: Record<string, unknown>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
     setIsDirty(true);
   }, []);
 
   // Form validation
   const validateForm = useCallback(() => {
-    const validation = validateEnvelopeForm(formData, existingEnvelopes, envelope?.id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const validation = validateEnvelopeForm(
+      formData,
+      existingEnvelopes as any,
+      envelope?.id as string | undefined
+    );
     setErrors(validation.errors);
     return validation.isValid;
   }, [formData, existingEnvelopes, envelope?.id]);
@@ -97,7 +112,8 @@ const useEnvelopeForm = ({
   // Reset form
   const resetForm = useCallback(() => {
     if (envelope) {
-      setFormData(transformEnvelopeToForm(envelope));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setFormData(transformEnvelopeToForm(envelope as any));
     } else {
       setFormData(createDefaultEnvelopeForm());
     }
@@ -121,7 +137,7 @@ const useEnvelopeForm = ({
 
       // Transform form data to envelope object
       const envelopeData = transformFormToEnvelope(formData, {
-        editingId: envelope?.id,
+        editingId: envelope?.id as string | undefined,
         createdBy: currentUser.userName,
       });
 
@@ -132,8 +148,9 @@ const useEnvelopeForm = ({
       setIsDirty(false);
       return true;
     } catch (error) {
-      logger.error("Error saving envelope", error);
-      globalToast.showError(error.message || "Failed to save envelope", "Save Error", 8000);
+      logger.error("Error saving envelope", { error });
+      const errorMessage = error instanceof Error ? error.message : "Failed to save envelope";
+      globalToast.showError(errorMessage, "Save Error", 8000);
       return false;
     } finally {
       setIsLoading(false);

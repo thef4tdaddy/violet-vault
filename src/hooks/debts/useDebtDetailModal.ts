@@ -5,6 +5,43 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useConfirm } from "../common/useConfirm";
+import type { DebtAccount, PayoffProjection } from "@/types/debt";
+
+// Extended type to handle runtime data that may have additional properties
+interface PaymentHistoryItem {
+  id?: string | number;
+  date: string;
+  amount: number;
+  principalAmount?: number;
+  interestAmount?: number;
+}
+
+interface ExtendedPayoffInfo extends Partial<PayoffProjection> {
+  payoffDate?: string | Date;
+  monthsToPayoff?: number;
+  totalInterest?: number;
+}
+
+interface DebtWithHistory extends Omit<DebtAccount, "payoffInfo"> {
+  paymentHistory?: PaymentHistoryItem[];
+  payoffInfo?: ExtendedPayoffInfo;
+}
+
+interface UseDebtDetailModalProps {
+  debt: DebtWithHistory | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onDelete: (debtId: string) => void;
+  onRecordPayment: (debtId: string, paymentData: PaymentData) => void;
+  onEdit: (debt: DebtWithHistory) => void;
+}
+
+interface PaymentData {
+  amount: number;
+  date: string;
+  paymentMethod: string;
+  notes: string;
+}
 
 export const useDebtDetailModal = ({
   debt,
@@ -13,7 +50,7 @@ export const useDebtDetailModal = ({
   onDelete,
   onRecordPayment,
   onEdit,
-}) => {
+}: UseDebtDetailModalProps) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const confirm = useConfirm();
@@ -77,7 +114,7 @@ export const useDebtDetailModal = ({
   }, [debt?.paymentHistory]);
 
   // Event handlers
-  const handleRecordPayment = (e) => {
+  const handleRecordPayment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const amount = parseFloat(paymentAmount);
     if (amount <= 0) return;
