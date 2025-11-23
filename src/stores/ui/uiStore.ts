@@ -10,19 +10,19 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 /**
  * Transform old data format to new format
  */
-const transformOldData = (parsedOldData) => ({
+const transformOldData = (parsedOldData: { state?: Record<string, unknown> }) => ({
   state: {
-    envelopes: parsedOldData.state.envelopes || [],
-    bills: parsedOldData.state.bills || [],
-    transactions: parsedOldData.state.transactions || [],
-    allTransactions: parsedOldData.state.allTransactions || [],
-    savingsGoals: parsedOldData.state.savingsGoals || [],
-    supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
-    debts: parsedOldData.state.debts || [],
-    unassignedCash: parsedOldData.state.unassignedCash || 0,
-    biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
-    paycheckHistory: parsedOldData.state.paycheckHistory || [],
-    actualBalance: parsedOldData.state.actualBalance || 0,
+    envelopes: (parsedOldData.state?.envelopes as unknown[]) || [],
+    bills: (parsedOldData.state?.bills as unknown[]) || [],
+    transactions: (parsedOldData.state?.transactions as unknown[]) || [],
+    allTransactions: (parsedOldData.state?.allTransactions as unknown[]) || [],
+    savingsGoals: (parsedOldData.state?.savingsGoals as unknown[]) || [],
+    supplementalAccounts: (parsedOldData.state?.supplementalAccounts as unknown[]) || [],
+    debts: (parsedOldData.state?.debts as unknown[]) || [],
+    unassignedCash: (parsedOldData.state?.unassignedCash as number) || 0,
+    biweeklyAllocation: (parsedOldData.state?.biweeklyAllocation as number) || 0,
+    paycheckHistory: (parsedOldData.state?.paycheckHistory as unknown[]) || [],
+    actualBalance: (parsedOldData.state?.actualBalance as number) || 0,
   },
   version: 0,
 });
@@ -30,21 +30,21 @@ const transformOldData = (parsedOldData) => ({
 /**
  * Seed Dexie database with migrated data
  */
-const seedDexieWithMigratedData = async (transformedData) => {
-  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
-  await budgetDb.bulkUpsertBills(transformedData.state.bills);
+const seedDexieWithMigratedData = async (transformedData: { state: Record<string, unknown> }) => {
+  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes as never[]);
+  await budgetDb.bulkUpsertBills(transformedData.state.bills as never[]);
   await budgetDb.bulkUpsertTransactions(
-    transformedData.state.allTransactions.length > 0
-      ? transformedData.state.allTransactions
-      : transformedData.state.transactions
+    (transformedData.state.allTransactions as unknown[]).length > 0
+      ? (transformedData.state.allTransactions as never[])
+      : (transformedData.state.transactions as never[])
   );
-  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
-  await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals as never[]);
+  await budgetDb.bulkUpsertDebts(transformedData.state.debts as never[]);
+  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory as never[]);
 
   await setBudgetMetadata({
-    unassignedCash: transformedData.state.unassignedCash || 0,
-    actualBalance: transformedData.state.actualBalance || 0,
+    unassignedCash: (transformedData.state.unassignedCash as number) || 0,
+    actualBalance: (transformedData.state.actualBalance as number) || 0,
   });
 };
 
@@ -78,7 +78,7 @@ const migrateOldData = async () => {
     });
   } catch (error) {
     logger.warn("Failed to migrate old data", {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       source: "migrateOldData",
     });
   }
@@ -140,12 +140,12 @@ const storeInitializer = (set, _get) => ({
       set((state) => {
         state.loadingPatchNotes = false;
         state.showPatchNotes = true;
-        state.patchNotesData = {
-          ...patchNotes,
-          fromVersion,
-          toVersion,
-          isUpdate: true,
-        };
+        state.patchNotesData = patchNotes;
+        if (state.patchNotesData) {
+          state.patchNotesData.fromVersion = fromVersion;
+          state.patchNotesData.toVersion = toVersion;
+          state.patchNotesData.isUpdate = true;
+        }
       });
 
       logger.info("Loaded patch notes for update", { fromVersion, toVersion });
@@ -164,7 +164,9 @@ const storeInitializer = (set, _get) => ({
     try {
       await migrateOldData();
     } catch (error) {
-      logger.warn("Migration failed in store", { error: error.message });
+      logger.warn("Migration failed in store", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   },
 
@@ -317,6 +319,37 @@ export interface UiStore {
     isUpdate?: boolean;
   } | null;
   loadingPatchNotes: boolean;
+
+  // Basic actions
+  setBiweeklyAllocation: (amount: number) => void;
+  openUnassignedCashModal: () => void;
+  closeUnassignedCashModal: () => void;
+  setPaycheckHistory: (history: UiStore["paycheckHistory"]) => void;
+  setDataLoaded: (loaded: boolean) => void;
+  setOnlineStatus: (status: boolean) => void;
+  setCloudSyncEnabled: (enabled: boolean) => void;
+
+  // PWA Update actions
+  setUpdateAvailable: (available: boolean) => void;
+  setIsUpdating: (updating: boolean) => void;
+  showInstallModal: () => void;
+  hideInstallModal: () => void;
+  setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void;
+  updateApp: () => Promise<void>;
+  installApp: () => Promise<boolean>;
+  manualInstall: () => Promise<{ success: boolean; reason: string }>;
+  dismissInstallPrompt: () => void;
+
+  // Patch notes actions
+  showPatchNotesModal: (patchNotesData: { version: string; notes: string[] }) => void;
+  hidePatchNotesModal: () => void;
+  loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<unknown>;
+
+  // Other actions
+  runMigrationIfNeeded: () => Promise<void>;
+  startBackgroundSync: () => Promise<void>;
+  resetAllData: () => void;
+  setDebts: () => void;
 }
 
 export default useUiStore;
