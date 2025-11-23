@@ -14,10 +14,10 @@ import logger from "../common/logger.ts";
 export const optimizedSerialization = {
   /**
    * Serialize data with compression and MessagePack
-   * @param {Object} data - Data to serialize
+   * @param {unknown} data - Data to serialize
    * @returns {Uint8Array} Compressed and packed binary data
    */
-  serialize(data) {
+  serialize(data: unknown): Uint8Array {
     try {
       const startTime = performance.now();
 
@@ -47,16 +47,17 @@ export const optimizedSerialization = {
       return packed;
     } catch (error) {
       logger.error("Serialization failed", error);
-      throw new Error(`Serialization failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Serialization failed: ${errorMessage}`);
     }
   },
 
   /**
    * Deserialize compressed MessagePack data back to object
    * @param {Uint8Array} packedData - Compressed and packed binary data
-   * @returns {Object} Original data object
+   * @returns {unknown} Original data object
    */
-  deserialize(packedData) {
+  deserialize(packedData: Uint8Array): unknown {
     try {
       const startTime = performance.now();
 
@@ -79,16 +80,25 @@ export const optimizedSerialization = {
       return data;
     } catch (error) {
       logger.error("Deserialization failed", error);
-      throw new Error(`Deserialization failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Deserialization failed: ${errorMessage}`);
     }
   },
 
   /**
    * Get compression stats for given data without actually serializing
-   * @param {Object} data - Data to analyze
-   * @returns {Object} Size analysis
+   * @param {unknown} data - Data to analyze
+   * @returns {Object | null} Size analysis
    */
-  analyzeCompression(data) {
+  analyzeCompression(data: unknown): {
+    originalSize: number;
+    compressedSize: number;
+    finalSize: number;
+    compressionRatio: number;
+    totalReduction: number;
+    spaceSaved: number;
+    spaceSavedPercent: number;
+  } | null {
     try {
       const jsonString = JSON.stringify(data);
       const originalSize = new TextEncoder().encode(jsonString).length;
@@ -121,7 +131,7 @@ export const optimizedSerialization = {
    * @param {Uint8Array} binaryData - Serialized binary data
    * @returns {string} Base64 encoded string
    */
-  toBase64(binaryData) {
+  toBase64(binaryData: Uint8Array): string {
     try {
       // Convert Uint8Array to base64 string
       let binary = "";
@@ -131,7 +141,8 @@ export const optimizedSerialization = {
       return btoa(binary);
     } catch (error) {
       logger.error("Base64 encoding failed", error);
-      throw new Error(`Base64 encoding failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Base64 encoding failed: ${errorMessage}`);
     }
   },
 
@@ -140,7 +151,7 @@ export const optimizedSerialization = {
    * @param {string} base64String - Base64 encoded string
    * @returns {Uint8Array} Binary data
    */
-  fromBase64(base64String) {
+  fromBase64(base64String: string): Uint8Array {
     try {
       const binary = atob(base64String);
       const bytes = new Uint8Array(binary.length);
@@ -150,16 +161,17 @@ export const optimizedSerialization = {
       return bytes;
     } catch (error) {
       logger.error("Base64 decoding failed", error);
-      throw new Error(`Base64 decoding failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Base64 decoding failed: ${errorMessage}`);
     }
   },
 
   /**
    * Complete pipeline: Serialize → Base64 for Firebase storage
-   * @param {Object} data - Data to prepare for Firebase
+   * @param {unknown} data - Data to prepare for Firebase
    * @returns {string} Base64 string ready for Firebase
    */
-  prepareForFirebase(data) {
+  prepareForFirebase(data: unknown): string {
     const serialized = this.serialize(data);
     return this.toBase64(serialized);
   },
@@ -167,19 +179,34 @@ export const optimizedSerialization = {
   /**
    * Complete pipeline: Base64 → Deserialize from Firebase storage
    * @param {string} base64String - Base64 string from Firebase
-   * @returns {Object} Original data object
+   * @returns {unknown} Original data object
    */
-  restoreFromFirebase(base64String) {
+  restoreFromFirebase(base64String: string): unknown {
     const binaryData = this.fromBase64(base64String);
     return this.deserialize(binaryData);
   },
 
   /**
    * Test the complete pipeline with sample data
-   * @param {Object} testData - Data to test with
+   * @param {unknown} testData - Data to test with
    * @returns {Object} Test results and performance metrics
    */
-  testPipeline(testData) {
+  testPipeline(testData: unknown): {
+    success: boolean;
+    totalTime?: number;
+    base64Size?: number;
+    analysis?: {
+      originalSize: number;
+      compressedSize: number;
+      finalSize: number;
+      compressionRatio: number;
+      totalReduction: number;
+      spaceSaved: number;
+      spaceSavedPercent: number;
+    } | null;
+    verified?: string;
+    error?: string;
+  } {
     try {
       const startTime = performance.now();
 
@@ -207,9 +234,10 @@ export const optimizedSerialization = {
       };
     } catch (error) {
       logger.error("Pipeline test failed", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
   },
