@@ -1,10 +1,26 @@
-import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
+import { RULE_TYPES, type AutoFundingRule } from "@/utils/budgeting/autofunding";
 import FixedAmountConfig from "./config/FixedAmountConfig";
 import PercentageConfig from "./config/PercentageConfig";
 import SplitRemainderConfig from "./config/SplitRemainderConfig";
 import PriorityFillConfig from "./config/PriorityFillConfig";
+import React from "react";
 
-const RuleConfigurationStep = ({
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+}
+
+interface RuleConfigurationStepProps {
+  ruleData: AutoFundingRule;
+  updateConfig: (updates: Partial<AutoFundingRule["config"]>) => void;
+  envelopes: Envelope[];
+  toggleTargetEnvelope: (envelopeId: string | number) => void;
+  errors: Record<string, string>;
+}
+
+const RuleConfigurationStep: React.FC<RuleConfigurationStepProps> = ({
   ruleData,
   updateConfig,
   envelopes,

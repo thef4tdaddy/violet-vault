@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui";
 import StylizedButtonText from "@/components/ui/StylizedButtonText";
+import React from "react";
+
+interface ReturningUserActionsProps {
+  onSubmit: () => void;
+  onChangeProfile: () => void;
+  onStartFresh: () => void;
+  isLoading: boolean;
+  canSubmit: boolean;
+}
 
 /**
  * Returning User Actions Component
  * Login, change profile, and start fresh buttons for returning users
  * Extracted from UserSetup with UI standards compliance
  */
-const ReturningUserActions = ({
+const ReturningUserActions: React.FC<ReturningUserActionsProps> = ({
   onSubmit,
   onChangeProfile,
   onStartFresh,

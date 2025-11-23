@@ -1,8 +1,28 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../../utils";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
 
-const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentBalance?: number;
+  monthlyAmount?: number;
+}
+
+interface PriorityFillConfigProps {
+  ruleData: AutoFundingRule;
+  updateConfig: (updates: Partial<AutoFundingRule["config"]>) => void;
+  envelopes: Envelope[];
+  errors: Record<string, string>;
+}
+
+const PriorityFillConfig: React.FC<PriorityFillConfigProps> = ({
+  ruleData,
+  updateConfig,
+  envelopes,
+  errors,
+}) => {
   return (
     <>
       <div>
@@ -15,7 +35,7 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
           }`}
         >
           <option value="">Select envelope...</option>
-          {envelopes.map((envelope) => {
+          {envelopes.map((envelope: Envelope) => {
             const remaining = Math.max(
               0,
               (envelope.monthlyAmount || 0) - (envelope.currentBalance || 0)
@@ -46,7 +66,7 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
       {ruleData.config.targetId && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           {(() => {
-            const envelope = envelopes.find((e) => e.id === ruleData.config.targetId);
+            const envelope = envelopes.find((e: Envelope) => e.id === ruleData.config.targetId);
             if (!envelope) return null;
 
             const current = envelope.currentBalance || 0;
