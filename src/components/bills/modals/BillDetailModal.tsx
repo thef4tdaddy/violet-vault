@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent } from "react";
 import { getIcon } from "../../../utils";
 import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/bills/useBillDetail";
@@ -8,12 +8,23 @@ import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { Bill } from "@/types/bills";
+
+interface BillDetailModalProps {
+  bill: Bill | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onDelete: (bill: Bill) => void | Promise<void>;
+  onMarkPaid: (bill: Bill, amount: number) => void | Promise<void>;
+  onEdit: (bill: Bill) => void;
+  onCreateRecurring: (bill: Bill) => void;
+}
 
 /**
  * Pure UI component for viewing and managing individual bill details
  * Business logic extracted to useBillDetail hook following Issue #152 pattern
  */
-const BillDetailModal = ({
+const BillDetailModal: React.FC<BillDetailModalProps> = ({
   bill,
   isOpen,
   onClose,

@@ -1,7 +1,33 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => {
+interface AllocationItem {
+  envelopeId: string | number;
+  envelopeName: string;
+  envelopeType: string;
+  amount: number;
+  monthlyAmount?: number;
+  priority: string;
+}
+
+interface AllocationPreviewData {
+  allocations: AllocationItem[];
+  totalAllocated: number;
+  remainingAmount: number;
+  allocationRate: string;
+}
+
+interface AllocationPreviewProps {
+  allocationPreview: AllocationPreviewData;
+  hasAmount: boolean;
+  allocationMode: string;
+}
+
+const AllocationPreview: React.FC<AllocationPreviewProps> = ({
+  allocationPreview,
+  hasAmount,
+  allocationMode,
+}) => {
   const { allocations, totalAllocated, remainingAmount, allocationRate } = allocationPreview;
 
   if (!hasAmount) {
@@ -29,7 +55,7 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
     );
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string): string => {
     switch (priority) {
       case "critical":
         return "text-red-600 bg-red-50 border-red-200";
@@ -44,7 +70,7 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
     }
   };
 
-  const getPriorityLabel = (priority) => {
+  const getPriorityLabel = (priority: string): string => {
     switch (priority) {
       case "critical":
         return "Critical";
@@ -95,7 +121,7 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
       <div className="space-y-2">
         <h4 className="font-medium text-gray-900">Envelope Allocations</h4>
         <div className="max-h-64 overflow-y-auto space-y-2">
-          {allocations.map((allocation) => (
+          {allocations.map((allocation: AllocationItem) => (
             <div
               key={allocation.envelopeId}
               className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"

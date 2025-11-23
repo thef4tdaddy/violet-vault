@@ -2,19 +2,35 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { Button, Select, Radio } from "../../ui";
 
+interface Bill {
+  id: string;
+  name?: string;
+  provider?: string;
+  amount?: number;
+  frequency?: string;
+  envelopeId?: string;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string | number;
+  name?: string;
+  [key: string]: unknown;
+}
+
 // Helper to get available bills for selection
-const getAvailableBills = (allBills, envelopeId) => {
+const getAvailableBills = (allBills: Bill[], envelopeId: string | null) => {
   return allBills.filter((bill) => !bill.envelopeId || bill.envelopeId === envelopeId);
 };
 
 // Helper to find selected bill
-const findSelectedBill = (allBills, selectedBillId) => {
+const findSelectedBill = (allBills: Bill[], selectedBillId: string | null) => {
   if (!selectedBillId) return null;
   return allBills.find((bill) => bill.id === selectedBillId) || null;
 };
 
 // Helper to format bill option text
-const formatBillOption = (bill) => {
+const formatBillOption = (bill: Bill) => {
   const name = bill.name || bill.provider || "Unnamed Bill";
   const amount = bill.amount?.toFixed(2) || "0.00";
   const frequency = bill.frequency || "monthly";
@@ -22,7 +38,7 @@ const formatBillOption = (bill) => {
 };
 
 // ConnectedBillDisplay - shows details of selected bill
-const ConnectedBillDisplay = ({ bill }) => {
+const ConnectedBillDisplay: React.FC<{ bill: Bill | null }> = ({ bill }) => {
   if (!bill) return null;
 
   return (
@@ -46,11 +62,21 @@ const ConnectedBillDisplay = ({ bill }) => {
   );
 };
 
+interface BillConnectionSelectorProps {
+  selectedBillId: string | null;
+  onBillSelection: (billId: string) => void;
+  allBills?: Bill[];
+  envelopeId?: string | null;
+  onCreateBill?: (() => void) | null;
+  showCreateOption?: boolean;
+  disabled?: boolean;
+}
+
 /**
  * Shared component for bill connection functionality
  * Handles connecting to existing bills or creating new ones
  */
-const BillConnectionSelector = ({
+const BillConnectionSelector: React.FC<BillConnectionSelectorProps> = ({
   selectedBillId,
   onBillSelection,
   allBills = [],

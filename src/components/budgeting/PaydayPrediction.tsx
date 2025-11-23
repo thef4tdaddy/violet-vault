@@ -150,8 +150,8 @@ const ActionCard = ({
 // Sub-component: Proactive Suggestions
 interface ProactiveSuggestionsProps {
   daysUntil: number;
-  onProcessPaycheck: () => void;
-  onPrepareEnvelopes: () => void;
+  onProcessPaycheck?: () => void;
+  onPrepareEnvelopes?: () => void;
 }
 
 const ProactiveSuggestions = ({
@@ -258,21 +258,21 @@ const PaydayPrediction = ({
 
   const formattedPrediction = formatPaydayPrediction(prediction);
   const daysUntil = getDaysUntilPayday(prediction);
-  const showProactiveSuggestions = daysUntil <= 3 && daysUntil >= 0;
+  const showProactiveSuggestions = daysUntil !== null && daysUntil <= 3 && daysUntil >= 0;
   const confidenceColor = getConfidenceColor(prediction.confidence);
 
   return (
     <div
-      className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle(daysUntil)} ${className}`}
+      className={`glassmorphism rounded-2xl p-4 border ${daysUntil !== null ? getUrgencyStyle(daysUntil) : ""} ${className}`}
     >
       <PredictionHeader
         prediction={prediction}
-        daysUntil={daysUntil}
+        daysUntil={daysUntil ?? 0}
         formattedPrediction={formattedPrediction}
         confidenceColor={confidenceColor}
       />
 
-      {showProactiveSuggestions && (
+      {showProactiveSuggestions && daysUntil !== null && (
         <ProactiveSuggestions
           daysUntil={daysUntil}
           onProcessPaycheck={onProcessPaycheck}

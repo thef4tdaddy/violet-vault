@@ -64,7 +64,12 @@ export const useDebtDetailModal = ({
 
   // Calculate progress percentage
   const progressData = useMemo(() => {
-    if (!debt || !debt.originalBalance || debt.originalBalance <= 0) {
+    if (
+      !debt ||
+      !debt.originalBalance ||
+      debt.originalBalance <= 0 ||
+      debt.currentBalance === undefined
+    ) {
       return { percentage: 0, hasProgress: false };
     }
 
@@ -116,6 +121,8 @@ export const useDebtDetailModal = ({
   // Event handlers
   const handleRecordPayment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!debt) return;
+
     const amount = parseFloat(paymentAmount);
     if (amount <= 0) return;
 
@@ -132,6 +139,8 @@ export const useDebtDetailModal = ({
   };
 
   const handleDelete = async () => {
+    if (!debt) return;
+
     const confirmed = await confirm({
       title: "Delete Debt",
       message: `Are you sure you want to delete "${debt.name}"? This action cannot be undone.`,
@@ -147,6 +156,7 @@ export const useDebtDetailModal = ({
   };
 
   const handleEdit = () => {
+    if (!debt) return;
     onClose();
     onEdit(debt);
   };
@@ -156,6 +166,7 @@ export const useDebtDetailModal = ({
   };
 
   const handleCancelPayment = () => {
+    if (!debt) return;
     setShowPaymentForm(false);
     setPaymentAmount(debt.minimumPayment?.toString() || "");
   };

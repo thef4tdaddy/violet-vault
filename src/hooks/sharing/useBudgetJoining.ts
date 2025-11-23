@@ -3,6 +3,28 @@ import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 
+interface JoinBudgetParams {
+  shareCode: string;
+  password: string;
+  userName: string;
+  userColor: string;
+  onJoinSuccess?: (budgetInfo: {
+    budgetId: string;
+    password: string;
+    userInfo: {
+      id: string;
+      userName: string;
+      userColor: string;
+      joinedVia: string;
+      joinedAt: number;
+    };
+    shareCode: string;
+    sharedBy: string;
+    userCount: number;
+  }) => void;
+  onClose: () => void;
+}
+
 /**
  * Custom hook for budget joining logic
  * Extracted from JoinBudgetModal to reduce complexity
@@ -19,7 +41,7 @@ export const useBudgetJoining = () => {
     userColor,
     onJoinSuccess,
     onClose,
-  }) => {
+  }: JoinBudgetParams) => {
     if (!shareCode || !password || !userName.trim()) {
       showErrorToast("Please fill in all required fields");
       return false;
@@ -69,7 +91,8 @@ export const useBudgetJoining = () => {
       return true;
     } catch (error) {
       logger.error("Failed to join budget", error);
-      showErrorToast(error.message || "Failed to join budget");
+      const errorMessage = error instanceof Error ? error.message : "Failed to join budget";
+      showErrorToast(errorMessage);
       return false;
     } finally {
       setIsJoining(false);

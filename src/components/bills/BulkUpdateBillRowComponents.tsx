@@ -1,10 +1,44 @@
 import React from "react";
 import { getIcon } from "@/utils";
+import type { Bill } from "@/types/bills";
+
+interface BillChange {
+  amount?: number;
+  dueDate?: string;
+  originalDueDate?: string;
+}
+
+interface AmountChange {
+  hasChange: boolean;
+  original: number;
+}
+
+interface AmountUpdateFieldProps {
+  change: BillChange | undefined;
+  amountChange: AmountChange | undefined;
+  billId: string;
+  updateChange: (billId: string, field: string, value: number | string) => void;
+}
+
+interface DateUpdateFieldProps {
+  change: BillChange | undefined;
+  billId: string;
+  updateChange: (billId: string, field: string, value: number | string) => void;
+}
+
+interface BillInfoProps {
+  bill: Bill;
+}
 
 /**
  * Amount input field component for bulk update
  */
-export const AmountUpdateField = ({ change, amountChange, billId, updateChange }) => {
+export const AmountUpdateField: React.FC<AmountUpdateFieldProps> = ({
+  change,
+  amountChange,
+  billId,
+  updateChange,
+}) => {
   return (
     <div className="flex items-center gap-2">
       {React.createElement(getIcon("DollarSign"), {
@@ -29,7 +63,11 @@ export const AmountUpdateField = ({ change, amountChange, billId, updateChange }
 /**
  * Date input field component for bulk update
  */
-export const DateUpdateField = ({ change, billId, updateChange }) => {
+export const DateUpdateField: React.FC<DateUpdateFieldProps> = ({
+  change,
+  billId,
+  updateChange,
+}) => {
   return (
     <div className="flex items-center gap-2">
       {React.createElement(getIcon("Calendar"), {
@@ -50,7 +88,7 @@ export const DateUpdateField = ({ change, billId, updateChange }) => {
 /**
  * Bill info section component
  */
-export const BillInfo = ({ bill }) => {
+export const BillInfo: React.FC<BillInfoProps> = ({ bill }) => {
   return (
     <div className="flex-1">
       <h5 className="font-bold text-gray-900">{bill.provider || bill.description}</h5>

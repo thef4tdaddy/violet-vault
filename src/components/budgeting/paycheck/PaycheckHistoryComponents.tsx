@@ -59,20 +59,20 @@ export const PaycheckStatsDisplay: React.FC<PaycheckStatsDisplayProps> = ({ payc
       <div>
         <span className="text-gray-600 block">Average Amount</span>
         <span className="font-bold text-gray-900">
-          {formatPaycheckAmount(paycheckStats.averageAmount)}
+          {formatPaycheckAmount(paycheckStats.averageAmount ?? 0)}
         </span>
       </div>
       <div>
         <span className="text-gray-600 block">Total Income</span>
         <span className="font-bold text-gray-900">
-          {formatPaycheckAmount(paycheckStats.totalAmount)}
+          {formatPaycheckAmount(paycheckStats.totalAmount ?? 0)}
         </span>
       </div>
       <div>
         <span className="text-gray-600 block">Range</span>
         <span className="font-bold text-gray-900">
-          {formatPaycheckAmount(paycheckStats.minAmount)} -{" "}
-          {formatPaycheckAmount(paycheckStats.maxAmount)}
+          {formatPaycheckAmount(paycheckStats.minAmount ?? 0)} -{" "}
+          {formatPaycheckAmount(paycheckStats.maxAmount ?? 0)}
         </span>
       </div>
     </div>
@@ -137,7 +137,9 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
             {getModeLabel(paycheck.allocationMode)}
           </span>
         </div>
-        <span className="font-bold text-green-600">{formatPaycheckAmount(paycheck.amount)}</span>
+        <span className="font-bold text-green-600">
+          {formatPaycheckAmount(paycheck.amount ?? 0)}
+        </span>
       </div>
 
       <div className="flex items-center justify-between text-sm text-gray-600">
@@ -150,7 +152,7 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
         </div>
         <div>
           <span className="text-green-600">
-            {formatPaycheckAmount(paycheck.totalAllocated)} allocated
+            {formatPaycheckAmount(paycheck.totalAllocated ?? 0)} allocated
           </span>
           {paycheck.remainingAmount !== undefined && paycheck.remainingAmount > 0 && (
             <span className="text-blue-600 ml-2">

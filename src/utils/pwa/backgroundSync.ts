@@ -5,10 +5,23 @@ import logger from "../common/logger";
  * Handles queuing and syncing of offline operations
  */
 
+interface SyncOperation {
+  id?: string;
+  type: string;
+  method: string;
+  url: string;
+  data?: Record<string, unknown>;
+  headers?: Record<string, string>;
+  timestamp?: number;
+  retryCount?: number;
+  maxRetries?: number;
+  lastError?: string;
+}
+
 class BackgroundSyncManager {
   syncQueue: string;
   isOnline: boolean;
-  pendingOperations: Array<Record<string, unknown>>;
+  pendingOperations: SyncOperation[];
 
   constructor() {
     this.syncQueue = "violet-vault-sync-queue";
@@ -32,7 +45,7 @@ class BackgroundSyncManager {
    * @param {Object} operation.data - Request payload
    * @param {Object} operation.headers - Request headers
    */
-  async queueOperation(operation) {
+  async queueOperation(operation: SyncOperation): Promise<string> {
     const queuedOperation = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
@@ -71,8 +84,8 @@ class BackgroundSyncManager {
     });
 
     const operationsToSync = [...this.pendingOperations];
-    const successfulOperations = [];
-    const failedOperations = [];
+    const successfulOperations: SyncOperation[] = [];
+    const failedOperations: SyncOperation[] = [];
 
     for (const operation of operationsToSync) {
       try {
@@ -83,10 +96,12 @@ class BackgroundSyncManager {
           operationId: operation.id,
         });
       } catch (error) {
-        operation.retryCount = ((operation.retryCount as number | undefined) || 0) + 1;
-        operation.lastError = (error as Error).message;
+        const currentRetryCount = operation.retryCount ?? 0;
+        operation.retryCount = currentRetryCount + 1;
+        operation.lastError = error instanceof Error ? error.message : String(error);
 
-        if (operation.retryCount >= operation.maxRetries) {
+        const maxRetries = operation.maxRetries ?? 3;
+        if (operation.retryCount >= maxRetries) {
           logger.error("❌ Background Sync: Operation failed permanently", error, {
             operationType: operation.type,
             operationId: operation.id,
@@ -99,7 +114,7 @@ class BackgroundSyncManager {
             operationId: operation.id,
             retryCount: operation.retryCount,
             maxRetries: operation.maxRetries,
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
           });
         }
       }
@@ -127,7 +142,7 @@ class BackgroundSyncManager {
   /**
    * Execute a queued operation
    */
-  async executeOperation(operation) {
+  async executeOperation(operation: SyncOperation): Promise<unknown> {
     const { method, url, data, headers } = operation;
 
     const response = await fetch(url, {

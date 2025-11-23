@@ -2,8 +2,26 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import BulkUpdateBillRow from "./BulkUpdateBillRow";
+import type { Bill } from "@/types/bills";
 
-const BulkUpdateEditor = ({
+interface BillChanges {
+  [billId: string]: {
+    amount?: number;
+    dueDate?: string;
+    originalDueDate?: string;
+  };
+}
+
+interface BulkUpdateEditorProps {
+  selectedBills: Bill[];
+  changes: BillChanges;
+  updateMode: string;
+  updateChange: (billId: string, field: string, value: number | string) => void;
+  applyBulkChange: (field: string, value: number | string) => void;
+  resetChanges: () => void;
+}
+
+const BulkUpdateEditor: React.FC<BulkUpdateEditorProps> = ({
   selectedBills,
   changes,
   updateMode,

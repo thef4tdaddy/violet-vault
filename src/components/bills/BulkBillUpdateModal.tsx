@@ -10,8 +10,23 @@ import BulkUpdateModeSelector from "./BulkUpdateModeSelector";
 import BulkUpdateSummary from "./BulkUpdateSummary";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { Bill } from "@/types/bills";
 
-const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
+interface BulkBillUpdateModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedBills?: Bill[];
+  onUpdateBills: (bills: Bill[]) => Promise<void>;
+  onError?: (error: string) => void;
+}
+
+const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
+  isOpen,
+  onClose,
+  selectedBills = [],
+  onUpdateBills,
+  onError,
+}) => {
   const [updateMode, setUpdateMode] = useState("amounts");
 
   const {

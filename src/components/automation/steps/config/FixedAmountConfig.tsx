@@ -1,8 +1,27 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../../utils";
+import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
 
-const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
+interface Envelope {
+  id: string | number;
+  name: string;
+  currentBalance?: number;
+}
+
+interface FixedAmountConfigProps {
+  ruleData: AutoFundingRule;
+  updateConfig: (updates: Partial<AutoFundingRule["config"]>) => void;
+  envelopes: Envelope[];
+  errors: Record<string, string>;
+}
+
+const FixedAmountConfig: React.FC<FixedAmountConfigProps> = ({
+  ruleData,
+  updateConfig,
+  envelopes,
+  errors,
+}) => {
   return (
     <>
       <div>
@@ -44,7 +63,7 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
           }`}
         >
           <option value="">Select envelope...</option>
-          {envelopes.map((envelope) => (
+          {envelopes.map((envelope: Envelope) => (
             <option key={envelope.id} value={envelope.id}>
               {envelope.name} ($
               {envelope.currentBalance?.toFixed(2) || "0.00"})

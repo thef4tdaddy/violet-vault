@@ -31,8 +31,8 @@ interface SummaryCardProps {
  */
 const SummaryCards = () => {
   const openUnassignedCashModal = useBudgetStore(
-    (state) => state.openUnassignedCashModal
-  ) as () => void;
+    (state: { openUnassignedCashModal: () => void }) => state.openUnassignedCashModal
+  );
   const { unassignedCash } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();
@@ -42,9 +42,13 @@ const SummaryCards = () => {
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum: number, env: { currentBalance?: number }) => sum + (env.currentBalance || 0),
+    0
+  );
   const totalSavingsBalance = savingsGoals.reduce(
-    (sum, goal) => sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
+    (sum: number, goal: { currentAmount?: number | string }) =>
+      sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
     0
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;

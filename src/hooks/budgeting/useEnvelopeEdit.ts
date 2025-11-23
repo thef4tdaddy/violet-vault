@@ -4,6 +4,26 @@ import useEditLock from "../common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import useEnvelopeForm from "./useEnvelopeForm";
 
+interface Envelope {
+  id: string | number;
+  name?: string;
+  currentBalance?: number;
+}
+
+interface User {
+  userName: string;
+}
+
+interface UseEnvelopeEditProps {
+  isOpen?: boolean;
+  envelope?: Envelope | null;
+  existingEnvelopes?: Envelope[];
+  onSave: (envelopeData: unknown) => Promise<void>;
+  onClose: () => void;
+  onDelete: (envelopeId: string | number) => Promise<void>;
+  currentUser?: User;
+}
+
 /**
  * Custom hook for editing envelopes with edit locking support
  * Combines envelope form management with edit locking functionality
@@ -16,7 +36,7 @@ const useEnvelopeEdit = ({
   onClose,
   onDelete,
   currentUser = { userName: "User" },
-}) => {
+}: UseEnvelopeEditProps) => {
   // Get auth context for edit locking
   const {
     securityContext: { budgetId },
@@ -76,6 +96,10 @@ const useEnvelopeEdit = ({
   const handleDelete = async () => {
     if (!canEdit) {
       throw new Error("Cannot delete envelope - it is locked by another user");
+    }
+
+    if (!envelope) {
+      throw new Error("No envelope to delete");
     }
 
     await onDelete(envelope.id);

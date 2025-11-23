@@ -7,6 +7,13 @@ import {
 } from "../../utils/notifications/permissionUtils";
 import logger from "../../utils/common/logger";
 
+interface PermissionResult {
+  success: boolean;
+  reason?: string;
+  error?: string;
+  token?: string;
+}
+
 /**
  * React hook for Firebase Cloud Messaging integration
  * Provides easy access to FCM functionality with permission management
@@ -14,10 +21,10 @@ import logger from "../../utils/common/logger";
 export const useFirebaseMessaging = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState(null);
-  const [permissionStatus, setPermissionStatus] = useState(null);
-  const [error, setError] = useState(null);
-  const [lastMessage, setLastMessage] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [permissionStatus, setPermissionStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastMessage, setLastMessage] = useState<unknown>(null);
 
   // Update permission status
   const updatePermissionStatus = useCallback(() => {
@@ -59,7 +66,7 @@ export const useFirebaseMessaging = () => {
   }, [isInitialized, updatePermissionStatus]);
 
   // Request permission and get token
-  const requestPermissionAndGetToken = useCallback(async () => {
+  const requestPermissionAndGetToken = useCallback(async (): Promise<PermissionResult> => {
     if (!isInitialized) {
       const initialized = await initialize();
       if (!initialized) {

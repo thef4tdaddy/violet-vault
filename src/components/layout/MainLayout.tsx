@@ -131,7 +131,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   useNetworkStatus();
 
   // Sync conflicts state
-  const [syncConflicts, setSyncConflicts] = useState(null);
+  const [syncConflicts, setSyncConflicts] = useState<unknown>(null);
 
   // Toast notifications
   const toasts = useToastStore((state) => state.toasts);

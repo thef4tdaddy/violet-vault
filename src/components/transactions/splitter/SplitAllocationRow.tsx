@@ -3,7 +3,31 @@ import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 
-const SplitAllocationRow = ({
+// Type definitions
+interface Split {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  envelopeId?: string;
+}
+
+interface Envelope {
+  id: string;
+  name: string;
+}
+
+interface SplitAllocationRowProps {
+  split: Split;
+  index: number;
+  canRemove: boolean;
+  onUpdate: (id: string, field: string, value: string | number) => void;
+  onRemove: (id: string) => void;
+  availableCategories: string[];
+  envelopes: Envelope[];
+}
+
+const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
   split,
   index: _index,
   canRemove,

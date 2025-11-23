@@ -2,7 +2,27 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const HistoryList = ({
+// Type definitions
+interface HistoryCommit {
+  hash: string;
+  shortHash: string;
+  author: string;
+  message: string;
+  timestamp: number;
+}
+
+interface HistoryListProps {
+  loading: boolean;
+  history: HistoryCommit[];
+  selectedCommit: string | null;
+  expandedCommits: Set<string>;
+  handleCommitSelection: (hash: string) => void;
+  handleRestoreFromHistory: (hash: string) => void;
+  toggleCommitExpanded: (hash: string) => void;
+  getAuthorColor: (author: string) => string;
+}
+
+const HistoryList: React.FC<HistoryListProps> = ({
   loading,
   history,
   selectedCommit,

@@ -3,12 +3,47 @@ import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
 
-const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
-  const getProgressPercentage = (current, target) => {
+// Type definitions
+interface SavingsGoal {
+  id: string;
+  name: string;
+  currentAmount: number;
+  targetAmount: number;
+  targetDate?: string;
+  color: string;
+  priority: string;
+  description?: string;
+}
+
+interface Priority {
+  value: string;
+  label: string;
+  color: string;
+}
+
+interface TimeRemaining {
+  text: string;
+  status: "overdue" | "due" | "urgent" | "soon" | "normal";
+}
+
+interface SavingsGoalCardProps {
+  goal: SavingsGoal;
+  onEdit: (goal: SavingsGoal) => void;
+  onDelete: (goal: SavingsGoal) => void;
+  priorities: Priority[];
+}
+
+const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
+  goal,
+  onEdit,
+  onDelete,
+  priorities,
+}) => {
+  const getProgressPercentage = (current: number, target: number): number => {
     return target > 0 ? (current / target) * 100 : 0;
   };
 
-  const getTimeRemaining = (targetDate) => {
+  const getTimeRemaining = (targetDate?: string): TimeRemaining | null => {
     if (!targetDate) return null;
     const today = new Date();
     const target = new Date(targetDate);
@@ -31,7 +66,7 @@ const SavingsGoalCard = ({ goal, onEdit, onDelete, priorities }) => {
   const timeRemaining = getTimeRemaining(goal.targetDate);
   const priority = priorities.find((p) => p.value === goal.priority);
 
-  const getTimeRemainingColor = (status) => {
+  const getTimeRemainingColor = (status: TimeRemaining["status"]): string => {
     switch (status) {
       case "overdue":
         return "text-red-600 bg-red-50 border-red-200";

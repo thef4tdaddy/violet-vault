@@ -90,6 +90,12 @@ export const ActionButtons = ({ onCancel, onSubmit, canSubmit, isLoading }: Acti
   );
 };
 
+interface Bill {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 interface ModalContentProps {
   formData: {
     envelopeType: string;
@@ -101,7 +107,7 @@ interface ModalContentProps {
   calculatedAmounts: Record<string, number>;
   isLoading: boolean;
   canSubmit: boolean;
-  allBills: unknown[];
+  allBills: Bill[];
   onUpdateField: (field: string, value: unknown) => void;
   onBillSelection: (billId: string) => void;
   onCreateBill?: () => void;
@@ -130,7 +136,7 @@ export const ModalContent = ({
       {/* Envelope Type Selection */}
       <EnvelopeTypeSelector
         selectedType={formData.envelopeType}
-        onTypeChange={(type) => onUpdateField("envelopeType", type)}
+        onTypeChange={(type: string) => onUpdateField("envelopeType", type)}
         excludeTypes={[ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND]}
         disabled={isLoading}
       />
@@ -155,7 +161,7 @@ export const ModalContent = ({
       {/* Allocation Mode */}
       <AllocationModeSelector
         autoAllocate={formData.autoAllocate}
-        onAutoAllocateChange={(value) => onUpdateField("autoAllocate", value)}
+        onAutoAllocateChange={(value: boolean) => onUpdateField("autoAllocate", value)}
         disabled={isLoading}
       />
 

@@ -7,6 +7,17 @@ import {
   matchesDateFilter,
   compareTransactions,
 } from "../../utils/validation";
+import type { Transaction } from "@/types/finance";
+
+interface UseTransactionFiltersParams {
+  transactions: Transaction[];
+  searchTerm: string;
+  dateFilter: string;
+  typeFilter: string;
+  envelopeFilter: string;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+}
 
 export const useTransactionFilters = ({
   transactions,
@@ -16,7 +27,7 @@ export const useTransactionFilters = ({
   envelopeFilter,
   sortBy,
   sortOrder,
-}) => {
+}: UseTransactionFiltersParams) => {
   const filteredTransactions = useMemo(() => {
     // Guard against undefined transactions
     if (!transactions || !Array.isArray(transactions)) {

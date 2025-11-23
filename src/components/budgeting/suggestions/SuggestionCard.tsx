@@ -2,31 +2,63 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const PRIORITY_ICONS = {
+type SuggestionPriority = "high" | "medium" | "low";
+type SuggestionType =
+  | "new_envelope"
+  | "merchant_pattern"
+  | "increase_envelope"
+  | "decrease_envelope";
+type SuggestionAction = "create_envelope" | "increase_budget" | "decrease_budget";
+
+interface Suggestion {
+  id: string;
+  title: string;
+  description: string;
+  reasoning: string;
+  priority: SuggestionPriority;
+  type: SuggestionType;
+  action: SuggestionAction;
+  suggestedAmount: number;
+  impact: string;
+}
+
+const PRIORITY_ICONS: Record<SuggestionPriority, string> = {
   high: "AlertTriangle",
   medium: "Lightbulb",
   low: "Target",
 };
 
-const PRIORITY_COLORS = {
+const PRIORITY_COLORS: Record<SuggestionPriority, string> = {
   high: "text-red-500",
   medium: "text-amber-500",
   low: "text-blue-500",
 };
 
-const TYPE_ICONS = {
+const TYPE_ICONS: Record<SuggestionType, string> = {
   new_envelope: "Plus",
   merchant_pattern: "Plus",
   increase_envelope: "TrendingUp",
   decrease_envelope: "TrendingDown",
 };
 
-const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) => {
+interface SuggestionCardProps {
+  suggestion: Suggestion;
+  onApply: (suggestion: Suggestion) => void;
+  onDismiss: (id: string) => void;
+  isCompact?: boolean;
+}
+
+const SuggestionCard: React.FC<SuggestionCardProps> = ({
+  suggestion,
+  onApply,
+  onDismiss,
+  isCompact = false,
+}) => {
   const priorityIconName = PRIORITY_ICONS[suggestion.priority] || "Zap";
   const typeIconName = TYPE_ICONS[suggestion.type] || "Eye";
   const priorityColor = PRIORITY_COLORS[suggestion.priority] || "text-gray-500";
 
-  const getActionButtonText = (action) => {
+  const getActionButtonText = (action: SuggestionAction): string => {
     switch (action) {
       case "create_envelope":
         return "Create Envelope";
@@ -39,7 +71,7 @@ const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) =
     }
   };
 
-  const getActionButtonColor = (action) => {
+  const getActionButtonColor = (action: SuggestionAction): string => {
     switch (action) {
       case "create_envelope":
         return "bg-green-500 hover:bg-green-600";

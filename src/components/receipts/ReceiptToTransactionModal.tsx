@@ -10,7 +10,7 @@ import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 // ModalHeader - displays title and close button
-const ModalHeader = ({ step, onClose }) => (
+const ModalHeader: React.FC<{ step: number; onClose: () => void }> = ({ step, onClose }) => (
   <div className="flex items-center justify-between mb-8">
     <div className="flex items-center">
       <div className="glassmorphism rounded-full p-3 border-2 border-purple-300 mr-4">
@@ -31,7 +31,7 @@ const ModalHeader = ({ step, onClose }) => (
 );
 
 // ProgressBar - shows step progression
-const ProgressBar = ({ currentStep }) => (
+const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => (
   <div className="mb-8">
     <div className="flex items-center justify-between">
       {[1, 2, 3].map((stepNum) => (
@@ -61,7 +61,15 @@ const ProgressBar = ({ currentStep }) => (
 );
 
 // ModalFooter - navigation and submit buttons
-const ModalFooter = ({ step, isSubmitting, canProceed, onBack, onNext, onSubmit, onClose }) => (
+const ModalFooter: React.FC<{
+  step: number;
+  isSubmitting: boolean;
+  canProceed: boolean;
+  onBack: () => void;
+  onNext: () => void;
+  onSubmit: () => void;
+  onClose: () => void;
+}> = ({ step, isSubmitting, canProceed, onBack, onNext, onSubmit, onClose }) => (
   <div className="flex items-center justify-between pt-6 border-t-2 border-black">
     <Button
       onClick={step > 1 ? onBack : onClose}

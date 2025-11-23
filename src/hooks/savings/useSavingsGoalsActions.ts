@@ -4,19 +4,39 @@ import { globalToast } from "../../stores/ui/toastStore";
 import { useConfirm } from "../common/useConfirm";
 import logger from "../../utils/common/logger";
 
+interface SavingsGoal {
+  id: string;
+  name: string;
+}
+
+interface UseSavingsGoalsActionsProps {
+  onAddGoal: (goalData: Record<string, unknown>) => Promise<void> | void;
+  onUpdateGoal: (goalId: string, goalData: Record<string, unknown>) => Promise<void> | void;
+  onDeleteGoal: (goalId: string) => Promise<void> | void;
+  onDistributeToGoals: (distribution: unknown) => Promise<void> | void;
+}
+
 /**
  * Custom hook for managing savings goals UI actions and modal states
  */
-const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistributeToGoals }) => {
+const useSavingsGoalsActions = ({
+  onAddGoal,
+  onUpdateGoal,
+  onDeleteGoal,
+  onDistributeToGoals,
+}: UseSavingsGoalsActionsProps) => {
   // Modal state management
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDistributeModal, setShowDistributeModal] = useState(false);
-  const [editingGoal, setEditingGoal] = useState(null);
+  const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
 
   const confirm = useConfirm();
 
   // Goal submission handler (add/edit)
-  const handleGoalSubmit = async (goalData, goalId = null) => {
+  const handleGoalSubmit = async (
+    goalData: Record<string, unknown>,
+    goalId: string | null = null
+  ) => {
     try {
       if (goalId) {
         // Update existing goal
@@ -40,12 +60,12 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
   };
 
   // Edit goal handler
-  const handleEditGoal = (goal) => {
+  const handleEditGoal = (goal: SavingsGoal) => {
     setEditingGoal(goal);
   };
 
   // Delete goal handler with confirmation
-  const handleDeleteGoal = async (goal) => {
+  const handleDeleteGoal = async (goal: SavingsGoal) => {
     const isConfirmed = await confirm({
       title: "Delete Savings Goal",
       message: `Are you sure you want to delete "${goal.name}"? This action cannot be undone.`,
@@ -65,7 +85,7 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
   };
 
   // Distribute funds handler
-  const handleDistribute = async (distribution) => {
+  const handleDistribute = async (distribution: unknown) => {
     try {
       await onDistributeToGoals(distribution);
       globalToast.showSuccess("Funds distributed successfully!", "Success", 5000);

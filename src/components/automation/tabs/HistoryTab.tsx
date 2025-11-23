@@ -2,7 +2,31 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails }) => {
+interface Execution {
+  id: string;
+  executedAt: string;
+  success: boolean;
+  totalFunded?: number;
+  rulesExecuted?: number;
+  results?: Array<{
+    success: boolean;
+    ruleName?: string;
+    amount?: number;
+    error?: string;
+  }>;
+}
+
+interface HistoryTabProps {
+  executionHistory: Execution[];
+  showExecutionDetails: string | null;
+  onToggleDetails: (id: string | null) => void;
+}
+
+const HistoryTab: React.FC<HistoryTabProps> = ({
+  executionHistory,
+  showExecutionDetails,
+  onToggleDetails,
+}) => {
   return (
     <div className="space-y-4">
       {executionHistory.length === 0 ? (

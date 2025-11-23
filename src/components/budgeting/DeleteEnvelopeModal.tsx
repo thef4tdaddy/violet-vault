@@ -3,8 +3,19 @@ import { Button, Radio } from "@/components/ui";
 import { getIcon } from "../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { Envelope } from "@/types/finance";
+import type { Bill } from "@/types/bills";
 
-const DeleteEnvelopeModal = ({
+interface DeleteEnvelopeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (envelopeId: string | number, deleteBillsToo: boolean) => void;
+  envelope: Envelope | null;
+  connectedBills?: Bill[];
+  isDeleting?: boolean;
+}
+
+const DeleteEnvelopeModal: React.FC<DeleteEnvelopeModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
