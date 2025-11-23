@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "@/components/ui";
 import { useUserSetup } from "@/hooks/auth/useUserSetup";
 import type { UserSetupPayload } from "@/hooks/auth/useUserSetup";
@@ -112,7 +112,9 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
 
             {isReturningUser ? (
               <ReturningUserActions
-                onSubmit={handleStep1Continue}
+                onSubmit={() =>
+                  handleStep1Continue({ preventDefault: () => {} } as React.FormEvent)
+                }
                 onChangeProfile={switchToChangeProfile}
                 onStartFresh={clearSavedProfile}
                 isLoading={isLoading}

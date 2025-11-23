@@ -76,19 +76,43 @@ export const useDebtDashboard = () => {
     setEditingDebt(null);
     setShowAddModal(true);
   };
-
   const handleEditDebt = (debt: DebtAccount) => {
     setEditingDebt(debt);
     setShowAddModal(true);
   };
-
-  const handleDebtClick = (debt: DebtAccount) => {
-    setSelectedDebt(debt);
-  };
-
+  const handleDebtClick = (debt: DebtAccount) => setSelectedDebt(debt);
   const handleCloseModal = () => {
     setShowAddModal(false);
     setEditingDebt(null);
+  };
+
+  const processDebtUpdate = async (debtId: string, rawUpdates: Record<string, unknown>) => {
+    const {
+      connectionData,
+      paymentMethod,
+      createBill: _createBill,
+      existingBillId,
+      newEnvelopeName: _newEnvelopeName,
+      ...debtUpdates
+    } = rawUpdates;
+
+    await updateDebt(debtId, debtUpdates as Parameters<typeof updateDebt>[1]);
+
+    const connectionPayload =
+      connectionData && typeof connectionData === "object"
+        ? (connectionData as { existingBillId?: string | number; paymentMethod?: string })
+        : null;
+
+    const targetBillId = existingBillId ?? connectionPayload?.existingBillId;
+
+    if (
+      linkDebtToBill &&
+      targetBillId &&
+      (paymentMethod === "connect_existing_bill" ||
+        connectionPayload?.paymentMethod === "connect_existing_bill")
+    ) {
+      await linkDebtToBill(debtId, String(targetBillId));
+    }
   };
 
   const handleModalSubmit = async (
@@ -99,35 +123,10 @@ export const useDebtDashboard = () => {
       const isUpdatePayload = typeof debtIdOrData === "string" || typeof debtIdOrData === "number";
 
       if (isUpdatePayload) {
-        const debtId = String(debtIdOrData);
-        const rawUpdates = (maybeUpdates ?? {}) as Record<string, unknown>;
-
-        const {
-          connectionData,
-          paymentMethod,
-          createBill: _createBill,
-          existingBillId,
-          newEnvelopeName: _newEnvelopeName,
-          ...debtUpdates
-        } = rawUpdates;
-
-        await updateDebt(debtId, debtUpdates as Parameters<typeof updateDebt>[1]);
-
-        const connectionPayload =
-          connectionData && typeof connectionData === "object"
-            ? (connectionData as { existingBillId?: string | number; paymentMethod?: string })
-            : null;
-
-        const targetBillId = existingBillId ?? connectionPayload?.existingBillId;
-
-        if (
-          linkDebtToBill &&
-          targetBillId &&
-          (paymentMethod === "connect_existing_bill" ||
-            connectionPayload?.paymentMethod === "connect_existing_bill")
-        ) {
-          await linkDebtToBill(debtId, String(targetBillId));
-        }
+        await processDebtUpdate(
+          String(debtIdOrData),
+          (maybeUpdates ?? {}) as Record<string, unknown>
+        );
       } else {
         await createDebt(debtIdOrData as Parameters<typeof createDebt>[0]);
       }
@@ -147,17 +146,14 @@ export const useDebtDashboard = () => {
       throw error;
     }
   };
-
   const handleRecordPayment = async (
     debtId: string,
     paymentData: { amount: number; date?: string }
   ) => {
     try {
       await recordPayment(debtId, paymentData);
-      // Refresh selected debt if it's the one being paid
       if (selectedDebt && selectedDebt.id === debtId) {
-        const updatedDebt = debts.find((d) => d.id === debtId);
-        setSelectedDebt(updatedDebt ?? null);
+        setSelectedDebt(debts.find((d) => d.id === debtId) ?? null);
       }
     } catch (error) {
       logger.error("Failed to record payment:", error);

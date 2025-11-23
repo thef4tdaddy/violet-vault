@@ -12,12 +12,6 @@ interface Bill {
   [key: string]: unknown;
 }
 
-interface Envelope {
-  id: string | number;
-  name?: string;
-  [key: string]: unknown;
-}
-
 // Helper to get available bills for selection
 const getAvailableBills = (allBills: Bill[], envelopeId: string | null) => {
   return allBills.filter((bill) => !bill.envelopeId || bill.envelopeId === envelopeId);

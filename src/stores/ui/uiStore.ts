@@ -289,7 +289,7 @@ const storeInitializer = (
 
 const base = subscribeWithSelector(immer(storeInitializer));
 
-let useUiStore: typeof create<StoreState & ReturnType<typeof storeInitializer>>;
+let useUiStore;
 
 if (LOCAL_ONLY_MODE) {
   // No persistence when running in local-only mode

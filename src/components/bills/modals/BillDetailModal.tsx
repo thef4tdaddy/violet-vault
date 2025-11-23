@@ -1,4 +1,4 @@
-import React, { FormEvent } from "react";
+import React from "react";
 import { getIcon } from "../../../utils";
 import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/bills/useBillDetail";
