@@ -21,11 +21,12 @@ const LockScreen = () => {
   const [pendingConfirm, setPendingConfirm] = useState<{ cancel: () => void } | null>(null);
   const [passwordToValidate, setPasswordToValidate] = useState("");
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
-  const processedValidationRef = useRef<
+
+  type ValidationResult =
     | { isValid: boolean; reason?: string; isCorrupted?: boolean }
-    | { isValid: boolean; reason: string; error: unknown }
-    | null
-  >(null);
+    | { isValid: boolean; reason: string; error: unknown };
+
+  const processedValidationRef = useRef<ValidationResult | null>(null);
 
   // Password validation query
   const { data: validationResult, isLoading: isValidating } = usePasswordValidation(

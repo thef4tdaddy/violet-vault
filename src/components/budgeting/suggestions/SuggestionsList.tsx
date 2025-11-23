@@ -37,14 +37,14 @@ const SuggestionsList: React.FC<SuggestionsListProps> = ({
 
   // Group suggestions by priority for better organization
   const groupedSuggestions = suggestions.reduce(
-    (acc: Record<string, Suggestion[]>, suggestion: Suggestion) => {
+    (acc: Record<"high" | "medium" | "low", Suggestion[]>, suggestion: Suggestion) => {
       if (!acc[suggestion.priority]) {
         acc[suggestion.priority] = [];
       }
       acc[suggestion.priority].push(suggestion);
       return acc;
     },
-    {}
+    { high: [], medium: [], low: [] }
   );
 
   const priorityConfig: Record<

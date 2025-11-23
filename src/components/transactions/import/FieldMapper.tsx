@@ -1,9 +1,10 @@
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 
+type DataRow = Record<string, unknown>;
+
 interface ImportData {
-  data?: Record<string, unknown>[];
-  [key: number]: Record<string, unknown>;
+  data: DataRow[];
 }
 
 interface FieldMapping {
@@ -16,7 +17,7 @@ interface FieldMapping {
 }
 
 interface FieldMapperProps {
-  importData: ImportData | Record<string, unknown>[];
+  importData: ImportData | DataRow[];
   fieldMapping: FieldMapping;
   setFieldMapping: (mapping: FieldMapping) => void;
   onBack: () => void;
@@ -30,6 +31,8 @@ const FieldMapper: React.FC<FieldMapperProps> = ({
   onBack,
   onImport,
 }) => {
+  // Normalize the import data to always work with array format
+  const dataArray = Array.isArray(importData) ? importData : importData.data;
   const isValid = fieldMapping.date && fieldMapping.description && fieldMapping.amount;
 
   return (
@@ -62,7 +65,7 @@ const FieldMapper: React.FC<FieldMapperProps> = ({
                   className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg"
                 >
                   <option value="">Skip this field</option>
-                  {Object.keys((importData.data || importData)[0] || {}).map((header) => (
+                  {Object.keys(dataArray[0] || {}).map((header) => (
                     <option key={header} value={header}>
                       {header}
                     </option>
@@ -74,15 +77,13 @@ const FieldMapper: React.FC<FieldMapperProps> = ({
         </div>
 
         <div>
-          <h5 className="font-medium text-gray-900 mb-3">
-            Preview ({(importData.data || importData).length} rows)
-          </h5>
+          <h5 className="font-medium text-gray-900 mb-3">Preview ({dataArray.length} rows)</h5>
           <div className="glassmorphism border rounded-lg overflow-hidden border-white/20">
             <div className="max-h-64 overflow-y-auto">
               <table className="min-w-full text-sm">
                 <thead className="bg-white/50">
                   <tr>
-                    {Object.keys((importData.data || importData)[0] || {})
+                    {Object.keys(dataArray[0] || {})
                       .slice(0, 4)
                       .map((header) => (
                         <th key={header} className="px-3 py-2 text-left font-medium text-gray-900">
@@ -92,9 +93,7 @@ const FieldMapper: React.FC<FieldMapperProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {(importData.data || importData)
-                    .slice(0, 5)
-                    .map((row: Record<string, unknown>, index: number) => (
+                  {dataArray.slice(0, 5).map((row: DataRow, index: number) => (
                     <tr key={index}>
                       {Object.values(row)
                         .slice(0, 4)
