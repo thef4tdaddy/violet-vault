@@ -36,11 +36,14 @@ export class ScreenshotService {
       let screenshot = null;
 
       // Try modern native screenshot API first (requires user interaction)
-      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+      if (navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === "function") {
         try {
           screenshot = await this.captureWithDisplayMedia();
         } catch (error) {
-          logger.warn("Native screen capture failed, falling back", error);
+          logger.warn(
+            "Native screen capture failed, falling back",
+            error as Record<string, unknown>
+          );
         }
       }
 
@@ -49,7 +52,10 @@ export class ScreenshotService {
         try {
           screenshot = await this.captureWithHtml2Canvas();
         } catch (error) {
-          logger.warn("html2canvas capture failed, using final fallback", error);
+          logger.warn(
+            "html2canvas capture failed, using final fallback",
+            error as Record<string, unknown>
+          );
           screenshot = await this.captureFallbackMethod();
         }
       }
@@ -109,6 +115,10 @@ export class ScreenshotService {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Failed to get canvas context");
+    }
 
     ctx.drawImage(video, 0, 0);
     const screenshotDataUrl = canvas.toDataURL("image/png", 0.8);
@@ -194,6 +204,10 @@ export class ScreenshotService {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
 
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
+      }
+
       canvas.width = Math.min(window.innerWidth, 1200);
       canvas.height = Math.min(window.innerHeight, 800);
 
@@ -226,6 +240,52 @@ export class ScreenshotService {
       logger.error("All screenshot methods failed", error);
       return null;
     }
+  }
+
+  /**
+   * Helper method to calculate new dimensions maintaining aspect ratio
+   * @param {number} width - Original width
+   * @param {number} height - Original height
+   * @param {number} maxWidth - Maximum width
+   * @param {number} maxHeight - Maximum height
+   * @returns {Object} New dimensions
+   */
+  private static calculateNewDimensions(
+    width: number,
+    height: number,
+    maxWidth: number,
+    maxHeight: number
+  ): { width: number; height: number } {
+    if (width > maxWidth || height > maxHeight) {
+      const ratio = Math.min(maxWidth / width, maxHeight / height);
+      return {
+        width: Math.round(width * ratio),
+        height: Math.round(height * ratio),
+      };
+    }
+    return { width, height };
+  }
+
+  /**
+   * Helper method to create and configure canvas
+   * @param {number} width - Canvas width
+   * @param {number} height - Canvas height
+   * @returns {Object} Canvas and context
+   */
+  private static createCanvas(
+    width: number,
+    height: number
+  ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Failed to get canvas context");
+    }
+
+    return { canvas, ctx };
   }
 
   /**
@@ -266,18 +326,15 @@ export class ScreenshotService {
       });
 
       // Calculate new dimensions maintaining aspect ratio
-      let { width, height } = img;
-      if (width > maxWidth || height > maxHeight) {
-        const ratio = Math.min(maxWidth / width, maxHeight / height);
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-      }
+      const { width, height } = this.calculateNewDimensions(
+        img.width,
+        img.height,
+        maxWidth,
+        maxHeight
+      );
 
       // Create canvas and draw compressed image
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
+      const { canvas, ctx } = this.createCanvas(width, height);
 
       // Improve compression quality
       ctx.imageSmoothingEnabled = true;
