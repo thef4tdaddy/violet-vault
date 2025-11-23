@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +4 |
-| TypeScript Errors | 40 | +40 |
-| TypeScript Strict Mode Errors | 2137 | +2137 |
+| ESLint Issues | 4 | 0 |
+| TypeScript Errors | 40 | 0 |
+| TypeScript Strict Mode Errors | 2130 | -7 |
 
-*Last updated: 2025-11-23 13:13:19 UTC*
+*Last updated: 2025-11-23 13:34:58 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -292,7 +292,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 7 errors in `src/components/settings/archiving/ArchivingActionButtons.tsx`
 - 7 errors in `src/components/security/LockScreen.tsx`
-- 7 errors in `src/components/pwa/InstallPromptModal.tsx`
 - 7 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 7 errors in `src/components/modals/QuickFundForm.tsx`
 - 7 errors in `src/components/history/viewer/ChangeDetails.tsx`
@@ -609,16 +608,16 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 633 | `TS7006` |
+| 630 | `TS7006` |
 | 608 | `TS7031` |
 | 186 | `TS2345` |
 | 154 | `TS2322` |
 | 122 | `TS2339` |
 | 112 | `TS18046` |
-| 64 | `TS7005` |
 | 63 | `TS7053` |
+| 61 | `TS7005` |
 | 50 | `TS18048` |
-| 39 | `TS7034` |
+| 38 | `TS7034` |
 | 37 | `TS18047` |
 | 25 | `TS2769` |
 | 6 | `TS2411` |
@@ -1454,13 +1453,6 @@ src/components/pages/MainDashboard.tsx(159,9): error TS2322: Type '() => Envelop
 src/components/pages/MainDashboard.tsx(169,9): error TS2322: Type '() => EnvelopeOption[]' is not assignable to type '() => never[]'.
   Type 'EnvelopeOption[]' is not assignable to type 'never[]'.
     Type 'EnvelopeOption' is not assignable to type 'never'.
-src/components/pwa/InstallPromptModal.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/pwa/InstallPromptModal.tsx(13,29): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(13,41): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(14,32): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(14,44): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(15,22): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/InstallPromptModal.tsx(15,34): error TS7006: Parameter 'state' implicitly has an 'any' type.
 src/components/pwa/OfflineStatusIndicator.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/pwa/OfflineStatusIndicator.tsx(34,20): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/OfflineStatusIndicator.tsx(34,32): error TS7006: Parameter 'state' implicitly has an 'any' type.
