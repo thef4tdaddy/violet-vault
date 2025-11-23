@@ -91,9 +91,42 @@ import {
   type BeforeInstallPromptEvent,
 } from "./uiStoreActions.ts";
 
+interface StoreState {
+  biweeklyAllocation: number;
+  isUnassignedCashModalOpen: boolean;
+  paycheckHistory: Array<{
+    id: string;
+    amount: number;
+    date: string;
+    payerName?: string;
+    notes?: string;
+  }>;
+  isActualBalanceManual: boolean;
+  isOnline: boolean;
+  dataLoaded: boolean;
+  cloudSyncEnabled: boolean;
+  updateAvailable: boolean;
+  isUpdating: boolean;
+  showInstallPrompt: boolean;
+  installPromptEvent: BeforeInstallPromptEvent | null;
+  showPatchNotes: boolean;
+  patchNotesData: {
+    version: string;
+    notes: string[];
+    fromVersion?: string;
+    toVersion?: string;
+    isUpdate?: boolean;
+  } | null;
+  loadingPatchNotes: boolean;
+  [key: string]: unknown;
+}
+
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set, _get) => ({
+const storeInitializer = (
+  set: (fn: (state: StoreState) => void) => void,
+  _get: () => StoreState
+) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -128,8 +161,8 @@ const storeInitializer = (set, _get) => ({
   ...createPatchNotesActions(set),
 
   // Load and show patch notes for version update
-  async loadPatchNotesForUpdate(fromVersion, toVersion) {
-    set((state) => {
+  async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
+    set((state: StoreState) => {
       state.loadingPatchNotes = true;
     });
 
@@ -137,7 +170,7 @@ const storeInitializer = (set, _get) => ({
       const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
       const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
 
-      set((state) => {
+      set((state: StoreState) => {
         state.loadingPatchNotes = false;
         state.showPatchNotes = true;
         state.patchNotesData = patchNotes;
@@ -152,7 +185,7 @@ const storeInitializer = (set, _get) => ({
       return patchNotes;
     } catch (error) {
       logger.error("Failed to load patch notes", error);
-      set((state) => {
+      set((state: StoreState) => {
         state.loadingPatchNotes = false;
       });
       return null;
@@ -226,7 +259,7 @@ const storeInitializer = (set, _get) => ({
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
   resetAllData() {
     logger.info("Resetting UI state");
-    set((state) => {
+    set((state: StoreState) => {
       // Reset UI state
       state.biweeklyAllocation = 0;
       state.isActualBalanceManual = false;
@@ -255,7 +288,7 @@ const storeInitializer = (set, _get) => ({
 
 const base = subscribeWithSelector(immer(storeInitializer));
 
-let useUiStore;
+let useUiStore: typeof create<StoreState & ReturnType<typeof storeInitializer>>;
 
 if (LOCAL_ONLY_MODE) {
   // No persistence when running in local-only mode

@@ -14,9 +14,33 @@ import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
 import BillTable from "./BillTable";
 import BillManagerModals from "./BillManagerModals";
+import type { Bill } from "@/types/bills";
+
+interface Transaction {
+  id: string;
+  date: Date | string;
+  amount: number;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string | number;
+  name?: string;
+  [key: string]: unknown;
+}
+
+interface BillManagerProps {
+  transactions?: Transaction[];
+  envelopes?: Envelope[];
+  onUpdateBill?: (bill: Bill) => void | Promise<void>;
+  onCreateRecurringBill?: (bill: Bill) => void | Promise<void>;
+  onSearchNewBills?: () => void | Promise<void>;
+  onError?: (error: string) => void;
+  className?: string;
+}
 
 // Loading component
-const BillManagerLoading = ({ className }) => (
+const BillManagerLoading: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`animate-pulse ${className}`}>
     <div className="space-y-4">
       <div className="h-12 bg-gray-200 rounded"></div>
@@ -25,12 +49,12 @@ const BillManagerLoading = ({ className }) => (
   </div>
 );
 
-const BillManager = ({
+const BillManager: React.FC<BillManagerProps> = ({
   transactions: propTransactions = [],
   envelopes: propEnvelopes = [],
-  onUpdateBill: _onUpdateBill,
-  onCreateRecurringBill: _onCreateRecurringBill,
-  onSearchNewBills: _onSearchNewBills,
+  onUpdateBill,
+  onCreateRecurringBill,
+  onSearchNewBills,
   onError,
   className = "",
 }) => {
@@ -79,6 +103,10 @@ const BillManager = ({
   } = useBillManager({
     propTransactions,
     propEnvelopes,
+    onUpdateBill,
+    onCreateRecurringBill,
+    onSearchNewBills,
+    onError,
   });
 
   const payBillHandler = billOperations.handlePayBill;

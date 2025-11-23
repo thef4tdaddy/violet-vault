@@ -110,25 +110,29 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
         results.data.metadata.record = defaultMetadata;
       } catch (error) {
         logger.error("❌ Failed to create metadata:", error);
-        results.errors.push(`Failed to create metadata: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        results.errors.push(`Failed to create metadata: ${errorMessage}`);
       }
     }
 
     // Check all other tables (including paycheckHistory)
     const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"];
-    const counts = {};
+    const counts: Record<string, { count: number; sample: unknown } | { error: string }> = {};
 
     for (const table of tables) {
       try {
-        const count = await window.budgetDb[table].count();
-        const sample = await window.budgetDb[table].limit(1).toArray();
+        const count = await window.budgetDb[table as keyof typeof window.budgetDb].count();
+        const sample = await window.budgetDb[table as keyof typeof window.budgetDb]
+          .limit(1)
+          .toArray();
         counts[table] = {
           count,
           sample: sample[0] || null,
         };
         logger.info(`📊 ${table}: ${count} records`);
       } catch (err) {
-        counts[table] = { error: err.message };
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        counts[table] = { error: errorMessage };
         logger.error(`❌ Error checking ${table}:`, err);
       }
     }
@@ -145,7 +149,8 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
 
     logger.info("📋 Budget table records:", budgetRecords as unknown as Record<string, unknown>);
   } catch (error) {
-    results.errors.push(`Diagnostic failed: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    results.errors.push(`Diagnostic failed: ${errorMessage}`);
     logger.error("❌ Diagnostic error:", error);
   }
 
@@ -203,7 +208,8 @@ export const inspectPaycheckRecords = async (): Promise<InspectionResult> => {
     return { success: true, total: allPaychecks.length, records: allPaychecks };
   } catch (error) {
     logger.error("❌ Paycheck inspection failed:", error);
-    return { success: false, error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -330,7 +336,8 @@ export const cleanupCorruptedPaychecks = async (
     }
   } catch (error) {
     logger.error("❌ Paycheck cleanup failed:", error);
-    return { success: false, error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: errorMessage };
   }
 };
 
