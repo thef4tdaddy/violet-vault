@@ -186,11 +186,6 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 17 errors in `src/hooks/auth/authOperations.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
-- 15 errors in `src/hooks/transactions/useTransactionBalanceUpdater.ts`
-- 15 errors in `src/hooks/budgeting/usePaycheckProcessor.ts`
-- 15 errors in `src/hooks/bills/useSmartBillSuggestions.ts`
-- 15 errors in `src/components/transactions/TransactionFilters.tsx`
-- 15 errors in `src/components/sharing/ShareCodeModal.tsx`
 - 14 errors in `src/utils/sync/validation/encryptedDataValidator.ts`
 - 14 errors in `src/utils/pwa/patchNotesManager.ts`
 - 14 errors in `src/utils/layout/paycheckDeletionUtils.ts`
@@ -399,6 +394,7 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/components/budgeting/shared/EnvelopeTypeSelector.tsx`
 - 4 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
+- 4 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 4 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 4 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
 - 4 errors in `src/components/analytics/tabs/TrendsTab.tsx`
@@ -2049,23 +2045,6 @@ src/hooks/bills/useBillValidation.ts(48,6): error TS7006: Parameter 'type' impli
 src/hooks/bills/useBillValidation.ts(48,12): error TS7006: Parameter 'changes' implicitly has an 'any' type.
 src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
 src/hooks/bills/useBulkBillOperations.ts(31,39): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,41): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,48): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(8,59): error TS7006: Parameter 'searchQuery' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(20,32): error TS7006: Parameter 'query' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(22,11): error TS7034: Variable 'suggestions' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/hooks/bills/useSmartBillSuggestions.ts(25,24): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(37,20): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(39,50): error TS7006: Parameter 'env' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(59,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(67,18): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(81,24): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(86,10): error TS7006: Parameter 'word' implicitly has an 'any' type.
-src/hooks/bills/useSmartBillSuggestions.ts(89,40): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(101,31): error TS7005: Variable 'suggestions' implicitly has an 'any[]' type.
-src/hooks/bills/useSmartBillSuggestions.ts(109,20): error TS2345: Argument of type 'any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type 'any[]' is not assignable to type 'never[]'.
-    Type 'any' is not assignable to type 'never'.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(6,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(121,12): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
@@ -2203,28 +2182,6 @@ src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overloa
       Type 'undefined' is not assignable to type 'string | number'.
 src/hooks/budgeting/usePaycheckHistory.ts(10,38): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
 src/hooks/budgeting/usePaycheckHistory.ts(14,39): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,26): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,33): error TS7006: Parameter 'errors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(16,41): error TS7006: Parameter 'setErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(18,16): error TS7006: Parameter 'prevErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,37): error TS7006: Parameter 'formData' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,47): error TS7006: Parameter 'currentAllocations' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(35,67): error TS7006: Parameter 'setErrors' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(56,3): error TS7031: Binding element 'onAddPaycheck' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(86,29): error TS2345: Argument of type 'AllocationResult' is not assignable to parameter of type 'SetStateAction<{ allocations: never[]; totalAllocated: number; remainingAmount: number; allocationRate: number; }>'.
-  Type 'AllocationResult' is not assignable to type '{ allocations: never[]; totalAllocated: number; remainingAmount: number; allocationRate: number; }'.
-    Types of property 'allocations' are incompatible.
-      Type 'AllocationItem[]' is not assignable to type 'never[]'.
-        Type 'AllocationItem' is not assignable to type 'never'.
-src/hooks/budgeting/usePaycheckProcessor.ts(94,6): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(94,13): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(106,6): error TS7006: Parameter 'payerName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(115,6): error TS7006: Parameter 'payerName' implicitly has an 'any' type.
-src/hooks/budgeting/usePaycheckProcessor.ts(171,23): error TS2345: Argument of type '(prev: never[]) => string[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
-  Type '(prev: never[]) => string[]' is not assignable to type '(prevState: never[]) => never[]'.
-    Type 'string[]' is not assignable to type 'never[]'.
-      Type 'string' is not assignable to type 'never'.
-src/hooks/budgeting/usePaycheckProcessor.ts(186,9): error TS18046: 'error' is of type 'unknown'.
 src/hooks/budgeting/usePaydayPrediction.ts(11,30): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,47): error TS7006: Parameter 'isUnlocked' implicitly has an 'any' type.
 src/hooks/budgeting/useSmartSuggestions.ts(11,36): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
@@ -2548,21 +2505,6 @@ src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,10): error TS18046:
 src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,17): error TS18046: 'bVal' is of type 'unknown'.
 src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,28): error TS18046: 'aVal' is of type 'unknown'.
 src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,35): error TS18046: 'bVal' is of type 'unknown'.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(5,39): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(5,45): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(5,53): error TS7006: Parameter 'multiplier' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(16,33): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(16,39): error TS7006: Parameter 'amount' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(16,47): error TS7006: Parameter 'multiplier' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(22,3): error TS7006: Parameter 'currentActualBalance' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(23,3): error TS7006: Parameter 'currentUnassignedCash' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(24,3): error TS7006: Parameter 'actualBalanceChange' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(25,3): error TS7006: Parameter 'unassignedChange' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(35,3): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(36,3): error TS7006: Parameter 'balanceChange' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(37,3): error TS7006: Parameter 'currentActualBalance' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(38,3): error TS7006: Parameter 'actualBalanceChange' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionBalanceUpdater.ts(56,47): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionData.ts(120,54): error TS2345: Argument of type 'Logger' is not assignable to parameter of type 'Logger'.
   Types of property 'debug' are incompatible.
     Type '(message: string, data?: Record<string, unknown>) => void' is not assignable to type '(msg: string, data?: unknown) => void'.

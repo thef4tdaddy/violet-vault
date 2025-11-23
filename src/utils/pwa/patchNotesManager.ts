@@ -49,7 +49,7 @@ class PatchNotesManager {
       logger.debug("Fetched and cached changelog", { size: content.length });
       return content;
     } catch (error) {
-      logger.warn("Failed to fetch changelog:", error);
+      logger.warn("Failed to fetch changelog:", error as Record<string, unknown>);
 
       // Return fallback content if fetch fails
       return this.getFallbackChangelog();
@@ -59,7 +59,7 @@ class PatchNotesManager {
   /**
    * Extract patch notes for a specific version
    */
-  async getPatchNotesForVersion(version) {
+  async getPatchNotesForVersion(version: string): Promise<string> {
     try {
       const changelog = await this.fetchChangelog();
       return this.extractVersionNotes(changelog, version);
@@ -72,7 +72,7 @@ class PatchNotesManager {
   /**
    * Extract notes for a version from changelog content
    */
-  extractVersionNotes(changelog, version) {
+  extractVersionNotes(changelog: string, version: string): string {
     // Look for version header (e.g., "## [1.9.0]" or "# v1.9.0")
     const versionRegex = new RegExp(
       `(?:^|\\n)(?:##?\\s*(?:\\[?v?${version.replace(/\./g, "\\.")}\\]?|${version.replace(/\./g, "\\.")}))(?:\\s*-[^\\n]*)?(?:\\n|$)`,
@@ -106,8 +106,8 @@ class PatchNotesManager {
   /**
    * Parse version content into structured format
    */
-  parseVersionContent(content, version) {
-    const lines = content.split("\n").filter((line) => line.trim());
+  parseVersionContent(content: string, version: string): Record<string, unknown> {
+    const lines = content.split("\n").filter((line: string) => line.trim());
 
     let summary = "";
     const features = [];
@@ -191,34 +191,38 @@ class PatchNotesManager {
   /**
    * Get top highlights for the popup (first 3-5 most important items)
    */
-  getTopHighlights(patchNotes) {
-    const highlights = [];
+  getTopHighlights(patchNotes: Record<string, unknown>): Array<{ type: string; text: string }> {
+    const highlights: Array<{ type: string; text: string }> = [];
+    const breaking = (patchNotes.breaking as string[]) || [];
+    const features = (patchNotes.features as string[]) || [];
+    const fixes = (patchNotes.fixes as string[]) || [];
+    const other = (patchNotes.other as string[]) || [];
 
     // Prioritize breaking changes, then features, then fixes
-    if (patchNotes.breaking.length > 0) {
+    if (breaking.length > 0) {
       highlights.push(
-        ...patchNotes.breaking.slice(0, 2).map((item) => ({ type: "breaking", text: item }))
+        ...breaking.slice(0, 2).map((item: string) => ({ type: "breaking", text: item }))
       );
     }
 
-    if (highlights.length < 5 && patchNotes.features.length > 0) {
+    if (highlights.length < 5 && features.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.features.slice(0, remaining).map((item) => ({ type: "feature", text: item }))
+        ...features.slice(0, remaining).map((item: string) => ({ type: "feature", text: item }))
       );
     }
 
-    if (highlights.length < 5 && patchNotes.fixes.length > 0) {
+    if (highlights.length < 5 && fixes.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.fixes.slice(0, remaining).map((item) => ({ type: "fix", text: item }))
+        ...fixes.slice(0, remaining).map((item: string) => ({ type: "fix", text: item }))
       );
     }
 
-    if (highlights.length < 5 && patchNotes.other.length > 0) {
+    if (highlights.length < 5 && other.length > 0) {
       const remaining = 5 - highlights.length;
       highlights.push(
-        ...patchNotes.other.slice(0, remaining).map((item) => ({ type: "other", text: item }))
+        ...other.slice(0, remaining).map((item: string) => ({ type: "other", text: item }))
       );
     }
 
@@ -228,7 +232,7 @@ class PatchNotesManager {
   /**
    * Get fallback patch notes when fetch fails
    */
-  getFallbackPatchNotes(version) {
+  getFallbackPatchNotes(version: string): Record<string, unknown> {
     return {
       version,
       summary: `Version ${version} includes new features, improvements, and bug fixes.`,
@@ -284,7 +288,7 @@ class PatchNotesManager {
       hasCache: !!this.changelogCache,
       isValid,
       cacheAge: this.cacheTimestamp ? now - this.cacheTimestamp : 0,
-      timeUntilExpiry: isValid ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
+      timeUntilExpiry: isValid && this.cacheTimestamp !== null ? this.cacheTTL - (now - this.cacheTimestamp) : 0,
     };
   }
 }
