@@ -3,7 +3,37 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import SplitAllocationRow from "./SplitAllocationRow";
 
-const SplitAllocationsSection = ({
+interface SplitAllocation {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface Envelope {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+interface SplitAllocationsSectionProps {
+  splitAllocations: SplitAllocation[];
+  availableCategories: Category[];
+  envelopes: Envelope[];
+  onUpdateSplit: (id: string, updates: Record<string, unknown>) => void;
+  onRemoveSplit: (id: string) => void;
+  onAddSplit: () => void;
+  onSmartSplit: () => void;
+  onAutoBalance: () => void;
+  canAutoBalance: boolean;
+  errors?: string[];
+}
+
+const SplitAllocationsSection: React.FC<SplitAllocationsSectionProps> = ({
   splitAllocations,
   availableCategories,
   envelopes,

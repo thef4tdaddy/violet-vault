@@ -8,7 +8,10 @@ import logger from "../../utils/common/logger";
 import localStorageService from "../../services/storage/localStorageService";
 
 // Helper to apply create envelope suggestion
-const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
+const applyCreateEnvelope = async (
+  suggestion: { data: { name: string; [key: string]: unknown } },
+  onCreateEnvelope: ((data: unknown) => void | Promise<void>) | undefined
+) => {
   if (onCreateEnvelope) {
     await onCreateEnvelope(suggestion.data);
     globalToast.showSuccess(`Created "${suggestion.data.name}" envelope`, "Suggestion Applied");
@@ -16,7 +19,20 @@ const applyCreateEnvelope = async (suggestion, onCreateEnvelope) => {
 };
 
 // Helper to apply budget change suggestion
-const applyBudgetChange = async (suggestion, onUpdateEnvelope, actionType) => {
+const applyBudgetChange = async (
+  suggestion: {
+    data: {
+      envelopeId: string;
+      suggestedAmount: number;
+      currentAmount?: number;
+      [key: string]: unknown;
+    };
+  },
+  onUpdateEnvelope:
+    | ((envelopeId: string, updates: Record<string, unknown>) => void | Promise<void>)
+    | undefined,
+  actionType: "increase" | "decrease"
+) => {
   if (onUpdateEnvelope) {
     await onUpdateEnvelope(suggestion.data.envelopeId, {
       monthlyAmount: suggestion.data.suggestedAmount,
@@ -28,6 +44,16 @@ const applyBudgetChange = async (suggestion, onUpdateEnvelope, actionType) => {
     globalToast.showSuccess(message, "Budget Updated");
   }
 };
+
+interface UseSmartSuggestionsParams {
+  transactions?: unknown[];
+  envelopes?: unknown[];
+  onCreateEnvelope?: (data: unknown) => void | Promise<void>;
+  onUpdateEnvelope?: (envelopeId: string, updates: Record<string, unknown>) => void | Promise<void>;
+  onDismissSuggestion?: (suggestionId: string) => void;
+  dateRange?: string;
+  showDismissed?: boolean;
+}
 
 /**
  * Custom hook for managing smart envelope suggestions
@@ -41,7 +67,7 @@ const useSmartSuggestions = ({
   onDismissSuggestion,
   dateRange = "6months",
   showDismissed = false,
-}) => {
+}: UseSmartSuggestionsParams) => {
   // Settings and state
   const [analysisSettings, setAnalysisSettings] = useState(DEFAULT_ANALYSIS_SETTINGS);
   const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
@@ -75,9 +101,12 @@ const useSmartSuggestions = ({
   }, []);
 
   // Update analysis settings
-  const updateAnalysisSettings = useCallback((newSettings) => {
-    setAnalysisSettings((prev) => ({ ...prev, ...newSettings }));
-  }, []);
+  const updateAnalysisSettings = useCallback(
+    (newSettings: Partial<typeof DEFAULT_ANALYSIS_SETTINGS>) => {
+      setAnalysisSettings((prev) => ({ ...prev, ...newSettings }));
+    },
+    []
+  );
 
   // Reset analysis settings to defaults
   const resetAnalysisSettings = useCallback(() => {
@@ -86,7 +115,7 @@ const useSmartSuggestions = ({
 
   // Dismiss suggestion
   const handleDismissSuggestion = useCallback(
-    (suggestionId) => {
+    (suggestionId: string) => {
       setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
       onDismissSuggestion?.(suggestionId);
 
@@ -97,7 +126,12 @@ const useSmartSuggestions = ({
 
   // Apply suggestion action
   const handleApplySuggestion = useCallback(
-    async (suggestion) => {
+    async (suggestion: {
+      id: string;
+      action: string;
+      data: Record<string, unknown>;
+      [key: string]: unknown;
+    }) => {
       try {
         switch (suggestion.action) {
           case "create_envelope":
@@ -121,11 +155,8 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
-        globalToast.showError(
-          error.message || "Failed to apply suggestion",
-          "Application Error",
-          8000
-        );
+        const errorMessage = error instanceof Error ? error.message : "Failed to apply suggestion";
+        globalToast.showError(errorMessage, "Application Error", 8000);
       }
     },
     [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
@@ -153,24 +184,30 @@ const useSmartSuggestions = ({
   const suggestionStats = useMemo(() => {
     const totalSuggestions = suggestions.length;
     const priorityCounts = suggestions.reduce(
-      (acc, s) => {
+      (acc: Record<string, number>, s: { priority: string }) => {
         acc[s.priority] = (acc[s.priority] || 0) + 1;
         return acc;
       },
       { high: 0, medium: 0, low: 0 }
     );
 
-    const typeCounts = suggestions.reduce((acc, s) => {
+    const typeCounts = suggestions.reduce((acc: Record<string, number>, s: { type: string }) => {
       acc[s.type] = (acc[s.type] || 0) + 1;
       return acc;
     }, {});
 
-    const potentialSavings = suggestions.reduce((sum, s) => {
-      if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
-        return sum + (Number(s.data.currentAmount) - Number(s.data.suggestedAmount));
-      }
-      return sum;
-    }, 0);
+    const potentialSavings = suggestions.reduce(
+      (
+        sum: number,
+        s: { type: string; data: { currentAmount?: number; suggestedAmount?: number } }
+      ) => {
+        if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
+          return sum + (Number(s.data.currentAmount) - Number(s.data.suggestedAmount));
+        }
+        return sum;
+      },
+      0
+    );
 
     return {
       totalSuggestions,

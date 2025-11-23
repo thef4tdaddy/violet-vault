@@ -4,7 +4,25 @@ import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
 
-const ImportModal = ({
+interface ImportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  importStep: number;
+  setImportStep: (step: number) => void;
+  importData: unknown[];
+  setImportData: (data: unknown[]) => void;
+  fieldMapping: Record<string, string>;
+  setFieldMapping: (mapping: Record<string, string>) => void;
+  importProgress: {
+    current: number;
+    total: number;
+    percentage: number;
+  };
+  onImport: () => void | Promise<void>;
+  onFileUpload: (data: unknown[]) => void;
+}
+
+const ImportModal: React.FC<ImportModalProps> = ({
   isOpen,
   onClose,
   importStep,

@@ -2,8 +2,31 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { Button } from "../../ui";
 
+interface AnalysisSettings {
+  minAmount: number;
+  minTransactions: number;
+  overspendingThreshold: number;
+  bufferPercentage: number;
+  [key: string]: unknown;
+}
+
+interface SuggestionStats {
+  totalSuggestions: number;
+  priorityCounts: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  potentialSavings: number;
+  [key: string]: unknown;
+}
+
 // SettingField component - reusable input field with label and help text
-const SettingField = ({ label, helpText, children }) => (
+const SettingField: React.FC<{
+  label: string;
+  helpText: string;
+  children: React.ReactNode;
+}> = ({ label, helpText, children }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
     {children}
@@ -12,7 +35,7 @@ const SettingField = ({ label, helpText, children }) => (
 );
 
 // StatsDisplay component - shows suggestion statistics
-const StatsDisplay = ({ stats }) => (
+const StatsDisplay: React.FC<{ stats: SuggestionStats }> = ({ stats }) => (
   <div className="bg-white rounded-lg p-3 border border-gray-200">
     <h5 className="font-medium text-gray-900 mb-2 text-sm">Current Analysis</h5>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
@@ -44,14 +67,22 @@ const StatsDisplay = ({ stats }) => (
   </div>
 );
 
-const SuggestionSettings = ({
+interface SuggestionSettingsProps {
+  settings: AnalysisSettings;
+  onUpdateSettings: (updates: Partial<AnalysisSettings>) => void;
+  onResetSettings: () => void;
+  onRefresh: () => void;
+  suggestionStats: SuggestionStats | null;
+}
+
+const SuggestionSettings: React.FC<SuggestionSettingsProps> = ({
   settings,
   onUpdateSettings,
   onResetSettings,
   onRefresh,
   suggestionStats,
 }) => {
-  const handleSettingChange = (key, value) => {
+  const handleSettingChange = (key: string, value: number) => {
     onUpdateSettings({ [key]: value });
   };
 
