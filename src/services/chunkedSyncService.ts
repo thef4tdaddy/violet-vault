@@ -192,7 +192,7 @@ class ChunkedSyncService implements IChunkedSyncService {
       }
     } catch (error) {
       // Fallback to original method if compression analysis fails
-      logger.debug("Compression analysis failed, using JSON size", error);
+      logger.debug("Compression analysis failed, using JSON size", error as Record<string, unknown>);
     }
 
     // Fallback: original JSON size calculation
@@ -421,7 +421,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Save main document with resilience and timeout
         logger.info("🚀 [CHUNKED SYNC] About to save main document to Firebase");
-        await Promise.race([
+        await Promise.race<void>([
           this.resilience.execute(
             () => {
               logger.debug("🚀 [CHUNKED SYNC] Calling setDoc for main document");
@@ -430,7 +430,7 @@ class ChunkedSyncService implements IChunkedSyncService {
             "saveMainDocument",
             "saveMainDocument"
           ),
-          new Promise((_, reject) =>
+          new Promise<void>((_, reject) =>
             setTimeout(() => reject(new Error("Main document save timed out")), 30000)
           ),
         ]);
@@ -491,7 +491,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
           // Commit batch with resilience and timeout
           logger.debug(`🚀 [CHUNKED SYNC] About to commit batch ${batchNumber}`);
-          await Promise.race([
+          await Promise.race<void>([
             this.resilience.execute(
               () => {
                 logger.debug(`🚀 [CHUNKED SYNC] Calling batch.commit() for batch ${batchNumber}`);
@@ -500,7 +500,7 @@ class ChunkedSyncService implements IChunkedSyncService {
               "saveChunkBatch",
               `saveChunkBatch-${batchNumber}`
             ),
-            new Promise((_, reject) =>
+            new Promise<void>((_, reject) =>
               setTimeout(() => reject(new Error(`Batch ${batchNumber} commit timed out`)), 45000)
             ),
           ]);
@@ -544,7 +544,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           () => getDoc(doc(db, "budgets", this.budgetId)),
           "loadMainDocument",
           "loadMainDocument"
-        )) as DocumentSnapshot;
+        )) as DocumentSnapshot<Record<string, unknown>>;
         if (!mainDoc.exists()) {
           logger.info("No cloud data found");
           return null;
@@ -559,7 +559,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Check if we have chunks to reassemble
         if (mainData._manifest) {
-          let manifest;
+          let manifest: { version?: string; metadata?: { totalChunks?: number }; chunks?: unknown[] } = {};
           try {
             // Validate manifest data before decryption
             const manifestData = mainData._manifest as Record<string, unknown>;
@@ -638,8 +638,8 @@ class ChunkedSyncService implements IChunkedSyncService {
             return null; // Return null to trigger fresh upload from local data without clearing cloud
           }
           logger.debug("Loaded manifest", {
-            version: manifest.version,
-            totalChunks: manifest.metadata.totalChunks,
+            version: (manifest as { version?: string; metadata?: { totalChunks?: number } }).version,
+            totalChunks: (manifest as { version?: string; metadata?: { totalChunks?: number } }).metadata?.totalChunks,
           });
 
           // Load all chunks

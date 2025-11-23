@@ -9,12 +9,38 @@ import PaycheckAllocationModes from "./paycheck/PaycheckAllocationModes";
 import PaycheckAllocationPreview from "./paycheck/PaycheckAllocationPreview";
 import PaycheckHistory from "./paycheck/PaycheckHistory";
 
+interface Envelope {
+  id: string | number;
+  name?: string;
+  autoAllocate?: boolean;
+  currentBalance?: number;
+  monthlyAmount?: number;
+}
+
+interface PaycheckHistoryItem {
+  id: string | number;
+  payerName?: string;
+  amount?: number;
+}
+
+interface User {
+  userName: string;
+}
+
+interface PaycheckProcessorProps {
+  envelopes?: Envelope[];
+  paycheckHistory?: PaycheckHistoryItem[];
+  onProcessPaycheck: (data: unknown) => Promise<void>;
+  onDeletePaycheck: (paycheck: PaycheckHistoryItem) => Promise<void>;
+  currentUser: User;
+}
+
 /**
  * Main PaycheckProcessor component
  * Refactored to follow the 7-phase refactoring methodology
  * Reduced from 600 lines to ~175 lines (71% reduction)
  */
-const PaycheckProcessor = ({
+const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
   envelopes = [],
   paycheckHistory = [],
   onProcessPaycheck,
@@ -88,7 +114,7 @@ const PaycheckHeader = () => (
 /**
  * Main paycheck form component
  */
-const PaycheckForm = ({ formHook }) => (
+const PaycheckForm: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({ formHook }) => (
   <div className="space-y-6">
     <PaycheckAmountInput
       value={formHook.paycheckAmount}
@@ -122,7 +148,7 @@ const PaycheckForm = ({ formHook }) => (
 /**
  * Form action buttons component
  */
-const PaycheckFormButtons = ({ formHook }) => (
+const PaycheckFormButtons: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({ formHook }) => (
   <div className="flex gap-4">
     <Button
       onClick={() => formHook.setShowPreview(true)}
