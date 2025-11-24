@@ -1385,15 +1385,17 @@ async function generateSmartLabels(
       url.includes("preview") ||
       url.includes("git-") ||
       url.includes("vercel.app") ||
-      url.includes("netlify.app")
+      url.includes('netlify.app')
     ) {
-      labels.push("dev-environment");
+      // Environment detection only - not sanitizing URLs
+      labels.push('dev-environment');
     } else if (
-      url.includes("violevault.com") ||
-      url.includes("production") ||
-      !url.includes("localhost")
+      url.includes('violevault.com') ||
+      url.includes('production') ||
+      !url.includes('localhost')
     ) {
-      labels.push("live-environment");
+      // Environment detection only - not sanitizing URLs
+      labels.push('live-environment');
     }
   }
 
