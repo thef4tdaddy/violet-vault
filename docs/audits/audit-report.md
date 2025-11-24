@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 4 | +1 |
-| TypeScript Errors | 73 | 0 |
-| TypeScript Strict Mode Errors | 825 | 0 |
+| ESLint Issues | 3 | -1 |
+| TypeScript Errors | 75 | +2 |
+| TypeScript Strict Mode Errors | 827 | +2 |
 
-*Last updated: 2025-11-24 22:49:00 UTC*
+*Last updated: 2025-11-24 22:50:37 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,7 +27,6 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 1 issues in `violet-vault/src/hooks/receipts/useReceiptToTransaction.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
@@ -36,14 +35,12 @@
 | Count | Rule ID |
 |---|---|
 | 3 | `max-lines-per-function` |
-| 1 | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/receipts/useReceiptToTransaction.ts:54:95 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
@@ -61,6 +58,7 @@ violet-vault/src/hooks/receipts/useReceiptToTransaction.ts:54:95 - 1 - Unexpecte
 - 2 errors in `src/services/chunkedSyncService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 2 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
+- 2 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 2 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 2 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
 - 2 errors in `src/hooks/auth/useAuthManager.ts`
@@ -96,7 +94,7 @@ violet-vault/src/hooks/receipts/useReceiptToTransaction.ts:54:95 - 1 - Unexpecte
 | Count | Error Code |
 |---|---|
 | 30 | `TS2322` |
-| 21 | `TS2345` |
+| 22 | `TS2345` |
 | 5 | `TS2339` |
 | 3 | `TS2769` |
 | 3 | `TS2459` |
@@ -109,6 +107,7 @@ violet-vault/src/hooks/receipts/useReceiptToTransaction.ts:54:95 - 1 - Unexpecte
 | 1 | `TS2554` |
 | 1 | `TS2365` |
 | 1 | `TS2353` |
+| 1 | `TS2352` |
 | 1 | `TS18047` |
 
 ### Detailed Type Error Report
@@ -257,6 +256,11 @@ src/hooks/layout/usePaycheckOperations.ts(53,11): error TS2345: Argument of type
 src/hooks/notifications/useFirebaseMessaging.ts(32,25): error TS2345: Argument of type 'PermissionStatusForUI' is not assignable to parameter of type 'SetStateAction<string>'.
 src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
 src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(56,9): error TS2345: Argument of type '{ [key: string]: unknown; id: string | number; name: string; category?: string; }[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{ [key: string]: unknown; id: string | number; name: string; category?: string; }' is missing the following properties from type 'Envelope': currentBalance, targetAmount
+src/hooks/receipts/useReceiptToTransaction.ts(56,9): error TS2352: Conversion of type 'Envelope[]' to type '{ [key: string]: unknown; id: string | number; name: string; category?: string; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is not comparable to type '{ [key: string]: unknown; id: string | number; name: string; category?: string; }'.
+    Index signature for type 'string' is missing in type 'Envelope'.
 src/hooks/settings/useSettingsSectionRenderer.ts(105,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Type 'User' is not assignable to type 'CurrentUser'.
@@ -457,6 +461,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
 - 2 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
 - 2 errors in `src/hooks/security/useSecuritySettingsLogic.ts`
+- 2 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 2 errors in `src/hooks/mobile/useBottomNavigation.ts`
 - 2 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 2 errors in `src/hooks/common/useTransactionArchiving.ts`
@@ -623,7 +628,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 151 | `TS2345` |
+| 152 | `TS2345` |
 | 148 | `TS7031` |
 | 145 | `TS2322` |
 | 117 | `TS7006` |
@@ -636,8 +641,8 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 24 | `TS2339` |
 | 10 | `TS18047` |
 | 4 | `TS2783` |
+| 4 | `TS2352` |
 | 3 | `TS2459` |
-| 3 | `TS2352` |
 | 2 | `TS7022` |
 | 2 | `TS2741` |
 | 2 | `TS2740` |
@@ -1673,6 +1678,11 @@ src/hooks/notifications/useFirebaseMessaging.ts(97,7): error TS2322: Type 'Token
       Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
 src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(56,9): error TS2345: Argument of type '{ [key: string]: unknown; id: string | number; name: string; category?: string | undefined; }[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{ [key: string]: unknown; id: string | number; name: string; category?: string | undefined; }' is missing the following properties from type 'Envelope': currentBalance, targetAmount
+src/hooks/receipts/useReceiptToTransaction.ts(56,9): error TS2352: Conversion of type 'Envelope[]' to type '{ [key: string]: unknown; id: string | number; name: string; category?: string | undefined; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is not comparable to type '{ [key: string]: unknown; id: string | number; name: string; category?: string | undefined; }'.
+    Index signature for type 'string' is missing in type 'Envelope'.
 src/hooks/savings/useSavingsGoals/index.ts(85,9): error TS2322: Type 'UseMutationResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>' is not assignable to type 'MutationHandler'.
   Type 'Override<MutationObserverIdleResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>, { mutate: UseMutateFunction<...>; }> & { ...; }' is not assignable to type 'MutationHandler'.
     Types of property 'mutateAsync' are incompatible.

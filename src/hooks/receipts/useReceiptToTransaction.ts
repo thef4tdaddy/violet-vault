@@ -51,7 +51,15 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
   // Auto-suggest envelope based on merchant
   useEffect(() => {
     if (receiptData?.merchant && envelopes.length > 0) {
-      const suggestedEnvelope = suggestEnvelopeForMerchant(receiptData.merchant, envelopes as any);
+      const suggestedEnvelope = suggestEnvelopeForMerchant(
+        receiptData.merchant,
+        envelopes as Array<{
+          id: string | number;
+          name: string;
+          category?: string;
+          [key: string]: unknown;
+        }>
+      );
       if (suggestedEnvelope) {
         setTransactionForm((prev) => ({
           ...prev,
