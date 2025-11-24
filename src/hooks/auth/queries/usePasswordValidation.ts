@@ -10,7 +10,7 @@ import localStorageService from "../../../services/storage/localStorageService";
 
 // Query Keys
 export const passwordValidationQueryKeys = {
-  validation: (password) => ["auth", "validation", password],
+  validation: (password: string) => ["auth", "validation", password],
 };
 
 /**
@@ -71,7 +71,7 @@ const testPasswordDecryption = async (
 /**
  * Hook for password validation query
  */
-export const usePasswordValidation = (password, _options = {}) => {
+export const usePasswordValidation = (password: string, _options = {}) => {
   return useQuery({
     queryKey: passwordValidationQueryKeys.validation(password),
     queryFn: async () => {
@@ -105,10 +105,11 @@ export const usePasswordValidation = (password, _options = {}) => {
         );
       } catch (error) {
         logger.error("TanStack: Password validation error", error);
+        const err = error as Error;
         return {
           isValid: false,
           reason: "unexpected_error",
-          error: error.message,
+          error: err.message,
         };
       }
     },
