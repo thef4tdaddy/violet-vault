@@ -1,8 +1,15 @@
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { renderIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import type { Transaction } from "@/types/finance";
 
-const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
+interface SplitterHeaderProps {
+  transaction: Transaction;
+  onClose?: () => void;
+  hasUnsavedChanges: boolean;
+}
+
+const SplitterHeader: React.FC<SplitterHeaderProps> = ({ transaction, onClose, hasUnsavedChanges }) => {
   const confirm = useConfirm();
 
   const handleClose = async () => {
