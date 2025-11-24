@@ -1,11 +1,37 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+interface StrategyDebt {
+  id: string;
+  name: string;
+  currentBalance: number;
+  minimumPayment: number;
+  interestRate?: number;
+  priority: number;
+  monthsToPayoff: number;
+  totalInterestCost: number;
+  strategy: string;
+  [key: string]: unknown;
+}
+
+interface Strategy {
+  debts: StrategyDebt[];
+  totalInterest: number;
+  payoffTime: number;
+  name: string;
+  description: string;
+}
+
+interface StrategyCardProps {
+  strategy: Strategy;
+  isRecommended?: boolean;
+}
+
 /**
  * Card component for displaying debt payoff strategy details
  * Pure UI component - receives strategy data as props
  */
-const StrategyCard = ({ strategy, isRecommended = false }) => {
+const StrategyCard: React.FC<StrategyCardProps> = ({ strategy, isRecommended = false }) => {
   if (!strategy || !strategy.debts.length) {
     return (
       <div className="bg-white rounded-xl p-6 border border-gray-200">

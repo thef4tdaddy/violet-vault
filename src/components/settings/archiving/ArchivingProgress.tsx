@@ -1,7 +1,20 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
+interface ArchivingProgressData {
+  stage: string;
+  progress: number;
+}
+
+interface ArchivingProgressProps {
+  isArchiving: boolean;
+  archivingProgress: ArchivingProgressData | null;
+}
+
+const ArchivingProgress: React.FC<ArchivingProgressProps> = ({
+  isArchiving,
+  archivingProgress,
+}) => {
   if (!isArchiving || !archivingProgress) return null;
 
   return (

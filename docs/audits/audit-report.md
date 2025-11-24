@@ -4,14 +4,13 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 6 | +2 |
-| TypeScript Errors | 41 | +1 |
-| TypeScript Strict Mode Errors | 2106 | -12 |
+| ESLint Issues | 30 | +30 |
+| TypeScript Errors | 333 | +333 |
+| TypeScript Strict Mode Errors | 1229 | +1229 |
 
-*Last updated: 2025-11-23 13:56:37 UTC*
+*Last updated: 2025-11-24 02:50:16 UTC*
 
 ## Table of Contents
-
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -28,55 +27,205 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 5 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts`
 - 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts`
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts`
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/QuickPaymentForm.tsx`
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/components/bills/BillManager.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/savings/savingsCalculations.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDashboard.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/ImportModal.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/FieldMapper.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/sync/health/SyncHealthDetails.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/sharing/ShareCodeModal.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/receipts/ReceiptScanner.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/DebtSummaryCards.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/bills/modals/BillDetailModal.tsx`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/bills/BulkBillUpdateModal.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 3 | `no-undef` |
-| 3 | `max-lines-per-function` |
+| 19 | `no-undef` |
+| 5 | `max-lines-per-function` |
+| 2 | `complexity` |
+| 2 | `@typescript-eslint/no-unused-vars` |
+| 1 | `null` |
+| 1 | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/components/bills/BillManager.tsx:43:27 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/bills/BillManager.tsx:52:20 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/bills/BulkBillUpdateModal.tsx:23:28 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/bills/modals/BillDetailModal.tsx:1:17 - 1 - 'FormEvent' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+/home/runner/work/violet-vault/violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx:15:11 - 1 - 'Envelope' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/DebtSummaryCards.tsx:14:25 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/QuickPaymentForm.tsx:7:17 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/QuickPaymentForm.tsx:17:25 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/receipts/ReceiptScanner.tsx:26:23 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx:27:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/components/sharing/ShareCodeModal.tsx:29:23 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/sync/health/SyncHealthDetails.tsx:47:26 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/FieldMapper.tsx:27:20 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/ImportModal.tsx:25:20 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/accounts/useSupplementalAccounts.ts:41:33 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionUtils.ts:30:34 - 1 - Arrow function has too many lines (159). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts:102:5 - 1 - Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any'). (null)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useEnvelopeForm.ts:105:28 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckForm.ts:16:18 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:47:14 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:47:29 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:70:14 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:70:29 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/usePaycheckProcessor.ts:86:30 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDashboard.ts:7:33 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/debts/useDebtDetailModal.ts:122:35 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:10:26 - 1 - 'NodeJS' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/mobile/useFABBehavior.ts:46:17 - 1 - 'React' is not defined. (no-undef)
+/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore.ts:13:79 - 1 - Arrow function has a complexity of 23. Maximum allowed is 15. (complexity)
+/home/runner/work/violet-vault/violet-vault/src/utils/savings/savingsCalculations.ts:238:93 - 1 - Arrow function has a complexity of 16. Maximum allowed is 15. (complexity)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+- 12 errors in `src/stores/ui/uiStore.ts`
+- 12 errors in `src/main.tsx`
+- 12 errors in `src/components/pwa/UpdateAvailableModal.tsx`
+- 10 errors in `src/components/budgeting/EnvelopeGrid.tsx`
+- 8 errors in `src/components/layout/ViewRenderer.tsx`
+- 8 errors in `src/components/bills/modals/BillDetailModal.tsx`
+- 8 errors in `src/components/bills/BillManagerModals.tsx`
+- 7 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 6 errors in `src/hooks/debts/useDebtManagement.ts`
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
+- 6 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
+- 6 errors in `src/components/modals/QuickFundModal.tsx`
+- 5 errors in `src/utils/layout/paycheckDeletionUtils.ts`
+- 5 errors in `src/hooks/transactions/useTransactionLedger.ts`
+- 5 errors in `src/hooks/transactions/useTransactionFilters.ts`
+- 5 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 5 errors in `src/hooks/debts/useDebts.ts`
+- 5 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 5 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
+- 5 errors in `src/components/transactions/TransactionLedger.tsx`
+- 5 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
+- 5 errors in `src/components/savings/SavingsGoals.tsx`
+- 5 errors in `src/components/pwa/PatchNotesModal.tsx`
+- 5 errors in `src/components/debt/DebtDashboard.tsx`
+- 5 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
+- 5 errors in `src/App.tsx`
+- 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
+- 4 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
+- 4 errors in `src/hooks/common/useNetworkStatus.ts`
+- 4 errors in `src/hooks/common/useActualBalance.ts`
+- 4 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
+- 4 errors in `src/hooks/bills/useBillManager.ts`
+- 4 errors in `src/components/transactions/TransactionSplitter.tsx`
+- 4 errors in `src/components/debt/modals/DebtDetailModal.tsx`
+- 4 errors in `src/components/debt/DebtStrategies.tsx`
+- 4 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
+- 4 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
+- 3 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
+- 3 errors in `src/utils/pwa/patchNotesManager.ts`
+- 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
+- 3 errors in `src/hooks/transactions/useTransactionQuery.ts`
+- 3 errors in `src/hooks/settings/useSettingsDashboard.ts`
+- 3 errors in `src/hooks/layout/usePaycheckOperations.ts`
+- 3 errors in `src/hooks/common/useImportData.ts`
+- 3 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 3 errors in `src/hooks/analytics/useReportExporter.ts`
+- 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
+- 3 errors in `src/components/transactions/import/ImportModal.tsx`
+- 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
+- 3 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
+- 3 errors in `src/components/budgeting/PaycheckProcessor.tsx`
+- 3 errors in `src/components/automation/AutoFundingDashboard.tsx`
+- 2 errors in `src/utils/sync/validation/checksumUtils.ts`
+- 2 errors in `src/utils/debug/dataDiagnostic.ts`
+- 2 errors in `src/services/chunkedSyncService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
-- 2 errors in `src/hooks/bills/useBillManager.ts`
-- 2 errors in `src/components/layout/MainLayout.tsx`
-- 1 errors in `src/components/settings/SettingsDashboard.tsx`
+- 2 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
+- 2 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
+- 2 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
+- 2 errors in `src/components/transactions/components/TransactionRow.tsx`
+- 2 errors in `src/components/sync/health/SyncHealthDetails.tsx`
+- 2 errors in `src/components/settings/sections/GeneralSettingsSection.tsx`
+- 2 errors in `src/components/settings/SettingsDashboard.tsx`
+- 2 errors in `src/components/receipts/steps/ConfirmationStep.tsx`
+- 2 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
+- 2 errors in `src/components/modals/UnassignedCashModal.tsx`
+- 2 errors in `src/components/bills/SmartBillMatcher.tsx`
+- 2 errors in `src/components/bills/BulkUpdateEditor.tsx`
+- 2 errors in `src/components/bills/BulkUpdateBillRow.tsx`
+- 2 errors in `src/components/bills/BillManager.tsx`
+- 2 errors in `src/components/automation/tabs/HistoryTab.tsx`
+- 1 errors in `src/services/editLockService.ts`
+- 1 errors in `src/services/authService.ts`
+- 1 errors in `src/hooks/mobile/useFABBehavior.ts`
+- 1 errors in `src/hooks/debts/useDebtDashboard.ts`
+- 1 errors in `src/hooks/common/useTransactions.ts`
+- 1 errors in `src/hooks/common/useDataInitialization.ts`
+- 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
+- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
+- 1 errors in `src/hooks/auth/useAuthenticationManager.ts`
+- 1 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
+- 1 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
+- 1 errors in `src/db/budgetDb.ts`
+- 1 errors in `src/components/transactions/TransactionTable.tsx`
+- 1 errors in `src/components/settings/sections/NotificationSettingsSection.tsx`
+- 1 errors in `src/components/settings/SecuritySettings.tsx`
+- 1 errors in `src/components/security/LockScreen.tsx`
+- 1 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
+- 1 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
+- 1 errors in `src/components/layout/SummaryCards.tsx`
+- 1 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
+- 1 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 1 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
+- 1 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
+- 1 errors in `src/components/bills/BulkBillUpdateModal.tsx`
+- 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
+- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/analytics/ReportExporter.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 18 | `TS2322` |
-| 15 | `TS2345` |
-| 4 | `TS2339` |
-| 1 | `TS2741` |
-| 1 | `TS2719` |
-| 1 | `TS2352` |
+| 103 | `TS2345` |
+| 102 | `TS2322` |
+| 80 | `TS2339` |
+| 9 | `TS2739` |
+| 9 | `TS2719` |
+| 7 | `TS2352` |
+| 4 | `TS2740` |
+| 4 | `TS2717` |
+| 4 | `TS2687` |
+| 3 | `TS2741` |
+| 2 | `TS2554` |
+| 1 | `TS6196` |
+| 1 | `TS6133` |
+| 1 | `TS2769` |
+| 1 | `TS2559` |
+| 1 | `TS2538` |
+| 1 | `TS2349` |
 
 ### Detailed Type Error Report
 ```
+src/App.tsx(29,20): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(30,28): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(31,42): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(33,27): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(36,27): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
 src/components/accounts/SupplementalAccounts.tsx(90,5): error TS2322: Type 'unknown' is not assignable to type '(account: Account) => void'.
   Type '{}' provides no match for the signature '(account: Account): void'.
 src/components/accounts/SupplementalAccounts.tsx(91,5): error TS2322: Type 'unknown' is not assignable to type '(account: Account) => void'.
@@ -101,12 +250,396 @@ src/components/accounts/SupplementalAccounts.tsx(154,9): error TS2741: Property 
 src/components/analytics/ReportExporter.tsx(107,15): error TS2322: Type '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' is not assignable to type 'Record<string, boolean>'.
   Property 'customDateRange' is incompatible with index signature.
     Type '{ start: string; end: string; }' is not assignable to type 'boolean'.
+src/components/auth/UserSetup.tsx(115,17): error TS2322: Type '(e: FormEvent) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/components/automation/AutoFundingDashboard.tsx(14,53): error TS2339: Property 'envelopes' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/automation/AutoFundingDashboard.tsx(149,15): error TS2322: Type 'FC<HistoryTabProps>' is not assignable to type 'ComponentType<HistoryTabProps>'.
+  Type 'React.FunctionComponent<HistoryTabProps>' is not assignable to type 'React.FunctionComponent<HistoryTabProps>'. Two different types with this name exist, but they are unrelated.
+    Type 'HistoryTabProps' is not assignable to type 'HistoryTabProps'. Two different types with this name exist, but they are unrelated.
+      Types of property 'executionHistory' are incompatible.
+        Type 'Execution[]' is not assignable to type 'ExecutionHistoryEntry[]'.
+          Type 'Execution' is missing the following properties from type 'ExecutionHistoryEntry': timestamp, trigger
+src/components/automation/AutoFundingDashboard.tsx(162,9): error TS2322: Type 'undefined[] | UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'unknown[]'.
+  Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'unknown[]'.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(35,68): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/automation/tabs/HistoryTab.tsx(134,30): error TS2339: Property 'error' does not exist on type 'Execution'.
+src/components/automation/tabs/HistoryTab.tsx(136,58): error TS2339: Property 'error' does not exist on type 'Execution'.
+src/components/bills/BillManager.tsx(105,5): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/bills/BillManager.tsx(182,9): error TS2322: Type '{ id: string; label: string; count: number; icon: string; color: string; }[]' is not assignable to type 'Tab[]'.
+  Type '{ id: string; label: string; count: number; icon: string; color: string; }' is not assignable to type 'Tab'.
+    Types of property 'icon' are incompatible.
+      Type 'string' is not assignable to type 'ComponentType<{ className?: string; }>'.
+src/components/bills/BillManagerModals.tsx(149,11): error TS2739: Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
+src/components/bills/BillManagerModals.tsx(152,11): error TS2322: Type '(billId: string, deleteEnvelope?: boolean) => Promise<void>' is not assignable to type '(bill: Bill) => void | Promise<void>'.
+  Types of parameters 'billId' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'string'.
+src/components/bills/BillManagerModals.tsx(154,13): error TS2322: Type 'Promise<unknown>' is not assignable to type 'void | Promise<void>'.
+  Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
+    Type 'unknown' is not assignable to type 'void'.
+src/components/bills/BillManagerModals.tsx(154,42): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'string'.
+src/components/bills/BillManagerModals.tsx(155,35): error TS2339: Property 'amount' does not exist on type 'number'.
+src/components/bills/BillManagerModals.tsx(156,37): error TS2339: Property 'paidDate' does not exist on type 'number'.
+src/components/bills/BillManagerModals.tsx(159,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'BillEntity'.
+      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type 'Bill'.
+src/components/bills/BillManagerModals.tsx(163,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'BillEntity'.
+      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type 'Bill'.
+src/components/bills/BulkBillUpdateModal.tsx(40,25): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type '{ id: string; name: string; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; dueDate?: string | Date; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }[]'.
+  Type 'Bill' is missing the following properties from type '{ id: string; name: string; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; dueDate?: string | Date; frequency?: "monthly" | "quarterly" | "annually"; envelopeId?: string; createdAt?: number; description?: string; paymentMethod?: string; }': isRecurring, lastModified
+src/components/bills/BulkUpdateBillRow.tsx(59,19): error TS2739: Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
+src/components/bills/BulkUpdateBillRow.tsx(65,15): error TS2719: Type 'AmountChange' is not assignable to type 'AmountChange'. Two different types with this name exist, but they are unrelated.
+  Types of property 'original' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/bills/BulkUpdateBillRowComponents.tsx(90,70): error TS2339: Property 'description' does not exist on type 'Bill'.
+src/components/bills/BulkUpdateEditor.tsx(94,15): error TS2322: Type 'Bill' is not assignable to type 'BillEntity'.
+  Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'Bill'.
+src/components/bills/BulkUpdateEditor.tsx(96,15): error TS2322: Type 'string' is not assignable to type 'UpdateMode'.
+src/components/bills/SmartBillMatcher.tsx(32,23): error TS2352: Conversion of type 'Suggestion[]' to type 'Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Suggestion' is not comparable to type 'Suggestion'.
+    Types of property 'envelope' are incompatible.
+      Type 'Envelope' is not comparable to type 'Envelope'.
+        Index signature for type 'string' is missing in type 'Envelope'.
+src/components/bills/SmartBillMatcher.tsx(32,47): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Bill[]'.
+  Type '{}' is missing the following properties from type 'Bill': id, name
+src/components/bills/modals/BillDetailModal.tsx(1,17): error TS6133: 'FormEvent' is declared but its value is never read.
+src/components/bills/modals/BillDetailModal.tsx(48,23): error TS2739: Type 'Bill' is missing the following properties from type 'Bill': isRecurring, lastModified
+src/components/bills/modals/BillDetailModal.tsx(48,29): error TS2322: Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(billId: string) => void'.
+  Types of parameters 'bill' and 'billId' are incompatible.
+    Type 'string' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,39): error TS2322: Type '(bill: Bill, amount: number) => void | Promise<void>' is not assignable to type '(billId: string, paymentData: PaymentData) => void'.
+  Types of parameters 'bill' and 'billId' are incompatible.
+    Type 'string' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,60): error TS2322: Type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Property 'color' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,68): error TS2322: Type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Property 'color' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill'.
+src/components/bills/modals/BillDetailModal.tsx(83,44): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(90,34): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
+src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type '{}'.
+src/components/budgeting/CreateEnvelopeModal.tsx(58,5): error TS2322: Type '(envelope: unknown) => void' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/budgeting/CreateEnvelopeModal.tsx(104,13): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Property 'name' is optional in type 'Bill' but required in type 'Bill'.
+src/components/budgeting/CreateEnvelopeModal.tsx(133,13): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Property 'name' is optional in type 'Bill' but required in type 'Bill'.
+src/components/budgeting/CreateEnvelopeModalComponents.tsx(171,11): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'Bill'.
+src/components/budgeting/EditEnvelopeModal.tsx(67,5): error TS2322: Type 'unknown[]' is not assignable to type 'Envelope[]'.
+  Property 'id' is missing in type '{}' but required in type 'Envelope'.
+src/components/budgeting/EditEnvelopeModal.tsx(68,5): error TS2322: Type '(envelope: unknown) => void | Promise<void>' is not assignable to type '(envelopeData: unknown) => Promise<void>'.
+  Type 'void | Promise<void>' is not assignable to type 'Promise<void>'.
+    Type 'void' is not assignable to type 'Promise<void>'.
+src/components/budgeting/EditEnvelopeModal.tsx(70,5): error TS2322: Type '(envelopeId: string) => void | Promise<void>' is not assignable to type '(envelopeId: string | number) => Promise<void>'.
+  Type 'void | Promise<void>' is not assignable to type 'Promise<void>'.
+    Type 'void' is not assignable to type 'Promise<void>'.
+src/components/budgeting/EditEnvelopeModal.tsx(129,11): error TS2739: Type 'EnvelopeRef' is missing the following properties from type 'Envelope': name, currentBalance, targetAmount
+src/components/budgeting/EditEnvelopeModal.tsx(181,9): error TS2739: Type 'EnvelopeRef' is missing the following properties from type 'Envelope': name, currentBalance, targetAmount
+src/components/budgeting/EnvelopeGrid.tsx(147,9): error TS2322: Type '(id: string, amount: number) => Promise<void>' is not assignable to type '(amount: number) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/budgeting/EnvelopeGrid.tsx(272,42): error TS2345: Argument of type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(273,45): error TS2345: Argument of type '(state: BudgetState) => unknown[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(274,38): error TS2345: Argument of type '(state: BudgetState) => unknown[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(275,44): error TS2345: Argument of type '(state: BudgetState) => unknown' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(276,43): error TS2345: Argument of type '(state: BudgetState) => (bill: unknown) => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => (bill: unknown) => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(371,33): error TS2345: Argument of type 'Envelope[] | Envelope[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; ... 31 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = []>(initiali...' is not assignable to parameter of type 'Envelope[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'Envelope[]'.
+src/components/budgeting/EnvelopeGrid.tsx(414,7): error TS2322: Type 'Bill[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unk...' is not assignable to type 'unknown[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'unknown[]'.
+src/components/budgeting/EnvelopeGrid.tsx(420,9): error TS2322: Type 'Envelope[] | Envelope[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; ... 31 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = []>(initiali...' is not assignable to type 'Envelope[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'Envelope[]'.
+src/components/budgeting/EnvelopeGrid.tsx(432,9): error TS2322: Type 'Bill[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unk...' is not assignable to type 'unknown[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'unknown[]'.
+src/components/budgeting/PaycheckProcessor.tsx(80,13): error TS2322: Type 'Envelope[]' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
+  Property 'targetAmount' is missing in type 'Envelope' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
+src/components/budgeting/PaycheckProcessor.tsx(87,9): error TS2719: Type 'PaycheckHistoryItem[]' is not assignable to type 'PaycheckHistoryItem[]'. Two different types with this name exist, but they are unrelated.
+  Type 'PaycheckHistoryItem' is not assignable to type 'PaycheckHistoryItem'. Two different types with this name exist, but they are unrelated.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/budgeting/PaycheckProcessor.tsx(139,7): error TS2322: Type 'string' is not assignable to type 'AllocationMode'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(167,11): error TS2739: Type '{}' is missing the following properties from type 'AnalysisSettings': minAmount, minTransactions, overspendingThreshold, bufferPercentage
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(171,11): error TS2739: Type '{}' is missing the following properties from type 'SuggestionStats': totalSuggestions, priorityCounts, potentialSavings
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(176,7): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/suggestionUtils").Suggestion[]' is not assignable to type 'Suggestion[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/suggestionUtils").Suggestion' is not assignable to type 'Suggestion'.
+    Index signature for type 'string' is missing in type 'Suggestion'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(212,5): error TS2322: Type '(envelope: Envelope) => void' is not assignable to type '(envelopeId: string, updates: Record<string, unknown>) => void | Promise<void>'.
+  Types of parameters 'envelope' and 'envelopeId' are incompatible.
+    Type 'string' is not assignable to type 'Envelope'.
+src/components/budgeting/envelope/EnvelopeItem.tsx(66,91): error TS2345: Argument of type 'Envelope' is not assignable to parameter of type 'EnvelopeWithStatus'.
+  Types of property 'status' are incompatible.
+    Type 'string' is not assignable to type '"overdue" | "healthy" | "overspent" | "underfunded"'.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(16,5): error TS2345: Argument of type '(state: { openUnassignedCashModal?: () => void; }) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { openUnassignedCashModal?: () => void; }) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Type '() => void' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '() => void' is not assignable to type 'StoreState'.
+src/components/budgeting/shared/BillConnectionSelector.tsx(15,11): error TS6196: 'Envelope' is declared but never used.
+src/components/budgeting/suggestions/SuggestionsList.tsx(112,19): error TS2740: Type 'Suggestion' is missing the following properties from type 'Suggestion': title, description, reasoning, type, and 3 more.
+src/components/budgeting/suggestions/SuggestionsList.tsx(113,19): error TS2719: Type '(suggestion: Suggestion) => void' is not assignable to type '(suggestion: Suggestion) => void'. Two different types with this name exist, but they are unrelated.
+  Types of parameters 'suggestion' and 'suggestion' are incompatible.
+    Type 'Suggestion' is not assignable to type 'Suggestion'. Two different types with this name exist, but they are unrelated.
+      Index signature for type 'string' is missing in type 'Suggestion'.
+src/components/budgeting/suggestions/SuggestionsList.tsx(114,19): error TS2322: Type '(suggestion: Suggestion) => void' is not assignable to type '(id: string) => void'.
+  Types of parameters 'suggestion' and 'id' are incompatible.
+    Type 'string' is not assignable to type 'Suggestion'.
+src/components/debt/DebtDashboard.tsx(89,15): error TS2322: Type '(debtId: string, paymentData: { amount: number; date?: string; }) => Promise<void>' is not assignable to type '(debt: DebtAccount, amount: number) => void'.
+  Types of parameters 'debtId' and 'debt' are incompatible.
+    Type 'DebtAccount' is not assignable to type 'string'.
+src/components/debt/DebtDashboard.tsx(110,11): error TS2322: Type 'DebtAccount' is not assignable to type 'Record<string, unknown> & { id: string; }'.
+  Type 'DebtAccount' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'DebtAccount'.
+src/components/debt/DebtDashboard.tsx(114,11): error TS2322: Type '(debtId: string, paymentData: { amount: number; date?: string; }) => Promise<void>' is not assignable to type '(debtId: string, amount: number) => Promise<void>'.
+  Types of parameters 'paymentData' and 'amount' are incompatible.
+    Type 'number' is not assignable to type '{ amount: number; date?: string; }'.
+src/components/debt/DebtDashboard.tsx(115,11): error TS2322: Type '(debt: DebtAccount) => void' is not assignable to type '(debt: Record<string, unknown>) => void'.
+  Types of parameters 'debt' and 'debt' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type 'DebtAccount': id, name, creditor, balance, and 6 more.
+src/components/debt/DebtDashboard.tsx(122,9): error TS2322: Type 'DebtAccount[]' is not assignable to type 'UpcomingPayment[]'.
+  Type 'DebtAccount' is missing the following properties from type 'UpcomingPayment': debtId, debtName, dueDate, amount
+src/components/debt/DebtStrategies.tsx(25,25): error TS2345: Argument of type 'DebtAccount[]' is not assignable to parameter of type 'Debt[]'.
+  Type 'DebtAccount' is not assignable to type 'Debt'.
+    Property 'currentBalance' is optional in type 'DebtAccount' but required in type 'Debt'.
+src/components/debt/DebtStrategies.tsx(59,11): error TS2322: Type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: { priority: number; monthsToPayoff: number; totalInterestCost: number; strategy: string; ... 6 more ...; interestRate?: number; }[]; totalInterest: number; payoffTime: number; name: string; description:...' is not assignable to type 'Strategy'.
+  Type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' is not assignable to type 'Strategy'.
+    Property 'name' is optional in type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' but required in type 'Strategy'.
+src/components/debt/DebtStrategies.tsx(63,11): error TS2322: Type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: { priority: number; monthsToPayoff: number; totalInterestCost: number; strategy: string; ... 6 more ...; interestRate?: number; }[]; totalInterest: number; payoffTime: number; name: string; description:...' is not assignable to type 'Strategy'.
+  Type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' is not assignable to type 'Strategy'.
+    Property 'name' is optional in type '{ debts: any[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' but required in type 'Strategy'.
+src/components/debt/DebtStrategies.tsx(113,27): error TS2322: Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { ...; } | { ...; }; }[]' is not assignable to type 'PaymentImpactScenario[]'.
+  Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { monthsToPayoff: number; tot...' is not assignable to type 'PaymentImpactScenario'.
+    Types of property 'avalanche' are incompatible.
+      Type '{ monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }' is not assignable to type '{ timeSavings: number; interestSavings: number; }'.
+        Type '{ monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; }' is not assignable to type '{ timeSavings: number; interestSavings: number; }'.
+          Property 'timeSavings' is optional in type '{ monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; }' but required in type '{ timeSavings: number; interestSavings: number; }'.
+src/components/debt/modals/DebtDetailModal.tsx(52,5): error TS2740: Type 'Record<string, unknown> & { id: string; }' is missing the following properties from type 'DebtWithHistory': name, status, balance, type, and 5 more.
+src/components/debt/modals/DebtDetailModal.tsx(56,5): error TS2322: Type '(debtId: string, amount: number) => Promise<void>' is not assignable to type '(debtId: string, paymentData: PaymentData) => void'.
+  Types of parameters 'amount' and 'paymentData' are incompatible.
+    Type 'PaymentData' is not assignable to type 'number'.
+src/components/debt/modals/DebtDetailModal.tsx(57,5): error TS2322: Type '(debt: Record<string, unknown>) => void' is not assignable to type '(debt: DebtWithHistory) => void'.
+  Types of parameters 'debt' and 'debt' are incompatible.
+    Type 'DebtWithHistory' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'DebtWithHistory'.
+src/components/debt/modals/DebtDetailModal.tsx(81,47): error TS2322: Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string; interestDisplay: string; date: string; amount: number; principalAmount?: number; interestAmount?: number; }[]' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string; interestDisplay?: string; }[]'.
+  Type '{ id: string | number; displayDate: string; formattedAmount: string; principalDisplay: string; interestDisplay: string; date: string; amount: number; principalAmount?: number; interestAmount?: number; }' is not assignable to type '{ id: string; formattedAmount: string; displayDate: string; principalDisplay?: string; interestDisplay?: string; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/history/BudgetHistoryViewer.tsx(49,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/history/BudgetHistoryViewer.tsx(121,15): error TS2322: Type 'BudgetCommit[]' is not assignable to type 'HistoryCommit[]'.
+  Property 'shortHash' is missing in type 'BudgetCommit' but required in type 'HistoryCommit'.
+src/components/history/BudgetHistoryViewer.tsx(133,15): error TS2322: Type '{ commit: BudgetCommit; changes: BudgetChange[]; }' is not assignable to type 'CommitDetails'.
+  Types of property 'changes' are incompatible.
+    Type 'BudgetChange[]' is not assignable to type 'Change[]'.
+      Property 'type' is missing in type 'BudgetChange' but required in type 'Change'.
+src/components/layout/MainLayout.tsx(237,5): error TS2345: Argument of type '(state: Record<string, unknown>) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/layout/MainLayout.tsx(288,5): error TS2345: Argument of type '(state: Record<string, unknown>) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/layout/MainLayout.tsx(291,5): error TS2345: Argument of type '(state: Record<string, unknown>) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/layout/MainLayout.tsx(324,11): error TS2322: Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'boolean'.
+src/components/layout/MainLayout.tsx(325,11): error TS2322: Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' is not assignable to type 'boolean'.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; }>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
   Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/layout/SummaryCards.tsx(34,5): error TS2345: Argument of type '(state: { openUnassignedCashModal: () => void; }) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { openUnassignedCashModal: () => void; }) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type '{ openUnassignedCashModal: () => void; }'.
+src/components/layout/ViewRenderer.tsx(253,9): error TS2322: Type '(distribution: unknown, description: string) => Promise<unknown>' is not assignable to type '(amount: number, goals: unknown[]) => void'.
+  Types of parameters 'description' and 'goals' are incompatible.
+    Type 'unknown[]' is not assignable to type 'string'.
+src/components/layout/ViewRenderer.tsx(271,9): error TS2322: Type 'UseMutateFunction<{ id: string; date: Date; amount: number; source: string; lastModified: number; createdAt: number; mode: string; unassignedCashBefore: number; unassignedCashAfter: number; actualBalanceBefore: number; actualBalanceAfter: number; envelopeAllocations: { ...; }[]; notes: string; }, Error, PaycheckData...' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/layout/ViewRenderer.tsx(272,9): error TS2322: Type '(paycheckId: string) => Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => Promise<void>'.
+  Types of parameters 'paycheckId' and 'paycheck' are incompatible.
+    Type 'PaycheckHistoryItem' is not assignable to type 'string'.
+src/components/layout/ViewRenderer.tsx(273,44): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory[]' is not assignable to parameter of type 'PaycheckHistory[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory' is not assignable to type 'PaycheckHistory'.
+    Types of property 'allocations' are incompatible.
+      Type 'Record<string, number> | { envelopeId: string; envelopeName: string; amount: number; }[]' is not assignable to type 'unknown[]'.
+        Type 'Record<string, number>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/layout/ViewRenderer.tsx(275,9): error TS2741: Property 'userName' is missing in type 'Record<string, unknown>' but required in type 'User'.
+src/components/layout/ViewRenderer.tsx(280,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to type 'Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'Transaction'.
+    Index signature for type 'string' is missing in type 'Transaction'.
+src/components/layout/ViewRenderer.tsx(281,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to type 'Envelope[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope' is not assignable to type 'Envelope'.
+    Index signature for type 'string' is missing in type 'Envelope'.
+src/components/layout/ViewRenderer.tsx(282,9): error TS2322: Type '(updatedBill: Record<string, unknown>) => void' is not assignable to type '(bill: Bill) => void | Promise<void>'.
+  Types of parameters 'updatedBill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'Bill'.
+src/components/modals/QuickFundModal.tsx(53,28): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/components/modals/QuickFundModal.tsx(53,32): error TS2554: Expected 1 arguments, but got 2.
+src/components/modals/QuickFundModal.tsx(59,24): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/components/modals/QuickFundModal.tsx(59,28): error TS2554: Expected 1 arguments, but got 2.
+src/components/modals/QuickFundModal.tsx(83,66): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/components/modals/QuickFundModal.tsx(90,11): error TS2741: Property 'name' is missing in type '{}' but required in type 'Envelope'.
+src/components/modals/UnassignedCashModal.tsx(311,22): error TS2339: Property 'isUnassignedCashModalOpen' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/modals/UnassignedCashModal.tsx(315,22): error TS2339: Property 'closeUnassignedCashModal' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/OfflineStatusIndicator.tsx(34,48): error TS2339: Property 'isOnline' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/PatchNotesModal.tsx(89,37): error TS2345: Argument of type '(state: UiStore) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(90,26): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' to type 'PatchNotesData' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/components/pwa/PatchNotesModal.tsx(91,5): error TS2345: Argument of type '(state: UiStore) => { version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => { version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(93,40): error TS2345: Argument of type '(state: UiStore) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(94,42): error TS2345: Argument of type '(state: UiStore) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'UiStore'.
+src/components/pwa/UpdateAvailableModal.tsx(29,28): error TS2339: Property 'hasContent' does not exist on type 'string'.
+src/components/pwa/UpdateAvailableModal.tsx(30,65): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
+src/components/pwa/UpdateAvailableModal.tsx(31,25): error TS2345: Argument of type '{ type: string; text: string; }[]' is not assignable to parameter of type 'SetStateAction<PatchNote[]>'.
+  Type '{ type: string; text: string; }[]' is not assignable to type 'PatchNote[]'.
+    Type '{ type: string; text: string; }' is not assignable to type 'PatchNote'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type '"other" | "breaking" | "fix" | "feature"'.
+src/components/pwa/UpdateAvailableModal.tsx(53,55): error TS2339: Property 'updateAvailable' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/UpdateAvailableModal.tsx(54,50): error TS2339: Property 'isUpdating' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/UpdateAvailableModal.tsx(55,58): error TS2339: Property 'setUpdateAvailable' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/UpdateAvailableModal.tsx(56,49): error TS2339: Property 'updateApp' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/pwa/UpdateAvailableModal.tsx(58,54): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'boolean'.
+src/components/pwa/UpdateAvailableModal.tsx(59,39): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'boolean'.
+src/components/pwa/UpdateAvailableModal.tsx(68,24): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/components/pwa/UpdateAvailableModal.tsx(164,13): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean'.
+src/components/pwa/UpdateAvailableModal.tsx(184,13): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean'.
+src/components/receipts/ReceiptToTransactionModal.tsx(161,13): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Envelope' is missing the following properties from type 'Envelope': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(184,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
+src/components/receipts/components/ReceiptExtractedData.tsx(94,86): error TS2339: Property 'processingTime' does not exist on type 'ExtractedData'.
+src/components/receipts/steps/ConfirmationStep.tsx(64,70): error TS2345: Argument of type 'string | number | Date' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/receipts/steps/ConfirmationStep.tsx(139,70): error TS2345: Argument of type 'string | number | Date' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/savings/SavingsGoals.tsx(44,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/savings/SavingsGoals.tsx(93,27): error TS2322: Type 'unknown[]' is not assignable to type 'SavingsGoal[]'.
+  Type '{}' is missing the following properties from type 'SavingsGoal': id, name, category, priority, and 5 more.
+src/components/savings/SavingsGoals.tsx(132,27): error TS2339: Property 'id' does not exist on type 'unknown'.
+src/components/savings/SavingsGoals.tsx(133,17): error TS2740: Type '{}' is missing the following properties from type 'SavingsGoal': id, name, currentAmount, targetAmount, and 2 more.
+src/components/savings/SavingsGoals.tsx(156,9): error TS2322: Type 'unknown[]' is not assignable to type 'SavingsGoal[]'.
+  Type '{}' is missing the following properties from type 'SavingsGoal': id, name, targetAmount, currentAmount, priority
+src/components/security/LockScreen.tsx(239,20): error TS2345: Argument of type 'KeyboardEvent<HTMLInputElement>' is not assignable to parameter of type 'FormEvent<HTMLFormElement>'.
+  Types of property 'currentTarget' are incompatible.
+    Type 'EventTarget & HTMLInputElement' is not assignable to type 'EventTarget & HTMLFormElement'.
+      Type 'EventTarget & HTMLInputElement' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, elements, encoding, and 11 more.
+src/components/settings/SecuritySettings.tsx(83,16): error TS2322: Type '{ securitySettings: SecuritySettings; handleSettingChange: (setting: any, value: any) => void; }' is not assignable to type 'ClipboardSecuritySectionProps'.
+  Types of property 'securitySettings' are incompatible.
+    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecuritySettings' is not assignable to type 'SecuritySettings'.
+      Index signature for type 'string' is missing in type 'SecuritySettings'.
+src/components/settings/SettingsDashboard.tsx(110,5): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean'.
 src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
   Type 'void' is not assignable to type 'Promise<AuthResult>'.
+src/components/settings/sections/GeneralSettingsSection.tsx(286,53): error TS2339: Property 'manualInstall' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/components/settings/sections/GeneralSettingsSection.tsx(303,53): error TS2538: Type 'unknown' cannot be used as an index type.
+src/components/settings/sections/NotificationSettingsSection.tsx(264,27): error TS2322: Type 'string' is not assignable to type 'PermissionStatus'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(10,5): error TS2717: Subsequent property declarations must have the same type.  Property 'getQuickSyncStatus' must be of type '() => Promise<any>', but here has type '() => Promise<unknown>'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(11,5): error TS2717: Subsequent property declarations must have the same type.  Property 'runMasterSyncValidation' must be of type '() => Promise<ValidationResults>', but here has type '() => Promise<unknown>'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(12,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
+src/components/settings/sections/SyncDebugToolsSection.tsx(13,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
+src/components/settings/sections/SyncDebugToolsSection.tsx(14,5): error TS2717: Subsequent property declarations must have the same type.  Property 'forceCloudDataReset' must be of type '() => Promise<{ success: boolean; message?: string; error?: string; }>', but here has type '() => Promise<unknown>'.
+src/components/sync/health/SyncHealthDetails.tsx(56,50): error TS2345: Argument of type 'SyncStatus' is not assignable to parameter of type 'SyncStatus'.
+  Index signature for type 'string' is missing in type 'SyncStatus'.
+src/components/sync/health/SyncHealthDetails.tsx(58,56): error TS2345: Argument of type 'RecoveryResult' is not assignable to parameter of type 'RecoveryResult'.
+  Index signature for type 'string' is missing in type 'RecoveryResult'.
+src/components/transactions/TransactionLedger.tsx(176,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/components/transactions/TransactionLedger.tsx(178,7): error TS2740: Type '{}' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/TransactionLedger.tsx(180,7): error TS2322: Type 'unknown' is not assignable to type 'Record<string, string>'.
+  Index signature for type 'string' is missing in type '{}'.
+src/components/transactions/TransactionLedger.tsx(182,7): error TS2739: Type '{}' is missing the following properties from type '{ current: number; total: number; percentage: number; }': current, total, percentage
+src/components/transactions/TransactionLedger.tsx(184,7): error TS2322: Type '(file: File) => void' is not assignable to type '(data: unknown[]) => void'.
+  Types of parameters 'file' and 'data' are incompatible.
+    Type 'unknown[]' is missing the following properties from type 'File': lastModified, name, webkitRelativePath, size, and 5 more.
+src/components/transactions/TransactionSplitter.tsx(102,19): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/transactions/TransactionSplitter.tsx(103,19): error TS2322: Type 'string[]' is not assignable to type 'Category[]'.
+  Type 'string' is not assignable to type 'Category'.
+src/components/transactions/TransactionSplitter.tsx(104,19): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]' is not assignable to type 'Envelope[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'Envelope'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/transactions/TransactionSplitter.tsx(106,19): error TS2322: Type '(splitId: string, field: keyof SplitAllocation, value: unknown) => void' is not assignable to type '(id: string, updates: Record<string, unknown>) => void'.
+  Target signature provides too few arguments. Expected 3 or more, but got 2.
+src/components/transactions/TransactionTable.tsx(139,21): error TS2322: Type '(transaction: Transaction) => void' is not assignable to type '(transactionId: string) => void'.
+  Types of parameters 'transaction' and 'transactionId' are incompatible.
+    Type 'string' is not assignable to type 'Transaction'.
+src/components/transactions/components/TransactionRow.tsx(39,60): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
+  Type '{}' is missing the following properties from type 'Envelope': id, name, currentBalance, targetAmount
+src/components/transactions/components/TransactionRow.tsx(134,42): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'string'.
+src/components/transactions/import/ImportModal.tsx(59,44): error TS2322: Type '(data: unknown[]) => void' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
+  Types of parameters 'data' and 'event' are incompatible.
+    Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/import/ImportModal.tsx(63,13): error TS2322: Type 'unknown[]' is not assignable to type 'ImportData | DataRow[]'.
+  Type 'unknown[]' is not assignable to type 'DataRow[]'.
+    Type 'unknown' is not assignable to type 'DataRow'.
+      Index signature for type 'string' is missing in type '{}'.
+src/components/transactions/import/ImportModal.tsx(72,51): error TS2322: Type '{ current: number; total: number; percentage: number; }' is not assignable to type 'number'.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(117,13): error TS2739: Type 'SplitAllocation' is missing the following properties from type 'Split': description, amount, category
+src/components/transactions/splitter/SplitAllocationsSection.tsx(120,13): error TS2322: Type '(id: string, updates: Record<string, unknown>) => void' is not assignable to type '(id: string, field: string, value: string | number) => void'.
+  Types of parameters 'updates' and 'field' are incompatible.
+    Type 'string' is not assignable to type 'Record<string, unknown>'.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(122,13): error TS2322: Type 'Category[]' is not assignable to type 'string[]'.
+  Type 'Category' is not assignable to type 'string'.
+src/db/budgetDb.ts(94,9): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '"creating"' is not assignable to parameter of type '"deleting"'.
 src/hooks/accounts/useSupplementalAccounts.ts(109,44): error TS2345: Argument of type 'Account' is not assignable to parameter of type 'Account'.
   Type 'Account' is missing the following properties from type 'Account': type, currentBalance, color, isActive
 src/hooks/accounts/useSupplementalAccounts.ts(134,7): error TS2322: Type '(account: Account) => void' is not assignable to type '(id: string, data: unknown) => void'.
@@ -118,6 +651,11 @@ src/hooks/accounts/useSupplementalAccounts.ts(157,7): error TS2345: Argument of 
   Type 'TransferringAccount' is missing the following properties from type 'Account': type, currentBalance, color, isActive
 src/hooks/accounts/useSupplementalAccounts.ts(172,35): error TS2345: Argument of type 'TransferringAccount' is not assignable to parameter of type 'TransferringAccount'.
   Property 'currentBalance' is missing in type 'TransferringAccount' but required in type 'TransferringAccount'.
+src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(16,11): error TS2339: Property 'paycheckHistory' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(17,5): error TS2345: Argument of type '(state: { paycheckHistory?: PaycheckItem[]; }) => { paycheckHistory: PaycheckItem[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { paycheckHistory?: PaycheckItem[]; }) => { paycheckHistory: PaycheckItem[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Type '{ paycheckHistory: PaycheckItem[]; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ paycheckHistory: PaycheckItem[]; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, isActualBalanceManual, isOnline, and 9 more.
 src/hooks/analytics/useReportExporter.ts(48,9): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
 src/hooks/analytics/useReportExporter.ts(112,41): error TS2322: Type 'unknown' is not assignable to type 'string'.
 src/hooks/analytics/useReportExporter.ts(129,24): error TS2345: Argument of type '(prev: { includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }) => { ...; }' is not assignable to parameter of type 'SetStateAction<{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }>'.
@@ -125,6 +663,14 @@ src/hooks/analytics/useReportExporter.ts(129,24): error TS2345: Argument of type
     Call signature return types '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: unknown; }' and '{ includeSummary: boolean; includeCharts: boolean; includeTransactions: boolean; includeEnvelopes: boolean; includeSavings: boolean; includeInsights: boolean; customDateRange: { start: string; end: string; }; }' are incompatible.
       The types of 'customDateRange' are incompatible between these types.
         Type '{}' is missing the following properties from type '{ start: string; end: string; }': start, end
+src/hooks/auth/mutations/useJoinBudgetMutation.ts(194,46): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/hooks/auth/mutations/useLoginMutations.ts(53,40): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/hooks/auth/useAuthenticationManager.ts(132,34): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | UserData'.
+src/hooks/bills/useBillManager.ts(93,18): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' to type 'BudgetState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/hooks/bills/useBillManager.ts(94,5): error TS2345: Argument of type '(state: BudgetState) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
 src/hooks/bills/useBillManager.ts(197,5): error TS2322: Type '(bills: Bill[]) => void' is not assignable to type '(bills: Set<string>) => void'.
   Types of parameters 'bills' and 'bills' are incompatible.
     Type 'Set<string>' is missing the following properties from type 'Bill[]': length, pop, push, concat, and 24 more.
@@ -132,6 +678,43 @@ src/hooks/bills/useBillManager.ts(197,23): error TS2352: Conversion of type 'Dis
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'Bill[]' is not comparable to type 'SetStateAction<Set<unknown>>'.
       Type 'Bill[]' is missing the following properties from type 'Set<unknown>': add, clear, delete, has, and 2 more.
+src/hooks/bills/useBillManagerHelpers.ts(260,48): error TS2345: Argument of type 'BillRecord' is not assignable to parameter of type 'Bill'.
+  Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
+src/hooks/bills/useBillManagerHelpers.ts(262,22): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'BillRecord'.
+  Index signature for type 'string' is missing in type 'Bill'.
+src/hooks/bills/useBillManagerHelpers.ts(276,52): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to parameter of type 'Bill'.
+  Index signature for type 'string' is missing in type 'Bill'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...' to type 'BudgetContext' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(42,5): error TS2345: Argument of type '(state: BudgetSelector) => { envelopes: Envelope[]; unassignedCash: number; allTransactions: Transaction[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetSelector) => { envelopes: Envelope[]; unassignedCash: number; allTransactions: Transaction[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Type '{ envelopes: Envelope[]; unassignedCash: number; allTransactions: Transaction[]; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ envelopes: Envelope[]; unassignedCash: number; allTransactions: Transaction[]; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(23,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(36,25): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'Budget'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(58,31): error TS2339: Property 'envelopes' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(59,36): error TS2339: Property 'unassignedCash' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(60,34): error TS2339: Property 'allTransactions' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(71,54): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'AutoFundingRule[]'.
+  Type '{}' is missing the following properties from type 'AutoFundingRule': id, name, description, type, and 7 more.
+src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(74,45): error TS2345: Argument of type 'ExecutionRecord[]' is not assignable to parameter of type 'ExecutionHistoryItem[]'.
+  Type 'ExecutionRecord' is not assignable to type 'ExecutionHistoryItem'.
+    Property 'executedAt' is optional in type 'ExecutionRecord' but required in type 'ExecutionHistoryItem'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(190,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(241,22): error TS2339: Property 'transferFunds' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/useEnvelopeEdit.ts(66,31): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/hooks/budgeting/useEnvelopeEdit.ts(115,5): error TS2322: Type 'Envelope' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'Envelope'.
+src/hooks/budgeting/useEnvelopeEdit.ts(116,5): error TS2322: Type 'Envelope[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'Envelope' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'Envelope'.
+src/hooks/budgeting/useEnvelopeEdit.ts(117,5): error TS2322: Type '(envelopeData: unknown) => Promise<boolean>' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
+    Type 'boolean' is not assignable to type 'void'.
+src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'Envelope[]'.
+  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'Envelope'.
 src/hooks/budgeting/usePaycheckForm.ts(67,40): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
 src/hooks/budgeting/usePaycheckForm.ts(77,58): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
@@ -144,6 +727,48 @@ src/hooks/budgeting/usePaycheckForm.ts(174,64): error TS2345: Argument of type '
   Type '{}' is missing the following properties from type 'Envelope': id, name, category, archived, lastModified
 src/hooks/budgeting/usePaycheckForm.ts(208,70): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type '{}' is missing the following properties from type 'PaycheckHistory': id, amount, lastModified
+src/hooks/budgeting/useSmartSuggestions.ts(88,37): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Transaction[]'.
+  Type '{}' is missing the following properties from type 'Transaction': amount, date
+src/hooks/budgeting/useSmartSuggestions.ts(138,39): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; name: string; }; }'.
+  Types of property 'data' are incompatible.
+    Property 'name' is missing in type 'Record<string, unknown>' but required in type '{ [key: string]: unknown; name: string; }'.
+src/hooks/budgeting/useSmartSuggestions.ts(142,37): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number; }; }'.
+  Types of property 'data' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type '{ [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number; }': envelopeId, suggestedAmount
+src/hooks/budgeting/useSmartSuggestions.ts(146,37): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number; }; }'.
+  Types of property 'data' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type '{ [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number; }': envelopeId, suggestedAmount
+src/hooks/budgeting/useSmartSuggestions.ts(150,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
+src/hooks/common/useActualBalance.ts(30,5): error TS2339: Property 'actualBalance' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/common/useActualBalance.ts(31,5): error TS2339: Property 'isActualBalanceManual' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/common/useActualBalance.ts(32,5): error TS2339: Property 'setActualBalance' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/common/useActualBalance.ts(34,5): error TS2345: Argument of type '(state: BudgetState) => { actualBalance: number; isActualBalanceManual: boolean; setActualBalance: (balance: number) => void; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => { actualBalance: number; isActualBalanceManual: boolean; setActualBalance: (balance: number) => void; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetState'.
+src/hooks/common/useDataInitialization.ts(40,60): error TS2339: Property 'cloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/common/useImportData.ts(212,11): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[]' is not assignable to type 'Envelope[]'.
+      Type '{}' is missing the following properties from type 'Envelope': id, name, currentBalance, targetAmount
+src/hooks/common/useImportData.ts(231,29): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[]' is not assignable to type 'Envelope[]'.
+      Type '{}' is missing the following properties from type 'Envelope': id, name, currentBalance, targetAmount
+src/hooks/common/useImportData.ts(233,34): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[]' is not assignable to type 'Envelope[]'.
+      Type '{}' is missing the following properties from type 'Envelope': id, name, currentBalance, targetAmount
+src/hooks/common/useNetworkStatus.ts(11,59): error TS2339: Property 'setOnlineStatus' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/common/useNetworkStatus.ts(18,23): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/common/useNetworkStatus.ts(24,23): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/common/useNetworkStatus.ts(32,21): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
+    Types of property 'date' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
+src/hooks/debts/useDebtDashboard.ts(156,35): error TS2345: Argument of type '{ amount: number; date?: string; }' is not assignable to parameter of type '{ amount: number; paymentDate: string; notes?: string; }'.
+  Property 'paymentDate' is missing in type '{ amount: number; date?: string; }' but required in type '{ amount: number; paymentDate: string; notes?: string; }'.
 src/hooks/debts/useDebtManagement.ts(134,7): error TS2322: Type 'UseMutateAsyncFunction<{ id?: string; status: string; author?: string; }, Error, { [key: string]: unknown; id?: string; status?: string; author?: string; }, unknown>' is not assignable to type '(data: DebtData) => Promise<CreatedDebt>'.
   Types of parameters 'variables' and 'data' are incompatible.
     Type 'DebtData' is not assignable to type '{ [key: string]: unknown; id?: string; status?: string; author?: string; }'.
@@ -172,207 +797,300 @@ src/hooks/debts/useDebts.ts(195,20): error TS2339: Property 'name' does not exis
 src/hooks/debts/useDebts.ts(196,20): error TS2339: Property 'type' does not exist on type '{ id?: string; status: string; author?: string; }'.
 src/hooks/debts/useDebts.ts(197,30): error TS2339: Property 'currentBalance' does not exist on type '{ id?: string; status: string; author?: string; }'.
 src/hooks/debts/useDebts.ts(198,28): error TS2339: Property 'interestRate' does not exist on type '{ id?: string; status: string; author?: string; }'.
+src/hooks/layout/usePaycheckOperations.ts(43,71): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'Paycheck[]'.
+  Type 'PaycheckHistory' is not assignable to type 'Paycheck'.
+    Property 'amount' is optional in type 'PaycheckHistory' but required in type 'Paycheck'.
+src/hooks/layout/usePaycheckOperations.ts(53,11): error TS2345: Argument of type 'VioletVaultDB' is not assignable to parameter of type '{ envelopes: { get: (id: string | number) => Promise<unknown>; update: (id: string | number, data: unknown) => Promise<void>; }; }'.
+  The types of 'envelopes.update' are incompatible between these types.
+    Type '(key: string | Envelope, changes: UpdateSpec<Envelope> | ((obj: Envelope, ctx: { value: any; primKey: IndexableType; }) => boolean | void)) => PromiseExtended<...>' is not assignable to type '(id: string | number, data: unknown) => Promise<void>'.
+      Types of parameters 'key' and 'id' are incompatible.
+        Type 'string | number' is not assignable to type 'string | Envelope'.
+          Type 'number' is not assignable to type 'string | Envelope'.
+src/hooks/layout/usePaycheckOperations.ts(75,68): error TS2345: Argument of type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: FilterParams) => (string | FilterParams)[]; ... 48 more ...; syncActivity: () => string[]; }' is not assignable to parameter of type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
+  Types of property 'paycheckHistory' are incompatible.
+    Type '() => string[]' is not assignable to type 'unknown[]'.
 src/hooks/mobile/useFABBehavior.ts(76,39): error TS2339: Property 'focus' does not exist on type 'Element'.
+src/hooks/notifications/useFirebaseMessaging.ts(32,25): error TS2345: Argument of type 'PermissionStatusForUI' is not assignable to parameter of type 'SetStateAction<string>'.
+src/hooks/notifications/useFirebaseMessaging.ts(137,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
+src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(46,82): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
+  Type 'Envelope' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
+    Property 'currentBalance' is optional in type 'Envelope' but required in type 'Envelope'.
+src/hooks/receipts/useReceiptToTransaction.ts(48,28): error TS2345: Argument of type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to parameter of type 'SetStateAction<{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }>'.
+  Type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to type '(prevState: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }'.
+    Call signature return types '{ envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' and '{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }' are incompatible.
+      The types of 'envelopeId' are incompatible between these types.
+        Type 'string | number' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(86,37): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(101,9): error TS2559: Type 'string' has no properties in common with type '{ url?: string; }'.
+src/hooks/settings/useSettingsDashboard.ts(103,60): error TS2339: Property 'cloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/settings/useSettingsDashboard.ts(104,63): error TS2339: Property 'setCloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/settings/useSettingsDashboard.ts(109,25): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/sync/useFirebaseSync.ts(57,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/sync/useFirebaseSync.ts(129,28): error TS2339: Property 'getActiveUsers' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(129,54): error TS2339: Property 'getRecentActivity' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(133,30): error TS2339: Property 'getActiveUsers' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(134,33): error TS2339: Property 'getRecentActivity' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/transactions/useTransactionFilters.ts(41,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(42,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(43,33): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(44,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(47,43): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
 src/hooks/transactions/useTransactionImport.ts(78,61): error TS2345: Argument of type 'ImportData' is not assignable to parameter of type 'unknown[] | { data?: unknown[]; }'.
   Type 'ImportData' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
 src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '{ amount: number; }[]'.
   Property 'amount' is missing in type '{}' but required in type '{ amount: number; }'.
+src/hooks/transactions/useTransactionLedger.ts(35,5): error TS2345: Argument of type '(state: { setAllTransactions?: (transactions: unknown[]) => void; updateBill?: (bill: unknown) => void; }) => { setAllTransactions: (transactions: unknown[]) => void; updateBill: (bill: unknown) => void; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { setAllTransactions?: (transactions: unknown[]) => void; updateBill?: (bill: unknown) => void; }) => { setAllTransactions: (transactions: unknown[]) => void; updateBill: (bill: unknown) => void; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Type '{ setAllTransactions: (transactions: unknown[]) => void; updateBill: (bill: unknown) => void; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ setAllTransactions: (transactions: unknown[]) => void; updateBill: (bill: unknown) => void; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
+src/hooks/transactions/useTransactionLedger.ts(45,11): error TS2339: Property 'setAllTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/transactions/useTransactionLedger.ts(45,31): error TS2339: Property 'updateBill' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/transactions/useTransactionLedger.ts(80,5): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
+    Types of property 'date' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionLedger.ts(86,5): error TS2322: Type 'string' is not assignable to type '"asc" | "desc"'.
+src/hooks/transactions/useTransactionQuery.ts(44,11): error TS2339: Property 'transactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/transactions/useTransactionQuery.ts(44,46): error TS2339: Property 'allTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/hooks/transactions/useTransactionQuery.ts(46,7): error TS2345: Argument of type '(state: BudgetStore) => { transactions: Transaction[]; allTransactions: Transaction[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetStore) => { transactions: Transaction[]; allTransactions: Transaction[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' is not assignable to type 'BudgetStore'.
+src/hooks/transactions/useTransactionsV2.ts(57,5): error TS2345: Argument of type '(state: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): v...' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): v...' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false)...'.
+    Type '{ updateTransactions: unknown; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ updateTransactions: unknown; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
+src/hooks/transactions/useTransactionsV2.ts(58,28): error TS2352: Conversion of type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false): void; (st...'.
+src/hooks/transactions/useTransactionsV2.ts(86,19): error TS2339: Property 'updateTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = ...'.
+src/main.tsx(151,55): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(152,61): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(153,47): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(154,47): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,45): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,95): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,141): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(160,180): error TS2339: Property 'length' does not exist on type 'unknown'.
+src/main.tsx(178,47): error TS2339: Property 'forcePushToCloud' does not exist on type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
+src/main.tsx(197,40): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(205,29): error TS2345: Argument of type 'DexieData' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'DexieData'.
+src/main.tsx(207,50): error TS2345: Argument of type 'CloudSyncService' is not assignable to parameter of type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
+  Property 'forcePushData' is missing in type 'CloudSyncService' but required in type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string; }>; }'.
+src/services/authService.ts(577,32): error TS2352: Conversion of type 'typeof import("/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore")' to type '{ useBudgetStore: { getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: () => Promise<void>; }; }; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'useBudgetStore' are incompatible.
+    Type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>' is not comparable to type '{ getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: () => Promise<void>; }; }'.
+src/services/chunkedSyncService.ts(427,34): error TS2345: Argument of type 'Promise<unknown>[]' is not assignable to parameter of type 'Iterable<void | PromiseLike<void>>'.
+  The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+    Type 'IteratorResult<Promise<unknown>, any>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+      Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+        Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorYieldResult<void | PromiseLike<void>>'.
+          Type 'Promise<unknown>' is not assignable to type 'void | PromiseLike<void>'.
+            Type 'Promise<unknown>' is not assignable to type 'PromiseLike<void>'.
+              Types of property 'then' are incompatible.
+                Type '<TResult1 = unknown, TResult2 = never>(onfulfilled?: (value: unknown) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) => Promise<...>' is not assignable to type '<TResult1 = void, TResult2 = never>(onfulfilled?: (value: void) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) => PromiseLike<...>'.
+                  Types of parameters 'onfulfilled' and 'onfulfilled' are incompatible.
+                    Types of parameters 'value' and 'value' are incompatible.
+                      Type 'unknown' is not assignable to type 'void'.
+src/services/chunkedSyncService.ts(497,36): error TS2345: Argument of type 'Promise<unknown>[]' is not assignable to parameter of type 'Iterable<void | PromiseLike<void>>'.
+  The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+    Type 'IteratorResult<Promise<unknown>, any>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+      Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+        Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorYieldResult<void | PromiseLike<void>>'.
+          Type 'Promise<unknown>' is not assignable to type 'void | PromiseLike<void>'.
+            Type 'Promise<unknown>' is not assignable to type 'PromiseLike<void>'.
+              Types of property 'then' are incompatible.
+                Type '<TResult1 = unknown, TResult2 = never>(onfulfilled?: (value: unknown) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) => Promise<...>' is not assignable to type '<TResult1 = void, TResult2 = never>(onfulfilled?: (value: void) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) => PromiseLike<...>'.
+                  Types of parameters 'onfulfilled' and 'onfulfilled' are incompatible.
+                    Types of parameters 'value' and 'value' are incompatible.
+                      Type 'unknown' is not assignable to type 'void'.
+src/services/editLockService.ts(129,51): error TS2345: Argument of type 'LockDocument' is not assignable to parameter of type 'ExistingLock'.
+  Property 'userId' is optional in type 'LockDocument' but required in type 'ExistingLock'.
+src/stores/ui/uiStore.ts(155,25): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(158,29): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(161,30): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(176,9): error TS2322: Type 'string' is not assignable to type '{ version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; }'.
+src/stores/ui/uiStore.ts(223,32): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(295,3): error TS2322: Type 'UseBoundStore<WithImmer<Write<StoreApi<StoreState>, StoreSubscribeWithSelector<StoreState>>>>' is not assignable to type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+  Type 'StoreState' is not assignable to type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+    Type 'StoreState' is not assignable to type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; }'.
+      Type 'StoreState' provides no match for the signature '(): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+src/stores/ui/uiStore.ts(297,3): error TS2322: Type 'UseBoundStore<WithImmer<Write<WithPersist<WithDevtools<StoreApi<StoreState>>, { biweeklyAllocation: number; paycheckHistory: { id: string; amount: number; date: string; payerName?: string; notes?: string; }[]; ... 7 more ...; showPatchNotes: boolean; }>, StoreSubscribeWithSelector<...>>>>' is not assignable to type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+  Type 'StoreState' is not assignable to type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+    Type 'StoreState' is not assignable to type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; }'.
+      Type 'StoreState' provides no match for the signature '(): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+src/stores/ui/uiStore.ts(324,26): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(324,71): error TS2339: Property 'setState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,26): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,72): error TS2339: Property 'setState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,82): error TS2345: Argument of type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>' is not assignable to parameter of type '{ getState: () => UiStore; }'.
+src/utils/debug/dataDiagnostic.ts(124,84): error TS2339: Property 'count' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
+  Property 'count' does not exist on type 'string'.
+src/utils/debug/dataDiagnostic.ts(126,12): error TS2339: Property 'limit' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
+  Property 'limit' does not exist on type 'string'.
+src/utils/layout/paycheckDeletionUtils.ts(52,47): error TS2339: Property 'currentBalance' does not exist on type 'unknown'.
+src/utils/layout/paycheckDeletionUtils.ts(110,56): error TS2339: Property 'get' does not exist on type '{ delete: (id: string | number) => Promise<void>; }'.
+src/utils/layout/paycheckDeletionUtils.ts(126,25): error TS2349: This expression is not callable.
+  Type 'unknown[]' has no call signatures.
+src/utils/layout/paycheckDeletionUtils.ts(128,55): error TS2339: Property 'envelopes' does not exist on type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
+src/utils/layout/paycheckDeletionUtils.ts(132,55): error TS2339: Property 'dashboard' does not exist on type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
+src/utils/pwa/patchNotesManager.ts(68,7): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
+src/utils/pwa/patchNotesManager.ts(85,7): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
+src/utils/pwa/patchNotesManager.ts(103,5): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<unknown>', but here has type '() => Promise<DataDetectionResult>'.
+src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
+src/utils/sync/validation/checksumUtils.ts(23,7): error TS2322: Type 'Uint8Array<ArrayBuffer>' is not assignable to type 'ArrayBuffer'.
+  Types of property '[Symbol.toStringTag]' are incompatible.
+    Type '"Uint8Array"' is not assignable to type '"ArrayBuffer"'.
+src/utils/sync/validation/checksumUtils.ts(32,7): error TS2322: Type 'Uint8Array<ArrayBuffer>' is not assignable to type 'ArrayBuffer'.
+  Types of property '[Symbol.toStringTag]' are incompatible.
+    Type '"Uint8Array"' is not assignable to type '"ArrayBuffer"'.
 ```
 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-
 - 17 errors in `src/hooks/auth/authOperations.ts`
 - 16 errors in `src/services/bugReport/screenshotService.ts`
 - 16 errors in `src/components/automation/steps/ReviewStep.tsx`
-- 14 errors in `src/utils/sync/validation/encryptedDataValidator.ts`
-- 14 errors in `src/utils/pwa/patchNotesManager.ts`
-- 14 errors in `src/utils/layout/paycheckDeletionUtils.ts`
 - 14 errors in `src/hooks/receipts/useReceiptScanner.ts`
-- 14 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 14 errors in `src/components/sharing/steps/UserSetupStep.tsx`
+- 14 errors in `src/components/pwa/UpdateAvailableModal.tsx`
 - 14 errors in `src/components/dashboard/RecentTransactionsWidget.tsx`
 - 14 errors in `src/components/dashboard/AccountBalanceOverview.tsx`
+- 14 errors in `src/components/budgeting/EnvelopeGrid.tsx`
 - 14 errors in `src/components/automation/AutoFundingDashboard.tsx`
 - 13 errors in `src/utils/settings/settingsHelpers.ts`
 - 13 errors in `src/utils/security/optimizedSerialization.ts`
 - 13 errors in `src/hooks/bills/useBillManager.ts`
-- 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 12 errors in `src/utils/pwa/serviceWorkerDiagnostics.ts`
-- 12 errors in `src/utils/debug/dataDiagnostic.ts`
 - 12 errors in `src/utils/accounts/accountValidation.ts`
-- 12 errors in `src/components/bills/BillManager.tsx`
-- 12 errors in `src/components/automation/tabs/RulesTabComponents.tsx`
-- 11 errors in `src/utils/security/shareCodeUtils.ts`
-- 11 errors in `src/utils/savings/savingsFormUtils.ts`
-- 11 errors in `src/utils/bills/billDetailUtils.ts`
-- 11 errors in `src/hooks/history/useBudgetHistoryViewer.ts`
-- 11 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
-- 11 errors in `src/components/transactions/import/ImportModal.tsx`
-- 11 errors in `src/components/budgeting/suggestions/SuggestionSettings.tsx`
-- 11 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
-- 11 errors in `src/components/budgeting/EnvelopeGrid.tsx`
-- 10 errors in `src/utils/sync/syncHealthChecker.ts`
-- 10 errors in `src/utils/sync/RetryManager.ts`
-- 10 errors in `src/utils/services/editLockHelpers.ts`
-- 10 errors in `src/utils/query/queryClientConfig.ts`
-- 10 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
-- 10 errors in `src/hooks/budgeting/autofunding/useExecutionStatistics.ts`
-- 10 errors in `src/hooks/auth/useAuthCompatibility.ts`
-- 10 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
-- 10 errors in `src/components/settings/sections/SecurityLoggingSection.tsx`
-- 10 errors in `src/components/settings/sections/GeneralSettingsSection.tsx`
-- 10 errors in `src/components/receipts/steps/ConfirmationStep.tsx`
-- 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
+- 12 errors in `src/stores/ui/uiStore.ts`
+- 12 errors in `src/main.tsx`
+- 12 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
+- 11 errors in `src/db/budgetDb.ts`
+- 11 errors in `src/components/bills/BillManager.tsx`
 - 10 errors in `src/components/layout/MainLayout.tsx`
-- 9 errors in `src/utils/pwa/backgroundSync.ts`
-- 9 errors in `src/utils/debug/syncDiagnostic.ts`
-- 9 errors in `src/utils/debug/reactErrorDetector.ts`
+- 10 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
-- 9 errors in `src/utils/analytics/trendHelpers.ts`
-- 9 errors in `src/services/bugReport/uiStateService.ts`
 - 9 errors in `src/hooks/debts/useDebts.ts`
-- 9 errors in `src/hooks/debts/useDebtDetailModal.ts`
-- 9 errors in `src/hooks/debts/useDebtDashboard.ts`
-- 9 errors in `src/hooks/budgeting/useEnvelopeForm.ts`
-- 9 errors in `src/hooks/budgeting/useEnvelopeCalculations.ts`
-- 9 errors in `src/hooks/auth/useAuthFlow.ts`
-- 9 errors in `src/db/budgetDb.ts`
-- 9 errors in `src/components/transactions/splitter/SplitAllocationRow.tsx`
-- 9 errors in `src/components/savings/SavingsGoalCard.tsx`
-- 9 errors in `src/components/onboarding/components/TutorialOverlay.tsx`
-- 9 errors in `src/components/history/viewer/HistoryList.tsx`
-- 9 errors in `src/components/debt/modals/UpcomingPaymentsModal.tsx`
+- 9 errors in `src/components/transactions/TransactionLedger.tsx`
+- 9 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
+- 9 errors in `src/components/bills/BillManagerModals.tsx`
+- 8 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
-- 8 errors in `src/hooks/savings/useSavingsGoalsActions.ts`
-- 8 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 8 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 8 errors in `src/hooks/accounts/useSupplementalAccounts.ts`
-- 8 errors in `src/components/transactions/components/TransactionRow.tsx`
-- 8 errors in `src/components/sync/health/SyncHealthDetails.tsx`
-- 8 errors in `src/components/dashboard/ReconcileTransactionModal.tsx`
-- 8 errors in `src/components/budgeting/suggestions/SuggestionCard.tsx`
-- 8 errors in `src/components/budgeting/DeleteEnvelopeModal.tsx`
-- 8 errors in `src/components/bills/modals/BillDetailModal.tsx`
-- 8 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
-- 8 errors in `src/components/analytics/AnalyticsDashboard.tsx`
+- 8 errors in `src/components/layout/ViewRenderer.tsx`
+- 8 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 8 errors in `src/components/accounts/SupplementalAccounts.tsx`
-- 7 errors in `src/utils/security/errorViewer.ts`
-- 7 errors in `src/utils/security/cryptoCompat.ts`
-- 7 errors in `src/utils/billIcons/iconUtils.ts`
-- 7 errors in `src/services/bugReport/index.ts`
-- 7 errors in `src/services/bugReport/contextAnalysisService.ts`
-- 7 errors in `src/hooks/transactions/useTransactionUtils.ts`
-- 7 errors in `src/hooks/transactions/useTransactionFilters.ts`
-- 7 errors in `src/hooks/sharing/useBudgetJoining.ts`
-- 7 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
-- 7 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 7 errors in `src/hooks/debts/useDebtManagement.ts`
-- 7 errors in `src/hooks/common/useModalManager.ts`
-- 7 errors in `src/components/transactions/import/FieldMapper.tsx`
-- 7 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
-- 7 errors in `src/components/settings/archiving/ArchivingActionButtons.tsx`
-- 7 errors in `src/components/security/LockScreen.tsx`
-- 7 errors in `src/components/savings/SavingsSummaryCard.tsx`
-- 7 errors in `src/components/pwa/InstallPromptModal.tsx`
-- 7 errors in `src/components/modals/UnassignedCashModal.tsx`
-- 7 errors in `src/components/modals/QuickFundForm.tsx`
-- 7 errors in `src/components/history/viewer/ChangeDetails.tsx`
-- 7 errors in `src/components/debt/ui/QuickPaymentForm.tsx`
-- 7 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
-- 7 errors in `src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx`
-- 7 errors in `src/components/budgeting/PaydayPrediction.tsx`
-- 7 errors in `src/components/bills/BulkUpdateEditor.tsx`
-- 7 errors in `src/components/automation/tabs/HistoryTab.tsx`
-- 7 errors in `src/App.tsx`
-- 6 errors in `src/utils/dataManagement/validationUtils.ts`
-- 6 errors in `src/utils/common/BaseMutex.ts`
-- 6 errors in `src/utils/budgeting/envelopeStyles.ts`
-- 6 errors in `src/services/firebaseSyncService.ts`
-- 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
-- 6 errors in `src/hooks/common/useExportData.ts`
+- 7 errors in `src/hooks/common/useActualBalance.ts`
+- 7 errors in `src/components/pwa/PatchNotesModal.tsx`
+- 6 errors in `src/services/bugReport/index.ts`
 - 6 errors in `src/hooks/budgeting/usePaycheckForm.ts`
-- 6 errors in `src/hooks/bills/useBillManagerUI.ts`
-- 6 errors in `src/components/sharing/steps/ShareCodeStep.tsx`
-- 6 errors in `src/components/settings/sections/AutoLockSettingsSection.tsx`
-- 6 errors in `src/components/savings/SavingsGoals.tsx`
+- 6 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 6 errors in `src/components/modals/QuickFundModal.tsx`
-- 6 errors in `src/components/layout/NavigationTabs.tsx`
-- 6 errors in `src/components/debt/ui/PaymentImpactTable.tsx`
-- 6 errors in `src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx`
-- 6 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
-- 6 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
-- 6 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
-- 6 errors in `src/components/automation/steps/config/PriorityFillConfig.tsx`
-- 5 errors in `src/utils/sync/validation/checksumUtils.ts`
+- 6 errors in `src/components/debt/DebtDashboard.tsx`
+- 6 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
+- 6 errors in `src/App.tsx`
 - 5 errors in `src/utils/sync/syncFlowValidator.ts`
 - 5 errors in `src/utils/sync/syncEdgeCaseTester.ts`
 - 5 errors in `src/utils/pwa/offlineDataValidator.ts`
+- 5 errors in `src/utils/layout/paycheckDeletionUtils.ts`
+- 5 errors in `src/utils/debug/dataDiagnostic.ts`
 - 5 errors in `src/utils/dataManagement/dexieUtils.ts`
 - 5 errors in `src/utils/budgeting/envelopeIntegrityChecker.ts`
 - 5 errors in `src/utils/budgeting/autofunding/conditions.ts`
 - 5 errors in `src/services/security/securityService.ts`
+- 5 errors in `src/services/chunkedSyncService.ts`
 - 5 errors in `src/services/bugReport/pageDetectionService.ts`
 - 5 errors in `src/hooks/transactions/useTransactionSplitter.ts`
+- 5 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 5 errors in `src/hooks/transactions/useTransactionData.ts`
 - 5 errors in `src/hooks/sync/useManualSync.ts`
+- 5 errors in `src/hooks/sync/useFirebaseSync.ts`
 - 5 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
-- 5 errors in `src/hooks/settings/useSettingsDashboard.ts`
 - 5 errors in `src/hooks/savings/useSavingsGoals/index.ts`
+- 5 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 5 errors in `src/hooks/common/useFABActions.ts`
-- 5 errors in `src/hooks/common/useActualBalance.ts`
 - 5 errors in `src/hooks/common/bug-report/useBugReportHighlight.ts`
+- 5 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useTransferFunds.ts`
 - 5 errors in `src/hooks/budgeting/mutations/useDeleteEnvelope.ts`
 - 5 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 5 errors in `src/components/transactions/splitter/SplitActions.tsx`
 - 5 errors in `src/components/transactions/components/DeleteConfirmation.tsx`
 - 5 errors in `src/components/transactions/TransactionTable.tsx`
+- 5 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 5 errors in `src/components/settings/sections/AccountSettingsSection.tsx`
 - 5 errors in `src/components/settings/archiving/ArchivingConfiguration.tsx`
+- 5 errors in `src/components/settings/SettingsDashboard.tsx`
+- 5 errors in `src/components/savings/SavingsGoals.tsx`
 - 5 errors in `src/components/receipts/steps/ReceiptDataStep.tsx`
 - 5 errors in `src/components/receipts/steps/EnvelopeSelectionStep.tsx`
 - 5 errors in `src/components/receipts/components/ReceiptUploadArea.tsx`
 - 5 errors in `src/components/receipts/components/ExtractedDataField.tsx`
+- 5 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 5 errors in `src/components/receipts/ReceiptButton.tsx`
-- 5 errors in `src/components/pwa/PatchNotesModal.tsx`
-- 5 errors in `src/components/layout/ViewRenderer.tsx`
-- 5 errors in `src/components/layout/SummaryCards.tsx`
 - 5 errors in `src/components/debt/modals/DebtDetailModal.tsx`
-- 5 errors in `src/components/budgeting/envelope/EnvelopeActions.tsx`
-- 5 errors in `src/components/budgeting/PaycheckProcessor.tsx`
-- 5 errors in `src/components/bills/modals/BillDetailActions.tsx`
-- 5 errors in `src/components/bills/BulkBillUpdateModal.tsx`
-- 5 errors in `src/components/bills/BillManagerHeader.tsx`
-- 5 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
-- 5 errors in `src/components/automation/steps/config/PercentageConfig.tsx`
-- 5 errors in `src/components/automation/steps/config/FixedAmountConfig.tsx`
-- 5 errors in `src/components/automation/steps/RuleConfigurationStep.tsx`
-- 5 errors in `src/components/auth/components/ReturningUserActions.tsx`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
+- 4 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
+- 4 errors in `src/utils/pwa/patchNotesManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
+- 4 errors in `src/utils/debug/reactErrorDetector.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
-- 4 errors in `src/services/chunkedSyncService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
+- 4 errors in `src/hooks/transactions/useTransactionsV2.ts`
 - 4 errors in `src/hooks/transactions/useTransactionImport.ts`
-- 4 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
+- 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 4 errors in `src/hooks/mobile/usePullToRefresh.ts`
-- 4 errors in `src/hooks/layout/usePaycheckOperations.ts`
-- 4 errors in `src/hooks/common/useDataInitialization.ts`
+- 4 errors in `src/hooks/common/useNetworkStatus.ts`
+- 4 errors in `src/hooks/common/useImportData.ts`
+- 4 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
 - 4 errors in `src/hooks/budgeting/useBudgetData/queries.ts`
 - 4 errors in `src/hooks/budgeting/autofunding/useAutoFunding.ts`
 - 4 errors in `src/hooks/bills/useBillValidation.ts`
 - 4 errors in `src/hooks/bills/useBillOperationWrappers.ts`
-- 4 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
+- 4 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 4 errors in `src/hooks/analytics/useReportExporter.ts`
 - 4 errors in `src/components/transactions/ledger/TransactionLedgerHeader.tsx`
-- 4 errors in `src/components/transactions/TransactionLedger.tsx`
+- 4 errors in `src/components/transactions/import/ImportModal.tsx`
 - 4 errors in `src/components/sync/health/SyncStatusIndicator.tsx`
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingStatusOverview.tsx`
@@ -382,11 +1100,16 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 4 errors in `src/components/onboarding/hooks/useTutorialControls.ts`
 - 4 errors in `src/components/layout/AppRoutes.tsx`
 - 4 errors in `src/components/history/viewer/HistoryControls.tsx`
+- 4 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 4 errors in `src/components/debt/ui/DebtList.tsx`
+- 4 errors in `src/components/debt/DebtStrategies.tsx`
 - 4 errors in `src/components/budgeting/shared/EnvelopeTypeSelector.tsx`
 - 4 errors in `src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx`
+- 4 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 4 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
+- 4 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 4 errors in `src/components/budgeting/BillEnvelopeFundingInfo.tsx`
-- 4 errors in `src/components/bills/SmartBillMatcher.tsx`
+- 4 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 4 errors in `src/components/auth/components/UserSetupHeader.tsx`
 - 4 errors in `src/components/auth/components/ShareCodeDisplay.tsx`
 - 4 errors in `src/components/analytics/tabs/TrendsTab.tsx`
@@ -395,54 +1118,56 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
 - 3 errors in `src/utils/analytics/transactionAnalyzer.ts`
 - 3 errors in `src/stores/ui/fabStore.ts`
-- 3 errors in `src/hooks/transactions/useTransactionsV2.ts`
-- 3 errors in `src/hooks/sync/useFirebaseSync.ts`
+- 3 errors in `src/services/bugReport/contextAnalysisService.ts`
+- 3 errors in `src/hooks/transactions/useTransactionQuery.ts`
+- 3 errors in `src/hooks/settings/useSettingsDashboard.ts`
 - 3 errors in `src/hooks/mobile/useFABSmartPositioning.ts`
-- 3 errors in `src/hooks/common/useNetworkStatus.ts`
+- 3 errors in `src/hooks/layout/usePaycheckOperations.ts`
+- 3 errors in `src/hooks/common/useDataInitialization.ts`
 - 3 errors in `src/hooks/common/useConnectionManager/useConnectionOperations.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportSubmission.ts`
 - 3 errors in `src/hooks/common/bug-report/useBugReportDiagnostics.ts`
 - 3 errors in `src/hooks/budgeting/useBudgetData/mutationsHelpers.ts`
-- 3 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingData.ts`
+- 3 errors in `src/hooks/auth/useAuthFlow.ts`
 - 3 errors in `src/hooks/auth/queries/usePasswordValidation.ts`
 - 3 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
-- 3 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
+- 3 errors in `src/hooks/auth/mutations/useLoginMutations.ts`
 - 3 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
 - 3 errors in `src/hooks/analytics/useChartsAnalytics.ts`
 - 3 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
+- 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 3 errors in `src/components/transactions/ledger/TransactionPagination.tsx`
-- 3 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 3 errors in `src/components/sharing/JoinBudgetModal.tsx`
 - 3 errors in `src/components/settings/sections/SecuritySettingsSection.tsx`
 - 3 errors in `src/components/settings/archiving/ArchivingPreviewResults.tsx`
-- 3 errors in `src/components/settings/SettingsDashboard.tsx`
 - 3 errors in `src/components/security/LocalDataSecurityWarning.tsx`
 - 3 errors in `src/components/receipts/components/ReceiptImagePreview.tsx`
 - 3 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 3 errors in `src/components/receipts/components/ExtractedItemsList.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
+- 3 errors in `src/components/layout/SummaryCards.tsx`
 - 3 errors in `src/components/history/viewer/IntegrityWarning.tsx`
-- 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
-- 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 3 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeHistoryModal.tsx`
-- 3 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
+- 3 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailHeader.tsx`
 - 3 errors in `src/components/bills/BulkUpdateSummary.tsx`
 - 3 errors in `src/components/bills/BillTabs.tsx`
 - 3 errors in `src/components/bills/BillTableHeader.tsx`
 - 3 errors in `src/components/bills/BillTableEmptyState.tsx`
 - 3 errors in `src/components/bills/BillModalHeader.tsx`
-- 3 errors in `src/components/bills/BillManagerModals.tsx`
 - 3 errors in `src/components/bills/AddBillModal.tsx`
 - 3 errors in `src/components/automation/steps/RuleTypeStep.tsx`
 - 3 errors in `src/components/analytics/tabs/HealthTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
+- 2 errors in `src/utils/sync/validation/checksumUtils.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
 - 2 errors in `src/utils/security/keyExport.ts`
+- 2 errors in `src/utils/query/queryClientConfig.ts`
 - 2 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 2 errors in `src/utils/debts/calculations/interestCalculation.ts`
 - 2 errors in `src/utils/dataManagement/fileUtils.ts`
@@ -451,9 +1176,9 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 2 errors in `src/utils/bills/billUpdateHelpers.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
+- 2 errors in `src/services/editLockService.ts`
 - 2 errors in `src/services/bugReport/errorTrackingService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionTable.ts`
-- 2 errors in `src/hooks/transactions/useTransactionQuery.ts`
 - 2 errors in `src/hooks/transactions/useTransactionForm.ts`
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/sharing/useShareCodeValidation.ts`
@@ -466,47 +1191,38 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 2 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
 - 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetData/utilities.ts`
+- 2 errors in `src/hooks/budgeting/autofunding/useUndoOperations.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useExecutionHistory.ts`
+- 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 2 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts`
 - 2 errors in `src/hooks/bills/useBillOperations.ts`
-- 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
+- 2 errors in `src/hooks/auth/useAuthCompatibility.ts`
 - 2 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
+- 2 errors in `src/hooks/auth/mutations/useJoinBudgetMutation.ts`
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
 - 2 errors in `src/hooks/analytics/useBillAnalysis.ts`
-- 2 errors in `src/hooks/analytics/useAnalyticsExport.ts`
+- 2 errors in `src/hooks/analytics/queries/usePaycheckTrendsQuery.ts`
 - 2 errors in `src/contexts/authUtils.ts`
-- 2 errors in `src/components/transactions/import/ImportProgress.tsx`
 - 2 errors in `src/components/transactions/components/TransactionRow.tsx`
-- 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
-- 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
-- 2 errors in `src/components/settings/archiving/ArchivingProgress.tsx`
-- 2 errors in `src/components/settings/archiving/ArchivingHeader.tsx`
-- 2 errors in `src/components/settings/EnvelopeIntegrityChecker.tsx`
-- 2 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
-- 2 errors in `src/components/receipts/components/ReceiptErrorState.tsx`
-- 2 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 2 errors in `src/components/onboarding/hooks/useTutorialPositioning.ts`
+- 2 errors in `src/components/settings/sections/GeneralSettingsSection.tsx`
+- 2 errors in `src/components/receipts/steps/ConfirmationStep.tsx`
 - 2 errors in `src/components/onboarding/EmptyStateHints.tsx`
 - 2 errors in `src/components/modals/UnassignedCashModal.tsx`
 - 2 errors in `src/components/mobile/FABActionMenu.tsx`
-- 2 errors in `src/components/debt/ui/StrategyCard.tsx`
-- 2 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
-- 2 errors in `src/components/debt/modals/DebtModalHeader.tsx`
-- 2 errors in `src/components/debt/DebtStrategies.tsx`
+- 2 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
-- 2 errors in `src/components/debt/DebtDashboard.tsx`
-- 2 errors in `src/components/charts/ComposedFinancialChart.tsx`
-- 2 errors in `src/components/budgeting/shared/FrequencySelector.tsx`
-- 2 errors in `src/components/budgeting/shared/AllocationModeSelector.tsx`
 - 2 errors in `src/components/budgeting/paycheck/PaycheckAmountInput.tsx`
+- 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
 - 2 errors in `src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx`
 - 2 errors in `src/components/budgeting/envelope/EnvelopeModalHeader.tsx`
-- 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 errors in `src/components/budgeting/EditEnvelopeModalComponents.tsx`
-- 2 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 2 errors in `src/components/bills/smartBillMatcherHelpers.ts`
+- 2 errors in `src/components/bills/SmartBillMatcher.tsx`
 - 2 errors in `src/components/bills/BulkUpdateModeSelector.tsx`
+- 2 errors in `src/components/bills/BulkUpdateEditor.tsx`
+- 2 errors in `src/components/bills/BulkUpdateBillRow.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
+- 2 errors in `src/components/automation/tabs/HistoryTab.tsx`
 - 2 errors in `src/components/automation/steps/TriggerScheduleStep.tsx`
 - 2 errors in `src/components/automation/components/StepNavigation.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
@@ -536,24 +1252,25 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/utils/analytics/categoryPatterns.ts`
 - 1 errors in `src/stores/ui/toastStore.ts`
 - 1 errors in `src/services/typedChunkedSyncService.ts`
-- 1 errors in `src/services/editLockService.ts`
+- 1 errors in `src/services/firebaseSyncService.ts`
+- 1 errors in `src/services/authService.ts`
 - 1 errors in `src/services/activityLogger.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
 - 1 errors in `src/hooks/debts/useDebtModalLogic.ts`
+- 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
-- 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useEnvelopes.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
-- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts`
 - 1 errors in `src/hooks/bills/useBulkBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
+- 1 errors in `src/hooks/bills/useBillManagerUI.ts`
 - 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/useKeyManagement.ts`
@@ -562,8 +1279,12 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/hooks/analytics/useTransactionFiltering.ts`
 - 1 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
 - 1 errors in `src/components/transactions/splitter/SplitTotals.tsx`
+- 1 errors in `src/components/settings/sections/NotificationSettingsSection.tsx`
 - 1 errors in `src/components/settings/archiving/ArchivingResult.tsx`
+- 1 errors in `src/components/settings/SecuritySettings.tsx`
+- 1 errors in `src/components/security/LockScreen.tsx`
 - 1 errors in `src/components/receipts/components/ReceiptScannerHeader.tsx`
+- 1 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
 - 1 errors in `src/components/onboarding/hooks/useTutorialSteps.ts`
 - 1 errors in `src/components/monitoring/HighlightLoader.tsx`
 - 1 errors in `src/components/layout/AppWrapper.tsx`
@@ -572,23 +1293,30 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/components/history/ObjectHistoryViewer.tsx`
 - 1 errors in `src/components/history/IntegrityStatusIndicatorHelpers.tsx`
 - 1 errors in `src/components/history/IntegrityStatusIndicator.tsx`
+- 1 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
 - 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
 - 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
 - 1 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/charts/TrendLineChart.tsx`
+- 1 errors in `src/components/budgeting/shared/BillConnectionSelector.tsx`
+- 1 errors in `src/components/budgeting/envelope/UnassignedCashEnvelope.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
-- 1 errors in `src/components/budgeting/CreateEnvelopeModal.tsx`
 - 1 errors in `src/components/budgeting/CashFlowSummary.tsx`
 - 1 errors in `src/components/bills/modals/BulkUpdateConfirmModal.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailSections.tsx`
+- 1 errors in `src/components/bills/BulkUpdateBillRowComponents.tsx`
 - 1 errors in `src/components/bills/BillFormSections.tsx`
 - 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
+- 1 errors in `src/components/automation/steps/config/SplitRemainderConfig.tsx`
+- 1 errors in `src/components/automation/AutoFundingView.tsx`
+- 1 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
 - 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
+- 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
 - 1 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
 - 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
@@ -596,50 +1324,52 @@ src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument o
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 
 ### Strict Mode Error Breakdown
-
 | Count | Error Code |
 |---|---|
-| 611 | `TS7006` |
-| 609 | `TS7031` |
-| 186 | `TS2345` |
-| 147 | `TS2322` |
-| 129 | `TS2339` |
-| 112 | `TS18046` |
-| 64 | `TS7005` |
-| 54 | `TS7053` |
-| 50 | `TS18048` |
-| 39 | `TS7034` |
-| 37 | `TS18047` |
-| 25 | `TS2769` |
-| 6 | `TS2411` |
-| 5 | `TS2722` |
-| 5 | `TS2531` |
-| 5 | `TS2353` |
-| 4 | `TS2352` |
+| 236 | `TS2345` |
+| 231 | `TS2322` |
+| 205 | `TS7031` |
+| 184 | `TS7006` |
+| 123 | `TS2339` |
+| 53 | `TS18046` |
+| 35 | `TS18048` |
+| 33 | `TS2769` |
+| 25 | `TS7053` |
+| 22 | `TS18047` |
+| 10 | `TS2719` |
+| 10 | `TS2352` |
+| 7 | `TS7005` |
+| 7 | `TS2774` |
+| 6 | `TS7034` |
+| 5 | `TS2717` |
+| 4 | `TS2739` |
+| 4 | `TS2687` |
 | 3 | `TS2783` |
+| 3 | `TS2722` |
 | 2 | `TS7022` |
-| 2 | `TS7019` |
-| 2 | `TS2719` |
+| 2 | `TS2740` |
+| 2 | `TS2554` |
+| 2 | `TS2538` |
+| 2 | `TS2531` |
+| 2 | `TS2353` |
+| 2 | `TS2349` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
 | 1 | `TS7016` |
-| 1 | `TS2774` |
-| 1 | `TS2740` |
+| 1 | `TS6196` |
+| 1 | `TS6133` |
+| 1 | `TS2741` |
 | 1 | `TS2698` |
 | 1 | `TS2683` |
-| 1 | `TS2538` |
 | 1 | `TS2365` |
-| 1 | `TS2349` |
 
 ### Detailed Strict Mode Report
-
 ```
-src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/App.tsx(29,9): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/App.tsx(30,17): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/App.tsx(31,31): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/App.tsx(33,16): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/App.tsx(36,16): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/App.tsx(29,20): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(30,28): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(31,42): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(33,27): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/App.tsx(36,27): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
 src/App.tsx(63,25): error TS2322: Type 'CloudSyncService' is not assignable to type 'FirebaseSyncService'.
   Types of property 'start' are incompatible.
     Type '(config: SyncConfig) => void' is not assignable to type '(config: unknown) => void'.
@@ -705,11 +1435,8 @@ src/components/auth/UserIndicator.tsx(71,23): error TS2349: This expression is n
   Type 'never' has no call signatures.
 src/components/auth/UserIndicator.tsx(116,11): error TS2322: Type '((updates: { [key: string]: unknown; userName: string; userColor: string; budgetId?: string | undefined; }) => Promise<void>) | undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
   Type 'undefined' is not assignable to type '(updates: Record<string, unknown>) => void | Promise<void>'.
-src/components/auth/components/ReturningUserActions.tsx(10,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(11,3): error TS7031: Binding element 'onChangeProfile' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(12,3): error TS7031: Binding element 'onStartFresh' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(13,3): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
-src/components/auth/components/ReturningUserActions.tsx(14,3): error TS7031: Binding element 'canSubmit' implicitly has an 'any' type.
+src/components/auth/UserSetup.tsx(115,17): error TS2322: Type '(e: FormEvent) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/auth/components/ShareCodeDisplay.tsx(10,29): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
 src/components/auth/components/ShareCodeDisplay.tsx(10,40): error TS7031: Binding element 'onCreateBudget' implicitly has an 'any' type.
 src/components/auth/components/ShareCodeDisplay.tsx(10,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
@@ -723,11 +1450,9 @@ src/components/auth/components/UserSetupHeader.tsx(9,61): error TS7031: Binding 
 src/components/auth/components/UserSetupLayout.tsx(6,28): error TS7031: Binding element 'children' implicitly has an 'any' type.
 src/components/auth/key-management/MainContent.tsx(116,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
   Type 'null' is not assignable to type 'string'.
-src/components/automation/AutoFundingDashboard.tsx(8,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/automation/AutoFundingDashboard.tsx(13,33): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(13,41): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/automation/AutoFundingDashboard.tsx(14,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/automation/AutoFundingDashboard.tsx(14,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/automation/AutoFundingDashboard.tsx(14,53): error TS2339: Property 'envelopes' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
 src/components/automation/AutoFundingDashboard.tsx(33,27): error TS7006: Parameter 'rule' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(38,33): error TS7006: Parameter 'ruleData' implicitly has an 'any' type.
 src/components/automation/AutoFundingDashboard.tsx(41,32): error TS2339: Property 'id' does not exist on type 'never'.
@@ -740,6 +1465,23 @@ src/components/automation/AutoFundingDashboard.tsx(141,15): error TS2322: Type '
   Types of parameters 'value' and 'show' are incompatible.
     Type 'string | null' is not assignable to type 'SetStateAction<null>'.
       Type 'string' is not assignable to type 'SetStateAction<null>'.
+src/components/automation/AutoFundingDashboard.tsx(149,15): error TS2322: Type 'FC<HistoryTabProps>' is not assignable to type 'ComponentType<HistoryTabProps>'.
+  Type 'React.FunctionComponent<HistoryTabProps>' is not assignable to type 'React.FunctionComponent<HistoryTabProps>'. Two different types with this name exist, but they are unrelated.
+    Type 'HistoryTabProps' is not assignable to type 'HistoryTabProps'. Two different types with this name exist, but they are unrelated.
+      Types of property 'executionHistory' are incompatible.
+        Type 'ExecutionHistoryEntry[]' is not assignable to type 'Execution[]'.
+          Property 'success' is missing in type 'ExecutionHistoryEntry' but required in type 'Execution'.
+src/components/automation/AutoFundingDashboard.tsx(162,9): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'unknown[]'.
+src/components/automation/AutoFundingRuleBuilder.tsx(158,9): error TS2322: Type '(envelopeId: string) => void' is not assignable to type '(envelopeId: string | number) => void'.
+  Types of parameters 'envelopeId' and 'envelopeId' are incompatible.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/components/automation/AutoFundingView.tsx(120,11): error TS2322: Type 'FC<HistoryTabProps>' is not assignable to type 'ComponentType<{ executionHistory: unknown[]; showExecutionDetails: string | null; onToggleDetails: (show: string | null) => void; }>'.
+  Type 'FunctionComponent<HistoryTabProps>' is not assignable to type 'FunctionComponent<{ executionHistory: unknown[]; showExecutionDetails: string | null; onToggleDetails: (show: string | null) => void; }>'.
+    Type '{ executionHistory: unknown[]; showExecutionDetails: string | null; onToggleDetails: (show: string | null) => void; }' is not assignable to type 'HistoryTabProps'.
+      Types of property 'executionHistory' are incompatible.
+        Type 'unknown[]' is not assignable to type 'Execution[]'.
+          Type 'unknown' is not assignable to type 'Execution'.
 src/components/automation/components/StepNavigation.tsx(4,27): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
 src/components/automation/components/StepNavigation.tsx(4,40): error TS7031: Binding element 'onStepChange' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(6,27): error TS7006: Parameter 'type' implicitly has an 'any' type.
@@ -758,53 +1500,15 @@ src/components/automation/steps/ReviewStep.tsx(66,44): error TS7006: Parameter '
 src/components/automation/steps/ReviewStep.tsx(82,31): error TS7031: Binding element 'description' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(93,23): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/ReviewStep.tsx(93,33): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/RuleConfigurationStep.tsx(8,3): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/RuleConfigurationStep.tsx(9,3): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/RuleConfigurationStep.tsx(10,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/RuleConfigurationStep.tsx(11,3): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
-src/components/automation/steps/RuleConfigurationStep.tsx(12,3): error TS7031: Binding element 'errors' implicitly has an 'any' type.
 src/components/automation/steps/RuleTypeStep.tsx(5,25): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/RuleTypeStep.tsx(5,35): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
 src/components/automation/steps/RuleTypeStep.tsx(5,51): error TS7031: Binding element 'errors' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,32): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
 src/components/automation/steps/TriggerScheduleStep.tsx(5,42): error TS7031: Binding element 'updateRuleData' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,30): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,40): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,54): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(5,65): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/FixedAmountConfig.tsx(47,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,29): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,39): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,53): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(5,64): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/PercentageConfig.tsx(50,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,31): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,41): error TS7031: Binding element 'updateConfig' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,55): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(5,66): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(18,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/steps/config/PriorityFillConfig.tsx(49,46): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,33): error TS7031: Binding element 'ruleData' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,43): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,54): error TS7031: Binding element 'toggleTargetEnvelope' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(5,76): error TS7031: Binding element 'errors' implicitly has an 'any' type.
-src/components/automation/steps/config/SplitRemainderConfig.tsx(14,27): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(5,23): error TS7031: Binding element 'executionHistory' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(5,41): error TS7031: Binding element 'showExecutionDetails' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(5,63): error TS7031: Binding element 'onToggleDetails' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(20,34): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(20,45): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(92,46): error TS7006: Parameter 'result' implicitly has an 'any' type.
-src/components/automation/tabs/HistoryTab.tsx(92,54): error TS7006: Parameter 'resultIndex' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(4,3): error TS7031: Binding element 'rules' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(5,3): error TS7031: Binding element 'onCreateRule' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(6,3): error TS7031: Binding element 'onEditRule' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(7,3): error TS7031: Binding element 'onDeleteRule' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(8,3): error TS7031: Binding element 'onToggleRule' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(9,3): error TS7031: Binding element 'onExecuteRules' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(10,3): error TS7031: Binding element 'isExecuting' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(12,40): error TS7006: Parameter 'r' implicitly has an 'any' type.
-src/components/automation/tabs/RulesTab.tsx(28,23): error TS7006: Parameter 'rule' implicitly has an 'any' type.
+src/components/automation/steps/config/SplitRemainderConfig.tsx(35,68): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/automation/tabs/HistoryTab.tsx(134,30): error TS2339: Property 'error' does not exist on type 'Execution'.
+src/components/automation/tabs/HistoryTab.tsx(136,58): error TS2339: Property 'error' does not exist on type 'Execution'.
 src/components/bills/AddBillModal.tsx(211,5): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
   Type 'null' is not assignable to type 'string'.
 src/components/bills/AddBillModal.tsx(257,5): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
@@ -820,46 +1524,68 @@ src/components/bills/BillFormFields.tsx(101,11): error TS2322: Type 'boolean | n
 src/components/bills/BillFormSections.tsx(266,17): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Object literal may only specify known properties, and 'className' does not exist in type 'Attributes'.
-src/components/bills/BillManager.tsx(19,31): error TS7031: Binding element 'className' implicitly has an 'any' type.
-src/components/bills/BillManager.tsx(31,17): error TS7031: Binding element '_onUpdateBill' implicitly has an 'any' type.
-src/components/bills/BillManager.tsx(32,26): error TS7031: Binding element '_onCreateRecurringBill' implicitly has an 'any' type.
-src/components/bills/BillManager.tsx(33,21): error TS7031: Binding element '_onSearchNewBills' implicitly has an 'any' type.
-src/components/bills/BillManager.tsx(34,3): error TS7031: Binding element 'onError' implicitly has an 'any' type.
-src/components/bills/BillManager.tsx(115,5): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: unknown) => void'.
+src/components/bills/BillManager.tsx(105,5): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/bills/BillManager.tsx(143,5): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: unknown) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'unknown' is not assignable to type 'BillRecord | null'.
-src/components/bills/BillManager.tsx(116,5): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: unknown) => void'.
+src/components/bills/BillManager.tsx(144,5): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: unknown) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'unknown' is not assignable to type 'BillRecord | null'.
-src/components/bills/BillManager.tsx(170,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity) => void'.
+src/components/bills/BillManager.tsx(171,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/bills/BillManager.tsx(182,9): error TS2322: Type '{ id: string; label: string; count: number; icon: string; color: string; }[]' is not assignable to type 'Tab[]'.
+  Type '{ id: string; label: string; count: number; icon: string; color: string; }' is not assignable to type 'Tab'.
+    Types of property 'icon' are incompatible.
+      Type 'string' is not assignable to type 'ComponentType<{ className?: string | undefined; }> | undefined'.
+src/components/bills/BillManager.tsx(198,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillEntity' is not assignable to type 'BillRecord | null'.
-src/components/bills/BillManager.tsx(192,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity | null) => void'.
+src/components/bills/BillManager.tsx(220,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity | null) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillEntity | null' is not assignable to type 'BillRecord | null'.
       Type 'BillEntity' is not assignable to type 'BillRecord | null'.
-src/components/bills/BillManager.tsx(193,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity | null) => void'.
+src/components/bills/BillManager.tsx(221,9): error TS2322: Type '(bill: BillRecord | null) => void' is not assignable to type '(bill: BillEntity | null) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillEntity | null' is not assignable to type 'BillRecord | null'.
       Type 'BillEntity' is not assignable to type 'BillRecord | null'.
-src/components/bills/BillManager.tsx(198,9): error TS2322: Type '(updatedBills: Bill[]) => Promise<void>' is not assignable to type '(updates: BillEntity[]) => Promise<void>'.
+src/components/bills/BillManager.tsx(226,9): error TS2322: Type '(updatedBills: Bill[]) => Promise<void>' is not assignable to type '(updates: BillEntity[]) => Promise<void>'.
   Types of parameters 'updatedBills' and 'updates' are incompatible.
     Type 'BillEntity[]' is not assignable to type 'Bill[]'.
       Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
-src/components/bills/BillManager.tsx(199,9): error TS2322: Type '(billsToAdd: Bill[]) => Promise<void>' is not assignable to type '(bills: BillEntity[]) => Promise<void>'.
+src/components/bills/BillManager.tsx(227,9): error TS2322: Type '(billsToAdd: Bill[]) => Promise<void>' is not assignable to type '(bills: BillEntity[]) => Promise<void>'.
   Types of parameters 'billsToAdd' and 'bills' are incompatible.
     Type 'BillEntity[]' is not assignable to type 'Bill[]'.
       Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
-src/components/bills/BillManagerHeader.tsx(10,3): error TS7031: Binding element 'isEditLocked' implicitly has an 'any' type.
-src/components/bills/BillManagerHeader.tsx(11,3): error TS7031: Binding element 'currentEditor' implicitly has an 'any' type.
-src/components/bills/BillManagerHeader.tsx(12,3): error TS7031: Binding element 'isSearching' implicitly has an 'any' type.
-src/components/bills/BillManagerHeader.tsx(13,3): error TS7031: Binding element 'searchNewBills' implicitly has an 'any' type.
-src/components/bills/BillManagerHeader.tsx(14,3): error TS7031: Binding element 'handleAddNewBill' implicitly has an 'any' type.
+src/components/bills/BillManager.tsx(229,9): error TS2322: Type '((error: string) => void) | undefined' is not assignable to type '(error: string) => void'.
+  Type 'undefined' is not assignable to type '(error: string) => void'.
 src/components/bills/BillManagerModals.tsx(115,11): error TS2322: Type '(billId: string, deleteEnvelope?: boolean | undefined) => Promise<void>' is not assignable to type '(id: unknown, deleteEnvelope?: boolean | undefined) => void | Promise<void>'.
   Types of parameters 'billId' and 'id' are incompatible.
     Type 'unknown' is not assignable to type 'string'.
-src/components/bills/BillManagerModals.tsx(153,24): error TS7006: Parameter 'billId' implicitly has an 'any' type.
-src/components/bills/BillManagerModals.tsx(153,32): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
+src/components/bills/BillManagerModals.tsx(149,11): error TS2322: Type 'BillEntity' is not assignable to type 'Bill | null'.
+  Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
+src/components/bills/BillManagerModals.tsx(152,11): error TS2322: Type '(billId: string, deleteEnvelope?: boolean | undefined) => Promise<void>' is not assignable to type '(bill: Bill) => void | Promise<void>'.
+  Types of parameters 'billId' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'string'.
+src/components/bills/BillManagerModals.tsx(154,13): error TS2322: Type 'Promise<unknown>' is not assignable to type 'void | Promise<void>'.
+  Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
+    Type 'unknown' is not assignable to type 'void'.
+src/components/bills/BillManagerModals.tsx(154,42): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'string'.
+src/components/bills/BillManagerModals.tsx(155,35): error TS2339: Property 'amount' does not exist on type 'number'.
+src/components/bills/BillManagerModals.tsx(156,37): error TS2339: Property 'paidDate' does not exist on type 'number'.
+src/components/bills/BillManagerModals.tsx(159,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'BillEntity'.
+      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type 'Bill'.
+src/components/bills/BillManagerModals.tsx(163,11): error TS2322: Type '(bill: BillEntity) => void' is not assignable to type '(bill: Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'BillEntity'.
+      Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type 'Bill'.
 src/components/bills/BillModalHeader.tsx(10,28): error TS7031: Binding element 'editingBill' implicitly has an 'any' type.
 src/components/bills/BillModalHeader.tsx(10,41): error TS7031: Binding element 'formData' implicitly has an 'any' type.
 src/components/bills/BillModalHeader.tsx(10,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
@@ -872,47 +1598,59 @@ src/components/bills/BillTableHeader.tsx(9,60): error TS7031: Binding element 's
 src/components/bills/BillTabs.tsx(5,21): error TS7031: Binding element 'activeTab' implicitly has an 'any' type.
 src/components/bills/BillTabs.tsx(5,32): error TS7031: Binding element 'onTabChange' implicitly has an 'any' type.
 src/components/bills/BillTabs.tsx(5,45): error TS7031: Binding element 'bills' implicitly has an 'any' type.
-src/components/bills/BulkBillUpdateModal.tsx(14,32): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/bills/BulkBillUpdateModal.tsx(14,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/BulkBillUpdateModal.tsx(14,69): error TS7031: Binding element 'onUpdateBills' implicitly has an 'any' type.
-src/components/bills/BulkBillUpdateModal.tsx(14,84): error TS7031: Binding element 'onError' implicitly has an 'any' type.
-src/components/bills/BulkBillUpdateModal.tsx(55,17): error TS18046: 'error' is of type 'unknown'.
-src/components/bills/BulkUpdateBillRowComponents.tsx(7,37): error TS7031: Binding element 'change' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(7,45): error TS7031: Binding element 'amountChange' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(7,59): error TS7031: Binding element 'billId' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(7,67): error TS7031: Binding element 'updateChange' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(32,35): error TS7031: Binding element 'change' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(32,43): error TS7031: Binding element 'billId' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(32,51): error TS7031: Binding element 'updateChange' implicitly has an 'any' type.
-src/components/bills/BulkUpdateBillRowComponents.tsx(53,28): error TS7031: Binding element 'bill' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(7,3): error TS7031: Binding element 'selectedBills' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(8,3): error TS7031: Binding element 'changes' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(9,3): error TS7031: Binding element 'updateMode' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(10,3): error TS7031: Binding element 'updateChange' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(11,3): error TS7031: Binding element 'applyBulkChange' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(12,3): error TS7031: Binding element 'resetChanges' implicitly has an 'any' type.
-src/components/bills/BulkUpdateEditor.tsx(73,31): error TS7006: Parameter 'bill' implicitly has an 'any' type.
+src/components/bills/BulkBillUpdateModal.tsx(40,25): error TS2345: Argument of type 'Bill[]' is not assignable to parameter of type '{ id: string; name: string; dueDate: string | Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; frequency?: "monthly" | "quarterly" | "annually" | undefined; envelopeId?: string | undefined; createdAt?: number | undefined; description?: string | undefined; paymentMe...'.
+  Type 'Bill' is missing the following properties from type '{ id: string; name: string; dueDate: string | Date; amount: number; category: string; isPaid: boolean; isRecurring: boolean; lastModified: number; frequency?: "monthly" | "quarterly" | "annually" | undefined; envelopeId?: string | undefined; createdAt?: number | undefined; description?: string | undefined; paymentMe...': isRecurring, lastModified
+src/components/bills/BulkBillUpdateModal.tsx(70,17): error TS18046: 'error' is of type 'unknown'.
+src/components/bills/BulkBillUpdateModal.tsx(111,17): error TS2322: Type '(billId: string, field: BillField, value: string | number) => void' is not assignable to type '(billId: string, field: string, value: string | number) => void'.
+  Types of parameters 'field' and 'field' are incompatible.
+    Type 'string' is not assignable to type 'BillField'.
+src/components/bills/BulkBillUpdateModal.tsx(112,17): error TS2322: Type '(field: BillField, value: string | number) => void' is not assignable to type '(field: string, value: string | number) => void'.
+  Types of parameters 'field' and 'field' are incompatible.
+    Type 'string' is not assignable to type 'BillField'.
+src/components/bills/BulkUpdateBillRow.tsx(59,19): error TS2739: Type 'BillEntity' is missing the following properties from type 'Bill': amount, frequency, dueDate, category, color
+src/components/bills/BulkUpdateBillRow.tsx(65,15): error TS2719: Type 'AmountChange' is not assignable to type 'AmountChange'. Two different types with this name exist, but they are unrelated.
+  Types of property 'original' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/bills/BulkUpdateBillRowComponents.tsx(90,70): error TS2339: Property 'description' does not exist on type 'Bill'.
+src/components/bills/BulkUpdateEditor.tsx(94,15): error TS2322: Type 'Bill' is not assignable to type 'BillEntity'.
+  Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'Bill'.
+src/components/bills/BulkUpdateEditor.tsx(96,15): error TS2322: Type 'string' is not assignable to type 'UpdateMode'.
 src/components/bills/BulkUpdateModeSelector.tsx(9,35): error TS7031: Binding element 'updateMode' implicitly has an 'any' type.
 src/components/bills/BulkUpdateModeSelector.tsx(9,47): error TS7031: Binding element 'setUpdateMode' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,30): error TS7031: Binding element 'summary' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,39): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/bills/BulkUpdateSummary.tsx(9,48): error TS7031: Binding element 'handleSubmit' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailActions.tsx(10,3): error TS7031: Binding element 'bill' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailActions.tsx(11,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailActions.tsx(12,3): error TS7031: Binding element 'handleEdit' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailActions.tsx(13,3): error TS7031: Binding element 'handleDelete' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailActions.tsx(14,3): error TS7031: Binding element 'handleCreateRecurring' implicitly has an 'any' type.
+src/components/bills/SmartBillMatcher.tsx(32,23): error TS2352: Conversion of type 'Suggestion[]' to type 'Suggestion[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Suggestion' is not comparable to type 'Suggestion'.
+    Types of property 'envelope' are incompatible.
+      Type 'Envelope' is not comparable to type 'Envelope'.
+        Index signature for type 'string' is missing in type 'Envelope'.
+src/components/bills/SmartBillMatcher.tsx(32,47): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Bill[]'.
+  Type 'unknown' is not assignable to type 'Bill'.
 src/components/bills/modals/BillDetailHeader.tsx(10,36): error TS7031: Binding element 'bill' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailHeader.tsx(10,42): error TS7031: Binding element 'statusInfo' implicitly has an 'any' type.
 src/components/bills/modals/BillDetailHeader.tsx(10,54): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(17,3): error TS7031: Binding element 'bill' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(18,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(19,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(20,3): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(21,3): error TS7031: Binding element 'onMarkPaid' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(22,3): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(23,3): error TS7031: Binding element 'onCreateRecurring' implicitly has an 'any' type.
-src/components/bills/modals/BillDetailModal.tsx(120,11): error TS2322: Type '(e: FormEvent<HTMLFormElement>) => Promise<void>' is not assignable to type '(e: FormEvent<Element>) => void'.
+src/components/bills/modals/BillDetailModal.tsx(1,17): error TS6133: 'FormEvent' is declared but its value is never read.
+src/components/bills/modals/BillDetailModal.tsx(48,23): error TS2322: Type 'Bill | null' is not assignable to type 'Bill'.
+  Type 'null' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,29): error TS2322: Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(billId: string) => void'.
+  Types of parameters 'bill' and 'billId' are incompatible.
+    Type 'string' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,39): error TS2322: Type '(bill: Bill, amount: number) => void | Promise<void>' is not assignable to type '(billId: string, paymentData: PaymentData) => void'.
+  Types of parameters 'bill' and 'billId' are incompatible.
+    Type 'string' is not assignable to type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,60): error TS2322: Type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Property 'color' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill'.
+src/components/bills/modals/BillDetailModal.tsx(48,68): error TS2322: Type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill) => void' is not assignable to type '(bill: import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill) => void'.
+  Types of parameters 'bill' and 'bill' are incompatible.
+    Property 'color' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill'.
+src/components/bills/modals/BillDetailModal.tsx(54,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/bills/modals/BillDetailModal.tsx(83,44): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(90,34): error TS2339: Property 'nextDueDate' does not exist on type 'Bill'.
+src/components/bills/modals/BillDetailModal.tsx(131,11): error TS2322: Type '(e: FormEvent<HTMLFormElement>) => Promise<void>' is not assignable to type '(e: FormEvent<Element>) => void | Promise<void>'.
   Types of parameters 'e' and 'e' are incompatible.
     Type 'FormEvent<Element>' is not assignable to type 'FormEvent<HTMLFormElement>'.
       Type 'Element' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, autocomplete, elements, and 148 more.
@@ -924,16 +1662,8 @@ src/components/bills/modals/BillDetailSections.tsx(45,29): error TS2769: No over
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
 src/components/bills/modals/BillDetailStats.tsx(10,35): error TS7031: Binding element 'bill' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(11,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(12,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(13,3): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(14,3): error TS7031: Binding element 'selectedBills' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(15,3): error TS7031: Binding element 'changes' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(16,3): error TS7031: Binding element 'summary' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(51,35): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(71,24): error TS18047: 'dateChange' is possibly 'null'.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(73,70): error TS18047: 'dateChange' is possibly 'null'.
-src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,72): error TS18047: 'dateChange' is possibly 'null'.
+src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,53): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
 src/components/bills/smartBillMatcherHelpers.ts(45,36): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
 src/components/bills/smartBillMatcherHelpers.ts(52,35): error TS7006: Parameter 'confidence' implicitly has an 'any' type.
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(8,30): error TS7006: Parameter 'progress' implicitly has an 'any' type.
@@ -942,40 +1672,65 @@ src/components/budgeting/BillEnvelopeFundingInfo.tsx(103,47): error TS18048: 'ne
 src/components/budgeting/BillEnvelopeFundingInfo.tsx(301,11): error TS2322: Type '{ id: string; name: string; amount: number; dueDate: string; category?: string | undefined; frequency: string; } | null | undefined' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
   Type 'null' is not assignable to type '{ amount: number; frequency?: string | undefined; } | undefined'.
 src/components/budgeting/CashFlowSummary.tsx(4,28): error TS7031: Binding element 'cashFlow' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(133,24): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,24): error TS2322: Type '"savings"' is not assignable to type 'never'.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(134,48): error TS2322: Type '"sinking_fund"' is not assignable to type 'never'.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(158,32): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(165,11): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
-src/components/budgeting/CreateEnvelopeModalComponents.tsx(168,11): error TS2322: Type '(() => void) | undefined' is not assignable to type 'null | undefined'.
-  Type '() => void' is not assignable to type 'null | undefined'.
-src/components/budgeting/DeleteEnvelopeModal.tsx(8,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/budgeting/DeleteEnvelopeModal.tsx(9,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/budgeting/DeleteEnvelopeModal.tsx(10,3): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/budgeting/DeleteEnvelopeModal.tsx(11,3): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/budgeting/DeleteEnvelopeModal.tsx(65,33): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/budgeting/DeleteEnvelopeModal.tsx(68,31): error TS2339: Property 'name' does not exist on type 'never'.
-src/components/budgeting/DeleteEnvelopeModal.tsx(68,44): error TS2339: Property 'provider' does not exist on type 'never'.
-src/components/budgeting/DeleteEnvelopeModal.tsx(68,72): error TS2339: Property 'amount' does not exist on type 'never'.
-src/components/budgeting/EditEnvelopeModal.tsx(66,5): error TS2322: Type 'EnvelopeRef | null | undefined' is not assignable to type 'null | undefined'.
-  Type 'EnvelopeRef' is not assignable to type 'null | undefined'.
-src/components/budgeting/EditEnvelopeModal.tsx(67,5): error TS2322: Type 'unknown[]' is not assignable to type 'never[]'.
-  Type 'unknown' is not assignable to type 'never'.
+src/components/budgeting/CreateEnvelopeModal.tsx(57,5): error TS2322: Type 'unknown[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+src/components/budgeting/CreateEnvelopeModal.tsx(58,5): error TS2322: Type '(envelope: unknown) => void' is not assignable to type '(data: unknown) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.
+src/components/budgeting/CreateEnvelopeModal.tsx(104,13): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Types of property 'name' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/components/budgeting/CreateEnvelopeModal.tsx(133,13): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Types of property 'name' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/components/budgeting/CreateEnvelopeModalComponents.tsx(140,24): error TS2322: Type '"savings"' is not assignable to type 'never'.
+src/components/budgeting/CreateEnvelopeModalComponents.tsx(140,48): error TS2322: Type '"sinking_fund"' is not assignable to type 'never'.
+src/components/budgeting/CreateEnvelopeModalComponents.tsx(171,11): error TS2719: Type 'Bill[]' is not assignable to type 'Bill[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Bill' is not assignable to type 'Bill'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'Bill'.
+src/components/budgeting/CreateEnvelopeModalComponents.tsx(172,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/components/budgeting/EditEnvelopeModal.tsx(67,5): error TS2322: Type 'unknown[]' is not assignable to type 'Envelope[]'.
+  Type 'unknown' is not assignable to type 'Envelope'.
+src/components/budgeting/EditEnvelopeModal.tsx(68,5): error TS2322: Type '((envelope: unknown) => void | Promise<void>) | undefined' is not assignable to type '(envelopeData: unknown) => Promise<void>'.
+  Type 'undefined' is not assignable to type '(envelopeData: unknown) => Promise<void>'.
+src/components/budgeting/EditEnvelopeModal.tsx(70,5): error TS2322: Type '((envelopeId: string) => void | Promise<void>) | undefined' is not assignable to type '(envelopeId: string | number) => Promise<void>'.
+  Type 'undefined' is not assignable to type '(envelopeId: string | number) => Promise<void>'.
+src/components/budgeting/EditEnvelopeModal.tsx(129,11): error TS2739: Type 'EnvelopeRef' is missing the following properties from type 'Envelope': name, currentBalance, targetAmount
 src/components/budgeting/EditEnvelopeModal.tsx(150,13): error TS2322: Type 'LockDocument | null' is not assignable to type 'null | undefined'.
   Type 'LockDocument' is not assignable to type 'null | undefined'.
+src/components/budgeting/EditEnvelopeModal.tsx(181,9): error TS2739: Type 'EnvelopeRef' is missing the following properties from type 'Envelope': name, currentBalance, targetAmount
 src/components/budgeting/EditEnvelopeModalComponents.tsx(178,26): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/EditEnvelopeModalComponents.tsx(179,11): error TS2322: Type '("savings" | "sinking_fund")[]' is not assignable to type 'never[]'.
   Type '"savings" | "sinking_fund"' is not assignable to type 'never'.
     Type '"savings"' is not assignable to type 'never'.
-src/components/budgeting/EnvelopeGrid.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/EnvelopeGrid.tsx(272,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(273,30): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(274,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(275,29): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/EnvelopeGrid.tsx(276,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(147,9): error TS2322: Type '(id: string, amount: number) => Promise<void>' is not assignable to type '(amount: number) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/budgeting/EnvelopeGrid.tsx(272,42): error TS2345: Argument of type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => BudgetEnvelope[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(273,45): error TS2345: Argument of type '(state: BudgetState) => unknown[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(274,38): error TS2345: Argument of type '(state: BudgetState) => unknown[]' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown[]' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(275,44): error TS2345: Argument of type '(state: BudgetState) => unknown' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => unknown' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(276,43): error TS2345: Argument of type '(state: BudgetState) => (bill: unknown) => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => (bill: unknown) => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
+src/components/budgeting/EnvelopeGrid.tsx(371,33): error TS2345: Argument of type 'Envelope[] | Envelope[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; ... 31 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = []>(i...' is not assignable to parameter of type 'Envelope[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'Envelope[]'.
 src/components/budgeting/EnvelopeGrid.tsx(404,7): error TS2322: Type 'Dispatch<SetStateAction<FilterOptions>>' is not assignable to type '(opts: unknown) => void'.
   Types of parameters 'value' and 'opts' are incompatible.
     Type 'unknown' is not assignable to type 'SetStateAction<FilterOptions>'.
@@ -985,35 +1740,43 @@ src/components/budgeting/EnvelopeGrid.tsx(408,7): error TS2322: Type '(envelope:
 src/components/budgeting/EnvelopeGrid.tsx(411,7): error TS2322: Type '(envelope: EnvelopeRef) => void' is not assignable to type '(env: unknown) => void'.
   Types of parameters 'envelope' and 'env' are incompatible.
     Type 'unknown' is not assignable to type 'EnvelopeRef'.
+src/components/budgeting/EnvelopeGrid.tsx(414,7): error TS2322: Type 'Bill[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<...>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifie...' is not assignable to type 'unknown[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'unknown[]'.
+src/components/budgeting/EnvelopeGrid.tsx(420,9): error TS2322: Type 'Envelope[] | Envelope[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; ... 31 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknown][] = []>(i...' is not assignable to type 'Envelope[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'Envelope[]'.
 src/components/budgeting/EnvelopeGrid.tsx(427,9): error TS2322: Type '(envelopeData: { id: string; [key: string]: unknown; }) => Promise<void>' is not assignable to type '(data: unknown) => Promise<void>'.
   Types of parameters 'envelopeData' and 'data' are incompatible.
     Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; }'.
-src/components/budgeting/PaycheckProcessor.tsx(20,3): error TS7031: Binding element 'onProcessPaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(21,3): error TS7031: Binding element 'onDeletePaycheck' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(22,3): error TS7031: Binding element 'currentUser' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(91,25): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
-src/components/budgeting/PaycheckProcessor.tsx(125,32): error TS7031: Binding element 'formHook' implicitly has an 'any' type.
-src/components/budgeting/PaydayPrediction.tsx(261,36): error TS18047: 'daysUntil' is possibly 'null'.
-src/components/budgeting/PaydayPrediction.tsx(261,54): error TS18047: 'daysUntil' is possibly 'null'.
-src/components/budgeting/PaydayPrediction.tsx(266,74): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
-  Type 'null' is not assignable to type 'number'.
-src/components/budgeting/PaydayPrediction.tsx(270,9): error TS2322: Type 'number | null' is not assignable to type 'number'.
-  Type 'null' is not assignable to type 'number'.
-src/components/budgeting/PaydayPrediction.tsx(277,11): error TS2322: Type 'number | null' is not assignable to type 'number'.
-  Type 'null' is not assignable to type 'number'.
-src/components/budgeting/PaydayPrediction.tsx(278,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
-  Type 'undefined' is not assignable to type '() => void'.
-src/components/budgeting/PaydayPrediction.tsx(279,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
-  Type 'undefined' is not assignable to type '() => void'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(209,5): error TS2322: Type 'Transaction[]' is not assignable to type 'never[]'.
-  Type 'Transaction' is not assignable to type 'never'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(210,5): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,28): error TS7031: Binding element 'isCollapsed' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,41): error TS7031: Binding element 'onToggleCollapse' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,59): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(13,67): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
-src/components/budgeting/envelope/EnvelopeActions.tsx(14,26): error TS7006: Parameter 'isCollapsed' implicitly has an 'any' type.
+src/components/budgeting/EnvelopeGrid.tsx(432,9): error TS2322: Type 'Bill[] | ({ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<...>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifie...' is not assignable to type 'unknown[]'.
+  Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'unknown[]'.
+src/components/budgeting/PaycheckProcessor.tsx(80,13): error TS2322: Type 'Envelope[]' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
+  Property 'targetAmount' is missing in type 'Envelope' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
+src/components/budgeting/PaycheckProcessor.tsx(87,9): error TS2719: Type 'PaycheckHistoryItem[]' is not assignable to type 'PaycheckHistoryItem[]'. Two different types with this name exist, but they are unrelated.
+  Type 'PaycheckHistoryItem' is not assignable to type 'PaycheckHistoryItem'. Two different types with this name exist, but they are unrelated.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/budgeting/PaycheckProcessor.tsx(139,7): error TS2322: Type 'string' is not assignable to type 'AllocationMode'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(167,11): error TS2322: Type 'unknown' is not assignable to type 'AnalysisSettings'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(171,11): error TS2322: Type 'unknown' is not assignable to type 'SuggestionStats | null'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(176,7): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/suggestionUtils").Suggestion[]' is not assignable to type 'Suggestion[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/suggestionUtils").Suggestion' is not assignable to type 'Suggestion'.
+    Index signature for type 'string' is missing in type 'Suggestion'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(211,5): error TS2322: Type '(envelope: Partial<Envelope>) => void' is not assignable to type '(data: unknown) => void | Promise<void>'.
+  Types of parameters 'envelope' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'Partial<Envelope>'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(212,5): error TS2322: Type '(envelope: Envelope) => void' is not assignable to type '(envelopeId: string, updates: Record<string, unknown>) => void | Promise<void>'.
+  Types of parameters 'envelope' and 'envelopeId' are incompatible.
+    Type 'string' is not assignable to type 'Envelope'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(264,11): error TS2322: Type '(newSettings: Partial<typeof DEFAULT_ANALYSIS_SETTINGS>) => void' is not assignable to type '(settings: unknown) => void'.
+  Types of parameters 'newSettings' and 'settings' are incompatible.
+    Type 'unknown' is not assignable to type 'Partial<{ minAmount: number; minTransactions: number; overspendingThreshold: number; overfundingThreshold: number; bufferPercentage: number; }>'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(269,11): error TS2322: Type '(suggestion: { id: string; action: string; data: Record<string, unknown>; [key: string]: unknown; }) => Promise<void>' is not assignable to type '(suggestion: unknown) => void'.
+  Types of parameters 'suggestion' and 'suggestion' are incompatible.
+    Type 'unknown' is not assignable to type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }'.
+src/components/budgeting/SmartEnvelopeSuggestions.tsx(270,11): error TS2322: Type '(suggestionId: string) => void' is not assignable to type '(suggestion: unknown) => void'.
+  Types of parameters 'suggestionId' and 'suggestion' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
 src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(11,36): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/budgeting/envelope/EnvelopeGridView.tsx(101,30): error TS2345: Argument of type '(envelope: { id: string; [key: string]: unknown; }) => JSX.Element' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => Element'.
   Types of parameters 'envelope' and 'value' are incompatible.
@@ -1021,6 +1784,9 @@ src/components/budgeting/envelope/EnvelopeGridView.tsx(101,30): error TS2345: Ar
 src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(10,49): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(10,58): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/budgeting/envelope/EnvelopeHistoryModal.tsx(16,32): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/budgeting/envelope/EnvelopeItem.tsx(66,91): error TS2345: Argument of type 'Envelope' is not assignable to parameter of type 'EnvelopeWithStatus'.
+  Types of property 'status' are incompatible.
+    Type 'string' is not assignable to type '"overdue" | "healthy" | "overspent" | "underfunded" | undefined'.
 src/components/budgeting/envelope/EnvelopeItem.tsx(77,9): error TS2322: Type '((envelopeId: string) => void) | undefined' is not assignable to type '(envelopeId: string) => void'.
   Type 'undefined' is not assignable to type '(envelopeId: string) => void'.
 src/components/budgeting/envelope/EnvelopeItem.tsx(78,9): error TS2322: Type '((envelope: Envelope) => void) | undefined' is not assignable to type '(envelope: Envelope) => void'.
@@ -1036,103 +1802,28 @@ src/components/budgeting/envelope/EnvelopeStatusDisplay.tsx(14,26): error TS7006
 src/components/budgeting/envelope/EnvelopeSummary.tsx(3,28): error TS7031: Binding element 'totals' implicitly has an 'any' type.
 src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,34): error TS7031: Binding element 'swipeState' implicitly has an 'any' type.
 src/components/budgeting/envelope/SwipeIndicatorOverlay.tsx(11,46): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,35): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(6,51): error TS7031: Binding element 'onViewHistory' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(7,51): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(14,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(4,30): error TS7031: Binding element 'allocationPreview' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(4,49): error TS7031: Binding element 'hasAmount' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(4,60): error TS7031: Binding element 'allocationMode' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(32,29): error TS7006: Parameter 'priority' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(47,29): error TS7006: Parameter 'priority' implicitly has an 'any' type.
-src/components/budgeting/paycheck/AllocationPreview.tsx(98,29): error TS7006: Parameter 'allocation' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(8,38): error TS7031: Binding element 'preview' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(8,47): error TS7031: Binding element 'hasAmount' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(57,30): error TS7031: Binding element 'preview' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(80,32): error TS7031: Binding element 'preview' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(80,41): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(84,23): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckAllocationPreview.tsx(111,34): error TS7031: Binding element 'preview' implicitly has an 'any' type.
+src/components/budgeting/envelope/UnassignedCashEnvelope.tsx(16,5): error TS2345: Argument of type '(state: { openUnassignedCashModal?: () => void; }) => (() => void) | undefined' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { openUnassignedCashModal?: () => void; }) => (() => void) | undefined' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Type '(() => void) | undefined' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type 'undefined' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+        Type 'undefined' is not assignable to type 'StoreState'.
+src/components/budgeting/paycheck/AllocationPreview.tsx(147,51): error TS18048: 'allocation.monthlyAmount' is possibly 'undefined'.
+src/components/budgeting/paycheck/AllocationPreview.tsx(149,44): error TS18048: 'allocation.monthlyAmount' is possibly 'undefined'.
 src/components/budgeting/paycheck/PaycheckAmountInput.tsx(8,32): error TS7031: Binding element 'value' implicitly has an 'any' type.
 src/components/budgeting/paycheck/PaycheckAmountInput.tsx(8,39): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(62,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(68,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(74,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(75,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(140,74): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckHistoryComponents.tsx(153,35): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
-  Type 'undefined' is not assignable to type 'number'.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(12,3): error TS7031: Binding element 'payerName' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(13,3): error TS7031: Binding element 'uniquePayers' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(14,3): error TS7031: Binding element 'showAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(15,3): error TS7031: Binding element 'newPayerName' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(16,3): error TS7031: Binding element 'isProcessing' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(17,3): error TS7031: Binding element 'onPayerChange' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(18,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(19,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(20,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(21,3): error TS7031: Binding element 'getPayerPrediction' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(48,32): error TS7006: Parameter 'payer' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(80,32): error TS7031: Binding element 'payerName' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(80,43): error TS7031: Binding element 'prediction' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(96,3): error TS7031: Binding element 'uniquePayers' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(97,3): error TS7031: Binding element 'newPayerName' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(98,3): error TS7031: Binding element 'onNewPayerNameChange' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(99,3): error TS7031: Binding element 'onAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/paycheck/PaycheckPayerSelector.tsx(100,3): error TS7031: Binding element 'onToggleAddNewPayer' implicitly has an 'any' type.
-src/components/budgeting/shared/AllocationModeSelector.tsx(9,35): error TS7031: Binding element 'autoAllocate' implicitly has an 'any' type.
-src/components/budgeting/shared/AllocationModeSelector.tsx(9,49): error TS7031: Binding element 'onAutoAllocateChange' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(6,28): error TS7006: Parameter 'allBills' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(6,38): error TS7006: Parameter 'envelopeId' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(7,27): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(11,27): error TS7006: Parameter 'allBills' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(11,37): error TS7006: Parameter 'selectedBillId' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(13,25): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(17,27): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(25,33): error TS7031: Binding element 'bill' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(54,3): error TS7031: Binding element 'selectedBillId' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(55,3): error TS7031: Binding element 'onBillSelection' implicitly has an 'any' type.
-src/components/budgeting/shared/BillConnectionSelector.tsx(87,32): error TS7006: Parameter 'bill' implicitly has an 'any' type.
+src/components/budgeting/shared/BillConnectionSelector.tsx(15,11): error TS6196: 'Envelope' is declared but never used.
 src/components/budgeting/shared/EnvelopeTypeSelector.tsx(11,3): error TS7031: Binding element 'selectedType' implicitly has an 'any' type.
 src/components/budgeting/shared/EnvelopeTypeSelector.tsx(12,3): error TS7031: Binding element 'onTypeChange' implicitly has an 'any' type.
 src/components/budgeting/shared/EnvelopeTypeSelector.tsx(16,24): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/components/budgeting/shared/EnvelopeTypeSelector.tsx(40,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'never'.
-src/components/budgeting/shared/FrequencySelector.tsx(11,3): error TS7031: Binding element 'selectedFrequency' implicitly has an 'any' type.
-src/components/budgeting/shared/FrequencySelector.tsx(12,3): error TS7031: Binding element 'onFrequencyChange' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionCard.tsx(24,27): error TS7031: Binding element 'suggestion' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionCard.tsx(24,39): error TS7031: Binding element 'onApply' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionCard.tsx(24,48): error TS7031: Binding element 'onDismiss' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionCard.tsx(25,28): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: string; medium: string; low: string; }'.
-src/components/budgeting/suggestions/SuggestionCard.tsx(26,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ new_envelope: string; merchant_pattern: string; increase_envelope: string; decrease_envelope: string; }'.
-src/components/budgeting/suggestions/SuggestionCard.tsx(27,25): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ high: string; medium: string; low: string; }'.
-src/components/budgeting/suggestions/SuggestionCard.tsx(29,32): error TS7006: Parameter 'action' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionCard.tsx(42,33): error TS7006: Parameter 'action' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(6,25): error TS7031: Binding element 'label' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(6,32): error TS7031: Binding element 'helpText' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(6,42): error TS7031: Binding element 'children' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(15,25): error TS7031: Binding element 'stats' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(48,3): error TS7031: Binding element 'settings' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(49,3): error TS7031: Binding element 'onUpdateSettings' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(50,3): error TS7031: Binding element 'onResetSettings' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(51,3): error TS7031: Binding element 'onRefresh' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(52,3): error TS7031: Binding element 'suggestionStats' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(54,32): error TS7006: Parameter 'key' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionSettings.tsx(54,37): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(6,3): error TS7031: Binding element 'suggestions' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(7,3): error TS7031: Binding element 'onApplySuggestion' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(8,3): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(26,50): error TS7006: Parameter 'acc' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(26,55): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
-src/components/budgeting/suggestions/SuggestionsList.tsx(64,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ high: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; medium: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; low: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; }'.
-  No index signature with a parameter of type 'string' was found on type '{ high: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; medium: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; low: { label: string; icon: string; color: string; bgColor: string; borderColor: string; }; }'.
-src/components/budgeting/suggestions/SuggestionsList.tsx(84,41): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
+src/components/budgeting/suggestions/SuggestionsList.tsx(112,19): error TS2740: Type 'Suggestion' is missing the following properties from type 'Suggestion': title, description, reasoning, type, and 3 more.
+src/components/budgeting/suggestions/SuggestionsList.tsx(113,19): error TS2719: Type '(suggestion: Suggestion) => void' is not assignable to type '(suggestion: Suggestion) => void'. Two different types with this name exist, but they are unrelated.
+  Types of parameters 'suggestion' and 'suggestion' are incompatible.
+    Type 'Suggestion' is not assignable to type 'Suggestion'. Two different types with this name exist, but they are unrelated.
+      Index signature for type 'string' is missing in type 'Suggestion'.
+src/components/budgeting/suggestions/SuggestionsList.tsx(114,19): error TS2322: Type '(suggestion: Suggestion) => void' is not assignable to type '(id: string) => void'.
+  Types of parameters 'suggestion' and 'id' are incompatible.
+    Type 'string' is not assignable to type 'Suggestion'.
 src/components/charts/CategoryBarChart.tsx(153,14): error TS2769: No overload matches this call.
   Overload 2 of 2, '(props: Props): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
     Type 'unknown' is not assignable to type 'Key | null | undefined'.
@@ -1144,8 +1835,6 @@ src/components/charts/CategoryBarChart.tsx(153,14): error TS2769: No overload ma
     Type '{}' is not assignable to type 'string'.
 src/components/charts/CategoryBarChart.tsx(157,15): error TS2783: 'fill' is specified more than once, so this usage will be overwritten.
 src/components/charts/CategoryBarChart.tsx(157,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/components/charts/ComposedFinancialChart.tsx(230,33): error TS7031: Binding element 'data' implicitly has an 'any' type.
-src/components/charts/ComposedFinancialChart.tsx(258,3): error TS7031: Binding element 'data' implicitly has an 'any' type.
 src/components/charts/TrendLineChart.tsx(63,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ line: { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]; area: ({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { ...; })[]; bar: ({ ...; } | { ...; })[]; }'.
   No index signature with a parameter of type 'string' was found on type '{ line: { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]; area: ({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { ...; })[]; bar: ({ ...; } | { ...; })[]; }'.
 src/components/dashboard/AccountBalanceOverview.tsx(7,34): error TS7006: Parameter 'isBalanced' implicitly has an 'any' type.
@@ -1176,20 +1865,24 @@ src/components/dashboard/RecentTransactionsWidget.tsx(41,27): error TS2339: Prop
 src/components/dashboard/RecentTransactionsWidget.tsx(48,51): error TS2339: Property 'amount' does not exist on type 'never'.
 src/components/dashboard/RecentTransactionsWidget.tsx(50,28): error TS2339: Property 'amount' does not exist on type 'never'.
 src/components/dashboard/RecentTransactionsWidget.tsx(50,73): error TS2339: Property 'amount' does not exist on type 'never'.
-src/components/dashboard/ReconcileTransactionModal.tsx(9,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/dashboard/ReconcileTransactionModal.tsx(10,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/dashboard/ReconcileTransactionModal.tsx(11,3): error TS7031: Binding element 'newTransaction' implicitly has an 'any' type.
-src/components/dashboard/ReconcileTransactionModal.tsx(12,3): error TS7031: Binding element 'onUpdateTransaction' implicitly has an 'any' type.
-src/components/dashboard/ReconcileTransactionModal.tsx(13,3): error TS7031: Binding element 'onReconcile' implicitly has an 'any' type.
-src/components/dashboard/ReconcileTransactionModal.tsx(103,37): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/dashboard/ReconcileTransactionModal.tsx(103,55): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/dashboard/ReconcileTransactionModal.tsx(104,27): error TS2339: Property 'name' does not exist on type 'never'.
 src/components/debt/DebtDashboard.tsx(66,52): error TS2322: Type 'Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>' is not assignable to type 'Dispatch<SetStateAction<Record<string, string | boolean>>>'.
   Type 'SetStateAction<Record<string, string | boolean>>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
     Type 'Record<string, string | boolean>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
       Type 'Record<string, string | boolean>' is missing the following properties from type '{ type: string; status: string; sortBy: string; sortOrder: string; }': type, status, sortBy, sortOrder
-src/components/debt/DebtDashboard.tsx(122,9): error TS2322: Type 'DebtAccount[]' is not assignable to type 'never[]'.
-  Type 'DebtAccount' is not assignable to type 'never'.
+src/components/debt/DebtDashboard.tsx(89,15): error TS2322: Type '(debtId: string, paymentData: { amount: number; date?: string; }) => Promise<void>' is not assignable to type '(debt: DebtAccount, amount: number) => void'.
+  Types of parameters 'debtId' and 'debt' are incompatible.
+    Type 'DebtAccount' is not assignable to type 'string'.
+src/components/debt/DebtDashboard.tsx(110,11): error TS2322: Type 'DebtAccount' is not assignable to type 'Record<string, unknown> & { id: string; }'.
+  Type 'DebtAccount' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'DebtAccount'.
+src/components/debt/DebtDashboard.tsx(114,11): error TS2322: Type '(debtId: string, paymentData: { amount: number; date?: string; }) => Promise<void>' is not assignable to type '(debtId: string, amount: number) => Promise<void>'.
+  Types of parameters 'paymentData' and 'amount' are incompatible.
+    Type 'number' is not assignable to type '{ amount: number; date?: string | undefined; }'.
+src/components/debt/DebtDashboard.tsx(115,11): error TS2322: Type '(debt: DebtAccount) => void' is not assignable to type '(debt: Record<string, unknown>) => void'.
+  Types of parameters 'debt' and 'debt' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type 'DebtAccount': id, name, creditor, balance, and 6 more.
+src/components/debt/DebtDashboard.tsx(122,9): error TS2322: Type 'DebtAccount[]' is not assignable to type 'UpcomingPayment[]'.
+  Type 'DebtAccount' is missing the following properties from type 'UpcomingPayment': debtId, debtName, dueDate, amount
 src/components/debt/DebtDashboardComponents.tsx(62,15): error TS2322: Type '(debt: DebtAccount) => void' is not assignable to type '(debt: DebtAccount | Debt) => void'.
   Types of parameters 'debt' and 'debt' are incompatible.
     Type 'DebtAccount | Debt' is not assignable to type 'DebtAccount'.
@@ -1198,9 +1891,26 @@ src/components/debt/DebtDashboardComponents.tsx(63,15): error TS2322: Type '(deb
   Types of parameters 'debt' and 'debt' are incompatible.
     Type 'DebtAccount | Debt' is not assignable to type 'DebtAccount'.
       Type 'Debt' is missing the following properties from type 'DebtAccount': balance, interestRate, minimumPayment, status, and 2 more.
-src/components/debt/DebtStrategies.tsx(11,27): error TS7031: Binding element 'debts' implicitly has an 'any' type.
-src/components/debt/DebtStrategies.tsx(108,27): error TS2322: Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { ...; } | { ...; }; }[]' is not assignable to type 'never[]'.
-  Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { monthsToPayoff: number; tot...' is not assignable to type 'never'.
+src/components/debt/DebtStrategies.tsx(25,25): error TS2345: Argument of type 'DebtAccount[]' is not assignable to parameter of type 'Debt[]'.
+  Type 'DebtAccount' is not assignable to type 'Debt'.
+    Types of property 'currentBalance' are incompatible.
+      Type 'number | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+src/components/debt/DebtStrategies.tsx(59,11): error TS2322: Type '{ debts: never[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: { priority: number; monthsToPayoff: number; totalInterestCost: number; strategy: string; ... 6 more ...; interestRate?: number | undefined; }[]; totalInterest: number; payoffTime: number; name: string...' is not assignable to type 'Strategy'.
+  Type '{ debts: never[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' is not assignable to type 'Strategy'.
+    Types of property 'name' are incompatible.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/debt/DebtStrategies.tsx(63,11): error TS2322: Type '{ debts: never[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; } | { debts: { priority: number; monthsToPayoff: number; totalInterestCost: number; strategy: string; ... 6 more ...; interestRate?: number | undefined; }[]; totalInterest: number; payoffTime: number; name: string...' is not assignable to type 'Strategy'.
+  Type '{ debts: never[]; totalInterest: number; payoffTime: number; name?: undefined; description?: undefined; }' is not assignable to type 'Strategy'.
+    Types of property 'name' are incompatible.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/debt/DebtStrategies.tsx(113,27): error TS2322: Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { ...; } | { ...; }; }[]' is not assignable to type 'PaymentImpactScenario[]'.
+  Type '{ extraPayment: number; avalanche: { monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }; snowball: { monthsToPayoff: number; tot...' is not assignable to type 'PaymentImpactScenario'.
+    Types of property 'avalanche' are incompatible.
+      Type '{ monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; } | { monthsToPayoff: number; totalInterest: number; timeSavings: number; interestSavings: number; savings?: undefined; }' is not assignable to type '{ timeSavings: number; interestSavings: number; }'.
+        Type '{ monthsToPayoff: number; totalInterest: number; savings: number; timeSavings?: undefined; interestSavings?: undefined; }' is not assignable to type '{ timeSavings: number; interestSavings: number; }'.
+          Types of property 'timeSavings' are incompatible.
+            Type 'undefined' is not assignable to type 'number'.
 src/components/debt/modals/AddDebtModal.tsx(47,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/debt/modals/DebtDetailModal.tsx(52,5): error TS2322: Type '(Record<string, unknown> & { id: string; }) | undefined' is not assignable to type 'DebtWithHistory | null'.
@@ -1221,45 +1931,22 @@ src/components/debt/modals/DebtDetailModal.tsx(81,47): error TS2322: Type '{ id:
         Type 'number' is not assignable to type 'string'.
 src/components/debt/modals/DebtFormFields.tsx(96,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/debt/modals/DebtModalHeader.tsx(9,28): error TS7031: Binding element 'isEditMode' implicitly has an 'any' type.
-src/components/debt/modals/DebtModalHeader.tsx(9,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(11,34): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(11,42): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(16,23): error TS7006: Parameter 'dateString' implicitly has an 'any' type.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(24,82): error TS2339: Property 'amount' does not exist on type 'never'.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(67,35): error TS2339: Property 'debtId' does not exist on type 'never'.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(71,71): error TS2339: Property 'debtName' does not exist on type 'never'.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(72,83): error TS2339: Property 'dueDate' does not exist on type 'never'.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(76,33): error TS2339: Property 'amount' does not exist on type 'never'.
-src/components/debt/modals/UpcomingPaymentsModal.tsx(78,78): error TS2339: Property 'type' does not exist on type 'never'.
 src/components/debt/ui/DebtCardProgressBar.tsx(5,32): error TS7031: Binding element 'progressData' implicitly has an 'any' type.
 src/components/debt/ui/DebtList.tsx(200,107): error TS2339: Property 'className' does not exist on type 'never'.
 src/components/debt/ui/DebtList.tsx(203,29): error TS2339: Property 'icon' does not exist on type 'never'.
 src/components/debt/ui/DebtList.tsx(203,41): error TS2339: Property 'label' does not exist on type 'never'.
 src/components/debt/ui/DebtList.tsx(203,55): error TS2339: Property 'name' does not exist on type 'never'.
 src/components/debt/ui/DebtProgressBar.tsx(5,28): error TS7031: Binding element 'progressData' implicitly has an 'any' type.
-src/components/debt/ui/DebtSummaryCards.tsx(8,29): error TS7031: Binding element 'stats' implicitly has an 'any' type.
-src/components/debt/ui/DebtSummaryCards.tsx(8,36): error TS7031: Binding element 'onDueSoonClick' implicitly has an 'any' type.
-src/components/debt/ui/PaymentImpactTable.tsx(53,45): error TS2339: Property 'extraPayment' does not exist on type 'never'.
-src/components/debt/ui/PaymentImpactTable.tsx(61,79): error TS2339: Property 'extraPayment' does not exist on type 'never'.
-src/components/debt/ui/PaymentImpactTable.tsx(75,35): error TS2339: Property 'avalanche' does not exist on type 'never'.
-src/components/debt/ui/PaymentImpactTable.tsx(81,35): error TS2339: Property 'avalanche' does not exist on type 'never'.
-src/components/debt/ui/PaymentImpactTable.tsx(99,35): error TS2339: Property 'snowball' does not exist on type 'never'.
-src/components/debt/ui/PaymentImpactTable.tsx(105,35): error TS2339: Property 'snowball' does not exist on type 'never'.
-src/components/debt/ui/QuickPaymentForm.tsx(8,3): error TS7031: Binding element 'showPaymentForm' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(9,3): error TS7031: Binding element 'paymentAmount' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(10,3): error TS7031: Binding element 'setPaymentAmount' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(11,3): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(12,3): error TS7031: Binding element 'onShowForm' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(13,3): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
-src/components/debt/ui/QuickPaymentForm.tsx(14,3): error TS7031: Binding element 'isActiveDebt' implicitly has an 'any' type.
-src/components/debt/ui/StrategyCard.tsx(8,25): error TS7031: Binding element 'strategy' implicitly has an 'any' type.
-src/components/debt/ui/StrategyCard.tsx(78,35): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/components/history/BudgetHistoryViewer.tsx(23,32): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/history/BudgetHistoryViewer.tsx(45,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
+src/components/debt/ui/DebtSummaryCards.tsx(63,11): error TS2322: Type '(() => void) | null | undefined' is not assignable to type '(() => void) | undefined'.
+  Type 'null' is not assignable to type '(() => void) | undefined'.
+src/components/history/BudgetHistoryViewer.tsx(49,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
   Type 'void' is not assignable to type 'Promise<void>'.
-src/components/history/BudgetHistoryViewer.tsx(52,28): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+src/components/history/BudgetHistoryViewer.tsx(56,28): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
   Type 'null' is not assignable to type 'string'.
+src/components/history/BudgetHistoryViewer.tsx(121,15): error TS2322: Type 'BudgetCommit[]' is not assignable to type 'HistoryCommit[]'.
+  Property 'shortHash' is missing in type 'BudgetCommit' but required in type 'HistoryCommit'.
+src/components/history/BudgetHistoryViewer.tsx(133,15): error TS2322: Type '{ commit: BudgetCommit | undefined; changes: BudgetChange[]; } | null | undefined' is not assignable to type 'CommitDetails | null'.
+  Type 'undefined' is not assignable to type 'CommitDetails | null'.
 src/components/history/IntegrityStatusIndicator.tsx(148,40): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number | Date'.
@@ -1271,27 +1958,13 @@ src/components/history/IntegrityStatusIndicatorHelpers.tsx(185,75): error TS2345
   Type 'undefined' is not assignable to type 'string'.
 src/components/history/ObjectHistoryViewer.tsx(39,7): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
-src/components/history/viewer/ChangeDetails.tsx(6,3): error TS7031: Binding element 'selectedCommit' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(7,3): error TS7031: Binding element 'commitDetailsLoading' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(8,3): error TS7031: Binding element 'commitDetails' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(9,3): error TS7031: Binding element 'handleRestoreFromHistory' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(10,3): error TS7031: Binding element 'getChangeIcon' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(75,45): error TS7006: Parameter 'change' implicitly has an 'any' type.
-src/components/history/viewer/ChangeDetails.tsx(75,53): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/history/viewer/ChangeDetails.tsx(116,73): error TS18048: 'change.diff' is possibly 'undefined'.
+src/components/history/viewer/ChangeDetails.tsx(117,47): error TS18048: 'change.diff' is possibly 'undefined'.
 src/components/history/viewer/HistoryControls.tsx(7,28): error TS7031: Binding element 'filter' implicitly has an 'any' type.
 src/components/history/viewer/HistoryControls.tsx(7,36): error TS7031: Binding element 'updateFilter' implicitly has an 'any' type.
 src/components/history/viewer/HistoryControls.tsx(7,50): error TS7031: Binding element 'loading' implicitly has an 'any' type.
 src/components/history/viewer/HistoryControls.tsx(7,59): error TS7031: Binding element 'exportHistory' implicitly has an 'any' type.
 src/components/history/viewer/HistoryHeader.tsx(7,26): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(6,3): error TS7031: Binding element 'loading' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(7,3): error TS7031: Binding element 'history' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(8,3): error TS7031: Binding element 'selectedCommit' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(9,3): error TS7031: Binding element 'expandedCommits' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(10,3): error TS7031: Binding element 'handleCommitSelection' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(11,3): error TS7031: Binding element 'handleRestoreFromHistory' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(12,3): error TS7031: Binding element 'toggleCommitExpanded' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(13,3): error TS7031: Binding element 'getAuthorColor' implicitly has an 'any' type.
-src/components/history/viewer/HistoryList.tsx(38,25): error TS7006: Parameter 'commit' implicitly has an 'any' type.
 src/components/history/viewer/HistoryStatistics.tsx(4,30): error TS7031: Binding element 'statistics' implicitly has an 'any' type.
 src/components/history/viewer/IntegrityWarning.tsx(5,29): error TS7031: Binding element 'integrityCheck' implicitly has an 'any' type.
 src/components/history/viewer/IntegrityWarning.tsx(5,45): error TS7031: Binding element 'showIntegrityDetails' implicitly has an 'any' type.
@@ -1301,47 +1974,69 @@ src/components/layout/AppRoutes.tsx(18,30): error TS7031: Binding element 'curre
 src/components/layout/AppRoutes.tsx(18,43): error TS7031: Binding element 'totalBiweeklyNeed' implicitly has an 'any' type.
 src/components/layout/AppRoutes.tsx(18,62): error TS7031: Binding element 'setActiveView' implicitly has an 'any' type.
 src/components/layout/AppWrapper.tsx(9,23): error TS7031: Binding element 'firebaseSync' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/layout/MainLayout.tsx(195,9): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(conflicts: unknown) => void'.
-  Types of parameters 'value' and 'conflicts' are incompatible.
-    Type 'unknown' is not assignable to type 'SetStateAction<null>'.
 src/components/layout/MainLayout.tsx(210,54): error TS2322: Type '(id: number) => void' is not assignable to type '(id: string | number) => void'.
   Types of parameters 'id' and 'id' are incompatible.
     Type 'string | number' is not assignable to type 'number'.
       Type 'string' is not assignable to type 'number'.
-src/components/layout/MainLayout.tsx(236,24): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/layout/MainLayout.tsx(237,5): error TS2345: Argument of type '(state: Record<string, unknown>) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
 src/components/layout/MainLayout.tsx(256,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
-src/components/layout/MainLayout.tsx(287,20): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(290,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/layout/MainLayout.tsx(288,5): error TS2345: Argument of type '(state: Record<string, unknown>) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/layout/MainLayout.tsx(291,5): error TS2345: Argument of type '(state: Record<string, unknown>) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: Record<string, unknown>) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/layout/MainLayout.tsx(324,11): error TS2322: Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'boolean'.
+src/components/layout/MainLayout.tsx(325,11): error TS2322: Type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' is not assignable to type 'boolean'.
 src/components/layout/MainLayout.tsx(477,11): error TS2322: Type '(event: ChangeEvent<HTMLInputElement>) => Promise<{ success: boolean; imported: { envelopes: number; bills: number; transactions: number; savingsGoals: number; debts: number; paycheckHistory: number; auditLog: number; }; } | undefined>' is not assignable to type '() => void'.
   Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/layout/MainLayout.tsx(484,11): error TS2322: Type '(oldPassword: string, newPassword: string) => Promise<void>' is not assignable to type '(password: string) => void'.
   Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/layout/MainLayout.tsx(485,11): error TS2322: Type 'unknown' is not assignable to type '{ userName?: string | undefined; userColor?: string | undefined; }'.
-src/components/layout/NavigationTabs.tsx(38,18): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/layout/NavigationTabs.tsx(40,18): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/layout/NavigationTabs.tsx(45,19): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/layout/NavigationTabs.tsx(47,19): error TS2339: Property 'style' does not exist on type 'never'.
-src/components/layout/NavigationTabs.tsx(55,16): error TS2339: Property 'addEventListener' does not exist on type 'never'.
-src/components/layout/NavigationTabs.tsx(61,18): error TS2339: Property 'removeEventListener' does not exist on type 'never'.
-src/components/layout/SummaryCards.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/layout/SummaryCards.tsx(33,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/SummaryCards.tsx(34,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/layout/SummaryCards.tsx(157,13): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+src/components/layout/SummaryCards.tsx(34,5): error TS2345: Argument of type '(state: { openUnassignedCashModal: () => void; }) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { openUnassignedCashModal: () => void; }) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type '{ openUnassignedCashModal: () => void; }'.
+src/components/layout/SummaryCards.tsx(161,13): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
   Type 'undefined' is not assignable to type 'boolean'.
-src/components/layout/SummaryCards.tsx(158,13): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+src/components/layout/SummaryCards.tsx(162,13): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
   Type 'undefined' is not assignable to type 'boolean'.
-src/components/layout/ViewRenderer.tsx(248,9): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'never[]'.
-  Type 'Record<string, unknown>' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(269,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(270,9): error TS2322: Type 'PaycheckHistory[]' is not assignable to type 'never[]'.
-  Type 'PaycheckHistory' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(280,9): error TS2322: Type 'Transaction[]' is not assignable to type 'never[]'.
-  Type 'Transaction' is not assignable to type 'never'.
-src/components/layout/ViewRenderer.tsx(281,9): error TS2322: Type 'Envelope[]' is not assignable to type 'never[]'.
-  Type 'Envelope' is not assignable to type 'never'.
+src/components/layout/ViewRenderer.tsx(253,9): error TS2322: Type '(distribution: unknown, description: string) => Promise<unknown>' is not assignable to type '(amount: number, goals: unknown[]) => void'.
+  Types of parameters 'description' and 'goals' are incompatible.
+    Type 'unknown[]' is not assignable to type 'string'.
+src/components/layout/ViewRenderer.tsx(271,9): error TS2322: Type 'UseMutateFunction<{ id: string; date: Date; amount: number; source: string; lastModified: number; createdAt: number; mode: string; unassignedCashBefore: number; unassignedCashAfter: number; actualBalanceBefore: number; actualBalanceAfter: number; envelopeAllocations: { ...; }[]; notes: string; }, Error, PaycheckData...' is not assignable to type '(data: unknown) => Promise<void>'.
+  Types of parameters 'variables' and 'data' are incompatible.
+    Type 'unknown' is not assignable to type 'PaycheckData & { mode: string; }'.
+      Type 'unknown' is not assignable to type 'PaycheckData'.
+src/components/layout/ViewRenderer.tsx(272,9): error TS2322: Type '(paycheckId: string) => Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => Promise<void>'.
+  Types of parameters 'paycheckId' and 'paycheck' are incompatible.
+    Type 'PaycheckHistoryItem' is not assignable to type 'string'.
+src/components/layout/ViewRenderer.tsx(273,44): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory[]' is not assignable to parameter of type 'PaycheckHistory[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory' is not assignable to type 'PaycheckHistory'.
+    Types of property 'allocations' are incompatible.
+      Type 'Record<string, number> | { envelopeId: string; envelopeName: string; amount: number; }[] | undefined' is not assignable to type 'unknown[] | undefined'.
+        Type 'Record<string, number>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/layout/ViewRenderer.tsx(275,9): error TS2322: Type 'Record<string, unknown> | undefined' is not assignable to type 'User'.
+  Type 'undefined' is not assignable to type 'User'.
+src/components/layout/ViewRenderer.tsx(280,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to type 'Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'Transaction'.
+    Index signature for type 'string' is missing in type 'Transaction'.
+src/components/layout/ViewRenderer.tsx(281,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope[]' is not assignable to type 'Envelope[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Envelope' is not assignable to type 'Envelope'.
+    Index signature for type 'string' is missing in type 'Envelope'.
+src/components/layout/ViewRenderer.tsx(282,9): error TS2322: Type '(updatedBill: Record<string, unknown>) => void' is not assignable to type '(bill: Bill) => void | Promise<void>'.
+  Types of parameters 'updatedBill' and 'bill' are incompatible.
+    Type 'Bill' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'Bill'.
 src/components/mobile/FABActionMenu.tsx(121,30): error TS7006: Parameter 'action' implicitly has an 'any' type.
 src/components/mobile/FABActionMenu.tsx(121,38): error TS7006: Parameter 'index' implicitly has an 'any' type.
 src/components/mobile/SlideUpModal.tsx(302,5): error TS2345: Argument of type 'RefObject<HTMLDivElement | null>' is not assignable to parameter of type 'RefObject<HTMLDivElement>'.
@@ -1353,28 +2048,19 @@ src/components/mobile/SlideUpModal.tsx(350,9): error TS2322: Type 'RefObject<HTM
 src/components/mobile/SlideUpModal.tsx(351,9): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
-src/components/modals/QuickFundModal.tsx(13,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/modals/QuickFundModal.tsx(14,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/modals/QuickFundModal.tsx(15,3): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/modals/QuickFundModal.tsx(16,3): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
-src/components/modals/QuickFundModal.tsx(17,3): error TS7031: Binding element 'suggestedAmount' implicitly has an 'any' type.
-src/components/modals/QuickFundModal.tsx(18,3): error TS7031: Binding element 'unassignedCash' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(311,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/modals/UnassignedCashModal.tsx(315,6): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/modals/QuickFundModal.tsx(53,28): error TS2339: Property 'id' does not exist on type '{}'.
+src/components/modals/QuickFundModal.tsx(53,32): error TS2554: Expected 1 arguments, but got 2.
+src/components/modals/QuickFundModal.tsx(59,24): error TS2339: Property 'id' does not exist on type '{}'.
+src/components/modals/QuickFundModal.tsx(59,28): error TS2554: Expected 1 arguments, but got 2.
+src/components/modals/QuickFundModal.tsx(83,66): error TS2339: Property 'name' does not exist on type '{}'.
+src/components/modals/QuickFundModal.tsx(90,11): error TS2741: Property 'name' is missing in type '{}' but required in type 'Envelope'.
+src/components/modals/UnassignedCashModal.tsx(311,22): error TS2339: Property 'isUnassignedCashModalOpen' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/modals/UnassignedCashModal.tsx(315,22): error TS2339: Property 'closeUnassignedCashModal' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
 src/components/monitoring/HighlightLoader.tsx(22,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/components/onboarding/EmptyStateHints.tsx(228,46): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
 src/components/onboarding/EmptyStateHints.tsx(258,37): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
   No index signature with a parameter of type 'string' was found on type '{ blue: string; red: string; orange: string; green: string; purple: string; indigo: string; teal: string; }'.
-src/components/onboarding/components/TutorialOverlay.tsx(10,3): error TS7031: Binding element 'currentStepElement' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(11,3): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(12,3): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(13,3): error TS7031: Binding element 'tutorialStepsLength' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(14,3): error TS7031: Binding element 'tooltipPosition' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(15,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(16,3): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(17,3): error TS7031: Binding element 'onPrev' implicitly has an 'any' type.
-src/components/onboarding/components/TutorialOverlay.tsx(18,3): error TS7031: Binding element 'onSkip' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(10,3): error TS7006: Parameter 'tutorialSteps' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(11,3): error TS7006: Parameter 'currentStep' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialControls.ts(12,3): error TS7006: Parameter 'setCurrentStep' implicitly has an 'any' type.
@@ -1383,8 +2069,6 @@ src/components/onboarding/hooks/useTutorialHighlight.ts(8,41): error TS7006: Par
 src/components/onboarding/hooks/useTutorialHighlight.ts(35,40): error TS7006: Parameter 'element' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialHighlight.ts(45,31): error TS7006: Parameter 'shouldHighlight' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialHighlight.ts(45,48): error TS7006: Parameter 'element' implicitly has an 'any' type.
-src/components/onboarding/hooks/useTutorialPositioning.ts(8,43): error TS7006: Parameter 'element' implicitly has an 'any' type.
-src/components/onboarding/hooks/useTutorialPositioning.ts(8,52): error TS7006: Parameter 'step' implicitly has an 'any' type.
 src/components/onboarding/hooks/useTutorialSteps.ts(128,6): error TS7006: Parameter 'currentStep' implicitly has an 'any' type.
 src/components/pages/MainDashboard.tsx(81,38): error TS7006: Parameter 'newBalance' implicitly has an 'any' type.
 src/components/pages/MainDashboard.tsx(158,9): error TS2322: Type 'Transaction[]' is not assignable to type 'never[]'.
@@ -1392,48 +2076,65 @@ src/components/pages/MainDashboard.tsx(158,9): error TS2322: Type 'Transaction[]
 src/components/pages/MainDashboard.tsx(159,9): error TS2322: Type '() => EnvelopeOption[]' is not assignable to type '() => never[]'.
   Type 'EnvelopeOption[]' is not assignable to type 'never[]'.
     Type 'EnvelopeOption' is not assignable to type 'never'.
-src/components/pages/MainDashboard.tsx(169,9): error TS2322: Type '() => EnvelopeOption[]' is not assignable to type '() => never[]'.
-  Type 'EnvelopeOption[]' is not assignable to type 'never[]'.
-    Type 'EnvelopeOption' is not assignable to type 'never'.
-src/components/pwa/OfflineStatusIndicator.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/pwa/OfflineStatusIndicator.tsx(34,20): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/OfflineStatusIndicator.tsx(34,32): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/pages/MainDashboard.tsx(167,9): error TS2322: Type '(updates: Partial<TransactionFormState>) => void' is not assignable to type '(updates: Partial<NewTransaction>) => void'.
+  Types of parameters 'updates' and 'updates' are incompatible.
+    Type 'Partial<NewTransaction>' is not assignable to type 'Partial<TransactionFormState>'.
+      Types of property 'amount' are incompatible.
+        Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+          Type 'number' is not assignable to type 'string'.
+src/components/pwa/OfflineStatusIndicator.tsx(34,48): error TS2339: Property 'isOnline' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
 src/components/pwa/OfflineStatusIndicator.tsx(55,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/pwa/PatchNotesModal.tsx(6,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/pwa/PatchNotesModal.tsx(89,26): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/PatchNotesModal.tsx(90,26): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/PatchNotesModal.tsx(93,29): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/PatchNotesModal.tsx(94,31): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
+src/components/pwa/OfflineStatusIndicator.tsx(106,7): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/components/pwa/OfflineStatusIndicator.tsx(255,45): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/components/pwa/PatchNotesModal.tsx(89,37): error TS2345: Argument of type '(state: UiStore) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(90,26): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' to type 'PatchNotesData | null' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/components/pwa/PatchNotesModal.tsx(91,5): error TS2345: Argument of type '(state: UiStore) => { version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; } | null' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => { version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; } | null' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(93,40): error TS2345: Argument of type '(state: UiStore) => boolean' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => boolean' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(94,42): error TS2345: Argument of type '(state: UiStore) => () => void' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: UiStore) => () => void' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'UiStore'.
+src/components/pwa/PatchNotesModal.tsx(95,24): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/components/pwa/PatchNotesModal.tsx(130,7): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/components/pwa/UpdateAvailableModal.tsx(29,28): error TS2339: Property 'hasContent' does not exist on type 'string'.
+src/components/pwa/UpdateAvailableModal.tsx(30,65): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
+src/components/pwa/UpdateAvailableModal.tsx(31,25): error TS2345: Argument of type '{ type: string; text: string; }[]' is not assignable to parameter of type 'SetStateAction<PatchNote[]>'.
+  Type '{ type: string; text: string; }[]' is not assignable to type 'PatchNote[]'.
+    Type '{ type: string; text: string; }' is not assignable to type 'PatchNote'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type '"other" | "breaking" | "fix" | "feature"'.
 src/components/pwa/UpdateAvailableModal.tsx(35,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/pwa/UpdateAvailableModal.tsx(53,27): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(53,39): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(54,22): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(54,34): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(55,30): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(55,42): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(56,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(56,33): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/pwa/UpdateAvailableModal.tsx(53,55): error TS2339: Property 'updateAvailable' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/pwa/UpdateAvailableModal.tsx(54,50): error TS2339: Property 'isUpdating' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/pwa/UpdateAvailableModal.tsx(55,58): error TS2339: Property 'setUpdateAvailable' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/pwa/UpdateAvailableModal.tsx(56,49): error TS2339: Property 'updateApp' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/pwa/UpdateAvailableModal.tsx(58,54): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'boolean'.
+src/components/pwa/UpdateAvailableModal.tsx(59,39): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'boolean'.
+src/components/pwa/UpdateAvailableModal.tsx(68,24): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/components/pwa/UpdateAvailableModal.tsx(164,13): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean | undefined'.
+src/components/pwa/UpdateAvailableModal.tsx(167,14): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/components/pwa/UpdateAvailableModal.tsx(184,13): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean | undefined'.
 src/components/receipts/ReceiptButton.tsx(13,26): error TS7031: Binding element 'onTransactionCreated' implicitly has an 'any' type.
 src/components/receipts/ReceiptButton.tsx(26,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/components/receipts/ReceiptButton.tsx(35,35): error TS7006: Parameter 'processedReceipt' implicitly has an 'any' type.
 src/components/receipts/ReceiptButton.tsx(41,38): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/components/receipts/ReceiptButton.tsx(41,51): error TS7006: Parameter 'receipt' implicitly has an 'any' type.
-src/components/receipts/ReceiptScanner.tsx(21,27): error TS7031: Binding element 'onReceiptProcessed' implicitly has an 'any' type.
-src/components/receipts/ReceiptScanner.tsx(21,47): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(13,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(13,30): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(34,24): error TS7031: Binding element 'currentStep' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,24): error TS7031: Binding element 'step' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,30): error TS7031: Binding element 'isSubmitting' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,44): error TS7031: Binding element 'canProceed' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,56): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,64): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,72): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(64,82): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(97,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(97,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(97,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(105,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(105,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(105,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(161,13): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
+  Type 'Envelope' is missing the following properties from type 'Envelope': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(184,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
+  Type 'string' is not assignable to type 'boolean'.
 src/components/receipts/components/ExtractedDataField.tsx(7,31): error TS7031: Binding element 'label' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedDataField.tsx(7,38): error TS7031: Binding element 'value' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedDataField.tsx(7,45): error TS7031: Binding element 'confidence' implicitly has an 'any' type.
@@ -1445,10 +2146,7 @@ src/components/receipts/components/ExtractedItemsList.tsx(16,41): error TS7006: 
 src/components/receipts/components/ReceiptActionButtons.tsx(8,33): error TS7031: Binding element 'extractedData' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptActionButtons.tsx(8,48): error TS7031: Binding element 'onReset' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptActionButtons.tsx(8,57): error TS7031: Binding element 'onConfirm' implicitly has an 'any' type.
-src/components/receipts/components/ReceiptErrorState.tsx(9,30): error TS7031: Binding element 'error' implicitly has an 'any' type.
-src/components/receipts/components/ReceiptErrorState.tsx(9,37): error TS7031: Binding element 'onRetry' implicitly has an 'any' type.
-src/components/receipts/components/ReceiptExtractedData.tsx(11,33): error TS7031: Binding element 'extractedData' implicitly has an 'any' type.
-src/components/receipts/components/ReceiptExtractedData.tsx(14,27): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/components/receipts/components/ReceiptExtractedData.tsx(94,86): error TS2339: Property 'processingTime' does not exist on type 'ExtractedData'.
 src/components/receipts/components/ReceiptImagePreview.tsx(10,32): error TS7031: Binding element 'uploadedImage' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptImagePreview.tsx(10,47): error TS7031: Binding element 'showImagePreview' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptImagePreview.tsx(10,65): error TS7031: Binding element 'onTogglePreview' implicitly has an 'any' type.
@@ -1458,16 +2156,10 @@ src/components/receipts/components/ReceiptUploadArea.tsx(11,3): error TS7031: Bi
 src/components/receipts/components/ReceiptUploadArea.tsx(12,3): error TS7031: Binding element 'fileInputRef' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptUploadArea.tsx(13,3): error TS7031: Binding element 'cameraInputRef' implicitly has an 'any' type.
 src/components/receipts/components/ReceiptUploadArea.tsx(14,3): error TS7031: Binding element 'onFileInputChange' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(10,35): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(56,35): error TS7031: Binding element 'selectedEnvelope' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(56,53): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(95,35): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(131,33): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(131,46): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(150,29): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(150,42): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(150,59): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/receipts/steps/ConfirmationStep.tsx(151,44): error TS7006: Parameter 'env' implicitly has an 'any' type.
+src/components/receipts/steps/ConfirmationStep.tsx(64,70): error TS2345: Argument of type 'string | number | Date' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/receipts/steps/ConfirmationStep.tsx(139,70): error TS2345: Argument of type 'string | number | Date' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
 src/components/receipts/steps/EnvelopeSelectionStep.tsx(5,34): error TS7031: Binding element 'transactionForm' implicitly has an 'any' type.
 src/components/receipts/steps/EnvelopeSelectionStep.tsx(5,51): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
 src/components/receipts/steps/EnvelopeSelectionStep.tsx(5,62): error TS7031: Binding element 'handleFormChange' implicitly has an 'any' type.
@@ -1478,62 +2170,44 @@ src/components/receipts/steps/ReceiptDataStep.tsx(6,41): error TS7031: Binding e
 src/components/receipts/steps/ReceiptDataStep.tsx(6,58): error TS7031: Binding element 'handleFormChange' implicitly has an 'any' type.
 src/components/receipts/steps/ReceiptDataStep.tsx(105,49): error TS7006: Parameter 'item' implicitly has an 'any' type.
 src/components/receipts/steps/ReceiptDataStep.tsx(105,55): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(6,28): error TS7031: Binding element 'goal' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(6,34): error TS7031: Binding element 'onEdit' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(6,42): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(6,52): error TS7031: Binding element 'priorities' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(7,34): error TS7006: Parameter 'current' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(7,43): error TS7006: Parameter 'target' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(11,29): error TS7006: Parameter 'targetDate' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(32,37): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/components/savings/SavingsGoalCard.tsx(34,34): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/components/savings/SavingsGoals.tsx(17,3): error TS7031: Binding element 'onAddGoal' implicitly has an 'any' type.
-src/components/savings/SavingsGoals.tsx(18,3): error TS7031: Binding element 'onUpdateGoal' implicitly has an 'any' type.
-src/components/savings/SavingsGoals.tsx(19,3): error TS7031: Binding element 'onDeleteGoal' implicitly has an 'any' type.
-src/components/savings/SavingsGoals.tsx(20,3): error TS7031: Binding element 'onDistributeToGoals' implicitly has an 'any' type.
-src/components/savings/SavingsGoals.tsx(125,27): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/savings/SavingsGoals.tsx(140,9): error TS2322: Type '(goalData: any, goalId?: null) => Promise<void>' is not assignable to type '(goalData: Omit<Goal, "id">, goalId?: string | undefined) => void'.
-  Types of parameters 'goalId' and 'goalId' are incompatible.
-    Type 'string | undefined' is not assignable to type 'null | undefined'.
-      Type 'string' is not assignable to type 'null | undefined'.
+src/components/savings/SavingsGoals.tsx(44,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/components/savings/SavingsGoals.tsx(93,27): error TS2322: Type 'unknown[]' is not assignable to type 'SavingsGoal[]'.
+  Type 'unknown' is not assignable to type 'SavingsGoal'.
+src/components/savings/SavingsGoals.tsx(132,22): error TS18046: 'goal' is of type 'unknown'.
+src/components/savings/SavingsGoals.tsx(133,17): error TS2322: Type 'unknown' is not assignable to type 'SavingsGoal'.
+src/components/savings/SavingsGoals.tsx(156,9): error TS2322: Type 'unknown[]' is not assignable to type 'SavingsGoal[]'.
+  Type 'unknown' is not assignable to type 'SavingsGoal'.
 src/components/security/LocalDataSecurityWarning.tsx(12,37): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(12,46): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
 src/components/security/LocalDataSecurityWarning.tsx(133,26): error TS7031: Binding element 'onAcknowledge' implicitly has an 'any' type.
-src/components/security/LockScreen.tsx(58,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
-src/components/security/LockScreen.tsx(126,9): error TS2353: Object literal may only specify known properties, and 'cancel' does not exist in type '(prevState: null) => null'.
-src/components/security/LockScreen.tsx(156,7): error TS2322: Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; } | { isValid: boolean; reason: string; error: any; }' is not assignable to type 'null'.
-  Type '{ isValid: boolean; reason?: string | undefined; isCorrupted?: boolean | undefined; }' is not assignable to type 'null'.
-src/components/security/LockScreen.tsx(161,26): error TS2339: Property 'cancel' does not exist on type 'never'.
-src/components/security/LockScreen.tsx(204,35): error TS2339: Property 'focus' does not exist on type 'never'.
-src/components/security/LockScreen.tsx(217,31): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/security/LockScreen.tsx(232,27): error TS7006: Parameter 'e' implicitly has an 'any' type.
-src/components/settings/EnvelopeIntegrityChecker.tsx(17,37): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/settings/EnvelopeIntegrityChecker.tsx(17,45): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/settings/SettingsDashboard.tsx(121,5): error TS2322: Type '(profile: { userName: string; userColor: string; }) => void' is not assignable to type '(profile: unknown) => void'.
+src/components/security/LockScreen.tsx(239,20): error TS2345: Argument of type 'KeyboardEvent<HTMLInputElement>' is not assignable to parameter of type 'FormEvent<HTMLFormElement>'.
+  Types of property 'currentTarget' are incompatible.
+    Type 'EventTarget & HTMLInputElement' is not assignable to type 'EventTarget & HTMLFormElement'.
+      Type 'EventTarget & HTMLInputElement' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, elements, encoding, and 11 more.
+src/components/settings/SecuritySettings.tsx(83,16): error TS2322: Type '{ securitySettings: SecuritySettings; handleSettingChange: (setting: any, value: any) => void; }' is not assignable to type 'ClipboardSecuritySectionProps'.
+  Types of property 'securitySettings' are incompatible.
+    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecuritySettings' is not assignable to type 'SecuritySettings'.
+      Index signature for type 'string' is missing in type 'SecuritySettings'.
+src/components/settings/SettingsDashboard.tsx(110,5): error TS2322: Type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to type 'boolean | undefined'.
+src/components/settings/SettingsDashboard.tsx(121,5): error TS2322: Type '(profile: { userName: string; userColor: string; }) => void' is not assignable to type '(profile: UserProfile) => void'.
   Types of parameters 'profile' and 'profile' are incompatible.
-    Type 'unknown' is not assignable to type '{ userName: string; userColor: string; }'.
+    Type 'UserProfile' is not assignable to type '{ userName: string; userColor: string; }'.
+      Types of property 'userName' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+src/components/settings/SettingsDashboard.tsx(124,5): error TS2322: Type 'unknown' is not assignable to type 'SecurityManager | undefined'.
 src/components/settings/SettingsDashboard.tsx(162,13): error TS2322: Type '(password: string) => void' is not assignable to type '(current: string, newPass: string) => Promise<AuthResult>'.
   Type 'void' is not assignable to type 'Promise<AuthResult>'.
 src/components/settings/SettingsDashboard.tsx(167,9): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/settings/archiving/ArchivingActionButtons.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(7,3): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(8,3): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(9,3): error TS7031: Binding element 'confirmArchiving' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(10,3): error TS7031: Binding element 'handlePreview' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(11,3): error TS7031: Binding element 'toggleConfirmArchiving' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingActionButtons.tsx(12,3): error TS7031: Binding element 'onArchiveClick' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingConfiguration.tsx(7,3): error TS7031: Binding element 'selectedPeriod' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingConfiguration.tsx(8,3): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingConfiguration.tsx(9,3): error TS7031: Binding element 'showAdvancedOptions' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingConfiguration.tsx(10,3): error TS7031: Binding element 'handlePeriodChange' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingConfiguration.tsx(11,3): error TS7031: Binding element 'toggleAdvancedOptions' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingHeader.tsx(5,28): error TS7031: Binding element 'onRefresh' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingHeader.tsx(5,39): error TS7031: Binding element 'isLoading' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(5,36): error TS7031: Binding element 'showPreview' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(5,49): error TS7031: Binding element 'previewData' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingPreviewResults.tsx(5,62): error TS7031: Binding element 'onClosePreview' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingProgress.tsx(4,30): error TS7031: Binding element 'isArchiving' implicitly has an 'any' type.
-src/components/settings/archiving/ArchivingProgress.tsx(4,43): error TS7031: Binding element 'archivingProgress' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingResult.tsx(4,28): error TS7031: Binding element 'lastResult' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingStatusOverview.tsx(5,3): error TS7031: Binding element 'archivingStatus' implicitly has an 'any' type.
 src/components/settings/archiving/ArchivingStatusOverview.tsx(6,3): error TS7031: Binding element 'needsArchiving' implicitly has an 'any' type.
@@ -1544,36 +2218,10 @@ src/components/settings/sections/AccountSettingsSection.tsx(12,3): error TS7031:
 src/components/settings/sections/AccountSettingsSection.tsx(13,3): error TS7031: Binding element 'onLogout' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(14,3): error TS7031: Binding element 'onOpenResetConfirm' implicitly has an 'any' type.
 src/components/settings/sections/AccountSettingsSection.tsx(15,3): error TS7031: Binding element 'onUpdateProfile' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(8,25): error TS7031: Binding element 'enabled' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(8,34): error TS7031: Binding element 'onChange' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(8,44): error TS7031: Binding element 'label' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(8,51): error TS7031: Binding element 'description' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(33,36): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
-src/components/settings/sections/AutoLockSettingsSection.tsx(33,54): error TS7031: Binding element 'handleSettingChange' implicitly has an 'any' type.
-src/components/settings/sections/ClipboardSecuritySection.tsx(8,37): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
-src/components/settings/sections/ClipboardSecuritySection.tsx(8,55): error TS7031: Binding element 'handleSettingChange' implicitly has an 'any' type.
-src/components/settings/sections/DevToolsSection.tsx(17,28): error TS7031: Binding element 'onOpenEnvelopeChecker' implicitly has an 'any' type.
-src/components/settings/sections/DevToolsSection.tsx(17,51): error TS7031: Binding element 'onCreateTestHistory' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/settings/sections/GeneralSettingsSection.tsx(270,3): error TS7031: Binding element 'isLocalOnlyMode' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(271,3): error TS7031: Binding element 'cloudSyncEnabled' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(272,3): error TS7031: Binding element 'isSyncing' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(273,3): error TS7031: Binding element 'onOpenLocalOnlySettings' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(274,3): error TS7031: Binding element 'onToggleCloudSync' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(275,3): error TS7031: Binding element 'onManualSync' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(277,25): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(277,37): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/settings/sections/GeneralSettingsSection.tsx(294,44): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ already_installed: string; not_available: string; declined: string; }'.
-src/components/settings/sections/SecurityLoggingSection.tsx(10,3): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(11,3): error TS7031: Binding element 'securityEvents' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(12,3): error TS7031: Binding element 'showEvents' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(13,3): error TS7031: Binding element 'handleSettingChange' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(14,3): error TS7031: Binding element 'toggleEventsDisplay' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(15,3): error TS7031: Binding element 'exportSecurityEvents' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(16,3): error TS7031: Binding element 'showClearConfirmDialog' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(19,32): error TS7031: Binding element 'event' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(20,32): error TS7006: Parameter 'type' implicitly has an 'any' type.
-src/components/settings/sections/SecurityLoggingSection.tsx(148,41): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/components/settings/sections/GeneralSettingsSection.tsx(286,53): error TS2339: Property 'manualInstall' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/components/settings/sections/GeneralSettingsSection.tsx(303,53): error TS2538: Type 'unknown' cannot be used as an index type.
+src/components/settings/sections/NotificationSettingsSection.tsx(264,27): error TS2322: Type 'string | null' is not assignable to type 'PermissionStatus | null'.
+  Type 'string' is not assignable to type 'PermissionStatus'.
 src/components/settings/sections/SecuritySettingsSection.tsx(6,3): error TS7031: Binding element 'securityManager' implicitly has an 'any' type.
 src/components/settings/sections/SecuritySettingsSection.tsx(7,3): error TS7031: Binding element 'onOpenSecuritySettings' implicitly has an 'any' type.
 src/components/settings/sections/SecuritySettingsSection.tsx(8,3): error TS7031: Binding element 'onShowLocalDataSecurity' implicitly has an 'any' type.
@@ -1581,39 +2229,18 @@ src/components/settings/sections/SecurityStatusSection.tsx(9,3): error TS7031: B
 src/components/settings/sections/SecurityStatusSection.tsx(10,3): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(11,3): error TS7031: Binding element 'securityEvents' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(12,3): error TS7031: Binding element 'timeUntilAutoLock' implicitly has an 'any' type.
-src/components/settings/sections/SyncDebugToolsSection.tsx(7,34): error TS7031: Binding element 'isDebugMode' implicitly has an 'any' type.
-src/components/settings/sections/SyncDebugToolsSection.tsx(41,36): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(41,36): error TS18048: 'window.getQuickSyncStatus' is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(65,40): error TS18048: 'window.runMasterSyncValidation' is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(171,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(10,5): error TS2717: Subsequent property declarations must have the same type.  Property 'getQuickSyncStatus' must be of type '(() => Promise<any>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(11,5): error TS2717: Subsequent property declarations must have the same type.  Property 'runMasterSyncValidation' must be of type '(() => Promise<ValidationResults>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(12,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
+src/components/settings/sections/SyncDebugToolsSection.tsx(13,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
+src/components/settings/sections/SyncDebugToolsSection.tsx(14,5): error TS2717: Subsequent property declarations must have the same type.  Property 'forceCloudDataReset' must be of type '(() => Promise<{ success: boolean; message?: string | undefined; error?: string | undefined; }>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(103,40): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(103,40): error TS18048: 'window.detectLocalDataDebug' is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(126,40): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(126,40): error TS18048: 'window.hasLocalDataDebug' is possibly 'undefined'.
 src/components/sharing/JoinBudgetModal.tsx(17,28): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
 src/components/sharing/JoinBudgetModal.tsx(17,36): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/sharing/JoinBudgetModal.tsx(17,45): error TS7031: Binding element 'onJoinSuccess' implicitly has an 'any' type.
-src/components/sharing/ShareCodeModal.tsx(17,27): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/sharing/ShareCodeModal.tsx(17,35): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/sharing/ShareCodeModal.tsx(45,67): error TS2345: Argument of type 'UserData' is not assignable to parameter of type 'null | undefined'.
-src/components/sharing/ShareCodeModal.tsx(54,22): error TS2345: Argument of type '{ shareCode: string; qrData: string; shareUrl: string; expiresAt: number; }' is not assignable to parameter of type 'SetStateAction<null>'.
-  Type '{ shareCode: string; qrData: string; shareUrl: string; expiresAt: number; }' provides no match for the signature '(prevState: null): null'.
-src/components/sharing/ShareCodeModal.tsx(84,65): error TS2345: Argument of type 'UserData' is not assignable to parameter of type 'null | undefined'.
-src/components/sharing/ShareCodeModal.tsx(93,20): error TS2345: Argument of type '{ shareCode: string; qrData: string; shareUrl: string; expiresAt: number; }' is not assignable to parameter of type 'SetStateAction<null>'.
-  Type '{ shareCode: string; qrData: string; shareUrl: string; expiresAt: number; }' provides no match for the signature '(prevState: null): null'.
-src/components/sharing/ShareCodeModal.tsx(124,21): error TS2339: Property 'shareCode' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(127,53): error TS2339: Property 'shareCode' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(132,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/sharing/ShareCodeModal.tsx(138,21): error TS2339: Property 'shareUrl' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(141,53): error TS2339: Property 'shareUrl' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(144,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/sharing/ShareCodeModal.tsx(197,38): error TS2339: Property 'qrData' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(218,38): error TS2339: Property 'shareCode' does not exist on type 'never'.
-src/components/sharing/ShareCodeModal.tsx(243,38): error TS2339: Property 'shareUrl' does not exist on type 'never'.
-src/components/sharing/steps/ShareCodeStep.tsx(8,26): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
-src/components/sharing/steps/ShareCodeStep.tsx(8,37): error TS7031: Binding element 'setShareCode' implicitly has an 'any' type.
-src/components/sharing/steps/ShareCodeStep.tsx(8,51): error TS7031: Binding element 'onValidate' implicitly has an 'any' type.
-src/components/sharing/steps/ShareCodeStep.tsx(8,63): error TS7031: Binding element 'onQRScan' implicitly has an 'any' type.
-src/components/sharing/steps/ShareCodeStep.tsx(8,73): error TS7031: Binding element 'isValidating' implicitly has an 'any' type.
-src/components/sharing/steps/ShareCodeStep.tsx(9,25): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/components/sharing/steps/UserSetupStep.tsx(9,3): error TS7031: Binding element 'shareInfo' implicitly has an 'any' type.
 src/components/sharing/steps/UserSetupStep.tsx(10,3): error TS7031: Binding element 'creatorInfo' implicitly has an 'any' type.
 src/components/sharing/steps/UserSetupStep.tsx(11,3): error TS7031: Binding element 'password' implicitly has an 'any' type.
@@ -1631,33 +2258,25 @@ src/components/sharing/steps/UserSetupStep.tsx(23,25): error TS7006: Parameter '
 src/components/sync/ConflictResolutionModal.tsx(26,36): error TS7031: Binding element 'syncConflicts' implicitly has an 'any' type.
 src/components/sync/ConflictResolutionModal.tsx(26,51): error TS7031: Binding element 'onResolveConflict' implicitly has an 'any' type.
 src/components/sync/ConflictResolutionModal.tsx(26,70): error TS7031: Binding element 'onDismiss' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(43,3): error TS7031: Binding element 'syncStatus' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(44,3): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(45,3): error TS7031: Binding element 'isRecovering' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(46,3): error TS7031: Binding element 'recoveryResult' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(47,3): error TS7031: Binding element 'onRefresh' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(48,3): error TS7031: Binding element 'onRunValidation' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(49,3): error TS7031: Binding element 'onResetData' implicitly has an 'any' type.
-src/components/sync/health/SyncHealthDetails.tsx(137,13): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/sync/health/SyncHealthDetails.tsx(56,50): error TS2345: Argument of type 'SyncStatus' is not assignable to parameter of type 'SyncStatus'.
+  Index signature for type 'string' is missing in type 'SyncStatus'.
+src/components/sync/health/SyncHealthDetails.tsx(58,56): error TS2345: Argument of type 'RecoveryResult | null' is not assignable to parameter of type 'RecoveryResult | null'.
+  Type 'RecoveryResult' is not assignable to type 'RecoveryResult'. Two different types with this name exist, but they are unrelated.
+    Index signature for type 'string' is missing in type 'RecoveryResult'.
+src/components/sync/health/SyncHealthDetails.tsx(109,16): error TS18048: 'syncStatus.failedTests' is possibly 'undefined'.
+src/components/sync/health/SyncHealthDetails.tsx(111,13): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/sync/health/SyncHealthDetails.tsx(142,13): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/sync/health/SyncStatusIndicator.tsx(27,32): error TS7031: Binding element 'syncStatus' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,44): error TS7031: Binding element 'isBackgroundSyncing' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,65): error TS7031: Binding element 'onClick' implicitly has an 'any' type.
 src/components/sync/health/SyncStatusIndicator.tsx(27,74): error TS7031: Binding element 'showDetails' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(7,3): error TS7031: Binding element 'searchTerm' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(8,3): error TS7031: Binding element 'setSearchTerm' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(9,3): error TS7031: Binding element 'dateFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(10,3): error TS7031: Binding element 'setDateFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(11,3): error TS7031: Binding element 'typeFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(12,3): error TS7031: Binding element 'setTypeFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(13,3): error TS7031: Binding element 'envelopeFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(14,3): error TS7031: Binding element 'setEnvelopeFilter' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(15,3): error TS7031: Binding element 'sortBy' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(16,3): error TS7031: Binding element 'setSortBy' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(17,3): error TS7031: Binding element 'sortOrder' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(18,3): error TS7031: Binding element 'setSortOrder' implicitly has an 'any' type.
-src/components/transactions/TransactionFilters.tsx(115,39): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionFilters.tsx(115,59): error TS2339: Property 'id' does not exist on type 'never'.
-src/components/transactions/TransactionFilters.tsx(116,29): error TS2339: Property 'name' does not exist on type 'never'.
+src/components/transactions/TransactionLedger.tsx(176,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/components/transactions/TransactionLedger.tsx(178,7): error TS2322: Type 'unknown' is not assignable to type 'unknown[]'.
+src/components/transactions/TransactionLedger.tsx(180,7): error TS2322: Type 'unknown' is not assignable to type 'Record<string, string>'.
+src/components/transactions/TransactionLedger.tsx(182,7): error TS2322: Type 'unknown' is not assignable to type '{ current: number; total: number; percentage: number; }'.
+src/components/transactions/TransactionLedger.tsx(184,7): error TS2322: Type '(file: File) => void' is not assignable to type '(data: unknown[]) => void'.
+  Types of parameters 'file' and 'data' are incompatible.
+    Type 'unknown[]' is missing the following properties from type 'File': lastModified, name, webkitRelativePath, size, and 5 more.
 src/components/transactions/TransactionLedger.tsx(476,7): error TS2322: Type 'Dispatch<SetStateAction<null>>' is not assignable to type '(transaction: Transaction | null) => void'.
   Types of parameters 'value' and 'transaction' are incompatible.
     Type 'Transaction | null' is not assignable to type 'SetStateAction<null>'.
@@ -1674,8 +2293,20 @@ src/components/transactions/TransactionLedger.tsx(498,7): error TS2322: Type '(m
     Type 'unknown' is not assignable to type 'FieldMapping'.
 src/components/transactions/TransactionSplitter.tsx(34,5): error TS2322: Type 'Transaction | null' is not assignable to type 'Transaction | undefined'.
   Type 'null' is not assignable to type 'Transaction | undefined'.
-src/components/transactions/TransactionSplitter.tsx(105,19): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
-  Type 'string' is not assignable to type 'never'.
+src/components/transactions/TransactionSplitter.tsx(102,19): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation[]' is not assignable to type 'SplitAllocation[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").SplitAllocation' is not assignable to type 'SplitAllocation'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/transactions/TransactionSplitter.tsx(103,19): error TS2322: Type 'string[]' is not assignable to type 'Category[]'.
+  Type 'string' is not assignable to type 'Category'.
+src/components/transactions/TransactionSplitter.tsx(104,19): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]' is not assignable to type 'Envelope[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'Envelope'.
+    Types of property 'id' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
+src/components/transactions/TransactionSplitter.tsx(106,19): error TS2322: Type '(splitId: string, field: keyof SplitAllocation, value: unknown) => void' is not assignable to type '(id: string, updates: Record<string, unknown>) => void'.
+  Target signature provides too few arguments. Expected 3 or more, but got 2.
 src/components/transactions/TransactionSplitter.tsx(126,13): error TS2322: Type 'string[]' is not assignable to type 'never[]'.
   Type 'string' is not assignable to type 'never'.
 src/components/transactions/TransactionTable.tsx(139,21): error TS2322: Type '(transaction: Transaction) => void' is not assignable to type '(transactionId: string) => void'.
@@ -1694,26 +2325,19 @@ src/components/transactions/components/DeleteConfirmation.tsx(8,77): error TS703
 src/components/transactions/components/TransactionRow.tsx(39,60): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Envelope[]'.
   Type 'unknown' is not assignable to type 'Envelope'.
 src/components/transactions/components/TransactionRow.tsx(134,42): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'string'.
-src/components/transactions/import/FieldMapper.tsx(4,24): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,36): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,50): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,67): error TS7031: Binding element 'onBack' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(4,75): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(67,69): error TS7006: Parameter 'row' implicitly has an 'any' type.
-src/components/transactions/import/FieldMapper.tsx(67,74): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(8,3): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(9,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(10,3): error TS7031: Binding element 'importStep' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(11,3): error TS7031: Binding element 'setImportStep' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(12,3): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(13,3): error TS7031: Binding element 'setImportData' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(14,3): error TS7031: Binding element 'fieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(15,3): error TS7031: Binding element 'setFieldMapping' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(16,3): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(17,3): error TS7031: Binding element 'onImport' implicitly has an 'any' type.
-src/components/transactions/import/ImportModal.tsx(18,3): error TS7031: Binding element 'onFileUpload' implicitly has an 'any' type.
-src/components/transactions/import/ImportProgress.tsx(4,27): error TS7031: Binding element 'importData' implicitly has an 'any' type.
-src/components/transactions/import/ImportProgress.tsx(4,39): error TS7031: Binding element 'importProgress' implicitly has an 'any' type.
+src/components/transactions/import/ImportModal.tsx(59,44): error TS2322: Type '(data: unknown[]) => void' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
+  Types of parameters 'data' and 'event' are incompatible.
+    Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/import/ImportModal.tsx(63,13): error TS2322: Type 'unknown[]' is not assignable to type 'ImportData | DataRow[]'.
+  Type 'unknown[]' is not assignable to type 'DataRow[]'.
+    Type 'unknown' is not assignable to type 'DataRow'.
+src/components/transactions/import/ImportModal.tsx(65,13): error TS2322: Type '(mapping: Record<string, string>) => void' is not assignable to type '(mapping: FieldMapping) => void'.
+  Types of parameters 'mapping' and 'mapping' are incompatible.
+    Type 'FieldMapping' is not assignable to type 'Record<string, string>'.
+      'string' index signatures are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+src/components/transactions/import/ImportModal.tsx(72,51): error TS2322: Type '{ current: number; total: number; percentage: number; }' is not assignable to type 'number'.
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(7,3): error TS7031: Binding element 'transactionCount' implicitly has an 'any' type.
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(8,3): error TS7031: Binding element 'netCashFlow' implicitly has an 'any' type.
 src/components/transactions/ledger/TransactionLedgerHeader.tsx(9,3): error TS7031: Binding element 'onAddTransaction' implicitly has an 'any' type.
@@ -1726,26 +2350,12 @@ src/components/transactions/splitter/SplitActions.tsx(5,33): error TS7031: Bindi
 src/components/transactions/splitter/SplitActions.tsx(5,52): error TS7031: Binding element 'isSaving' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitActions.tsx(5,75): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitActions.tsx(5,83): error TS7031: Binding element 'onCancel' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(7,3): error TS7031: Binding element 'split' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(8,10): error TS7031: Binding element '_index' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(9,3): error TS7031: Binding element 'canRemove' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(10,3): error TS7031: Binding element 'onUpdate' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(11,3): error TS7031: Binding element 'onRemove' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(12,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(13,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(57,39): error TS7006: Parameter 'category' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationRow.tsx(74,28): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(7,3): error TS7031: Binding element 'splitAllocations' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(8,3): error TS7031: Binding element 'availableCategories' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(9,3): error TS7031: Binding element 'envelopes' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(10,3): error TS7031: Binding element 'onUpdateSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(11,3): error TS7031: Binding element 'onRemoveSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(12,3): error TS7031: Binding element 'onAddSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(13,3): error TS7031: Binding element 'onSmartSplit' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(14,3): error TS7031: Binding element 'onAutoBalance' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(15,3): error TS7031: Binding element 'canAutoBalance' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(84,32): error TS7006: Parameter 'split' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(84,39): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(117,13): error TS2739: Type 'SplitAllocation' is missing the following properties from type 'Split': description, amount, category
+src/components/transactions/splitter/SplitAllocationsSection.tsx(120,13): error TS2322: Type '(id: string, updates: Record<string, unknown>) => void' is not assignable to type '(id: string, field: string, value: string | number) => void'.
+  Types of parameters 'updates' and 'field' are incompatible.
+    Type 'string' is not assignable to type 'Record<string, unknown>'.
+src/components/transactions/splitter/SplitAllocationsSection.tsx(122,13): error TS2322: Type 'Category[]' is not assignable to type 'string[]'.
+  Type 'Category' is not assignable to type 'string'.
 src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitterHeader.tsx(5,27): error TS7031: Binding element 'transaction' implicitly has an 'any' type.
 src/components/transactions/splitter/SplitterHeader.tsx(5,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
@@ -1762,38 +2372,44 @@ src/contexts/authUtils.ts(106,18): error TS2345: Argument of type '(prev: AuthCo
       The types of 'user.userName' are incompatible between these types.
         Type 'string | undefined' is not assignable to type 'string'.
           Type 'undefined' is not assignable to type 'string'.
-src/db/budgetDb.ts(133,29): error TS2769: No overload matches this call.
+src/db/budgetDb.ts(94,9): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '"creating"' is not assignable to parameter of type '"deleting"'.
+src/db/budgetDb.ts(142,31): error TS2769: No overload matches this call.
   Overload 1 of 4, '(target: {}, source: Record<string, unknown>): Record<string, unknown>', gave the following error.
     Argument of type 'unknown' is not assignable to parameter of type '{}'.
   Overload 2 of 4, '(target: object, ...sources: any[]): any', gave the following error.
     Argument of type 'unknown' is not assignable to parameter of type 'object'.
-src/db/budgetDb.ts(186,23): error TS2345: Argument of type 'Table<Envelope, string, Envelope>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(191,9): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '"updating"' is not assignable to parameter of type '"deleting"'.
+src/db/budgetDb.ts(208,23): error TS2345: Argument of type 'Table<Envelope, string, Envelope>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(187,23): error TS2345: Argument of type 'Table<Transaction, string, Transaction>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(209,23): error TS2345: Argument of type 'Table<Transaction, string, Transaction>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(188,23): error TS2345: Argument of type 'Table<Bill, string, Bill>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(210,23): error TS2345: Argument of type 'Table<Bill, string, Bill>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(189,23): error TS2345: Argument of type 'Table<SavingsGoal, string, SavingsGoal>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(211,23): error TS2345: Argument of type 'Table<SavingsGoal, string, SavingsGoal>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(190,23): error TS2345: Argument of type 'Table<PaycheckHistory, string, PaycheckHistory>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(212,23): error TS2345: Argument of type 'Table<PaycheckHistory, string, PaycheckHistory>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(191,23): error TS2345: Argument of type 'Table<Debt, string, Debt>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
+src/db/budgetDb.ts(213,23): error TS2345: Argument of type 'Table<Debt, string, Debt>' is not assignable to parameter of type 'Table<unknown, unknown, unknown>'.
   Types of property 'hook' are incompatible.
     Types of parameters 'subscriber' and 'subscriber' are incompatible.
       Type 'unknown' is not assignable to type 'string | void | undefined'.
-src/db/budgetDb.ts(561,5): error TS2322: Type 'BudgetRecord | undefined' is not assignable to type 'BudgetRecord | null'.
+src/db/budgetDb.ts(583,5): error TS2322: Type 'BudgetRecord | undefined' is not assignable to type 'BudgetRecord | null'.
   Type 'undefined' is not assignable to type 'BudgetRecord | null'.
-src/db/budgetDb.ts(585,5): error TS2322: Type 'BudgetRecord | undefined' is not assignable to type 'BudgetRecord | null'.
+src/db/budgetDb.ts(607,5): error TS2322: Type 'BudgetRecord | undefined' is not assignable to type 'BudgetRecord | null'.
   Type 'undefined' is not assignable to type 'BudgetRecord | null'.
 src/hooks/accounts/useSupplementalAccounts.ts(97,43): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
@@ -1813,21 +2429,16 @@ src/hooks/accounts/useSupplementalAccounts.ts(172,35): error TS2345: Argument of
   Type 'null' is not assignable to type 'TransferringAccount'.
 src/hooks/accounts/useSupplementalAccounts.ts(192,48): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'never[]'.
   Type 'unknown' is not assignable to type 'never'.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(11,31): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(35,33): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(35,38): error TS7006: Parameter 'pc' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(60,61): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(60,66): error TS7006: Parameter 'pc' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(61,62): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(61,67): error TS7006: Parameter 'pc' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(71,46): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(71,51): error TS7006: Parameter 'pc' implicitly has an 'any' type.
-src/hooks/analytics/useAnalyticsExport.ts(8,44): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/hooks/analytics/useAnalyticsExport.ts(8,50): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
+src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(16,11): error TS2339: Property 'paycheckHistory' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/analytics/queries/usePaycheckTrendsQuery.ts(17,5): error TS2345: Argument of type '(state: { paycheckHistory?: PaycheckItem[] | undefined; }) => { paycheckHistory: PaycheckItem[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { paycheckHistory?: PaycheckItem[] | undefined; }) => { paycheckHistory: PaycheckItem[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Type '{ paycheckHistory: PaycheckItem[]; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ paycheckHistory: PaycheckItem[]; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, isActualBalanceManual, isOnline, and 9 more.
 src/hooks/analytics/useAnalyticsIntegration.ts(129,36): error TS7006: Parameter 'newTimeFilter' implicitly has an 'any' type.
-src/hooks/analytics/useBillAnalysis.ts(11,33): error TS7006: Parameter 'bills' implicitly has an 'any' type.
-src/hooks/analytics/useBillAnalysis.ts(11,40): error TS7006: Parameter 'settings' implicitly has an 'any' type.
+src/hooks/analytics/useBillAnalysis.ts(13,65): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'BillItem[]'.
+  Type 'unknown' is not assignable to type 'BillItem'.
+src/hooks/analytics/useBillAnalysis.ts(14,69): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'BillItem[]'.
+  Type 'unknown' is not assignable to type 'BillItem'.
 src/hooks/analytics/useChartsAnalytics.ts(39,6): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(47,46): error TS7006: Parameter 'type' implicitly has an 'any' type.
 src/hooks/analytics/useChartsAnalytics.ts(51,40): error TS7006: Parameter 'tabId' implicitly has an 'any' type.
@@ -1864,12 +2475,10 @@ src/hooks/auth/authOperations.ts(117,79): error TS7006: Parameter 'updatedProfil
 src/hooks/auth/authOperations.ts(135,14): error TS18046: 'error' is of type 'unknown'.
 src/hooks/auth/authOperations.ts(143,44): error TS7006: Parameter 'authContext' implicitly has an 'any' type.
 src/hooks/auth/authOperations.ts(151,47): error TS7006: Parameter 'authContext' implicitly has an 'any' type.
-src/hooks/auth/mutations/useJoinBudgetMutation.ts(193,19): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/auth/mutations/useJoinBudgetMutation.ts(194,31): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/auth/mutations/useJoinBudgetMutation.ts(194,46): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
 src/hooks/auth/mutations/useJoinBudgetMutation.ts(203,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
   Type 'undefined' is not assignable to type 'string | null'.
-src/hooks/auth/mutations/useLoginMutations.ts(52,13): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/auth/mutations/useLoginMutations.ts(53,25): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/auth/mutations/useLoginMutations.ts(53,40): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
 src/hooks/auth/mutations/useLoginMutations.ts(313,7): error TS2322: Type 'null' is not assignable to type 'Record<string, unknown>'.
 src/hooks/auth/mutations/useLoginMutations.ts(356,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
   Type 'undefined' is not assignable to type 'string | null'.
@@ -1885,43 +2494,32 @@ src/hooks/auth/mutations/useProfileMutations.ts(67,20): error TS2345: Argument o
 src/hooks/auth/queries/usePasswordValidation.ts(13,16): error TS7006: Parameter 'password' implicitly has an 'any' type.
 src/hooks/auth/queries/usePasswordValidation.ts(74,39): error TS7006: Parameter 'password' implicitly has an 'any' type.
 src/hooks/auth/queries/usePasswordValidation.ts(111,18): error TS18046: 'error' is of type 'unknown'.
-src/hooks/auth/useAuthCompatibility.ts(29,19): error TS7006: Parameter 'password' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(34,37): error TS7006: Parameter 'joinData' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(43,18): error TS7006: Parameter 'updatedUser' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(47,28): error TS7006: Parameter 'oldPassword' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(47,41): error TS7006: Parameter 'newPassword' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(52,27): error TS7006: Parameter 'updatedProfile' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(57,23): error TS7006: Parameter '_timestamp' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(61,30): error TS7006: Parameter 'password' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(73,28): error TS7031: Binding element '_key' implicitly has an 'any' type.
-src/hooks/auth/useAuthCompatibility.ts(73,40): error TS7031: Binding element '_salt' implicitly has an 'any' type.
-src/hooks/auth/useAuthFlow.ts(29,12): error TS7006: Parameter 'userDataOrPassword' implicitly has an 'any' type.
-src/hooks/auth/useAuthFlow.ts(50,58): error TS2345: Argument of type '(password: any, userData?: null) => Promise<any>' is not assignable to parameter of type 'LoginFunction'.
+src/hooks/auth/useAuthCompatibility.ts(30,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
+src/hooks/auth/useAuthCompatibility.ts(44,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<UserData>'.
+src/hooks/auth/useAuthFlow.ts(69,58): error TS2345: Argument of type '(password: any, userData?: null) => Promise<any>' is not assignable to parameter of type 'LoginFunction'.
   Types of parameters 'userData' and 'userData' are incompatible.
     Type 'UserData | null' is not assignable to type 'null | undefined'.
       Type 'UserData' is not assignable to type 'null | undefined'.
-src/hooks/auth/useAuthFlow.ts(54,67): error TS2345: Argument of type '(password: any, userData?: null) => Promise<any>' is not assignable to parameter of type 'LoginFunction'.
-  Types of parameters 'userData' and 'userData' are incompatible.
-    Type 'UserData | null' is not assignable to type 'null | undefined'.
-      Type 'UserData' is not assignable to type 'null | undefined'.
-src/hooks/auth/useAuthFlow.ts(58,61): error TS2345: Argument of type '(password: any, userData?: null) => Promise<any>' is not assignable to parameter of type 'LoginFunction'.
-  Types of parameters 'userData' and 'userData' are incompatible.
-    Type 'UserData | null' is not assignable to type 'null | undefined'.
-      Type 'UserData' is not assignable to type 'null | undefined'.
-src/hooks/auth/useAuthFlow.ts(63,13): error TS18046: 'error' is of type 'unknown'.
-src/hooks/auth/useAuthFlow.ts(67,40): error TS18046: 'error' is of type 'unknown'.
-src/hooks/auth/useAuthFlow.ts(78,12): error TS7006: Parameter 'oldPass' implicitly has an 'any' type.
-src/hooks/auth/useAuthFlow.ts(78,21): error TS7006: Parameter 'newPass' implicitly has an 'any' type.
-src/hooks/auth/useAuthFlow.ts(90,12): error TS7006: Parameter 'updatedProfile' implicitly has an 'any' type.
+src/hooks/auth/useAuthFlow.ts(73,57): error TS2345: Argument of type 'UserData | null' is not assignable to parameter of type 'UserData'.
+  Type 'null' is not assignable to type 'UserData'.
+src/hooks/auth/useAuthFlow.ts(77,51): error TS2345: Argument of type 'UserData | null' is not assignable to parameter of type 'UserData'.
+  Type 'null' is not assignable to type 'UserData'.
 src/hooks/auth/useAuthManager.ts(95,31): error TS7006: Parameter 'password' implicitly has an 'any' type.
 src/hooks/auth/useAuthenticationManager.ts(85,45): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthenticationManager.ts(86,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
+src/hooks/auth/useAuthenticationManager.ts(132,34): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | UserData'.
+src/hooks/auth/useAuthenticationManager.ts(138,5): error TS2322: Type '(updatedProfile: UserProfile) => Promise<void>' is not assignable to type '(updatedProfile: unknown) => void'.
+  Types of parameters 'updatedProfile' and 'updatedProfile' are incompatible.
+    Type 'unknown' is not assignable to type 'UserProfile'.
 src/hooks/auth/useKeyManagement.ts(321,56): error TS2345: Argument of type '{ budgetId: string; importedSalt: Uint8Array<ArrayBufferLike>; }' is not assignable to parameter of type 'null | undefined'.
 src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
-src/hooks/bills/useBillManager.ts(12,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/bills/useBillManager.ts(93,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/bills/useBillManager.ts(93,18): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' to type 'BudgetState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/hooks/bills/useBillManager.ts(94,5): error TS2345: Argument of type '(state: BudgetState) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
 src/hooks/bills/useBillManager.ts(118,9): error TS2345: Argument of type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to parameter of type '((bill: BillRecord) => void | Promise<void>) | undefined'.
   Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(bill: BillRecord) => void | Promise<void>'.
     Types of parameters 'bill' and 'bill' are incompatible.
@@ -1969,7 +2567,14 @@ src/hooks/bills/useBillManager.ts(204,5): error TS2322: Type '(bill: Bill | null
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManagerHelpers.ts(260,55): error TS7006: Parameter 'updatedBill' implicitly has an 'any' type.
+src/hooks/bills/useBillManagerDisplayLogic.ts(36,26): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/bills/useBillManagerHelpers.ts(260,48): error TS2345: Argument of type 'BillRecord' is not assignable to parameter of type 'Bill'.
+  Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
+src/hooks/bills/useBillManagerHelpers.ts(262,22): error TS2345: Argument of type 'Bill' is not assignable to parameter of type 'BillRecord'.
+  Index signature for type 'string' is missing in type 'Bill'.
+src/hooks/bills/useBillManagerHelpers.ts(276,52): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to parameter of type 'Bill'.
+  Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/bills/useBillManagerHelpers.ts(285,44): error TS2345: Argument of type 'BillRecord[]' is not assignable to parameter of type 'Bill[]'.
   Type 'BillRecord' is not assignable to type 'Bill'.
     Types of property 'dueDate' are incompatible.
@@ -1980,12 +2585,7 @@ src/hooks/bills/useBillManagerHelpers.ts(316,22): error TS2345: Argument of type
     Types of property 'dueDate' are incompatible.
       Type 'string | Date | null' is not assignable to type 'string | Date | undefined'.
         Type 'null' is not assignable to type 'string | Date | undefined'.
-src/hooks/bills/useBillManagerUI.ts(19,25): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerUI.ts(19,29): error TS7006: Parameter 'label' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerUI.ts(19,36): error TS7006: Parameter 'count' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerUI.ts(19,43): error TS7006: Parameter 'icon' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerUI.ts(19,49): error TS7006: Parameter 'color' implicitly has an 'any' type.
-src/hooks/bills/useBillManagerUI.ts(95,50): error TS2345: Argument of type '(bill: { id: string; }) => string' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => string'.
+src/hooks/bills/useBillManagerUI.ts(101,50): error TS2345: Argument of type '(bill: { id: string; }) => string' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => string'.
   Types of parameters 'bill' and 'value' are incompatible.
     Type 'unknown' is not assignable to type '{ id: string; }'.
 src/hooks/bills/useBillOperationWrappers.ts(38,12): error TS7006: Parameter 'updatedBills' implicitly has an 'any' type.
@@ -2004,8 +2604,12 @@ src/hooks/bills/useBillValidation.ts(48,6): error TS7006: Parameter 'type' impli
 src/hooks/bills/useBillValidation.ts(48,12): error TS7006: Parameter 'changes' implicitly has an 'any' type.
 src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
 src/hooks/bills/useBulkBillOperations.ts(31,39): error TS7006: Parameter 'bill' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(6,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS2352: Conversion of type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...' to type 'BudgetContext' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/budgeting/autofunding/useAutoFunding.ts(42,5): error TS2345: Argument of type '(state: BudgetSelector) => { envelopes: Envelope[] | undefined; unassignedCash: number | undefined; allTransactions: Transaction[] | undefined; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetSelector) => { envelopes: Envelope[] | undefined; unassignedCash: number | undefined; allTransactions: Transaction[] | undefined; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Type '{ envelopes: Envelope[] | undefined; unassignedCash: number | undefined; allTransactions: Transaction[] | undefined; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ envelopes: Envelope[] | undefined; unassignedCash: number | undefined; allTransactions: Transaction[] | undefined; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(121,12): error TS7006: Parameter 'executionId' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(141,6): error TS7006: Parameter 'importData' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingData.ts(31,65): error TS2345: Argument of type 'Dispatch<SetStateAction<null>>' is not assignable to parameter of type '(val: string | null) => void'.
@@ -2022,17 +2626,22 @@ src/hooks/budgeting/autofunding/useAutoFundingData.ts(42,54): error TS2345: Argu
       Type 'string' is not assignable to type 'SetStateAction<null>'.
 src/hooks/budgeting/autofunding/useAutoFundingDataHelpers.ts(215,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
   Type 'undefined' is not assignable to type 'string | null'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(3,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(14,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(32,12): error TS7006: Parameter 'rules' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(61,28): error TS2345: Argument of type '{ id: string; trigger: string; executedAt: string; rulesExecuted: number; totalFunded: number; results: ({ ruleId: string; ruleName: string; success: boolean; error: string; amount: number; executedAt: string; transfers?: undefined; targetEnvelopes?: undefined; } | { ...; })[]; remainingCash: number; initialCash: nu...' is not assignable to parameter of type 'SetStateAction<null>'.
-  Type 'undefined' is not assignable to type 'SetStateAction<null>'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(63,28): error TS18048: 'result.execution' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(64,26): error TS18048: 'result.execution' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(75,41): error TS18046: 'error' is of type 'unknown'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(23,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(36,25): error TS2345: Argument of type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>' is not assignable to parameter of type 'Budget'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(58,31): error TS2339: Property 'envelopes' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(59,36): error TS2339: Property 'unassignedCash' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(60,34): error TS2339: Property 'allTransactions' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(71,54): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'AutoFundingRule[]'.
+  Type 'unknown' is not assignable to type 'AutoFundingRule'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(76,28): error TS18048: 'result.execution' is possibly 'undefined'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(77,26): error TS18048: 'result.execution' is possibly 'undefined'.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(7,37): error TS7006: Parameter 'lastExecution' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution/useExecutionSummary.ts(23,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(74,45): error TS2345: Argument of type 'ExecutionRecord[]' is not assignable to parameter of type 'ExecutionHistoryItem[]'.
+  Type 'ExecutionRecord' is not assignable to type 'ExecutionHistoryItem'.
+    Types of property 'executedAt' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string | number | Date'.
+        Type 'undefined' is not assignable to type 'string | number | Date'.
 src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useExecutionHistory.ts(68,37): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
@@ -2048,19 +2657,8 @@ src/hooks/budgeting/autofunding/useExecutionHistory.ts(75,37): error TS2769: No 
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(10,47): error TS7006: Parameter 'executionHistory' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(14,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(17,10): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(17,15): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(21,18): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(22,18): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(22,23): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,50): error TS7006: Parameter 'acc' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(25,55): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useExecutionStatistics.ts(35,10): error TS7006: Parameter 'execution' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(190,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useUndoOperations.ts(190,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(190,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/budgeting/autofunding/useUndoOperations.ts(241,22): error TS2339: Property 'transferFunds' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(27,23): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(31,59): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/hooks/budgeting/mutations/useDeleteEnvelope.ts(36,27): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
@@ -2090,14 +2688,15 @@ src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of t
       Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(107,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(136,62): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/hooks/budgeting/useEnvelopeEdit.ts(15,3): error TS7031: Binding element 'onSave' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeEdit.ts(16,3): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeEdit.ts(17,3): error TS7031: Binding element 'onDelete' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeEdit.ts(46,41): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeEdit.ts(47,38): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/budgeting/useEnvelopeEdit.ts(61,29): error TS7006: Parameter 'envelopeData' implicitly has an 'any' type.
-src/hooks/budgeting/useEnvelopeEdit.ts(83,20): error TS18047: 'envelope' is possibly 'null'.
-src/hooks/budgeting/useEnvelopeEdit.ts(93,5): error TS2322: Type '(envelopeData: any) => Promise<boolean>' is not assignable to type '(data: unknown) => Promise<void>'.
+src/hooks/budgeting/useEnvelopeEdit.ts(66,31): error TS2345: Argument of type 'string | number | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/budgeting/useEnvelopeEdit.ts(115,5): error TS2322: Type 'Envelope | null' is not assignable to type 'Record<string, unknown> | null | undefined'.
+  Type 'Envelope' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'Envelope'.
+src/hooks/budgeting/useEnvelopeEdit.ts(116,5): error TS2322: Type 'Envelope[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'Envelope' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'Envelope'.
+src/hooks/budgeting/useEnvelopeEdit.ts(117,5): error TS2322: Type '(envelopeData: unknown) => Promise<boolean>' is not assignable to type '(data: unknown) => Promise<void>'.
   Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
     Type 'boolean' is not assignable to type 'void'.
 src/hooks/budgeting/useEnvelopes.ts(17,54): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'Envelope[]'.
@@ -2129,22 +2728,18 @@ src/hooks/budgeting/usePaycheckHistory.ts(10,38): error TS7031: Binding element 
 src/hooks/budgeting/usePaycheckHistory.ts(14,39): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,30): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,47): error TS7006: Parameter 'isUnlocked' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(11,36): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(11,48): error TS7006: Parameter 'onCreateEnvelope' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(19,34): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(19,46): error TS7006: Parameter 'onUpdateEnvelope' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(19,64): error TS7006: Parameter 'actionType' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(39,3): error TS7031: Binding element 'onCreateEnvelope' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(40,3): error TS7031: Binding element 'onUpdateEnvelope' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(41,3): error TS7031: Binding element 'onDismissSuggestion' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(78,47): error TS7006: Parameter 'newSettings' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(89,6): error TS7006: Parameter 'suggestionId' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(100,12): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(125,11): error TS18046: 'error' is of type 'unknown'.
-src/hooks/budgeting/useSmartSuggestions.ts(164,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/hooks/budgeting/useSmartSuggestions.ts(164,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
+src/hooks/budgeting/useSmartSuggestions.ts(88,37): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type 'Transaction[]'.
+  Type 'unknown' is not assignable to type 'Transaction'.
+src/hooks/budgeting/useSmartSuggestions.ts(138,39): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; name: string; }; }'.
+  Types of property 'data' are incompatible.
+    Property 'name' is missing in type 'Record<string, unknown>' but required in type '{ [key: string]: unknown; name: string; }'.
+src/hooks/budgeting/useSmartSuggestions.ts(142,37): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number | undefined; }; }'.
+  Types of property 'data' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type '{ [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number | undefined; }': envelopeId, suggestedAmount
+src/hooks/budgeting/useSmartSuggestions.ts(146,37): error TS2345: Argument of type '{ [key: string]: unknown; id: string; action: string; data: Record<string, unknown>; }' is not assignable to parameter of type '{ data: { [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number | undefined; }; }'.
+  Types of property 'data' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type '{ [key: string]: unknown; envelopeId: string; suggestedAmount: number; currentAmount?: number | undefined; }': envelopeId, suggestedAmount
+src/hooks/budgeting/useSmartSuggestions.ts(150,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/hooks/common/bug-report/useBugReportDiagnostics.ts(36,22): error TS2345: Argument of type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' is not assignable to parameter of type 'SetStateAction<null>'.
   Type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' is not assignable to type 'SetStateAction<null>'.
     Type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' provides no match for the signature '(prevState: null): null'.
@@ -2163,8 +2758,13 @@ src/hooks/common/bug-report/useBugReportSubmission.ts(230,5): error TS2322: Type
   Types of parameters 'severity' and 'severity' are incompatible.
     Type 'string | undefined' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
       Type 'string' is not assignable to type '"low" | "medium" | "high" | "critical" | undefined'.
-src/hooks/common/useActualBalance.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/common/useActualBalance.ts(33,7): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/common/useActualBalance.ts(30,5): error TS2339: Property 'actualBalance' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/common/useActualBalance.ts(31,5): error TS2339: Property 'isActualBalanceManual' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/common/useActualBalance.ts(32,5): error TS2339: Property 'setActualBalance' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/common/useActualBalance.ts(34,5): error TS2345: Argument of type '(state: BudgetState) => { actualBalance: number; isActualBalanceManual: boolean; setActualBalance: (balance: number) => void; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetState) => { actualBalance: number; isActualBalanceManual: boolean; setActualBalance: (balance: number) => void; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetState'.
 src/hooks/common/useActualBalance.ts(98,6): error TS7006: Parameter 'calculatedBalance' implicitly has an 'any' type.
 src/hooks/common/useActualBalance.ts(112,6): error TS7006: Parameter 'newBalance' implicitly has an 'any' type.
 src/hooks/common/useActualBalance.ts(149,45): error TS7006: Parameter 'inputValue' implicitly has an 'any' type.
@@ -2173,50 +2773,47 @@ src/hooks/common/useConnectionManager/useConnectionConfig.ts(6,32): error TS7006
 src/hooks/common/useConnectionManager/useConnectionOperations.ts(183,40): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/common/useConnectionManager/useConnectionOperations.ts(196,67): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/common/useConnectionManager/useConnectionOperations.ts(209,55): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
-src/hooks/common/useDataInitialization.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/common/useDataInitialization.ts(40,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/common/useDataInitialization.ts(40,44): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/common/useDataInitialization.ts(40,60): error TS2339: Property 'cloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/common/useDataInitialization.ts(57,13): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
 src/hooks/common/useDataInitialization.ts(67,22): error TS18046: 'error' is of type 'unknown'.
-src/hooks/common/useExportData.ts(22,26): error TS7006: Parameter 'exportableData' implicitly has an 'any' type.
-src/hooks/common/useExportData.ts(41,27): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/hooks/common/useExportData.ts(41,33): error TS7006: Parameter 'pureTransactions' implicitly has an 'any' type.
-src/hooks/common/useExportData.ts(41,51): error TS7006: Parameter 'fileSize' implicitly has an 'any' type.
-src/hooks/common/useExportData.ts(60,29): error TS7006: Parameter 'counts' implicitly has an 'any' type.
-src/hooks/common/useExportData.ts(106,40): error TS18046: 'error' is of type 'unknown'.
 src/hooks/common/useFABActions.ts(44,11): error TS7034: Variable 'actionIds' implicitly has type 'any[]' in some locations where its type cannot be determined.
 src/hooks/common/useFABActions.ts(47,18): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/common/useFABActions.ts(49,31): error TS2339: Property 'id' does not exist on type 'never'.
 src/hooks/common/useFABActions.ts(54,7): error TS7005: Variable 'actionIds' implicitly has an 'any[]' type.
 src/hooks/common/useFABActions.ts(90,34): error TS7006: Parameter 'screenId' implicitly has an 'any' type.
 src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
-src/hooks/common/useNetworkStatus.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/common/useNetworkStatus.ts(11,27): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/common/useNetworkStatus.ts(11,43): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/common/useImportData.ts(212,11): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[] | undefined' is not assignable to type 'Envelope[] | undefined'.
+      Type 'unknown[]' is not assignable to type 'Envelope[]'.
+        Type 'unknown' is not assignable to type 'Envelope'.
+src/hooks/common/useImportData.ts(231,29): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[] | undefined' is not assignable to type 'Envelope[] | undefined'.
+      Type 'unknown[]' is not assignable to type 'Envelope[]'.
+        Type 'unknown' is not assignable to type 'Envelope'.
+src/hooks/common/useImportData.ts(233,34): error TS2345: Argument of type 'ImportedData & { allTransactions: unknown[]; }' is not assignable to parameter of type 'ValidatedImportData'.
+  Types of property 'envelopes' are incompatible.
+    Type 'unknown[] | undefined' is not assignable to type 'Envelope[] | undefined'.
+      Type 'unknown[]' is not assignable to type 'Envelope[]'.
+        Type 'unknown' is not assignable to type 'Envelope'.
+src/hooks/common/useNetworkStatus.ts(11,59): error TS2339: Property 'setOnlineStatus' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/common/useNetworkStatus.ts(18,23): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/common/useNetworkStatus.ts(24,23): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/common/useNetworkStatus.ts(32,21): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
 src/hooks/common/usePrompt.ts(109,12): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/hooks/common/useRouterPageDetection.ts(22,25): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
   No index signature with a parameter of type 'string' was found on type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
 src/hooks/common/useRouterPageDetection.ts(66,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
 src/hooks/common/useTransactionArchiving.ts(105,12): error TS7006: Parameter 'archiveId' implicitly has an 'any' type.
 src/hooks/common/useTransactionArchiving.ts(126,41): error TS7006: Parameter 'transactionCount' implicitly has an 'any' type.
-src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'Transaction[]' is not assignable to parameter of type 'never[]'.
-  Type 'Transaction' is not assignable to type 'never'.
+src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
+    Types of property 'date' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
 src/hooks/dashboard/useMainDashboard.ts(173,6): error TS7006: Parameter 'difference' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(84,27): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(89,28): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(145,35): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(155,38): error TS7006: Parameter 'debtId' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(155,46): error TS7006: Parameter 'paymentData' implicitly has an 'any' type.
-src/hooks/debts/useDebtDashboard.ts(159,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/debts/useDebtDashboard.ts(161,25): error TS2345: Argument of type 'DebtAccount | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
-  Type 'undefined' is not assignable to type 'SetStateAction<null>'.
-src/hooks/debts/useDebtDetailModal.ts(71,49): error TS18048: 'debt.currentBalance' is possibly 'undefined'.
-src/hooks/debts/useDebtDetailModal.ts(129,21): error TS18047: 'debt' is possibly 'null'.
-src/hooks/debts/useDebtDetailModal.ts(131,22): error TS18047: 'debt' is possibly 'null'.
-src/hooks/debts/useDebtDetailModal.ts(137,52): error TS18047: 'debt' is possibly 'null'.
-src/hooks/debts/useDebtDetailModal.ts(144,16): error TS18047: 'debt' is possibly 'null'.
-src/hooks/debts/useDebtDetailModal.ts(151,12): error TS2345: Argument of type 'DebtWithHistory | null' is not assignable to parameter of type 'DebtWithHistory'.
-  Type 'null' is not assignable to type 'DebtWithHistory'.
-src/hooks/debts/useDebtDetailModal.ts(160,22): error TS18047: 'debt' is possibly 'null'.
+src/hooks/debts/useDebtDashboard.ts(156,35): error TS2345: Argument of type '{ amount: number; date?: string | undefined; }' is not assignable to parameter of type '{ amount: number; paymentDate: string; notes?: string | undefined; }'.
+  Property 'paymentDate' is missing in type '{ amount: number; date?: string | undefined; }' but required in type '{ amount: number; paymentDate: string; notes?: string | undefined; }'.
 src/hooks/debts/useDebtManagement.ts(78,7): error TS2345: Argument of type 'UseMutateAsyncFunction<{ envelopeType: string; name: string; category: string; targetAmount: number; description?: string | undefined; id: string; currentBalance: number; archived: boolean; createdAt: number; lastModified: number; }, Error, AddEnvelopeData, unknown>' is not assignable to parameter of type '(data: unknown) => unknown'.
   Types of parameters 'variables' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'AddEnvelopeData'.
@@ -2256,30 +2853,25 @@ src/hooks/debts/useDebts.ts(195,20): error TS2339: Property 'name' does not exis
 src/hooks/debts/useDebts.ts(196,20): error TS2339: Property 'type' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
 src/hooks/debts/useDebts.ts(197,30): error TS2339: Property 'currentBalance' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
 src/hooks/debts/useDebts.ts(198,28): error TS2339: Property 'interestRate' does not exist on type '{ id?: string | undefined; status: string; author?: string | undefined; }'.
-src/hooks/history/useBudgetHistoryViewer.ts(17,46): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(21,45): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(33,37): error TS7006: Parameter 'updates' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(60,41): error TS7006: Parameter 'restore' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(65,12): error TS7006: Parameter 'commitHash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(122,38): error TS7006: Parameter 'changeType' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(143,39): error TS7006: Parameter 'author' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(149,12): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ system: string; user: string; default: string; }'.
-src/hooks/history/useBudgetHistoryViewer.ts(152,41): error TS7006: Parameter 'hash' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(156,40): error TS7006: Parameter 'timestamp' implicitly has an 'any' type.
-src/hooks/history/useBudgetHistoryViewer.ts(160,35): error TS7006: Parameter 'date' implicitly has an 'any' type.
-src/hooks/layout/usePaycheckOperations.ts(18,51): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
-src/hooks/layout/usePaycheckOperations.ts(18,63): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/hooks/layout/usePaycheckOperations.ts(66,23): error TS18046: 'error' is of type 'unknown'.
-src/hooks/layout/usePaycheckOperations.ts(67,21): error TS18046: 'error' is of type 'unknown'.
+src/hooks/layout/usePaycheckOperations.ts(43,71): error TS2345: Argument of type 'PaycheckHistory[]' is not assignable to parameter of type 'Paycheck[]'.
+  Type 'PaycheckHistory' is not assignable to type 'Paycheck'.
+    Types of property 'amount' are incompatible.
+      Type 'number | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+src/hooks/layout/usePaycheckOperations.ts(53,11): error TS2345: Argument of type 'VioletVaultDB' is not assignable to parameter of type '{ envelopes: { get: (id: string | number) => Promise<unknown>; update: (id: string | number, data: unknown) => Promise<void>; }; }'.
+  The types of 'envelopes.get' are incompatible between these types.
+    Type '{ (key: string): PromiseExtended<Envelope | undefined>; <R>(key: string, thenShortcut: ThenShortcut<Envelope | undefined, R>): PromiseExtended<...>; (equalityCriterias: { ...; }): PromiseExtended<...>; <R>(equalityCriterias: { ...; }, thenShortcut: ThenShortcut<...>): PromiseExtended<...>; }' is not assignable to type '(id: string | number) => Promise<unknown>'.
+      Types of parameters 'key' and 'id' are incompatible.
+        Type 'string | number' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/hooks/layout/usePaycheckOperations.ts(75,68): error TS2345: Argument of type '{ budget: string[]; budgetData: () => string[]; budgetSummary: () => string[]; budgetMetadata: string[]; unassignedCash: () => string[]; actualBalance: () => string[]; envelopes: string[]; envelopesList: (filters?: FilterParams) => (string | FilterParams)[]; ... 48 more ...; syncActivity: () => string[]; }' is not assignable to parameter of type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
+  Types of property 'paycheckHistory' are incompatible.
+    Type '() => string[]' is not assignable to type 'unknown[]'.
 src/hooks/mobile/useBottomNavigation.ts(132,20): error TS7006: Parameter 'itemKey' implicitly has an 'any' type.
 src/hooks/mobile/useBottomNavigation.ts(133,20): error TS7006: Parameter 'key' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(8,23): error TS7006: Parameter 'callback' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(13,6): error TS7006: Parameter 'event' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(15,7): error TS2322: Type 'Timeout' is not assignable to type 'null'.
-src/hooks/mobile/useFABBehavior.ts(43,32): error TS7006: Parameter 'isExpanded' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(43,44): error TS7006: Parameter 'setExpanded' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(43,57): error TS7006: Parameter 'containerRef' implicitly has an 'any' type.
-src/hooks/mobile/useFABBehavior.ts(45,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/hooks/mobile/useFABBehavior.ts(76,39): error TS2339: Property 'focus' does not exist on type 'Element'.
+src/hooks/mobile/useFABBehavior.ts(127,50): error TS2345: Argument of type 'RefObject<null>' is not assignable to parameter of type 'RefObject<HTMLElement>'.
+  Type 'null' is not assignable to type 'HTMLElement'.
 src/hooks/mobile/useFABSmartPositioning.ts(13,9): error TS7034: Variable 'resizeTimeout' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/mobile/useFABSmartPositioning.ts(17,20): error TS7005: Variable 'resizeTimeout' implicitly has an 'any' type.
 src/hooks/mobile/useFABSmartPositioning.ts(60,20): error TS7005: Variable 'resizeTimeout' implicitly has an 'any' type.
@@ -2288,17 +2880,14 @@ src/hooks/mobile/usePullToRefresh.ts(21,29): error TS7006: Parameter 'e' implici
 src/hooks/mobile/usePullToRefresh.ts(30,32): error TS2339: Property 'scrollTop' does not exist on type 'never'.
 src/hooks/mobile/usePullToRefresh.ts(35,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
 src/hooks/mobile/useSlideUpModal.ts(41,37): error TS7006: Parameter 'newConfig' implicitly has an 'any' type.
-src/hooks/notifications/useFirebaseMessaging.ts(25,25): error TS2345: Argument of type 'PermissionStatusForUI' is not assignable to parameter of type 'SetStateAction<null>'.
-  Type 'PermissionStatusForUI' provides no match for the signature '(prevState: null): null'.
-src/hooks/notifications/useFirebaseMessaging.ts(46,20): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<null>'.
-src/hooks/notifications/useFirebaseMessaging.ts(53,16): error TS18046: 'err' is of type 'unknown'.
-src/hooks/notifications/useFirebaseMessaging.ts(85,18): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<null>'.
-src/hooks/notifications/useFirebaseMessaging.ts(92,16): error TS18046: 'err' is of type 'unknown'.
-src/hooks/notifications/useFirebaseMessaging.ts(93,56): error TS18046: 'err' is of type 'unknown'.
-src/hooks/notifications/useFirebaseMessaging.ts(124,31): error TS7006: Parameter 'event' implicitly has an 'any' type.
-src/hooks/notifications/useFirebaseMessaging.ts(126,24): error TS2353: Object literal may only specify known properties, and 'payload' does not exist in type '(prevState: null) => null'.
-src/hooks/notifications/useFirebaseMessaging.ts(167,45): error TS2339: Property 'canShowPrompt' does not exist on type 'never'.
-src/hooks/notifications/useFirebaseMessaging.ts(168,36): error TS2339: Property 'isSupported' does not exist on type 'never'.
+src/hooks/notifications/useFirebaseMessaging.ts(32,25): error TS2345: Argument of type 'PermissionStatusForUI' is not assignable to parameter of type 'SetStateAction<string | null>'.
+src/hooks/notifications/useFirebaseMessaging.ts(97,7): error TS2322: Type 'TokenResult' is not assignable to type 'PermissionResult'.
+  Types of property 'token' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+src/hooks/notifications/useFirebaseMessaging.ts(137,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
+src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
 src/hooks/receipts/useReceiptScanner.ts(10,35): error TS7006: Parameter 'onReceiptProcessed' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptScanner.ts(23,37): error TS7006: Parameter 'file' implicitly has an 'any' type.
 src/hooks/receipts/useReceiptScanner.ts(45,12): error TS7006: Parameter 'file' implicitly has an 'any' type.
@@ -2315,13 +2904,20 @@ src/hooks/receipts/useReceiptScanner.ts(121,9): error TS2698: Spread types may o
 src/hooks/receipts/useReceiptScanner.ts(136,24): error TS2339: Property 'url' does not exist on type 'never'.
 src/hooks/receipts/useReceiptScanner.ts(137,41): error TS2339: Property 'url' does not exist on type 'never'.
 src/hooks/receipts/useReceiptScanner.ts(139,22): error TS2339: Property 'url' does not exist on type 'never'.
-src/hooks/receipts/useReceiptToTransaction.ts(11,41): error TS7006: Parameter 'receiptData' implicitly has an 'any' type.
-src/hooks/receipts/useReceiptToTransaction.ts(43,29): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/receipts/useReceiptToTransaction.ts(43,36): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/receipts/useReceiptToTransaction.ts(108,39): error TS18046: 'error' is of type 'unknown'.
-src/hooks/receipts/useReceiptToTransaction.ts(130,37): error TS7006: Parameter 'merchant' implicitly has an 'any' type.
-src/hooks/receipts/useReceiptToTransaction.ts(130,47): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/hooks/receipts/useReceiptToTransaction.ts(158,10): error TS7006: Parameter 'env' implicitly has an 'any' type.
+src/hooks/receipts/useReceiptToTransaction.ts(46,82): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
+  Type 'Envelope' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
+    Types of property 'currentBalance' are incompatible.
+      Type 'number | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+src/hooks/receipts/useReceiptToTransaction.ts(48,28): error TS2345: Argument of type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to parameter of type 'SetStateAction<{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }>'.
+  Type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to type '(prevState: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }'.
+    Call signature return types '{ envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' and '{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }' are incompatible.
+      The types of 'envelopeId' are incompatible between these types.
+        Type 'string | number' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(86,37): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/hooks/receipts/useReceiptToTransaction.ts(101,9): error TS2322: Type 'string | undefined' is not assignable to type '{ url?: string | undefined; } | undefined'.
+  Type 'string' has no properties in common with type '{ url?: string | undefined; }'.
 src/hooks/savings/useSavingsGoals/index.ts(85,9): error TS2322: Type 'UseMutationResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>' is not assignable to type 'MutationHandler'.
   Type 'Override<MutationObserverIdleResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>, { mutate: UseMutateFunction<...>; }> & { ...; }' is not assignable to type 'MutationHandler'.
     Types of property 'mutateAsync' are incompatible.
@@ -2352,32 +2948,96 @@ src/hooks/savings/useSavingsGoals/index.ts(89,9): error TS2322: Type 'UseMutatio
       Type 'UseMutateAsyncFunction<{ totalAmount: number; results: { goalId: string; goalName: string; amount: number; updatedGoal: SavingsGoal; transaction: { id: string; date: Date; description: string; amount: number; ... 4 more ...; createdAt: number; }; }[]; summary: string; }, Error, { ...; }, unknown>' is not assignable to type '(...args: unknown[]) => Promise<unknown>'.
         Types of parameters 'variables' and 'args' are incompatible.
           Type 'unknown' is not assignable to type '{ distribution: Record<string, string | number>; description?: string | undefined; }'.
-src/hooks/savings/useSavingsGoalsActions.ts(10,35): error TS7031: Binding element 'onAddGoal' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(10,46): error TS7031: Binding element 'onUpdateGoal' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(10,60): error TS7031: Binding element 'onDeleteGoal' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(10,74): error TS7031: Binding element 'onDistributeToGoals' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(19,35): error TS7006: Parameter 'goalData' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(43,27): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(48,35): error TS7006: Parameter 'goal' implicitly has an 'any' type.
-src/hooks/savings/useSavingsGoalsActions.ts(68,35): error TS7006: Parameter 'distribution' implicitly has an 'any' type.
 src/hooks/security/useSecuritySettingsLogic.ts(18,6): error TS7006: Parameter 'setting' implicitly has an 'any' type.
 src/hooks/security/useSecuritySettingsLogic.ts(18,15): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/settings/useSettingsDashboard.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/settings/useSettingsDashboard.ts(103,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/settings/useSettingsDashboard.ts(103,44): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/hooks/settings/useSettingsDashboard.ts(104,31): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/settings/useSettingsDashboard.ts(104,47): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/settings/useSettingsDashboard.ts(103,60): error TS2339: Property 'cloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/settings/useSettingsDashboard.ts(104,63): error TS2339: Property 'setCloudSyncEnabled' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/settings/useSettingsDashboard.ts(109,25): error TS2345: Argument of type 'boolean' is not assignable to parameter of type '(state: StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) => unknown'.
+src/hooks/settings/useSettingsSectionRenderer.ts(95,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(96,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(97,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(98,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(99,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
 src/hooks/settings/useSettingsSectionRenderer.ts(100,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+            Type 'boolean | undefined' is not assignable to type 'boolean'.
+              Type 'undefined' is not assignable to type 'boolean'.
                 Type '(() => void) | undefined' is not assignable to type '() => void'.
                   Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(101,11): error TS2769: No overload matches this call.
+                    Type '(() => void) | undefined' is not assignable to type '() => void'.
+                      Type 'undefined' is not assignable to type '() => void'.
+                        Type '(() => void) | undefined' is not assignable to type '() => void'.
+                          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(121,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Type '(() => void) | undefined' is not assignable to type '() => void'.
       Type 'undefined' is not assignable to type '() => void'.
@@ -2387,7 +3047,7 @@ src/hooks/settings/useSettingsSectionRenderer.ts(101,11): error TS2769: No overl
               Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
                 Type '(() => void) | undefined' is not assignable to type '() => void'.
                   Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(102,11): error TS2769: No overload matches this call.
+src/hooks/settings/useSettingsSectionRenderer.ts(122,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Type '(() => void) | undefined' is not assignable to type '() => void'.
       Type 'undefined' is not assignable to type '() => void'.
@@ -2397,7 +3057,7 @@ src/hooks/settings/useSettingsSectionRenderer.ts(102,11): error TS2769: No overl
               Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
                 Type '(() => void) | undefined' is not assignable to type '() => void'.
                   Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(103,11): error TS2769: No overload matches this call.
+src/hooks/settings/useSettingsSectionRenderer.ts(123,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Type '(() => void) | undefined' is not assignable to type '() => void'.
       Type 'undefined' is not assignable to type '() => void'.
@@ -2407,13 +3067,28 @@ src/hooks/settings/useSettingsSectionRenderer.ts(103,11): error TS2769: No overl
               Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
                 Type '(() => void) | undefined' is not assignable to type '() => void'.
                   Type 'undefined' is not assignable to type '() => void'.
-src/hooks/sharing/useBudgetJoining.ts(16,5): error TS7031: Binding element 'shareCode' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(17,5): error TS7031: Binding element 'password' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(18,5): error TS7031: Binding element 'userName' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(19,5): error TS7031: Binding element 'userColor' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(20,5): error TS7031: Binding element 'onJoinSuccess' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(21,5): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/hooks/sharing/useBudgetJoining.ts(72,22): error TS18046: 'error' is of type 'unknown'.
+src/hooks/settings/useSettingsSectionRenderer.ts(124,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
+                Type '(() => void) | undefined' is not assignable to type '() => void'.
+                  Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(135,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
+src/hooks/settings/useSettingsSectionRenderer.ts(136,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+        Type '(() => void) | undefined' is not assignable to type '() => void'.
+          Type 'undefined' is not assignable to type '() => void'.
 src/hooks/sharing/useQRCodeProcessing.ts(12,26): error TS7006: Parameter 'qrData' implicitly has an 'any' type.
 src/hooks/sharing/useQRCodeProcessing.ts(12,34): error TS7006: Parameter 'setShareCode' implicitly has an 'any' type.
 src/hooks/sharing/useQRCodeProcessing.ts(12,48): error TS7006: Parameter 'setCreatorInfo' implicitly has an 'any' type.
@@ -2421,9 +3096,11 @@ src/hooks/sharing/useQRCodeProcessing.ts(12,64): error TS7006: Parameter 'valida
 src/hooks/sharing/useQRCodeProcessing.ts(31,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/sharing/useShareCodeValidation.ts(19,36): error TS7006: Parameter 'code' implicitly has an 'any' type.
 src/hooks/sharing/useShareCodeValidation.ts(39,11): error TS2353: Object literal may only specify known properties, and 'createdBy' does not exist in type '(prevState: null) => null'.
-src/hooks/sync/useFirebaseSync.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/sync/useFirebaseSync.ts(57,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/sync/useFirebaseSync.ts(57,30): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/hooks/sync/useFirebaseSync.ts(57,46): error TS2339: Property 'budget' does not exist on type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/sync/useFirebaseSync.ts(129,28): error TS2339: Property 'getActiveUsers' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(129,54): error TS2339: Property 'getRecentActivity' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(133,30): error TS2339: Property 'getActiveUsers' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+src/hooks/sync/useFirebaseSync.ts(134,33): error TS2339: Property 'getRecentActivity' does not exist on type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
 src/hooks/sync/useManualSync.ts(92,39): error TS2339: Property 'counts' does not exist on type '{ success: boolean; reason: string; direction?: undefined; error?: undefined; } | { success: boolean; direction: string; reason?: undefined; error?: undefined; } | { success: boolean; error: string; reason?: undefined; direction?: undefined; }'.
   Property 'counts' does not exist on type '{ success: boolean; reason: string; direction?: undefined; error?: undefined; }'.
 src/hooks/sync/useManualSync.ts(97,30): error TS2339: Property 'counts' does not exist on type '{ success: boolean; reason: string; direction?: undefined; error?: undefined; } | { success: boolean; direction: string; reason?: undefined; error?: undefined; } | { success: boolean; error: string; reason?: undefined; direction?: undefined; }'.
@@ -2466,13 +3143,26 @@ src/hooks/transactions/useTransactionData.ts(150,7): error TS2740: Type '{}' is 
 src/hooks/transactions/useTransactionData.ts(234,85): error TS2339: Property 'length' does not exist on type '{}'.
 src/hooks/transactions/useTransactionFileUpload.ts(27,18): error TS18047: 'event.target.files' is possibly 'null'.
 src/hooks/transactions/useTransactionFileUpload.ts(59,56): error TS18046: 'error' is of type 'unknown'.
-src/hooks/transactions/useTransactionFilters.ts(12,3): error TS7031: Binding element 'transactions' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(13,3): error TS7031: Binding element 'searchTerm' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(14,3): error TS7031: Binding element 'dateFilter' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(15,3): error TS7031: Binding element 'typeFilter' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(16,3): error TS7031: Binding element 'envelopeFilter' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(17,3): error TS7031: Binding element 'sortBy' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionFilters.ts(18,3): error TS7031: Binding element 'sortOrder' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionFilters.ts(41,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(42,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(43,33): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(44,29): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(47,43): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
+  Types of property 'envelopeId' are incompatible.
+    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
 src/hooks/transactions/useTransactionForm.ts(21,25): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionForm.ts(34,30): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionImport.ts(49,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; }'.
@@ -2489,16 +3179,29 @@ src/hooks/transactions/useTransactionImport.ts(86,7): error TS2769: No overload 
         Type 'unknown' is not assignable to type '{ amount: number; }'.
 src/hooks/transactions/useTransactionImport.ts(101,44): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '{ amount: number; }[]'.
   Type 'unknown' is not assignable to type '{ amount: number; }'.
-src/hooks/transactions/useTransactionLedger.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/transactions/useTransactionLedger.ts(34,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionLedger.ts(35,5): error TS2345: Argument of type '(state: { setAllTransactions?: ((transactions: unknown[]) => void) | undefined; updateBill?: ((bill: unknown) => void) | undefined; }) => { setAllTransactions: ((transactions: unknown[]) => void) | undefined; updateBill: ((bill: unknown) => void) | undefined; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { setAllTransactions?: ((transactions: unknown[]) => void) | undefined; updateBill?: ((bill: unknown) => void) | undefined; }) => { setAllTransactions: ((transactions: unknown[]) => void) | undefined; updateBill: ((bill: unknown) => void) | undefined; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Type '{ setAllTransactions: ((transactions: unknown[]) => void) | undefined; updateBill: ((bill: unknown) => void) | undefined; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ setAllTransactions: ((transactions: unknown[]) => void) | undefined; updateBill: ((bill: unknown) => void) | undefined; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
+src/hooks/transactions/useTransactionLedger.ts(45,11): error TS2339: Property 'setAllTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/transactions/useTransactionLedger.ts(45,31): error TS2339: Property 'updateBill' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/transactions/useTransactionLedger.ts(80,5): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction[]'.
+  Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
+    Types of property 'date' are incompatible.
+      Type 'Date' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionLedger.ts(86,5): error TS2322: Type 'string' is not assignable to type '"asc" | "desc"'.
 src/hooks/transactions/useTransactionLedger.ts(104,5): error TS2345: Argument of type 'UseMutateAsyncFunction<Transaction, Error, TransactionInput, unknown>' is not assignable to parameter of type 'AddTransactionFn'.
   Types of parameters 'variables' and 'transaction' are incompatible.
     Type 'unknown' is not assignable to type 'TransactionInput'.
 src/hooks/transactions/useTransactionLedger.ts(158,44): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/transactions/useTransactionLedger.ts(202,22): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionLedger.ts(226,29): error TS7006: Parameter 'direction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionQuery.ts(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/transactions/useTransactionQuery.ts(45,5): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionLedger.ts(204,39): error TS2345: Argument of type 'Transaction' is not assignable to parameter of type 'SetStateAction<null>'.
+  Type 'Transaction' provides no match for the signature '(prevState: null): null'.
+src/hooks/transactions/useTransactionQuery.ts(44,11): error TS2339: Property 'transactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/transactions/useTransactionQuery.ts(44,46): error TS2339: Property 'allTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
+src/hooks/transactions/useTransactionQuery.ts(46,7): error TS2345: Argument of type '(state: BudgetStore) => { transactions: Transaction[]; allTransactions: Transaction[]; }' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: BudgetStore) => { transactions: Transaction[]; allTransactions: Transaction[]; }' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Types of parameters 'state' and 'setState' are incompatible.
+      Type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' is not assignable to type 'BudgetStore'.
 src/hooks/transactions/useTransactionSplitter.ts(117,7): error TS2345: Argument of type 'Transaction | undefined' is not assignable to parameter of type 'Transaction'.
   Type 'undefined' is not assignable to type 'Transaction'.
 src/hooks/transactions/useTransactionSplitter.ts(153,24): error TS2345: Argument of type 'Transaction | undefined' is not assignable to parameter of type 'Transaction'.
@@ -2509,34 +3212,15 @@ src/hooks/transactions/useTransactionSplitter.ts(167,49): error TS2345: Argument
   Type 'undefined' is not assignable to type 'Transaction'.
 src/hooks/transactions/useTransactionSplitter.ts(178,9): error TS2322: Type 'Transaction | undefined' is not assignable to type 'Transaction'.
   Type 'undefined' is not assignable to type 'Transaction'.
-src/hooks/transactions/useTransactionSplitterUI.ts(29,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(30,3): error TS7006: Parameter 'setSplitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(31,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(32,3): error TS7006: Parameter 'envelopes' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(51,26): error TS7006: Parameter 'prev' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,10): error TS7006: Parameter 'field' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(56,17): error TS7006: Parameter 'value' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(71,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(72,28): error TS7006: Parameter 'prev' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(72,50): error TS7006: Parameter 'split' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(131,3): error TS7006: Parameter 'splitAllocations' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(132,3): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(133,3): error TS7006: Parameter 'setIsProcessing' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(134,3): error TS7006: Parameter 'onSplitTransaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(135,3): error TS7006: Parameter 'onClose' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionSplitterUI.ts(166,39): error TS18046: 'error' is of type 'unknown'.
 src/hooks/transactions/useTransactionTable.ts(24,30): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionTable.ts(32,31): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionUtils.ts(6,6): error TS7006: Parameter 'id' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionUtils.ts(6,40): error TS2339: Property 'id' does not exist on type 'never'.
-src/hooks/transactions/useTransactionUtils.ts(11,6): error TS7006: Parameter 'envId' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionUtils.ts(11,45): error TS2339: Property 'envelopeId' does not exist on type 'never'.
-src/hooks/transactions/useTransactionUtils.ts(16,6): error TS7006: Parameter 'cat' implicitly has an 'any' type.
-src/hooks/transactions/useTransactionUtils.ts(16,43): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/transactions/useTransactionUtils.ts(21,58): error TS2339: Property 'category' does not exist on type 'never'.
-src/hooks/transactions/useTransactionsV2.ts(7,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/transactions/useTransactionsV2.ts(56,23): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/transactions/useTransactionsV2.ts(57,5): error TS2345: Argument of type '(state: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: fa...' is not assignable to parameter of type 'StateCreator<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }, [], []>'.
+  Type '(state: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: fa...' is not assignable to type '(setState: { (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?:...'.
+    Type '{ updateTransactions: unknown; }' is not assignable to type 'StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+      Type '{ updateTransactions: unknown; }' is missing the following properties from type 'StoreState': biweeklyAllocation, isUnassignedCashModalOpen, paycheckHistory, isActualBalanceManual, and 10 more.
+src/hooks/transactions/useTransactionsV2.ts(58,28): error TS2352: Conversion of type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type '{ (partial: (StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }) | Partial<...> | ((state: StoreState & { ...; }) => (StoreState & { ...; }) | Partial<...>), replace?: false | un...'.
+src/hooks/transactions/useTransactionsV2.ts(86,19): error TS2339: Property 'updateTransactions' does not exist on type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; } & StoreApi<...> & (<Mos extends [StoreMutatorIdentifier, unknow...'.
 src/hooks/transactions/useTransactionsV2.ts(89,41): error TS2339: Property 'length' does not exist on type '{}'.
 src/main.tsx(151,55): error TS2339: Property 'length' does not exist on type '{}'.
 src/main.tsx(152,61): error TS2339: Property 'length' does not exist on type '{}'.
@@ -2554,19 +3238,18 @@ src/main.tsx(205,29): error TS2345: Argument of type 'DexieData' is not assignab
 src/main.tsx(207,50): error TS2345: Argument of type 'CloudSyncService' is not assignable to parameter of type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
   Property 'forcePushData' is missing in type 'CloudSyncService' but required in type '{ stop: () => void; clearAllData: () => Promise<void>; forcePushData: () => Promise<{ success: boolean; error?: string | undefined; }>; }'.
 src/services/activityLogger.ts(126,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/services/authService.ts(577,32): error TS2352: Conversion of type 'typeof import("/home/runner/work/violet-vault/violet-vault/src/stores/ui/uiStore")' to type '{ useBudgetStore: { getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: () => Promise<void>; }; }; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'useBudgetStore' are incompatible.
+    Type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>' is not comparable to type '{ getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: () => Promise<void>; }; }'.
 src/services/bugReport/browserInfoService.ts(117,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(160,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(184,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/browserInfoService.ts(218,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/contextAnalysisService.ts(123,11): error TS2352: Conversion of type '{ modals: never[]; forms: never[]; buttons: never[]; inputs: never[]; }' to type 'UIState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ modals: never[]; forms: never[]; buttons: never[]; inputs: never[]; }' is missing the following properties from type 'UIState': drawers, tabs, loading, interactions
-src/services/bugReport/contextAnalysisService.ts(157,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/contextAnalysisService.ts(186,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/contextAnalysisService.ts(206,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/contextAnalysisService.ts(226,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/bugReport/contextAnalysisService.ts(243,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+src/services/bugReport/contextAnalysisService.ts(260,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
-src/services/bugReport/contextAnalysisService.ts(243,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+src/services/bugReport/contextAnalysisService.ts(260,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
 src/services/bugReport/errorTrackingService.ts(106,26): error TS2322: Type '(event: ErrorEvent) => void' is not assignable to type '{ handleEvent: (event: Event) => void; } | ((event: Event) => void)'.
   Type '(event: ErrorEvent) => void' is not assignable to type '(event: Event) => void'.
@@ -2575,7 +3258,6 @@ src/services/bugReport/errorTrackingService.ts(106,26): error TS2322: Type '(eve
 src/services/bugReport/errorTrackingService.ts(217,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/bugReport/index.ts(107,9): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
 src/services/bugReport/index.ts(120,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Error'.
-src/services/bugReport/index.ts(158,26): error TS18046: 'error' is of type 'unknown'.
 src/services/bugReport/index.ts(431,16): error TS18046: 'error' is of type 'unknown'.
 src/services/bugReport/index.ts(457,16): error TS18046: 'error' is of type 'unknown'.
 src/services/bugReport/index.ts(482,16): error TS18046: 'error' is of type 'unknown'.
@@ -2602,10 +3284,21 @@ src/services/bugReport/screenshotService.ts(219,9): error TS18047: 'ctx' is poss
 src/services/bugReport/screenshotService.ts(283,7): error TS18047: 'ctx' is possibly 'null'.
 src/services/bugReport/screenshotService.ts(284,7): error TS18047: 'ctx' is possibly 'null'.
 src/services/bugReport/screenshotService.ts(287,7): error TS18047: 'ctx' is possibly 'null'.
-src/services/chunkedSyncService.ts(195,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/services/chunkedSyncService.ts(275,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+src/services/chunkedSyncService.ts(278,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
   No index signature with a parameter of type 'string' was found on type '{}'.
-src/services/chunkedSyncService.ts(428,29): error TS2769: No overload matches this call.
+src/services/chunkedSyncService.ts(427,34): error TS2345: Argument of type 'Promise<unknown>[]' is not assignable to parameter of type 'Iterable<void | PromiseLike<void>>'.
+  The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+    Type 'IteratorResult<Promise<unknown>, undefined>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+      Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+        Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorYieldResult<void | PromiseLike<void>>'.
+          Type 'Promise<unknown>' is not assignable to type 'void | PromiseLike<void>'.
+            Type 'Promise<unknown>' is not assignable to type 'PromiseLike<void>'.
+              Types of property 'then' are incompatible.
+                Type '<TResult1 = unknown, TResult2 = never>(onfulfilled?: ((value: unknown) => TResult1 | PromiseLike<TResult1>) | null | undefined, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined) => Promise<...>' is not assignable to type '<TResult1 = void, TResult2 = never>(onfulfilled?: ((value: void) => TResult1 | PromiseLike<TResult1>) | null | undefined, onrejected?: ((reason: any) => TResult2 | PromiseLike<...>) | null | undefined) => PromiseLike<...>'.
+                  Types of parameters 'onfulfilled' and 'onfulfilled' are incompatible.
+                    Types of parameters 'value' and 'value' are incompatible.
+                      Type 'unknown' is not assignable to type 'void'.
+src/services/chunkedSyncService.ts(431,29): error TS2769: No overload matches this call.
   Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
     Argument of type 'string | null' is not assignable to parameter of type 'string'.
       Type 'null' is not assignable to type 'string'.
@@ -2615,7 +3308,19 @@ src/services/chunkedSyncService.ts(428,29): error TS2769: No overload matches th
   Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
     Argument of type 'Firestore' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
       Type 'Firestore' is missing the following properties from type 'DocumentReference<unknown, DocumentData>': converter, firestore, id, path, and 2 more.
-src/services/chunkedSyncService.ts(544,24): error TS2769: No overload matches this call.
+src/services/chunkedSyncService.ts(497,36): error TS2345: Argument of type 'Promise<unknown>[]' is not assignable to parameter of type 'Iterable<void | PromiseLike<void>>'.
+  The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+    Type 'IteratorResult<Promise<unknown>, undefined>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+      Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorResult<void | PromiseLike<void>, any>'.
+        Type 'IteratorYieldResult<Promise<unknown>>' is not assignable to type 'IteratorYieldResult<void | PromiseLike<void>>'.
+          Type 'Promise<unknown>' is not assignable to type 'void | PromiseLike<void>'.
+            Type 'Promise<unknown>' is not assignable to type 'PromiseLike<void>'.
+              Types of property 'then' are incompatible.
+                Type '<TResult1 = unknown, TResult2 = never>(onfulfilled?: ((value: unknown) => TResult1 | PromiseLike<TResult1>) | null | undefined, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined) => Promise<...>' is not assignable to type '<TResult1 = void, TResult2 = never>(onfulfilled?: ((value: void) => TResult1 | PromiseLike<TResult1>) | null | undefined, onrejected?: ((reason: any) => TResult2 | PromiseLike<...>) | null | undefined) => PromiseLike<...>'.
+                  Types of parameters 'onfulfilled' and 'onfulfilled' are incompatible.
+                    Types of parameters 'value' and 'value' are incompatible.
+                      Type 'unknown' is not assignable to type 'void'.
+src/services/chunkedSyncService.ts(547,24): error TS2769: No overload matches this call.
   Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
     Argument of type 'string | null' is not assignable to parameter of type 'string'.
       Type 'null' is not assignable to type 'string'.
@@ -2625,47 +3330,19 @@ src/services/chunkedSyncService.ts(544,24): error TS2769: No overload matches th
   Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
     Argument of type 'Firestore' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
       Type 'Firestore' is missing the following properties from type 'DocumentReference<unknown, DocumentData>': converter, firestore, id, path, and 2 more.
+src/services/editLockService.ts(129,51): error TS2345: Argument of type 'LockDocument | null' is not assignable to parameter of type 'ExistingLock | null | undefined'.
+  Type 'LockDocument' is not assignable to type 'ExistingLock'.
+    Types of property 'userId' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
 src/services/editLockService.ts(372,26): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/services/firebaseMessaging.ts(175,36): error TS2345: Argument of type 'Messaging | null' is not assignable to parameter of type 'Messaging'.
   Type 'null' is not assignable to type 'Messaging'.
 src/services/firebaseMessaging.ts(294,38): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/services/firebaseSyncService.ts(166,46): error TS2345: Argument of type 'Auth | null' is not assignable to parameter of type 'Auth'.
+src/services/firebaseSyncService.ts(170,46): error TS2345: Argument of type 'Auth | null' is not assignable to parameter of type 'Auth'.
   Type 'null' is not assignable to type 'Auth'.
-src/services/firebaseSyncService.ts(178,58): error TS2345: Argument of type 'Auth | null' is not assignable to parameter of type 'Auth'.
-  Type 'null' is not assignable to type 'Auth'.
-src/services/firebaseSyncService.ts(237,26): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'Firestore'.
-      Type 'null' is not assignable to type 'Firestore'.
-  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
-  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
-src/services/firebaseSyncService.ts(268,26): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'Firestore'.
-      Type 'null' is not assignable to type 'Firestore'.
-  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
-  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
-src/services/firebaseSyncService.ts(305,24): error TS2769: No overload matches this call.
-  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'Firestore'.
-      Type 'null' is not assignable to type 'Firestore'.
-  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
-  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
-    Argument of type 'Firestore | null' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
-      Type 'null' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
-src/services/firebaseSyncService.ts(367,15): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/services/keys/keyManagementService.ts(111,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/services/keys/keyManagementService.ts(345,26): error TS2769: No overload matches this call.
   The last overload gave the following error.
@@ -2692,17 +3369,33 @@ src/stores/ui/fabStore.ts(249,11): error TS7023: 'getDebugInfo' implicitly has r
 src/stores/ui/fabStore.ts(251,19): error TS7022: 'state' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
 src/stores/ui/toastStore.ts(87,11): error TS2352: Conversion of type '{ toasts: never[]; }' to type 'ToastState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ toasts: never[]; }' is missing the following properties from type 'ToastState': addToast, removeToast, clearAllToasts, showSuccess, and 4 more.
-src/stores/ui/uiStore.ts(96,27): error TS7006: Parameter 'set' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(96,32): error TS7006: Parameter '_get' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(131,33): error TS7006: Parameter 'fromVersion' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(131,46): error TS7006: Parameter 'toVersion' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(132,10): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(140,12): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(155,12): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(167,57): error TS18046: 'error' is of type 'unknown'.
-src/stores/ui/uiStore.ts(188,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(227,10): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(256,5): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
+src/stores/ui/uiStore.ts(155,25): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(158,29): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(161,30): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+  Types of parameters 'fn' and 'updater' are incompatible.
+    Types of parameters 'draft' and 'state' are incompatible.
+      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
+src/stores/ui/uiStore.ts(176,9): error TS2322: Type 'string' is not assignable to type '{ version: string; notes: string[]; fromVersion?: string | undefined; toVersion?: string | undefined; isUpdate?: boolean | undefined; }'.
+src/stores/ui/uiStore.ts(223,32): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(295,3): error TS2322: Type 'UseBoundStore<WithImmer<Write<StoreApi<{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }>, StoreSubscribeWithSelector<...>...' is not assignable to type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+  Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' is not assignable to type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+    Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' is not assignable to type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; }'.
+      Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' provides no match for the signature '(): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+src/stores/ui/uiStore.ts(297,3): error TS2322: Type 'UseBoundStore<WithImmer<Write<WithPersist<WithDevtools<StoreApi<{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }>>, { ......' is not assignable to type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+  Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' is not assignable to type 'UseBoundStore<StoreApi<StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>>'.
+    Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' is not assignable to type '{ (): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }; <U>(selector: (state: StoreState & { ...; }) => U): U; }'.
+      Type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; startBackgroundSync(authData?: { ...; } | undefined): Promise<...>; ... 29 more ...; loadingPatchNotes: boolean; }' provides no match for the signature '(): StoreState & { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<string | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }'.
+src/stores/ui/uiStore.ts(324,26): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(324,71): error TS2339: Property 'setState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,26): error TS2339: Property 'getState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,72): error TS2339: Property 'setState' does not exist on type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>'.
+src/stores/ui/uiStore.ts(325,82): error TS2345: Argument of type 'typeof create<StoreState & ReturnType<typeof storeInitializer>>' is not assignable to parameter of type '{ getState: () => UiStore; }'.
 src/utils/accounts/accountValidation.ts(11,37): error TS7006: Parameter 'accountForm' implicitly has an 'any' type.
 src/utils/accounts/accountValidation.ts(93,38): error TS7006: Parameter 'transferForm' implicitly has an 'any' type.
 src/utils/accounts/accountValidation.ts(93,52): error TS7006: Parameter 'fromAccount' implicitly has an 'any' type.
@@ -2783,12 +3476,6 @@ src/utils/budgeting/envelopeIntegrityChecker.ts(119,14): error TS18046: 'error' 
 src/utils/budgeting/envelopeIntegrityChecker.ts(130,48): error TS7006: Parameter 'corruptedEnvelopes' implicitly has an 'any' type.
 src/utils/budgeting/envelopeIntegrityChecker.ts(216,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/budgeting/envelopeIntegrityChecker.ts(277,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/budgeting/envelopeStyles.ts(6,38): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/envelopeStyles.ts(8,18): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
-src/utils/budgeting/envelopeStyles.ts(20,32): error TS7006: Parameter 'envelope' implicitly has an 'any' type.
-src/utils/budgeting/envelopeStyles.ts(39,31): error TS7006: Parameter 'status' implicitly has an 'any' type.
-src/utils/budgeting/envelopeStyles.ts(55,37): error TS7006: Parameter 'utilizationRate' implicitly has an 'any' type.
-src/utils/budgeting/envelopeStyles.ts(55,54): error TS7006: Parameter 'status' implicitly has an 'any' type.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/budgeting/paycheckProcessing.ts(35,5): error TS2769: No overload matches this call.
   Overload 1 of 3, '(callbackfn: (previousValue: { currentBalance?: string | number | undefined; }, currentValue: { currentBalance?: string | number | undefined; }, currentIndex: number, array: { currentBalance?: string | ... 1 more ... | undefined; }[]) => { ...; }, initialValue: { ...; }): { ...; }', gave the following error.
@@ -2815,12 +3502,6 @@ src/utils/budgeting/paycheckProcessing.ts(40,5): error TS2769: No overload match
             Type 'string | number | undefined' is not assignable to type 'string | number'.
               Type 'undefined' is not assignable to type 'string | number'.
 src/utils/budgeting/paycheckProcessing.ts(44,33): error TS2365: Operator '+' cannot be applied to types '{ currentBalance?: string | number | undefined; }' and '{ currentBalance?: string | number | undefined; }'.
-src/utils/common/BaseMutex.ts(62,35): error TS2531: Object is possibly 'null'.
-src/utils/common/BaseMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/common/BaseMutex.ts(71,24): error TS2339: Property 'operationName' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/common/BaseMutex.ts(80,17): error TS7006: Parameter 'fn' implicitly has an 'any' type.
-src/utils/common/BaseMutex.ts(109,48): error TS2531: Object is possibly 'null'.
-src/utils/common/BaseMutex.ts(116,9): error TS7006: Parameter 'operationName' implicitly has an 'any' type.
 src/utils/common/budgetHistoryTracker.ts(109,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: string | null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
     Type 'string | null' is not assignable to type 'string | undefined'.
@@ -2845,102 +3526,43 @@ src/utils/dataManagement/dexieUtils.ts(47,41): error TS7006: Parameter 'data' im
 src/utils/dataManagement/fileUtils.ts(3,33): error TS7006: Parameter 'file' implicitly has an 'any' type.
 src/utils/dataManagement/fileUtils.ts(11,36): error TS18047: 'e.target' is possibly 'null'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/dataManagement/validationUtils.ts(3,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/dataManagement/validationUtils.ts(13,32): error TS7006: Parameter 'importedData' implicitly has an 'any' type.
-src/utils/dataManagement/validationUtils.ts(13,46): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/utils/dataManagement/validationUtils.ts(19,28): error TS7006: Parameter 'importedData' implicitly has an 'any' type.
-src/utils/dataManagement/validationUtils.ts(25,38): error TS7006: Parameter 'importedData' implicitly has an 'any' type.
-src/utils/dataManagement/validationUtils.ts(25,52): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
 src/utils/debts/calculations/interestCalculation.ts(12,42): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/utils/debts/calculations/interestCalculation.ts(12,48): error TS7006: Parameter 'paymentAmount' implicitly has an 'any' type.
 src/utils/debts/calculations/nextPaymentDate.ts(13,42): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/utils/debts/calculations/nextPaymentDate.ts(13,48): error TS7006: Parameter 'relatedBill' implicitly has an 'any' type.
 src/utils/debts/calculations/payoffProjection.ts(11,43): error TS7006: Parameter 'debt' implicitly has an 'any' type.
-src/utils/debug/dataDiagnostic.ts(113,59): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/dataDiagnostic.ts(123,29): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.
-  No index signature with a parameter of type 'string' was found on type 'VioletVaultDB'.
-src/utils/debug/dataDiagnostic.ts(124,30): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.
-  No index signature with a parameter of type 'string' was found on type 'VioletVaultDB'.
-src/utils/debug/dataDiagnostic.ts(125,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/debug/dataDiagnostic.ts(131,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/debug/dataDiagnostic.ts(131,34): error TS18046: 'err' is of type 'unknown'.
-src/utils/debug/dataDiagnostic.ts(148,47): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/dataDiagnostic.ts(206,37): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/dataDiagnostic.ts(298,20): error TS18048: 'window.budgetDb' is possibly 'undefined'.
-src/utils/debug/dataDiagnostic.ts(301,20): error TS18048: 'window.budgetDb' is possibly 'undefined'.
-src/utils/debug/dataDiagnostic.ts(303,23): error TS2345: Argument of type 'string | Date | undefined' is not assignable to parameter of type 'IndexableType'.
+src/utils/debug/dataDiagnostic.ts(124,84): error TS2339: Property 'count' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
+  Property 'count' does not exist on type 'string'.
+src/utils/debug/dataDiagnostic.ts(126,12): error TS2339: Property 'limit' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
+  Property 'limit' does not exist on type 'string'.
+src/utils/debug/dataDiagnostic.ts(304,20): error TS18048: 'window.budgetDb' is possibly 'undefined'.
+src/utils/debug/dataDiagnostic.ts(307,20): error TS18048: 'window.budgetDb' is possibly 'undefined'.
+src/utils/debug/dataDiagnostic.ts(309,23): error TS2345: Argument of type 'string | Date | undefined' is not assignable to parameter of type 'IndexableType'.
   Type 'undefined' is not assignable to type 'IndexableType'.
-src/utils/debug/dataDiagnostic.ts(333,37): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/reactErrorDetector.ts(29,34): error TS7006: Parameter 'actionName' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(56,40): error TS7006: Parameter 'hookName' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(56,50): error TS7006: Parameter 'dependencies' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(60,6): error TS7006: Parameter 'dep' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(69,42): error TS7006: Parameter 'dep' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(127,40): error TS7006: Parameter 'store' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(127,47): error TS7006: Parameter 'storeName' implicitly has an 'any' type.
-src/utils/debug/reactErrorDetector.ts(136,26): error TS7019: Rest parameter 'args' implicitly has an 'any[]' type.
-src/utils/debug/reactErrorDetector.ts(138,30): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
-src/utils/debug/syncDiagnostic.ts(107,47): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/syncDiagnostic.ts(135,60): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/syncDiagnostic.ts(156,11): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/debug/syncDiagnostic.ts(156,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'VioletVaultDB'.
-  No index signature with a parameter of type 'string' was found on type 'VioletVaultDB'.
-src/utils/debug/syncDiagnostic.ts(158,11): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/debug/syncDiagnostic.ts(158,39): error TS18046: 'err' is of type 'unknown'.
-src/utils/debug/syncDiagnostic.ts(177,55): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/syncDiagnostic.ts(204,55): error TS18046: 'error' is of type 'unknown'.
-src/utils/debug/syncDiagnostic.ts(236,58): error TS18046: 'error' is of type 'unknown'.
+src/utils/debug/reactErrorDetector.ts(132,40): error TS7006: Parameter 'store' implicitly has an 'any' type.
+src/utils/debug/reactErrorDetector.ts(132,47): error TS7006: Parameter 'storeName' implicitly has an 'any' type.
+src/utils/debug/reactErrorDetector.ts(141,26): error TS7019: Rest parameter 'args' implicitly has an 'any[]' type.
+src/utils/debug/reactErrorDetector.ts(143,30): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
 src/utils/icons/index.ts(334,25): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
 src/utils/icons/index.ts(336,10): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ "arrow-right": ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; ... 123 more ...; CreditCard: ForwardRefExoticComponent<...>; }'.
 src/utils/icons/index.ts(340,29): error TS7006: Parameter 'iconComponent' implicitly has an 'any' type.
 src/utils/icons/index.ts(346,28): error TS7006: Parameter 'iconName' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(10,42): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(10,54): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(15,50): error TS7006: Parameter 'p' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(33,50): error TS7006: Parameter 'paycheckToDelete' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(33,68): error TS7006: Parameter 'budgetDb' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(56,6): error TS7006: Parameter 'sum' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(56,11): error TS7006: Parameter 'alloc' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(65,49): error TS7006: Parameter 'paycheckToDelete' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(65,67): error TS7006: Parameter 'budgetDb' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(65,77): error TS7006: Parameter 'getBudgetMetadata' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(96,44): error TS7006: Parameter 'paycheckId' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(96,56): error TS7006: Parameter 'budgetDb' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(117,48): error TS7006: Parameter 'queryClient' implicitly has an 'any' type.
-src/utils/layout/paycheckDeletionUtils.ts(117,61): error TS7006: Parameter 'queryKeys' implicitly has an 'any' type.
+src/utils/layout/paycheckDeletionUtils.ts(52,47): error TS2339: Property 'currentBalance' does not exist on type '{}'.
+src/utils/layout/paycheckDeletionUtils.ts(110,56): error TS2339: Property 'get' does not exist on type '{ delete: (id: string | number) => Promise<void>; }'.
+src/utils/layout/paycheckDeletionUtils.ts(126,25): error TS2349: This expression is not callable.
+  Type 'unknown[]' has no call signatures.
+src/utils/layout/paycheckDeletionUtils.ts(128,55): error TS2339: Property 'envelopes' does not exist on type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
+src/utils/layout/paycheckDeletionUtils.ts(132,55): error TS2339: Property 'dashboard' does not exist on type '{ paycheckHistory: unknown[]; budgetMetadata: unknown[]; }'.
 src/utils/pageDetection/pageIdentifier.ts(37,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/pwa/backgroundSync.ts(35,24): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/pwa/backgroundSync.ts(74,11): error TS7034: Variable 'successfulOperations' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/pwa/backgroundSync.ts(75,11): error TS7034: Variable 'failedOperations' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/pwa/backgroundSync.ts(89,13): error TS18046: 'operation.retryCount' is of type 'unknown'.
-src/utils/pwa/backgroundSync.ts(89,37): error TS18046: 'operation.maxRetries' is of type 'unknown'.
-src/utils/pwa/backgroundSync.ts(102,20): error TS18046: 'error' is of type 'unknown'.
-src/utils/pwa/backgroundSync.ts(110,16): error TS7005: Variable 'successfulOperations' implicitly has an 'any[]' type.
-src/utils/pwa/backgroundSync.ts(115,16): error TS7005: Variable 'failedOperations' implicitly has an 'any[]' type.
-src/utils/pwa/backgroundSync.ts(130,26): error TS7006: Parameter 'operation' implicitly has an 'any' type.
 src/utils/pwa/offlineDataValidator.ts(119,23): error TS7006: Parameter 'tableName' implicitly has an 'any' type.
 src/utils/pwa/offlineDataValidator.ts(121,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'VioletVaultDB'.
 src/utils/pwa/offlineDataValidator.ts(131,63): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/pwa/offlineDataValidator.ts(155,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/pwa/offlineDataValidator.ts(181,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/pwa/patchNotesManager.ts(52,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/pwa/patchNotesManager.ts(62,33): error TS7006: Parameter 'version' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(75,23): error TS7006: Parameter 'changelog' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(75,34): error TS7006: Parameter 'version' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(109,23): error TS7006: Parameter 'content' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(109,32): error TS7006: Parameter 'version' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(110,47): error TS7006: Parameter 'line' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(194,20): error TS7006: Parameter 'patchNotes' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(200,49): error TS7006: Parameter 'item' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(207,57): error TS7006: Parameter 'item' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(214,54): error TS7006: Parameter 'item' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(221,54): error TS7006: Parameter 'item' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(231,25): error TS7006: Parameter 'version' implicitly has an 'any' type.
-src/utils/pwa/patchNotesManager.ts(287,57): error TS2531: Object is possibly 'null'.
+src/utils/pwa/patchNotesManager.ts(68,7): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
+src/utils/pwa/patchNotesManager.ts(85,7): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
+src/utils/pwa/patchNotesManager.ts(89,24): error TS18048: 'match.index' is possibly 'undefined'.
+src/utils/pwa/patchNotesManager.ts(103,5): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'string'.
 src/utils/pwa/pwaManager.ts(71,7): error TS2322: Type 'ServiceWorkerRegistration | undefined' is not assignable to type 'ServiceWorkerRegistration | null'.
   Type 'undefined' is not assignable to type 'ServiceWorkerRegistration | null'.
 src/utils/pwa/pwaManager.ts(88,11): error TS2531: Object is possibly 'null'.
@@ -2963,38 +3585,18 @@ src/utils/pwa/serviceWorkerDiagnostics.ts(368,25): error TS18046: 'error' is of 
 src/utils/query/backgroundSyncService.ts(92,20): error TS18046: 'restoreError' is of type 'unknown'.
 src/utils/query/prefetchHelpers.ts(55,13): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/utils/query/queryClientConfig.ts(125,22): error TS7006: Parameter 'entityType' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(149,24): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(149,34): error TS7006: Parameter 'queryFn' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(160,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/query/queryClientConfig.ts(170,21): error TS7006: Parameter 'queryKeys' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(171,24): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(180,18): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(187,22): error TS7006: Parameter 'queryKey' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(187,32): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/query/queryClientConfig.ts(194,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,12): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,19): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,30): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(240,37): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,10): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,17): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,28): error TS18046: 'aVal' is of type 'unknown'.
-src/utils/savings/savingsCalculations.ts(242,35): error TS18046: 'bVal' is of type 'unknown'.
-src/utils/security/cryptoCompat.ts(23,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/security/cryptoCompat.ts(61,43): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/security/cryptoCompat.ts(61,54): error TS7019: Rest parameter 'args' implicitly has an 'any[]' type.
-src/utils/security/cryptoCompat.ts(69,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'SubtleCrypto'.
-src/utils/security/cryptoCompat.ts(73,18): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'SubtleCrypto'.
-src/utils/security/cryptoCompat.ts(85,32): error TS7006: Parameter 'length' implicitly has an 'any' type.
-src/utils/security/cryptoCompat.ts(129,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/security/errorViewer.ts(52,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(52,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(96,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(96,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(103,14): error TS7006: Parameter 'timestamp' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(129,21): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/security/errorViewer.ts(129,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/utils/query/queryClientConfig.ts(58,7): error TS2322: Type '(error: unknown, query: Query) => void' is not assignable to type '(error: Error, query: Query<unknown, unknown, unknown, readonly unknown[]>) => void'.
+  Types of parameters 'query' and 'query' are incompatible.
+    Type 'Query<unknown, unknown, unknown, readonly unknown[]>' is not assignable to type 'Query<unknown, Error, unknown, readonly unknown[]>'.
+      Types of property 'state' are incompatible.
+        Type 'QueryState<unknown, unknown>' is not assignable to type 'QueryState<unknown, Error>'.
+          Type 'unknown' is not assignable to type 'Error'.
+src/utils/query/queryClientConfig.ts(65,7): error TS2322: Type '(_data: unknown, query: Query) => void' is not assignable to type '(data: unknown, query: Query<unknown, unknown, unknown, readonly unknown[]>) => void'.
+  Types of parameters 'query' and 'query' are incompatible.
+    Type 'Query<unknown, unknown, unknown, readonly unknown[]>' is not assignable to type 'Query<unknown, Error, unknown, readonly unknown[]>'.
+      Types of property 'state' are incompatible.
+        Type 'QueryState<unknown, unknown>' is not assignable to type 'QueryState<unknown, Error>'.
+          Type 'unknown' is not assignable to type 'Error'.
 src/utils/security/keyExport.ts(268,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/security/keyExport.ts(319,35): error TS7016: Could not find a declaration file for module 'qrcode'. '/home/runner/work/violet-vault/violet-vault/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
   Try `npm i --save-dev @types/qrcode` if it exists or add a new declaration (.d.ts) file containing `declare module 'qrcode';`
@@ -3011,16 +3613,6 @@ src/utils/security/optimizedSerialization.ts(162,22): error TS7006: Parameter 'd
 src/utils/security/optimizedSerialization.ts(172,23): error TS7006: Parameter 'base64String' implicitly has an 'any' type.
 src/utils/security/optimizedSerialization.ts(182,16): error TS7006: Parameter 'testData' implicitly has an 'any' type.
 src/utils/security/optimizedSerialization.ts(212,16): error TS18046: 'error' is of type 'unknown'.
-src/utils/services/editLockHelpers.ts(11,43): error TS7006: Parameter 'budgetId' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(11,53): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(11,66): error TS7006: Parameter 'auth' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(29,32): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(67,42): error TS7006: Parameter 'existingLock' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(67,56): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(67,69): error TS7006: Parameter 'releaseLockFn' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(115,33): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(115,40): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
-src/utils/services/editLockHelpers.ts(115,53): error TS7006: Parameter 'budgetId' implicitly has an 'any' type.
 src/utils/settings/settingsHelpers.ts(24,43): error TS7006: Parameter 'settings' implicitly has an 'any' type.
 src/utils/settings/settingsHelpers.ts(46,42): error TS7006: Parameter 'settings' implicitly has an 'any' type.
 src/utils/settings/settingsHelpers.ts(77,39): error TS7006: Parameter 'data' implicitly has an 'any' type.
@@ -3041,16 +3633,6 @@ src/utils/stores/createSafeStore.ts(182,5): error TS2345: Argument of type 'Stat
         Type 'Record<string, unknown>' is not assignable to type 'T & Record<string, unknown>'.
           Type 'Record<string, unknown>' is not assignable to type 'T'.
             'Record<string, unknown>' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint 'object'.
-src/utils/sync/RetryManager.ts(24,17): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(45,22): error TS7006: Parameter 'operations' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(83,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,27): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,38): error TS7006: Parameter 'config' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(98,46): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(109,17): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,24): error TS7006: Parameter 'error' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,31): error TS7006: Parameter 'config' implicitly has an 'any' type.
-src/utils/sync/RetryManager.ts(118,39): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
 src/utils/sync/SyncMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
 src/utils/sync/SyncMutex.ts(80,18): error TS7006: Parameter 'duration' implicitly has an 'any' type.
 src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>' is not assignable to parameter of type 'QueueItem<unknown>'.
@@ -3059,36 +3641,15 @@ src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>
       Types of parameters 'data' and 'data' are incompatible.
         Type 'unknown' is not assignable to type 'T'.
           'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
-src/utils/sync/autoBackupService.ts(93,18): error TS18048: 'backup.metadata' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(94,31): error TS18048: 'backup.metadata' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(197,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(197,72): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(198,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(198,78): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(199,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(199,64): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(200,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(200,64): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(201,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(201,78): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(202,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(203,52): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(206,15): error TS18048: 'data' is possibly 'undefined'.
-src/utils/sync/autoBackupService.ts(209,19): error TS18048: 'data' is possibly 'undefined'.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '(() => Promise<unknown>) | undefined', but here has type '() => Promise<DataDetectionResult>'.
+src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
+src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2717: Subsequent property declarations must have the same type.  Property 'hasLocalDataDebug' must be of type '(() => Promise<boolean>) | undefined', but here has type '() => Promise<boolean>'.
 src/utils/sync/dataDetectionHelper.ts(104,48): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(568,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/resilience/index.ts(52,19): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(24,36): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(24,45): error TS7006: Parameter 'attempt' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(38,35): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(38,44): error TS7006: Parameter 'errorType' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(45,41): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(53,38): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(62,36): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(71,31): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
-src/utils/sync/retryMetrics.ts(81,30): error TS7006: Parameter 'metrics' implicitly has an 'any' type.
 src/utils/sync/retryPolicies.ts(11,34): error TS7006: Parameter 'error' implicitly has an 'any' type.
 src/utils/sync/retryPolicies.ts(39,42): error TS7006: Parameter 'errorCode' implicitly has an 'any' type.
 src/utils/sync/retryPolicies.ts(54,44): error TS7006: Parameter 'error' implicitly has an 'any' type.
@@ -3113,51 +3674,18 @@ src/utils/sync/syncFlowValidator.ts(171,45): error TS2345: Argument of type 'str
   Type 'undefined' is not assignable to type 'IndexableType'.
 src/utils/sync/syncFlowValidator.ts(172,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'IndexableType'.
   Type 'undefined' is not assignable to type 'IndexableType'.
-src/utils/sync/syncFlowValidator.ts(305,11): error TS2345: Argument of type 'DataCollection | null' is not assignable to parameter of type 'DataCollection'.
+src/utils/sync/syncFlowValidator.ts(309,11): error TS2345: Argument of type 'DataCollection | null' is not assignable to parameter of type 'DataCollection'.
   Type 'null' is not assignable to type 'DataCollection'.
-src/utils/sync/syncHealthChecker.ts(26,40): error TS7006: Parameter 'results' implicitly has an 'any' type.
-src/utils/sync/syncHealthChecker.ts(80,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(120,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(160,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(195,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(225,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(261,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(290,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(317,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/syncHealthChecker.ts(331,26): error TS7006: Parameter 'test' implicitly has an 'any' type.
-src/utils/sync/validation/checksumUtils.ts(15,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/sync/validation/checksumUtils.ts(51,59): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/validation/checksumUtils.ts(62,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
-src/utils/sync/validation/checksumUtils.ts(62,46): error TS7006: Parameter 'expectedChecksum' implicitly has an 'any' type.
-src/utils/sync/validation/checksumUtils.ts(87,58): error TS18046: 'error' is of type 'unknown'.
-src/utils/sync/validation/encryptedDataValidator.ts(14,39): error TS7006: Parameter 'encryptedData' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(16,9): error TS7034: Variable 'warnings' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/sync/validation/encryptedDataValidator.ts(21,38): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/sync/validation/encryptedDataValidator.ts(34,38): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/sync/validation/encryptedDataValidator.ts(37,63): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/sync/validation/encryptedDataValidator.ts(44,29): error TS7006: Parameter 'encryptedData' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(44,44): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(44,55): error TS7006: Parameter 'errors' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(44,63): error TS7006: Parameter 'warnings' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(76,43): error TS18046: 'validationError' is of type 'unknown'.
-src/utils/sync/validation/encryptedDataValidator.ts(85,33): error TS7006: Parameter 'encryptedData' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(85,48): error TS7006: Parameter 'errors' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(85,56): error TS7006: Parameter 'warnings' implicitly has an 'any' type.
-src/utils/sync/validation/encryptedDataValidator.ts(85,66): error TS7006: Parameter 'operation' implicitly has an 'any' type.
+src/utils/sync/validation/checksumUtils.ts(23,7): error TS2322: Type 'Uint8Array<ArrayBuffer>' is not assignable to type 'ArrayBuffer'.
+  Types of property '[Symbol.toStringTag]' are incompatible.
+    Type '"Uint8Array"' is not assignable to type '"ArrayBuffer"'.
+src/utils/sync/validation/checksumUtils.ts(32,7): error TS2322: Type 'Uint8Array<ArrayBuffer>' is not assignable to type 'ArrayBuffer'.
+  Types of property '[Symbol.toStringTag]' are incompatible.
+    Type '"Uint8Array"' is not assignable to type '"ArrayBuffer"'.
 src/utils/testing/storeTestUtils.ts(58,13): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(59,11): error TS18048: 'transaction.metadata.shipping' is possibly 'undefined'.
-src/utils/transactions/splitting.ts(70,11): error TS18048: 'transaction.metadata.tax' is possibly 'undefined'.
-src/utils/transactions/splitting.ts(81,7): error TS2322: Type '({ id: number; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem: boolean; originalItem: { name: string; price?: number | undefined; totalPrice?: number | undefined; category?: { ...; } | undefined; }; } | { ...; })[]' is not assignable to type 'SplitAllocation[]'.
-  Type '{ id: number; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem: boolean; originalItem: { name: string; price?: number | undefined; totalPrice?: number | undefined; category?: { ...; } | undefined; }; } | { ...; }' is not assignable to type 'SplitAllocation'.
-    Type '{ id: number; description: string; amount: number | undefined; category: string; envelopeId: string; isOriginalItem: boolean; }' is not assignable to type 'SplitAllocation'.
-      Types of property 'amount' are incompatible.
-        Type 'number | undefined' is not assignable to type 'number'.
-          Type 'undefined' is not assignable to type 'number'.
-src/utils/transactions/splitting.ts(141,14): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(182,40): error TS18046: 'error' is of type 'unknown'.
-src/utils/transactions/splitting.ts(432,58): error TS18046: 'error' is of type 'unknown'.
 ```
+

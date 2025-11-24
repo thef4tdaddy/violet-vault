@@ -1,11 +1,24 @@
 import React from "react";
 import { getIcon } from "../../../utils/icons";
 
+interface SecuritySettings {
+  clipboardClearTimeout: number;
+  [key: string]: unknown;
+}
+
+interface ClipboardSecuritySectionProps {
+  securitySettings: SecuritySettings;
+  handleSettingChange: (key: string, value: unknown) => void;
+}
+
 /**
  * Clipboard security settings section
  * Extracted from SecuritySettings.jsx with enhanced UI standards
  */
-const ClipboardSecuritySection = ({ securitySettings, handleSettingChange }) => {
+const ClipboardSecuritySection: React.FC<ClipboardSecuritySectionProps> = ({
+  securitySettings,
+  handleSettingChange,
+}) => {
   return (
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-purple-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">

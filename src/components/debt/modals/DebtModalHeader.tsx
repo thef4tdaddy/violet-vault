@@ -2,11 +2,16 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
+interface DebtModalHeaderProps {
+  isEditMode: boolean;
+  onClose: () => void;
+}
+
 /**
  * Header section for AddDebtModal
  * Pure UI component that preserves exact visual appearance
  */
-const DebtModalHeader = ({ isEditMode, onClose }) => {
+const DebtModalHeader: React.FC<DebtModalHeaderProps> = ({ isEditMode, onClose }) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3">

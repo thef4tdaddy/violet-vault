@@ -20,7 +20,11 @@ import ChangeDetails from "./viewer/ChangeDetails";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-const BudgetHistoryViewer = ({ onClose }) => {
+interface BudgetHistoryViewerProps {
+  onClose: () => void;
+}
+
+const BudgetHistoryViewer: React.FC<BudgetHistoryViewerProps> = ({ onClose }) => {
   const {
     commits: history,
     isLoading: loading,

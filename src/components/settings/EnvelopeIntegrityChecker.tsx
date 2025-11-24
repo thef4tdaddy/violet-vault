@@ -9,12 +9,17 @@ import { EnvelopeIntegrityRecommendations } from "./EnvelopeIntegrityRecommendat
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+interface EnvelopeIntegrityCheckerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 /**
  * Envelope Integrity Checker Component
  * Addresses GitHub issue #539 - empty envelopes with no details
  * Refactored using extracted components and custom hook for better maintainability
  */
-const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
+const EnvelopeIntegrityChecker: React.FC<EnvelopeIntegrityCheckerProps> = ({ isOpen, onClose }) => {
   // Use extracted hook for all logic
   const {
     report,
