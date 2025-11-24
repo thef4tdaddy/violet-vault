@@ -8,6 +8,7 @@ import {
   compareTransactions,
 } from "../../utils/validation";
 import type { Transaction } from "@/types/finance";
+import type { Transaction as ValidationTransaction } from "../../utils/validation/transactionValidation";
 
 interface UseTransactionFiltersParams {
   transactions: Transaction[];
@@ -38,13 +39,20 @@ export const useTransactionFilters = ({
       .filter((transaction) => {
         return (
           isValidTransaction(transaction) &&
-          matchesSearchTerm(transaction as any, searchTerm) &&
-          matchesTypeFilter(transaction as any, typeFilter) &&
-          matchesEnvelopeFilter(transaction as any, envelopeFilter) &&
-          matchesDateFilter(transaction as any, dateFilter)
+          matchesSearchTerm(transaction as ValidationTransaction, searchTerm) &&
+          matchesTypeFilter(transaction as ValidationTransaction, typeFilter) &&
+          matchesEnvelopeFilter(transaction as ValidationTransaction, envelopeFilter) &&
+          matchesDateFilter(transaction as ValidationTransaction, dateFilter)
         );
       })
-      .sort((a, b) => compareTransactions(a as any, b as any, sortBy, sortOrder));
+      .sort((a, b) =>
+        compareTransactions(
+          a as ValidationTransaction,
+          b as ValidationTransaction,
+          sortBy,
+          sortOrder
+        )
+      );
   }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
 
   return filteredTransactions;

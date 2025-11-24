@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 9 | +6 |
-| TypeScript Errors | 82 | -6 |
-| TypeScript Strict Mode Errors | 837 | -6 |
+| ESLint Issues | 3 | -6 |
+| TypeScript Errors | 83 | +1 |
+| TypeScript Strict Mode Errors | 838 | 0 |
 
-*Last updated: 2025-11-24 22:35:10 UTC*
+*Last updated: 2025-11-24 22:36:55 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,7 +27,6 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 6 issues in `violet-vault/src/hooks/transactions/useTransactionFilters.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
@@ -35,7 +34,6 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 6 | `@typescript-eslint/no-explicit-any` |
 | 3 | `max-lines-per-function` |
 
 ### Detailed Lint Report
@@ -43,12 +41,6 @@
 violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:41:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:42:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:43:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:44:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
-violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:58 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
@@ -78,6 +70,7 @@ violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:58 - 1 - Unexpec
 - 2 errors in `src/components/savings/SavingsGoals.tsx`
 - 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 1 errors in `src/utils/security/encryption.ts`
+- 1 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 1 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
 - 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
@@ -108,9 +101,9 @@ violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:58 - 1 - Unexpec
 | 4 | `TS2717` |
 | 4 | `TS2687` |
 | 3 | `TS2769` |
+| 3 | `TS2459` |
 | 2 | `TS2741` |
 | 2 | `TS2739` |
-| 2 | `TS2459` |
 | 1 | `TS2740` |
 | 1 | `TS2719` |
 | 1 | `TS2694` |
@@ -279,6 +272,7 @@ src/hooks/settings/useSettingsSectionRenderer.ts(114,11): error TS2769: No overl
   The last overload gave the following error.
     Property 'lockApp' is missing in type 'SecurityManager' but required in type 'SecurityManager'.
 src/hooks/sharing/useQRCodeProcessing.ts(34,13): error TS2322: Type 'number' is not assignable to type 'string'.
+src/hooks/transactions/useTransactionFilters.ts(11,15): error TS2459: Module '"../../utils/validation/transactionValidation"' declares 'Transaction' locally, but it is not exported.
 src/hooks/transactions/useTransactionLedger.ts(80,5): error TS2322: Type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction[]'.
   Type 'import("violet-vault/src/db/types").Transaction' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction'.
     Types of property 'date' are incompatible.
@@ -573,6 +567,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 1 errors in `src/services/typedChunkedSyncService.ts`
 - 1 errors in `src/services/firebaseSyncService.ts`
 - 1 errors in `src/services/activityLogger.ts`
+- 1 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
 - 1 errors in `src/hooks/mobile/useFABBehavior.ts`
@@ -663,13 +658,13 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 | 4 | `TS2783` |
 | 4 | `TS2687` |
 | 3 | `TS2722` |
+| 3 | `TS2459` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
 | 2 | `TS2741` |
 | 2 | `TS2740` |
 | 2 | `TS2739` |
 | 2 | `TS2531` |
-| 2 | `TS2459` |
 | 2 | `TS2353` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
@@ -2004,6 +1999,7 @@ src/hooks/transactions/useTransactionData.ts(150,7): error TS2740: Type '{}' is 
 src/hooks/transactions/useTransactionData.ts(234,85): error TS2339: Property 'length' does not exist on type '{}'.
 src/hooks/transactions/useTransactionFileUpload.ts(27,18): error TS18047: 'event.target.files' is possibly 'null'.
 src/hooks/transactions/useTransactionFileUpload.ts(59,56): error TS18046: 'error' is of type 'unknown'.
+src/hooks/transactions/useTransactionFilters.ts(11,15): error TS2459: Module '"../../utils/validation/transactionValidation"' declares 'Transaction' locally, but it is not exported.
 src/hooks/transactions/useTransactionForm.ts(21,25): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionForm.ts(34,30): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionImport.ts(49,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; }'.
