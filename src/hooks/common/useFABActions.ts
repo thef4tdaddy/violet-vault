@@ -2,8 +2,11 @@ import { useEffect } from "react";
 import { useFABActions, useFABSelectors } from "../../stores/ui/fabStore";
 
 interface FABAction {
-  id?: string;
-  [key: string]: unknown;
+  id: string;
+  icon: string;
+  label: string;
+  color: string;
+  action: (() => void) | null;
 }
 
 interface RegisterFABActionsOptions {
@@ -53,7 +56,7 @@ export const useRegisterFABActions = ({
 
   // Register secondary actions
   useEffect(() => {
-    const actionIds = [];
+    const actionIds: string[] = [];
 
     secondaryActions.forEach((action) => {
       if (action.id) {
