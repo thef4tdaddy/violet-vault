@@ -9,14 +9,19 @@ import { isValidShareCode } from "../../utils/validation";
  * Extracted from JoinBudgetModal to reduce complexity
  */
 export const useShareCodeValidation = () => {
-  const [shareInfo, setShareInfo] = useState(null);
-  const [creatorInfo, setCreatorInfo] = useState(null);
+  const [shareInfo, setShareInfo] = useState<{
+    createdBy: string;
+    createdAt: number;
+    expiresAt: number;
+    userCount: string;
+  } | null>(null);
+  const [creatorInfo, setCreatorInfo] = useState<unknown>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
-  const validateShareCode = async (code) => {
+  const validateShareCode = async (code: string) => {
     if (!isValidShareCode(code)) {
       return false;
     }

@@ -11,6 +11,17 @@ const initialForm = {
   reconciled: false,
 };
 
+interface Transaction {
+  date: string;
+  description: string;
+  amount: number;
+  envelopeId: string;
+  category: string;
+  notes: string;
+  reconciled: boolean;
+  [key: string]: unknown;
+}
+
 export const useTransactionForm = () => {
   const [transactionForm, setTransactionForm] = useState(initialForm);
 
@@ -18,7 +29,7 @@ export const useTransactionForm = () => {
     setTransactionForm(initialForm);
   };
 
-  const populateForm = (transaction) => {
+  const populateForm = (transaction: Transaction) => {
     setTransactionForm({
       date: transaction.date,
       description: transaction.description,
@@ -31,7 +42,7 @@ export const useTransactionForm = () => {
     });
   };
 
-  const createTransaction = (currentUser) => {
+  const createTransaction = (currentUser: { userName: string; [key: string]: unknown }) => {
     return {
       id: Date.now(),
       ...transactionForm,

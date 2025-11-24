@@ -4,7 +4,20 @@ import { useCallback } from "react";
  * Hook for execution summary utilities
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
-export const useExecutionSummary = (lastExecution) => {
+interface LastExecution {
+  id: string;
+  trigger: string;
+  executedAt: string;
+  rulesExecuted: number;
+  totalFunded: number;
+  remainingCash: number;
+  initialCash: number;
+  success?: boolean;
+  results?: Array<{ success: boolean; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
+export const useExecutionSummary = (lastExecution: LastExecution | null) => {
   // Get execution summary for display
   const getExecutionSummary = useCallback(() => {
     if (!lastExecution) {

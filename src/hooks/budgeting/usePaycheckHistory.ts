@@ -7,11 +7,22 @@ import logger from "../../utils/common/logger";
  * Custom hook for paycheck history management
  * Handles history operations and delete functionality
  */
-export const usePaycheckHistory = ({ onDeletePaycheck }) => {
-  const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
+interface Paycheck {
+  id: string;
+  payerName: string;
+  amount: number;
+  [key: string]: unknown;
+}
+
+interface UsePaycheckHistoryParams {
+  onDeletePaycheck?: (id: string) => Promise<void>;
+}
+
+export const usePaycheckHistory = ({ onDeletePaycheck }: UsePaycheckHistoryParams) => {
+  const [deletingPaycheckId, setDeletingPaycheckId] = useState<string | null>(null);
   const confirm = useConfirm();
 
-  const handleDeletePaycheck = async (paycheck) => {
+  const handleDeletePaycheck = async (paycheck: Paycheck) => {
     if (!onDeletePaycheck) return;
 
     const isConfirmed = await confirm({

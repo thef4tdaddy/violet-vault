@@ -9,8 +9,18 @@ import logger from "../../utils/common/logger";
  * Login with password and optional user data (for new users)
  */
 export const createLoginOperation =
-  (loginMutation) =>
-  async (password, userData = null) => {
+  (loginMutation: {
+    mutateAsync: (args: {
+      password: string;
+      userData: unknown | null;
+    }) => Promise<{
+      success: boolean;
+      user?: { userName?: string };
+      error?: string;
+      [key: string]: unknown;
+    }>;
+  }) =>
+  async (password: string, userData: unknown | null = null) => {
     try {
       logger.auth("AuthManager: Starting login", {
         hasPassword: !!password,
@@ -39,29 +49,37 @@ export const createLoginOperation =
 /**
  * Join budget with share code
  */
-export const createJoinBudgetOperation = (joinBudgetMutation) => async (joinData) => {
-  try {
-    logger.auth("AuthManager: Starting budget join", {
-      budgetId: joinData.budgetId?.substring(0, 8) + "...",
-      sharedBy: joinData.sharedBy,
-    });
+export const createJoinBudgetOperation =
+  (joinBudgetMutation: {
+    mutateAsync: (joinData: {
+      budgetId?: string;
+      sharedBy?: string;
+      [key: string]: unknown;
+    }) => Promise<unknown>;
+  }) =>
+  async (joinData: { budgetId?: string; sharedBy?: string; [key: string]: unknown }) => {
+    try {
+      logger.auth("AuthManager: Starting budget join", {
+        budgetId: joinData.budgetId?.substring(0, 8) + "...",
+        sharedBy: joinData.sharedBy,
+      });
 
-    const result = await joinBudgetMutation.mutateAsync(joinData);
+      const result = await joinBudgetMutation.mutateAsync(joinData);
 
-    if (result.success) {
-      logger.auth("AuthManager: Budget join successful");
-      return { success: true, data: result };
-    } else {
-      return { success: false, error: result.error };
+      if (result.success) {
+        logger.auth("AuthManager: Budget join successful");
+        return { success: true, data: result };
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (error) {
+      logger.error("AuthManager: Budget join error", error);
+      return {
+        success: false,
+        error: error.message || "Failed to join budget",
+      };
     }
-  } catch (error) {
-    logger.error("AuthManager: Budget join error", error);
-    return {
-      success: false,
-      error: error.message || "Failed to join budget",
-    };
-  }
-};
+  };
 
 /**
  * Logout user and clear session

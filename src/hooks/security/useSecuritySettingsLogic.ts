@@ -15,7 +15,7 @@ export const useSecuritySettingsLogic = () => {
 
   // Setting change handler
   const handleSettingChange = useCallback(
-    (setting, value) => {
+    (setting: string, value: unknown) => {
       updateSettings({ [setting]: value });
     },
     [updateSettings]
