@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | 0 |
-| TypeScript Errors | 73 | -4 |
-| TypeScript Strict Mode Errors | 825 | -4 |
+| ESLint Issues | 4 | +1 |
+| TypeScript Errors | 73 | 0 |
+| TypeScript Strict Mode Errors | 825 | 0 |
 
-*Last updated: 2025-11-24 22:43:38 UTC*
+*Last updated: 2025-11-24 22:49:00 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 1 issues in `violet-vault/src/hooks/receipts/useReceiptToTransaction.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
@@ -35,18 +36,20 @@
 | Count | Rule ID |
 |---|---|
 | 3 | `max-lines-per-function` |
+| 1 | `@typescript-eslint/no-explicit-any` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/receipts/useReceiptToTransaction.ts:54:95 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
+- 5 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 4 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 3 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
@@ -81,7 +84,6 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 - 1 errors in `src/components/settings/sections/NotificationSettingsSection.tsx`
 - 1 errors in `src/components/security/LockScreen.tsx`
 - 1 errors in `src/components/receipts/components/ExtractedDataField.tsx`
-- 1 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 1 errors in `src/components/layout/MainLayout.tsx`
 - 1 errors in `src/components/debt/DebtStrategies.tsx`
 - 1 errors in `src/components/debt/DebtDashboard.tsx`
@@ -93,8 +95,8 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 27 | `TS2322` |
-| 24 | `TS2345` |
+| 30 | `TS2322` |
+| 21 | `TS2345` |
 | 5 | `TS2339` |
 | 3 | `TS2769` |
 | 3 | `TS2459` |
@@ -104,8 +106,8 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 | 1 | `TS2719` |
 | 1 | `TS2717` |
 | 1 | `TS2694` |
-| 1 | `TS2559` |
 | 1 | `TS2554` |
+| 1 | `TS2365` |
 | 1 | `TS2353` |
 | 1 | `TS18047` |
 
@@ -156,6 +158,16 @@ src/components/layout/ViewRenderer.tsx(333,9): error TS2322: Type 'import("viole
         Type 'string | number' is not assignable to type 'string'.
           Type 'number' is not assignable to type 'string'.
 src/components/receipts/components/ExtractedDataField.tsx(27,49): error TS2345: Argument of type 'number' is not assignable to parameter of type 'ConfidenceLevel'.
+src/components/receipts/ReceiptToTransactionModal.tsx(130,45): error TS2365: Operator '>' cannot be applied to types 'string' and 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(144,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(151,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(168,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
 src/components/receipts/ReceiptToTransactionModal.tsx(200,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
 src/components/savings/SavingsGoals.tsx(45,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
@@ -245,17 +257,6 @@ src/hooks/layout/usePaycheckOperations.ts(53,11): error TS2345: Argument of type
 src/hooks/notifications/useFirebaseMessaging.ts(32,25): error TS2345: Argument of type 'PermissionStatusForUI' is not assignable to parameter of type 'SetStateAction<string>'.
 src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
 src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(46,82): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'import("violet-vault/src/types/finance").Envelope[]'.
-  Type 'Envelope' is not assignable to type 'import("violet-vault/src/types/finance").Envelope'.
-    Property 'currentBalance' is optional in type 'Envelope' but required in type 'Envelope'.
-src/hooks/receipts/useReceiptToTransaction.ts(48,28): error TS2345: Argument of type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to parameter of type 'SetStateAction<{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }>'.
-  Type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to type '(prevState: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }'.
-    Call signature return types '{ envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' and '{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }' are incompatible.
-      The types of 'envelopeId' are incompatible between these types.
-        Type 'string | number' is not assignable to type 'string'.
-          Type 'number' is not assignable to type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(86,37): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(101,9): error TS2559: Type 'string' has no properties in common with type '{ url?: string; }'.
 src/hooks/settings/useSettingsSectionRenderer.ts(105,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Type 'User' is not assignable to type 'CurrentUser'.
@@ -317,6 +318,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/components/bills/BillManager.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
+- 8 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 8 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 7 errors in `src/App.tsx`
@@ -357,7 +359,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 4 errors in `src/stores/ui/uiStore.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
-- 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 4 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 4 errors in `src/hooks/mobile/usePullToRefresh.ts`
 - 4 errors in `src/hooks/common/useDataInitialization.ts`
@@ -373,7 +374,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 4 errors in `src/components/settings/sections/SecurityStatusSection.tsx`
 - 4 errors in `src/components/settings/archiving/ArchivingStatusOverview.tsx`
 - 4 errors in `src/components/settings/SettingsDashboard.tsx`
-- 4 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 4 errors in `src/components/pwa/OfflineStatusIndicator.tsx`
 - 4 errors in `src/components/onboarding/hooks/useTutorialHighlight.ts`
@@ -623,9 +623,9 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 154 | `TS2345` |
+| 151 | `TS2345` |
 | 148 | `TS7031` |
-| 143 | `TS2322` |
+| 145 | `TS2322` |
 | 117 | `TS7006` |
 | 43 | `TS7005` |
 | 39 | `TS2769` |
@@ -643,6 +643,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 2 | `TS2740` |
 | 2 | `TS2722` |
 | 2 | `TS2531` |
+| 2 | `TS2365` |
 | 2 | `TS2353` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
@@ -654,7 +655,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 1 | `TS2683` |
 | 1 | `TS2554` |
 | 1 | `TS2538` |
-| 1 | `TS2365` |
 | 1 | `TS2349` |
 
 ### Detailed Strict Mode Report
@@ -1134,6 +1134,16 @@ src/components/receipts/ReceiptScanner.tsx(59,15): error TS2322: Type 'RefObject
 src/components/receipts/ReceiptToTransactionModal.tsx(105,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
 src/components/receipts/ReceiptToTransactionModal.tsx(105,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/receipts/ReceiptToTransactionModal.tsx(105,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(130,45): error TS2365: Operator '>' cannot be applied to types 'string' and 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(144,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(151,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/components/receipts/ReceiptToTransactionModal.tsx(168,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+  Types of property 'amount' are incompatible.
+    Type 'string' is not assignable to type 'number'.
 src/components/receipts/ReceiptToTransactionModal.tsx(200,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
 src/components/savings/SavingsGoals.tsx(45,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
@@ -1663,20 +1673,6 @@ src/hooks/notifications/useFirebaseMessaging.ts(97,7): error TS2322: Type 'Token
       Type 'null' is not assignable to type 'string | undefined'.
 src/hooks/notifications/useFirebaseMessaging.ts(177,45): error TS2339: Property 'canShowPrompt' does not exist on type 'string'.
 src/hooks/notifications/useFirebaseMessaging.ts(178,36): error TS2339: Property 'isSupported' does not exist on type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(46,82): error TS2345: Argument of type 'Envelope[]' is not assignable to parameter of type 'import("violet-vault/src/types/finance").Envelope[]'.
-  Type 'Envelope' is not assignable to type 'import("violet-vault/src/types/finance").Envelope'.
-    Types of property 'currentBalance' are incompatible.
-      Type 'number | undefined' is not assignable to type 'number'.
-        Type 'undefined' is not assignable to type 'number'.
-src/hooks/receipts/useReceiptToTransaction.ts(48,28): error TS2345: Argument of type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to parameter of type 'SetStateAction<{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }>'.
-  Type '(prev: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' is not assignable to type '(prevState: { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }) => { description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }'.
-    Call signature return types '{ envelopeId: string | number; category: string; description: string; amount: number; date: string; type: string; notes: string; }' and '{ description: string; amount: number; date: string; envelopeId: string; category: string; type: string; notes: string; }' are incompatible.
-      The types of 'envelopeId' are incompatible between these types.
-        Type 'string | number' is not assignable to type 'string'.
-          Type 'number' is not assignable to type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(86,37): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
-src/hooks/receipts/useReceiptToTransaction.ts(101,9): error TS2322: Type 'string | undefined' is not assignable to type '{ url?: string | undefined; } | undefined'.
-  Type 'string' has no properties in common with type '{ url?: string | undefined; }'.
 src/hooks/savings/useSavingsGoals/index.ts(85,9): error TS2322: Type 'UseMutationResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>' is not assignable to type 'MutationHandler'.
   Type 'Override<MutationObserverIdleResult<SavingsGoal, Error, NewSavingsGoalData, { previousGoals: unknown; }>, { mutate: UseMutateFunction<...>; }> & { ...; }' is not assignable to type 'MutationHandler'.
     Types of property 'mutateAsync' are incompatible.
