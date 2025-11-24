@@ -146,7 +146,7 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
 
       {showBillDetail && (
         <BillDetailModal
-          bill={showBillDetail}
+          bill={showBillDetail as unknown as import("@/types/bills").Bill}
           isOpen={!!showBillDetail}
           onClose={() => setShowBillDetail(null)}
           onDelete={(billId: string) => deleteBill(billId)}

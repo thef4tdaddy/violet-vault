@@ -164,18 +164,34 @@ const ExpandedView = ({
     {showSettings && (
       <div className="mb-6">
         <SuggestionSettings
-          settings={analysisSettings}
+          settings={
+            analysisSettings as unknown as {
+              minAmount: number;
+              minTransactions: number;
+              overspendingThreshold: number;
+              bufferPercentage: number;
+              [key: string]: unknown;
+            }
+          }
           onUpdateSettings={updateAnalysisSettings}
           onResetSettings={resetAnalysisSettings}
           onRefresh={refreshSuggestions}
-          suggestionStats={suggestionStats}
+          suggestionStats={
+            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
+          }
         />
       </div>
     )}
     <SuggestionsList
-      suggestions={suggestions}
-      onApplySuggestion={handleApplySuggestion}
-      onDismissSuggestion={handleDismissSuggestion}
+      suggestions={suggestions as unknown as import("./suggestions/SuggestionsList").Suggestion[]}
+      onApplySuggestion={
+        handleApplySuggestion as unknown as (
+          suggestion: import("./suggestions/SuggestionsList").Suggestion
+        ) => void
+      }
+      onDismissSuggestion={(suggestion: import("./suggestions/SuggestionsList").Suggestion) =>
+        handleDismissSuggestion(suggestion.id)
+      }
       isCompact={false}
     />
   </>
@@ -209,7 +225,9 @@ const SmartEnvelopeSuggestions = ({
     transactions,
     envelopes,
     onCreateEnvelope,
-    onUpdateEnvelope,
+    onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => {
+      return onUpdateEnvelope(envelopeId, updates);
+    },
     onDismissSuggestion,
     dateRange,
     showDismissed,
@@ -264,7 +282,9 @@ const SmartEnvelopeSuggestions = ({
           updateAnalysisSettings={updateAnalysisSettings}
           resetAnalysisSettings={resetAnalysisSettings}
           refreshSuggestions={refreshSuggestions}
-          suggestionStats={suggestionStats}
+          suggestionStats={
+            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
+          }
           suggestions={typedSuggestions}
           handleApplySuggestion={handleApplySuggestion}
           handleDismissSuggestion={handleDismissSuggestion}

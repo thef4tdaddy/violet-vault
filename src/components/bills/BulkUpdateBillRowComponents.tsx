@@ -8,9 +8,14 @@ interface BillChange {
   originalDueDate?: string;
 }
 
-interface AmountChange {
+export interface AmountChange {
   hasChange: boolean;
   original: number;
+  updated?: number;
+  difference?: string;
+  differenceFormatted?: string;
+  isIncrease?: boolean;
+  isDecrease?: boolean;
 }
 
 interface AmountUpdateFieldProps {

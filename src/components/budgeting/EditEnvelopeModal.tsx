@@ -63,11 +63,15 @@ const EditEnvelopeModal = ({
     isExpired,
   } = useEnvelopeEdit({
     isOpen,
-    envelope,
-    existingEnvelopes,
-    onSave: onUpdateEnvelope,
+    envelope: envelope as unknown as import("@/types/finance").Envelope | null,
+    existingEnvelopes: (existingEnvelopes || []) as Array<{
+      id: string | number;
+      name?: string;
+      currentBalance?: number;
+    }>,
+    onSave: onUpdateEnvelope as (envelopeData: unknown) => Promise<void>,
     onClose,
-    onDelete: onDeleteEnvelope,
+    onDelete: onDeleteEnvelope as (envelopeId: string | number) => Promise<void>,
     currentUser,
   });
 
@@ -126,7 +130,7 @@ const EditEnvelopeModal = ({
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteConfirm}
-          envelope={envelope}
+          envelope={envelope as unknown as import("@/types/finance").Envelope | null}
         />
       </>
     );
@@ -178,7 +182,14 @@ const EditEnvelopeModal = ({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
-        envelope={envelope}
+        envelope={
+          envelope as {
+            id: string;
+            name?: string;
+            currentBalance?: number;
+            targetAmount?: number;
+          } | null
+        }
       />
     </>
   );

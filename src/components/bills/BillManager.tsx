@@ -23,11 +23,12 @@ interface Transaction {
   [key: string]: unknown;
 }
 
-interface Envelope {
+import type { Envelope as EnvelopeFromTypes } from "@/types/bills";
+
+type Envelope = EnvelopeFromTypes & {
   id: string | number;
-  name?: string;
   [key: string]: unknown;
-}
+};
 
 interface BillManagerProps {
   transactions?: Transaction[];

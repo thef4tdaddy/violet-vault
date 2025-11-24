@@ -1,3 +1,4 @@
+import React from "react";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { renderIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";

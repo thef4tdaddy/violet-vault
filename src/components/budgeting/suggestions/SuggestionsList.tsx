@@ -2,7 +2,7 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import SuggestionCard from "./SuggestionCard";
 
-interface Suggestion {
+export interface Suggestion {
   id: string;
   priority: "high" | "medium" | "low";
   [key: string]: unknown;

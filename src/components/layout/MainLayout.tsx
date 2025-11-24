@@ -445,7 +445,12 @@ const MainContentLayoutView = ({
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
-          syncConflicts={syncConflicts}
+          syncConflicts={
+            (syncConflicts || []) as unknown as Array<{
+              hasConflict: boolean;
+              [key: string]: unknown;
+            }>
+          }
           onResolveConflict={onResolveConflict}
           onDismiss={onClearConflict}
         />

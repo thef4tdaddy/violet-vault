@@ -77,14 +77,14 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
           <PaycheckAllocationPreview
             preview={preview}
             hasAmount={!!formHook.paycheckAmount}
-            envelopes={envelopes}
+            envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
           />
         </div>
       </div>
 
       {/* Paycheck History */}
       <PaycheckHistory
-        paycheckHistory={paycheckHistory}
+        paycheckHistory={paycheckHistory as unknown as PaycheckHistoryItem[]}
         onDeletePaycheck={historyHook.handleDeletePaycheck}
         deletingPaycheckId={historyHook.deletingPaycheckId}
       />
@@ -136,7 +136,7 @@ const PaycheckForm: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> =
     />
 
     <PaycheckAllocationModes
-      allocationMode={formHook.allocationMode}
+      allocationMode={formHook.allocationMode as "allocate" | "leftover"}
       onChange={formHook.setAllocationMode}
       disabled={formHook.isProcessing}
     />

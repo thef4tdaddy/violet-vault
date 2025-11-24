@@ -105,7 +105,11 @@ const DebtStrategies = ({ debts }) => {
       )}
 
       {/* Payment Impact Analysis */}
-      <PaymentImpactTable paymentImpact={paymentImpact} />
+      <PaymentImpactTable
+        paymentImpact={
+          paymentImpact as unknown as import("./ui/PaymentImpactTable").PaymentImpactScenario[]
+        }
+      />
     </div>
   );
 };

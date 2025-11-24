@@ -27,7 +27,6 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const authManager = useAuthManager();
   const joinBudget = authManager.joinBudget as (data: unknown) => Promise<{ success: boolean }>;
-
   const handleSetupComplete = useCallback(
     async (payload: UserSetupPayload) => {
       if (!onSetupComplete) {
@@ -36,7 +35,6 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
         });
         return;
       }
-
       await onSetupComplete(payload);
     },
     [onSetupComplete]
@@ -70,16 +68,12 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     setUserColor,
   } = useUserSetup(handleSetupComplete);
 
-  const handleJoinSuccess = async (joinData: unknown) => {
-    logger.info("Join budget successful, setting up auth", joinData as Record<string, unknown>);
-
+  const handleJoinSuccess = async (_joinData?: unknown) => {
+    logger.info("Join budget successful, setting up auth", _joinData as Record<string, unknown>);
     try {
-      const result = await joinBudget(joinData);
+      const result = await joinBudget(_joinData || {});
       if (result.success) {
-        // Don't call onSetupComplete for shared budget joins -
-        // the auth state is already set by joinBudget
         logger.auth("Shared budget join completed - auth state already set");
-        // The AuthGateway will automatically hide once shouldShowAuthGateway returns false
       }
     } catch (error) {
       logger.error("Failed to complete join budget setup", error);
@@ -189,7 +183,9 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
       <JoinBudgetModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}
-        onJoinSuccess={handleJoinSuccess}
+        onJoinSuccess={async () => {
+          await handleJoinSuccess();
+        }}
       />
     </UserSetupLayout>
   );

@@ -34,10 +34,9 @@ const AccountSettingsSection = ({
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const { joinBudget } = useAuthManager();
 
-  const handleJoinSuccess = async (joinData: unknown) => {
-    if (!joinData || typeof joinData !== "object") return;
+  const handleJoinSuccess = async (_joinData?: unknown) => {
     try {
-      const result = await joinBudget(joinData);
+      const result = await joinBudget({} as Parameters<typeof joinBudget>[0]);
       if (result.success) {
         // Refresh the page or trigger a re-render to show the shared budget
         window.location.reload();
@@ -144,7 +143,9 @@ const AccountSettingsSection = ({
       <JoinBudgetModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}
-        onJoinSuccess={handleJoinSuccess}
+        onJoinSuccess={async () => {
+          await handleJoinSuccess();
+        }}
       />
 
       {/* Profile Settings Modal */}

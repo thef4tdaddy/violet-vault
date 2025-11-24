@@ -4,6 +4,41 @@ import logger from "@/utils/common/logger";
 import type { DebtSubmissionData } from "./useDebtForm";
 import type { DebtAccount } from "@/types/debt";
 
+// Helper function to process debt updates
+const processDebtUpdateHelper = async (
+  debtId: string,
+  rawUpdates: Record<string, unknown>,
+  updateDebt: (id: string, updates: unknown) => Promise<void>,
+  linkDebtToBill?: (debtId: string, billId: string) => Promise<void>
+): Promise<void> => {
+  const {
+    connectionData,
+    paymentMethod,
+    createBill: _createBill,
+    existingBillId,
+    newEnvelopeName: _newEnvelopeName,
+    ...debtUpdates
+  } = rawUpdates;
+
+  await updateDebt(debtId, debtUpdates);
+
+  const connectionPayload =
+    connectionData && typeof connectionData === "object"
+      ? (connectionData as { existingBillId?: string | number; paymentMethod?: string })
+      : null;
+
+  const targetBillId = existingBillId ?? connectionPayload?.existingBillId;
+
+  if (
+    linkDebtToBill &&
+    targetBillId &&
+    (paymentMethod === "connect_existing_bill" ||
+      connectionPayload?.paymentMethod === "connect_existing_bill")
+  ) {
+    await linkDebtToBill(debtId, String(targetBillId));
+  }
+};
+
 export const useDebtDashboard = () => {
   const {
     debts,
@@ -36,7 +71,7 @@ export const useDebtDashboard = () => {
   }, [debts, getUpcomingPayments]);
 
   // Filter and sort debts
-  const filteredDebts = useMemo(() => {
+  const filterAndSortDebts = useMemo(() => {
     if (!debts) return [];
 
     let filtered = [...debts];
@@ -71,61 +106,36 @@ export const useDebtDashboard = () => {
     return filtered;
   }, [debts, filterOptions]);
 
+  const filteredDebts = filterAndSortDebts;
+
   // Modal handlers
-  const handleAddDebt = () => {
+  const handleAddDebt = (): void => {
     setEditingDebt(null);
     setShowAddModal(true);
   };
-  const handleEditDebt = (debt: DebtAccount) => {
+  const handleEditDebt = (debt: DebtAccount): void => {
     setEditingDebt(debt);
     setShowAddModal(true);
   };
-  const handleDebtClick = (debt: DebtAccount) => setSelectedDebt(debt);
-  const handleCloseModal = () => {
+  const handleDebtClick = (debt: DebtAccount): void => setSelectedDebt(debt);
+  const handleCloseModal = (): void => {
     setShowAddModal(false);
     setEditingDebt(null);
-  };
-
-  const processDebtUpdate = async (debtId: string, rawUpdates: Record<string, unknown>) => {
-    const {
-      connectionData,
-      paymentMethod,
-      createBill: _createBill,
-      existingBillId,
-      newEnvelopeName: _newEnvelopeName,
-      ...debtUpdates
-    } = rawUpdates;
-
-    await updateDebt(debtId, debtUpdates as Parameters<typeof updateDebt>[1]);
-
-    const connectionPayload =
-      connectionData && typeof connectionData === "object"
-        ? (connectionData as { existingBillId?: string | number; paymentMethod?: string })
-        : null;
-
-    const targetBillId = existingBillId ?? connectionPayload?.existingBillId;
-
-    if (
-      linkDebtToBill &&
-      targetBillId &&
-      (paymentMethod === "connect_existing_bill" ||
-        connectionPayload?.paymentMethod === "connect_existing_bill")
-    ) {
-      await linkDebtToBill(debtId, String(targetBillId));
-    }
   };
 
   const handleModalSubmit = async (
     debtIdOrData: DebtSubmissionData | string,
     maybeUpdates?: DebtSubmissionData
-  ) => {
+  ): Promise<void> => {
     try {
       const isUpdatePayload = typeof debtIdOrData === "string" || typeof debtIdOrData === "number";
 
       if (isUpdatePayload) {
-        await processDebtUpdate(
+        await processDebtUpdateHelper(
           String(debtIdOrData),
-          (maybeUpdates ?? {}) as Record<string, unknown>
+          (maybeUpdates ?? {}) as Record<string, unknown>,
+          updateDebt as (id: string, updates: unknown) => Promise<void>,
+          linkDebtToBill
         );
       } else {
         await createDebt(debtIdOrData as Parameters<typeof createDebt>[0]);
@@ -137,7 +147,7 @@ export const useDebtDashboard = () => {
     }
   };
 
-  const handleDeleteDebt = async (debtId: string) => {
+  const handleDeleteDebt = async (debtId: string): Promise<void> => {
     try {
       await deleteDebt(debtId);
       setSelectedDebt(null);
@@ -149,7 +159,7 @@ export const useDebtDashboard = () => {
   const handleRecordPayment = async (
     debtId: string,
     paymentData: { amount: number; date?: string }
-  ) => {
+  ): Promise<void> => {
     try {
       await recordPayment(debtId, paymentData);
       if (selectedDebt && selectedDebt.id === debtId) {

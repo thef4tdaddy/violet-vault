@@ -1,6 +1,5 @@
 // src/components/budgeting/EnvelopeGrid.tsx - Refactored with separated logic
 import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "react";
-// @ts-expect-error TS7034 -- useUiStore has complex conditional typing due to LOCAL_ONLY_MODE that TypeScript can't infer in strict mode
 import useUiStoreRaw from "@/stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
@@ -299,7 +298,6 @@ const useResolvedData = (
     return budgetState.updateBill;
   };
   // Use type assertions to work around store typing limitations
-  // @ts-expect-error TS7034 TS7005 -- useUiStoreRaw has complex conditional typing that TypeScript can't infer in strict mode
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Store type is complex and not properly exported
   const useUiStore = useUiStoreRaw as any as <T>(
     selector: (state: Record<string, unknown>) => T

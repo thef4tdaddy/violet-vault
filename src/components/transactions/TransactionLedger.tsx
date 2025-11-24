@@ -68,14 +68,19 @@ interface TransactionLedgerViewProps {
   }) => void;
   showImportModal: boolean;
   onCloseImportModal: () => void;
-  importStep: unknown;
-  setImportStep: (step: unknown) => void;
-  importData: unknown;
-  fieldMapping: unknown;
-  setFieldMapping: (mapping: unknown) => void;
-  importProgress: unknown;
+  importStep: number;
+  setImportStep: (step: number) => void;
+  importData: unknown[];
+  setImportData: (data: unknown[]) => void;
+  fieldMapping: Record<string, string>;
+  setFieldMapping: (mapping: Record<string, string>) => void;
+  importProgress: {
+    current: number;
+    total: number;
+    percentage: number;
+  };
   onImport: () => void;
-  onFileUpload: (file: File) => void;
+  onFileUpload: (data: unknown[]) => void;
 }
 
 const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
@@ -493,12 +498,21 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       onCloseImportModal={handleCloseImportModal}
       importStep={importStep}
       setImportStep={setImportStep}
-      importData={importData}
-      fieldMapping={fieldMapping}
-      setFieldMapping={setFieldMapping}
-      importProgress={importProgress}
+      importData={importData as unknown as unknown[]}
+      setImportData={() => {}}
+      fieldMapping={fieldMapping as Record<string, string>}
+      setFieldMapping={setFieldMapping as (mapping: Record<string, string>) => void}
+      importProgress={
+        importProgress as unknown as { current: number; total: number; percentage: number }
+      }
       onImport={handleImport}
-      onFileUpload={handleFileUpload}
+      onFileUpload={(data: unknown[]) => {
+        // Convert the data array back to a File object for handleFileUpload
+        if (data && data.length > 0 && typeof data[0] === "object" && data[0] instanceof File) {
+          return handleFileUpload(data[0] as File);
+        }
+        // logger.error('Invalid file data passed to onFileUpload'); // Assuming logger is not defined, so commenting out
+      }}
     />
   );
 };

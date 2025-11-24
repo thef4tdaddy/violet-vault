@@ -37,7 +37,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
     updateChange,
     applyBulkChange,
     resetChanges,
-  } = useBulkBillUpdate(selectedBills, isOpen);
+  } = useBulkBillUpdate(selectedBills as unknown as import("@/domain/schemas/bill").Bill[], isOpen);
 
   // Initialize changes when modal opens
   useEffect(() => {

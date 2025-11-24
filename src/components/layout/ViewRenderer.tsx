@@ -314,19 +314,28 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     paycheck: (
       <PaycheckProcessor
         envelopes={envelopes}
-        paycheckHistory={tanStackPaycheckHistory}
-        onProcessPaycheck={tanStackProcessPaycheck}
-        onDeletePaycheck={(paycheckId: string) =>
-          handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)
+        paycheckHistory={
+          tanStackPaycheckHistory as unknown as import("@/db/types").PaycheckHistory[]
         }
-        currentUser={currentUser}
+        onProcessPaycheck={tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>}
+        onDeletePaycheck={
+          ((paycheckId: string) =>
+            handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)) as unknown as (
+            paycheck: import("@/db/types").PaycheckHistory
+          ) => Promise<void>
+        }
+        currentUser={currentUser as unknown as import("@/types/finance").User}
       />
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions}
-        envelopes={envelopes}
-        onUpdateBill={handleUpdateBill}
+        transactions={safeTransactions as unknown as import("@/types/finance").Transaction[]}
+        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        onUpdateBill={
+          handleUpdateBill as unknown as (
+            bill: import("@/types/bills").Bill
+          ) => void | Promise<void>
+        }
         onCreateRecurringBill={() => {}}
         onSearchNewBills={async () => {}}
         onError={handleBillManagerError}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
 import { useShareCodeValidation } from "@/hooks/sharing/useShareCodeValidation";
 import { useBudgetJoining } from "@/hooks/sharing/useBudgetJoining";
