@@ -2,6 +2,14 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface ReceiptUploadAreaProps {
+  onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  cameraInputRef: React.RefObject<HTMLInputElement>;
+  onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 /**
  * Receipt Upload Area Component
  * Handles drag and drop, file upload, and camera capture UI with standards compliance
@@ -12,7 +20,7 @@ const ReceiptUploadArea = ({
   fileInputRef,
   cameraInputRef,
   onFileInputChange,
-}) => {
+}: ReceiptUploadAreaProps) => {
   return (
     <>
       <div

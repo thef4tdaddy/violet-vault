@@ -58,10 +58,11 @@ export const useChangePasswordMutation = () => {
         return { success: true, newKey, newSalt };
       } catch (error) {
         logger.error("Password change failed.", error);
-        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        const err = error as Error & { name?: string };
+        if (err.name === "OperationError" || err.message.toLowerCase().includes("decrypt")) {
           return { success: false, error: "Invalid current password." };
         }
-        return { success: false, error: error.message };
+        return { success: false, error: err.message };
       }
     },
     onSuccess: (result) => {
@@ -69,7 +70,7 @@ export const useChangePasswordMutation = () => {
         setError(result.error);
       }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       logger.error("Change password mutation failed", error);
       setError(error.message || "Failed to change password");
     },

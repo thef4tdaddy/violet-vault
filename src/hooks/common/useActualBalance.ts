@@ -95,7 +95,7 @@ export const useActualBalance = () => {
    * @returns {number} The difference (positive = manual is higher)
    */
   const getBalanceDifference = useCallback(
-    (calculatedBalance) => {
+    (calculatedBalance: number) => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
@@ -109,7 +109,7 @@ export const useActualBalance = () => {
    * @returns {boolean} Whether confirmation is needed
    */
   const shouldConfirmChange = useCallback(
-    (newBalance, threshold = 500) => {
+    (newBalance: number, threshold = 500) => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
@@ -146,7 +146,7 @@ export const useActualBalance = () => {
    * @param {string} inputValue - The input string to validate
    * @returns {Object} Validation result with isValid and parsedValue
    */
-  const validateBalanceInput = useCallback((inputValue) => {
+  const validateBalanceInput = useCallback((inputValue: string) => {
     // Allow empty string, numbers, decimal point, and negative sign
     const isValidFormat = inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue);
 

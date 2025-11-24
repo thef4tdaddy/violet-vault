@@ -6,13 +6,32 @@ import type { UseMutationResult } from "@tanstack/react-query";
  * Separated to reduce function complexity and improve maintainability
  */
 
-// Type definitions for auth operations
-export interface LoginResult {
+interface LoginData {
+  password: string;
+  userData?: unknown;
+}
+
+interface LoginResult {
   success: boolean;
-  user?: { userName?: string; [key: string]: unknown };
+  user?: {
+    userName?: string;
+    userColor?: string;
+    uid?: string;
+  };
   error?: string;
-  newKey?: string;
-  newSalt?: string;
+}
+
+interface JoinBudgetData {
+  budgetId: string;
+  password: string;
+  userInfo: {
+    userName?: string;
+    email?: string;
+    userColor?: string;
+    [key: string]: unknown;
+  };
+  sharedBy: string;
+  shareCode?: string;
 }
 
 interface JoinBudgetResult {
@@ -20,38 +39,49 @@ interface JoinBudgetResult {
   error?: string;
 }
 
-export interface AuthContext {
-  user: { userName?: string; [key: string]: unknown } | null;
-  setAuthenticated: (
-    user: { userName?: string; [key: string]: unknown },
-    authData: { encryptionKey?: string; salt?: string }
-  ) => void;
-  lockSession: () => void;
-  updateActivity: () => void;
+interface ChangePasswordData {
+  oldPassword: string;
+  newPassword: string;
 }
 
-interface JoinData {
-  budgetId?: string;
-  sharedBy?: string;
+interface ChangePasswordResult {
+  success: boolean;
+  newKey?: CryptoKey;
+  newSalt?: Uint8Array;
+  error?: string;
 }
 
-interface UpdatedProfile {
+interface UpdateProfileData {
   userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+}
+
+interface UpdateProfileResult {
+  success: boolean;
+  error?: string;
+}
+
+interface AuthContext {
+  user?: {
+    userName?: string;
+    userColor?: string;
+    uid?: string;
+  };
+  setAuthenticated: (user: unknown, credentials: unknown) => void;
+  updateActivity: () => void;
+  lockSession: () => void;
+  updateUser: (updatedUser: unknown) => void;
+  [key: string]: unknown;
 }
 
 /**
  * Login with password and optional user data (for new users)
  */
-
 export const createLoginOperation =
-  (
-    loginMutation: UseMutationResult<
-      LoginResult,
-      Error,
-      { password: string; userData?: Record<string, unknown> }
-    >
-  ) =>
-  async (password: string, userData: Record<string, unknown> | null = null) => {
+  (loginMutation: UseMutationResult<LoginResult, Error, LoginData, unknown>) =>
+  async (password: string, userData: unknown = null) => {
     try {
       logger.auth("AuthManager: Starting login", {
         hasPassword: !!password,
@@ -69,11 +99,12 @@ export const createLoginOperation =
         return { success: true, data: result };
       } else {
         logger.auth("AuthManager: Login failed", { error: result.error });
-        return { success: false, error: result.error };
+        return { success: false, error: result.error, ...result };
       }
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("AuthManager: Login error", error);
-      return { success: false, error: error instanceof Error ? error.message : "Login failed" };
+      const err = error as Error;
+      return { success: false, error: err.message || "Login failed" };
     }
   };
 
@@ -81,8 +112,8 @@ export const createLoginOperation =
  * Join budget with share code
  */
 export const createJoinBudgetOperation =
-  (joinBudgetMutation: UseMutationResult<JoinBudgetResult, Error, JoinData>) =>
-  async (joinData: JoinData) => {
+  (joinBudgetMutation: UseMutationResult<JoinBudgetResult, Error, JoinBudgetData, unknown>) =>
+  async (joinData: JoinBudgetData) => {
     try {
       logger.auth("AuthManager: Starting budget join", {
         budgetId: joinData.budgetId?.substring(0, 8) + "...",
@@ -97,11 +128,12 @@ export const createJoinBudgetOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("AuthManager: Budget join error", error);
+      const err = error as Error;
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to join budget",
+        error: err.message || "Failed to join budget",
       };
     }
   };
@@ -116,7 +148,7 @@ export const createLogoutOperation =
       await logoutMutation.mutateAsync();
       logger.auth("AuthManager: Logout successful");
       return { success: true };
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("AuthManager: Logout error", error);
       // Still return success since auth state is cleared
       return { success: true };
@@ -129,9 +161,10 @@ export const createLogoutOperation =
 export const createChangePasswordOperation =
   (
     changePasswordMutation: UseMutationResult<
-      LoginResult,
+      ChangePasswordResult,
       Error,
-      { oldPassword: string; newPassword: string }
+      ChangePasswordData,
+      unknown
     >,
     authContext: AuthContext
   ) =>
@@ -154,11 +187,12 @@ export const createChangePasswordOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("AuthManager: Password change error", error);
+      const err = error as Error;
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to change password",
+        error: err.message || "Failed to change password",
       };
     }
   };
@@ -167,8 +201,10 @@ export const createChangePasswordOperation =
  * Update user profile
  */
 export const createUpdateProfileOperation =
-  (updateProfileMutation: UseMutationResult<JoinBudgetResult, Error, UpdatedProfile>) =>
-  async (updatedProfile: UpdatedProfile) => {
+  (
+    updateProfileMutation: UseMutationResult<UpdateProfileResult, Error, UpdateProfileData, unknown>
+  ) =>
+  async (updatedProfile: UpdateProfileData) => {
     try {
       logger.auth("AuthManager: Starting profile update", {
         userName: updatedProfile.userName,
@@ -182,11 +218,12 @@ export const createUpdateProfileOperation =
       } else {
         return { success: false, error: result.error };
       }
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("AuthManager: Profile update error", error);
+      const err = error as Error;
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to update profile",
+        error: err.message || "Failed to update profile",
       };
     }
   };

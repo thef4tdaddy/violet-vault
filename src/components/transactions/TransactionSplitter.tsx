@@ -31,7 +31,7 @@ const TransactionSplitter = ({
   className = "",
 }: TransactionSplitterProps) => {
   const splitter = useTransactionSplitter({
-    transaction,
+    transaction: transaction ?? undefined,
     envelopes,
     onSplit: onSave,
   });
@@ -74,10 +74,8 @@ const TransactionSplitter = ({
   }, [transaction, splitter.splitAllocations]);
 
   // Get categories for dropdown
-  const categoryOptions = React.useMemo(() => {
-    return availableCategories.length > 0
-      ? availableCategories
-      : Object.values(TRANSACTION_CATEGORIES).flat();
+  const categoryOptions = React.useMemo<string[]>(() => {
+    return availableCategories.length > 0 ? availableCategories : [...TRANSACTION_CATEGORIES];
   }, [availableCategories]);
 
   if (!isOpen || !transaction || !totals) return null;

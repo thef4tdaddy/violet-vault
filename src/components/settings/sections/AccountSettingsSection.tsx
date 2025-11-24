@@ -7,13 +7,28 @@ import ProfileSettings from "../../auth/ProfileSettings";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import logger from "@/utils/common/logger";
 
+interface CurrentUser {
+  userName?: string;
+  name?: string;
+  userColor?: string;
+  [key: string]: unknown;
+}
+
+interface AccountSettingsSectionProps {
+  currentUser: CurrentUser;
+  onOpenPasswordModal: () => void;
+  onLogout: () => void;
+  onOpenResetConfirm: () => void;
+  onUpdateProfile: (profile: CurrentUser) => void;
+}
+
 const AccountSettingsSection = ({
   currentUser,
   onOpenPasswordModal,
   onLogout,
   onOpenResetConfirm,
   onUpdateProfile,
-}) => {
+}: AccountSettingsSectionProps) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);

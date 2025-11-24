@@ -194,7 +194,7 @@ export const useJoinBudgetMutation = () => {
           const budgetState = useBudgetStore.getState();
 
           if (budgetState.cloudSyncEnabled) {
-            await budgetState.startBackgroundSync();
+            await budgetState.startBackgroundSync(result.sessionData ?? undefined);
           }
         } catch (error) {
           logger.error("Failed to start background sync after join", error);

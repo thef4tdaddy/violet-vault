@@ -2,6 +2,26 @@ import { useEffect } from "react";
 import { useFABActions, useFABSelectors } from "../../stores/ui/fabStore";
 
 /**
+ * FABAction interface - matches the interface in fabStore.ts
+ * Note: This is duplicated here as fabStore.ts doesn't export the type.
+ * If the original interface changes, this must be updated accordingly.
+ */
+interface FABAction {
+  id: string;
+  icon: string;
+  label: string;
+  color: string;
+  action: (() => void) | null;
+}
+
+interface RegisterFABActionsOptions {
+  primaryAction?: FABAction | null;
+  secondaryActions?: FABAction[];
+  visible?: boolean;
+  screenId?: string | null;
+}
+
+/**
  * Hook for components to easily register and manage FAB actions
  * Automatically handles cleanup on unmount
  *
@@ -16,7 +36,7 @@ export const useRegisterFABActions = ({
   secondaryActions = [],
   visible = true,
   screenId = null,
-} = {}) => {
+}: RegisterFABActionsOptions = {}) => {
   const { currentScreen } = useFABSelectors();
   const {
     registerPrimaryAction,
@@ -41,7 +61,7 @@ export const useRegisterFABActions = ({
 
   // Register secondary actions
   useEffect(() => {
-    const actionIds = [];
+    const actionIds: string[] = [];
 
     secondaryActions.forEach((action) => {
       if (action.id) {
@@ -70,7 +90,7 @@ export const useRegisterFABActions = ({
  *
  * @param {Object} handlers - Object mapping action IDs to handler functions
  */
-export const useSetFABDefaults = (handlers = {}) => {
+export const useSetFABDefaults = (handlers: Record<string, () => void> = {}) => {
   const { setDefaultActionHandler } = useFABActions();
 
   useEffect(() => {
@@ -87,7 +107,7 @@ export const useSetFABDefaults = (handlers = {}) => {
  *
  * @param {string} screenId - Current screen identifier
  */
-export const useSyncFABScreen = (screenId) => {
+export const useSyncFABScreen = (screenId: string) => {
   const { setCurrentScreen } = useFABActions();
 
   useEffect(() => {

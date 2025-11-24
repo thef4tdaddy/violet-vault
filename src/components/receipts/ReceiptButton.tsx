@@ -6,14 +6,43 @@ import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
 import { preloadOCR } from "../../utils/common/ocrProcessor";
 import logger from "../../utils/common/logger";
 
+interface ProcessedReceipt {
+  id?: string;
+  total: string | null;
+  merchant: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+  rawText?: string;
+  processingTime?: number;
+}
+
+interface Transaction {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface Receipt {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface ReceiptButtonProps {
+  onTransactionCreated?: (transaction: Transaction, receipt: Receipt) => void;
+  variant?: "primary" | "secondary" | "icon" | "fab";
+}
+
 /**
  * Button to trigger receipt scanning
  * Can be integrated into transaction forms or used as standalone
  */
-const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
+const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptButtonProps) => {
   const [showScanner, setShowScanner] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [receiptData, setReceiptData] = useState(null);
+  const [receiptData, setReceiptData] = useState<ProcessedReceipt | null>(null);
   const [isPreloading, setIsPreloading] = useState(false);
 
   const handleScanReceipt = async () => {
@@ -32,13 +61,13 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
     setShowScanner(true);
   };
 
-  const handleReceiptProcessed = (processedReceipt) => {
+  const handleReceiptProcessed = (processedReceipt: ProcessedReceipt) => {
     setReceiptData(processedReceipt);
     setShowScanner(false);
     setShowTransactionModal(true);
   };
 
-  const handleTransactionComplete = (transaction, receipt) => {
+  const handleTransactionComplete = (transaction: Transaction, receipt: Receipt) => {
     setShowTransactionModal(false);
     setReceiptData(null);
 

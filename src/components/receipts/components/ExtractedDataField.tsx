@@ -1,10 +1,24 @@
 import { renderConfidenceIndicator } from "@/utils/receipts/receiptHelpers";
 
+interface ExtractedDataFieldProps {
+  label: string;
+  value: string | number;
+  confidence: number;
+  fieldName: string;
+  formatter?: (val: string | number) => string | number;
+}
+
 /**
  * Individual Extracted Data Field Component
  * Displays a single field with confidence indicator
  */
-const ExtractedDataField = ({ label, value, confidence, fieldName, formatter = (val) => val }) => {
+const ExtractedDataField = ({
+  label,
+  value,
+  confidence,
+  fieldName,
+  formatter = (val: string | number) => val,
+}: ExtractedDataFieldProps) => {
   return (
     <div className="glassmorphism rounded-lg p-3 border border-white/20 bg-white/20 backdrop-blur-sm">
       <div className="flex items-center justify-between">
