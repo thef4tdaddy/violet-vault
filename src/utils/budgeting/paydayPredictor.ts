@@ -15,6 +15,7 @@ export interface PaydayPrediction {
   pattern: string | null;
   intervalDays?: number;
   message: string;
+  estimatedAmount?: number;
 }
 
 /**
