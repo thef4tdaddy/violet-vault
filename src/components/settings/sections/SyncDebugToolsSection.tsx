@@ -7,12 +7,57 @@ import logger from "../../../utils/common/logger";
 // Extend window interface for custom debug functions
 declare global {
   interface Window {
-    getQuickSyncStatus?: () => Promise<unknown>;
-    runMasterSyncValidation?: () => Promise<unknown>;
-    detectLocalDataDebug?: () => Promise<unknown>;
-    hasLocalDataDebug?: () => Promise<boolean>;
-    forceCloudDataReset?: () => Promise<unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getQuickSyncStatus?: () => Promise<any>;
+    runMasterSyncValidation?: () => Promise<ValidationResults>;
+    detectLocalDataDebug: () => Promise<DataDetectionResult>;
+    hasLocalDataDebug: () => Promise<boolean>;
+    forceCloudDataReset?: () => Promise<{ success: boolean; message?: string; error?: string }>;
   }
+}
+
+// Import the ValidationResults type
+interface ValidationResults {
+  healthCheck: {
+    passed: number;
+    failed: number;
+    tests: Array<{
+      name: string;
+      status: string;
+      details?: string;
+      error?: string;
+    }>;
+  } | null;
+  flowValidation?: unknown[];
+  edgeCases?: unknown[];
+  corruptionCheck?: Array<{
+    name: string;
+    description: string;
+    status: "passed" | "failed";
+    details: string;
+  }>;
+  summary: {
+    totalTests: number;
+    totalPassed: number;
+    totalFailed: number;
+    overallStatus: string;
+    duration: number;
+    breakdown: {
+      healthCheck: { passed: number; failed: number };
+      flowValidation: { passed: number; failed: number };
+      edgeCases: { passed: number; failed: number };
+      corruptionCheck: { passed: number; failed: number };
+    };
+  };
+}
+
+// Import the DataDetectionResult type
+interface DataDetectionResult {
+  hasData: boolean;
+  itemCount: number;
+  dataTypes: string[];
+  readyForCloudReset: boolean;
+  exception?: string;
 }
 
 interface SyncDebugToolsSectionProps {
@@ -153,7 +198,7 @@ const SyncDebugToolsSection: React.FC<SyncDebugToolsSectionProps> = ({ isDebugMo
                 });
                 if (confirmed) {
                   try {
-                    const result = await window.safeCloudDataReset();
+                    const result = await window.forceCloudDataReset();
                     logger.info("🛡️ SUCCESS:", result as unknown as Record<string, unknown>);
                   } catch (error) {
                     logger.error("🛡️ ERROR:", error as Record<string, unknown>);

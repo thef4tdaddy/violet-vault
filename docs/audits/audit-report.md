@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 3 | 0 |
-| TypeScript Errors | 83 | 0 |
-| TypeScript Strict Mode Errors | 838 | 0 |
+| TypeScript Errors | 77 | -6 |
+| TypeScript Strict Mode Errors | 829 | -9 |
 
-*Last updated: 2025-11-24 22:37:14 UTC*
+*Last updated: 2025-11-24 22:40:30 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -46,16 +46,15 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 5 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 4 errors in `src/stores/ui/uiStore.ts`
 - 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 4 errors in `src/components/transactions/TransactionSplitter.tsx`
-- 3 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 3 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 3 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
 - 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 3 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
+- 2 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 2 errors in `src/utils/debug/dataDiagnostic.ts`
 - 2 errors in `src/services/chunkedSyncService.ts`
 - 2 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -96,16 +95,15 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 | Count | Error Code |
 |---|---|
 | 27 | `TS2345` |
-| 26 | `TS2322` |
+| 27 | `TS2322` |
 | 5 | `TS2339` |
-| 4 | `TS2717` |
-| 4 | `TS2687` |
 | 3 | `TS2769` |
 | 3 | `TS2459` |
 | 2 | `TS2741` |
 | 2 | `TS2739` |
 | 1 | `TS2740` |
 | 1 | `TS2719` |
+| 1 | `TS2717` |
 | 1 | `TS2694` |
 | 1 | `TS2559` |
 | 1 | `TS2554` |
@@ -169,11 +167,6 @@ src/components/security/LockScreen.tsx(239,20): error TS2345: Argument of type '
     Type 'EventTarget & HTMLInputElement' is not assignable to type 'EventTarget & HTMLFormElement'.
       Type 'EventTarget & HTMLInputElement' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, elements, encoding, and 11 more.
 src/components/settings/sections/NotificationSettingsSection.tsx(264,27): error TS2322: Type 'string' is not assignable to type 'PermissionStatus'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(10,5): error TS2717: Subsequent property declarations must have the same type.  Property 'getQuickSyncStatus' must be of type '() => Promise<any>', but here has type '() => Promise<unknown>'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(11,5): error TS2717: Subsequent property declarations must have the same type.  Property 'runMasterSyncValidation' must be of type '() => Promise<ValidationResults>', but here has type '() => Promise<unknown>'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(12,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
-src/components/settings/sections/SyncDebugToolsSection.tsx(13,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
-src/components/settings/sections/SyncDebugToolsSection.tsx(14,5): error TS2717: Subsequent property declarations must have the same type.  Property 'forceCloudDataReset' must be of type '() => Promise<{ success: boolean; message?: string; error?: string; }>', but here has type '() => Promise<unknown>'.
 src/components/sync/health/SyncHealthDetails.tsx(57,50): error TS2345: Argument of type 'SyncStatus' is not assignable to parameter of type 'SyncStatus'.
   Index signature for type 'string' is missing in type 'SyncStatus'.
 src/components/sync/health/SyncHealthDetails.tsx(59,56): error TS2345: Argument of type 'RecoveryResult' is not assignable to parameter of type 'RecoveryResult'.
@@ -320,9 +313,11 @@ src/utils/debug/dataDiagnostic.ts(124,84): error TS2339: Property 'count' does n
 src/utils/debug/dataDiagnostic.ts(126,12): error TS2339: Property 'limit' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
   Property 'limit' does not exist on type 'string'.
 src/utils/security/encryption.ts(403,45): error TS2339: Property 'length' does not exist on type 'unknown'.
-src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
-src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<unknown>', but here has type '() => Promise<DataDetectionResult>'.
-src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<DataDetectionResult>', but here has type '() => Promise<DataDetectionResult>'.
+src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Promise<{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }>' is not assignable to type '() => Promise<DataDetectionResult>'.
+  Type 'Promise<{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }>' is not assignable to type 'Promise<DataDetectionResult>'.
+    Type '{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }' is not assignable to type 'DataDetectionResult'.
+      Type '{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; bills: number; savingsGoals: number; paychecks: number; cache: number; lastOptimized: number; }; recommendation: string; }' is missing the following properties from type 'DataDetectionResult': itemCount, dataTypes, readyForCloudReset
 ```
 
 ## Typecheck Strict Mode Audit
@@ -334,7 +329,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
-- 9 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 9 errors in `src/components/bills/BillManager.tsx`
 - 8 errors in `src/stores/ui/uiStore.ts`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
@@ -371,7 +365,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 5 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 4 errors in `src/utils/sync/retryUtils.ts`
 - 4 errors in `src/utils/sync/retryPolicies.ts`
-- 4 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/icons/index.ts`
 - 4 errors in `src/utils/debug/reactErrorDetector.ts`
@@ -456,6 +449,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 3 errors in `src/components/analytics/tabs/HealthTab.tsx`
 - 3 errors in `src/components/analytics/components/AnalyticsHeader.tsx`
 - 2 errors in `src/utils/testing/storeTestUtils.ts`
+- 2 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 2 errors in `src/utils/sync/SyncMutex.ts`
 - 2 errors in `src/utils/security/keyExport.ts`
 - 2 errors in `src/utils/query/queryClientConfig.ts`
@@ -500,6 +494,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 2 errors in `src/contexts/authUtils.ts`
 - 2 errors in `src/components/transactions/import/ImportProgress.tsx`
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
+- 2 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/GeneralSettingsSection.tsx`
 - 2 errors in `src/components/settings/sections/DevToolsSection.tsx`
 - 2 errors in `src/components/settings/sections/ClipboardSecuritySection.tsx`
@@ -644,32 +639,31 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 |---|---|
 | 157 | `TS2345` |
 | 148 | `TS7031` |
-| 142 | `TS2322` |
+| 143 | `TS2322` |
 | 117 | `TS7006` |
 | 43 | `TS7005` |
 | 39 | `TS2769` |
 | 31 | `TS18046` |
-| 30 | `TS18048` |
 | 29 | `TS7034` |
+| 29 | `TS18048` |
 | 24 | `TS7053` |
 | 24 | `TS2339` |
 | 10 | `TS18047` |
-| 5 | `TS2717` |
 | 4 | `TS2783` |
-| 4 | `TS2687` |
-| 3 | `TS2722` |
 | 3 | `TS2459` |
 | 3 | `TS2352` |
 | 2 | `TS7022` |
 | 2 | `TS2741` |
 | 2 | `TS2740` |
 | 2 | `TS2739` |
+| 2 | `TS2722` |
 | 2 | `TS2531` |
 | 2 | `TS2353` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
 | 1 | `TS7016` |
 | 1 | `TS2719` |
+| 1 | `TS2717` |
 | 1 | `TS2694` |
 | 1 | `TS2683` |
 | 1 | `TS2554` |
@@ -1192,15 +1186,8 @@ src/components/settings/sections/SecurityStatusSection.tsx(9,3): error TS7031: B
 src/components/settings/sections/SecurityStatusSection.tsx(10,3): error TS7031: Binding element 'securitySettings' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(11,3): error TS7031: Binding element 'securityEvents' implicitly has an 'any' type.
 src/components/settings/sections/SecurityStatusSection.tsx(12,3): error TS7031: Binding element 'timeUntilAutoLock' implicitly has an 'any' type.
-src/components/settings/sections/SyncDebugToolsSection.tsx(10,5): error TS2717: Subsequent property declarations must have the same type.  Property 'getQuickSyncStatus' must be of type '(() => Promise<any>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(11,5): error TS2717: Subsequent property declarations must have the same type.  Property 'runMasterSyncValidation' must be of type '(() => Promise<ValidationResults>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(12,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
-src/components/settings/sections/SyncDebugToolsSection.tsx(13,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
-src/components/settings/sections/SyncDebugToolsSection.tsx(14,5): error TS2717: Subsequent property declarations must have the same type.  Property 'forceCloudDataReset' must be of type '(() => Promise<{ success: boolean; message?: string | undefined; error?: string | undefined; }>) | undefined', but here has type '(() => Promise<unknown>) | undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(102,40): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(102,40): error TS18048: 'window.detectLocalDataDebug' is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(125,40): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(125,40): error TS18048: 'window.hasLocalDataDebug' is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(201,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(201,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
 src/components/settings/SettingsDashboard.tsx(100,7): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
 src/components/settings/SettingsDashboard.tsx(215,5): error TS2322: Type '(profile: { userName: string; userColor: string; }) => void' is not assignable to type '(profile: UserProfile) => void'.
   Types of parameters 'profile' and 'profile' are incompatible.
@@ -2360,10 +2347,11 @@ src/utils/stores/createSafeStore.ts(182,5): error TS2345: Argument of type 'Stat
         Type 'Record<string, unknown>' is not assignable to type 'T & Record<string, unknown>'.
           Type 'Record<string, unknown>' is not assignable to type 'T'.
             'Record<string, unknown>' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint 'object'.
-src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2687: All declarations of 'detectLocalDataDebug' must have identical modifiers.
-src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '(() => Promise<unknown>) | undefined', but here has type '() => Promise<DataDetectionResult>'.
-src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations of 'hasLocalDataDebug' must have identical modifiers.
-src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2717: Subsequent property declarations must have the same type.  Property 'hasLocalDataDebug' must be of type '(() => Promise<boolean>) | undefined', but here has type '() => Promise<boolean>'.
+src/utils/sync/corruptionRecoveryHelper.ts(48,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<DataDetectionResult>', but here has type '() => Promise<DataDetectionResult>'.
+src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Promise<{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }>' is not assignable to type '() => Promise<DataDetectionResult>'.
+  Type 'Promise<{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }>' is not assignable to type 'Promise<DataDetectionResult>'.
+    Type '{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; ... 4 more ...; lastOptimized: number; }; recommendation: string; } | { ...; }' is not assignable to type 'DataDetectionResult'.
+      Type '{ hasData: boolean; totalItems: number; details: { databaseOpen: boolean; samplesFound: { envelopes: boolean; transactions: boolean; bills: boolean; }; envelopes: number; transactions: number; bills: number; savingsGoals: number; paychecks: number; cache: number; lastOptimized: number; }; recommendation: string; }' is missing the following properties from type 'DataDetectionResult': itemCount, dataTypes, readyForCloudReset
 src/utils/sync/dataDetectionHelper.ts(104,48): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
