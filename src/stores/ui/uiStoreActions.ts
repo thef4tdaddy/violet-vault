@@ -20,7 +20,7 @@ export interface BeforeInstallPromptEvent extends Event {
 }
 
 // Type for the set function when using immer middleware
-type ImmerSet<T> = (updater: (draft: Draft<T>) => void) => void;
+export type ImmerSet<T> = (updater: (draft: Draft<T>) => void) => void;
 
 /**
  * Create basic state management actions

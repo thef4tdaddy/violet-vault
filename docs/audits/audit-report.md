@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 3 | 0 |
-| TypeScript Errors | 77 | -6 |
-| TypeScript Strict Mode Errors | 829 | -9 |
+| TypeScript Errors | 73 | -4 |
+| TypeScript Strict Mode Errors | 825 | -4 |
 
-*Last updated: 2025-11-24 22:40:30 UTC*
+*Last updated: 2025-11-24 22:43:38 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -46,7 +46,6 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 4 errors in `src/stores/ui/uiStore.ts`
 - 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
 - 4 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
@@ -94,14 +93,14 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 27 | `TS2345` |
 | 27 | `TS2322` |
+| 24 | `TS2345` |
 | 5 | `TS2339` |
 | 3 | `TS2769` |
 | 3 | `TS2459` |
 | 2 | `TS2741` |
-| 2 | `TS2739` |
 | 1 | `TS2740` |
+| 1 | `TS2739` |
 | 1 | `TS2719` |
 | 1 | `TS2717` |
 | 1 | `TS2694` |
@@ -295,19 +294,6 @@ src/services/chunkedSyncService.ts(497,36): error TS2345: Argument of type 'Prom
                   Types of parameters 'onfulfilled' and 'onfulfilled' are incompatible.
                     Types of parameters 'value' and 'value' are incompatible.
                       Type 'unknown' is not assignable to type 'void'.
-src/stores/ui/uiStore.ts(156,25): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(159,29): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(162,30): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(177,9): error TS2739: Type 'Record<string, unknown>' is missing the following properties from type '{ version: string; notes: string[]; fromVersion?: string; toVersion?: string; isUpdate?: boolean; }': version, notes
 src/utils/debug/dataDiagnostic.ts(124,84): error TS2339: Property 'count' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
   Property 'count' does not exist on type 'string'.
 src/utils/debug/dataDiagnostic.ts(126,12): error TS2339: Property 'limit' does not exist on type 'string | number | Dexie | Table<BudgetRecord, string, BudgetRecord> | Table<Envelope, string, Envelope> | ... 76 more ... | { ...; }'.
@@ -330,7 +316,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/components/bills/BillManager.tsx`
-- 8 errors in `src/stores/ui/uiStore.ts`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
 - 8 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -369,6 +354,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 4 errors in `src/utils/icons/index.ts`
 - 4 errors in `src/utils/debug/reactErrorDetector.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
+- 4 errors in `src/stores/ui/uiStore.ts`
 - 4 errors in `src/services/keys/keyManagementService.ts`
 - 4 errors in `src/services/bugReport/browserInfoService.ts`
 - 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
@@ -637,7 +623,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 157 | `TS2345` |
+| 154 | `TS2345` |
 | 148 | `TS7031` |
 | 143 | `TS2322` |
 | 117 | `TS7006` |
@@ -655,13 +641,13 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 2 | `TS7022` |
 | 2 | `TS2741` |
 | 2 | `TS2740` |
-| 2 | `TS2739` |
 | 2 | `TS2722` |
 | 2 | `TS2531` |
 | 2 | `TS2353` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
 | 1 | `TS7016` |
+| 1 | `TS2739` |
 | 1 | `TS2719` |
 | 1 | `TS2717` |
 | 1 | `TS2694` |
@@ -2140,29 +2126,16 @@ src/stores/ui/fabStore.ts(249,11): error TS7023: 'getDebugInfo' implicitly has r
 src/stores/ui/fabStore.ts(251,19): error TS7022: 'state' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
 src/stores/ui/toastStore.ts(87,11): error TS2352: Conversion of type '{ toasts: never[]; }' to type 'ToastState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ toasts: never[]; }' is missing the following properties from type 'ToastState': addToast, removeToast, clearAllToasts, showSuccess, and 4 more.
-src/stores/ui/uiStore.ts(156,25): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(159,29): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(162,30): error TS2345: Argument of type '(fn: (state: StoreState) => void) => void' is not assignable to parameter of type 'ImmerSet<UiStore>'.
-  Types of parameters 'fn' and 'updater' are incompatible.
-    Types of parameters 'draft' and 'state' are incompatible.
-      Type 'StoreState' is missing the following properties from type 'WritableDraft<UiStore>': setBiweeklyAllocation, openUnassignedCashModal, closeUnassignedCashModal, setPaycheckHistory, and 19 more.
-src/stores/ui/uiStore.ts(177,9): error TS2739: Type 'Record<string, unknown>' is missing the following properties from type '{ version: string; notes: string[]; fromVersion?: string | undefined; toVersion?: string | undefined; isUpdate?: boolean | undefined; }': version, notes
-src/stores/ui/uiStore.ts(224,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/stores/ui/uiStore.ts(292,5): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/stores/ui/uiStore.ts(325,60): error TS2345: Argument of type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+src/stores/ui/uiStore.ts(228,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/stores/ui/uiStore.ts(296,5): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
+src/stores/ui/uiStore.ts(329,60): error TS2345: Argument of type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to parameter of type 'ImmerSet<UiStore>'.
   Type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to type 'ImmerSet<UiStore>'.
     Types of parameters 'nextStateOrUpdater' and 'updater' are incompatible.
       Type '(draft: WritableDraft<UiStore>) => void' is not assignable to type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void)'.
         Type '(draft: WritableDraft<UiStore>) => void' is not assignable to type '(state: WritableDraft<{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>) => void'.
           Types of parameters 'draft' and 'state' are incompatible.
             Type 'WritableDraft<{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; }>' is missing the following properties from type 'WritableDraft<UiStore>': updateApp, installApp, manualInstall, dismissInstallPrompt
-src/stores/ui/uiStore.ts(326,61): error TS2345: Argument of type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to parameter of type 'ImmerSet<UiStore>'.
+src/stores/ui/uiStore.ts(330,61): error TS2345: Argument of type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to parameter of type 'ImmerSet<UiStore>'.
   Type '{ (nextStateOrUpdater: { loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void), shouldReplace?: false | undefined): void; (n...' is not assignable to type 'ImmerSet<UiStore>'.
     Types of parameters 'nextStateOrUpdater' and 'updater' are incompatible.
       Type '(draft: WritableDraft<UiStore>) => void' is not assignable to type '{ loadPatchNotesForUpdate(fromVersion: string, toVersion: string): Promise<Record<string, unknown> | null>; runMigrationIfNeeded(): Promise<void>; ... 30 more ...; loadingPatchNotes: boolean; } | Partial<...> | ((state: WritableDraft<...>) => void)'.

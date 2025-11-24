@@ -90,6 +90,7 @@ import {
   createPWAUpdateActions,
   createPatchNotesActions,
   type BeforeInstallPromptEvent,
+  type ImmerSet,
 } from "./uiStoreActions.ts";
 
 interface StoreState {
@@ -124,10 +125,7 @@ interface StoreState {
 
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (
-  set: (fn: (state: StoreState) => void) => void,
-  _get: () => StoreState
-) => ({
+const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -163,7 +161,7 @@ const storeInitializer = (
 
   // Load and show patch notes for version update
   async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
-    set((state: StoreState) => {
+    set((state) => {
       state.loadingPatchNotes = true;
     });
 
@@ -171,10 +169,16 @@ const storeInitializer = (
       const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
       const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
 
-      set((state: StoreState) => {
+      set((state) => {
         state.loadingPatchNotes = false;
         state.showPatchNotes = true;
-        state.patchNotesData = patchNotes;
+        state.patchNotesData = patchNotes as {
+          version: string;
+          notes: string[];
+          fromVersion?: string;
+          toVersion?: string;
+          isUpdate?: boolean;
+        };
         if (state.patchNotesData) {
           state.patchNotesData.fromVersion = fromVersion;
           state.patchNotesData.toVersion = toVersion;
@@ -186,7 +190,7 @@ const storeInitializer = (
       return patchNotes;
     } catch (error) {
       logger.error("Failed to load patch notes", error);
-      set((state: StoreState) => {
+      set((state) => {
         state.loadingPatchNotes = false;
       });
       return null;
