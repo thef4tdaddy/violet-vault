@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | +1 |
-| TypeScript Errors | 88 | -9 |
-| TypeScript Strict Mode Errors | 843 | -11 |
+| ESLint Issues | 9 | +6 |
+| TypeScript Errors | 82 | -6 |
+| TypeScript Strict Mode Errors | 837 | -6 |
 
-*Last updated: 2025-11-24 22:32:11 UTC*
+*Last updated: 2025-11-24 22:35:10 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 6 issues in `violet-vault/src/hooks/transactions/useTransactionFilters.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
@@ -34,19 +35,25 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 6 | `@typescript-eslint/no-explicit-any` |
 | 3 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
-violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (170). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:41:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:42:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:43:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:44:44 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:48 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+violet-vault/src/hooks/transactions/useTransactionFilters.ts:47:58 - 1 - Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 5 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 5 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 4 errors in `src/stores/ui/uiStore.ts`
 - 4 errors in `src/hooks/receipts/useReceiptToTransaction.ts`
@@ -74,7 +81,6 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 - 1 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
 - 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
-- 1 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBillDetail.ts`
@@ -96,7 +102,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 33 | `TS2345` |
+| 27 | `TS2345` |
 | 26 | `TS2322` |
 | 5 | `TS2339` |
 | 4 | `TS2717` |
@@ -234,11 +240,6 @@ src/hooks/budgeting/useEnvelopeEdit.ts(113,5): error TS2322: Type 'Envelope' is 
 src/hooks/budgeting/useEnvelopeEdit.ts(114,5): error TS2322: Type 'Envelope[]' is not assignable to type 'Record<string, unknown>[]'.
   Type 'Envelope' is not assignable to type 'Record<string, unknown>'.
     Index signature for type 'string' is missing in type 'Envelope'.
-src/hooks/budgeting/useSmartSuggestions.ts(89,37): error TS2345: Argument of type '{ id: string; amount: number; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; lastModified: number; date?: string | Date; createdAt?: number; description?: string; merchant?: string; receiptUrl?: string; }[]' is not assignable to parameter of type 'Transaction[]'.
-  Type '{ id: string; amount: number; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; lastModified: number; date?: string | Date; createdAt?: number; description?: string; merchant?: string; receiptUrl?: string; }' is not assignable to type 'Transaction'.
-    Types of property 'date' are incompatible.
-      Type 'string | Date' is not assignable to type 'string'.
-        Type 'Date' is not assignable to type 'string'.
 src/hooks/common/bug-report/useBugReportHighlight.ts(54,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/hooks/common/bug-report/useBugReportHighlight.ts(80,60): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/hooks/common/useTransactions.ts(42,48): error TS2345: Argument of type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to parameter of type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction[]'.
@@ -278,26 +279,6 @@ src/hooks/settings/useSettingsSectionRenderer.ts(114,11): error TS2769: No overl
   The last overload gave the following error.
     Property 'lockApp' is missing in type 'SecurityManager' but required in type 'SecurityManager'.
 src/hooks/sharing/useQRCodeProcessing.ts(34,13): error TS2322: Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(41,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(42,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(43,33): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(44,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(47,43): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
 src/hooks/transactions/useTransactionLedger.ts(80,5): error TS2322: Type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction[]'.
   Type 'import("violet-vault/src/db/types").Transaction' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction'.
     Types of property 'date' are incompatible.
@@ -380,7 +361,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 5 errors in `src/services/security/securityService.ts`
 - 5 errors in `src/services/bugReport/pageDetectionService.ts`
 - 5 errors in `src/hooks/transactions/useTransactionSplitter.ts`
-- 5 errors in `src/hooks/transactions/useTransactionFilters.ts`
 - 5 errors in `src/hooks/transactions/useTransactionData.ts`
 - 5 errors in `src/hooks/sync/useManualSync.ts`
 - 5 errors in `src/hooks/settings/useSettingsDashboard.ts`
@@ -604,7 +584,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 - 1 errors in `src/hooks/common/useImportData.ts`
 - 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
-- 1 errors in `src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
@@ -668,7 +647,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(49,5): error TS2687: All declarations
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 163 | `TS2345` |
+| 157 | `TS2345` |
 | 148 | `TS7031` |
 | 142 | `TS2322` |
 | 117 | `TS7006` |
@@ -1611,11 +1590,6 @@ src/hooks/budgeting/usePaycheckHistory.ts(10,38): error TS7031: Binding element 
 src/hooks/budgeting/usePaycheckHistory.ts(14,39): error TS7006: Parameter 'paycheck' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,30): error TS7006: Parameter 'paycheckHistory' implicitly has an 'any' type.
 src/hooks/budgeting/usePaydayPrediction.ts(11,47): error TS7006: Parameter 'isUnlocked' implicitly has an 'any' type.
-src/hooks/budgeting/useSmartSuggestions.ts(89,37): error TS2345: Argument of type '{ id: string; date: string | Date; amount: number; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; lastModified: number; createdAt?: number | undefined; description?: string | undefined; merchant?: string | undefined; receiptUrl?: string | undefined; }[]' is not assignable to parameter of type 'Transaction[]'.
-  Type '{ id: string; date: string | Date; amount: number; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; lastModified: number; createdAt?: number | undefined; description?: string | undefined; merchant?: string | undefined; receiptUrl?: string | undefined; }' is not assignable to type 'Transaction'.
-    Types of property 'date' are incompatible.
-      Type 'string | Date' is not assignable to type 'string'.
-        Type 'Date' is not assignable to type 'string'.
 src/hooks/common/bug-report/useBugReportDiagnostics.ts(36,22): error TS2345: Argument of type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' is not assignable to parameter of type 'SetStateAction<null>'.
   Type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' is not assignable to type 'SetStateAction<null>'.
     Type '{ success: boolean; components: { screenshot: { success: boolean; screenshot: boolean; info: ScreenshotInfo | null; methods: { displayMedia: boolean; html2canvas: boolean; }; error?: undefined; } | { ...; }; systemInfo: { ...; } | { ...; }; contextAnalysis: { ...; } | { ...; }; }; timestamp: string; error?: undefine...' provides no match for the signature '(prevState: null): null'.
@@ -2030,26 +2004,6 @@ src/hooks/transactions/useTransactionData.ts(150,7): error TS2740: Type '{}' is 
 src/hooks/transactions/useTransactionData.ts(234,85): error TS2339: Property 'length' does not exist on type '{}'.
 src/hooks/transactions/useTransactionFileUpload.ts(27,18): error TS18047: 'event.target.files' is possibly 'null'.
 src/hooks/transactions/useTransactionFileUpload.ts(59,56): error TS18046: 'error' is of type 'unknown'.
-src/hooks/transactions/useTransactionFilters.ts(41,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(42,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(43,33): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(44,29): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
-      Type 'number' is not assignable to type 'string'.
-src/hooks/transactions/useTransactionFilters.ts(47,43): error TS2345: Argument of type 'import("violet-vault/src/types/finance").Transaction' is not assignable to parameter of type 'Transaction'.
-  Types of property 'envelopeId' are incompatible.
-    Type 'string | number | undefined' is not assignable to type 'string | undefined'.
-      Type 'number' is not assignable to type 'string'.
 src/hooks/transactions/useTransactionForm.ts(21,25): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionForm.ts(34,30): error TS7006: Parameter 'currentUser' implicitly has an 'any' type.
 src/hooks/transactions/useTransactionImport.ts(49,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; }'.

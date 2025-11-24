@@ -6,6 +6,7 @@ import {
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import localStorageService from "../../services/storage/localStorageService";
+import type { Transaction, Envelope } from "../../db/types";
 
 // Helper to apply create envelope suggestion
 const applyCreateEnvelope = async (
@@ -46,8 +47,8 @@ const applyBudgetChange = async (
 };
 
 interface UseSmartSuggestionsParams {
-  transactions?: unknown[];
-  envelopes?: unknown[];
+  transactions?: Transaction[];
+  envelopes?: Envelope[];
   onCreateEnvelope?: (data: unknown) => void | Promise<void>;
   onUpdateEnvelope?: (envelopeId: string, updates: Record<string, unknown>) => void | Promise<void>;
   onDismissSuggestion?: (suggestionId: string) => void;
@@ -85,10 +86,34 @@ const useSmartSuggestions = ({
   // Generate suggestions based on current data and settings
   const suggestions = useMemo(() => {
     try {
-      return generateAllSuggestions(transactions, envelopes, analysisSettings, dateRange, {
-        dismissedSuggestions,
-        showDismissed,
-      });
+      // Transform Transaction type from db/types to suggestionUtils type
+      const transformedTransactions = transactions.map((t) => ({
+        amount: t.amount,
+        envelopeId: t.envelopeId,
+        category: t.category,
+        description: t.description,
+        date: typeof t.date === "string" ? t.date : t.date.toISOString().split("T")[0],
+      }));
+
+      // Transform Envelope type from db/types to suggestionUtils type
+      const transformedEnvelopes = envelopes.map((e) => ({
+        id: e.id,
+        name: e.name,
+        category: e.category,
+        monthlyAmount: e.monthlyBudget,
+        currentBalance: e.currentBalance,
+      }));
+
+      return generateAllSuggestions(
+        transformedTransactions,
+        transformedEnvelopes,
+        analysisSettings,
+        dateRange,
+        {
+          dismissedSuggestions,
+          showDismissed,
+        }
+      );
     } catch (error) {
       logger.error("Error generating smart suggestions:", error);
       return [];
@@ -135,19 +160,44 @@ const useSmartSuggestions = ({
       try {
         switch (suggestion.action) {
           case "create_envelope":
-            await applyCreateEnvelope(suggestion, onCreateEnvelope);
+            await applyCreateEnvelope(
+              suggestion as unknown as { data: { name: string; [key: string]: unknown } },
+              onCreateEnvelope
+            );
             break;
 
           case "increase_budget":
-            await applyBudgetChange(suggestion, onUpdateEnvelope, "increase");
+            await applyBudgetChange(
+              suggestion as unknown as {
+                data: {
+                  envelopeId: string;
+                  suggestedAmount: number;
+                  currentAmount?: number;
+                  [key: string]: unknown;
+                };
+              },
+              onUpdateEnvelope,
+              "increase"
+            );
             break;
 
           case "decrease_budget":
-            await applyBudgetChange(suggestion, onUpdateEnvelope, "decrease");
+            await applyBudgetChange(
+              suggestion as unknown as {
+                data: {
+                  envelopeId: string;
+                  suggestedAmount: number;
+                  currentAmount?: number;
+                  [key: string]: unknown;
+                };
+              },
+              onUpdateEnvelope,
+              "decrease"
+            );
             break;
 
           default:
-            logger.warn("Unknown suggestion action:", suggestion.action);
+            logger.warn("Unknown suggestion action:", { action: suggestion.action });
             return;
         }
 

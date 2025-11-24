@@ -38,13 +38,13 @@ export const useTransactionFilters = ({
       .filter((transaction) => {
         return (
           isValidTransaction(transaction) &&
-          matchesSearchTerm(transaction, searchTerm) &&
-          matchesTypeFilter(transaction, typeFilter) &&
-          matchesEnvelopeFilter(transaction, envelopeFilter) &&
-          matchesDateFilter(transaction, dateFilter)
+          matchesSearchTerm(transaction as any, searchTerm) &&
+          matchesTypeFilter(transaction as any, typeFilter) &&
+          matchesEnvelopeFilter(transaction as any, envelopeFilter) &&
+          matchesDateFilter(transaction as any, dateFilter)
         );
       })
-      .sort((a, b) => compareTransactions(a, b, sortBy, sortOrder));
+      .sort((a, b) => compareTransactions(a as any, b as any, sortBy, sortOrder));
   }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
 
   return filteredTransactions;
