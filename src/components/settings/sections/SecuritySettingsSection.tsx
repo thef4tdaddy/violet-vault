@@ -2,7 +2,17 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const SecuritySettingsSection = ({
+interface SecurityManager {
+  lockApp: () => void;
+}
+
+interface SecuritySettingsSectionProps {
+  securityManager: SecurityManager;
+  onOpenSecuritySettings: () => void;
+  onShowLocalDataSecurity: () => void;
+}
+
+const SecuritySettingsSection: React.FC<SecuritySettingsSectionProps> = ({
   securityManager,
   onOpenSecuritySettings,
   onShowLocalDataSecurity,

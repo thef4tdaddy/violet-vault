@@ -2,7 +2,29 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
 
-const EnvelopeSelectionStep = ({ transactionForm, envelopes, handleFormChange }) => {
+interface Envelope {
+  id: string;
+  name: string;
+  category: string;
+  allocated: number;
+  spent: number;
+}
+
+interface TransactionForm {
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  envelopeId: string;
+}
+
+interface EnvelopeSelectionStepProps {
+  transactionForm: TransactionForm;
+  envelopes: Envelope[];
+  handleFormChange: (field: string, value: string | number) => void;
+}
+
+const EnvelopeSelectionStep = ({ transactionForm, envelopes, handleFormChange }: EnvelopeSelectionStepProps) => {
   const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
 
   return (

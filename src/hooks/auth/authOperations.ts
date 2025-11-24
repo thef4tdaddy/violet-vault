@@ -1,9 +1,80 @@
 import logger from "../../utils/common/logger";
+import type { UseMutationResult } from "@tanstack/react-query";
 
 /**
  * Auth operation functions for useAuthManager
  * Separated to reduce function complexity and improve maintainability
  */
+
+interface LoginData {
+  password: string;
+  userData?: unknown;
+}
+
+interface LoginResult {
+  success: boolean;
+  user?: {
+    userName?: string;
+    userColor?: string;
+    uid?: string;
+  };
+  error?: string;
+}
+
+interface JoinBudgetData {
+  budgetId: string;
+  password: string;
+  userInfo: {
+    userName?: string;
+    email?: string;
+    userColor?: string;
+    [key: string]: unknown;
+  };
+  sharedBy: string;
+  shareCode?: string;
+}
+
+interface JoinBudgetResult {
+  success: boolean;
+  error?: string;
+}
+
+interface ChangePasswordData {
+  oldPassword: string;
+  newPassword: string;
+}
+
+interface ChangePasswordResult {
+  success: boolean;
+  newKey?: CryptoKey;
+  newSalt?: Uint8Array;
+  error?: string;
+}
+
+interface UpdateProfileData {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+}
+
+interface UpdateProfileResult {
+  success: boolean;
+  error?: string;
+}
+
+interface AuthContext {
+  user?: {
+    userName?: string;
+    userColor?: string;
+    uid?: string;
+  };
+  setAuthenticated: (user: unknown, credentials: unknown) => void;
+  updateActivity: () => void;
+  lockSession: () => void;
+  updateUser: (updatedUser: unknown) => void;
+  [key: string]: unknown;
+}
 
 /**
  * Login with password and optional user data (for new users)
@@ -42,7 +113,8 @@ export const createLoginOperation =
       }
     } catch (error) {
       logger.error("AuthManager: Login error", error);
-      return { success: false, error: error.message || "Login failed" };
+      const err = error as Error;
+      return { success: false, error: err.message || "Login failed" };
     }
   };
 
@@ -84,7 +156,8 @@ export const createJoinBudgetOperation =
 /**
  * Logout user and clear session
  */
-export const createLogoutOperation = (logoutMutation) => async () => {
+export const createLogoutOperation =
+  (logoutMutation: UseMutationResult<{ success: boolean }, Error, void, unknown>) => async () => {
   try {
     logger.auth("AuthManager: Starting logout");
     await logoutMutation.mutateAsync();
@@ -101,7 +174,16 @@ export const createLogoutOperation = (logoutMutation) => async () => {
  * Change user password
  */
 export const createChangePasswordOperation =
-  (changePasswordMutation, authContext) => async (oldPassword, newPassword) => {
+  (
+    changePasswordMutation: UseMutationResult<
+      ChangePasswordResult,
+      Error,
+      ChangePasswordData,
+      unknown
+    >,
+    authContext: AuthContext
+  ) =>
+  async (oldPassword: string, newPassword: string) => {
     try {
       logger.auth("AuthManager: Starting password change");
       const result = await changePasswordMutation.mutateAsync({
@@ -122,9 +204,10 @@ export const createChangePasswordOperation =
       }
     } catch (error) {
       logger.error("AuthManager: Password change error", error);
+      const err = error as Error;
       return {
         success: false,
-        error: error.message || "Failed to change password",
+        error: err.message || "Failed to change password",
       };
     }
   };
@@ -132,7 +215,11 @@ export const createChangePasswordOperation =
 /**
  * Update user profile
  */
-export const createUpdateProfileOperation = (updateProfileMutation) => async (updatedProfile) => {
+export const createUpdateProfileOperation =
+  (
+    updateProfileMutation: UseMutationResult<UpdateProfileResult, Error, UpdateProfileData, unknown>
+  ) =>
+  async (updatedProfile: UpdateProfileData) => {
   try {
     logger.auth("AuthManager: Starting profile update", {
       userName: updatedProfile.userName,
@@ -148,9 +235,10 @@ export const createUpdateProfileOperation = (updateProfileMutation) => async (up
     }
   } catch (error) {
     logger.error("AuthManager: Profile update error", error);
+    const err = error as Error;
     return {
       success: false,
-      error: error.message || "Failed to update profile",
+      error: err.message || "Failed to update profile",
     };
   }
 };
@@ -158,7 +246,7 @@ export const createUpdateProfileOperation = (updateProfileMutation) => async (up
 /**
  * Lock the current session (keep user data but require re-auth)
  */
-export const createLockSessionOperation = (authContext) => () => {
+export const createLockSessionOperation = (authContext: AuthContext) => () => {
   logger.auth("AuthManager: Locking session");
   authContext.lockSession();
 };
@@ -166,6 +254,6 @@ export const createLockSessionOperation = (authContext) => () => {
 /**
  * Update last activity timestamp
  */
-export const createUpdateActivityOperation = (authContext) => () => {
+export const createUpdateActivityOperation = (authContext: AuthContext) => () => {
   authContext.updateActivity();
 };
