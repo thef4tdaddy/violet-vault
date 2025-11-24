@@ -1,6 +1,18 @@
 import { useEffect } from "react";
 import { useFABActions, useFABSelectors } from "../../stores/ui/fabStore";
 
+interface FABAction {
+  id?: string;
+  [key: string]: unknown;
+}
+
+interface RegisterFABActionsOptions {
+  primaryAction?: FABAction | null;
+  secondaryActions?: FABAction[];
+  visible?: boolean;
+  screenId?: string | null;
+}
+
 /**
  * Hook for components to easily register and manage FAB actions
  * Automatically handles cleanup on unmount
@@ -16,7 +28,7 @@ export const useRegisterFABActions = ({
   secondaryActions = [],
   visible = true,
   screenId = null,
-} = {}) => {
+}: RegisterFABActionsOptions = {}) => {
   const { currentScreen } = useFABSelectors();
   const {
     registerPrimaryAction,
@@ -70,7 +82,7 @@ export const useRegisterFABActions = ({
  *
  * @param {Object} handlers - Object mapping action IDs to handler functions
  */
-export const useSetFABDefaults = (handlers = {}) => {
+export const useSetFABDefaults = (handlers: Record<string, () => void> = {}) => {
   const { setDefaultActionHandler } = useFABActions();
 
   useEffect(() => {
@@ -87,7 +99,7 @@ export const useSetFABDefaults = (handlers = {}) => {
  *
  * @param {string} screenId - Current screen identifier
  */
-export const useSyncFABScreen = (screenId) => {
+export const useSyncFABScreen = (screenId: string) => {
   const { setCurrentScreen } = useFABActions();
 
   useEffect(() => {
