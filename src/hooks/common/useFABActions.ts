@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { useFABActions, useFABSelectors } from "../../stores/ui/fabStore";
 
+/**
+ * FABAction interface - matches the interface in fabStore.ts
+ * Note: This is duplicated here as fabStore.ts doesn't export the type.
+ * If the original interface changes, this must be updated accordingly.
+ */
 interface FABAction {
   id: string;
   icon: string;
