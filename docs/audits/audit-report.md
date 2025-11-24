@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 30 | +30 |
-| TypeScript Errors | 333 | +333 |
-| TypeScript Strict Mode Errors | 1229 | +1229 |
+| ESLint Issues | 28 | -2 |
+| TypeScript Errors | 333 | 0 |
+| TypeScript Strict Mode Errors | 1229 | 0 |
 
-*Last updated: 2025-11-24 02:50:16 UTC*
+*Last updated: 2025-11-24 02:53:09 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -44,8 +44,6 @@
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/sync/health/SyncHealthDetails.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/sharing/ShareCodeModal.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/receipts/ReceiptScanner.tsx`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/DebtSummaryCards.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/bills/modals/BillDetailModal.tsx`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/bills/BulkBillUpdateModal.tsx`
@@ -53,7 +51,7 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 19 | `no-undef` |
+| 17 | `no-undef` |
 | 5 | `max-lines-per-function` |
 | 2 | `complexity` |
 | 2 | `@typescript-eslint/no-unused-vars` |
@@ -67,10 +65,8 @@
 /home/runner/work/violet-vault/violet-vault/src/components/bills/BulkBillUpdateModal.tsx:23:28 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/bills/modals/BillDetailModal.tsx:1:17 - 1 - 'FormEvent' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 /home/runner/work/violet-vault/violet-vault/src/components/budgeting/shared/BillConnectionSelector.tsx:15:11 - 1 - 'Envelope' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
-/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/DebtSummaryCards.tsx:14:25 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/debt/ui/QuickPaymentForm.tsx:7:17 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/debt/ui/QuickPaymentForm.tsx:17:25 - 1 - 'React' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/components/receipts/ReceiptScanner.tsx:26:23 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/settings/SettingsDashboard.tsx:27:27 - 1 - Arrow function has too many lines (164). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/components/sharing/ShareCodeModal.tsx:29:23 - 1 - 'React' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/components/sync/health/SyncHealthDetails.tsx:47:26 - 1 - 'React' is not defined. (no-undef)
@@ -1937,7 +1933,7 @@ src/components/debt/ui/DebtList.tsx(203,29): error TS2339: Property 'icon' does 
 src/components/debt/ui/DebtList.tsx(203,41): error TS2339: Property 'label' does not exist on type 'never'.
 src/components/debt/ui/DebtList.tsx(203,55): error TS2339: Property 'name' does not exist on type 'never'.
 src/components/debt/ui/DebtProgressBar.tsx(5,28): error TS7031: Binding element 'progressData' implicitly has an 'any' type.
-src/components/debt/ui/DebtSummaryCards.tsx(63,11): error TS2322: Type '(() => void) | null | undefined' is not assignable to type '(() => void) | undefined'.
+src/components/debt/ui/DebtSummaryCards.tsx(64,11): error TS2322: Type '(() => void) | null | undefined' is not assignable to type '(() => void) | undefined'.
   Type 'null' is not assignable to type '(() => void) | undefined'.
 src/components/history/BudgetHistoryViewer.tsx(49,64): error TS2345: Argument of type 'UseMutateFunction<{ commitHash: string; snapshot: any; }, Error, { commitHash: string; password: string; }, unknown>' is not assignable to parameter of type '(params: { commitHash: string; password: string; }) => Promise<void>'.
   Type 'void' is not assignable to type 'Promise<void>'.

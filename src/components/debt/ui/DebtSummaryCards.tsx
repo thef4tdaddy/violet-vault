@@ -1,3 +1,4 @@
+import React from "react";
 import PageSummaryCard from "../../ui/PageSummaryCard";
 import { getIcon } from "@/utils";
 import type { DebtStats } from "@/types/debt";
