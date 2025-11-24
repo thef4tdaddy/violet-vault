@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | -1 |
-| TypeScript Errors | 75 | +2 |
-| TypeScript Strict Mode Errors | 827 | +2 |
+| ESLint Issues | 7 | +4 |
+| TypeScript Errors | 80 | +5 |
+| TypeScript Strict Mode Errors | 832 | +5 |
 
-*Last updated: 2025-11-24 22:50:37 UTC*
+*Last updated: 2025-11-24 23:12:11 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 4 issues in `violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
@@ -34,19 +35,24 @@
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 4 | `@typescript-eslint/no-unused-vars` |
 | 3 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
 violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
+violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx:5:8 - 1 - 'logger' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx:11:15 - 1 - 'Envelope' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx:13:15 - 1 - 'Transaction' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
+violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx:108:60 - 1 - 'onComplete' is defined but never used. Allowed unused args must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 5 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
+- 10 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 4 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 3 errors in `src/hooks/budgeting/useEnvelopeEdit.ts`
@@ -96,8 +102,10 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 | 30 | `TS2322` |
 | 22 | `TS2345` |
 | 5 | `TS2339` |
+| 4 | `TS6133` |
 | 3 | `TS2769` |
 | 3 | `TS2459` |
+| 3 | `TS2352` |
 | 2 | `TS2741` |
 | 1 | `TS2740` |
 | 1 | `TS2739` |
@@ -105,9 +113,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow functi
 | 1 | `TS2717` |
 | 1 | `TS2694` |
 | 1 | `TS2554` |
-| 1 | `TS2365` |
 | 1 | `TS2353` |
-| 1 | `TS2352` |
 | 1 | `TS18047` |
 
 ### Detailed Type Error Report
@@ -157,18 +163,25 @@ src/components/layout/ViewRenderer.tsx(333,9): error TS2322: Type 'import("viole
         Type 'string | number' is not assignable to type 'string'.
           Type 'number' is not assignable to type 'string'.
 src/components/receipts/components/ExtractedDataField.tsx(27,49): error TS2345: Argument of type 'number' is not assignable to parameter of type 'ConfidenceLevel'.
-src/components/receipts/ReceiptToTransactionModal.tsx(130,45): error TS2365: Operator '>' cannot be applied to types 'string' and 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(144,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(5,1): error TS6133: 'logger' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(11,1): error TS6133: 'Envelope' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(13,1): error TS6133: 'Transaction' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(108,60): error TS6133: 'onComplete' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(143,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string; receiptUrl?: string; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(151,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(150,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string; receiptUrl?: string; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(168,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(152,15): error TS2352: Conversion of type 'Envelope[]' to type '{ id: string; name: string; category: string; allocated: number; spent: number; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is missing the following properties from type '{ id: string; name: string; category: string; allocated: number; spent: number; }': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(167,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string; receiptUrl?: string; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(200,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
+src/components/receipts/ReceiptToTransactionModal.tsx(169,15): error TS2352: Conversion of type 'Envelope[]' to type '{ id: string; name: string; category: string; allocated: number; spent: number; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is missing the following properties from type '{ id: string; name: string; category: string; allocated: number; spent: number; }': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(203,13): error TS2322: Type '(e: React.FormEvent<HTMLFormElement>) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/savings/SavingsGoals.tsx(45,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
   Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/savings/SavingsGoals.tsx(134,17): error TS2741: Property 'color' is missing in type 'import("violet-vault/src/db/types").SavingsGoal' but required in type 'SavingsGoal'.
@@ -315,6 +328,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 
 ### Files with Most Strict Mode Errors
 - 18 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
+- 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 11 errors in `src/hooks/bills/useBillManager.ts`
 - 11 errors in `src/db/budgetDb.ts`
 - 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
@@ -322,7 +336,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/components/bills/BillManager.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
-- 8 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 8 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 7 errors in `src/App.tsx`
@@ -640,15 +653,15 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 24 | `TS7053` |
 | 24 | `TS2339` |
 | 10 | `TS18047` |
+| 6 | `TS2352` |
+| 4 | `TS6133` |
 | 4 | `TS2783` |
-| 4 | `TS2352` |
 | 3 | `TS2459` |
 | 2 | `TS7022` |
 | 2 | `TS2741` |
 | 2 | `TS2740` |
 | 2 | `TS2722` |
 | 2 | `TS2531` |
-| 2 | `TS2365` |
 | 2 | `TS2353` |
 | 1 | `TS7023` |
 | 1 | `TS7019` |
@@ -660,6 +673,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 | 1 | `TS2683` |
 | 1 | `TS2554` |
 | 1 | `TS2538` |
+| 1 | `TS2365` |
 | 1 | `TS2349` |
 
 ### Detailed Strict Mode Report
@@ -1136,21 +1150,28 @@ src/components/receipts/ReceiptScanner.tsx(58,15): error TS2322: Type 'RefObject
 src/components/receipts/ReceiptScanner.tsx(59,15): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
-src/components/receipts/ReceiptToTransactionModal.tsx(105,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(105,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(105,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
-src/components/receipts/ReceiptToTransactionModal.tsx(130,45): error TS2365: Operator '>' cannot be applied to types 'string' and 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(144,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(5,1): error TS6133: 'logger' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(11,1): error TS6133: 'Envelope' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(13,1): error TS6133: 'Transaction' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(108,38): error TS7031: Binding element 'receiptData' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(108,51): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(108,60): error TS6133: 'onComplete' is declared but its value is never read.
+src/components/receipts/ReceiptToTransactionModal.tsx(108,60): error TS7031: Binding element 'onComplete' implicitly has an 'any' type.
+src/components/receipts/ReceiptToTransactionModal.tsx(143,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string | undefined; receiptUrl?: string | undefined; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(151,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(150,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string | undefined; receiptUrl?: string | undefined; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(168,13): error TS2322: Type '{ description: string; amount: string; date: string; envelopeId: string; category: string; type: "income" | "expense" | "transfer"; notes: string; }' is not assignable to type 'TransactionForm'.
+src/components/receipts/ReceiptToTransactionModal.tsx(152,15): error TS2352: Conversion of type 'Envelope[]' to type '{ id: string; name: string; category: string; allocated: number; spent: number; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is missing the following properties from type '{ id: string; name: string; category: string; allocated: number; spent: number; }': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(167,13): error TS2322: Type '{ date: string; description: string; amount: string; type: "income" | "expense" | "transfer"; envelopeId: string; category: string; notes: string; reconciled: boolean; merchant?: string | undefined; receiptUrl?: string | undefined; }' is not assignable to type 'TransactionForm'.
   Types of property 'amount' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/components/receipts/ReceiptToTransactionModal.tsx(200,13): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
-  Type 'string' is not assignable to type 'boolean'.
+src/components/receipts/ReceiptToTransactionModal.tsx(169,15): error TS2352: Conversion of type 'Envelope[]' to type '{ id: string; name: string; category: string; allocated: number; spent: number; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Envelope' is missing the following properties from type '{ id: string; name: string; category: string; allocated: number; spent: number; }': allocated, spent
+src/components/receipts/ReceiptToTransactionModal.tsx(203,13): error TS2322: Type '(e: React.FormEvent<HTMLFormElement>) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
 src/components/savings/SavingsGoals.tsx(45,5): error TS2322: Type '(amount: number, goals: unknown[]) => void' is not assignable to type '(distribution: unknown) => void | Promise<void>'.
   Target signature provides too few arguments. Expected 2 or more, but got 1.
 src/components/savings/SavingsGoals.tsx(134,17): error TS2741: Property 'color' is missing in type 'import("violet-vault/src/db/types").SavingsGoal' but required in type 'SavingsGoal'.

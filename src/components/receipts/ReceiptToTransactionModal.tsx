@@ -8,6 +8,9 @@ import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import type { Envelope } from "@/types/finance";
+import type { TransactionFormData } from "@/domain/schemas/transaction";
+import type { Transaction } from "@/types/finance";
 
 // ModalHeader - displays title and close button
 const ModalHeader: React.FC<{ step: number; onClose: () => void }> = ({ step, onClose }) => (
@@ -116,21 +119,17 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
 
   const modalRef = useModalAutoScroll(Boolean(receiptData));
 
-  const handleFormSubmit = async () => {
-    const result = await handleSubmit();
-    if (result.success) {
-      onComplete?.(result.transaction, result.receipt);
-    } else {
-      logger.error("Failed to submit receipt-to-transaction conversion:", result.error);
-    }
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSubmit();
   };
 
   const canProceed = () => {
     if (step === 1) {
-      return transactionForm.description && transactionForm.amount > 0;
+      return Boolean(transactionForm.description) && Number(transactionForm.amount) > 0;
     }
     if (step === 2) {
-      return transactionForm.envelopeId;
+      return Boolean(transactionForm.envelopeId);
     }
     return true;
   };
@@ -141,16 +140,16 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <ReceiptDataStep
             receiptData={receiptData}
-            transactionForm={transactionForm}
+            transactionForm={transactionForm as TransactionFormData}
             handleFormChange={handleFormChange}
           />
         );
       case 2:
         return (
           <EnvelopeSelectionStep
-            transactionForm={transactionForm}
+            transactionForm={transactionForm as TransactionFormData}
             envelopes={
-              envelopes as unknown as Array<{
+              envelopes as Array<{
                 id: string;
                 name: string;
                 category: string;
@@ -165,9 +164,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <ConfirmationStep
             receiptData={receiptData}
-            transactionForm={transactionForm}
+            transactionForm={transactionForm as TransactionFormData}
             envelopes={
-              envelopes as unknown as Array<{
+              envelopes as Array<{
                 id: string;
                 name: string;
                 category: string;
@@ -175,6 +174,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 spent: number;
               }>
             }
+            handleFormChange={handleFormChange}
           />
         );
       default:
@@ -196,7 +196,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           <div className="mb-8 overflow-y-auto max-h-[50vh] pr-2">{renderStepContent()}</div>
           <ModalFooter
             step={step}
-            isSubmitting={isSubmitting}
+            isSubmitting={isSubmitting as boolean}
             canProceed={canProceed()}
             onBack={handleBack}
             onNext={handleNext}
