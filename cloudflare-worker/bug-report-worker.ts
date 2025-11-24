@@ -1227,24 +1227,24 @@ async function generateSmartLabels(
   if (reportEnv?.browserInfo) {
     // Memory-related issues
     if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === 'object') {
-      const usedMemory =
-        (reportEnv.browserInfo.memory.usedJSHeapSize &&
-          parseInt(String(reportEnv.browserInfo.memory.usedJSHeapSize))) ||
-        0;
+      const usedMemory = reportEnv.browserInfo.memory.usedJSHeapSize || 0;
       if (usedMemory > 100) {
         // More than 100MB JS heap usage
-        labels.push('performance', 'memory');
+        addLabelIfExists('performance');
+        addLabelIfExists('memory');
       }
     }
 
     // Touch/mobile device indicators
     if (reportEnv.browserInfo.maxTouchPoints && reportEnv.browserInfo.maxTouchPoints > 0) {
-      labels.push('mobile', 'touch');
+      addLabelIfExists('mobile');
+      addLabelIfExists('touch');
     }
 
     // Offline/connectivity issues
     if (reportEnv.browserInfo.onLine === false) {
-      labels.push('connectivity', 'offline');
+      addLabelIfExists('connectivity');
+      addLabelIfExists('offline');
     }
   }
 
@@ -1255,11 +1255,13 @@ async function generateSmartLabels(
 
     if (localStorageKB > 1024 || sessionStorageKB > 512) {
       // Large storage usage
-      labels.push("storage", "performance");
+      addLabelIfExists('storage');
+      addLabelIfExists('performance');
     }
 
     if (reportEnv.storageInfo.error) {
-      labels.push("storage", "permissions");
+      addLabelIfExists('storage');
+      addLabelIfExists('permissions');
     }
   }
 
@@ -1271,69 +1273,76 @@ async function generateSmartLabels(
       const docHeight = reportEnv.domInfo.documentDimensions.height;
 
       if (docHeight > 10000 || docWidth > 3000) {
-        labels.push("performance", "ui");
+        addLabelIfExists('performance');
+        addLabelIfExists('ui');
       }
     }
 
     // Focus-related issues
     if (reportEnv.domInfo.focusedElement) {
       const focusedType = reportEnv.domInfo.focusedElement.type;
-      if (focusedType === "text" || focusedType === "email" || focusedType === "password") {
-        labels.push("forms", "input");
+      if (focusedType === 'text' || focusedType === 'email' || focusedType === 'password') {
+        addLabelIfExists('forms');
+        addLabelIfExists('input');
       }
     }
   }
 
   // Performance timing analysis
   if (reportEnv?.performanceInfo && Array.isArray(reportEnv.performanceInfo)) {
-    const perfData = reportEnv.performanceInfo.join(" ").toLowerCase();
-    if (perfData.includes("slow") || perfData.includes("timeout")) {
-      labels.push("performance", "loading");
+    const perfData = reportEnv.performanceInfo.join(' ').toLowerCase();
+    if (perfData.includes('slow') || perfData.includes('timeout')) {
+      addLabelIfExists('performance');
+      addLabelIfExists('loading');
     }
   }
 
   // Active modals and UI state context
   if (pageContext?.visibleModals && pageContext.visibleModals.length > 0) {
-    labels.push("modal", "ui");
+    addLabelIfExists('modal');
+    addLabelIfExists('ui');
 
     // Check for specific modal types
-    const modalText = pageContext.visibleModals.join(" ").toLowerCase();
-    if (modalText.includes("edit") || modalText.includes("add")) {
-      labels.push("forms");
+    const modalText = pageContext.visibleModals.join(' ').toLowerCase();
+    if (modalText.includes('edit') || modalText.includes('add')) {
+      addLabelIfExists('forms');
     }
-    if (modalText.includes("debt")) {
-      labels.push("debt");
+    if (modalText.includes('debt')) {
+      addLabelIfExists('debt');
     }
-    if (modalText.includes("envelope") || modalText.includes("budget")) {
-      labels.push("envelope");
+    if (modalText.includes('envelope') || modalText.includes('budget')) {
+      addLabelIfExists('envelope');
     }
   }
 
   // Button context for interaction issues
   if (pageContext?.activeButtons && pageContext.activeButtons.length > 0) {
-    const buttonText = pageContext.activeButtons.join(" ").toLowerCase();
-    if (buttonText.includes("save") || buttonText.includes("submit")) {
-      labels.push("forms", "save");
+    const buttonText = pageContext.activeButtons.join(' ').toLowerCase();
+    if (buttonText.includes('save') || buttonText.includes('submit')) {
+      addLabelIfExists('forms');
+      addLabelIfExists('save');
     }
-    if (buttonText.includes("delete") || buttonText.includes("remove")) {
-      labels.push("delete");
+    if (buttonText.includes('delete') || buttonText.includes('remove')) {
+      addLabelIfExists('delete');
     }
-    if (buttonText.includes("sync") || buttonText.includes("backup")) {
-      labels.push("sync");
+    if (buttonText.includes('sync') || buttonText.includes('backup')) {
+      addLabelIfExists('sync');
     }
   }
 
   // Enhanced accessibility and device context
-  if (reportEnv?.colorScheme === "dark") {
-    labels.push("dark-mode");
+  if (reportEnv?.colorScheme === 'dark') {
+    addLabelIfExists('dark-mode');
   }
 
   if (reportEnv?.reducedMotion === true) {
-    labels.push("accessibility", "motion");
+    addLabelIfExists('accessibility');
+    addLabelIfExists('motion');
   }
 
   if (reportEnv?.standaloneMode === true) {
-    labels.push("pwa", "standalone");
+    addLabelIfExists('pwa');
+    addLabelIfExists('standalone');
   }
 
   // Network/connection type analysis
