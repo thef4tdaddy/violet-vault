@@ -63,8 +63,8 @@ const useEnvelopeEdit = ({
     releaseLock,
     breakLock,
     isLoading: lockLoading,
-  } = useEditLock("envelope", envelope?.id, {
-    autoAcquire: isOpen && envelope?.id,
+  } = useEditLock("envelope", String(envelope?.id || ""), {
+    autoAcquire: isOpen && !!envelope?.id,
     autoRelease: true,
     showToasts: true,
   });

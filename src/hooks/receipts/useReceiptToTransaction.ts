@@ -53,12 +53,7 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
     if (receiptData?.merchant && envelopes.length > 0) {
       const suggestedEnvelope = suggestEnvelopeForMerchant(
         receiptData.merchant,
-        envelopes as Array<{
-          id: string | number;
-          name: string;
-          category?: string;
-          [key: string]: unknown;
-        }>
+        envelopes as Envelope[]
       );
       if (suggestedEnvelope) {
         setTransactionForm((prev) => ({

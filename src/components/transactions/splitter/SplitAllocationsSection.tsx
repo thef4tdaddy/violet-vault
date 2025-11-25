@@ -4,25 +4,19 @@ import { getIcon } from "../../../utils";
 import SplitAllocationRow from "./SplitAllocationRow";
 
 interface SplitAllocation {
-  id: string;
-  [key: string]: unknown;
-}
-
-interface Category {
-  id: string;
-  name: string;
+  id: string | number;
   [key: string]: unknown;
 }
 
 interface Envelope {
-  id: string;
+  id: string | number;
   name: string;
   [key: string]: unknown;
 }
 
 interface SplitAllocationsSectionProps {
   splitAllocations: SplitAllocation[];
-  availableCategories: Category[];
+  availableCategories: string[];
   envelopes: Envelope[];
   onUpdateSplit: (id: string, updates: Record<string, unknown>) => void;
   onRemoveSplit: (id: string) => void;

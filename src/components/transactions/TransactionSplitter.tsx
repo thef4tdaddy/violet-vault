@@ -78,6 +78,28 @@ const TransactionSplitter = ({
     return availableCategories.length > 0 ? availableCategories : [...TRANSACTION_CATEGORIES];
   }, [availableCategories]);
 
+  // Wrapper for updateSplit to match SplitAllocationsSection signature
+  const handleUpdateSplit = React.useCallback(
+    (id: string, updates: Record<string, unknown>) => {
+      Object.entries(updates).forEach(([field, value]) => {
+        splitter.updateSplit(id, field as keyof import("@/types/finance").SplitAllocation, value);
+      });
+    },
+    [splitter]
+  );
+
+  // Convert splitAllocations to ensure id is string
+  const splitAllocationsForSection = splitter.splitAllocations.map((split) => ({
+    ...split,
+    id: String(split.id),
+  }));
+
+  // Convert envelopes to ensure id is string
+  const envelopesForSection = envelopes.map((env) => ({
+    ...env,
+    id: String(env.id),
+  }));
+
   if (!isOpen || !transaction || !totals) return null;
 
   return (
@@ -97,11 +119,11 @@ const TransactionSplitter = ({
               {/* Split Allocations - Takes 2/3 width */}
               <div className="xl:col-span-2">
                 <SplitAllocationsSection
-                  splitAllocations={splitter.splitAllocations}
+                  splitAllocations={splitAllocationsForSection}
                   availableCategories={categoryOptions}
-                  envelopes={envelopes}
+                  envelopes={envelopesForSection}
                   errors={splitter.errors}
-                  onUpdateSplit={splitter.updateSplit}
+                  onUpdateSplit={handleUpdateSplit}
                   onRemoveSplit={splitter.removeSplit}
                   onAddSplit={splitter.addSplit}
                   onSmartSplit={splitter.distributeEvenly}
