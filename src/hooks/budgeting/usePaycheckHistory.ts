@@ -36,7 +36,7 @@ export const usePaycheckHistory = ({ onDeletePaycheck }: UsePaycheckHistoryProps
 
     try {
       await onDeletePaycheck(paycheck.id);
-      logger.debug("Paycheck deleted:", paycheck.id);
+      logger.debug("Paycheck deleted:", { paycheckId: paycheck.id });
       globalToast.showSuccess("Paycheck deleted successfully");
     } catch (error) {
       logger.error("Failed to delete paycheck:", error);

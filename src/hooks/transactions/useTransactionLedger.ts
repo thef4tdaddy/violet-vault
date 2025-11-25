@@ -79,7 +79,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   } = useTransactionImport(currentUser, handleBulkImport);
 
   const filteredTransactions = useTransactionFilters({
-    transactions,
+    transactions: transactions as unknown as FinanceTransaction[],
     searchTerm: ledgerState.searchTerm,
     dateFilter: ledgerState.dateFilter,
     typeFilter: ledgerState.typeFilter,
@@ -152,7 +152,8 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Event handlers
   const handleSubmitTransaction = async (): Promise<void> => {
-    const newTransaction = createTransaction(currentUser);
+    const user = currentUser as { userName: string };
+    const newTransaction = createTransaction(user);
 
     if (ledgerState.editingTransaction) {
       const transactionWithId = {
@@ -202,7 +203,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   };
 
   const startEdit = (transaction: FinanceTransaction): void => {
-    populateForm(transaction);
+    populateForm(transaction as unknown as Parameters<typeof populateForm>[0]);
     ledgerState.setEditingTransaction(transaction);
     ledgerState.setShowAddModal(true);
   };

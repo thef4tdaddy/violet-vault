@@ -9,7 +9,9 @@ import {
 
 interface PaycheckHistory {
   id: string | number;
-  amount?: number;
+  amount: number;
+  mode?: string;
+  envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
   allocations?: unknown[];
 }
 
@@ -50,7 +52,12 @@ export const usePaycheckOperations = () => {
         // Calculate new balances and handle envelope reversals
         const balances = await calculateReversedBalances(
           paycheckToDelete,
-          budgetDb,
+          budgetDb as unknown as {
+            envelopes: {
+              get: (id: string | number) => Promise<unknown>;
+              update: (id: string | number, data: unknown) => Promise<void>;
+            };
+          },
           getBudgetMetadata
         );
 

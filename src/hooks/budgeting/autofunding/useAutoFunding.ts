@@ -1,10 +1,8 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useAutoFundingRules } from "@/hooks/budgeting/autofunding/useAutoFundingRules";
 import { useAutoFundingExecution } from "@/hooks/budgeting/autofunding/useAutoFundingExecution";
 import { useAutoFundingData } from "@/hooks/budgeting/autofunding/useAutoFundingData";
 import { useAutoFundingHistory } from "@/hooks/budgeting/autofunding/useAutoFundingHistory";
-import useUiStore from "@/stores/ui/uiStore";
-import { useShallow } from "zustand/react/shallow";
 import type {
   UseAutoFundingRulesReturn,
   UseAutoFundingHistoryReturn,
@@ -13,7 +11,7 @@ import type {
   BudgetContext,
   ExecutionResult,
 } from "@/hooks/budgeting/autofunding/types";
-import type { Transaction, Envelope } from "@/types/finance";
+import type { Transaction } from "@/types/finance";
 import {
   isLikelyIncome,
   handleIncomeDetection,
@@ -32,19 +30,16 @@ import logger from "@/utils/common/logger";
  * Refactored from original useAutoFunding.js for Issue #506 - Logic ↔ UI separation
  */
 export const useAutoFunding = () => {
-  interface BudgetSelector {
-    envelopes?: Envelope[];
-    unassignedCash?: number;
-    allTransactions?: Transaction[];
-  }
-
-  const budget = useUiStore(
-    useShallow((state: BudgetSelector) => ({
-      envelopes: state.envelopes,
-      unassignedCash: state.unassignedCash,
-      allTransactions: state.allTransactions,
-    }))
-  ) as BudgetContext;
+  // Budget context is now provided by useBudgetData via TanStack Query
+  // This hook provides an empty default; consumers should pass actual budget data
+  const budget = useMemo<BudgetContext>(
+    () => ({
+      envelopes: [],
+      unassignedCash: 0,
+      allTransactions: [],
+    }),
+    []
+  );
 
   // Initialize individual hooks
   const dataHook = useAutoFundingData() as UseAutoFundingDataReturn;

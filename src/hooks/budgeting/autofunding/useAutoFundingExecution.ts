@@ -4,10 +4,11 @@ import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
+import type { ExecutionContext, Envelope } from "../../../utils/budgeting/autofunding/conditions";
 import logger from "../../../utils/common/logger";
 
 interface BudgetData {
-  envelopes?: unknown[];
+  envelopes?: Envelope[];
   unassignedCash?: number;
   allTransactions?: unknown[];
   transferFunds?: (from: string, to: string, amount: number, description?: string) => Promise<void>;
@@ -81,13 +82,12 @@ export const useAutoFundingExecution = () => {
       setIsExecuting(true);
 
       try {
-        const context = {
+        const context: ExecutionContext = {
           trigger,
           currentDate: new Date().toISOString(),
           data: {
             envelopes: budgetWithDefaults.envelopes ?? [],
             unassignedCash: budgetWithDefaults.unassignedCash ?? 0,
-            transactions: budgetWithDefaults.allTransactions ?? [],
             ...triggerData,
           },
         };

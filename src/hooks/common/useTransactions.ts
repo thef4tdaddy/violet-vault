@@ -39,7 +39,9 @@ const useTransactions = (options = {}) => {
   const analyticsData = useTransactionAnalytics(transactions);
 
   // Utility functions
-  const utilityFunctions = useTransactionUtils(transactions);
+  const utilityFunctions = useTransactionUtils(
+    transactions as unknown as import("@/types/finance").Transaction[]
+  );
 
   return {
     // Data
