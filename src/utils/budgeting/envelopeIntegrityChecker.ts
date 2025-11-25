@@ -75,7 +75,7 @@ export const findCorruptedEnvelopes = async () => {
  * @param {Array} envelopeIds - Array of envelope IDs to remove
  * @returns {Promise<Object>} - Result with success status and details
  */
-export const removeCorruptedEnvelopes = async (envelopeIds) => {
+export const removeCorruptedEnvelopes = async (envelopeIds: Array<string | number>) => {
   if (!envelopeIds || envelopeIds.length === 0) {
     return { success: true, removed: 0, message: "No envelopes to remove" };
   }
@@ -110,13 +110,14 @@ export const removeCorruptedEnvelopes = async (envelopeIds) => {
       message: `Successfully removed ${deletedCount} corrupted envelope${deletedCount === 1 ? "" : "s"}`,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("❌ Failed to remove corrupted envelopes", error, {
       ids: envelopeIds,
     });
     return {
       success: false,
       removed: 0,
-      error: error.message,
+      error: errorMessage,
       message: "Failed to remove corrupted envelopes",
     };
   }
@@ -127,7 +128,9 @@ export const removeCorruptedEnvelopes = async (envelopeIds) => {
  * @param {Array} corruptedEnvelopes - Array of corrupted envelope objects
  * @returns {Promise<Object>} - Result with success status and details
  */
-export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
+export const repairCorruptedEnvelopes = async (
+  corruptedEnvelopes: EnvelopeWithOptionalFields[]
+) => {
   if (!corruptedEnvelopes || corruptedEnvelopes.length === 0) {
     return { success: true, repaired: 0, message: "No envelopes to repair" };
   }
@@ -137,7 +140,7 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
       count: corruptedEnvelopes.length,
     });
 
-    const repairedEnvelopes = [];
+    const repairedEnvelopes: EnvelopeWithOptionalFields[] = [];
 
     for (const envelope of corruptedEnvelopes) {
       const repaired = { ...envelope };
@@ -145,7 +148,8 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
 
       // Fill in missing name
       if (!repaired.name || repaired.name.trim().length === 0) {
-        repaired.name = `Recovered Envelope ${envelope.id?.slice(0, 8) || "Unknown"}`;
+        const idStr = String(repaired.id);
+        repaired.name = `Recovered Envelope ${idStr.slice(0, 8) || "Unknown"}`;
         wasRepaired = true;
       }
 
@@ -185,7 +189,10 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
 
     // Update the repaired envelopes in the database
     if (repairedEnvelopes.length > 0) {
-      await budgetDb.envelopes.bulkPut(repairedEnvelopes);
+      // Cast to the database type since we've ensured all required fields are present
+      await budgetDb.envelopes.bulkPut(
+        repairedEnvelopes as unknown as import("../../db/types").Envelope[]
+      );
 
       logger.production("Repaired corrupted envelopes", {
         count: repairedEnvelopes.length,
@@ -209,11 +216,12 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
       message: `Successfully repaired ${repairedEnvelopes.length} corrupted envelope${repairedEnvelopes.length === 1 ? "" : "s"}`,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("❌ Failed to repair corrupted envelopes", error);
     return {
       success: false,
       repaired: 0,
-      error: error.message,
+      error: errorMessage,
       message: "Failed to repair corrupted envelopes",
     };
   }
@@ -267,6 +275,7 @@ export const getEnvelopeIntegrityReport = async () => {
 
     return report;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error("❌ Failed to generate envelope integrity report", error);
     return {
       total: 0,
@@ -274,7 +283,7 @@ export const getEnvelopeIntegrityReport = async () => {
       healthy: 0,
       corruptedEnvelopes: [],
       recommendations: ["Failed to generate report"],
-      error: error.message,
+      error: errorMessage,
     };
   }
 };

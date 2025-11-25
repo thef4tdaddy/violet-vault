@@ -120,7 +120,11 @@ interface ReceiptToTransactionModalProps {
   onComplete?: () => void;
 }
 
-const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete: _onComplete }: ReceiptToTransactionModalProps) => {
+const ReceiptToTransactionModal = ({
+  receiptData,
+  onClose,
+  onComplete: _onComplete,
+}: ReceiptToTransactionModalProps) => {
   const {
     transactionForm,
     isSubmitting,

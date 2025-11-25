@@ -52,10 +52,15 @@ export const initializeSplitsHandler = (
  * Add a new split allocation
  */
 export const addSplitHandler = (
-  transaction: Transaction,
+  transaction: Transaction | undefined,
   setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (fn: (prev: string[]) => string[]) => void
 ) => {
+  if (!transaction) {
+    setErrors((prev) => [...prev, "Cannot add split: no transaction provided"]);
+    return;
+  }
+
   try {
     setSplitAllocations((current) => {
       const newSplits = addNewSplit(current, transaction, {
@@ -141,10 +146,15 @@ export const removeSplitHandler = (
  * Auto-balance splits to equal total
  */
 export const autoBalanceHandler = (
-  transaction: Transaction,
+  transaction: Transaction | undefined,
   setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (errorsOrFn: string[] | ((prev: string[]) => string[])) => void
 ) => {
+  if (!transaction) {
+    setErrors(["Cannot auto-balance: no transaction provided"]);
+    return;
+  }
+
   try {
     setSplitAllocations((current) => {
       const balanced = autoBalanceSplits(current, transaction);
@@ -168,10 +178,15 @@ export const autoBalanceHandler = (
  * Split amount evenly across all allocations
  */
 export const distributeEvenlyHandler = (
-  transaction: Transaction,
+  transaction: Transaction | undefined,
   setSplitAllocations: (fn: (current: SplitAllocation[]) => SplitAllocation[]) => void,
   setErrors: (errorsOrFn: string[] | ((prev: string[]) => string[])) => void
 ) => {
+  if (!transaction) {
+    setErrors(["Cannot distribute evenly: no transaction provided"]);
+    return;
+  }
+
   try {
     setSplitAllocations((current) => {
       const evenSplits = splitEvenly(current, transaction);
@@ -197,9 +212,14 @@ export const distributeEvenlyHandler = (
  */
 export const checkSplitsHandler = (
   splitAllocations: SplitAllocation[],
-  transaction: Transaction,
+  transaction: Transaction | undefined,
   setErrors: (errors: string[]) => void
 ): boolean => {
+  if (!transaction) {
+    setErrors(["Cannot validate: no transaction provided"]);
+    return false;
+  }
+
   try {
     const validationErrors = validateSplitAllocations(splitAllocations, transaction);
     setErrors(validationErrors);
@@ -219,7 +239,7 @@ export const submitSplitHandler = async (
   params: {
     isProcessing: boolean;
     splitAllocations: SplitAllocation[];
-    transaction: Transaction;
+    transaction: Transaction | undefined;
     validateSplits: () => boolean;
     onSplit?: (splitTransactions: Transaction[], transaction: Transaction) => Promise<void>;
   },
@@ -227,6 +247,11 @@ export const submitSplitHandler = async (
   setErrors?: (fn: (prev: string[]) => string[]) => void
 ): Promise<boolean> => {
   if (params.isProcessing) return false;
+
+  if (!params.transaction) {
+    setErrors?.((prev) => [...prev, "Cannot submit: no transaction provided"]);
+    return false;
+  }
 
   try {
     setIsProcessing?.(true);

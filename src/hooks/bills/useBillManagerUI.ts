@@ -70,13 +70,7 @@ export function useBillManagerUI({
         "AlertTriangle",
         "red"
       ),
-      createViewMode(
-        "paid",
-        "Paid",
-        categorizedBills.paid?.length || 0,
-        "CheckCircle",
-        "green"
-      ),
+      createViewMode("paid", "Paid", categorizedBills.paid?.length || 0, "CheckCircle", "green"),
       createViewMode("all", "All Bills", bills?.length || 0, "FileText", "gray"),
     ],
     [categorizedBills, bills]

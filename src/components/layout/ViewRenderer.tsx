@@ -320,17 +320,22 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onProcessPaycheck={tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>}
         onDeletePaycheck={
           ((paycheckId: string) =>
-            handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)) as unknown as (
-            paycheck: import("@/db/types").PaycheckHistory
-          ) => Promise<void>
+            handleDeletePaycheck(
+              paycheckId,
+              tanStackPaycheckHistory as unknown as {
+                id: string | number;
+                amount?: number;
+                allocations?: unknown[];
+              }[]
+            )) as unknown as (paycheck: import("@/db/types").PaycheckHistory) => Promise<void>
         }
         currentUser={currentUser as unknown as import("@/types/finance").User}
       />
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions as unknown as import("@/types/finance").Transaction[]}
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        transactions={safeTransactions as unknown as import("@/types/bills").Transaction[]}
+        envelopes={envelopes as unknown as import("@/types/bills").Envelope[]}
         onUpdateBill={
           handleUpdateBill as unknown as (
             bill: import("@/types/bills").Bill

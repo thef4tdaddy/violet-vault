@@ -72,8 +72,18 @@ const TabContent = ({
       <TrendsTab
         chartType={chartType}
         handleChartTypeChange={handleChartTypeChange}
-        monthlyTrends={monthlyTrends as Array<{ month: string; value: number; [key: string]: unknown }> | null | undefined}
-        weeklyPatterns={weeklyPatterns as Array<{ day: string; amount: number; [key: string]: unknown }> | null | undefined}
+        monthlyTrends={
+          monthlyTrends as
+            | Array<{ month: string; value: number; [key: string]: unknown }>
+            | null
+            | undefined
+        }
+        weeklyPatterns={
+          weeklyPatterns as
+            | Array<{ day: string; amount: number; [key: string]: unknown }>
+            | null
+            | undefined
+        }
       />
     );
   }
@@ -81,7 +91,19 @@ const TabContent = ({
   if (activeTab === "health") {
     return (
       <HealthTab
-        envelopeHealth={envelopeHealth as Array<{ name: string; id?: string; status?: string; currentBalance?: number; monthlyBudget?: number; healthScore?: number }> | null | undefined}
+        envelopeHealth={
+          envelopeHealth as
+            | Array<{
+                name: string;
+                id?: string;
+                status?: string;
+                currentBalance?: number;
+                monthlyBudget?: number;
+                healthScore?: number;
+              }>
+            | null
+            | undefined
+        }
         budgetVsActual={budgetVsActual as Array<{ [key: string]: unknown }> | null | undefined}
       />
     );
