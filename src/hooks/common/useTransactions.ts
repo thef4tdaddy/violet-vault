@@ -5,6 +5,7 @@ import { useTransactionMutations } from "../transactions/useTransactionMutations
 import { useTransactionAnalytics } from "../transactions/useTransactionAnalytics.ts";
 import { useTransactionUtils } from "../transactions/useTransactionUtils.ts";
 import { queryKeys } from "../../utils/common/queryClient.ts";
+import type { Transaction as FinanceTransaction } from "../../types/finance.ts";
 
 /**
  * Specialized hook for transaction management
@@ -35,11 +36,12 @@ const useTransactions = (options = {}) => {
     isUpdating,
   } = useTransactionMutations();
 
-  // Analytics computation
+  // Analytics computation - uses db/types Transaction
   const analyticsData = useTransactionAnalytics(transactions);
 
-  // Utility functions
-  const utilityFunctions = useTransactionUtils(transactions);
+  // Utility functions - uses types/finance Transaction
+  // Cast transactions to FinanceTransaction[] for compatibility
+  const utilityFunctions = useTransactionUtils(transactions as unknown as FinanceTransaction[]);
 
   return {
     // Data

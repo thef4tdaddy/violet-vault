@@ -15,28 +15,30 @@ interface FormatBalanceOptions {
   maximumFractionDigits?: number;
 }
 
-interface BudgetState {
-  actualBalance: number;
-  isActualBalanceManual: boolean;
-  setActualBalance: (balance: number) => void;
-}
-
 /**
  * Custom hook for managing actual balance operations
  * Handles business logic for balance updates, validations, and state management
+ *
+ * @deprecated Use useActualBalance from '@/hooks/budgeting/useBudgetMetadata' instead
+ * This hook exists for backward compatibility but the proper implementation
+ * uses TanStack Query + Dexie for data management.
  */
 export const useActualBalance = () => {
-  const {
-    actualBalance,
-    isActualBalanceManual,
-    setActualBalance: setStoreBalance,
-  } = useBudgetStore(
-    useShallow((state: BudgetState) => ({
-      actualBalance: state.actualBalance,
+  // Note: actualBalance is no longer in UiStore - it's managed by TanStack Query + Dexie
+  // This hook provides a compatibility layer with hardcoded defaults
+  const { isActualBalanceManual } = useBudgetStore(
+    useShallow((state) => ({
       isActualBalanceManual: state.isActualBalanceManual,
-      setActualBalance: state.setActualBalance,
     }))
   );
+
+  // Default values since actualBalance is no longer in Zustand
+  const actualBalance = 0;
+  const setStoreBalance = (_balance: number) => {
+    logger.warn(
+      "useActualBalance from common/useActualBalance is deprecated. Use useActualBalance from @/hooks/budgeting/useBudgetMetadata instead."
+    );
+  };
 
   /**
    * Updates the actual balance with validation and audit logging

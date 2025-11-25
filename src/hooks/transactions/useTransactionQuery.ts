@@ -1,7 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore.ts";
-import { useShallow } from "zustand/react/shallow";
 import { queryKeys } from "../../utils/common/queryClient.ts";
 import { budgetDb } from "../../db/budgetDb.ts";
 import logger from "../../utils/common/logger.ts";
@@ -12,11 +10,6 @@ import {
   applyLimit,
   seedDexieFromZustand,
 } from "./helpers/transactionQueryHelpers.ts";
-
-interface BudgetStore {
-  transactions: Transaction[];
-  allTransactions: Transaction[];
-}
 
 interface UseTransactionQueryOptions {
   dateRange?: { start: Date; end: Date };
@@ -40,14 +33,10 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
     sortOrder = "desc",
   } = options;
 
-  // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
-  const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
-    useBudgetStore(
-      useShallow((state: BudgetStore) => ({
-        transactions: state.transactions,
-        allTransactions: state.allTransactions,
-      }))
-    );
+  // Note: Zustand no longer stores transactions - they are managed by TanStack Query → Dexie
+  // These empty arrays serve as fallback values for backward compatibility
+  const zustandTransactions: Transaction[] = [];
+  const zustandAllTransactions: Transaction[] = [];
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async (): Promise<Transaction[]> => {
