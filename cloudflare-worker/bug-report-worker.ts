@@ -4,16 +4,353 @@
  * Stores screenshots in R2 and sends notifications
  */
 
-// CORS headers for all responses
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Cloudflare Worker Environment Bindings
+ */
+interface Env {
+  GITHUB_TOKEN: string;
+  GITHUB_REPO: string;
+  R2_BUCKET: R2Bucket;
+  R2_PUBLIC_DOMAIN?: string;
+  NOTIFICATION_WEBHOOK?: string;
+  ALLOWED_ORIGINS?: string;
+}
+
+/**
+ * Page Context from frontend
+ */
+interface PageContext {
+  page?: string;
+  screenTitle?: string;
+  documentTitle?: string;
+  visibleModals?: string[];
+  activeButtons?: string[];
+  componentHints?: string[];
+  userLocation?: string;
+  route?: RouteInfo;
+}
+
+/**
+ * Enhanced Route Information
+ */
+interface RouteInfo {
+  currentView?: string;
+  routeType?: string;
+  buildTarget?: string;
+}
+
+/**
+ * Browser Performance Info
+ */
+interface BrowserInfo {
+  memory?: {
+    usedJSHeapSize?: number;
+    totalJSHeapSize?: number;
+  };
+  hardwareConcurrency?: number;
+  onLine?: boolean;
+  maxTouchPoints?: number;
+}
+
+/**
+ * Storage Information
+ */
+interface StorageInfo {
+  localStorage?: string;
+  localStorageItems?: number;
+  sessionStorage?: string;
+  sessionStorageItems?: number;
+  error?: string;
+}
+
+/**
+ * DOM State Information
+ */
+interface DOMInfo {
+  scrollPosition?: {
+    x: number;
+    y: number;
+  };
+  documentDimensions?: {
+    width: number;
+    height: number;
+  };
+  focusedElement?: {
+    tagName: string;
+    id?: string;
+    type?: string;
+  };
+}
+
+/**
+ * Report Environment Information
+ */
+interface ReportEnv {
+  url?: string;
+  appVersion?: string;
+  userAgent?: string;
+  viewport?: string;
+  timestamp?: string;
+  windowSize?: string;
+  devicePixelRatio?: number;
+  connectionType?: string;
+  colorScheme?: string;
+  timezone?: string;
+  language?: string;
+  locale?: string;
+  touchSupport?: boolean;
+  standaloneMode?: boolean;
+  reducedMotion?: boolean;
+  browserInfo?: BrowserInfo;
+  storageInfo?: StorageInfo;
+  domInfo?: DOMInfo;
+  pageContext?: PageContext;
+  performanceInfo?: string[];
+}
+
+/**
+ * System Information
+ */
+interface SystemInfo {
+  browser?: {
+    name?: string;
+    version?: string;
+    engine?: string;
+  };
+  performance?: {
+    memory?: {
+      usedJSHeapSize: number;
+    };
+  };
+}
+
+/**
+ * Custom Data from frontend
+ */
+interface CustomData {
+  highlightSession?: {
+    sessionUrl?: string;
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * Bug Report Data Structure
+ */
+interface BugReport {
+  title?: string;
+  description: string;
+  steps?: string;
+  expected?: string;
+  actual?: string;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  screenshot?: string;
+  sessionUrl?: string;
+  env?: ReportEnv;
+  systemInfo?: SystemInfo;
+  contextInfo?: unknown;
+  customData?: CustomData;
+}
+
+/**
+ * Bug Report Result
+ */
+interface BugReportResult {
+  success: boolean;
+  issueNumber: number;
+  issueUrl: string;
+  screenshotUrl: string | null;
+}
+
+/**
+ * Cleanup Result
+ */
+interface CleanupResult {
+  success?: boolean;
+  deletedCount?: number;
+  totalSizeFreed?: number;
+  message?: string;
+  error?: string;
+}
+
+/**
+ * Usage Stats
+ */
+interface UsageStats {
+  success?: boolean;
+  currentMonth?: string;
+  uploadsThisMonth?: number;
+  maxUploadsPerMonth?: number;
+  percentageUsed?: number;
+  totalStoredScreenshots?: number;
+  totalStorageUsed?: number;
+  freeStorageLimit?: number;
+  error?: string;
+}
+
+/**
+ * GitHub Milestone
+ */
+interface GitHubMilestone {
+  number: number;
+  title: string;
+  description?: string;
+  due_on?: string;
+  state: string;
+  open_issues: number;
+  closed_issues: number;
+  version?: string;
+}
+
+/**
+ * Processed Milestone
+ */
+interface ProcessedMilestone {
+  version: string;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  state: string;
+  progress: {
+    openIssues: number;
+    closedIssues: number;
+    total: number;
+    percentComplete: number;
+  };
+}
+
+/**
+ * Milestones Response
+ */
+interface MilestonesResponse {
+  success?: boolean;
+  milestones?: ProcessedMilestone[];
+  current?: {
+    version: string;
+    title: string;
+    description?: string;
+    dueDate?: string;
+    progress?: {
+      openIssues: number;
+      closedIssues: number;
+      total: number;
+      percentComplete: number;
+    };
+  };
+  error?: string;
+  fallback?: {
+    version: string;
+    title: string;
+  };
+}
+
+/**
+ * Release Please Response
+ */
+interface ReleasePleaseResponse {
+  success?: boolean;
+  nextVersion?: string;
+  currentVersion?: string;
+  latestRelease?: {
+    version: string;
+    name?: string;
+    publishedAt?: string;
+    htmlUrl?: string;
+  };
+  releasePR?: {
+    number: number;
+    title: string;
+    htmlUrl: string;
+    createdAt: string;
+  } | null;
+  error?: string;
+  fallback?: {
+    nextVersion: string;
+    currentVersion: string;
+  };
+}
+
+/**
+ * GitHub Issue Data
+ */
+interface GitHubIssueData {
+  title: string;
+  body: string;
+  labels: string[];
+  milestone?: number;
+}
+
+/**
+ * GitHub Issue Response
+ */
+interface GitHubIssue {
+  number: number;
+  html_url: string;
+  title: string;
+}
+
+/**
+ * GitHub Label
+ */
+interface GitHubLabel {
+  name: string;
+}
+
+/**
+ * GitHub Release
+ */
+interface GitHubRelease {
+  tag_name: string;
+  name?: string;
+  published_at?: string;
+  html_url?: string;
+  prerelease: boolean;
+}
+
+/**
+ * GitHub Pull Request
+ */
+interface GitHubPullRequest {
+  number: number;
+  title: string;
+  html_url: string;
+  created_at: string;
+  head: {
+    ref: string;
+  };
+}
+
+/**
+ * Notification Data
+ */
+interface NotificationData {
+  description: string;
+  screenshotUrl: string | null;
+  sessionUrl?: string;
+  githubIssueUrl: string;
+}
+
+// ============================================================================
+// CORS HEADERS
+// ============================================================================
+
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Max-Age": "86400",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
 };
 
+// ============================================================================
+// WORKER HANDLERS
+// ============================================================================
+
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     // Handle CORS preflight requests
@@ -68,17 +405,17 @@ export default {
 
       try {
         // Parse the bug report data
-        const payload = await request.json();
+        const payload = (await request.json()) as { data?: BugReport } & BugReport;
 
         // Handle nested structure from frontend (data field contains actual bug report)
         const bugReport = payload.data || payload;
 
         // Debug log to understand the structure
-        console.log("Payload structure:", {
+        console.log('Payload structure:', {
           hasData: !!payload.data,
           hasTitle: !!bugReport.title,
           hasDescription: !!bugReport.description,
-          payloadType: payload.type,
+          payloadType: 'type' in payload ? (payload as { type?: string }).type : undefined,
           payloadKeys: Object.keys(payload),
           bugReportKeys: Object.keys(bugReport || {}),
         });
@@ -110,16 +447,16 @@ export default {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (error) {
-        console.error("Bug report processing failed:", error);
+        console.error('Bug report processing failed:', error);
 
         return new Response(
           JSON.stringify({
-            error: "Internal server error",
-            message: error.message,
+            error: 'Internal server error',
+            message: error instanceof Error ? error.message : 'Unknown error',
           }),
           {
             status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           }
         );
       }
@@ -133,13 +470,13 @@ export default {
   },
 
   // Handle scheduled events (cron triggers)
-  async scheduled(controller, env) {
-    console.log("Running scheduled cleanup...");
+  async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext): Promise<void> {
+    console.log('Running scheduled cleanup...');
     try {
       const result = await cleanupOldScreenshots(env);
-      console.log("Cleanup result:", result);
+      console.log('Cleanup result:', result);
     } catch (error) {
-      console.error("Scheduled cleanup failed:", error);
+      console.error('Scheduled cleanup failed:', error);
     }
   },
 };
@@ -147,7 +484,7 @@ export default {
 /**
  * Process the bug report by creating GitHub issue and storing screenshot
  */
-async function processBugReport(bugReport, env) {
+async function processBugReport(bugReport: BugReport, env: Env): Promise<BugReportResult> {
   const {
     title,
     description,
@@ -159,7 +496,7 @@ async function processBugReport(bugReport, env) {
     sessionUrl,
     env: reportEnv,
     systemInfo,
-    contextInfo,
+    contextInfo: _contextInfo,
     customData,
   } = bugReport;
 
@@ -179,14 +516,14 @@ async function processBugReport(bugReport, env) {
     reportEnvKeys: reportEnv ? Object.keys(reportEnv) : null,
     hasPageContext: !!(reportEnv && reportEnv.pageContext),
     pageContextKeys: reportEnv && reportEnv.pageContext ? Object.keys(reportEnv.pageContext) : null,
-    hasContextInfo: !!contextInfo,
-    contextInfoKeys: contextInfo ? Object.keys(contextInfo) : null,
+    hasContextInfo: !!_contextInfo,
+    contextInfoKeys: _contextInfo ? Object.keys(_contextInfo as Record<string, unknown>) : null,
     hasSessionUrl: !!sessionUrl,
-    sessionUrl: sessionUrl || "null",
+    sessionUrl: sessionUrl || 'null',
   });
 
   // Store screenshot if provided
-  let screenshotUrl = null;
+  let screenshotUrl: string | null = null;
   if (screenshot) {
     try {
       screenshotUrl = await storeScreenshot(screenshot, env);
@@ -215,7 +552,7 @@ async function processBugReport(bugReport, env) {
       sessionUrl,
       env: reportEnv,
       systemInfo,
-      contextInfo,
+      contextInfo: _contextInfo,
       customData,
     },
     env
@@ -245,15 +582,15 @@ async function processBugReport(bugReport, env) {
 /**
  * Store screenshot in Cloudflare R2 with cost protection
  */
-async function storeScreenshot(screenshotDataUrl, env) {
+async function storeScreenshot(screenshotDataUrl: string, env: Env): Promise<string | null> {
   if (!env.R2_BUCKET) {
-    console.warn("R2_BUCKET not configured, skipping screenshot storage");
+    console.warn('R2_BUCKET not configured, skipping screenshot storage');
     return null;
   }
 
   try {
     // Extract base64 data from data URL
-    const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, "");
+    const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, '');
     const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
     // 🛡️ COST PROTECTION: Check file size (max 5MB to stay well under free tier)
@@ -327,9 +664,9 @@ async function storeScreenshot(screenshotDataUrl, env) {
  * 🛡️ COST PROTECTION: Cleanup old screenshots (call this periodically)
  * This should be called from a cron trigger or manually
  */
-async function cleanupOldScreenshots(env) {
+async function cleanupOldScreenshots(env: Env): Promise<CleanupResult> {
   if (!env.R2_BUCKET) {
-    return { error: "R2_BUCKET not configured" };
+    return { error: 'R2_BUCKET not configured' };
   }
 
   try {
@@ -345,7 +682,7 @@ async function cleanupOldScreenshots(env) {
     for (const object of objects.objects) {
       try {
         const objectDetails = await env.R2_BUCKET.head(object.key);
-        const uploadDate = objectDetails.customMetadata?.uploadDate;
+        const uploadDate = objectDetails?.customMetadata?.uploadDate;
 
         if (uploadDate) {
           const fileDate = new Date(uploadDate);
@@ -368,17 +705,17 @@ async function cleanupOldScreenshots(env) {
       message: `Cleaned up ${deletedCount} screenshots, freed ${Math.round(totalSize / (1024 * 1024))}MB`,
     };
   } catch (error) {
-    console.error("Cleanup failed:", error);
-    return { error: error.message };
+    console.error('Cleanup failed:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
 /**
  * Get usage statistics for monitoring
  */
-async function getUsageStats(env) {
+async function getUsageStats(env: Env): Promise<UsageStats> {
   if (!env.R2_BUCKET) {
-    return { error: "R2_BUCKET not configured" };
+    return { error: 'R2_BUCKET not configured' };
   }
 
   try {
@@ -405,18 +742,18 @@ async function getUsageStats(env) {
       freeStorageLimit: 10 * 1024, // 10GB in MB
     };
   } catch (error) {
-    return { error: error.message };
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
 /**
  * Get release-please information for next version targeting
  */
-async function getReleasePleaseInfo(env) {
+async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
     return {
-      error: "GitHub configuration not found",
-      fallback: { nextVersion: "1.9.0", currentVersion: "1.8.0" },
+      error: 'GitHub configuration not found',
+      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' },
     };
   }
 
@@ -437,7 +774,7 @@ async function getReleasePleaseInfo(env) {
       throw new Error(`GitHub API error: ${releasesResponse.status}`);
     }
 
-    const releases = await releasesResponse.json();
+    const releases = (await releasesResponse.json()) as GitHubRelease[];
 
     // Get release-please PRs (these contain the next version)
     const prsResponse = await fetch(
@@ -445,8 +782,8 @@ async function getReleasePleaseInfo(env) {
       {
         headers: {
           Authorization: `token ${env.GITHUB_TOKEN}`,
-          "User-Agent": "VioletVault-BugReporter/1.0",
-          Accept: "application/vnd.github.v3+json",
+          'User-Agent': 'VioletVault-BugReporter/1.0',
+          Accept: 'application/vnd.github.v3+json',
         },
       }
     );
@@ -455,15 +792,15 @@ async function getReleasePleaseInfo(env) {
       throw new Error(`GitHub API error: ${prsResponse.status}`);
     }
 
-    const prs = await prsResponse.json();
+    const prs = (await prsResponse.json()) as GitHubPullRequest[];
 
     // Find release-please PR (contains "chore(main): release" in title)
     const releasePR = prs.find(
-      (pr) => pr.title.includes("chore(main): release") && pr.head.ref.includes("release-please")
+      (pr) => pr.title.includes('chore(main): release') && pr.head.ref.includes('release-please')
     );
 
     // Extract version from release PR title: "chore(main): release violet-vault 1.8.0"
-    let nextVersion = null;
+    let nextVersion: string | null = null;
     if (releasePR) {
       const versionMatch = releasePR.title.match(/release\s+\S+\s+(\d+\.\d+\.\d+)/);
       nextVersion = versionMatch ? versionMatch[1] : null;
@@ -471,7 +808,7 @@ async function getReleasePleaseInfo(env) {
 
     // Get current/latest version from releases
     const latestRelease = releases.find((release) => !release.prerelease);
-    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, "") : "1.8.0";
+    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, '') : '1.8.0';
 
     // If no release PR found, increment the current version
     if (!nextVersion) {
@@ -499,10 +836,10 @@ async function getReleasePleaseInfo(env) {
         : null,
     };
   } catch (error) {
-    console.error("Failed to fetch release-please info:", error);
+    console.error('Failed to fetch release-please info:', error);
     return {
-      error: error.message,
-      fallback: { nextVersion: "1.9.0", currentVersion: "1.8.0" },
+      error: error instanceof Error ? error.message : 'Unknown error',
+      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' },
     };
   }
 }
@@ -510,13 +847,13 @@ async function getReleasePleaseInfo(env) {
 /**
  * Fetch GitHub milestones for version targeting
  */
-async function getMilestones(env) {
+async function getMilestones(env: Env): Promise<MilestonesResponse> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
     return {
-      error: "GitHub configuration not found",
+      error: 'GitHub configuration not found',
       fallback: {
-        version: "1.8.0",
-        title: "v1.8.0 - Cash Management (Fallback)",
+        version: '1.8.0',
+        title: 'v1.8.0 - Cash Management (Fallback)',
       },
     };
   }
@@ -537,32 +874,32 @@ async function getMilestones(env) {
       throw new Error(`GitHub API error: ${response.status}`);
     }
 
-    const milestones = await response.json();
+    const milestones = (await response.json()) as GitHubMilestone[];
 
     if (!milestones.length) {
       return {
         milestones: [],
         current: {
-          version: "1.8.0",
-          title: "v1.8.0 - Cash Management (Fallback)",
+          version: '1.8.0',
+          title: 'v1.8.0 - Cash Management (Fallback)',
         },
       };
     }
 
     // Extract version from milestone titles and sort by version number
     const processedMilestones = milestones
-      .map((milestone) => {
+      .map((milestone): GitHubMilestone => {
         const versionMatch = milestone.title.match(/v?(\d+\.\d+\.\d+)/);
         return {
           ...milestone,
-          version: versionMatch ? versionMatch[1] : null,
+          version: versionMatch ? versionMatch[1] : undefined,
         };
       })
-      .filter((m) => m.version) // Only keep milestones with valid versions
+      .filter((m): m is GitHubMilestone & { version: string } => Boolean(m.version)) // Only keep milestones with valid versions
       .sort((a, b) => {
         // Sort by version number (lowest first)
-        const aVersion = a.version.split(".").map(Number);
-        const bVersion = b.version.split(".").map(Number);
+        const aVersion = a.version.split('.').map(Number);
+        const bVersion = b.version.split('.').map(Number);
 
         for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
           const aPart = aVersion[i] || 0;
@@ -580,15 +917,15 @@ async function getMilestones(env) {
     if (milestonesWithDueDate.length > 0) {
       const now = new Date();
       currentMilestone = milestonesWithDueDate.sort((a, b) => {
-        const aDiff = Math.abs(new Date(a.due_on) - now);
-        const bDiff = Math.abs(new Date(b.due_on) - now);
+        const aDiff = Math.abs(new Date(a.due_on!).getTime() - now.getTime());
+        const bDiff = Math.abs(new Date(b.due_on!).getTime() - now.getTime());
         return aDiff - bDiff; // Closest due date first
       })[0];
     } else {
       // No due dates available, use highest version number (most recent)
       currentMilestone = processedMilestones.sort((a, b) => {
-        const aVersion = a.version.split(".").map(Number);
-        const bVersion = b.version.split(".").map(Number);
+        const aVersion = a.version.split('.').map(Number);
+        const bVersion = b.version.split('.').map(Number);
         for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
           const aPart = aVersion[i] || 0;
           const bPart = bVersion[i] || 0;
@@ -637,12 +974,12 @@ async function getMilestones(env) {
       },
     };
   } catch (error) {
-    console.error("Failed to fetch milestones:", error);
+    console.error('Failed to fetch milestones:', error);
     return {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       fallback: {
-        version: "1.8.0",
-        title: "v1.8.0 - Cash Management (Fallback)",
+        version: '1.8.0',
+        title: 'v1.8.0 - Cash Management (Fallback)',
       },
     };
   }
@@ -652,31 +989,36 @@ async function getMilestones(env) {
  * Generate smart labels based on bug report content and context
  * Uses existing GitHub labels instead of creating new ones
  */
-async function generateSmartLabels(description, reportEnv, env, severity = "medium") {
-  const labels = ["bug", "user-reported"];
+async function generateSmartLabels(
+  description: string,
+  reportEnv: ReportEnv | undefined,
+  env: Env,
+  severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
+): Promise<string[]> {
+  const labels: string[] = ['bug', 'user-reported'];
 
   // Fetch existing GitHub labels to avoid duplication
-  let existingLabels = [];
+  let existingLabels: string[] = [];
   try {
     const labelsResponse = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/labels`, {
       headers: {
         Authorization: `token ${env.GITHUB_TOKEN}`,
-        "User-Agent": "VioletVault-BugReporter/1.0",
+        'User-Agent': 'VioletVault-BugReporter/1.0',
         Accept: "application/vnd.github.v3+json",
       },
     });
 
     if (labelsResponse.ok) {
-      const labelsData = await labelsResponse.json();
+      const labelsData = (await labelsResponse.json()) as GitHubLabel[];
       existingLabels = labelsData.map((label) => label.name);
       console.log(`Found ${existingLabels.length} existing labels`);
     }
   } catch (error) {
-    console.error("Failed to fetch existing labels:", error);
+    console.error('Failed to fetch existing labels:', error);
   }
 
   // Helper function to add label only if it exists
-  const addLabelIfExists = (labelName) => {
+  const addLabelIfExists = (labelName: string): void => {
     if (existingLabels.includes(labelName) && !labels.includes(labelName)) {
       labels.push(labelName);
     }
@@ -704,18 +1046,18 @@ async function generateSmartLabels(description, reportEnv, env, severity = "medi
   const pageContext = reportEnv?.pageContext;
 
   // Priority-based labeling (keywords reserved for future use)
-  const _criticalKeywords = [
-    "crash",
-    "error",
-    "broken",
-    "not working",
-    "fail",
-    "exception",
-    "500",
-    "404",
-  ];
-  const _highPriorityKeywords = ["slow", "performance", "timeout", "loading"];
-  const _mediumPriorityKeywords = ["improvement", "enhance", "better", "should"];
+  // const _criticalKeywords = [
+  //   'crash',
+  //   'error',
+  //   'broken',
+  //   'not working',
+  //   'fail',
+  //   'exception',
+  //   '500',
+  //   '404',
+  // ];
+  // const _highPriorityKeywords = ['slow', 'performance', 'timeout', 'loading'];
+  // const _mediumPriorityKeywords = ['improvement', 'enhance', 'better', 'should'];
 
   // Detect code pastes (requested feature)
   const codeIndicators = [
@@ -884,37 +1226,42 @@ async function generateSmartLabels(description, reportEnv, env, severity = "medi
   // Enhanced context analysis using comprehensive browser info
   if (reportEnv?.browserInfo) {
     // Memory-related issues
-    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === "object") {
-      const usedMemory = parseInt(reportEnv.browserInfo.memory.usedJSHeapSize) || 0;
+    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === 'object') {
+      const usedMemory = reportEnv.browserInfo.memory.usedJSHeapSize || 0;
       if (usedMemory > 100) {
         // More than 100MB JS heap usage
-        labels.push("performance", "memory");
+        addLabelIfExists('performance');
+        addLabelIfExists('memory');
       }
     }
 
     // Touch/mobile device indicators
-    if (reportEnv.browserInfo.maxTouchPoints > 0) {
-      labels.push("mobile", "touch");
+    if (reportEnv.browserInfo.maxTouchPoints && reportEnv.browserInfo.maxTouchPoints > 0) {
+      addLabelIfExists('mobile');
+      addLabelIfExists('touch');
     }
 
     // Offline/connectivity issues
     if (reportEnv.browserInfo.onLine === false) {
-      labels.push("connectivity", "offline");
+      addLabelIfExists('connectivity');
+      addLabelIfExists('offline');
     }
   }
 
   // Storage-related issues
   if (reportEnv?.storageInfo) {
-    const localStorageKB = parseInt(reportEnv.storageInfo.localStorage) || 0;
-    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage) || 0;
+    const localStorageKB = parseInt(reportEnv.storageInfo.localStorage || '0') || 0;
+    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage || '0') || 0;
 
     if (localStorageKB > 1024 || sessionStorageKB > 512) {
       // Large storage usage
-      labels.push("storage", "performance");
+      addLabelIfExists('storage');
+      addLabelIfExists('performance');
     }
 
     if (reportEnv.storageInfo.error) {
-      labels.push("storage", "permissions");
+      addLabelIfExists('storage');
+      addLabelIfExists('permissions');
     }
   }
 
@@ -926,69 +1273,76 @@ async function generateSmartLabels(description, reportEnv, env, severity = "medi
       const docHeight = reportEnv.domInfo.documentDimensions.height;
 
       if (docHeight > 10000 || docWidth > 3000) {
-        labels.push("performance", "ui");
+        addLabelIfExists('performance');
+        addLabelIfExists('ui');
       }
     }
 
     // Focus-related issues
     if (reportEnv.domInfo.focusedElement) {
       const focusedType = reportEnv.domInfo.focusedElement.type;
-      if (focusedType === "text" || focusedType === "email" || focusedType === "password") {
-        labels.push("forms", "input");
+      if (focusedType === 'text' || focusedType === 'email' || focusedType === 'password') {
+        addLabelIfExists('forms');
+        addLabelIfExists('input');
       }
     }
   }
 
   // Performance timing analysis
   if (reportEnv?.performanceInfo && Array.isArray(reportEnv.performanceInfo)) {
-    const perfData = reportEnv.performanceInfo.join(" ").toLowerCase();
-    if (perfData.includes("slow") || perfData.includes("timeout")) {
-      labels.push("performance", "loading");
+    const perfData = reportEnv.performanceInfo.join(' ').toLowerCase();
+    if (perfData.includes('slow') || perfData.includes('timeout')) {
+      addLabelIfExists('performance');
+      addLabelIfExists('loading');
     }
   }
 
   // Active modals and UI state context
   if (pageContext?.visibleModals && pageContext.visibleModals.length > 0) {
-    labels.push("modal", "ui");
+    addLabelIfExists('modal');
+    addLabelIfExists('ui');
 
     // Check for specific modal types
-    const modalText = pageContext.visibleModals.join(" ").toLowerCase();
-    if (modalText.includes("edit") || modalText.includes("add")) {
-      labels.push("forms");
+    const modalText = pageContext.visibleModals.join(' ').toLowerCase();
+    if (modalText.includes('edit') || modalText.includes('add')) {
+      addLabelIfExists('forms');
     }
-    if (modalText.includes("debt")) {
-      labels.push("debt");
+    if (modalText.includes('debt')) {
+      addLabelIfExists('debt');
     }
-    if (modalText.includes("envelope") || modalText.includes("budget")) {
-      labels.push("envelope");
+    if (modalText.includes('envelope') || modalText.includes('budget')) {
+      addLabelIfExists('envelope');
     }
   }
 
   // Button context for interaction issues
   if (pageContext?.activeButtons && pageContext.activeButtons.length > 0) {
-    const buttonText = pageContext.activeButtons.join(" ").toLowerCase();
-    if (buttonText.includes("save") || buttonText.includes("submit")) {
-      labels.push("forms", "save");
+    const buttonText = pageContext.activeButtons.join(' ').toLowerCase();
+    if (buttonText.includes('save') || buttonText.includes('submit')) {
+      addLabelIfExists('forms');
+      addLabelIfExists('save');
     }
-    if (buttonText.includes("delete") || buttonText.includes("remove")) {
-      labels.push("delete");
+    if (buttonText.includes('delete') || buttonText.includes('remove')) {
+      addLabelIfExists('delete');
     }
-    if (buttonText.includes("sync") || buttonText.includes("backup")) {
-      labels.push("sync");
+    if (buttonText.includes('sync') || buttonText.includes('backup')) {
+      addLabelIfExists('sync');
     }
   }
 
   // Enhanced accessibility and device context
-  if (reportEnv?.colorScheme === "dark") {
-    labels.push("dark-mode");
+  if (reportEnv?.colorScheme === 'dark') {
+    addLabelIfExists('dark-mode');
   }
 
   if (reportEnv?.reducedMotion === true) {
-    labels.push("accessibility", "motion");
+    addLabelIfExists('accessibility');
+    addLabelIfExists('motion');
   }
 
   if (reportEnv?.standaloneMode === true) {
-    labels.push("pwa", "standalone");
+    addLabelIfExists('pwa');
+    addLabelIfExists('standalone');
   }
 
   // Network/connection type analysis
@@ -1031,15 +1385,17 @@ async function generateSmartLabels(description, reportEnv, env, severity = "medi
       url.includes("preview") ||
       url.includes("git-") ||
       url.includes("vercel.app") ||
-      url.includes("netlify.app")
+      url.includes('netlify.app')
     ) {
-      labels.push("dev-environment");
+      // Environment detection only - not sanitizing URLs
+      labels.push('dev-environment');
     } else if (
-      url.includes("violevault.com") ||
-      url.includes("production") ||
-      !url.includes("localhost")
+      url.includes('violevault.com') ||
+      url.includes('production') ||
+      !url.includes('localhost')
     ) {
-      labels.push("live-environment");
+      // Environment detection only - not sanitizing URLs
+      labels.push('live-environment');
     }
   }
 
@@ -1066,7 +1422,23 @@ async function generateSmartLabels(description, reportEnv, env, severity = "medi
 /**
  * Create GitHub issue using the GitHub API
  */
-async function createGitHubIssue(data, env) {
+async function createGitHubIssue(
+  data: {
+    title?: string;
+    description: string;
+    steps?: string;
+    expected?: string;
+    actual?: string;
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+    screenshotUrl: string | null;
+    sessionUrl?: string;
+    env?: ReportEnv;
+    systemInfo?: SystemInfo;
+    contextInfo?: unknown;
+    customData?: CustomData;
+  },
+  env: Env
+): Promise<GitHubIssue> {
   const {
     title,
     description,
@@ -1078,7 +1450,7 @@ async function createGitHubIssue(data, env) {
     sessionUrl,
     env: reportEnv,
     systemInfo,
-    _contextInfo,
+    contextInfo: _contextInfo,
     customData,
   } = data;
 
@@ -1151,14 +1523,14 @@ async function createGitHubIssue(data, env) {
     ) {
       // Handle single line with list indicators - split on list markers
       const line = lines[0];
-      let parts = [];
+      let parts: string[] = [];
 
-      if (line.includes("- ")) {
-        parts = line.split("- ").filter((p) => p.trim().length > 0);
-      } else if (line.includes("* ")) {
-        parts = line.split("* ").filter((p) => p.trim().length > 0);
-      } else if (line.includes("• ")) {
-        parts = line.split("• ").filter((p) => p.trim().length > 0);
+      if (line.includes('- ')) {
+        parts = line.split('- ').filter((p) => p.trim().length > 0);
+      } else if (line.includes('* ')) {
+        parts = line.split('* ').filter((p) => p.trim().length > 0);
+      } else if (line.includes('• ')) {
+        parts = line.split('• ').filter((p) => p.trim().length > 0);
       }
 
       if (parts.length > 1) {
@@ -1167,7 +1539,7 @@ async function createGitHubIssue(data, env) {
 
         processedDescription =
           `${firstPart}\n\n### Tasks/Steps:\n` +
-          remainingParts.map((part) => `- [ ] ${part.trim()}`).join("\n");
+          remainingParts.map((part) => `- [ ] ${part.trim()}`).join('\n');
       }
     }
   }
@@ -1193,14 +1565,14 @@ async function createGitHubIssue(data, env) {
     issueBody += `## Actual Behavior\n\n${actual}\n\n`;
   }
 
-  if (severity && severity !== "medium") {
-    const severityEmoji = {
-      low: "🔵",
-      medium: "🟡",
-      high: "🟠",
-      critical: "🔴",
+  if (severity && severity !== 'medium') {
+    const severityEmoji: Record<string, string> = {
+      low: '🔵',
+      medium: '🟡',
+      high: '🟠',
+      critical: '🔴',
     };
-    issueBody += `## Severity\n\n${severityEmoji[severity] || "🟡"} **${severity.toUpperCase()}**\n\n`;
+    issueBody += `## Severity\n\n${severityEmoji[severity] || '🟡'} **${severity.toUpperCase()}**\n\n`;
   }
 
   // Add enhanced user location prominently at the top (Issue #347)
@@ -1447,11 +1819,11 @@ async function createGitHubIssue(data, env) {
   }
 
   // Prepare issue data
-  const issueData = {
+  const issueData: GitHubIssueData = {
     title:
       title && title.trim()
-        ? title.substring(0, 80) + (title.length > 80 ? "..." : "")
-        : `Bug Report: ${description.substring(0, 60)}${description.length > 60 ? "..." : ""}`,
+        ? title.substring(0, 80) + (title.length > 80 ? '...' : '')
+        : `Bug Report: ${description.substring(0, 60)}${description.length > 60 ? '...' : ''}`,
     body: finalIssueBody,
     labels: smartLabels,
   };
@@ -1471,21 +1843,21 @@ async function createGitHubIssue(data, env) {
     );
 
     if (response.ok) {
-      const allMilestones = await response.json();
-      const targetMilestone = allMilestones.find((m) => m.title === milestoneInfo.current.title);
+      const allMilestones = (await response.json()) as GitHubMilestone[];
+      const targetMilestone = allMilestones.find((m) => m.title === milestoneInfo.current?.title);
       if (targetMilestone) {
         issueData.milestone = targetMilestone.number;
         console.log(
           `Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`
         );
       } else {
-        console.log(`Milestone not found: ${milestoneInfo.current.title}`);
+        console.log(`Milestone not found: ${milestoneInfo.current?.title}`);
       }
     } else {
-      console.log("Failed to fetch milestones for assignment");
+      console.log('Failed to fetch milestones for assignment');
     }
   } else {
-    console.log("No milestone info available for bug report assignment");
+    console.log('No milestone info available for bug report assignment');
   }
 
   // Create the GitHub issue
@@ -1513,7 +1885,7 @@ async function createGitHubIssue(data, env) {
     throw new Error(`GitHub API error: ${response.status} - ${errorData}`);
   }
 
-  const createdIssue = await response.json();
+  const createdIssue = (await response.json()) as GitHubIssue;
 
   // If body was too long, create a comment with full diagnostic information
   if (shouldCreateComment) {
@@ -1553,7 +1925,7 @@ async function createGitHubIssue(data, env) {
 /**
  * Send notification webhook (optional - for Slack, Discord, etc.)
  */
-async function sendNotification(data, env) {
+async function sendNotification(data: NotificationData, env: Env): Promise<void> {
   if (!env.NOTIFICATION_WEBHOOK) return;
 
   try {
@@ -1561,12 +1933,12 @@ async function sendNotification(data, env) {
       text: `🐛 New bug report received`,
       attachments: [
         {
-          color: "#ff6b6b",
+          color: '#ff6b6b',
           fields: [
             {
-              title: "Description",
+              title: 'Description',
               value:
-                data.description.substring(0, 200) + (data.description.length > 200 ? "..." : ""),
+                data.description.substring(0, 200) + (data.description.length > 200 ? '...' : ''),
               short: false,
             },
             {
