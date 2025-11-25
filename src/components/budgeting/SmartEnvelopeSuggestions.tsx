@@ -249,7 +249,7 @@ const SmartEnvelopeSuggestions = ({
 
   // When has suggestions, show full container
   const containerPadding = effectiveIsCollapsed ? "p-3" : "p-6";
-  const typedSuggestions = suggestions as Suggestion[];
+  const typedSuggestions = suggestions as unknown as Suggestion[];
 
   return (
     <div
@@ -274,9 +274,11 @@ const SmartEnvelopeSuggestions = ({
           }
           resetAnalysisSettings={resetAnalysisSettings}
           refreshSuggestions={refreshSuggestions}
-          suggestionStats={suggestionStats as SuggestionStats}
+          suggestionStats={suggestionStats as unknown as SuggestionStats}
           suggestions={typedSuggestions}
-          handleApplySuggestion={handleApplySuggestion as (suggestion: Suggestion) => void}
+          handleApplySuggestion={
+            handleApplySuggestion as unknown as (suggestion: Suggestion) => void
+          }
           handleDismissSuggestion={handleDismissSuggestion as (suggestionId: string) => void}
         />
       )}

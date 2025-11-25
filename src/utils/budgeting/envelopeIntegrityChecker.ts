@@ -1,5 +1,6 @@
 import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
+import type { Envelope } from "../../db/types";
 
 type EnvelopeWithOptionalFields = {
   id: string | number;
@@ -8,6 +9,8 @@ type EnvelopeWithOptionalFields = {
   monthlyAmount?: number;
   currentBalance?: number;
   createdAt?: string;
+  archived?: boolean;
+  lastModified?: number;
   [key: string]: unknown;
 };
 
@@ -178,6 +181,17 @@ export const repairCorruptedEnvelopes = async (
         wasRepaired = true;
       }
 
+      // Add required fields for Envelope type
+      if (repaired.archived == null) {
+        repaired.archived = false;
+        wasRepaired = true;
+      }
+
+      if (repaired.lastModified == null) {
+        repaired.lastModified = Date.now();
+        wasRepaired = true;
+      }
+
       repaired.lastUpdated = new Date().toISOString();
 
       if (wasRepaired) {
@@ -187,7 +201,8 @@ export const repairCorruptedEnvelopes = async (
 
     // Update the repaired envelopes in the database
     if (repairedEnvelopes.length > 0) {
-      await budgetDb.envelopes.bulkPut(repairedEnvelopes);
+      // Cast to Envelope[] since we've ensured all required fields are present
+      await budgetDb.envelopes.bulkPut(repairedEnvelopes as unknown as Envelope[]);
 
       logger.production("Repaired corrupted envelopes", {
         count: repairedEnvelopes.length,

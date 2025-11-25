@@ -7,29 +7,25 @@ import {
   getActionButtonStyle,
   formatRecoveryResult,
   hasRecoveryActions,
+  type SyncStatus as BaseSyncStatus,
+  type RecoveryResult as BaseRecoveryResult,
 } from "@/utils/common/syncHelpers";
 
 /**
- * Recovery result from sync health operations
+ * Extended sync status interface for this component
  */
-interface RecoveryResult {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
-/**
- * Current sync health status
- */
-interface SyncStatus {
+interface SyncStatus extends BaseSyncStatus {
   status: "CHECKING" | "HEALTHY" | "ISSUES_DETECTED" | "ERROR" | "CRITICAL_FAILURE";
   isHealthy: boolean | null;
   lastChecked: string | null;
   isLoading: boolean;
-  failedTests?: number;
-  error?: string;
   fullResults?: unknown;
 }
+
+/**
+ * Alias for recovery result type
+ */
+type RecoveryResult = BaseRecoveryResult;
 
 /**
  * SyncHealthDetails component displays detailed sync health information

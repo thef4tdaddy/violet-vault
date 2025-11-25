@@ -4,14 +4,14 @@
  * Components can import these helpers directly as they are pure display utilities
  */
 
-interface SyncStatus {
+export interface SyncStatus {
   status: string;
   isLoading?: boolean;
   failedTests?: number;
   [key: string]: unknown;
 }
 
-interface RecoveryResult {
+export interface RecoveryResult {
   success: boolean;
   message?: string;
   error?: string;

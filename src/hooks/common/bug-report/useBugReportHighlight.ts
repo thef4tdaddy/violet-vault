@@ -51,7 +51,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
       H.start();
       logger.debug("Started new Highlight.io session for bug report");
     } catch (error) {
-      logger.debug("Highlight.io start failed", (error as Error).message);
+      logger.debug("Highlight.io start failed", { error: (error as Error).message });
     }
   };
 
@@ -77,7 +77,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
         }
       }
     } catch (error) {
-      logger.debug("Highlight.io session management info", (error as Error).message);
+      logger.debug("Highlight.io session management info", { error: (error as Error).message });
     }
   };
 
@@ -88,7 +88,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
     try {
       return typeof H.getSessionURL === "function" ? H.getSessionURL() : null;
     } catch (error) {
-      logger.debug("Error getting Highlight.io session URL", error);
+      logger.debug("Error getting Highlight.io session URL", { error: (error as Error).message });
       return null;
     }
   };
@@ -100,7 +100,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
     try {
       return typeof H.getSessionMetadata === "function" ? H.getSessionMetadata() : null;
     } catch (error) {
-      logger.debug("Error getting Highlight.io session metadata", error);
+      logger.debug("Error getting Highlight.io session metadata", { error: (error as Error).message });
       return null;
     }
   };

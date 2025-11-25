@@ -104,7 +104,7 @@ export const useAuthManager = () => {
 
     // Utilities
     shouldShowAuthGateway: () => !isAuthenticated,
-    createPasswordValidator: (password) => ({
+    createPasswordValidator: (password: string) => ({
       password,
       enabled: !!password && password.length > 0,
     }),
