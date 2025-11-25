@@ -84,7 +84,11 @@ const TransactionArchiving = () => {
         archivingStatus={archivingStatus}
         needsArchiving={needsArchiving}
         getUrgencyColor={getUrgencyColor}
-        getUrgencyIcon={getUrgencyIcon}
+        getUrgencyIcon={
+          getUrgencyIcon as unknown as (
+            urgency: string
+          ) => React.ComponentType<{ className?: string }>
+        }
       />
 
       {needsArchiving && (

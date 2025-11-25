@@ -24,7 +24,14 @@ const ExtractedDataField = ({
       <div className="flex items-center justify-between">
         <span className="text-sm text-purple-900 font-semibold">{label}:</span>
         <div className="flex items-center gap-2">
-          {renderConfidenceIndicator(fieldName, confidence)}
+          {renderConfidenceIndicator(
+            fieldName,
+            (confidence as unknown as number) < 50
+              ? "low"
+              : (confidence as unknown as number) < 75
+                ? "medium"
+                : "high"
+          )}
           <span className="font-black text-black text-sm">
             {formatter(value) || "Not detected"}
           </span>

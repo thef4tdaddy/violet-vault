@@ -349,52 +349,54 @@ export const validateCondition = (condition: Condition): { isValid: boolean; err
  * @param {Array} envelopes - Available envelopes for name lookup
  * @returns {string} Human-readable condition description
  */
+const getEnvelopeBalanceDescription = (
+  condition: Condition,
+  envelopes: Envelope[],
+  operator: string
+): string => {
+  if (condition.envelopeId) {
+    const envelope = envelopes.find((e) => e.id === condition.envelopeId);
+    const envelopeName = envelope?.name || "Unknown Envelope";
+    return `${envelopeName} balance ${operator} $${condition.value}`;
+  }
+  return `Unassigned cash ${operator} $${condition.value}`;
+};
+
+const getDateRangeDescription = (condition: Condition): string => {
+  const startDate = condition.startDate
+    ? new Date(condition.startDate).toLocaleDateString()
+    : "N/A";
+  const endDate = condition.endDate ? new Date(condition.endDate).toLocaleDateString() : "N/A";
+  return `Between ${startDate} and ${endDate}`;
+};
+
+const getTransactionAmountDescription = (condition: Condition): string => {
+  const operators: Record<string, string> = {
+    greater_than: ">",
+    less_than: "<",
+    equals: "=",
+    greater_than_or_equal: "≥",
+    less_than_or_equal: "≤",
+  };
+  const operator = condition.operator ? operators[condition.operator] || condition.operator : "?";
+  return `Transaction amount ${operator} $${condition.value}`;
+};
+
 export const getConditionDescription = (
   condition: Condition,
   envelopes: Envelope[] = []
 ): string => {
   switch (condition.type) {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
-      if (condition.envelopeId) {
-        const envelope = envelopes.find((e) => e.id === condition.envelopeId);
-        const envelopeName = envelope?.name || "Unknown Envelope";
-        return `${envelopeName} balance < $${condition.value}`;
-      }
-      return `Unassigned cash < $${condition.value}`;
-
+      return getEnvelopeBalanceDescription(condition, envelopes, "<");
     case CONDITION_TYPES.BALANCE_GREATER_THAN:
-      if (condition.envelopeId) {
-        const envelope = envelopes.find((e) => e.id === condition.envelopeId);
-        const envelopeName = envelope?.name || "Unknown Envelope";
-        return `${envelopeName} balance > $${condition.value}`;
-      }
-      return `Unassigned cash > $${condition.value}`;
-
+      return getEnvelopeBalanceDescription(condition, envelopes, ">");
     case CONDITION_TYPES.UNASSIGNED_ABOVE:
       return `Unassigned cash > $${condition.value}`;
-
-    case CONDITION_TYPES.DATE_RANGE: {
-      const startDate = condition.startDate
-        ? new Date(condition.startDate).toLocaleDateString()
-        : "N/A";
-      const endDate = condition.endDate ? new Date(condition.endDate).toLocaleDateString() : "N/A";
-      return `Between ${startDate} and ${endDate}`;
-    }
-
-    case CONDITION_TYPES.TRANSACTION_AMOUNT: {
-      const operators: Record<string, string> = {
-        greater_than: ">",
-        less_than: "<",
-        equals: "=",
-        greater_than_or_equal: "≥",
-        less_than_or_equal: "≤",
-      };
-      const operator = condition.operator
-        ? operators[condition.operator] || condition.operator
-        : "?";
-      return `Transaction amount ${operator} $${condition.value}`;
-    }
-
+    case CONDITION_TYPES.DATE_RANGE:
+      return getDateRangeDescription(condition);
+    case CONDITION_TYPES.TRANSACTION_AMOUNT:
+      return getTransactionAmountDescription(condition);
     default:
       return "Unknown condition";
   }

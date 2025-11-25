@@ -33,10 +33,12 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
     useShallow(
-      (state: UiStore & {
-        setAllTransactions?: (transactions: unknown[]) => void;
-        updateBill?: (bill: unknown) => void;
-      }) => ({
+      (
+        state: UiStore & {
+          setAllTransactions?: (transactions: unknown[]) => void;
+          updateBill?: (bill: unknown) => void;
+        }
+      ) => ({
         setAllTransactions: state.setAllTransactions,
         updateBill: state.updateBill,
       })

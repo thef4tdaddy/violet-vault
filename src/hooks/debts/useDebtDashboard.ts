@@ -161,7 +161,10 @@ export const useDebtDashboard = () => {
     paymentData: { amount: number; date?: string }
   ): Promise<void> => {
     try {
-      await recordPayment(debtId, paymentData);
+      await recordPayment(debtId, {
+        amount: paymentData.amount,
+        paymentDate: paymentData.date || new Date().toISOString().split("T")[0],
+      });
       if (selectedDebt && selectedDebt.id === debtId) {
         setSelectedDebt(debts.find((d) => d.id === debtId) ?? null);
       }
