@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 4 | 0 |
-| TypeScript Errors | 47 | -2 |
-| TypeScript Strict Mode Errors | 596 | +4 |
+| TypeScript Errors | 46 | 0 |
+| TypeScript Strict Mode Errors | 590 | 0 |
 
-*Last updated: 2025-11-25 15:19:12 UTC*
+*Last updated: 2025-11-25 16:44:40 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -61,7 +61,6 @@
 - 2 errors in `src/components/receipts/ReceiptButton.tsx`
 - 2 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/components/bills/BillTable.tsx`
-- 1 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 1 errors in `src/hooks/transactions/useTransactionLedger.ts`
 - 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
@@ -96,7 +95,6 @@
 | 2 | `TS2459` |
 | 1 | `TS2741` |
 | 1 | `TS2739` |
-| 1 | `TS2717` |
 | 1 | `TS2353` |
 | 1 | `TS18047` |
 
@@ -225,7 +223,6 @@ src/hooks/transactions/useTransactionLedger.ts(80,5): error TS2322: Type 'import
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction'.
     Types of property 'date' are incompatible.
       Type 'Date' is not assignable to type 'string'.
-src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<DataDetectionResult>', but here has type '() => Promise<DataDetectionResult>'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -294,8 +291,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 3 errors in `src/components/bills/AddBillModal.tsx`
-- 2 errors in `src/utils/testing/storeTestUtils.ts`
-- 2 errors in `src/utils/sync/SyncMutex.ts`
 - 2 errors in `src/utils/security/keyExport.ts`
 - 2 errors in `src/utils/query/queryClientConfig.ts`
 - 2 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
@@ -391,8 +386,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
 - 1 errors in `src/utils/sync/resilience/index.ts`
-- 1 errors in `src/utils/sync/dataDetectionHelper.ts`
-- 1 errors in `src/utils/sync/corruptionRecoveryHelper.ts`
 - 1 errors in `src/utils/sync/SyncQueue.ts`
 - 1 errors in `src/utils/sync/RetryManager.ts`
 - 1 errors in `src/utils/stores/createSafeStore.ts`
@@ -500,14 +493,14 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 | 123 | `TS2322` |
 | 108 | `TS2345` |
 | 70 | `TS7031` |
-| 69 | `TS7006` |
+| 68 | `TS7006` |
 | 42 | `TS7005` |
 | 37 | `TS2769` |
 | 31 | `TS18048` |
 | 28 | `TS7034` |
-| 22 | `TS18046` |
-| 19 | `TS7053` |
-| 12 | `TS2339` |
+| 21 | `TS18046` |
+| 17 | `TS7053` |
+| 11 | `TS2339` |
 | 10 | `TS18047` |
 | 4 | `TS2783` |
 | 2 | `TS7022` |
@@ -521,7 +514,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 | 1 | `TS7016` |
 | 1 | `TS2741` |
 | 1 | `TS2739` |
-| 1 | `TS2717` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
 
@@ -967,8 +959,8 @@ src/components/settings/sections/DevToolsSection.tsx(17,28): error TS7031: Bindi
 src/components/settings/sections/DevToolsSection.tsx(17,51): error TS7031: Binding element 'onCreateTestHistory' implicitly has an 'any' type.
 src/components/settings/sections/GeneralSettingsSection.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/settings/sections/GeneralSettingsSection.tsx(286,25): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/settings/sections/SyncDebugToolsSection.tsx(201,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/components/settings/sections/SyncDebugToolsSection.tsx(201,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
 src/components/sync/ConflictResolutionModal.tsx(66,22): error TS18047: 'syncConflicts' is possibly 'null'.
 src/components/sync/health/SyncHealthDetails.tsx(57,50): error TS2345: Argument of type 'SyncStatus' is not assignable to parameter of type 'SyncStatus'.
   Index signature for type 'string' is missing in type 'SyncStatus'.
@@ -1891,24 +1883,16 @@ src/utils/stores/createSafeStore.ts(182,5): error TS2345: Argument of type 'Stat
           Type 'Record<string, unknown>' is not assignable to type 'T'.
             'Record<string, unknown>' is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of constraint 'object'.
 src/utils/sync/RetryManager.ts(171,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'RetryableError'.
-src/utils/sync/SyncMutex.ts(71,15): error TS2339: Property 'resolve' does not exist on type '{ resolve: () => void; operationName: string; } | undefined'.
-src/utils/sync/SyncMutex.ts(80,18): error TS7006: Parameter 'duration' implicitly has an 'any' type.
 src/utils/sync/SyncQueue.ts(79,39): error TS2345: Argument of type 'QueueItem<T>' is not assignable to parameter of type 'QueueItem<unknown>'.
   Types of property 'operation' are incompatible.
     Type '(data: T) => Promise<unknown>' is not assignable to type '(data: unknown) => Promise<unknown>'.
       Types of parameters 'data' and 'data' are incompatible.
         Type 'unknown' is not assignable to type 'T'.
           'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
-src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent property declarations must have the same type.  Property 'detectLocalDataDebug' must be of type '() => Promise<DataDetectionResult>', but here has type '() => Promise<DataDetectionResult>'.
-src/utils/sync/dataDetectionHelper.ts(118,48): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(517,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(536,16): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/masterSyncValidator.ts(568,14): error TS18046: 'error' is of type 'unknown'.
 src/utils/sync/resilience/index.ts(52,19): error TS7006: Parameter 'operation' implicitly has an 'any' type.
-src/utils/testing/storeTestUtils.ts(58,13): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
-  No index signature with a parameter of type 'string' was found on type 'unknown'.
-src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'unknown'.
-  No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
 ```
 
