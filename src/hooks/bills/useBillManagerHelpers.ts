@@ -250,7 +250,7 @@ const normalizeBillForUI = (bill: BillRecord, index: number): BillRecord => {
  */
 export const processBills = (
   combinedBills: BillRecord[],
-  onUpdateBill: ((bill: BillRecord) => void) | undefined,
+  onUpdateBill: ((bill: BillRecord | Bill) => void) | undefined,
   updateBillMutation: (updates: {
     billId: string;
     updates: Record<string, unknown>;
@@ -283,7 +283,9 @@ export const processBills = (
  * Categorize and calculate totals for bills
  */
 export const categorizeBillsWithTotals = (bills: BillRecord[]) => {
-  const categorizedBills = categorizeBills(bills) as unknown as ReturnType<typeof categorizeBills>;
+  const categorizedBills = categorizeBills(
+    bills as unknown as Bill[]
+  ) as unknown as ReturnType<typeof categorizeBills>;
   const totals = calculateBillTotals(categorizedBills);
   return { categorizedBills, totals };
 };
@@ -314,7 +316,10 @@ export const getFilteredBills = (
   filterOptions: FilterOptions
 ): BillRecord[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
-  return filterBills(billsToFilter, filterOptions) as unknown as BillRecord[];
+  return filterBills(
+    billsToFilter as unknown as Bill[],
+    filterOptions
+  ) as unknown as BillRecord[];
 };
 
 /**
@@ -427,12 +432,12 @@ export const createInitialUIState = () => ({
 interface UISetters {
   setSelectedBills: (bills: Set<string>) => void;
   setViewMode: (mode: string) => void;
-  setShowBillDetail: (bill: BillRecord | null) => void;
+  setShowBillDetail: (bill: BillRecord | Bill | null) => void;
   setShowAddBillModal: (show: boolean) => void;
-  setEditingBill: (bill: BillRecord | null) => void;
+  setEditingBill: (bill: BillRecord | Bill | null) => void;
   setShowBulkUpdateModal: (show: boolean) => void;
   setShowDiscoveryModal: (show: boolean) => void;
-  setHistoryBill: (bill: BillRecord | null) => void;
+  setHistoryBill: (bill: BillRecord | Bill | null) => void;
   setFilterOptions: (options: FilterOptions) => void;
 }
 
@@ -468,7 +473,7 @@ export const processAndResolveData = (
   budgetBills: unknown[],
   viewMode: string,
   filterOptions: FilterOptions,
-  onUpdateBill?: (bill: BillRecord) => void | Promise<void>,
+  onUpdateBill?: (bill: BillRecord | Bill) => void | Promise<void>,
   updateBillMutation?: (updates: {
     billId: string;
     updates: Record<string, unknown>;
@@ -563,9 +568,9 @@ export const handleSearchNewBills = async (
  */
 export const handleAddDiscoveredBillsAction = async (
   params: {
-    billsToAdd: BillRecord[];
-    onCreateRecurringBill?: (bill: BillRecord) => void | Promise<void>;
-    addBill: (bill: BillRecord) => Promise<void>;
+    billsToAdd: (BillRecord | Bill)[];
+    onCreateRecurringBill?: (bill: BillRecord | Bill) => void | Promise<void>;
+    addBill: (bill: BillRecord | Bill) => Promise<void>;
     onError?: (error: string) => void;
   },
   callbacks: {
@@ -574,7 +579,11 @@ export const handleAddDiscoveredBillsAction = async (
   }
 ): Promise<void> => {
   try {
-    await addDiscoveredBills(params.billsToAdd, params.onCreateRecurringBill, params.addBill);
+    await addDiscoveredBills(
+      params.billsToAdd as BillRecord[],
+      params.onCreateRecurringBill as ((bill: BillRecord) => void | Promise<void>) | undefined,
+      params.addBill as (bill: BillRecord) => Promise<void>
+    );
     callbacks.setShowDiscoveryModal(false);
     callbacks.setDiscoveredBills([]);
   } catch (error) {
