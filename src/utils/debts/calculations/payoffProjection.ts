@@ -8,7 +8,13 @@
  * @param {Object} debt - The debt object
  * @returns {Object} Payoff projection with monthsToPayoff, totalInterest, payoffDate
  */
-export function calculatePayoffProjection(debt) {
+interface DebtInput {
+  currentBalance: number | string;
+  minimumPayment: number | string;
+  interestRate: number | string;
+}
+
+export function calculatePayoffProjection(debt: DebtInput) {
   // Ensure we have valid numeric values
   const currentBalance = parseFloat(debt.currentBalance) || 0;
   const minimumPayment = parseFloat(debt.minimumPayment) || 0;

@@ -170,7 +170,7 @@ export const useTransactionReconciliation = (
   );
 
   const handleAutoReconcileDifference = useCallback(
-    (difference) => {
+    (difference: number) => {
       // Validate difference
       if (!difference || Math.abs(difference) < 0.01) {
         logger.warn("Auto-reconcile called with invalid difference", { difference });

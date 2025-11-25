@@ -58,7 +58,7 @@ export const validateTransactionData = (transactionData: unknown): ValidationRes
     logger.error("Error validating transaction data", error);
     return {
       isValid: false,
-      errors: ["Validation error: " + error.message],
+      errors: ["Validation error: " + (error as Error).message],
     };
   }
 };

@@ -89,7 +89,7 @@ export const backgroundSync = {
         } catch (restoreError) {
           logger.warn("Failed to restore cached query", {
             key: entry.key,
-            error: restoreError.message,
+            error: (restoreError as Error).message,
             source: "backgroundSync",
           });
         }

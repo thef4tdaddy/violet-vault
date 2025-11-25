@@ -114,7 +114,7 @@ export const quickToast = {
 
   // Sync toasts
   syncSuccess: () => useToastStore.getState().showSuccess(TOAST_MESSAGES.SYNC.SUCCESS),
-  syncFailed: (error) =>
+  syncFailed: (error: string) =>
     useToastStore.getState().showError(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
 };
 

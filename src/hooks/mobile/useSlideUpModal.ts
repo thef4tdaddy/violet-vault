@@ -8,7 +8,14 @@ import { useState, useCallback } from "react";
  *
  * Part of Issue #164 - Implement Slide-Up Modals for Mobile Flows
  */
-const useSlideUpModal = (initialConfig = {}) => {
+interface SlideUpModalConfig {
+  height?: string;
+  title?: string;
+  showHandle?: boolean;
+  backdrop?: boolean;
+}
+
+const useSlideUpModal = (initialConfig: SlideUpModalConfig = {}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState({
     height: "three-quarters",
@@ -18,7 +25,7 @@ const useSlideUpModal = (initialConfig = {}) => {
     ...initialConfig,
   });
 
-  const openModal = useCallback((newConfig = {}) => {
+  const openModal = useCallback((newConfig: SlideUpModalConfig = {}) => {
     setConfig((prev) => ({ ...prev, ...newConfig }));
     setIsOpen(true);
   }, []);
@@ -28,7 +35,7 @@ const useSlideUpModal = (initialConfig = {}) => {
   }, []);
 
   const toggleModal = useCallback(
-    (newConfig = {}) => {
+    (newConfig: SlideUpModalConfig = {}) => {
       if (isOpen) {
         closeModal();
       } else {
@@ -38,7 +45,7 @@ const useSlideUpModal = (initialConfig = {}) => {
     [isOpen, openModal, closeModal]
   );
 
-  const updateConfig = useCallback((newConfig) => {
+  const updateConfig = useCallback((newConfig: SlideUpModalConfig) => {
     setConfig((prev) => ({ ...prev, ...newConfig }));
   }, []);
 

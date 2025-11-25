@@ -2,8 +2,19 @@
  * Hook for connection configuration and display settings
  * Extracted from useConnectionManager.js for better maintainability
  */
+
+type EntityType = "bill" | "envelope" | "debt";
+
+interface ConnectionConfig {
+  displayTitle: string;
+  selectTitle: string;
+  connectionType: string;
+  selectPrompt: string;
+  tip: string;
+}
+
 export const useConnectionConfig = () => {
-  const getConnectionConfig = (entityType) => {
+  const getConnectionConfig = (entityType: EntityType | string): ConnectionConfig => {
     switch (entityType) {
       case "bill":
         return {
