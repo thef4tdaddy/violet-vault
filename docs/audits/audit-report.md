@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 33 | -4 |
-| TypeScript Strict Mode Errors | 209 | -4 |
+| TypeScript Errors | 30 | -3 |
+| TypeScript Strict Mode Errors | 207 | -2 |
 
-*Last updated: 2025-11-25 23:32:56 UTC*
+*Last updated: 2025-11-25 23:45:28 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -29,15 +29,17 @@
 ### Files with Most Issues
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
-| 1 | `react-hooks/exhaustive-deps` |
+| 2 | `react-hooks/exhaustive-deps` |
 | 1 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts:82:6 - 1 - React Hook useMemo has a missing dependency: 'bill'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:52:9 - 1 - The 'budgetWithDefaults' logical expression could make the dependencies of useCallback Hook (at line 123) change on every render. To fix this, wrap the initialization of 'budgetWithDefaults' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:104:29 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 ```
@@ -45,7 +47,6 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 3 errors in `src/components/transactions/TransactionTable.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
@@ -53,9 +54,9 @@
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
-- 1 errors in `src/hooks/bills/useBillDetail.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
 - 1 errors in `src/components/ui/ConfirmModal.tsx`
+- 1 errors in `src/components/transactions/TransactionTable.tsx`
 - 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
@@ -75,11 +76,10 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 19 | `TS2322` |
+| 17 | `TS2322` |
 | 9 | `TS2345` |
 | 3 | `TS2769` |
 | 1 | `TS2741` |
-| 1 | `TS18047` |
 
 ### Detailed Type Error Report
 ```
@@ -148,10 +148,10 @@ src/components/settings/SecuritySettings.tsx(74,16): error TS2322: Type '{ isLoc
 src/components/settings/TransactionArchiving.tsx(106,9): error TS2322: Type '{ totalCount: number; cutoffDate: Date; categories: Record<string, { count: number; amount: number; }>; envelopes: Record<string, { count: number; amount: number; }>; totalAmount: number; dateRange: { ...; }; }' is not assignable to type 'PreviewData'.
   The types of 'dateRange.earliest' are incompatible between these types.
     Type 'Date' is not assignable to type 'string'.
-src/components/transactions/TransactionLedger.tsx(183,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
+src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
   Type 'unknown' is not assignable to type 'DataRow'.
     Index signature for type 'string' is missing in type '{}'.
-src/components/transactions/TransactionLedger.tsx(189,7): error TS2322: Type '(data: unknown[]) => void' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
+src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void>' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
 src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
@@ -161,10 +161,6 @@ src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type 
         Type 'number' is not assignable to type 'string'.
 src/components/transactions/TransactionTable.tsx(124,21): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to type 'Transaction'.
   Index signature for type 'string' is missing in type 'Transaction'.
-src/components/transactions/TransactionTable.tsx(127,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
-  Index signature for type 'string' is missing in type 'VirtualItem'.
-src/components/transactions/TransactionTable.tsx(135,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
-  Index signature for type 'string' is missing in type 'VirtualItem'.
 src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Argument of type 'unknown' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
@@ -172,7 +168,6 @@ src/components/ui/SecurityAlert.tsx(99,22): error TS2769: No overload matches th
   The last overload gave the following error.
     Argument of type 'string | number | bigint | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | ComponentType<...>' is not assignable to parameter of type 'string | FunctionComponent<{ className?: string; }> | ComponentClass<{ className?: string; }, any>'.
       Type 'number' is not assignable to type 'string | FunctionComponent<{ className?: string; }> | ComponentClass<{ className?: string; }, any>'.
-src/hooks/bills/useBillDetail.ts(75,51): error TS18047: 'dueDate' is possibly 'null'.
 src/hooks/bills/useBillManagerHelpers.ts(286,44): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill[]' is not assignable to parameter of type 'Bill[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to type 'Bill'.
     Index signature for type 'string' is missing in type 'Bill'.
@@ -196,7 +191,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 4 errors in `src/components/layout/ViewRenderer.tsx`
-- 3 errors in `src/components/transactions/TransactionTable.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
 - 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
@@ -289,6 +283,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
 - 1 errors in `src/components/ui/ConfirmModal.tsx`
 - 1 errors in `src/components/transactions/splitter/SplitTotals.tsx`
+- 1 errors in `src/components/transactions/TransactionTable.tsx`
 - 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 1 errors in `src/components/settings/archiving/ArchivingResult.tsx`
@@ -351,7 +346,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 79 | `TS2322` |
+| 77 | `TS2322` |
 | 60 | `TS2345` |
 | 17 | `TS7031` |
 | 11 | `TS7006` |
@@ -656,20 +651,20 @@ src/components/settings/archiving/ArchivingResult.tsx(4,28): error TS7031: Bindi
 src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
 src/components/sync/ConflictResolutionModal.tsx(66,22): error TS18047: 'syncConflicts' is possibly 'null'.
-src/components/transactions/TransactionLedger.tsx(183,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
+src/components/transactions/TransactionLedger.tsx(505,7): error TS2322: Type 'Dispatch<SetStateAction<TransactionFormData>>' is not assignable to type '(form: unknown) => void'.
+  Types of parameters 'value' and 'form' are incompatible.
+    Type 'unknown' is not assignable to type 'SetStateAction<TransactionFormData>'.
+src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
   Type 'unknown' is not assignable to type 'DataRow'.
-src/components/transactions/TransactionLedger.tsx(186,7): error TS2322: Type '(mapping: Record<string, string>) => void' is not assignable to type '(mapping: FieldMapping) => void'.
+src/components/transactions/TransactionLedger.tsx(518,7): error TS2322: Type '(mapping: Record<string, string>) => void' is not assignable to type '(mapping: FieldMapping) => void'.
   Types of parameters 'mapping' and 'mapping' are incompatible.
     Type 'FieldMapping' is not assignable to type 'Record<string, string>'.
       'string' index signatures are incompatible.
         Type 'string | undefined' is not assignable to type 'string'.
           Type 'undefined' is not assignable to type 'string'.
-src/components/transactions/TransactionLedger.tsx(189,7): error TS2322: Type '(data: unknown[]) => void' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
+src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void> | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
-src/components/transactions/TransactionLedger.tsx(491,7): error TS2322: Type 'Dispatch<SetStateAction<TransactionFormData>>' is not assignable to type '(form: unknown) => void'.
-  Types of parameters 'value' and 'form' are incompatible.
-    Type 'unknown' is not assignable to type 'SetStateAction<TransactionFormData>'.
 src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean | undefined; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
   Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number | ""; isOriginalItem?: boolean; originalItem?: unknown; }' is not assignable to type 'Split'.
     Types of property 'envelopeId' are incompatible.
@@ -677,10 +672,6 @@ src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type 
         Type 'number' is not assignable to type 'string'.
 src/components/transactions/TransactionTable.tsx(124,21): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to type 'Transaction'.
   Index signature for type 'string' is missing in type 'Transaction'.
-src/components/transactions/TransactionTable.tsx(127,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
-  Index signature for type 'string' is missing in type 'VirtualItem'.
-src/components/transactions/TransactionTable.tsx(135,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
-  Index signature for type 'string' is missing in type 'VirtualItem'.
 src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
 src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
   The last overload gave the following error.
