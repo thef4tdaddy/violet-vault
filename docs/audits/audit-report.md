@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | 0 |
-| TypeScript Errors | 62 | -1 |
-| TypeScript Strict Mode Errors | 481 | -1 |
+| ESLint Issues | 6 | +1 |
+| TypeScript Errors | 62 | 0 |
+| TypeScript Strict Mode Errors | 481 | 0 |
 
-*Last updated: 2025-11-25 19:08:35 UTC*
+*Last updated: 2025-11-25 19:15:51 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,6 +27,7 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/common/lazyImport.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/autofunding/conditions.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/sync/useManualSync.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
@@ -37,6 +38,7 @@
 | Count | Rule ID |
 |---|---|
 | 4 | `max-lines-per-function` |
+| 1 | `no-undef` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
@@ -46,6 +48,7 @@
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/sync/useManualSync.ts:65:30 - 1 - Arrow function has too many lines (161). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/utils/budgeting/autofunding/conditions.ts:355:11 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
+/home/runner/work/violet-vault/violet-vault/src/utils/common/lazyImport.ts:14:31 - 1 - 'React' is not defined. (no-undef)
 ```
 
 ## Typecheck Audit

@@ -13,8 +13,10 @@ echo "🔍 Running TypeScript type check before push..."
 # Ignore tsc exit code - we only care about error count vs threshold
 TYPECHECK_OUTPUT=$(npx tsc --noEmit 2>&1 || true)
 ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | { grep "error TS" || true; } | wc -l | tr -d ' ')
-# Threshold increased to 65 to account for pre-existing type compatibility issues
-# between different Transaction/Bill/Envelope type definitions (Issue #1289 batch 5/6)
+# TODO: Reduce threshold back to 50 once the type compatibility issues between 
+# Transaction/Bill/Envelope type definitions are resolved (tracked in Issue #1289)
+# The 62 remaining errors are due to multiple type definitions for the same entities
+# across different files (e.g., src/db/types.ts vs src/types/finance.ts)
 ERROR_THRESHOLD=65
 
 if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
