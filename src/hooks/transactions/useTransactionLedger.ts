@@ -103,8 +103,8 @@ export const useTransactionLedger = (currentUser: unknown) => {
 
   // Use extracted operations hook
   const operations = useLedgerOperations(
-    addTransactionAsync,
-    deleteTransaction,
+    addTransactionAsync as never,
+    deleteTransaction as never,
     updateBill,
     envelopes as unknown as Array<Record<string, unknown>>
   );
@@ -158,7 +158,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
     if (ledgerState.editingTransaction) {
       const transactionWithId = {
         ...newTransaction,
-        id: ledgerState.editingTransaction.id,
+        id: (ledgerState.editingTransaction as { id: string | number }).id,
       };
       try {
         await updateTransactionAsync({

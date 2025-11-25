@@ -78,10 +78,10 @@ export const useDebtManagement = () => {
     createAPIWrappers(
       addEnvelopeAsync as unknown as (data: unknown) => unknown,
       createEnvelope as unknown as (data: unknown) => unknown,
-      addBillAsync,
+      addBillAsync as never,
       (id: string, updates: unknown) =>
         updateBillAsync({ billId: id, updates: updates as Record<string, unknown> }),
-      createTransaction
+      createTransaction as never
     );
 
   const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
@@ -208,7 +208,7 @@ export const useDebtManagement = () => {
     return recordPaymentOperation({
       debt: debt as unknown as DebtForHelper,
       paymentData,
-      updateDebtData,
+      updateDebtData: updateDebtData as never,
       createTransaction: createTransactionWrapper,
     });
   };
@@ -221,7 +221,7 @@ export const useDebtManagement = () => {
       debts: debts as unknown as DebtForHelper[],
       bills: normalizedBills as unknown as HelperBill[],
       updateBill: updateBillWrapper,
-      updateDebtData,
+      updateDebtData: updateDebtData as never,
     });
   };
 
@@ -230,7 +230,7 @@ export const useDebtManagement = () => {
     return syncDebtDueDatesOperation({
       debts: debts as unknown as DebtForHelper[],
       bills: normalizedBills as unknown as HelperBill[],
-      updateDebtData,
+      updateDebtData: updateDebtData as never,
     });
   };
 
@@ -240,7 +240,12 @@ export const useDebtManagement = () => {
     author = "Unknown User"
   ) => {
     if (!updateDebtData) throw new Error("Update debt function not available");
-    return updateDebtOperation({ debtId, updates, author, updateDebtData });
+    return updateDebtOperation({
+      debtId,
+      updates,
+      author,
+      updateDebtData: updateDebtData as never,
+    });
   };
 
   const transformBillsForDelete = () => {

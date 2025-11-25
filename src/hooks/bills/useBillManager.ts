@@ -16,7 +16,6 @@ import {
   handleAddDiscoveredBillsAction,
   createUIActions,
   processAndResolveData,
-  type FilterOptions,
 } from "@/hooks/bills/useBillManagerHelpers";
 import { useBillManagerUIState } from "./useBillManagerUIState";
 import type { Bill as BillType, Envelope as EnvelopeType } from "@/types/bills";
@@ -122,7 +121,7 @@ export const useBillManager = ({
         (budget.bills as unknown as Bill[]) || [],
         uiState.viewMode,
         uiState.filterOptions,
-        onUpdateBill,
+        onUpdateBill as never,
         updateBillAsync as unknown as (updates: {
           billId: string;
           updates: Record<string, unknown>;
@@ -147,12 +146,9 @@ export const useBillManager = ({
     bills: bills as Bill[],
     envelopes: envelopes as Envelope[],
     updateBill: updateBillForOperations,
-    onUpdateBill,
+    onUpdateBill: onUpdateBill as never,
     onError,
-    budget: budget as {
-      unassignedCash?: number;
-      updateBill?: (bill: Bill) => void | Promise<void>;
-    },
+    budget: budget as never,
     markBillPaid: markBillPaidAsync,
   });
 
@@ -160,15 +156,15 @@ export const useBillManager = ({
     () =>
       handleSearchNewBills(
         {
-          transactions,
-          bills,
-          envelopes,
+          transactions: transactions as never,
+          bills: bills as never,
+          envelopes: envelopes as never,
           onSearchNewBills,
           onError,
         },
         {
           setIsSearching: uiState.setIsSearching,
-          setDiscoveredBills: uiState.setDiscoveredBills,
+          setDiscoveredBills: uiState.setDiscoveredBills as never,
           setShowDiscoveryModal: uiState.setShowDiscoveryModal,
         }
       ),
@@ -179,14 +175,14 @@ export const useBillManager = ({
     (billsToAdd: Bill[]) =>
       handleAddDiscoveredBillsAction(
         {
-          billsToAdd,
-          onCreateRecurringBill,
-          addBill: addBill as unknown as (bill: Bill) => Promise<void>,
+          billsToAdd: billsToAdd as never,
+          onCreateRecurringBill: onCreateRecurringBill as never,
+          addBill: addBill as never,
           onError,
         },
         {
           setShowDiscoveryModal: uiState.setShowDiscoveryModal,
-          setDiscoveredBills: uiState.setDiscoveredBills,
+          setDiscoveredBills: uiState.setDiscoveredBills as never,
         }
       ),
     [addBill, onCreateRecurringBill, onError, uiState]
@@ -201,17 +197,17 @@ export const useBillManager = ({
   );
 
   const uiActions = createUIActions({
-    setSelectedBills: ((bills: Set<string>) => {
+    setSelectedBills: (bills: Set<string>) => {
       uiState.setSelectedBills(bills);
-    }) as unknown as (bills: Set<string>) => void,
+    },
     setViewMode: uiState.setViewMode,
-    setShowBillDetail: uiState.setShowBillDetail as (bill: Bill | null) => void,
+    setShowBillDetail: (bill) => uiState.setShowBillDetail(bill),
     setShowAddBillModal: uiState.setShowAddBillModal,
-    setEditingBill: uiState.setEditingBill as (bill: Bill | null) => void,
+    setEditingBill: (bill) => uiState.setEditingBill(bill),
     setShowBulkUpdateModal: uiState.setShowBulkUpdateModal,
     setShowDiscoveryModal: uiState.setShowDiscoveryModal,
-    setHistoryBill: uiState.setHistoryBill as (bill: Bill | null) => void,
-    setFilterOptions: uiState.setFilterOptions as (options: FilterOptions) => void,
+    setHistoryBill: (bill) => uiState.setHistoryBill(bill),
+    setFilterOptions: uiState.setFilterOptions,
   });
   const isLoading = transactionsLoading || envelopesLoading || billsLoading;
 

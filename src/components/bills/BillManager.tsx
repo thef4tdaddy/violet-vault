@@ -141,8 +141,8 @@ const BillManager: React.FC<BillManagerProps> = ({
     selectedBills: selectedBillsRaw as Set<string>,
     setSelectedBills,
     setShowAddBillModal,
-    setEditingBill,
-    setHistoryBill,
+    setEditingBill: (bill) => setEditingBill(bill as Bill | null),
+    setHistoryBill: (bill) => setHistoryBill(bill as Bill | null),
   });
 
   // Edit lock for collaborative editing
@@ -169,7 +169,7 @@ const BillManager: React.FC<BillManagerProps> = ({
       {/* Header with Actions */}
       <BillManagerHeader
         isEditLocked={isEditLocked}
-        currentEditor={currentEditor}
+        currentEditor={currentEditor ?? ""}
         isSearching={isSearching}
         searchNewBills={searchNewBills}
         handleAddNewBill={handleAddNewBill}
@@ -205,7 +205,7 @@ const BillManager: React.FC<BillManagerProps> = ({
         selectAllBills={selectAllBills}
         toggleBillSelection={toggleBillSelection}
         setShowBulkUpdateModal={setShowBulkUpdateModal}
-        setShowBillDetail={setShowBillDetail}
+        setShowBillDetail={(bill) => setShowBillDetail(bill as unknown as Bill | null)}
         getBillDisplayData={getBillDisplayData as never}
         billOperations={billTableOperations}
         categorizedBills={categorizedBills as never}
@@ -217,26 +217,28 @@ const BillManager: React.FC<BillManagerProps> = ({
         showAddBillModal={showAddBillModal}
         showBulkUpdateModal={showBulkUpdateModal}
         showDiscoveryModal={showDiscoveryModal}
-        showBillDetail={showBillDetail}
-        historyBill={historyBill}
-        editingBill={editingBill}
-        bills={bills}
-        envelopes={_envelopes}
+        showBillDetail={
+          showBillDetail as { id: string; name: string; [key: string]: unknown } | null
+        }
+        historyBill={historyBill as { id: string; name: string; [key: string]: unknown } | null}
+        editingBill={editingBill as { id: string; name: string; [key: string]: unknown } | null}
+        bills={bills as { id: string; name: string; [key: string]: unknown }[]}
+        envelopes={_envelopes as { id: string; name: string; [key: string]: unknown }[]}
         selectedBills={selectedBillsRaw as Set<string>}
-        discoveredBills={discoveredBills}
+        discoveredBills={discoveredBills as { id: string; name: string; [key: string]: unknown }[]}
         handleCloseModal={handleCloseModal}
         setShowBulkUpdateModal={setShowBulkUpdateModal}
         setShowDiscoveryModal={setShowDiscoveryModal}
-        setShowBillDetail={setShowBillDetail}
-        setHistoryBill={setHistoryBill}
-        handleEditBill={handleEditBill}
+        setShowBillDetail={(bill) => setShowBillDetail(bill as unknown as Bill | null)}
+        setHistoryBill={(bill) => setHistoryBill(bill as unknown as Bill | null)}
+        handleEditBill={(bill) => handleEditBill(bill as unknown)}
         addBill={addBill as never}
         updateBill={updateBill as never}
         deleteBill={deleteBill as never}
-        handleBulkUpdate={handleBulkUpdate}
-        handleAddDiscoveredBills={handleAddDiscoveredBills}
+        handleBulkUpdate={(entities) => handleBulkUpdate(entities as never)}
+        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as never)}
         billOperations={billOperations}
-        onError={onError}
+        onError={onError ?? (() => {})}
       />
     </div>
   );

@@ -5,21 +5,39 @@
 import { useState } from "react";
 
 import type { FilterOptions } from "./useBillManagerHelpers";
+import type { Bill } from "@/types/bills";
+
+/**
+ * Bill record type for UI state
+ */
+interface BillRecord {
+  id: string;
+  name: string;
+  amount: number;
+  category?: string;
+  dueDate: Date | string | null;
+  metadata?: Record<string, unknown>;
+  isPaid?: boolean;
+  isRecurring?: boolean;
+  lastModified?: number;
+  envelopeId?: string;
+  [key: string]: unknown;
+}
 
 /**
  * Custom hook for managing UI state in bill manager
  */
 export const useBillManagerUIState = () => {
-  const [selectedBills, setSelectedBills] = useState(new Set());
-  const [viewMode, setViewMode] = useState("upcoming");
-  const [isSearching, setIsSearching] = useState(false);
-  const [showBillDetail, setShowBillDetail] = useState(null);
-  const [showAddBillModal, setShowAddBillModal] = useState(false);
-  const [editingBill, setEditingBill] = useState(null);
-  const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
-  const [showDiscoveryModal, setShowDiscoveryModal] = useState(false);
-  const [discoveredBills, setDiscoveredBills] = useState([]);
-  const [historyBill, setHistoryBill] = useState(null);
+  const [selectedBills, setSelectedBills] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<string>("upcoming");
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [showBillDetail, setShowBillDetail] = useState<Bill | BillRecord | null>(null);
+  const [showAddBillModal, setShowAddBillModal] = useState<boolean>(false);
+  const [editingBill, setEditingBill] = useState<Bill | BillRecord | null>(null);
+  const [showBulkUpdateModal, setShowBulkUpdateModal] = useState<boolean>(false);
+  const [showDiscoveryModal, setShowDiscoveryModal] = useState<boolean>(false);
+  const [discoveredBills, setDiscoveredBills] = useState<BillRecord[]>([]);
+  const [historyBill, setHistoryBill] = useState<Bill | BillRecord | null>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     search: "",
     urgency: "all",
