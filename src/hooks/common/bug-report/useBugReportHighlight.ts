@@ -51,7 +51,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
       H.start();
       logger.debug("Started new Highlight.io session for bug report");
     } catch (error) {
-      logger.debug("Highlight.io start failed", (error as Error).message);
+      logger.debug("Highlight.io start failed", { error: (error as Error).message });
     }
   };
 
@@ -77,7 +77,7 @@ export const useBugReportHighlight = (): HighlightSessionActions => {
         }
       }
     } catch (error) {
-      logger.debug("Highlight.io session management info", (error as Error).message);
+      logger.debug("Highlight.io session management info", { error: (error as Error).message });
     }
   };
 

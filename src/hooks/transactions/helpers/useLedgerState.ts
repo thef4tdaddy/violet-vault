@@ -14,7 +14,7 @@ export const useLedgerState = () => {
   const [typeFilter, setTypeFilter] = useState("all");
   const [envelopeFilter, setEnvelopeFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleFilterChange = (key: string, value: string) => {
@@ -35,7 +35,7 @@ export const useLedgerState = () => {
         setSortBy(value);
         break;
       case "sortOrder":
-        setSortOrder(value);
+        setSortOrder(value as "asc" | "desc");
         break;
     }
   };

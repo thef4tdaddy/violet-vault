@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils";
 
 interface ShareCodeDisplayProps {
   shareCode: string;
-  onCreateBudget: () => void;
+  onCreateBudget: (e?: React.FormEvent) => void | Promise<void>;
   onBack: () => void;
   isLoading: boolean;
 }
