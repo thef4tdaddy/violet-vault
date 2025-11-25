@@ -50,17 +50,16 @@ export class StoreTestHelper<T extends Record<string, unknown>> {
 
   /**
    * Execute action and return new state
+   * Note: Action must be a function that optionally returns a Promise
    */
-  async executeAction<K extends keyof T>(
-    actionName: K,
-    ...args: T[K] extends (...a: infer Args) => unknown ? Args : never[]
-  ): Promise<T> {
+  async executeAction(actionName: keyof T, ...args: unknown[]): Promise<T> {
     const { result } = renderHook(() => this.storeHook());
 
     await act(async () => {
       const action = result.current[actionName];
       if (typeof action === "function") {
-        await (action as (...a: unknown[]) => Promise<unknown>)(...args);
+        const actionFn = action as (...a: unknown[]) => unknown | Promise<unknown>;
+        await actionFn(...args);
       }
     });
 

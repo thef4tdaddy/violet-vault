@@ -119,8 +119,9 @@ export const hasLocalData = async (): Promise<boolean> => {
     const stats = await budgetDb.getDatabaseStats();
     return stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    logger.warn("⚠️ Quick data check failed:", { error: errorMsg });
+    logger.warn("⚠️ Quick data check failed:", {
+      message: error instanceof Error ? error.message : String(error),
+    });
     return false; // Assume no data for safety
   }
 };
