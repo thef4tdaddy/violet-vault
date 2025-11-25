@@ -28,7 +28,8 @@ export const analyzeUncategorizedTransactions = (
   settings: AnalysisSettings
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
-  const { minTransactionCount, minAmount } = settings;
+  const minTransactionCount = settings.minTransactionCount ?? 3;
+  const minAmount = settings.minAmount ?? 20;
 
   // Group uncategorized transactions by merchant
   const uncategorizedTransactions = transactions.filter(
@@ -101,7 +102,7 @@ export const analyzeUnusedCategories = (
   settings: AnalysisSettings
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
-  const { unusedCategoryThreshold } = settings;
+  const unusedCategoryThreshold = settings.unusedCategoryThreshold ?? 3;
 
   const recentDate = new Date();
   recentDate.setMonth(recentDate.getMonth() - unusedCategoryThreshold);

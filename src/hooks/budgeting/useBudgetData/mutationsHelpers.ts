@@ -78,7 +78,8 @@ export const reverseEnvelopeAllocations = async (
   for (const allocation of envelopeAllocations) {
     const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
     if (envelope) {
-      const newBalance = envelope.currentBalance - allocation.amount;
+      const currentBalance = envelope.currentBalance ?? 0;
+      const newBalance = currentBalance - allocation.amount;
       await budgetDb.envelopes.update(allocation.envelopeId, {
         currentBalance: Math.max(0, newBalance),
       });
@@ -102,8 +103,8 @@ export const deleteAssociatedPaycheck = async (
   }
 
   const currentMetadata = await getBudgetMetadata();
-  await reversePaycheckBalances(paycheckRecord, currentMetadata);
-  await reverseEnvelopeAllocations(paycheckRecord.envelopeAllocations);
+  await reversePaycheckBalances(paycheckRecord, currentMetadata as BudgetMetadata);
+  await reverseEnvelopeAllocations(paycheckRecord.envelopeAllocations ?? []);
   await budgetDb.paycheckHistory.delete(paycheckId);
 
   logger.info("Associated paycheck deleted and effects reversed", {

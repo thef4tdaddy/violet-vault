@@ -11,7 +11,7 @@ export const shareCodeManager = {
    * This is the single source of truth for share code generation
    * @returns {string} 4-word BIP39 share code
    */
-  generateShareCode() {
+  generateShareCode(): string {
     const shareCode = shareCodeUtils.generateShareCode();
 
     logger.debug("Generated new share code", {
@@ -27,7 +27,7 @@ export const shareCodeManager = {
    * @param {string} shareCode - The share code to validate
    * @returns {boolean} True if valid format
    */
-  isValidShareCode(shareCode) {
+  isValidShareCode(shareCode: string): boolean {
     if (!shareCode || typeof shareCode !== "string") {
       return false;
     }
@@ -41,7 +41,7 @@ export const shareCodeManager = {
    * @param {string} shareCode - Raw share code
    * @returns {string} Formatted share code
    */
-  formatForDisplay(shareCode) {
+  formatForDisplay(shareCode: string): string {
     return shareCodeUtils.formatForDisplay(shareCode);
   },
 
@@ -51,7 +51,7 @@ export const shareCodeManager = {
    * @param {Object} creatorInfo - Creator profile information
    * @returns {string} QR data string
    */
-  generateQRData(shareCode, creatorInfo = null) {
+  generateQRData(shareCode: string, creatorInfo: Record<string, unknown> | null = null): string {
     return shareCodeUtils.generateQRData(shareCode, creatorInfo);
   },
 };
