@@ -11,21 +11,26 @@ import SyncHealthDashboard from "@/components/sync/SyncHealthDashboard";
 interface User {
   uid?: string;
   userName?: string;
+  name?: string;
   userColor?: string;
   email?: string;
   displayName?: string;
+  [key: string]: unknown;
 }
 
 interface UserProfile {
   userName?: string;
+  name?: string;
   userColor?: string;
   email?: string;
   displayName?: string;
+  [key: string]: unknown;
 }
 
 interface SecurityManager {
   isLocked?: boolean;
   hasEncryptionKey?: boolean;
+  lockApp?: () => void;
 }
 
 interface SettingsSectionRendererProps {

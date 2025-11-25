@@ -15,19 +15,19 @@ interface CurrentUser {
 }
 
 interface AccountSettingsSectionProps {
-  currentUser: CurrentUser;
-  onOpenPasswordModal: () => void;
-  onLogout: () => void;
-  onOpenResetConfirm: () => void;
-  onUpdateProfile: (profile: CurrentUser) => void;
+  currentUser?: CurrentUser;
+  onOpenPasswordModal?: () => void;
+  onLogout?: () => void;
+  onOpenResetConfirm?: () => void;
+  onUpdateProfile?: (profile: CurrentUser) => void;
 }
 
 const AccountSettingsSection = ({
-  currentUser,
-  onOpenPasswordModal,
-  onLogout,
-  onOpenResetConfirm,
-  onUpdateProfile,
+  currentUser = {},
+  onOpenPasswordModal = () => {},
+  onLogout = () => {},
+  onOpenResetConfirm = () => {},
+  onUpdateProfile = () => {},
 }: AccountSettingsSectionProps) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);

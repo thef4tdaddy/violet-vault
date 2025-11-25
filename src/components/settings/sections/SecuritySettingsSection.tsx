@@ -3,19 +3,19 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 interface SecurityManager {
-  lockApp: () => void;
+  lockApp?: () => void;
 }
 
 interface SecuritySettingsSectionProps {
-  securityManager: SecurityManager;
-  onOpenSecuritySettings: () => void;
-  onShowLocalDataSecurity: () => void;
+  securityManager?: SecurityManager;
+  onOpenSecuritySettings?: () => void;
+  onShowLocalDataSecurity?: () => void;
 }
 
 const SecuritySettingsSection: React.FC<SecuritySettingsSectionProps> = ({
   securityManager,
-  onOpenSecuritySettings,
-  onShowLocalDataSecurity,
+  onOpenSecuritySettings = () => {},
+  onShowLocalDataSecurity = () => {},
 }) => {
   return (
     <div className="space-y-6">
@@ -24,18 +24,20 @@ const SecuritySettingsSection: React.FC<SecuritySettingsSectionProps> = ({
       <div className="space-y-4">
         {securityManager && (
           <>
-            <Button
-              onClick={securityManager.lockApp}
-              className="w-full flex items-center p-3 border-2 border-black bg-red-50 rounded-lg hover:bg-red-100 transition-colors shadow-sm"
-            >
-              {React.createElement(getIcon("Lock"), {
-                className: "h-5 w-5 text-red-600 mr-3",
-              })}
-              <div className="text-left">
-                <p className="font-medium text-gray-900">Lock Application</p>
-                <p className="text-sm text-gray-700">Immediately lock the app</p>
-              </div>
-            </Button>
+            {securityManager.lockApp && (
+              <Button
+                onClick={securityManager.lockApp}
+                className="w-full flex items-center p-3 border-2 border-black bg-red-50 rounded-lg hover:bg-red-100 transition-colors shadow-sm"
+              >
+                {React.createElement(getIcon("Lock"), {
+                  className: "h-5 w-5 text-red-600 mr-3",
+                })}
+                <div className="text-left">
+                  <p className="font-medium text-gray-900">Lock Application</p>
+                  <p className="text-sm text-gray-700">Immediately lock the app</p>
+                </div>
+              </Button>
+            )}
 
             <Button
               onClick={onOpenSecuritySettings}

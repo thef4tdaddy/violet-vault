@@ -77,7 +77,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   } = useTransactionImport(currentUser, handleBulkImport);
 
   const filteredTransactions = useTransactionFilters({
-    transactions,
+    transactions: transactions as unknown as FinanceTransaction[],
     searchTerm: ledgerState.searchTerm,
     dateFilter: ledgerState.dateFilter,
     typeFilter: ledgerState.typeFilter,

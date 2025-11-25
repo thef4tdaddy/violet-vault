@@ -89,16 +89,18 @@ export class VioletVaultDB extends Dexie {
     });
 
     // Enhanced hooks for automatic timestamping across all tables
-    const addTimestampHooks = (table: Table<unknown, unknown>) => {
-      table.hook(
+    // Using explicit hook registration instead of generic function
+    // because Dexie's hook types don't work well with generics
+    const setupCreatingHook = <T, K>(table: Table<T, K>) => {
+      // Use type-assertion to work around Dexie's strict hook typing
+      (table.hook as unknown as { 
+        (event: "creating", callback: (primKey: K, obj: T, trans: unknown) => void): void
+      })(
         "creating",
         (
-          _primKey: string | number,
-          obj: unknown,
-          trans: {
-            source?: unknown;
-            [key: string]: unknown;
-          }
+          _primKey,
+          obj,
+          trans
         ) => {
           // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
           try {
@@ -187,9 +189,11 @@ export class VioletVaultDB extends Dexie {
         }
       );
 
-      table.hook(
+      (table.hook as unknown as {
+        (event: "updating", callback: (modifications: unknown, primKey: K, obj: T, trans: unknown) => void): void
+      })(
         "updating",
-        (modifications: unknown, _primKey: string | number, _obj: unknown, _trans: unknown) => {
+        (modifications, _primKey, _obj, _trans) => {
           (
             modifications as Partial<
               Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
@@ -200,12 +204,12 @@ export class VioletVaultDB extends Dexie {
     };
 
     // Apply hooks to all data tables
-    addTimestampHooks(this.envelopes);
-    addTimestampHooks(this.transactions);
-    addTimestampHooks(this.bills);
-    addTimestampHooks(this.savingsGoals);
-    addTimestampHooks(this.paycheckHistory);
-    addTimestampHooks(this.debts);
+    setupCreatingHook(this.envelopes);
+    setupCreatingHook(this.transactions);
+    setupCreatingHook(this.bills);
+    setupCreatingHook(this.savingsGoals);
+    setupCreatingHook(this.paycheckHistory);
+    setupCreatingHook(this.debts);
 
     // Audit log hook
     this.auditLog.hook("creating", (_primKey: number, obj: AuditLogEntry, _trans: unknown) => {
@@ -575,7 +579,8 @@ if (
 // Utility functions
 export const getEncryptedData = async (): Promise<BudgetRecord | null> => {
   try {
-    return await budgetDb.budget.get("budgetData");
+    const result = await budgetDb.budget.get("budgetData");
+    return result ?? null;
   } catch {
     return null;
   }
@@ -599,7 +604,8 @@ export const setEncryptedData = async (
 // Budget metadata functions for unassigned cash and other summary data
 export const getBudgetMetadata = async (): Promise<BudgetRecord | null> => {
   try {
-    return await budgetDb.budget.get("metadata");
+    const result = await budgetDb.budget.get("metadata");
+    return result ?? null;
   } catch {
     return null;
   }

@@ -8,7 +8,7 @@ import { RULE_TYPES } from "./rules.ts";
 import { calculateFundingAmount, sortRulesByPriority } from "./rules.ts";
 import { shouldRuleExecute } from "./conditions.ts";
 import type { AutoFundingRule, AutoFundingContext, EnvelopeData } from "./rules.ts";
-import type { ExecutionContext } from "./conditions.ts";
+import type { ExecutionContext, Rule } from "./conditions.ts";
 
 /**
  * Simulates execution of all applicable rules without making changes
@@ -55,7 +55,7 @@ export const simulateRuleExecution = (
   try {
     // Filter and sort rules by priority
     const executableRules = rules.filter((rule) =>
-      shouldRuleExecute(rule, context as ExecutionContext)
+      shouldRuleExecute(rule as unknown as Rule, context as ExecutionContext)
     );
     const sortedRules = sortRulesByPriority(executableRules);
 
@@ -256,22 +256,23 @@ export const createExecutionPlan = (
 ) => {
   const simulation = simulateRuleExecution(rules, context);
 
-  if (!simulation.success) {
+  if (!simulation.success || !simulation.simulation) {
     return simulation;
   }
 
+  const simData = simulation.simulation;
   const plan = {
     plannedAt: new Date().toISOString(),
     trigger: context.trigger,
     initialCash: context.data.unassignedCash,
-    finalCash: simulation.simulation.remainingCash,
-    totalToTransfer: simulation.simulation.totalPlanned,
-    rulesCount: simulation.simulation.rulesExecuted,
-    transfersCount: simulation.simulation.plannedTransfers.length,
-    rules: simulation.simulation.ruleResults.filter((r) => r.success),
-    transfers: simulation.simulation.plannedTransfers,
-    errors: simulation.simulation.errors,
-    warnings: generatePlanWarnings(simulation.simulation, context),
+    finalCash: simData.remainingCash,
+    totalToTransfer: simData.totalPlanned,
+    rulesCount: simData.rulesExecuted,
+    transfersCount: simData.plannedTransfers.length,
+    rules: simData.ruleResults.filter((r) => r.success),
+    transfers: simData.plannedTransfers,
+    errors: simData.errors,
+    warnings: generatePlanWarnings(simData, context),
   };
 
   return {

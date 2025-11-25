@@ -6,7 +6,6 @@
 
 import {
   ENVELOPE_TYPES,
-  ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
@@ -124,13 +123,13 @@ export const createDefaultEnvelopeForm = (): EnvelopeFormData => ({
  * Convert Zod errors to error object format
  */
 const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
-  const errors = {};
+  const errors: Record<string, string> = {};
   if (!zodResult.success) {
     const issues = zodResult.error?.issues ?? zodResult.error?.errors ?? [];
     issues.forEach((err) => {
       const fieldName = err.path[0];
       if (fieldName) {
-        errors[fieldName] = err.message;
+        errors[String(fieldName)] = err.message;
       }
     });
   }
@@ -183,13 +182,7 @@ const validateMonthlyAmount = (
   formData: EnvelopeFormData,
   errors: Record<string, string>
 ): void => {
-  const typeConfig = ENVELOPE_TYPE_CONFIG[formData.envelopeType];
-
-  if (typeConfig?.requiresMonthlyAmount && !formData.monthlyAmount) {
-    errors.monthlyAmount = "Monthly amount is required for this envelope type";
-    return;
-  }
-
+  // Validate monthly amount format if provided
   if (!formData.monthlyAmount) return;
 
   const amount = parseFloat(String(formData.monthlyAmount));
@@ -437,7 +430,7 @@ export const calculateEnvelopeProgress = (envelope: Envelope) => {
 
   // Estimate completion time based on monthly allocation
   let monthsRemaining = null;
-  if (!isComplete && envelope.monthlyAmount > 0) {
+  if (!isComplete && envelope.monthlyAmount && envelope.monthlyAmount > 0) {
     monthsRemaining = Math.ceil(remainingAmount / envelope.monthlyAmount);
   }
 
@@ -486,8 +479,8 @@ export const getColorOptions = () => [
  * @returns {Object} Compatibility result
  */
 export const validateEnvelopeTypeChange = (newType: string, envelope: Envelope | null) => {
-  const warnings = [];
-  const errors = [];
+  const warnings: string[] = [];
+  const errors: string[] = [];
 
   if (!envelope) return { isValid: true, warnings, errors };
 
@@ -496,7 +489,7 @@ export const validateEnvelopeTypeChange = (newType: string, envelope: Envelope |
     envelope.envelopeType === ENVELOPE_TYPES.SINKING_FUND &&
     newType !== ENVELOPE_TYPES.SINKING_FUND
   ) {
-    if (envelope.targetAmount > 0) {
+    if (envelope.targetAmount && envelope.targetAmount > 0) {
       warnings.push("Changing from sinking fund will remove target amount tracking");
     }
   }

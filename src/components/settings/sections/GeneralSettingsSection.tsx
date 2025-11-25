@@ -267,21 +267,21 @@ const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
 );
 
 interface GeneralSettingsSectionProps {
-  isLocalOnlyMode: boolean;
-  cloudSyncEnabled: boolean;
-  isSyncing: boolean;
-  onOpenLocalOnlySettings: () => void;
-  onToggleCloudSync: () => void;
-  onManualSync: () => void;
+  isLocalOnlyMode?: boolean;
+  cloudSyncEnabled?: boolean;
+  isSyncing?: boolean;
+  onOpenLocalOnlySettings?: () => void;
+  onToggleCloudSync?: () => void;
+  onManualSync?: () => void;
 }
 
 const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
-  isLocalOnlyMode,
-  cloudSyncEnabled,
-  isSyncing,
-  onOpenLocalOnlySettings,
-  onToggleCloudSync,
-  onManualSync,
+  isLocalOnlyMode = false,
+  cloudSyncEnabled = false,
+  isSyncing = false,
+  onOpenLocalOnlySettings = () => {},
+  onToggleCloudSync = () => {},
+  onManualSync = () => {},
 }) => {
   const manualInstall = useUiStore((state: UiStore) => state.manualInstall);
   const pwaStatus = usePwaStatus();

@@ -14,7 +14,15 @@ const isDevelopmentMode = () => {
   );
 };
 
-const DevToolsSection = ({ onOpenEnvelopeChecker, onCreateTestHistory }) => {
+interface DevToolsSectionProps {
+  onOpenEnvelopeChecker?: () => void;
+  onCreateTestHistory?: () => void;
+}
+
+const DevToolsSection: React.FC<DevToolsSectionProps> = ({
+  onOpenEnvelopeChecker = () => {},
+  onCreateTestHistory = () => {},
+}) => {
   const currentMode = import.meta.env.MODE || "production";
   const isDebugMode = isDevelopmentMode();
   const [logCount, setLogCount] = useState(() => logger.getBufferedLogCount());

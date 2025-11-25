@@ -4,17 +4,17 @@ import { getIcon } from "../../../utils";
 import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
 
 interface DataManagementSectionProps {
-  onOpenActivityFeed: () => void;
-  onExport: () => void;
-  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSync: () => void;
+  onOpenActivityFeed?: () => void;
+  onExport?: () => void;
+  onImport?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSync?: () => void;
 }
 
 const DataManagementSection: React.FC<DataManagementSectionProps> = ({
-  onOpenActivityFeed,
-  onExport,
-  onImport,
-  onSync,
+  onOpenActivityFeed = () => {},
+  onExport = () => {},
+  onImport = () => {},
+  onSync = () => {},
 }) => {
   return (
     <div className="space-y-6">
