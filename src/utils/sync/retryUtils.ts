@@ -11,7 +11,7 @@
 export const calculateRetryDelay = (
   attempt: number,
   options: { baseDelay?: number; maxDelay?: number; jitter?: boolean } = {}
-) => {
+): number => {
   const { baseDelay = 1000, maxDelay = 16000, jitter = true } = options;
 
   const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
@@ -26,7 +26,7 @@ export const calculateRetryDelay = (
 /**
  * Add jitter to prevent thundering herd
  */
-export const addJitter = (delay) => {
+export const addJitter = (delay: number): number => {
   // Add ±25% variance to prevent thundering herd
   const jitterRange = delay * 0.25;
   const jitterOffset = (Math.random() - 0.5) * 2 * jitterRange;
@@ -37,14 +37,14 @@ export const addJitter = (delay) => {
 /**
  * Promise-based delay utility
  */
-export const delay = (ms) => {
+export const delay = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
  * Calculate timeout for operation attempt
  */
-export const calculateTimeout = (attempt, baseTimeout = 30000) => {
+export const calculateTimeout = (attempt: number, baseTimeout = 30000): number => {
   // Increase timeout slightly with each attempt
   return baseTimeout + (attempt - 1) * 5000;
 };
@@ -52,7 +52,7 @@ export const calculateTimeout = (attempt, baseTimeout = 30000) => {
 /**
  * Format delay for human-readable logging
  */
-export const formatDelay = (ms) => {
+export const formatDelay = (ms: number): string => {
   if (ms < 1000) return `${ms}ms`;
   if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
   return `${(ms / 60000).toFixed(1)}m`;

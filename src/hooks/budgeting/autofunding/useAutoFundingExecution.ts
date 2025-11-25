@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.ts";
+import { TRIGGER_TYPES, type AutoFundingRule } from "../../../utils/budgeting/autofunding/rules.ts";
 import useUiStore from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
@@ -39,7 +39,7 @@ export const useAutoFundingExecution = () => {
   // Execute rules with given trigger
   const executeRules = useCallback(
     async (
-      rules: unknown[],
+      rules: AutoFundingRule[],
       trigger: string = TRIGGER_TYPES.MANUAL,
       triggerData: Record<string, unknown> = {}
     ): Promise<ExecutionResult> => {

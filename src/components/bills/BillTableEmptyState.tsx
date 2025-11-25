@@ -1,11 +1,30 @@
 import React from "react";
 import { getIcon } from "../../utils";
+import type { Bill } from "@/types/bills";
+
+interface CategorizedBills {
+  upcoming?: Bill[];
+  overdue?: Bill[];
+  paid?: Bill[];
+  all?: Bill[];
+  [key: string]: Bill[] | undefined;
+}
+
+interface BillTableEmptyStateProps {
+  viewMode: string;
+  filteredBills: Bill[];
+  categorizedBills: CategorizedBills;
+}
 
 /**
  * Empty state component for BillTable
  * Extracted to reduce BillTable complexity
  */
-const BillTableEmptyState = ({ viewMode, filteredBills, categorizedBills }) => {
+const BillTableEmptyState: React.FC<BillTableEmptyStateProps> = ({
+  viewMode,
+  filteredBills,
+  categorizedBills,
+}) => {
   const isDev = import.meta.env.MODE === "development";
 
   return (

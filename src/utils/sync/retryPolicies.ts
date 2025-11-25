@@ -5,12 +5,19 @@
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 
+interface RetryableError {
+  name?: string;
+  message?: string;
+  code?: string;
+  status?: number;
+}
+
 /**
  * Determine if error should be retried
  */
-export const shouldRetryError = (error) => {
+export const shouldRetryError = (error: RetryableError): boolean => {
   // Network errors - always retry
-  if (error.name === "NetworkError" || error.message.includes("fetch")) {
+  if (error.name === "NetworkError" || (error.message && error.message.includes("fetch"))) {
     return true;
   }
 
@@ -36,7 +43,7 @@ export const shouldRetryError = (error) => {
 /**
  * Check if Firebase error code is retryable
  */
-export const isRetryableFirebaseError = (errorCode) => {
+export const isRetryableFirebaseError = (errorCode: string): boolean => {
   const retryableCodes = [
     "unavailable",
     "deadline-exceeded",
@@ -51,7 +58,7 @@ export const isRetryableFirebaseError = (errorCode) => {
 /**
  * Check if encryption error might be transient
  */
-export const isTransientEncryptionError = (error) => {
+export const isTransientEncryptionError = (error: RetryableError): boolean => {
   const transientMessages = ["data is too small", "decrypt", "Invalid key", "Failed to decrypt"];
 
   return transientMessages.some((msg) => error.message && error.message.includes(msg));
@@ -60,7 +67,7 @@ export const isTransientEncryptionError = (error) => {
 /**
  * Classify error for metrics and logging
  */
-export const classifyError = (error) => {
+export const classifyError = (error: RetryableError): string => {
   if (error.name === "NetworkError") return "network";
   if (error.code) return "firebase";
   if (isTransientEncryptionError(error)) return "encryption";

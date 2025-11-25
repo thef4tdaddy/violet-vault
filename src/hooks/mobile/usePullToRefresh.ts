@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { hapticFeedback } from "../../utils/ui/touchFeedback";
 
 /**
@@ -8,7 +8,7 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
  * @returns {object} - Pull-to-refresh state and handlers
  */
 export const usePullToRefresh = (
-  onRefresh,
+  onRefresh: () => Promise<void> | void,
   { threshold = 80, resistance = 2.5, enabled = true } = {}
 ) => {
   const [isPulling, setIsPulling] = useState(false);
@@ -16,9 +16,9 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0);
   const startY = useRef(0);
   const currentY = useRef(0);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
     if (!enabled || isRefreshing) return;
 
     const touch = e.touches[0];
@@ -32,7 +32,7 @@ export const usePullToRefresh = (
     }
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: React.TouchEvent) => {
     if (!enabled || !isPulling || isRefreshing) return;
 
     const touch = e.touches[0];

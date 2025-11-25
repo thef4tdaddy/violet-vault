@@ -2,15 +2,16 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 7 | 0 |
-| TypeScript Errors | 92 | 0 |
-| TypeScript Strict Mode Errors | 750 | 0 |
+| Category                      | Current | Change |
+| ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 7       | 0      |
+| TypeScript Errors             | 80      | 0      |
+| TypeScript Strict Mode Errors | 832     | 0      |
 
-*Last updated: 2025-11-25 00:11:01 UTC*
+_Last updated: 2025-11-24 23:14:58 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -27,18 +28,21 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 4 issues in `/home/runner/work/violet-vault/violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/auth/UserSetup.tsx`
+
+- 4 issues in `violet-vault/src/components/receipts/ReceiptToTransactionModal.tsx`
+- 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
+- 1 issues in `violet-vault/src/components/budgeting/EditEnvelopeModal.tsx`
+- 1 issues in `violet-vault/src/components/auth/UserSetup.tsx`
 
 ### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 4 | `@typescript-eslint/no-unused-vars` |
-| 3 | `max-lines-per-function` |
+
+| Count | Rule ID                             |
+| ----- | ----------------------------------- |
+| 4     | `@typescript-eslint/no-unused-vars` |
+| 3     | `max-lines-per-function`            |
 
 ### Detailed Lint Report
+
 ```
 /home/runner/work/violet-vault/violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
@@ -52,6 +56,7 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+
 - 10 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 4 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 3 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
@@ -104,26 +109,28 @@
 - 1 errors in `src/components/auth/UserSetup.tsx`
 
 ### Type Error Breakdown by Category
+
 | Count | Error Code |
-|---|---|
-| 39 | `TS2322` |
-| 27 | `TS2345` |
-| 4 | `TS6133` |
-| 3 | `TS2769` |
-| 3 | `TS2459` |
-| 3 | `TS2352` |
-| 3 | `TS2339` |
-| 2 | `TS2741` |
-| 1 | `TS2740` |
-| 1 | `TS2739` |
-| 1 | `TS2719` |
-| 1 | `TS2717` |
-| 1 | `TS2694` |
-| 1 | `TS2554` |
-| 1 | `TS2353` |
-| 1 | `TS18047` |
+| ----- | ---------- |
+| 30    | `TS2322`   |
+| 22    | `TS2345`   |
+| 5     | `TS2339`   |
+| 4     | `TS6133`   |
+| 3     | `TS2769`   |
+| 3     | `TS2459`   |
+| 3     | `TS2352`   |
+| 2     | `TS2741`   |
+| 1     | `TS2740`   |
+| 1     | `TS2739`   |
+| 1     | `TS2719`   |
+| 1     | `TS2717`   |
+| 1     | `TS2694`   |
+| 1     | `TS2554`   |
+| 1     | `TS2353`   |
+| 1     | `TS18047`  |
 
 ### Detailed Type Error Report
+
 ```
 src/components/analytics/components/TabContent.tsx(75,9): error TS2322: Type 'unknown[]' is not assignable to type 'MonthlyTrend[]'.
   Type '{}' is missing the following properties from type 'MonthlyTrend': month, value
@@ -363,6 +370,7 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
+
 - 18 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 13 errors in `src/components/receipts/ReceiptToTransactionModal.tsx`
 - 11 errors in `src/hooks/bills/useBillManager.ts`
@@ -659,44 +667,46 @@ src/utils/sync/corruptionRecoveryHelper.ts(127,3): error TS2322: Type '() => Pro
 - 1 errors in `src/components/accounts/AccountsGrid.tsx`
 
 ### Strict Mode Error Breakdown
+
 | Count | Error Code |
-|---|---|
-| 148 | `TS2322` |
-| 143 | `TS2345` |
-| 104 | `TS7031` |
-| 98 | `TS7006` |
-| 43 | `TS7005` |
-| 39 | `TS2769` |
-| 29 | `TS7034` |
-| 29 | `TS18046` |
-| 26 | `TS18048` |
-| 23 | `TS7053` |
-| 18 | `TS2339` |
-| 10 | `TS18047` |
-| 5 | `TS2352` |
-| 4 | `TS6133` |
-| 4 | `TS2783` |
-| 3 | `TS2459` |
-| 2 | `TS7022` |
-| 2 | `TS2741` |
-| 2 | `TS2740` |
-| 2 | `TS2722` |
-| 2 | `TS2531` |
-| 2 | `TS2353` |
-| 1 | `TS7023` |
-| 1 | `TS7019` |
-| 1 | `TS7016` |
-| 1 | `TS2739` |
-| 1 | `TS2719` |
-| 1 | `TS2717` |
-| 1 | `TS2694` |
-| 1 | `TS2683` |
-| 1 | `TS2554` |
-| 1 | `TS2538` |
-| 1 | `TS2365` |
-| 1 | `TS2349` |
+| ----- | ---------- |
+| 152   | `TS2345`   |
+| 148   | `TS7031`   |
+| 145   | `TS2322`   |
+| 117   | `TS7006`   |
+| 43    | `TS7005`   |
+| 39    | `TS2769`   |
+| 31    | `TS18046`  |
+| 29    | `TS7034`   |
+| 29    | `TS18048`  |
+| 24    | `TS7053`   |
+| 24    | `TS2339`   |
+| 10    | `TS18047`  |
+| 6     | `TS2352`   |
+| 4     | `TS6133`   |
+| 4     | `TS2783`   |
+| 3     | `TS2459`   |
+| 2     | `TS7022`   |
+| 2     | `TS2741`   |
+| 2     | `TS2740`   |
+| 2     | `TS2722`   |
+| 2     | `TS2531`   |
+| 2     | `TS2353`   |
+| 1     | `TS7023`   |
+| 1     | `TS7019`   |
+| 1     | `TS7016`   |
+| 1     | `TS2739`   |
+| 1     | `TS2719`   |
+| 1     | `TS2717`   |
+| 1     | `TS2694`   |
+| 1     | `TS2683`   |
+| 1     | `TS2554`   |
+| 1     | `TS2538`   |
+| 1     | `TS2365`   |
+| 1     | `TS2349`   |
 
 ### Detailed Strict Mode Report
+
 ```
 src/App.tsx(16,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/App.tsx(29,9): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -2340,4 +2350,3 @@ src/utils/testing/storeTestUtils.ts(72,16): error TS7053: Element implicitly has
   No index signature with a parameter of type 'string' was found on type 'unknown'.
 src/utils/transactions/operations.ts(61,39): error TS18046: 'error' is of type 'unknown'.
 ```
-

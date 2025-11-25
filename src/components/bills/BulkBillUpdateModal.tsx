@@ -67,7 +67,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
       await onUpdateBills(updatedBills as Bill[]);
       onClose();
     } catch (error) {
-      onError?.(error.message || "Failed to update bills");
+      onError?.((error as Error)?.message || "Failed to update bills");
     }
   };
 
