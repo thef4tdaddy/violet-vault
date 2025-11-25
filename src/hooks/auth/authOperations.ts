@@ -203,9 +203,14 @@ export const createChangePasswordOperation =
  */
 export const createUpdateProfileOperation =
   (
-    updateProfileMutation: UseMutationResult<UpdateProfileResult, Error, UpdateProfileData, unknown>
+    updateProfileMutation: UseMutationResult<
+      UpdateProfileResult,
+      Error,
+      UpdateProfileInput,
+      unknown
+    >
   ) =>
-  async (updatedProfile: UpdateProfileData) => {
+  async (updatedProfile: UpdateProfileInput) => {
     try {
       logger.auth("AuthManager: Starting profile update", {
         userName: updatedProfile.userName,

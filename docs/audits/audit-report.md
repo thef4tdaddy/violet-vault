@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 8 | 0 |
-| TypeScript Errors | 74 | 0 |
-| TypeScript Strict Mode Errors | 406 | 0 |
+| ESLint Issues | 6 | -2 |
+| TypeScript Errors | 72 | -2 |
+| TypeScript Strict Mode Errors | 405 | -1 |
 
-*Last updated: 2025-11-25 20:01:59 UTC*
+*Last updated: 2025-11-25 20:08:17 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,7 +27,6 @@
 ## Lint Audit
 
 ### Files with Most Issues
-- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/common/lazyImport.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/utils/budgeting/autofunding/conditions.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/sync/useManualSync.ts`
@@ -39,15 +38,13 @@
 | Count | Rule ID |
 |---|---|
 | 4 | `max-lines-per-function` |
-| 3 | `no-undef` |
+| 1 | `no-undef` |
 | 1 | `complexity` |
 
 ### Detailed Lint Report
 ```
 /home/runner/work/violet-vault/violet-vault/src/components/auth/UserSetup.tsx:26:19 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/components/budgeting/EditEnvelopeModal.tsx:27:27 - 1 - Arrow function has too many lines (152). Maximum allowed is 150. (max-lines-per-function)
-/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:206:74 - 1 - 'UpdateProfileData' is not defined. (no-undef)
-/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations.ts:208:26 - 1 - 'UpdateProfileData' is not defined. (no-undef)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:63:29 - 1 - Arrow function has too many lines (190). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/sync/useManualSync.ts:65:30 - 1 - Arrow function has too many lines (161). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/utils/budgeting/autofunding/conditions.ts:355:11 - 1 - Arrow function has a complexity of 17. Maximum allowed is 15. (complexity)
@@ -66,7 +63,6 @@
 - 3 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 2 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 2 errors in `src/hooks/layout/usePaycheckOperations.ts`
-- 2 errors in `src/hooks/auth/authOperations.ts`
 - 2 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
 - 2 errors in `src/hooks/analytics/useSmartCategoryAnalysis.ts`
 - 2 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
@@ -112,7 +108,6 @@
 | 6 | `TS2769` |
 | 2 | `TS2719` |
 | 2 | `TS2694` |
-| 2 | `TS2304` |
 | 1 | `TS2741` |
 | 1 | `TS2739` |
 | 1 | `TS2353` |
@@ -262,8 +257,6 @@ src/hooks/analytics/useTransactionAnalysis.ts(23,7): error TS2345: Argument of t
   Property 'lastModified' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction'.
 src/hooks/analytics/useTransactionAnalysis.ts(27,7): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction[]'.
   Property 'lastModified' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Transaction'.
-src/hooks/auth/authOperations.ts(206,74): error TS2304: Cannot find name 'UpdateProfileData'.
-src/hooks/auth/authOperations.ts(208,26): error TS2304: Cannot find name 'UpdateProfileData'.
 src/hooks/bills/useBillDetail.ts(74,72): error TS18047: 'bill.dueDate' is possibly 'null'.
 src/hooks/bills/useBillManager.ts(94,5): error TS2345: Argument of type '(state: BudgetState) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }' is not assignable to parameter of type '(state: UiStore) => { allTransactions: Transaction[]; envelopes: Envelope[]; bills: Bill[]; }'.
   Types of parameters 'state' and 'state' are incompatible.
@@ -350,7 +343,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 4 errors in `src/components/transactions/import/ImportModal.tsx`
 - 4 errors in `src/components/settings/SettingsDashboard.tsx`
 - 4 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
-- 3 errors in `src/hooks/auth/authOperations.ts`
 - 3 errors in `src/components/transactions/TransactionTable.tsx`
 - 3 errors in `src/components/receipts/ReceiptButton.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
@@ -381,6 +373,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/hooks/bills/useBillOperations.ts`
 - 2 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
+- 2 errors in `src/hooks/auth/useAuthManager.ts`
 - 2 errors in `src/hooks/auth/useAuthFlow.ts`
 - 2 errors in `src/hooks/auth/mutations/useProfileMutations.ts`
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
@@ -469,8 +462,8 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/hooks/bills/useBills/index.ts`
 - 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
-- 1 errors in `src/hooks/auth/useAuthManager.ts`
 - 1 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
+- 1 errors in `src/hooks/auth/authOperations.ts`
 - 1 errors in `src/hooks/analytics/utils/csvImageExportUtils.ts`
 - 1 errors in `src/hooks/analytics/useTransactionFiltering.ts`
 - 1 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
@@ -532,7 +525,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 | Count | Error Code |
 |---|---|
 | 121 | `TS2322` |
-| 109 | `TS2345` |
+| 110 | `TS2345` |
 | 41 | `TS7031` |
 | 37 | `TS2769` |
 | 24 | `TS18048` |
@@ -547,7 +540,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 | 2 | `TS7034` |
 | 2 | `TS7005` |
 | 2 | `TS2694` |
-| 2 | `TS2304` |
 | 1 | `TS7016` |
 | 1 | `TS2741` |
 | 1 | `TS2739` |
@@ -1105,8 +1097,6 @@ src/hooks/analytics/utils/csvImageExportUtils.ts(97,57): error TS2345: Argument 
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(85,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AnalyticsData'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(94,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'BalanceData'.
 src/hooks/auth/authOperations.ts(103,18): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
-src/hooks/auth/authOperations.ts(206,74): error TS2304: Cannot find name 'UpdateProfileData'.
-src/hooks/auth/authOperations.ts(208,26): error TS2304: Cannot find name 'UpdateProfileData'.
 src/hooks/auth/mutations/usePasswordMutations.ts(70,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
   Type 'undefined' is not assignable to type 'string | null'.
 src/hooks/auth/mutations/useProfileMutations.ts(37,44): error TS2345: Argument of type '{ userName: string | undefined; userColor: string | undefined; }' is not assignable to parameter of type '{ userName: string; userColor: string; shareCode?: string | undefined; joinedVia?: string | undefined; sharedBy?: string | undefined; }'.
@@ -1129,6 +1119,15 @@ src/hooks/auth/useAuthManager.ts(49,38): error TS2345: Argument of type 'UseMuta
               Type 'LoginData' is not assignable to type 'LoginMutationVariables'.
                 Types of property 'userData' are incompatible.
                   Type 'unknown' is not assignable to type 'Record<string, unknown> | undefined'.
+src/hooks/auth/useAuthManager.ts(62,54): error TS2345: Argument of type 'UseMutationResult<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>' is not assignable to parameter of type 'UseMutationResult<UpdateProfileResult, Error, UpdateProfileInput, unknown>'.
+  Type 'Override<MutationObserverIdleResult<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>, { ...; }> & { ...; }' is not assignable to type 'UseMutationResult<UpdateProfileResult, Error, UpdateProfileInput, unknown>'.
+    Type 'Override<MutationObserverIdleResult<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>, { ...; }> & { ...; }' is not assignable to type 'Override<MutationObserverIdleResult<UpdateProfileResult, Error, UpdateProfileInput, unknown>, { mutate: UseMutateFunction<...>; }> & { ...; }'.
+      Type 'Override<MutationObserverIdleResult<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>, { ...; }> & { ...; }' is not assignable to type 'Override<MutationObserverIdleResult<UpdateProfileResult, Error, UpdateProfileInput, unknown>, { mutate: UseMutateFunction<...>; }>'.
+        Types of property 'mutate' are incompatible.
+          Type 'UseMutateFunction<{ success: boolean; error: string; profile?: undefined; } | { success: boolean; profile: UpdateProfileInput; error?: undefined; }, Error, UpdateProfileInput, unknown>' is not assignable to type 'UseMutateFunction<UpdateProfileResult, Error, UpdateProfileInput, unknown>'.
+            Types of parameters 'variables' and 'variables' are incompatible.
+              Type 'import("/home/runner/work/violet-vault/violet-vault/src/hooks/auth/authOperations").UpdateProfileInput' is not assignable to type 'UpdateProfileInput'.
+                Index signature for type 'string' is missing in type 'UpdateProfileInput'.
 src/hooks/auth/useAuthenticationManager.ts(98,45): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthenticationManager.ts(99,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
