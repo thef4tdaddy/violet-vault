@@ -128,7 +128,9 @@ export const removeCorruptedEnvelopes = async (envelopeIds: Array<string | numbe
  * @param {Array} corruptedEnvelopes - Array of corrupted envelope objects
  * @returns {Promise<Object>} - Result with success status and details
  */
-export const repairCorruptedEnvelopes = async (corruptedEnvelopes: EnvelopeWithOptionalFields[]) => {
+export const repairCorruptedEnvelopes = async (
+  corruptedEnvelopes: EnvelopeWithOptionalFields[]
+) => {
   if (!corruptedEnvelopes || corruptedEnvelopes.length === 0) {
     return { success: true, repaired: 0, message: "No envelopes to repair" };
   }
@@ -188,7 +190,9 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes: EnvelopeWithO
     // Update the repaired envelopes in the database
     if (repairedEnvelopes.length > 0) {
       // Cast to the database type since we've ensured all required fields are present
-      await budgetDb.envelopes.bulkPut(repairedEnvelopes as unknown as import("../../db/types").Envelope[]);
+      await budgetDb.envelopes.bulkPut(
+        repairedEnvelopes as unknown as import("../../db/types").Envelope[]
+      );
 
       logger.production("Repaired corrupted envelopes", {
         count: repairedEnvelopes.length,

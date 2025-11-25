@@ -377,9 +377,7 @@ export const getConditionDescription = (
       const startDate = condition.startDate
         ? new Date(condition.startDate).toLocaleDateString()
         : "N/A";
-      const endDate = condition.endDate
-        ? new Date(condition.endDate).toLocaleDateString()
-        : "N/A";
+      const endDate = condition.endDate ? new Date(condition.endDate).toLocaleDateString() : "N/A";
       return `Between ${startDate} and ${endDate}`;
     }
 
@@ -391,7 +389,9 @@ export const getConditionDescription = (
         greater_than_or_equal: "≥",
         less_than_or_equal: "≤",
       };
-      const operator = condition.operator ? operators[condition.operator] || condition.operator : "?";
+      const operator = condition.operator
+        ? operators[condition.operator] || condition.operator
+        : "?";
       return `Transaction amount ${operator} $${condition.value}`;
     }
 

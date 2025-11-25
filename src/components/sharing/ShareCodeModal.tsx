@@ -239,7 +239,9 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
                         : "bg-purple-600 hover:bg-purple-700 text-white"
                     }`}
                   >
-                    {copied ? renderIcon("Check", { className: "h-5 w-5" }) : renderIcon("Copy", { className: "h-5 w-5" })}
+                    {copied
+                      ? renderIcon("Check", { className: "h-5 w-5" })
+                      : renderIcon("Copy", { className: "h-5 w-5" })}
                   </Button>
                 </div>
               </div>
