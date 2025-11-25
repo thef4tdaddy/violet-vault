@@ -12,17 +12,14 @@ interface Change {
 }
 
 interface CommitDetails {
-  commit:
-    | {
-        hash?: string;
-        message?: string;
-        author?: string;
-        timestamp?: string | number;
-        parentHash?: string;
-      }
-    | {
-        [key: string]: unknown;
-      };
+  commit: {
+    hash?: string;
+    message?: string;
+    author?: string;
+    timestamp?: string | number;
+    parentHash?: string;
+    [key: string]: unknown;
+  };
   changes: Change[];
 }
 

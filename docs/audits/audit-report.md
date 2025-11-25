@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | +3 |
-| TypeScript Errors | 58 | +58 |
-| TypeScript Strict Mode Errors | 657 | +657 |
+| ESLint Issues | 3 | 0 |
+| TypeScript Errors | 49 | -9 |
+| TypeScript Strict Mode Errors | 648 | -9 |
 
-*Last updated: 2025-11-25 13:44:39 UTC*
+*Last updated: 2025-11-25 13:57:05 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -46,10 +46,8 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 5 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 3 errors in `src/components/receipts/ReceiptButton.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
-- 3 errors in `src/components/layout/MainLayout.tsx`
 - 2 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 2 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 2 errors in `src/hooks/auth/useAuthManager.ts`
@@ -79,7 +77,6 @@
 - 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 1 errors in `src/components/debt/DebtStrategies.tsx`
 - 1 errors in `src/components/debt/DebtDashboard.tsx`
-- 1 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
@@ -88,17 +85,15 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 22 | `TS2322` |
+| 18 | `TS2322` |
 | 15 | `TS2345` |
-| 7 | `TS2769` |
-| 2 | `TS2741` |
+| 6 | `TS2769` |
 | 2 | `TS2719` |
 | 2 | `TS2459` |
-| 2 | `TS2339` |
+| 1 | `TS2741` |
 | 1 | `TS2739` |
 | 1 | `TS2717` |
 | 1 | `TS2694` |
-| 1 | `TS2554` |
 | 1 | `TS2353` |
 | 1 | `TS18047` |
 
@@ -123,28 +118,12 @@ src/components/budgeting/PaycheckProcessor.tsx(87,9): error TS2719: Type 'Payche
 src/components/budgeting/PaydayPrediction.tsx(105,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Object literal may only specify known properties, and 'title' does not exist in type 'Attributes & { className?: string; }'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(229,43): error TS2554: Expected 1 arguments, but got 2.
 src/components/debt/DebtDashboard.tsx(122,15): error TS2353: Object literal may only specify known properties, and 'paymentDate' does not exist in type '{ amount: number; date?: string; }'.
 src/components/debt/DebtStrategies.tsx(110,73): error TS2694: Namespace '"/home/runner/work/violet-vault/violet-vault/src/components/debt/ui/PaymentImpactTable"' has no exported member 'PaymentImpactScenario'.
 src/components/history/BudgetHistoryViewer.tsx(139,15): error TS2322: Type '{ commit: BudgetCommit; changes: BudgetChange[]; }' is not assignable to type 'CommitDetails'.
-  Types of property 'changes' are incompatible.
-    Type 'BudgetChange[]' is not assignable to type 'Change[]'.
-      Type 'BudgetChange' is not assignable to type 'Change'.
-        Index signature for type 'string' is missing in type 'BudgetChange'.
-src/components/history/viewer/ChangeDetails.tsx(72,45): error TS2339: Property 'substring' does not exist on type 'unknown'.
-src/components/history/viewer/ChangeDetails.tsx(76,60): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/history/viewer/ChangeDetails.tsx(80,42): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/history/viewer/ChangeDetails.tsx(83,50): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
-    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
-  Overload 2 of 4, '(value: string | number): Date', gave the following error.
-    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
-src/components/history/viewer/ChangeDetails.tsx(89,54): error TS2339: Property 'substring' does not exist on type 'unknown'.
-src/components/layout/MainLayout.tsx(440,11): error TS2322: Type 'unknown' is not assignable to type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type '{}'.
-src/components/layout/MainLayout.tsx(441,11): error TS2322: Type 'unknown' is not assignable to type 'Record<string, unknown>'.
-  Index signature for type 'string' is missing in type '{}'.
-src/components/layout/MainLayout.tsx(448,11): error TS2741: Property 'hasConflict' is missing in type '{ [key: string]: unknown; hasConflict: boolean; }[]' but required in type 'SyncConflict'.
+  Types of property 'commit' are incompatible.
+    Type 'BudgetCommit' is not assignable to type '{ [key: string]: unknown; hash?: string; message?: string; author?: string; timestamp?: string | number; parentHash?: string; }'.
+      Index signature for type 'string' is missing in type 'BudgetCommit'.
 src/components/layout/ViewRenderer.tsx(323,46): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").PaycheckHistory' is not assignable to type 'PaycheckHistory'.
     Types of property 'allocations' are incompatible.
@@ -266,12 +245,11 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 - 11 errors in `src/hooks/bills/useBillManager.ts`
 - 11 errors in `src/db/budgetDb.ts`
 - 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
-- 10 errors in `src/components/layout/MainLayout.tsx`
 - 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
 - 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
-- 9 errors in `src/components/history/viewer/ChangeDetails.tsx`
 - 9 errors in `src/components/bills/BillManager.tsx`
 - 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
+- 7 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/App.tsx`
 - 6 errors in `src/services/bugReport/index.ts`
 - 6 errors in `src/hooks/transactions/useTransactionLedger.ts`
@@ -294,7 +272,6 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 - 5 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 5 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
 - 5 errors in `src/components/pwa/PatchNotesModal.tsx`
-- 5 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 4 errors in `src/utils/pwa/pwaManager.ts`
 - 4 errors in `src/utils/bills/billCalculations.ts`
 - 4 errors in `src/stores/ui/uiStore.ts`
@@ -307,6 +284,8 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 - 4 errors in `src/components/settings/SettingsDashboard.tsx`
 - 4 errors in `src/components/receipts/ReceiptButton.tsx`
 - 4 errors in `src/components/layout/ViewRenderer.tsx`
+- 4 errors in `src/components/history/viewer/ChangeDetails.tsx`
+- 4 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 3 errors in `src/utils/sync/masterSyncValidator.ts`
 - 3 errors in `src/utils/budgeting/paycheckProcessing.ts`
 - 3 errors in `src/utils/auth/shareCodeManager.ts`
@@ -539,8 +518,8 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 134 | `TS2322` |
 | 133 | `TS2345` |
+| 129 | `TS2322` |
 | 73 | `TS7031` |
 | 73 | `TS7006` |
 | 43 | `TS7005` |
@@ -549,11 +528,10 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 | 26 | `TS18048` |
 | 25 | `TS18046` |
 | 22 | `TS7053` |
-| 16 | `TS2339` |
+| 14 | `TS2339` |
 | 10 | `TS18047` |
 | 4 | `TS2783` |
 | 2 | `TS7022` |
-| 2 | `TS2741` |
 | 2 | `TS2722` |
 | 2 | `TS2719` |
 | 2 | `TS2531` |
@@ -562,11 +540,11 @@ src/utils/sync/corruptionRecoveryHelper.ts(52,5): error TS2717: Subsequent prope
 | 2 | `TS2352` |
 | 1 | `TS7023` |
 | 1 | `TS7016` |
+| 1 | `TS2741` |
 | 1 | `TS2740` |
 | 1 | `TS2739` |
 | 1 | `TS2717` |
 | 1 | `TS2694` |
-| 1 | `TS2554` |
 | 1 | `TS2538` |
 | 1 | `TS2365` |
 | 1 | `TS2349` |
@@ -746,7 +724,6 @@ src/components/budgeting/PaydayPrediction.tsx(105,11): error TS2769: No overload
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(227,5): error TS2322: Type '(envelope: Partial<Envelope>) => void' is not assignable to type '(data: unknown) => void | Promise<void>'.
   Types of parameters 'envelope' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'Partial<Envelope>'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(229,43): error TS2554: Expected 1 arguments, but got 2.
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(282,11): error TS2322: Type '(newSettings: Partial<typeof DEFAULT_ANALYSIS_SETTINGS>) => void' is not assignable to type '(settings: unknown) => void'.
   Types of parameters 'newSettings' and 'settings' are incompatible.
     Type 'unknown' is not assignable to type 'Partial<{ minAmount: number; minTransactions: number; overspendingThreshold: number; overfundingThreshold: number; bufferPercentage: number; }>'.
@@ -844,20 +821,17 @@ src/components/history/IntegrityStatusIndicatorHelpers.tsx(185,75): error TS2345
   Type 'undefined' is not assignable to type 'string'.
 src/components/history/ObjectHistoryViewer.tsx(39,7): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
-src/components/history/viewer/ChangeDetails.tsx(72,45): error TS2339: Property 'substring' does not exist on type '{}'.
-src/components/history/viewer/ChangeDetails.tsx(76,60): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/history/viewer/ChangeDetails.tsx(80,42): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/history/viewer/ChangeDetails.tsx(83,50): error TS2769: No overload matches this call.
+src/components/history/viewer/ChangeDetails.tsx(80,50): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
-    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+    Argument of type 'string | number | undefined' is not assignable to parameter of type 'string | number | Date'.
+      Type 'undefined' is not assignable to type 'string | number | Date'.
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
-    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
-src/components/history/viewer/ChangeDetails.tsx(85,15): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/components/history/viewer/ChangeDetails.tsx(89,54): error TS2339: Property 'substring' does not exist on type '{}'.
-src/components/history/viewer/ChangeDetails.tsx(112,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+    Argument of type 'string | number | undefined' is not assignable to parameter of type 'string | number'.
+      Type 'undefined' is not assignable to type 'string | number'.
+src/components/history/viewer/ChangeDetails.tsx(109,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/history/viewer/ChangeDetails.tsx(121,73): error TS18048: 'change.diff' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(122,47): error TS18048: 'change.diff' is possibly 'undefined'.
+src/components/history/viewer/ChangeDetails.tsx(118,73): error TS18048: 'change.diff' is possibly 'undefined'.
+src/components/history/viewer/ChangeDetails.tsx(119,47): error TS18048: 'change.diff' is possibly 'undefined'.
 src/components/history/viewer/HistoryHeader.tsx(7,26): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/history/viewer/HistoryStatistics.tsx(4,30): error TS7031: Binding element 'statistics' implicitly has an 'any' type.
 src/components/history/viewer/IntegrityWarning.tsx(5,29): error TS7031: Binding element 'integrityCheck' implicitly has an 'any' type.
@@ -874,10 +848,7 @@ src/components/layout/MainLayout.tsx(256,18): error TS7053: Element implicitly h
   No index signature with a parameter of type 'string' was found on type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
 src/components/layout/MainLayout.tsx(287,20): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/layout/MainLayout.tsx(290,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(440,11): error TS2322: Type 'unknown' is not assignable to type 'Record<string, unknown>'.
-src/components/layout/MainLayout.tsx(441,11): error TS2322: Type 'unknown' is not assignable to type 'Record<string, unknown>'.
-src/components/layout/MainLayout.tsx(448,11): error TS2741: Property 'hasConflict' is missing in type '{ [key: string]: unknown; hasConflict: boolean; }[]' but required in type 'SyncConflict'.
-src/components/layout/MainLayout.tsx(490,11): error TS2322: Type 'unknown' is not assignable to type '{ userName?: string | undefined; userColor?: string | undefined; }'.
+src/components/layout/MainLayout.tsx(489,11): error TS2322: Type 'unknown' is not assignable to type '{ userName?: string | undefined; userColor?: string | undefined; }'.
 src/components/layout/SummaryCards.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/layout/SummaryCards.tsx(33,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/layout/ViewRenderer.tsx(321,9): error TS2322: Type '(paycheck: PaycheckHistory) => Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => Promise<void>'.
