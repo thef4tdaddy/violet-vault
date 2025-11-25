@@ -128,7 +128,9 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
 
     return "";
   } catch (error) {
-    logger.warn(`Error normalizing date: ${dateInput}`, error);
+    logger.warn(`Error normalizing date: ${dateInput}`, {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return "";
   }
 };
@@ -140,7 +142,7 @@ export const normalizeBillDate = (dateInput: string | Date): string => {
  * @returns {number|null} Days until due (negative if overdue), null if invalid date
  */
 export const calculateDaysUntilDue = (
-  dueDate: string | Date,
+  dueDate: string | Date | undefined,
   fromDate: Date = new Date()
 ): number | null => {
   if (!dueDate) return null;
@@ -163,7 +165,9 @@ export const calculateDaysUntilDue = (
 
     return Math.ceil((due.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
   } catch (error) {
-    logger.warn(`Invalid due date: ${dueDate}`, error);
+    logger.warn(`Invalid due date: ${dueDate}`, {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 };
@@ -198,7 +202,7 @@ export const processBillCalculations = (bill: Bill, fromDate: Date = new Date())
     amount: typeof bill.amount === "number" ? bill.amount : 0,
     description: bill.description || bill.provider || `Bill ${bill.id}`,
     isPaid: Boolean(bill.isPaid),
-    daysUntilDue,
+    daysUntilDue: daysUntilDue ?? undefined,
     urgency,
   };
 };

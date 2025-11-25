@@ -111,8 +111,8 @@ const useEnvelopeEdit = ({
 
   // Use envelope form hook with enhanced handlers
   const formHook = useEnvelopeForm({
-    envelope,
-    existingEnvelopes,
+    envelope: envelope as unknown as Record<string, unknown> | null,
+    existingEnvelopes: existingEnvelopes as unknown as Record<string, unknown>[],
     onSave: handleSave,
     onClose: handleClose,
     currentUser,

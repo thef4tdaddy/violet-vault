@@ -114,7 +114,9 @@ export class BrowserInfoService {
         permissions: this.getPermissionStates(),
       };
     } catch (error) {
-      logger.warn("Error collecting browser info", error);
+      logger.warn("Error collecting browser info", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         name: "Unknown",
         version: "Unknown",
@@ -157,7 +159,9 @@ export class BrowserInfoService {
       permissions.mediaDevices = "mediaDevices" in navigator;
       permissions.notification = "Notification" in window;
     } catch (error) {
-      logger.debug("Error checking permissions", error);
+      logger.debug("Error checking permissions", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     return permissions;
@@ -181,7 +185,9 @@ export class BrowserInfoService {
         orientation: window.screen?.orientation?.type || "Unknown",
       };
     } catch (error) {
-      logger.warn("Error collecting viewport info", error);
+      logger.warn("Error collecting viewport info", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         width: 0,
         height: 0,
@@ -215,7 +221,9 @@ export class BrowserInfoService {
         origin: url.origin,
       };
     } catch (error) {
-      logger.warn("Error collecting URL info", error);
+      logger.warn("Error collecting URL info", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         href: window.location.href || "Unknown",
         protocol: "Unknown",

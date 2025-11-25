@@ -47,7 +47,7 @@ export class PageDetectionService {
       const pathname = url.pathname;
 
       // Enhanced route analysis using route configuration
-      const currentView = pathToViewMap[pathname] || "unknown";
+      const currentView = (pathToViewMap as Record<string, string>)[pathname] || "unknown";
       const isAppRoute =
         Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
       const isMarketingRoute = !isAppRoute && !pathname.startsWith("/app");
@@ -70,7 +70,7 @@ export class PageDetectionService {
         routeType: isAppRoute ? "app" : "marketing",
       };
     } catch (error) {
-      logger.warn("Error collecting route info", error);
+      logger.warn("Error collecting route info", error as Record<string, unknown>);
       return {
         pathname: window.location.pathname || "/",
         search: window.location.search || "",
@@ -101,7 +101,7 @@ export class PageDetectionService {
 
       return context;
     } catch (error) {
-      logger.warn("Error getting screen context", error);
+      logger.warn("Error getting screen context", error as Record<string, unknown>);
       return {
         documentTitle: document.title || "Unknown",
         screenTitle: "Unknown",
@@ -144,7 +144,7 @@ export class PageDetectionService {
    */
   static extractBreadcrumbs(): string[] {
     try {
-      const breadcrumbs = [];
+      const breadcrumbs: string[] = [];
 
       // Look for common breadcrumb patterns
       const breadcrumbSelectors = [

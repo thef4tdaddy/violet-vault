@@ -5,7 +5,7 @@ import { getIcon } from "../../../utils";
 // Type definitions
 interface HistoryCommit {
   hash: string;
-  shortHash: string;
+  shortHash?: string;
   author: string;
   message: string;
   timestamp: number;

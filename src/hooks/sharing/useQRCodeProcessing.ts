@@ -5,7 +5,7 @@ import logger from "../../utils/common/logger";
 interface CreatorInfo {
   userName: string;
   userColor: string;
-  createdAt?: string;
+  createdAt?: string | number | null;
 }
 
 /**

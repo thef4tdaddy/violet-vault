@@ -3,6 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useConfirm } from "../../../hooks/common/useConfirm";
 import logger from "../../../utils/common/logger";
+import type { DataDetectionResult } from "@/types/sync";
 
 // Extend window interface for custom debug functions
 declare global {
@@ -49,15 +50,6 @@ interface ValidationResults {
       corruptionCheck: { passed: number; failed: number };
     };
   };
-}
-
-// Import the DataDetectionResult type
-interface DataDetectionResult {
-  hasData: boolean;
-  itemCount: number;
-  dataTypes: string[];
-  readyForCloudReset: boolean;
-  exception?: string;
 }
 
 interface SyncDebugToolsSectionProps {

@@ -3,21 +3,25 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 interface Change {
-  type: string;
-  changeType: string;
-  entityType: string;
+  type?: string;
+  changeType?: string;
+  entityType?: string;
   description?: string;
   diff?: Record<string, { from: unknown; to: unknown }>;
+  [key: string]: unknown;
+}
+
+interface Commit {
+  hash?: string;
+  message?: string;
+  author?: string;
+  timestamp?: string | number;
+  parentHash?: string;
+  [key: string]: unknown;
 }
 
 interface CommitDetails {
-  commit: {
-    hash?: string;
-    message: string;
-    author: string;
-    timestamp: string | number;
-    parentHash?: string;
-  };
+  commit?: Commit;
   changes: Change[];
 }
 

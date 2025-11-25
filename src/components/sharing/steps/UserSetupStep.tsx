@@ -57,7 +57,7 @@ const UserSetupStep = ({
       <div>
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            {renderIcon("CheckCircle", "h-5 w-5 text-green-600")}
+            {renderIcon("CheckCircle", { className: "h-5 w-5 text-green-600" })}
             <h4 className="font-black text-green-800 uppercase tracking-wide text-sm">
               Valid Share Code
             </h4>
@@ -150,7 +150,7 @@ const UserSetupStep = ({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
               >
-                {renderIcon(showPassword ? "EyeOff" : "Eye", "h-5 w-5")}
+                {renderIcon(showPassword ? "EyeOff" : "Eye", { className: "h-5 w-5" })}
               </Button>
             </div>
             <p className="text-xs text-purple-900">

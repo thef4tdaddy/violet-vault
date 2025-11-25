@@ -4,6 +4,10 @@
  */
 import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
+import type { DataDetectionResult, DataDetectionDetails } from "@/types/sync";
+
+// Re-export types for backward compatibility
+export type { DataDetectionResult, DataDetectionDetails };
 
 /**
  * Comprehensive local data detection with detailed logging
@@ -51,9 +55,19 @@ export const detectLocalData = async () => {
     });
 
     // 6. Comprehensive result
+    const dataTypes: string[] = [];
+    if (stats.envelopes > 0) dataTypes.push("envelopes");
+    if (stats.transactions > 0) dataTypes.push("transactions");
+    if (stats.bills > 0) dataTypes.push("bills");
+    if (stats.savingsGoals > 0) dataTypes.push("savingsGoals");
+    if (stats.paychecks > 0) dataTypes.push("paychecks");
+
     const result = {
       hasData: hasCoreData,
       totalItems,
+      itemCount: totalItems,
+      dataTypes,
+      readyForCloudReset: !hasCoreData,
       details: {
         ...stats,
         databaseOpen: dbOpen,
@@ -76,6 +90,9 @@ export const detectLocalData = async () => {
     return {
       hasData: false,
       totalItems: 0,
+      itemCount: 0,
+      dataTypes: [] as string[],
+      readyForCloudReset: true,
       details: {
         databaseOpen: false,
         envelopes: 0,
@@ -88,6 +105,7 @@ export const detectLocalData = async () => {
         error: errorMsg,
       },
       recommendation: "❌ Data detection failed - assume no data for safety",
+      exception: errorMsg,
     };
   }
 };
@@ -96,12 +114,14 @@ export const detectLocalData = async () => {
  * Quick data check for safety operations
  * Returns boolean result with minimal logging
  */
-export const hasLocalData = async () => {
+export const hasLocalData = async (): Promise<boolean> => {
   try {
     const stats = await budgetDb.getDatabaseStats();
     return stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
   } catch (error) {
-    logger.warn("⚠️ Quick data check failed:", error.message);
+    logger.warn("⚠️ Quick data check failed:", {
+      message: error instanceof Error ? error.message : String(error),
+    });
     return false; // Assume no data for safety
   }
 };
