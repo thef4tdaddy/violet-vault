@@ -11,7 +11,7 @@ interface LoginData {
   userData?: unknown;
 }
 
-interface LoginResult {
+export interface LoginResult {
   success: boolean;
   user?: {
     userName?: string;
@@ -63,7 +63,7 @@ interface UpdateProfileResult {
   error?: string;
 }
 
-interface AuthContext {
+export interface AuthContext {
   user?: {
     userName?: string;
     userColor?: string;

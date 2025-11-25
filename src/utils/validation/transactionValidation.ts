@@ -13,7 +13,7 @@ const BasicTransactionSchema = z.object({
   envelopeId: z.string().optional(),
 });
 
-interface Transaction {
+export interface Transaction {
   amount: number;
   description: string;
   date?: string | number;

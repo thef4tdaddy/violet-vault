@@ -49,7 +49,9 @@ interface SmartEnvelopeSuggestionsProps {
   transactions?: Transaction[];
   envelopes?: Envelope[];
   onCreateEnvelope: (envelope: Partial<Envelope>) => void;
-  onUpdateEnvelope: (envelope: Envelope) => void;
+  onUpdateEnvelope: (
+    envelope: Envelope
+  ) => void | ((id: string, updates: Record<string, unknown>) => void);
   onDismissSuggestion: (suggestion: unknown) => void;
   dateRange?: string;
   showDismissed?: boolean;
@@ -226,7 +228,12 @@ const SmartEnvelopeSuggestions = ({
     envelopes,
     onCreateEnvelope,
     onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => {
-      return onUpdateEnvelope(envelopeId, updates);
+      // Handle both function signatures - if envelope is provided or just id + updates
+      // Find the envelope and call with the full envelope
+      const envelope = envelopes?.find((e) => String(e.id) === envelopeId);
+      if (envelope && typeof onUpdateEnvelope === "function") {
+        onUpdateEnvelope({ ...envelope, ...updates } as Envelope);
+      }
     },
     onDismissSuggestion,
     dateRange,

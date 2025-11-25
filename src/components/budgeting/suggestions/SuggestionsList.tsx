@@ -2,10 +2,24 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import SuggestionCard from "./SuggestionCard";
 
+type SuggestionPriority = "high" | "medium" | "low";
+type SuggestionType =
+  | "new_envelope"
+  | "merchant_pattern"
+  | "increase_envelope"
+  | "decrease_envelope";
+type SuggestionAction = "create_envelope" | "increase_budget" | "decrease_budget";
+
 export interface Suggestion {
   id: string;
-  priority: "high" | "medium" | "low";
-  [key: string]: unknown;
+  title: string;
+  description: string;
+  reasoning: string;
+  priority: SuggestionPriority;
+  type: SuggestionType;
+  action: SuggestionAction;
+  suggestedAmount: number;
+  impact: string;
 }
 
 interface SuggestionsListProps {
@@ -111,7 +125,7 @@ const SuggestionsList: React.FC<SuggestionsListProps> = ({
                   key={suggestion.id}
                   suggestion={suggestion}
                   onApply={onApplySuggestion}
-                  onDismiss={onDismissSuggestion}
+                  onDismiss={() => onDismissSuggestion(suggestion)}
                   isCompact={isCompact}
                 />
               ))}

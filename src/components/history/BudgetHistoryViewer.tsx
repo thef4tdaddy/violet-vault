@@ -20,9 +20,9 @@ import ChangeDetails from "./viewer/ChangeDetails";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-const BudgetHistoryViewer = ({ onClose }) => {
+const BudgetHistoryViewer = ({ onClose }: { onClose: () => void }) => {
   const {
-    commits: history,
+    commits: rawHistory,
     isLoading: loading,
     isError: hasError,
     error,
@@ -30,6 +30,12 @@ const BudgetHistoryViewer = ({ onClose }) => {
     restore,
     exportHistory,
   } = useBudgetHistory({ limit: 50 });
+
+  // Transform commits to include shortHash
+  const history = (rawHistory || []).map((commit) => ({
+    ...commit,
+    shortHash: commit.hash?.slice(0, 7) || "",
+  }));
 
   const {
     selectedCommit,
@@ -54,8 +60,19 @@ const BudgetHistoryViewer = ({ onClose }) => {
   const [integrityCheck] = useState(null);
 
   // Get commit details for selected commit
-  const { data: commitDetails, isLoading: commitDetailsLoading } =
+  const { data: rawCommitDetails, isLoading: commitDetailsLoading } =
     useBudgetCommitDetails(selectedCommit);
+
+  // Transform commit details to match the expected interface
+  const commitDetails = rawCommitDetails
+    ? {
+        ...rawCommitDetails,
+        changes: (rawCommitDetails.changes || []).map((change) => ({
+          ...change,
+          type: change.changeType || "unknown",
+        })),
+      }
+    : null;
 
   const modalRef = useModalAutoScroll(true);
   const errorRef = useModalAutoScroll(hasError && Boolean(error));

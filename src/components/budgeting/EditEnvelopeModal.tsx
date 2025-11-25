@@ -182,14 +182,7 @@ const EditEnvelopeModal = ({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
-        envelope={
-          envelope as {
-            id: string;
-            name?: string;
-            currentBalance?: number;
-            targetAmount?: number;
-          } | null
-        }
+        envelope={envelope as Parameters<typeof DeleteEnvelopeModal>[0]["envelope"]}
       />
     </>
   );

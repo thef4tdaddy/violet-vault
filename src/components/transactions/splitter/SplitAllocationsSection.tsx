@@ -2,29 +2,13 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import SplitAllocationRow from "./SplitAllocationRow";
-
-interface SplitAllocation {
-  id: string;
-  [key: string]: unknown;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  [key: string]: unknown;
-}
-
-interface Envelope {
-  id: string;
-  name: string;
-  [key: string]: unknown;
-}
+import type { SplitAllocation, Envelope } from "@/types/finance";
 
 interface SplitAllocationsSectionProps {
   splitAllocations: SplitAllocation[];
-  availableCategories: Category[];
+  availableCategories: string[];
   envelopes: Envelope[];
-  onUpdateSplit: (id: string, updates: Record<string, unknown>) => void;
+  onUpdateSplit: (splitId: string, field: keyof SplitAllocation, value: unknown) => void;
   onRemoveSplit: (id: string) => void;
   onAddSplit: () => void;
   onSmartSplit: () => void;

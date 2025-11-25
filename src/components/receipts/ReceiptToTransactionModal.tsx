@@ -2,15 +2,11 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useReceiptToTransaction } from "../../hooks/receipts/useReceiptToTransaction";
-import logger from "../../utils/common/logger";
 import ReceiptDataStep from "./steps/ReceiptDataStep";
 import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { Envelope } from "@/types/finance";
-import type { TransactionFormData } from "@/domain/schemas/transaction";
-import type { Transaction } from "@/types/finance";
 
 // ModalHeader - displays title and close button
 const ModalHeader: React.FC<{ step: number; onClose: () => void }> = ({ step, onClose }) => (
@@ -105,7 +101,30 @@ const ModalFooter: React.FC<{
   </div>
 );
 
-const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
+interface ReceiptData {
+  merchant?: string;
+  total?: number;
+  date?: string;
+  imageData?: string;
+  rawText?: string;
+  confidence?: number;
+  items?: unknown[];
+  tax?: number;
+  subtotal?: number;
+  processingTime?: number;
+}
+
+interface ReceiptToTransactionModalProps {
+  receiptData: ReceiptData | null;
+  onClose: () => void;
+  onComplete?: () => void;
+}
+
+const ReceiptToTransactionModal = ({
+  receiptData,
+  onClose,
+  onComplete: _onComplete,
+}: ReceiptToTransactionModalProps) => {
   const {
     transactionForm,
     isSubmitting,
@@ -119,8 +138,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
 
   const modalRef = useModalAutoScroll(Boolean(receiptData));
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleFormSubmit = () => {
     handleSubmit();
   };
 
@@ -135,21 +153,27 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
   };
 
   const renderStepContent = () => {
+    // Convert the form data for step components that expect amount as number
+    const formWithNumberAmount = {
+      ...transactionForm,
+      amount: Number(transactionForm.amount) || 0,
+    };
+
     switch (step) {
       case 1:
         return (
           <ReceiptDataStep
-            receiptData={receiptData}
-            transactionForm={transactionForm as TransactionFormData}
+            receiptData={receiptData as Parameters<typeof ReceiptDataStep>[0]["receiptData"]}
+            transactionForm={formWithNumberAmount}
             handleFormChange={handleFormChange}
           />
         );
       case 2:
         return (
           <EnvelopeSelectionStep
-            transactionForm={transactionForm as TransactionFormData}
+            transactionForm={formWithNumberAmount}
             envelopes={
-              envelopes as Array<{
+              envelopes as unknown as Array<{
                 id: string;
                 name: string;
                 category: string;
@@ -163,10 +187,10 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
       case 3:
         return (
           <ConfirmationStep
-            receiptData={receiptData}
-            transactionForm={transactionForm as TransactionFormData}
+            receiptData={receiptData as Parameters<typeof ConfirmationStep>[0]["receiptData"]}
+            transactionForm={formWithNumberAmount}
             envelopes={
-              envelopes as Array<{
+              envelopes as unknown as Array<{
                 id: string;
                 name: string;
                 category: string;
@@ -174,7 +198,6 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 spent: number;
               }>
             }
-            handleFormChange={handleFormChange}
           />
         );
       default:

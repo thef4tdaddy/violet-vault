@@ -236,7 +236,15 @@ const LockScreen = () => {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleUnlock(e);
+      e.preventDefault();
+      // Create a synthetic submit action without the form event
+      if (!password.trim()) {
+        setError("Please enter your password");
+        return;
+      }
+      setIsUnlocking(true);
+      setError("");
+      setPasswordToValidate(password);
     }
   };
 

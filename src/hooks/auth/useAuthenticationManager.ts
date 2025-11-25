@@ -28,10 +28,20 @@ interface SecurityContext {
 }
 
 /**
+ * User data for setup
+ */
+interface UserData {
+  budgetId?: string;
+  password: string;
+  userName?: string;
+  userColor?: string;
+}
+
+/**
  * Auth operations interface
  */
 interface AuthOperations {
-  handleSetup: (userDataOrPassword: unknown) => Promise<void>;
+  handleSetup: (userDataOrPassword: string | UserData) => Promise<void>;
   handleLogout: () => void;
   handleChangePassword: (oldPass: string, newPass: string) => Promise<void>;
   handleUpdateProfile: (updatedProfile: unknown) => void;
@@ -128,7 +138,7 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
   // Core authentication operations - direct object without useMemo to avoid React Compiler conflicts
   const authOperations: AuthOperations = {
     // Setup & Login
-    handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
+    handleSetup: async (userDataOrPassword: string | UserData): Promise<void> => {
       await authFlow.handleSetup(userDataOrPassword);
     },
     handleLogout: authFlow.handleLogout,

@@ -19,7 +19,7 @@ interface DataDetectionDetails {
   paychecks: number;
   cache: number;
   lastOptimized: number;
-  error?: unknown;
+  error?: string;
 }
 
 interface DataDetectionResult {

@@ -26,6 +26,7 @@ interface UserProfile {
 interface SecurityManager {
   isLocked?: boolean;
   hasEncryptionKey?: boolean;
+  lockApp?: () => void;
 }
 
 interface SettingsSectionRendererProps {

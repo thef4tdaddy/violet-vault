@@ -158,7 +158,7 @@ export const useDebtDashboard = () => {
   };
   const handleRecordPayment = async (
     debtId: string,
-    paymentData: { amount: number; date?: string }
+    paymentData: { amount: number; paymentDate: string; notes?: string }
   ): Promise<void> => {
     try {
       await recordPayment(debtId, paymentData);

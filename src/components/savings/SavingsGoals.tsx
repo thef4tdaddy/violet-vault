@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
-import type { SavingsGoal } from "@/db/types";
+import type { SavingsGoal as DbSavingsGoal } from "@/db/types";
 
 // Import the new modular components
 import SavingsSummaryCard from "./SavingsSummaryCard";
@@ -11,6 +11,9 @@ import AddEditGoalModal from "./AddEditGoalModal";
 import DistributeModal from "./DistributeModal";
 import useSavingsGoalsActions from "../../hooks/savings/useSavingsGoalsActions";
 import { SAVINGS_PRIORITIES } from "../../utils/savings/savingsFormUtils";
+
+// Extended type with color for UI components
+type SavingsGoal = DbSavingsGoal & { color?: string };
 
 const SavingsGoals = ({
   savingsGoals = [],
@@ -25,7 +28,7 @@ const SavingsGoals = ({
   onAddGoal: (goal: unknown) => void;
   onUpdateGoal: (id: string, updates: unknown) => void;
   onDeleteGoal: (id: string) => void;
-  onDistributeToGoals: (amount: number, goals: unknown[]) => void;
+  onDistributeToGoals: (distribution: unknown) => void | Promise<void>;
 }) => {
   const {
     showDistributeModal,
@@ -131,7 +134,7 @@ const SavingsGoals = ({
             {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
-                goal={goal}
+                goal={{ ...goal, color: goal.color || "#a855f7" }}
                 onEdit={handleEditGoal}
                 onDelete={handleDeleteGoal}
                 priorities={SAVINGS_PRIORITIES}

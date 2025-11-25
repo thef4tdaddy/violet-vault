@@ -8,7 +8,14 @@ import {
   compareTransactions,
 } from "../../utils/validation";
 import type { Transaction } from "@/types/finance";
-import type { Transaction as ValidationTransaction } from "../../utils/validation/transactionValidation";
+
+interface ValidationTransaction {
+  amount: number;
+  description: string;
+  date?: string | number;
+  envelopeId?: string;
+  [key: string]: unknown;
+}
 
 interface UseTransactionFiltersParams {
   transactions: Transaction[];

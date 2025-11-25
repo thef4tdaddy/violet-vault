@@ -2,26 +2,13 @@ import React from "react";
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
-
-// Type definitions
-interface Split {
-  id: string;
-  description: string;
-  amount: number;
-  category: string;
-  envelopeId?: string;
-}
-
-interface Envelope {
-  id: string;
-  name: string;
-}
+import type { SplitAllocation, Envelope } from "@/types/finance";
 
 interface SplitAllocationRowProps {
-  split: Split;
+  split: SplitAllocation;
   index: number;
   canRemove: boolean;
-  onUpdate: (id: string, field: string, value: string | number) => void;
+  onUpdate: (id: string, field: keyof SplitAllocation, value: unknown) => void;
   onRemove: (id: string) => void;
   availableCategories: string[];
   envelopes: Envelope[];
@@ -36,6 +23,8 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
   availableCategories,
   envelopes,
 }) => {
+  const splitId = String(split.id);
+
   return (
     <div className="grid grid-cols-12 gap-3 items-center py-3 px-4 bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl border-2 border-black shadow-md">
       {/* Description */}
@@ -43,7 +32,7 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
         <input
           type="text"
           value={split.description}
-          onChange={(e) => onUpdate(split.id, "description", e.target.value)}
+          onChange={(e) => onUpdate(splitId, "description", e.target.value)}
           placeholder="Description..."
           className="w-full px-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-medium"
         />
@@ -60,7 +49,7 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
             step="0.01"
             min="0"
             value={split.amount}
-            onChange={(e) => onUpdate(split.id, "amount", parseFloat(e.target.value) || 0)}
+            onChange={(e) => onUpdate(splitId, "amount", parseFloat(e.target.value) || 0)}
             className="w-full pl-10 pr-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-bold"
           />
         </div>
@@ -74,7 +63,7 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
           })}
           <Select
             value={split.category}
-            onChange={(e) => onUpdate(split.id, "category", e.target.value)}
+            onChange={(e) => onUpdate(splitId, "category", e.target.value)}
             className="w-full pl-10 pr-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-medium appearance-none bg-white/60"
           >
             <option value="">Select category...</option>
@@ -90,13 +79,13 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
       {/* Envelope */}
       <div className="col-span-2">
         <Select
-          value={split.envelopeId || ""}
-          onChange={(e) => onUpdate(split.id, "envelopeId", e.target.value)}
+          value={String(split.envelopeId || "")}
+          onChange={(e) => onUpdate(splitId, "envelopeId", e.target.value)}
           className="w-full px-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-medium appearance-none bg-white/60"
         >
           <option value="">No envelope</option>
           {envelopes?.map((envelope) => (
-            <option key={envelope.id} value={envelope.id}>
+            <option key={String(envelope.id)} value={String(envelope.id)}>
               {envelope.name}
             </option>
           ))}
@@ -107,7 +96,7 @@ const SplitAllocationRow: React.FC<SplitAllocationRowProps> = ({
       <div className="col-span-1 flex justify-center">
         {canRemove && (
           <Button
-            onClick={() => onRemove(split.id)}
+            onClick={() => onRemove(splitId)}
             className="p-1 text-red-500 hover:text-red-700 glassmorphism backdrop-blur-sm hover:bg-red-50 rounded border-2 border-red-200 shadow-md hover:shadow-lg transition-all"
             title="Remove split"
           >

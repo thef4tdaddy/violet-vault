@@ -1,5 +1,13 @@
 import { renderConfidenceIndicator } from "@/utils/receipts/receiptHelpers";
 
+// Helper to convert numeric confidence to level
+const getConfidenceLevel = (confidence: number): "high" | "medium" | "low" | "none" => {
+  if (confidence >= 0.8) return "high";
+  if (confidence >= 0.5) return "medium";
+  if (confidence > 0) return "low";
+  return "none";
+};
+
 interface ExtractedDataFieldProps {
   label: string;
   value: string | number;
@@ -24,7 +32,7 @@ const ExtractedDataField = ({
       <div className="flex items-center justify-between">
         <span className="text-sm text-purple-900 font-semibold">{label}:</span>
         <div className="flex items-center gap-2">
-          {renderConfidenceIndicator(fieldName, confidence)}
+          {renderConfidenceIndicator(fieldName, getConfidenceLevel(confidence))}
           <span className="font-black text-black text-sm">
             {formatter(value) || "Not detected"}
           </span>

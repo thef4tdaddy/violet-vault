@@ -89,114 +89,99 @@ export class VioletVaultDB extends Dexie {
     });
 
     // Enhanced hooks for automatic timestamping across all tables
-    const addTimestampHooks = (table: Table<unknown, unknown>) => {
-      table.hook(
-        "creating",
-        (
-          _primKey: string | number,
-          obj: unknown,
-          trans: {
-            source?: unknown;
-            [key: string]: unknown;
-          }
-        ) => {
-          // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
-          try {
-            (obj as { lastModified: number; createdAt?: number }).lastModified = Date.now();
-            if (!(obj as { createdAt: number }).createdAt)
-              (obj as { createdAt: number }).createdAt = Date.now();
-          } catch (error: unknown) {
-            if (
-              error instanceof Error &&
-              (error.message.includes("not extensible") ||
-                error.message.includes("Cannot add property") ||
-                error.message.includes("read only property") ||
-                error.message.includes("Cannot assign to read only"))
-            ) {
-              logger.debug("🔧 Handling readonly/frozen object from Firebase", {
-                errorType: error.message,
-                objectId: (obj as { id: string }).id,
-                objectKeys: Object.keys(obj as object),
-              });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const addTimestampHooks = (table: Table<any, any>) => {
+      table.hook("creating", function (_primKey, obj, trans) {
+        // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
+        try {
+          (obj as { lastModified: number; createdAt?: number }).lastModified = Date.now();
+          if (!(obj as { createdAt: number }).createdAt)
+            (obj as { createdAt: number }).createdAt = Date.now();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            (error.message.includes("not extensible") ||
+              error.message.includes("Cannot add property") ||
+              error.message.includes("read only property") ||
+              error.message.includes("Cannot assign to read only"))
+          ) {
+            logger.debug("🔧 Handling readonly/frozen object from Firebase", {
+              errorType: error.message,
+              objectId: (obj as { id: string }).id,
+              objectKeys: Object.keys(obj as object),
+            });
 
-              // Create a completely new extensible object
-              const extensibleObj: Record<string, unknown> = {};
+            // Create a completely new extensible object
+            const extensibleObj: Record<string, unknown> = {};
 
-              // Copy all properties from the readonly object
-              Object.keys(obj as object).forEach((key) => {
-                try {
-                  extensibleObj[key] = (obj as Record<string, unknown>)[key];
-                } catch (copyError: unknown) {
-                  logger.warn(`Failed to copy property ${key}:`, {
-                    error: (copyError as Error).message,
-                  });
-                }
-              });
-
-              // Add timestamp properties
-              extensibleObj.lastModified = Date.now();
-              extensibleObj.createdAt = extensibleObj.createdAt || Date.now();
-
-              // Try to replace the object properties
+            // Copy all properties from the readonly object
+            Object.keys(obj as object).forEach((key) => {
               try {
-                Object.assign(obj, extensibleObj);
-              } catch {
-                // If Object.assign fails, clear the object and reassign
-                try {
-                  // Clear existing properties (if possible)
-                  Object.keys(obj as object).forEach((key) => {
-                    try {
-                      delete (obj as Record<string, unknown>)[key];
-                    } catch {
-                      // Property can't be deleted, skip it
-                    }
-                  });
+                extensibleObj[key] = (obj as Record<string, unknown>)[key];
+              } catch (copyError: unknown) {
+                logger.warn(`Failed to copy property ${key}:`, {
+                  error: (copyError as Error).message,
+                });
+              }
+            });
 
-                  // Add all properties from extensible object
-                  Object.keys(extensibleObj).forEach((key) => {
-                    try {
-                      (obj as Record<string, unknown>)[key] = extensibleObj[key];
-                    } catch (setError: unknown) {
-                      logger.warn(`Failed to set property ${key}:`, {
-                        error: (setError as Error).message,
-                      });
-                    }
-                  });
-                } catch (finalError: unknown) {
-                  logger.warn("Complete object replacement failed:", {
-                    error: (finalError as Error).message,
-                  });
-                  // IMPORTANT: Last resort fallback for frozen Firebase objects
-                  // This modifies Dexie's internal transaction.source as a final attempt
-                  // to handle frozen objects from Firebase. This is needed because
-                  // Firebase returns frozen objects that cannot be modified normally.
-                  // If Dexie API changes, this fallback may need to be updated.
-                  const transWithSource = trans as { source: unknown };
-                  if (
-                    typeof transWithSource.source === "object" &&
-                    transWithSource.source !== null
-                  ) {
-                    transWithSource.source = extensibleObj;
+            // Add timestamp properties
+            extensibleObj.lastModified = Date.now();
+            extensibleObj.createdAt = extensibleObj.createdAt || Date.now();
+
+            // Try to replace the object properties
+            try {
+              Object.assign(obj, extensibleObj);
+            } catch {
+              // If Object.assign fails, clear the object and reassign
+              try {
+                // Clear existing properties (if possible)
+                Object.keys(obj as object).forEach((key) => {
+                  try {
+                    delete (obj as Record<string, unknown>)[key];
+                  } catch {
+                    // Property can't be deleted, skip it
                   }
+                });
+
+                // Add all properties from extensible object
+                Object.keys(extensibleObj).forEach((key) => {
+                  try {
+                    (obj as Record<string, unknown>)[key] = extensibleObj[key];
+                  } catch (setError: unknown) {
+                    logger.warn(`Failed to set property ${key}:`, {
+                      error: (setError as Error).message,
+                    });
+                  }
+                });
+              } catch (finalError: unknown) {
+                logger.warn("Complete object replacement failed:", {
+                  error: (finalError as Error).message,
+                });
+                // IMPORTANT: Last resort fallback for frozen Firebase objects
+                // This modifies Dexie's internal transaction.source as a final attempt
+                // to handle frozen objects from Firebase. This is needed because
+                // Firebase returns frozen objects that cannot be modified normally.
+                // If Dexie API changes, this fallback may need to be updated.
+                const transWithSource = trans as unknown as { source: unknown };
+                if (typeof transWithSource.source === "object" && transWithSource.source !== null) {
+                  transWithSource.source = extensibleObj;
                 }
               }
-            } else {
-              throw error; // Re-throw unexpected errors
             }
+          } else {
+            throw error; // Re-throw unexpected errors
           }
         }
-      );
+      });
 
-      table.hook(
-        "updating",
-        (modifications: unknown, _primKey: string | number, _obj: unknown, _trans: unknown) => {
-          (
-            modifications as Partial<
-              Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
-            >
-          ).lastModified = Date.now();
-        }
-      );
+      table.hook("updating", function (modifications) {
+        (
+          modifications as Partial<
+            Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
+          >
+        ).lastModified = Date.now();
+      });
     };
 
     // Apply hooks to all data tables

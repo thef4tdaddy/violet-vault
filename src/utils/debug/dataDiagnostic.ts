@@ -116,15 +116,14 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     }
 
     // Check all other tables (including paycheckHistory)
-    const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"];
+    const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"] as const;
     const counts: Record<string, { count: number; sample: unknown } | { error: string }> = {};
 
     for (const table of tables) {
       try {
-        const count = await window.budgetDb[table as keyof typeof window.budgetDb].count();
-        const sample = await window.budgetDb[table as keyof typeof window.budgetDb]
-          .limit(1)
-          .toArray();
+        const tableRef = window.budgetDb[table];
+        const count = await tableRef.count();
+        const sample = await tableRef.limit(1).toArray();
         counts[table] = {
           count,
           sample: sample[0] || null,

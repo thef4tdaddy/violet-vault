@@ -400,7 +400,10 @@ export const encryptionUtils = {
       logger.info("Optimized decryption complete", {
         wasOptimized,
         compressedSize: encrypted.length,
-        decompressedSize: decompressedData?.length || 0,
+        decompressedSize:
+          Array.isArray(decompressedData) || typeof decompressedData === "string"
+            ? (decompressedData as string | unknown[]).length
+            : 0,
         compressionRatio: metadata?.compressionRatio || 1,
       });
 

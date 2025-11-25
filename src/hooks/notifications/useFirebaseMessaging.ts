@@ -5,6 +5,7 @@ import {
   requestNotificationPermission,
   trackPermissionDenial,
 } from "../../utils/notifications/permissionUtils";
+import type { PermissionStatusForUI } from "../../utils/notifications/permissionUtils";
 import logger from "../../utils/common/logger";
 
 interface PermissionResult {
@@ -22,7 +23,7 @@ export const useFirebaseMessaging = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [permissionStatus, setPermissionStatus] = useState<string | null>(null);
+  const [permissionStatus, setPermissionStatus] = useState<PermissionStatusForUI | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<unknown>(null);
 
