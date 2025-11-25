@@ -26,7 +26,10 @@ interface RelatedBill {
  * @param relatedBill - Related bill object (optional)
  * @returns ISO date string or null
  */
-export function calculateNextPaymentDate(debt: Debt, relatedBill?: RelatedBill | null): string | null {
+export function calculateNextPaymentDate(
+  debt: Debt,
+  relatedBill?: RelatedBill | null
+): string | null {
   // Use bill due date if available
   if (relatedBill?.dueDate) {
     return relatedBill.dueDate;

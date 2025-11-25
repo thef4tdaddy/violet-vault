@@ -181,7 +181,12 @@ const createUndoRecord = (executionId: string, totalAmount: number): ExecutionRe
 
 // Interface for budget operations needed by undo
 interface BudgetOperations {
-  transferFunds: (fromId: string, toId: string, amount: number, description: string) => Promise<void>;
+  transferFunds: (
+    fromId: string,
+    toId: string,
+    amount: number,
+    description: string
+  ) => Promise<void>;
 }
 
 /**

@@ -190,9 +190,7 @@ export const useManualSync = (): UseManualSyncReturn => {
           message: `Full sync completed (${direction})`,
         };
       }
-      throw new Error(
-        ("error" in syncResult ? syncResult.error : undefined) || "Full sync failed"
-      );
+      throw new Error(("error" in syncResult ? syncResult.error : undefined) || "Full sync failed");
     } catch (error) {
       logger.error("❌ Full sync failed:", error);
       setSyncError((error as Error).message);

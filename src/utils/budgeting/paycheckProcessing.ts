@@ -35,20 +35,14 @@ export const getCurrentBalances = async (
   const currentEnvelopes = envelopesQuery.data || [];
   const currentSavings = savingsGoalsQuery.data || [];
 
-  const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
-    (sum: number, env: BalanceItem) => {
-      const balance = env.currentBalance;
-      return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
-    },
-    0
-  );
-  const currentTotalSavingsBalance = currentSavings.reduce(
-    (sum: number, saving: BalanceItem) => {
-      const balance = saving.currentBalance;
-      return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
-    },
-    0
-  );
+  const currentTotalEnvelopeBalance = currentEnvelopes.reduce((sum: number, env: BalanceItem) => {
+    const balance = env.currentBalance;
+    return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
+  }, 0);
+  const currentTotalSavingsBalance = currentSavings.reduce((sum: number, saving: BalanceItem) => {
+    const balance = saving.currentBalance;
+    return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
+  }, 0);
   const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
 
   logger.info("Current balances before paycheck", {

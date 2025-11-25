@@ -31,7 +31,10 @@ interface BugReportSubmissionState {
  */
 interface BugReportSubmissionActions {
   submitReport: () => Promise<boolean>;
-  quickReport: (description: string, severity?: "low" | "medium" | "high" | "critical") => Promise<unknown>;
+  quickReport: (
+    description: string,
+    severity?: "low" | "medium" | "high" | "critical"
+  ) => Promise<unknown>;
   initializeHighlightSession: () => Promise<void>;
   getHighlightSessionData: () => Promise<{
     sessionUrl: string;

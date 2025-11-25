@@ -88,15 +88,18 @@ const useTransactionArchiving = () => {
   /**
    * Get archived analytics data
    */
-  const getArchivedAnalytics = useCallback(async (period: string = "yearly", category: string | null = null) => {
-    try {
-      const archiver = createArchiver();
-      return await archiver.getArchivedAnalytics(period, category);
-    } catch (error) {
-      logger.error("Failed to retrieve archived analytics", { error });
-      throw error;
-    }
-  }, []);
+  const getArchivedAnalytics = useCallback(
+    async (period: string = "yearly", category: string | null = null) => {
+      try {
+        const archiver = createArchiver();
+        return await archiver.getArchivedAnalytics(period, category);
+      } catch (error) {
+        logger.error("Failed to retrieve archived analytics", { error });
+        throw error;
+      }
+    },
+    []
+  );
 
   /**
    * Restore archived transactions (emergency function)
