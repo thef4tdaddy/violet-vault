@@ -39,7 +39,7 @@ interface BudgetState {
 export const useAutoFundingExecution = () => {
   // Access UI store state - budget data comes from TanStack Query hooks in actual usage
   // This provides fallback empty state for initialization
-  const budget: BudgetState = useUiStore((state: UiStore) => ({
+  const budget: BudgetState = useUiStore((_state: UiStore) => ({
     envelopes: [],
     unassignedCash: 0,
     allTransactions: [],
