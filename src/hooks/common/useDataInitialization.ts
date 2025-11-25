@@ -36,7 +36,7 @@ async function fixAutoAllocateUndefinedValues() {
  */
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
-  const [initError, setInitError] = useState(null);
+  const [initError, setInitError] = useState<string | null>(null);
   const cloudSyncEnabled = useBudgetStore((state) => state.cloudSyncEnabled);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const useDataInitialization = () => {
         logger.debug("✅ Background services initialized");
       } catch (error) {
         logger.error("❌ Failed to initialize background services", error);
-        setInitError(error.message);
+        setInitError((error as Error)?.message ?? "Unknown error");
       }
     };
 

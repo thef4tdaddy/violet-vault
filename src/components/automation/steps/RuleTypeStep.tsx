@@ -2,7 +2,24 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
 
-const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
+interface RuleData {
+  name: string;
+  description: string;
+  type: string;
+}
+
+interface RuleErrors {
+  name?: string;
+  type?: string;
+}
+
+interface RuleTypeStepProps {
+  ruleData: RuleData;
+  updateRuleData: (data: Partial<RuleData>) => void;
+  errors: RuleErrors;
+}
+
+const RuleTypeStep: React.FC<RuleTypeStepProps> = ({ ruleData, updateRuleData, errors }) => {
   return (
     <div className="space-y-6">
       <div>

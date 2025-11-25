@@ -7,13 +7,28 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 // Lazy load the history viewer for better performance
 const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));
 
-const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
+interface Envelope {
+  id: string;
+  name: string;
+}
+
+interface EnvelopeHistoryModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+  envelope: Envelope | null;
+}
+
+const EnvelopeHistoryModal: React.FC<EnvelopeHistoryModalProps> = ({
+  isOpen = false,
+  onClose,
+  envelope,
+}) => {
   const shouldRender = Boolean(isOpen && envelope);
   const modalRef = useModalAutoScroll(shouldRender);
 
   if (!shouldRender) return null;
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -33,7 +48,7 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
             {React.createElement(getIcon("History"), {
               className: "h-5 w-5 mr-2 text-purple-600",
             })}
-            Envelope History: {envelope.name}
+            Envelope History: {envelope!.name}
           </h2>
           <ModalCloseButton onClick={onClose} />
         </div>
@@ -49,8 +64,8 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
           >
             <ObjectHistoryViewer
               objectType="envelope"
-              objectId={envelope.id}
-              objectName={envelope.name}
+              objectId={envelope!.id}
+              objectName={envelope!.name}
               onClose={onClose}
             />
           </Suspense>

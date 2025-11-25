@@ -2,12 +2,19 @@ import React from "react";
 import { getIcon } from "../../utils";
 import { getIconByName } from "../../utils/common/billIcons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import type { Bill, BillFormData } from "@/types/bills";
+
+interface BillModalHeaderProps {
+  editingBill: Bill | null;
+  formData: BillFormData;
+  onClose: () => void;
+}
 
 /**
  * Header section for AddBillModal
  * Pure UI component that preserves exact visual appearance
  */
-const BillModalHeader = ({ editingBill, formData, onClose }) => {
+const BillModalHeader: React.FC<BillModalHeaderProps> = ({ editingBill, formData, onClose }) => {
   return (
     <div className="flex items-center justify-between p-6 border-b border-gray-200">
       <div className="flex items-center space-x-3">
