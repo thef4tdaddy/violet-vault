@@ -6,25 +6,30 @@ import {
   getStatusText,
 } from "../../../utils/sync/syncHealthHelpers";
 
-/**
- * @typedef {Object} SyncStatus
- * @property {'CHECKING'|'HEALTHY'|'ISSUES_DETECTED'|'ERROR'|'CRITICAL_FAILURE'} status - Current sync health status
- * @property {boolean} isLoading - Whether health check is in progress
- * @property {number} [failedTests] - Number of failed tests
- */
+interface SyncStatus {
+  status: string;
+  isLoading?: boolean;
+  failedTests?: number;
+  [key: string]: unknown;
+}
+
+interface SyncStatusIndicatorProps {
+  syncStatus: SyncStatus;
+  isBackgroundSyncing: boolean;
+  onClick: () => void;
+  showDetails: boolean;
+}
 
 /**
  * SyncStatusIndicator component displays compact sync health indicator button
  * Shows color-coded status with icon and text, clickable to show details
- *
- * @param {Object} props - Component props
- * @param {SyncStatus} props.syncStatus - Current sync health status
- * @param {boolean} props.isBackgroundSyncing - Whether sync is currently running
- * @param {Function} props.onClick - Callback when indicator is clicked
- * @param {boolean} props.showDetails - Whether details panel is currently shown
- * @returns {React.ReactElement} Rendered status indicator button
  */
-const SyncStatusIndicator = ({ syncStatus, isBackgroundSyncing, onClick, showDetails }) => {
+const SyncStatusIndicator = ({
+  syncStatus,
+  isBackgroundSyncing,
+  onClick,
+  showDetails,
+}: SyncStatusIndicatorProps) => {
   /**
    * Get appropriate icon for current sync status
    * @returns {React.ReactElement} SVG icon element

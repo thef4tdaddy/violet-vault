@@ -47,12 +47,13 @@ class SyncEdgeCaseTester {
       try {
         await test.call(this);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         this.testResults.push({
           test: test.name,
           status: "failed",
-          error: error.message,
+          error: errorMessage,
         });
-        logger.error(`❌ Test ${test.name} failed:`, error);
+        logger.error(`❌ Test ${test.name} failed:`, error as Record<string, unknown>);
       }
     }
 
@@ -161,19 +162,19 @@ class SyncEdgeCaseTester {
   async testLargeDatasets() {
     logger.info("🧪 Testing large dataset handling...");
 
-    const largeTransactions = [];
+    const largeTransactions: Array<Partial<Transaction>> = [];
     for (let i = 0; i < 1000; i++) {
       largeTransactions.push({
         id: `large-test-${i}`,
         description: `Large test transaction ${i}`.repeat(10), // Make it bigger
         amount: Math.random() * 1000,
-        date: new Date().toISOString(),
+        date: new Date(),
         lastModified: Date.now(),
       });
     }
 
     try {
-      await budgetDb.transactions.bulkAdd(largeTransactions);
+      await budgetDb.transactions.bulkAdd(largeTransactions as Transaction[]);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const passed = syncData.transactions.length === 1000 && !isNaN(syncData.lastModified);
@@ -288,16 +289,15 @@ class SyncEdgeCaseTester {
   async testNullAndUndefinedValues() {
     logger.info("🧪 Testing null and undefined value handling...");
 
-    const testData = {
+    const testData: Partial<Debt> = {
       id: "null-test",
-      name: null,
-      amount: undefined,
-      lastModified: null,
-      createdAt: undefined,
+      name: null as unknown as string,
+      currentBalance: undefined as unknown as number,
+      lastModified: null as unknown as number,
     };
 
     try {
-      await budgetDb.debts.add(testData as Partial<Debt> as Debt);
+      await budgetDb.debts.add(testData as Debt);
 
       const syncData = await cloudSyncService.fetchDexieData();
       const passed = syncData.debts.length >= 1 && !isNaN(syncData.lastModified);
@@ -356,13 +356,14 @@ class SyncEdgeCaseTester {
       try {
         await budgetDb.envelopes.delete("circular-test");
       } catch (cleanupError) {
-        logger.debug("Cleanup error:", cleanupError);
+        logger.debug("Cleanup error:", cleanupError as Record<string, unknown>);
       }
 
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.testResults.push({
         test: "testCircularReferences",
         status: "failed",
-        details: `Circular reference handling failed: ${error.message}`,
+        details: `Circular reference handling failed: ${errorMessage}`,
       });
     }
   }

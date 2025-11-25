@@ -4,7 +4,24 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { globalToast } from "../../../stores/ui/toastStore";
 
-const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
+interface HistoryFilter {
+  author: string;
+  limit: number;
+}
+
+interface HistoryControlsProps {
+  filter: HistoryFilter;
+  updateFilter: (update: Partial<HistoryFilter>) => void;
+  loading: boolean;
+  exportHistory: () => void;
+}
+
+const HistoryControls = ({
+  filter,
+  updateFilter,
+  loading,
+  exportHistory,
+}: HistoryControlsProps) => {
   return (
     <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
       <div className="flex items-center gap-4">

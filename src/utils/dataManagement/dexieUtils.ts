@@ -1,11 +1,15 @@
 import { budgetDb } from "../../db/budgetDb.ts";
+import type { Table } from "dexie";
 import logger from "../common/logger";
 
-const clearTable = async (table) => {
+const clearTable = async (table: Table) => {
   try {
     await table.clear();
   } catch (error) {
-    logger.warn(`Standard clear failed for ${table.name}, using individual deletion`, error);
+    logger.warn(
+      `Standard clear failed for ${table.name}, using individual deletion`,
+      error as Record<string, unknown>
+    );
     await table.toCollection().delete();
   }
 };
@@ -38,13 +42,28 @@ export const clearAllDexieData = async () => {
   logger.info("All Dexie data cleared successfully");
 };
 
-const bulkAddIfPresent = async (table, data) => {
+const bulkAddIfPresent = async (table: Table, data: unknown[] | undefined | null) => {
   if (data?.length) {
     await table.bulkAdd(data);
   }
 };
 
-export const importDataToDexie = async (data) => {
+interface ImportData {
+  envelopes?: unknown[];
+  bills?: unknown[];
+  allTransactions?: unknown[];
+  savingsGoals?: unknown[];
+  debts?: unknown[];
+  paycheckHistory?: unknown[];
+  auditLog?: unknown[];
+  unassignedCash?: number;
+  biweeklyAllocation?: number;
+  actualBalance?: number;
+  isActualBalanceManual?: boolean;
+  supplementalAccounts?: unknown[];
+}
+
+export const importDataToDexie = async (data: ImportData) => {
   logger.info("Importing data to Dexie");
   await budgetDb.transaction(
     "rw",

@@ -25,8 +25,16 @@ interface ValidationResults {
   error?: string;
 }
 
+type TableName =
+  | "envelopes"
+  | "transactions"
+  | "bills"
+  | "savingsGoals"
+  | "debts"
+  | "paycheckHistory";
+
 class OfflineDataValidator {
-  criticalTables: string[];
+  criticalTables: TableName[];
 
   constructor() {
     this.criticalTables = [
@@ -107,7 +115,7 @@ class OfflineDataValidator {
 
       return results;
     } catch (error) {
-      logger.error("❌ Offline data validation failed", error);
+      logger.error("❌ Offline data validation failed", error as Record<string, unknown>);
       results.error = (error as Error).message;
       return results;
     }
@@ -116,19 +124,27 @@ class OfflineDataValidator {
   /**
    * Get count of records in a table
    */
-  async getTableCount(tableName) {
+  async getTableCount(tableName: TableName): Promise<number> {
     try {
-      const table = budgetDb[tableName];
-      if (!table) {
-        logger.warn(`Table ${tableName} not found in Dexie schema`);
-        return 0;
+      // Access table through proper typing
+      const db = budgetDb;
+      if (tableName === "envelopes") {
+        return await db.envelopes.count();
+      } else if (tableName === "transactions") {
+        return await db.transactions.count();
+      } else if (tableName === "bills") {
+        return await db.bills.count();
+      } else if (tableName === "savingsGoals") {
+        return await db.savingsGoals.count();
+      } else if (tableName === "debts") {
+        return await db.debts.count();
+      } else if (tableName === "paycheckHistory") {
+        return await db.paycheckHistory.count();
       }
-
-      const count = await table.count();
-      logger.debug(`📋 Table ${tableName}: ${count} records`);
-      return count;
+      logger.warn(`Table ${tableName} not found in Dexie schema`);
+      return 0;
     } catch (error) {
-      logger.warn(`Failed to count records in ${tableName}:`, error);
+      logger.warn(`Failed to count records in ${tableName}:`, error as Record<string, unknown>);
       return 0;
     }
   }
@@ -152,7 +168,7 @@ class OfflineDataValidator {
         envelope: (tx as unknown as Record<string, unknown>).envelope,
       }));
     } catch (error) {
-      logger.warn("Failed to get recent transactions preview:", error);
+      logger.warn("Failed to get recent transactions preview:", error as Record<string, unknown>);
       return [];
     }
   }
@@ -178,7 +194,7 @@ class OfflineDataValidator {
         envelopeNames: envelopes.slice(0, 5).map((env) => env.name),
       };
     } catch (error) {
-      logger.warn("Failed to get envelope summary:", error);
+      logger.warn("Failed to get envelope summary:", error as Record<string, unknown>);
       return {
         totalEnvelopes: 0,
         totalAllocated: 0,

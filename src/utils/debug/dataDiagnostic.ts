@@ -116,24 +116,23 @@ export const runDataDiagnostic = async (): Promise<DataDiagnosticResults> => {
     }
 
     // Check all other tables (including paycheckHistory)
-    const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"];
+    const tableNames = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"] as const;
     const counts: Record<string, { count: number; sample: unknown } | { error: string }> = {};
 
-    for (const table of tables) {
+    for (const tableName of tableNames) {
       try {
-        const count = await window.budgetDb[table as keyof typeof window.budgetDb].count();
-        const sample = await window.budgetDb[table as keyof typeof window.budgetDb]
-          .limit(1)
-          .toArray();
-        counts[table] = {
+        const tableRef = window.budgetDb[tableName];
+        const count = await tableRef.count();
+        const sample = await tableRef.limit(1).toArray();
+        counts[tableName] = {
           count,
           sample: sample[0] || null,
         };
-        logger.info(`📊 ${table}: ${count} records`);
+        logger.info(`📊 ${tableName}: ${count} records`);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
-        counts[table] = { error: errorMessage };
-        logger.error(`❌ Error checking ${table}:`, err);
+        counts[tableName] = { error: errorMessage };
+        logger.error(`❌ Error checking ${tableName}:`, err);
       }
     }
 
@@ -300,16 +299,17 @@ export const cleanupCorruptedPaychecks = async (
       if (confirmed) {
         // Delete corrupted paychecks
         const deletePromises = corruptedPaychecks.map((paycheck) => {
-          if (paycheck.id) {
+          if (paycheck.id && window.budgetDb) {
             return window.budgetDb.paycheckHistory.delete(paycheck.id);
-          } else {
+          } else if (window.budgetDb && paycheck.date) {
             // For paychecks with no ID, we need to delete by a combination of fields
             return window.budgetDb.paycheckHistory
               .where("date")
-              .equals(paycheck.date)
+              .equals(paycheck.date as string)
               .and((p) => p.amount === paycheck.amount && p.source === paycheck.source)
               .delete();
           }
+          return Promise.resolve();
         });
 
         await Promise.all(deletePromises);
