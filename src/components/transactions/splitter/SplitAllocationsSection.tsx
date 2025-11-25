@@ -108,12 +108,22 @@ const SplitAllocationsSection: React.FC<SplitAllocationsSectionProps> = ({
         {splitAllocations.map((split, index) => (
           <SplitAllocationRow
             key={split.id}
-            split={split}
+            split={
+              split as unknown as {
+                id: string | number;
+                description?: string;
+                amount?: number;
+                category?: string;
+                [key: string]: unknown;
+              }
+            }
             index={index}
             canRemove={splitAllocations.length > 1}
-            onUpdate={onUpdateSplit}
+            onUpdate={
+              onUpdateSplit as unknown as (id: string, updates: Record<string, unknown>) => void
+            }
             onRemove={onRemoveSplit}
-            availableCategories={availableCategories}
+            availableCategories={availableCategories as unknown as string[]}
             envelopes={envelopes}
           />
         ))}

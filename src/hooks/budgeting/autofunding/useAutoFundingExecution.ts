@@ -31,9 +31,7 @@ interface ExtendedUiStore extends UiStore {
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUiStore(
-    (state: ExtendedUiStore) => state.budget
-  ) as BudgetData | undefined;
+  const budget = useUiStore((state: ExtendedUiStore) => state.budget) as BudgetData | undefined;
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 

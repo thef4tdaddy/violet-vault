@@ -68,17 +68,18 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     setUserColor,
   } = useUserSetup(handleSetupComplete);
 
-  const handleJoinSuccess = async (_joinData?: unknown) => {
-    logger.info("Join budget successful, setting up auth", _joinData as Record<string, unknown>);
-    try {
-      const result = await joinBudget(_joinData || {});
-      if (result.success) {
-        logger.auth("Shared budget join completed - auth state already set");
+  const handleJoinSuccess = useCallback(
+    async (_joinData?: unknown) => {
+      logger.info("Join budget successful, setting up auth", _joinData as Record<string, unknown>);
+      try {
+        const result = await joinBudget(_joinData || {});
+        if (result.success) logger.auth("Shared budget join completed - auth state already set");
+      } catch (error) {
+        logger.error("Failed to complete join budget setup", error);
       }
-    } catch (error) {
-      logger.error("Failed to complete join budget setup", error);
-    }
-  };
+    },
+    [joinBudget]
+  );
 
   return (
     <UserSetupLayout>
@@ -183,9 +184,7 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
       <JoinBudgetModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}
-        onJoinSuccess={async () => {
-          await handleJoinSuccess();
-        }}
+        onJoinSuccess={handleJoinSuccess}
       />
     </UserSetupLayout>
   );

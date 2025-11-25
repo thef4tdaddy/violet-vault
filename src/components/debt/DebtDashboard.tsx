@@ -119,7 +119,7 @@ const DebtDashboard = () => {
           onRecordPayment={async (debtId: string, amount: number) => {
             await handleRecordPayment(debtId, {
               amount,
-              paymentDate: new Date().toISOString().split("T")[0],
+              date: new Date().toISOString().split("T")[0],
             });
           }}
           onEdit={handleEditDebt as unknown as (debt: Record<string, unknown>) => void}

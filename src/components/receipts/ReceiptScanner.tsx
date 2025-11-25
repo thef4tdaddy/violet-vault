@@ -57,7 +57,21 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
     handleConfirmReceipt,
     resetScanner,
     toggleImagePreview,
-  } = useReceiptScanner(onReceiptProcessed);
+  } = useReceiptScanner(
+    onReceiptProcessed as unknown as (data: {
+      merchant: string | null;
+      total: string | null;
+      date: string | null;
+      time: string | null;
+      tax: string | null;
+      subtotal: string | null;
+      items: Array<{ description: string; amount: number; rawLine: string }>;
+      confidence: Record<string, string>;
+      rawText: string;
+      processingTime: number;
+      imageData: { file: File; preview: string };
+    }) => void
+  );
 
   const modalRef = useModalAutoScroll(true);
 
@@ -92,7 +106,29 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
                 onTogglePreview={toggleImagePreview}
               />
 
-              <ReceiptExtractedData extractedData={extractedData} />
+              <ReceiptExtractedData
+                extractedData={
+                  extractedData as unknown as
+                    | {
+                        merchant?: string;
+                        total?: number;
+                        date?: string;
+                        tax?: number;
+                        subtotal?: number;
+                        processingTime?: number;
+                        items?: unknown[];
+                        confidence: {
+                          merchant?: number;
+                          total?: number;
+                          date?: number;
+                          tax?: number;
+                          subtotal?: number;
+                        };
+                      }
+                    | null
+                    | undefined
+                }
+              />
 
               <ReceiptActionButtons
                 extractedData={extractedData}

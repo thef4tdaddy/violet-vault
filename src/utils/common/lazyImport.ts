@@ -1,4 +1,4 @@
-import { lazy, ComponentType, ReactElement } from "react";
+import React, { lazy, ComponentType, ReactElement } from "react";
 import logger from "../common/logger";
 
 interface ModuleWithDefault {

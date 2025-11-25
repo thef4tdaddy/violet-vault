@@ -236,7 +236,7 @@ const LockScreen = () => {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleUnlock(e);
+      handleUnlock(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
 

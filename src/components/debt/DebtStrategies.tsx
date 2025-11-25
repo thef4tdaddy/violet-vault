@@ -112,7 +112,14 @@ const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
       {/* Payment Impact Analysis */}
       <PaymentImpactTable
         paymentImpact={
-          paymentImpact as unknown as import("./ui/PaymentImpactTable").PaymentImpactScenario[]
+          paymentImpact as unknown as Array<{
+            strategy: string;
+            monthlyPayment: number;
+            totalInterest: number;
+            payoffDate: string;
+            totalPaid: number;
+            savings: number;
+          }>
         }
       />
     </div>
