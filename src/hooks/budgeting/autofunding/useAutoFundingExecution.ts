@@ -10,6 +10,7 @@ interface BudgetData {
   envelopes?: unknown[];
   unassignedCash?: number;
   allTransactions?: unknown[];
+  transferFunds?: (from: string, to: string, amount: number, description?: string) => Promise<void>;
 }
 
 interface ExecutionResult {
@@ -19,6 +20,17 @@ interface ExecutionResult {
     rulesExecuted: number;
     totalFunded: number;
   };
+}
+
+interface ExecutionRecord {
+  id: string;
+  trigger: string;
+  executedAt: string;
+  rulesExecuted: number;
+  totalFunded: number;
+  remainingCash: number;
+  initialCash: number;
+  success?: boolean;
 }
 
 // Extended store interface for legacy budget property
@@ -36,7 +48,12 @@ export const useAutoFundingExecution = () => {
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 
   // Use focused sub-hooks
-  const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budget);
+  const budgetWithDefaults: BudgetData = budget ?? {
+    envelopes: [],
+    unassignedCash: 0,
+    allTransactions: [],
+  };
+  const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budgetWithDefaults);
   const {
     executeTransfer,
     simulateExecution,
@@ -44,8 +61,10 @@ export const useAutoFundingExecution = () => {
     validatePlannedTransfers,
     calculateImpact,
     canExecuteRules,
-  } = useExecutionUtils(budget);
-  const { getExecutionSummary } = useExecutionSummary(lastExecution);
+  } = useExecutionUtils(
+    budgetWithDefaults as BudgetData & { transferFunds: BudgetData["transferFunds"] }
+  );
+  const { getExecutionSummary } = useExecutionSummary(lastExecution as ExecutionRecord | null);
 
   // Execute rules with given trigger
   const executeRules = useCallback(
@@ -66,9 +85,9 @@ export const useAutoFundingExecution = () => {
           trigger,
           currentDate: new Date().toISOString(),
           data: {
-            envelopes: budget.envelopes || [],
-            unassignedCash: budget.unassignedCash || 0,
-            transactions: budget.allTransactions || [],
+            envelopes: budgetWithDefaults.envelopes ?? [],
+            unassignedCash: budgetWithDefaults.unassignedCash ?? 0,
+            transactions: budgetWithDefaults.allTransactions ?? [],
             ...triggerData,
           },
         };
@@ -81,7 +100,7 @@ export const useAutoFundingExecution = () => {
 
         const result = await executeRulesWithContext(rules, context, executeTransfer);
 
-        if (result.success) {
+        if (result.success && result.execution) {
           setLastExecution(result.execution);
           logger.info("Auto-funding execution completed successfully", {
             rulesExecuted: result.execution.rulesExecuted,
@@ -101,7 +120,7 @@ export const useAutoFundingExecution = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting, executeRulesWithContext, executeTransfer]
+    [budgetWithDefaults, isExecuting, executeRulesWithContext, executeTransfer]
   );
 
   return {

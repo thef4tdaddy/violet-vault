@@ -28,14 +28,17 @@
 
 ### Files with Most Issues
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
+- 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
+| 1 | `react-hooks/exhaustive-deps` |
 | 1 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
+violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:51:9 - 1 - The 'budgetWithDefaults' logical expression could make the dependencies of useCallback Hook (at line 123) change on every render. To fix this, wrap the initialization of 'budgetWithDefaults' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
 violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 ```
 
@@ -44,11 +47,9 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow funct
 ### Files with Most Type Errors
 - 4 errors in `src/components/debt/DebtStrategies.tsx`
 - 3 errors in `src/hooks/transactions/useTransactionLedger.ts`
-- 3 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 3 errors in `src/components/transactions/import/ImportModal.tsx`
 - 3 errors in `src/components/transactions/TransactionTable.tsx`
-- 2 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 2 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 2 errors in `src/hooks/auth/useAuthManager.ts`
 - 2 errors in `src/hooks/analytics/useTransactionAnalysis.ts`
@@ -57,6 +58,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow funct
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
+- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBillDetail.ts`
 - 1 errors in `src/hooks/analytics/useSmartCategoryAnalysis.ts`
@@ -64,6 +66,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow funct
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
 - 1 errors in `src/components/ui/ConfirmModal.tsx`
 - 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
+- 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
 - 1 errors in `src/components/savings/SavingsGoals.tsx`
 - 1 errors in `src/components/receipts/ReceiptScanner.tsx`
@@ -82,6 +85,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow funct
 | 20 | `TS2345` |
 | 6 | `TS2769` |
 | 2 | `TS2459` |
+| 1 | `TS2741` |
 | 1 | `TS2719` |
 | 1 | `TS18047` |
 
@@ -144,6 +148,7 @@ src/components/settings/SecuritySettings.tsx(74,16): error TS2322: Type '{ isLoc
   Types of property 'securitySettings' are incompatible.
     Type 'import("violet-vault/src/services/security/securityService").SecuritySettings' is not assignable to type 'SecuritySettings'.
       Index signature for type 'string' is missing in type 'SecuritySettings'.
+src/components/settings/SettingsDashboard.tsx(218,5): error TS2741: Property 'lockApp' is missing in type '{}' but required in type 'SecurityManager'.
 src/components/sync/health/SyncHealthDetails.tsx(57,50): error TS2345: Argument of type 'SyncStatus' is not assignable to parameter of type 'SyncStatus'.
   Index signature for type 'string' is missing in type 'SyncStatus'.
 src/components/sync/health/SyncHealthDetails.tsx(59,56): error TS2345: Argument of type 'RecoveryResult' is not assignable to parameter of type 'RecoveryResult'.
@@ -196,11 +201,7 @@ src/hooks/auth/useAuthManager.ts(18,8): error TS2459: Module '"./authOperations"
 src/hooks/bills/useBillDetail.ts(75,56): error TS18047: 'bill.dueDate' is possibly 'null'.
 src/hooks/bills/useBillOperations.ts(42,77): error TS2345: Argument of type 'import("violet-vault/src/types/bills").Envelope[]' is not assignable to parameter of type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Envelope[]'.
   Property 'targetAmount' is missing in type 'import("violet-vault/src/types/bills").Envelope' but required in type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Envelope'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(47,25): error TS2345: Argument of type 'BudgetData' is not assignable to parameter of type 'Budget'.
-  Property 'transferFunds' is missing in type 'BudgetData' but required in type 'Budget'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(48,55): error TS2345: Argument of type '{ rulesExecuted: number; totalFunded: number; }' is not assignable to parameter of type 'ExecutionRecord'.
-  Type '{ rulesExecuted: number; totalFunded: number; }' is missing the following properties from type 'ExecutionRecord': id, trigger, executedAt, remainingCash, initialCash
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(82,61): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: unknown[]; unassignedCash: number; transactions: unknown[]; }; }' is not assignable to parameter of type 'ExecutionContext'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(101,61): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: unknown[]; unassignedCash: number; transactions: unknown[]; }; }' is not assignable to parameter of type 'ExecutionContext'.
   The types of 'data.envelopes' are incompatible between these types.
     Type 'unknown[]' is not assignable to type 'Envelope[]'.
       Type '{}' is missing the following properties from type 'Envelope': id, currentBalance
@@ -219,13 +220,6 @@ src/hooks/layout/usePaycheckOperations.ts(53,11): error TS2345: Argument of type
       Types of parameters 'key' and 'id' are incompatible.
         Type 'string | number' is not assignable to type 'string | Envelope'.
           Type 'number' is not assignable to type 'string | Envelope'.
-src/hooks/settings/useSettingsSectionRenderer.ts(105,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User' is not assignable to type 'CurrentUser'.
-      Index signature for type 'string' is missing in type 'User'.
-src/hooks/settings/useSettingsSectionRenderer.ts(114,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Property 'lockApp' is missing in type 'SecurityManager' but required in type 'SecurityManager'.
 src/hooks/transactions/useTransactionLedger.ts(82,5): error TS2322: Type 'import("violet-vault/src/db/types").Transaction[]' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction[]'.
   Type 'import("violet-vault/src/db/types").Transaction' is not assignable to type 'import("/Users/thef4tdaddy/Git/violet-vault/src/types/finance").Transaction'.
     Types of property 'date' are incompatible.
@@ -245,19 +239,11 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 20 errors in `src/hooks/settings/useSettingsSectionRenderer.ts`
 - 11 errors in `src/hooks/bills/useBillManager.ts`
-- 11 errors in `src/db/budgetDb.ts`
-- 10 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
-- 10 errors in `src/components/pwa/UpdateAvailableModal.tsx`
-- 10 errors in `src/components/history/viewer/ChangeDetails.tsx`
-- 9 errors in `src/utils/budgeting/envelopeFormUtils.ts`
-- 9 errors in `src/utils/budgeting/autofunding/simulation.ts`
 - 9 errors in `src/components/bills/BillManager.tsx`
 - 8 errors in `src/hooks/transactions/useTransactionLedger.ts`
-- 8 errors in `src/hooks/transactions/helpers/transactionQueryHelpers.ts`
-- 7 errors in `src/components/layout/MainLayout.tsx`
 - 7 errors in `src/App.tsx`
+- 6 errors in `src/components/pwa/UpdateAvailableModal.tsx`
 - 5 errors in `src/hooks/savings/useSavingsGoals/index.ts`
 - 5 errors in `src/hooks/debts/useDebtManagement.ts`
 - 5 errors in `src/hooks/auth/useAuthManager.ts`
@@ -265,6 +251,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 5 errors in `src/components/sync/health/SyncHealthDetails.tsx`
 - 5 errors in `src/components/pwa/PatchNotesModal.tsx`
 - 4 errors in `src/stores/ui/uiStore.ts`
+- 4 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 4 errors in `src/components/transactions/import/ImportModal.tsx`
 - 4 errors in `src/components/settings/SettingsDashboard.tsx`
 - 4 errors in `src/components/debt/DebtStrategies.tsx`
@@ -460,6 +447,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 | 2 | `TS2722` |
 | 2 | `TS2719` |
 | 2 | `TS2459` |
+| 2 | `TS18047` |
 | 1 | `TS7016` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
@@ -718,37 +706,13 @@ src/components/history/IntegrityStatusIndicatorHelpers.tsx(185,75): error TS2345
   Type 'undefined' is not assignable to type 'string'.
 src/components/history/ObjectHistoryViewer.tsx(39,7): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
-src/components/history/viewer/ChangeDetails.tsx(71,18): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(75,61): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(79,43): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(82,50): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(82,50): error TS2769: No overload matches this call.
-  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
-    Argument of type 'string | number | undefined' is not assignable to parameter of type 'string | number | Date'.
-      Type 'undefined' is not assignable to type 'string | number | Date'.
-  Overload 2 of 4, '(value: string | number): Date', gave the following error.
-    Argument of type 'string | number | undefined' is not assignable to parameter of type 'string | number'.
-      Type 'undefined' is not assignable to type 'string | number'.
-src/components/history/viewer/ChangeDetails.tsx(84,16): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(88,22): error TS18048: 'commitDetails.commit' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(111,36): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-  Type 'undefined' is not assignable to type 'string'.
-src/components/history/viewer/ChangeDetails.tsx(120,73): error TS18048: 'change.diff' is possibly 'undefined'.
-src/components/history/viewer/ChangeDetails.tsx(121,47): error TS18048: 'change.diff' is possibly 'undefined'.
 src/components/history/viewer/HistoryHeader.tsx(7,26): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
 src/components/history/viewer/HistoryStatistics.tsx(4,30): error TS7031: Binding element 'statistics' implicitly has an 'any' type.
 src/components/layout/AppWrapper.tsx(9,23): error TS7031: Binding element 'firebaseSync' implicitly has an 'any' type.
 src/components/layout/MainLayout.tsx(3,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/layout/MainLayout.tsx(210,54): error TS2322: Type '(id: number) => void' is not assignable to type '(id: string | number) => void'.
-  Types of parameters 'id' and 'id' are incompatible.
-    Type 'string | number' is not assignable to type 'number'.
-      Type 'string' is not assignable to type 'number'.
-src/components/layout/MainLayout.tsx(236,24): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(256,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
-  No index signature with a parameter of type 'string' was found on type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
-src/components/layout/MainLayout.tsx(287,20): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(290,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/components/layout/MainLayout.tsx(496,11): error TS2322: Type 'unknown' is not assignable to type '{ userName?: string | undefined; userColor?: string | undefined; }'.
+src/components/layout/MainLayout.tsx(240,24): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/layout/MainLayout.tsx(288,20): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/components/layout/MainLayout.tsx(289,21): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/layout/SummaryCards.tsx(4,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/components/layout/SummaryCards.tsx(33,35): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/components/layout/ViewRenderer.tsx(321,9): error TS2322: Type '(paycheck: PaycheckHistory) => Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => Promise<void>'.
@@ -797,15 +761,11 @@ src/components/pwa/PatchNotesModal.tsx(90,26): error TS7005: Variable 'useUiStor
 src/components/pwa/PatchNotesModal.tsx(93,29): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/PatchNotesModal.tsx(94,31): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/pwa/UpdateAvailableModal.tsx(4,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/components/pwa/UpdateAvailableModal.tsx(35,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/components/pwa/UpdateAvailableModal.tsx(53,27): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(53,39): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(54,22): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(54,34): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(55,30): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(55,42): error TS7006: Parameter 'state' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(56,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/components/pwa/UpdateAvailableModal.tsx(56,33): error TS7006: Parameter 'state' implicitly has an 'any' type.
+src/components/pwa/UpdateAvailableModal.tsx(37,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/components/pwa/UpdateAvailableModal.tsx(55,27): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/components/pwa/UpdateAvailableModal.tsx(56,22): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/components/pwa/UpdateAvailableModal.tsx(57,30): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/components/pwa/UpdateAvailableModal.tsx(58,21): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedItemsList.tsx(5,31): error TS7031: Binding element 'items' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedItemsList.tsx(16,35): error TS7006: Parameter 'item' implicitly has an 'any' type.
 src/components/receipts/components/ExtractedItemsList.tsx(16,41): error TS7006: Parameter 'index' implicitly has an 'any' type.
@@ -858,7 +818,7 @@ src/components/settings/SettingsDashboard.tsx(215,5): error TS2322: Type '(profi
       Types of property 'userName' are incompatible.
         Type 'string | undefined' is not assignable to type 'string'.
           Type 'undefined' is not assignable to type 'string'.
-src/components/settings/SettingsDashboard.tsx(218,5): error TS2322: Type 'unknown' is not assignable to type 'SecurityManager | undefined'.
+src/components/settings/SettingsDashboard.tsx(218,5): error TS2322: Type 'unknown' is not assignable to type 'SecurityManager'.
 src/components/settings/SettingsDashboard.tsx(257,9): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
@@ -1021,44 +981,44 @@ src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLI
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
 src/hooks/bills/useBillManager.ts(12,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/bills/useBillManager.ts(93,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/bills/useBillManager.ts(118,9): error TS2345: Argument of type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to parameter of type '((bill: BillRecord) => void | Promise<void>) | undefined'.
+src/hooks/bills/useBillManager.ts(100,18): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
+src/hooks/bills/useBillManager.ts(125,9): error TS2345: Argument of type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to parameter of type '((bill: BillRecord) => void | Promise<void>) | undefined'.
   Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(bill: BillRecord) => void | Promise<void>'.
     Types of parameters 'bill' and 'bill' are incompatible.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManager.ts(143,5): error TS2322: Type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to type '((bill: import("violet-vault/src/types/bills").Bill) => void | Promise<void>) | undefined'.
+src/hooks/bills/useBillManager.ts(150,5): error TS2322: Type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to type '((bill: import("violet-vault/src/types/bills").Bill) => void | Promise<void>) | undefined'.
   Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(bill: import("violet-vault/src/types/bills").Bill) => void | Promise<void>'.
     Types of parameters 'bill' and 'bill' are incompatible.
       Type 'import("violet-vault/src/types/bills").Bill' is not assignable to type 'Bill'.
         Index signature for type 'string' is missing in type 'Bill'.
-src/hooks/bills/useBillManager.ts(145,5): error TS2322: Type '{ unassignedCash?: number | undefined; updateBill?: ((bill: Bill) => void | Promise<void>) | undefined; }' is not assignable to type 'BudgetContext'.
+src/hooks/bills/useBillManager.ts(152,5): error TS2322: Type '{ unassignedCash?: number | undefined; updateBill?: ((bill: Bill) => void | Promise<void>) | undefined; }' is not assignable to type 'BudgetContext'.
   Types of property 'updateBill' are incompatible.
     Type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to type '((bill: import("violet-vault/src/types/bills").Bill) => void | Promise<void>) | undefined'.
       Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(bill: import("violet-vault/src/types/bills").Bill) => void | Promise<void>'.
         Types of parameters 'bill' and 'bill' are incompatible.
           Type 'import("violet-vault/src/types/bills").Bill' is not assignable to type 'Bill'.
             Index signature for type 'string' is missing in type 'Bill'.
-src/hooks/bills/useBillManager.ts(164,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: BillRecord[]) => void'.
+src/hooks/bills/useBillManager.ts(171,11): error TS2322: Type 'Dispatch<SetStateAction<never[]>>' is not assignable to type '(bills: BillRecord[]) => void'.
   Types of parameters 'value' and 'bills' are incompatible.
     Type 'BillRecord[]' is not assignable to type 'SetStateAction<never[]>'.
       Type 'BillRecord[]' is not assignable to type 'never[]'.
         Type 'BillRecord' is not assignable to type 'never'.
-src/hooks/bills/useBillManager.ts(176,11): error TS2322: Type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to type '((bill: BillRecord) => void | Promise<void>) | undefined'.
+src/hooks/bills/useBillManager.ts(183,11): error TS2322: Type '((bill: Bill) => void | Promise<void>) | undefined' is not assignable to type '((bill: BillRecord) => void | Promise<void>) | undefined'.
   Type '(bill: Bill) => void | Promise<void>' is not assignable to type '(bill: BillRecord) => void | Promise<void>'.
     Types of parameters 'bill' and 'bill' are incompatible.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManager.ts(177,11): error TS2322: Type '(bill: Bill) => Promise<void>' is not assignable to type '(bill: BillRecord) => Promise<void>'.
+src/hooks/bills/useBillManager.ts(184,11): error TS2322: Type '(bill: Bill) => Promise<void>' is not assignable to type '(bill: BillRecord) => Promise<void>'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManager.ts(201,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
+src/hooks/bills/useBillManager.ts(208,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManager.ts(203,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
+src/hooks/bills/useBillManager.ts(210,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
-src/hooks/bills/useBillManager.ts(206,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
+src/hooks/bills/useBillManager.ts(213,5): error TS2322: Type '(bill: Bill | null) => void' is not assignable to type '(bill: BillRecord | null) => void'.
   Types of parameters 'bill' and 'bill' are incompatible.
     Type 'BillRecord | null' is not assignable to type 'Bill | null'.
       Type 'BillRecord' is missing the following properties from type 'Bill': frequency, color
@@ -1085,20 +1045,15 @@ src/hooks/bills/useBulkBillOperations.ts(31,39): error TS7006: Parameter 'bill' 
 src/hooks/budgeting/autofunding/useAutoFunding.ts(6,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/budgeting/autofunding/useAutoFunding.ts(41,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(3,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(34,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(47,25): error TS2345: Argument of type 'BudgetData | undefined' is not assignable to parameter of type 'Budget'.
-  Type 'undefined' is not assignable to type 'Budget'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(48,55): error TS2345: Argument of type '{ rulesExecuted: number; totalFunded: number; } | null | undefined' is not assignable to parameter of type 'ExecutionRecord | null'.
-  Type 'undefined' is not assignable to type 'ExecutionRecord | null'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(69,24): error TS18048: 'budget' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(70,29): error TS18048: 'budget' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(71,27): error TS18048: 'budget' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(82,61): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: unknown[]; unassignedCash: number; transactions: unknown[]; }; }' is not assignable to parameter of type 'ExecutionContext'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(46,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(65,5): error TS2345: Argument of type 'BudgetData & { transferFunds: ((from: string, to: string, amount: number, description?: string | undefined) => Promise<void>) | undefined; }' is not assignable to parameter of type 'Budget'.
+  Types of property 'transferFunds' are incompatible.
+    Type '((from: string, to: string, amount: number, description?: string | undefined) => Promise<void>) | undefined' is not assignable to type '(from: string, to: string, amount: number, description?: string | undefined) => Promise<void>'.
+      Type 'undefined' is not assignable to type '(from: string, to: string, amount: number, description?: string | undefined) => Promise<void>'.
+src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(101,61): error TS2345: Argument of type '{ trigger: string; currentDate: string; data: { envelopes: unknown[]; unassignedCash: number; transactions: unknown[]; }; }' is not assignable to parameter of type 'ExecutionContext'.
   The types of 'data.envelopes' are incompatible between these types.
     Type 'unknown[]' is not assignable to type 'Envelope[]'.
       Type 'unknown' is not assignable to type 'Envelope'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(87,28): error TS18048: 'result.execution' is possibly 'undefined'.
-src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(88,26): error TS18048: 'result.execution' is possibly 'undefined'.
 src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useUndoOperations.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/budgeting/autofunding/useUndoOperations.ts(200,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
@@ -1219,240 +1174,12 @@ src/hooks/savings/useSavingsGoals/index.ts(89,9): error TS2322: Type 'UseMutatio
 src/hooks/settings/useSettingsDashboard.ts(2,10): error TS7034: Variable 'useBudgetStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/settings/useSettingsDashboard.ts(103,28): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
 src/hooks/settings/useSettingsDashboard.ts(104,31): error TS7005: Variable 'useBudgetStore' implicitly has an 'any' type.
-src/hooks/settings/useSettingsSectionRenderer.ts(95,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(96,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(97,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(98,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(99,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(100,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'boolean | undefined' is not assignable to type 'boolean'.
-      Type 'undefined' is not assignable to type 'boolean'.
-        Type 'boolean | undefined' is not assignable to type 'boolean'.
-          Type 'undefined' is not assignable to type 'boolean'.
-            Type 'boolean | undefined' is not assignable to type 'boolean'.
-              Type 'undefined' is not assignable to type 'boolean'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '(() => void) | undefined' is not assignable to type '() => void'.
-                      Type 'undefined' is not assignable to type '() => void'.
-                        Type '(() => void) | undefined' is not assignable to type '() => void'.
-                          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(105,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User | undefined' is not assignable to type 'CurrentUser'.
-      Type 'undefined' is not assignable to type 'CurrentUser'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '((profile: UserProfile) => void) | undefined' is not assignable to type '(profile: CurrentUser) => void'.
-                      Type 'undefined' is not assignable to type '(profile: CurrentUser) => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(106,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User | undefined' is not assignable to type 'CurrentUser'.
-      Type 'undefined' is not assignable to type 'CurrentUser'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '((profile: UserProfile) => void) | undefined' is not assignable to type '(profile: CurrentUser) => void'.
-                      Type 'undefined' is not assignable to type '(profile: CurrentUser) => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(107,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User | undefined' is not assignable to type 'CurrentUser'.
-      Type 'undefined' is not assignable to type 'CurrentUser'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '((profile: UserProfile) => void) | undefined' is not assignable to type '(profile: CurrentUser) => void'.
-                      Type 'undefined' is not assignable to type '(profile: CurrentUser) => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(108,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User | undefined' is not assignable to type 'CurrentUser'.
-      Type 'undefined' is not assignable to type 'CurrentUser'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '((profile: UserProfile) => void) | undefined' is not assignable to type '(profile: CurrentUser) => void'.
-                      Type 'undefined' is not assignable to type '(profile: CurrentUser) => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(109,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'User | undefined' is not assignable to type 'CurrentUser'.
-      Type 'undefined' is not assignable to type 'CurrentUser'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-                    Type '((profile: UserProfile) => void) | undefined' is not assignable to type '(profile: CurrentUser) => void'.
-                      Type 'undefined' is not assignable to type '(profile: CurrentUser) => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(114,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'SecurityManager | undefined' is not assignable to type 'SecurityManager'.
-      Type 'undefined' is not assignable to type 'SecurityManager'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(115,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'SecurityManager | undefined' is not assignable to type 'SecurityManager'.
-      Type 'undefined' is not assignable to type 'SecurityManager'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(116,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type 'SecurityManager | undefined' is not assignable to type 'SecurityManager'.
-      Type 'undefined' is not assignable to type 'SecurityManager'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '(() => void) | undefined' is not assignable to type '() => void'.
-              Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(121,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(122,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(123,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(124,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-            Type '((event: ChangeEvent<HTMLInputElement>) => void) | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-              Type 'undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>) => void'.
-                Type '(() => void) | undefined' is not assignable to type '() => void'.
-                  Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(135,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
-src/hooks/settings/useSettingsSectionRenderer.ts(136,11): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Type '(() => void) | undefined' is not assignable to type '() => void'.
-      Type 'undefined' is not assignable to type '() => void'.
-        Type '(() => void) | undefined' is not assignable to type '() => void'.
-          Type 'undefined' is not assignable to type '() => void'.
 src/hooks/sharing/useQRCodeProcessing.ts(42,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/sync/useFirebaseSync.ts(2,8): error TS7034: Variable 'useUiStore' implicitly has type 'any' in some locations where its type cannot be determined.
 src/hooks/sync/useFirebaseSync.ts(63,18): error TS7005: Variable 'useUiStore' implicitly has an 'any' type.
 src/hooks/sync/useSyncHealthIndicator.ts(200,5): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(50,12): error TS18046: 'bVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(50,19): error TS18046: 'aVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(50,30): error TS18046: 'bVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(50,37): error TS18046: 'aVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,10): error TS18046: 'aVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,17): error TS18046: 'bVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,28): error TS18046: 'aVal' is of type 'unknown'.
-src/hooks/transactions/helpers/transactionQueryHelpers.ts(52,35): error TS18046: 'bVal' is of type 'unknown'.
 src/hooks/transactions/useTransactionFileUpload.ts(27,18): error TS18047: 'event.target.files' is possibly 'null'.
 src/hooks/transactions/useTransactionFileUpload.ts(59,56): error TS18046: 'error' is of type 'unknown'.
 src/hooks/transactions/useTransactionImport.ts(49,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; }'.
@@ -1546,34 +1273,10 @@ src/utils/billIcons/iconOptions.ts(179,10): error TS7053: Element implicitly has
   No index signature with a parameter of type 'string' was found on type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
 src/utils/bills/billUpdateHelpers.ts(106,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billUpdateHelpers.ts(107,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/utils/budgeting/autofunding/simulation.ts(58,25): error TS2345: Argument of type 'AutoFundingRule' is not assignable to parameter of type 'Rule'.
-  Types of property 'lastExecuted' are incompatible.
-    Type 'string | null' is not assignable to type 'string | undefined'.
-      Type 'null' is not assignable to type 'string | undefined'.
-src/utils/budgeting/autofunding/simulation.ts(267,16): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(268,22): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(269,17): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(270,21): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(271,12): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(272,16): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(273,13): error TS18047: 'simulation.simulation' is possibly 'null'.
-src/utils/budgeting/autofunding/simulation.ts(274,36): error TS2345: Argument of type '{ totalPlanned: number; rulesExecuted: number; plannedTransfers: { fromEnvelopeId: string; toEnvelopeId: string; amount: number; description: string; ruleId: string; ruleName: string; }[]; ruleResults: { ...; }[]; remainingCash: number; errors: { ...; }[]; } | null' is not assignable to parameter of type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
-  Type 'null' is not assignable to type '{ errors: { error: string; }[]; rulesExecuted: number; remainingCash: number; }'.
 src/utils/budgeting/envelopeCalculations.ts(110,63): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/utils/budgeting/envelopeCalculations.ts(521,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<FrequencyType, number>'.
   No index signature with a parameter of type 'string' was found on type 'Record<FrequencyType, number>'.
-src/utils/budgeting/envelopeFormUtils.ts(133,9): error TS7053: Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
-src/utils/budgeting/envelopeFormUtils.ts(186,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
-  No index signature with a parameter of type 'string' was found on type 'Record<EnvelopeType, EnvelopeTypeConfig>'.
-src/utils/budgeting/envelopeFormUtils.ts(440,22): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/envelopeFormUtils.ts(441,51): error TS18048: 'envelope.monthlyAmount' is possibly 'undefined'.
-src/utils/budgeting/envelopeFormUtils.ts(489,9): error TS7034: Variable 'warnings' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/envelopeFormUtils.ts(490,9): error TS7034: Variable 'errors' implicitly has type 'any[]' in some locations where its type cannot be determined.
-src/utils/budgeting/envelopeFormUtils.ts(492,42): error TS7005: Variable 'warnings' implicitly has an 'any[]' type.
-src/utils/budgeting/envelopeFormUtils.ts(492,52): error TS7005: Variable 'errors' implicitly has an 'any[]' type.
-src/utils/budgeting/envelopeFormUtils.ts(499,9): error TS18048: 'envelope.targetAmount' is possibly 'undefined'.
 src/utils/budgeting/paycheckDeletion.ts(34,26): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/utils/common/budgetHistoryTracker.ts(109,41): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: string | null; snapshotData: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.

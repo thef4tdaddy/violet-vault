@@ -60,7 +60,7 @@ const ChangeDetails: React.FC<ChangeDetailsProps> = ({
         </div>
       )}
 
-      {selectedCommit && commitDetails && (
+      {selectedCommit && commitDetails && commitDetails.commit && (
         <div className="border rounded-lg p-4 bg-white">
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
@@ -79,7 +79,10 @@ const ChangeDetails: React.FC<ChangeDetailsProps> = ({
                 <strong>Author:</strong> {commitDetails.commit.author}
               </p>
               <p>
-                <strong>Date:</strong> {new Date(commitDetails.commit.timestamp).toLocaleString()}
+                <strong>Date:</strong>{" "}
+                {commitDetails.commit.timestamp
+                  ? new Date(commitDetails.commit.timestamp).toLocaleString()
+                  : "Unknown"}
               </p>
               {commitDetails.commit.parentHash && (
                 <p>
@@ -108,7 +111,7 @@ const ChangeDetails: React.FC<ChangeDetailsProps> = ({
                     key={index}
                     className="flex items-start gap-2 p-2 bg-gray-50 rounded text-sm"
                   >
-                    {getChangeIcon(change.type)}
+                    {getChangeIcon(change.type ?? change.changeType ?? "")}
                     <div className="flex-1">
                       <p className="font-medium">
                         {change.description || `${change.changeType} ${change.entityType}`}
@@ -117,8 +120,8 @@ const ChangeDetails: React.FC<ChangeDetailsProps> = ({
                         <div className="mt-1 text-xs text-gray-600">
                           {Object.keys(change.diff).map((field) => (
                             <div key={field}>
-                              <strong>{field}:</strong> {JSON.stringify(change.diff[field].from)} →{" "}
-                              {JSON.stringify(change.diff[field].to)}
+                              <strong>{field}:</strong> {JSON.stringify(change.diff?.[field]?.from)}{" "}
+                              → {JSON.stringify(change.diff?.[field]?.to)}
                             </div>
                           ))}
                         </div>
