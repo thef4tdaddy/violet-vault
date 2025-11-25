@@ -24,9 +24,13 @@ interface DataDetectionDetails {
 
 interface DataDetectionResult {
   hasData: boolean;
-  totalItems: number;
-  details: DataDetectionDetails;
-  recommendation: string;
+  totalItems?: number;
+  itemCount: number;
+  dataTypes: string[];
+  readyForCloudReset: boolean;
+  details?: DataDetectionDetails;
+  recommendation?: string;
+  exception?: string;
 }
 
 interface SafeCloudDataResetResult {

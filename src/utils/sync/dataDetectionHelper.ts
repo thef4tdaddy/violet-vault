@@ -51,9 +51,19 @@ export const detectLocalData = async () => {
     });
 
     // 6. Comprehensive result
+    const dataTypes: string[] = [];
+    if (stats.envelopes > 0) dataTypes.push("envelopes");
+    if (stats.transactions > 0) dataTypes.push("transactions");
+    if (stats.bills > 0) dataTypes.push("bills");
+    if (stats.savingsGoals > 0) dataTypes.push("savingsGoals");
+    if (stats.paychecks > 0) dataTypes.push("paychecks");
+
     const result = {
       hasData: hasCoreData,
       totalItems,
+      itemCount: totalItems,
+      dataTypes,
+      readyForCloudReset: !hasCoreData,
       details: {
         ...stats,
         databaseOpen: dbOpen,
@@ -76,6 +86,9 @@ export const detectLocalData = async () => {
     return {
       hasData: false,
       totalItems: 0,
+      itemCount: 0,
+      dataTypes: [] as string[],
+      readyForCloudReset: true,
       details: {
         databaseOpen: false,
         envelopes: 0,
@@ -88,6 +101,7 @@ export const detectLocalData = async () => {
         error: errorMsg,
       },
       recommendation: "❌ Data detection failed - assume no data for safety",
+      exception: errorMsg,
     };
   }
 };

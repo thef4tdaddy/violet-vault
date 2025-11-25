@@ -5,7 +5,6 @@
  * Handles UI-specific business logic like selection, modal management, and display rules
  */
 import { useCallback, useMemo } from "react";
-import { getIcon } from "../../utils";
 import { useBillManagerHandlers } from "./useBillManagerHandlers";
 import { useBillManagerDisplayLogic } from "./useBillManagerDisplayLogic";
 
@@ -61,24 +60,24 @@ export function useBillManagerUI({
         "upcoming",
         "Upcoming",
         categorizedBills.upcoming?.length || 0,
-        getIcon("Calendar"),
+        "Calendar",
         "blue"
       ),
       createViewMode(
         "overdue",
         "Overdue",
         categorizedBills.overdue?.length || 0,
-        getIcon("AlertTriangle"),
+        "AlertTriangle",
         "red"
       ),
       createViewMode(
         "paid",
         "Paid",
         categorizedBills.paid?.length || 0,
-        getIcon("CheckCircle"),
+        "CheckCircle",
         "green"
       ),
-      createViewMode("all", "All Bills", bills?.length || 0, getIcon("FileText"), "gray"),
+      createViewMode("all", "All Bills", bills?.length || 0, "FileText", "gray"),
     ],
     [categorizedBills, bills]
   );

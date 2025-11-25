@@ -437,8 +437,8 @@ const MainContentLayoutView = ({
         <SummaryCards />
 
         <AppRoutes
-          budget={budget}
-          currentUser={currentUser}
+          budget={(budget || {}) as Record<string, unknown>}
+          currentUser={(currentUser || {}) as Record<string, unknown>}
           totalBiweeklyNeed={totalBiweeklyNeed}
           setActiveView={setActiveView}
         />
@@ -446,10 +446,9 @@ const MainContentLayoutView = ({
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
           syncConflicts={
-            (syncConflicts || []) as unknown as Array<{
-              hasConflict: boolean;
-              [key: string]: unknown;
-            }>
+            Array.isArray(syncConflicts) && syncConflicts.length > 0
+              ? (syncConflicts[0] as unknown as { hasConflict: boolean })
+              : null
           }
           onResolveConflict={onResolveConflict}
           onDismiss={onClearConflict}
