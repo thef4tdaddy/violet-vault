@@ -48,7 +48,10 @@ export const useSmartCategoryAnalysis = (
     transactions,
     settings
   ) as Suggestion[];
-  const billAnalysis = useBillAnalysis(bills, settings) as Suggestion[];
+  const billAnalysis = useBillAnalysis(
+    bills as unknown as import("@/types/bills").Bill[],
+    settings
+  ) as Suggestion[];
 
   return {
     filteredTransactions,
