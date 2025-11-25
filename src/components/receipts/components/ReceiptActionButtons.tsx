@@ -1,11 +1,25 @@
 import { Button } from "@/components/ui";
 import { hasMinimumExtractedData } from "@/utils/receipts/receiptHelpers";
 
+interface ExtractedData {
+  merchant?: string | null;
+  total?: string | null;
+  date?: string | null;
+  items?: Array<{ description: string; amount: number }>;
+  [key: string]: unknown;
+}
+
+interface ReceiptActionButtonsProps {
+  extractedData: ExtractedData;
+  onReset: () => void;
+  onConfirm: () => void;
+}
+
 /**
  * Receipt Action Buttons Component
  * Scan another receipt or create transaction with UI standards compliance
  */
-const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }) => {
+const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }: ReceiptActionButtonsProps) => {
   return (
     <div className="flex gap-3 pt-4">
       <Button

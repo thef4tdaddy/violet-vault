@@ -514,7 +514,7 @@ export const getQuickSyncStatus = async () => {
       checks.push({
         name: "Database Access",
         status: "❌ FAILED",
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
       failed++;
     }
@@ -533,7 +533,7 @@ export const getQuickSyncStatus = async () => {
       checks.push({
         name: "Cloud Sync Service",
         status: "❌ FAILED",
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
       failed++;
     }
@@ -565,7 +565,7 @@ export const getQuickSyncStatus = async () => {
     return {
       isHealthy: false,
       status: "ERROR",
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       lastChecked: new Date().toISOString(),
     };
   }

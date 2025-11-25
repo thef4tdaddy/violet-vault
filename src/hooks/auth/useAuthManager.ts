@@ -14,9 +14,8 @@ import {
   createUpdateProfileOperation,
   createLockSessionOperation,
   createUpdateActivityOperation,
-  type LoginResult,
-  type AuthContext,
 } from "./authOperations";
+import type { LoginResult, AuthContext } from "./authOperations";
 import type { UseMutationResult } from "@tanstack/react-query";
 
 /**
@@ -104,7 +103,7 @@ export const useAuthManager = () => {
 
     // Utilities
     shouldShowAuthGateway: () => !isAuthenticated,
-    createPasswordValidator: (password) => ({
+    createPasswordValidator: (password: string) => ({
       password,
       enabled: !!password && password.length > 0,
     }),
