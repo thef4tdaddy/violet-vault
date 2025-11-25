@@ -5,22 +5,36 @@ import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
 
+type DataRow = Record<string, unknown>;
+
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  category?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: unknown[];
-  setImportData: (data: unknown[]) => void;
-  fieldMapping: Record<string, string>;
-  setFieldMapping: (mapping: Record<string, string>) => void;
+  importData: DataRow[];
+  setImportData: (data: DataRow[]) => void;
+  fieldMapping: FieldMapping;
+  setFieldMapping: (mapping: FieldMapping) => void;
   importProgress: {
     current: number;
     total: number;
     percentage: number;
   };
   onImport: () => void | Promise<void>;
-  onFileUpload: (data: unknown[]) => void;
+  onFileUpload: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    options: { clearExisting: boolean }
+  ) => void;
 }
 
 const ImportModal: React.FC<ImportModalProps> = ({
@@ -70,7 +84,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
         )}
 
         {importStep === 3 && (
-          <ImportProgress importData={importData} importProgress={importProgress} />
+          <ImportProgress importData={importData} importProgress={importProgress.percentage} />
         )}
       </div>
     </div>

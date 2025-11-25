@@ -20,6 +20,21 @@ const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings")
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
 const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
+// Type definitions
+interface SecurityManager {
+  isLocked?: boolean;
+  hasEncryptionKey?: boolean;
+  lockApp: () => void;
+}
+
+interface UserProfile {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Helper component to render all settings modals
  */
@@ -46,8 +61,8 @@ const SettingsModals = ({
   showSecuritySettings: boolean;
   showEnvelopeChecker: boolean;
   showLocalDataSecurity: boolean;
-  activityFeedModalRef: React.RefObject<HTMLDivElement>;
-  securityManager: unknown;
+  activityFeedModalRef: React.RefObject<HTMLDivElement | null>;
+  securityManager: SecurityManager | null;
   onChangePassword: (password: string) => void;
   onClosePasswordModal: () => void;
   onCloseActivityFeed: () => void;
@@ -143,9 +158,9 @@ const SettingsDashboard = ({
   onChangePassword: (password: string) => void;
   currentUser: { userName?: string; userColor?: string };
   isLocalOnlyMode?: boolean;
-  securityManager: unknown;
+  securityManager: SecurityManager | null;
   initialSection?: string;
-  onUpdateProfile: (profile: { userName: string; userColor: string }) => void;
+  onUpdateProfile: (profile: UserProfile) => void;
 }) => {
   // Use the reusable modal manager instead of the old hook
   const {
