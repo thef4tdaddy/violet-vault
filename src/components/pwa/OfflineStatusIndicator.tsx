@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import useUiStore from "../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../stores/ui/uiStore";
 import backgroundSyncManager from "../../utils/pwa/backgroundSync";
 import logger from "../../utils/common/logger";
 import { useConfirm } from "../../hooks/common/useConfirm";
@@ -31,7 +31,7 @@ interface SyncStatus {
  * Shows connection status, pending sync operations, and offline capabilities
  */
 const OfflineStatusIndicator: React.FC = () => {
-  const isOnline = useUiStore((state) => state.isOnline);
+  const isOnline = useUiStore((state: UiStore) => state.isOnline);
   const confirm = useConfirm();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     pendingCount: 0,
@@ -52,7 +52,7 @@ const OfflineStatusIndicator: React.FC = () => {
           setLastSyncTime(new Date());
         }
       } catch (error) {
-        logger.warn("Failed to get sync status:", error);
+        logger.warn("Failed to get sync status:", error as Record<string, unknown>);
       }
     };
 

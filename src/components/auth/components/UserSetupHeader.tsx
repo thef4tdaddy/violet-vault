@@ -1,12 +1,19 @@
 import logoOnly from "../../../assets/icon-512x512.png";
 import { getStepTitle, getStepSubtitle } from "../../../utils/auth/userSetupHelpers.tsx";
 
+interface UserSetupHeaderProps {
+  step: number;
+  isReturningUser: boolean;
+  userName: string;
+  userColor: string;
+}
+
 /**
  * User Setup Header Component
  * Displays logo, title, and subtitle based on current step and user state
  * Extracted from UserSetup with UI standards compliance
  */
-const UserSetupHeader = ({ step, isReturningUser, userName, userColor }) => {
+const UserSetupHeader = ({ step, isReturningUser, userName, userColor }: UserSetupHeaderProps) => {
   return (
     <div className="text-center mb-8">
       <div className="flex justify-center mb-8">

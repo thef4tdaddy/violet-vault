@@ -1,11 +1,35 @@
 import { Button } from "@/components/ui";
 import { TrendLineChart, CategoryBarChart } from "../../charts";
 
+interface MonthlyTrend {
+  month: string;
+  value: number;
+  [key: string]: unknown;
+}
+
+interface WeeklyPattern {
+  day: string;
+  amount: number;
+  [key: string]: unknown;
+}
+
+interface TrendsTabProps {
+  chartType: string;
+  handleChartTypeChange: (type: string) => void;
+  monthlyTrends: MonthlyTrend[] | null | undefined;
+  weeklyPatterns: WeeklyPattern[] | null | undefined;
+}
+
 /**
  * Trends tab content for analytics
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatterns }) => {
+const TrendsTab = ({
+  chartType,
+  handleChartTypeChange,
+  monthlyTrends,
+  weeklyPatterns,
+}: TrendsTabProps) => {
   return (
     <div className="space-y-6">
       {/* Spending Trends Chart */}

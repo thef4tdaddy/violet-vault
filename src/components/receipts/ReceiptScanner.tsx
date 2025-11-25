@@ -8,6 +8,19 @@ import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+interface ReceiptData {
+  amount?: number;
+  merchant?: string;
+  date?: string;
+  category?: string;
+  [key: string]: unknown;
+}
+
+interface ReceiptScannerProps {
+  onReceiptProcessed: (data: ReceiptData) => void;
+  onClose: () => void;
+}
+
 /**
  * Receipt Scanner Component (Refactored)
  * Handles image upload, camera capture, and OCR processing
@@ -18,7 +31,7 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
  * - UI Standards: Applied glassmorphism, hard borders, ALL CAPS typography
  * - Maintainability: Single-responsibility components with clear interfaces
  */
-const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
+const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) => {
   const {
     // State
     isProcessing,

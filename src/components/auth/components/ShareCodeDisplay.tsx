@@ -2,12 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils";
 
+interface ShareCodeDisplayProps {
+  shareCode: string;
+  onCreateBudget: () => void;
+  onBack: () => void;
+  isLoading: boolean;
+}
+
 /**
  * Share Code Display Component
  * Shows the generated 4-word share code with copy/save options
  * Critical step - user MUST save this code to access budget on other devices
  */
-const ShareCodeDisplay = ({ shareCode, onCreateBudget, onBack, isLoading }) => {
+const ShareCodeDisplay = ({
+  shareCode,
+  onCreateBudget,
+  onBack,
+  isLoading,
+}: ShareCodeDisplayProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

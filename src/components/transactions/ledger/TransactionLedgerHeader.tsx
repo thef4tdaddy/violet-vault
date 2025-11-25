@@ -3,12 +3,19 @@ import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
 
+interface TransactionLedgerHeaderProps {
+  transactionCount: number;
+  netCashFlow: number;
+  onAddTransaction: () => void;
+  onImportTransactions: () => void;
+}
+
 const TransactionLedgerHeader = ({
   transactionCount,
   netCashFlow,
   onAddTransaction,
   onImportTransactions,
-}) => {
+}: TransactionLedgerHeaderProps) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
