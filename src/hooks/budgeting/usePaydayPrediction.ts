@@ -4,11 +4,17 @@ import useToast from "../common/useToast";
 import logger from "../../utils/common/logger";
 import localStorageService from "../../services/storage/localStorageService";
 
+interface PaycheckHistoryItem {
+  date: string | Date;
+  amount: number;
+  [key: string]: unknown;
+}
+
 /**
  * Custom hook for payday prediction and notifications
  * Extracts payday prediction logic from MainLayout component
  */
-const usePaydayPrediction = (paycheckHistory, isUnlocked) => {
+const usePaydayPrediction = (paycheckHistory: PaycheckHistoryItem[] | null, isUnlocked: boolean) => {
   const { showPayday } = useToast();
 
   // Check for payday predictions and show notifications

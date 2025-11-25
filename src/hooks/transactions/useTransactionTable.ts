@@ -1,13 +1,14 @@
 import { useState, useRef, useCallback } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import type { Transaction } from "@/types/finance";
 
 /**
  * Hook for managing transaction table state and virtualization
  */
-export const useTransactionTable = (transactions = []) => {
-  const [historyTransaction, setHistoryTransaction] = useState(null);
-  const [deletingTransaction, setDeletingTransaction] = useState(null);
-  const parentRef = useRef(null);
+export const useTransactionTable = (transactions: Transaction[] = []) => {
+  const [historyTransaction, setHistoryTransaction] = useState<Transaction | null>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null);
+  const parentRef = useRef<HTMLDivElement | null>(null);
 
   // Memoize estimateSize for virtualizer compatibility
   const estimateSize = useCallback(() => 80, []);
@@ -21,7 +22,7 @@ export const useTransactionTable = (transactions = []) => {
   });
 
   // Delete confirmation state management
-  const handleDeleteClick = (transaction) => {
+  const handleDeleteClick = (transaction: Transaction) => {
     setDeletingTransaction(transaction);
   };
 
@@ -29,7 +30,7 @@ export const useTransactionTable = (transactions = []) => {
     setDeletingTransaction(null);
   };
 
-  const handleHistoryClick = (transaction) => {
+  const handleHistoryClick = (transaction: Transaction) => {
     setHistoryTransaction(transaction);
   };
 

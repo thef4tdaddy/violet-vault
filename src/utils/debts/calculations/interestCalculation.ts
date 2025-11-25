@@ -3,13 +3,18 @@
  * Isolated to prevent temporal dead zone issues during minification
  */
 
+interface Debt {
+  interestRate?: number;
+  currentBalance?: number;
+}
+
 /**
  * Calculate interest portion of a payment
- * @param {Object} debt - The debt object
- * @param {number} paymentAmount - Payment amount
- * @returns {number} Interest portion of payment
+ * @param debt - The debt object
+ * @param paymentAmount - Payment amount
+ * @returns Interest portion of payment
  */
-export function calculateInterestPortion(debt, paymentAmount) {
+export function calculateInterestPortion(debt: Debt, paymentAmount: number): number {
   if (!debt.interestRate || !debt.currentBalance) {
     return 0;
   }

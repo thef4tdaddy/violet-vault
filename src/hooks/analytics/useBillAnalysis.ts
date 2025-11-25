@@ -7,8 +7,13 @@ import {
   analyzeBillCategorization,
   analyzeBillCategoryOptimization,
 } from "../../utils/analytics/billAnalyzer";
+import type { Bill } from "@/types/bills";
 
-export const useBillAnalysis = (bills, settings) => {
+interface AnalysisSettings {
+  [key: string]: unknown;
+}
+
+export const useBillAnalysis = (bills: Bill[], settings: AnalysisSettings) => {
   return useMemo(() => {
     const categorizationSuggestions = analyzeBillCategorization(bills, settings);
     const optimizationSuggestions = analyzeBillCategoryOptimization(bills, settings);

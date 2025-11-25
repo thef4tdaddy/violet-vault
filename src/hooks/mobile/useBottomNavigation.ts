@@ -129,8 +129,8 @@ export const useBottomNavigation = () => {
     getVisibleItems,
 
     // Utility functions
-    isItemActive: (itemKey) => activeItem === itemKey,
-    getItemByKey: (key) => navigationItems.find((item) => item.key === key),
+    isItemActive: (itemKey: string) => activeItem === itemKey,
+    getItemByKey: (key: string) => navigationItems.find((item) => item.key === key),
 
     // Responsive helpers
     shouldShowScrollHint: navigationItems.length > 5,

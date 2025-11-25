@@ -4,13 +4,29 @@
  */
 import { PAYMENT_FREQUENCIES } from "../../../constants/debts";
 
+interface PaymentHistoryEntry {
+  date: string | Date;
+  amount?: number;
+}
+
+interface Debt {
+  paymentDueDate?: string;
+  nextPaymentDate?: string;
+  paymentFrequency?: string;
+  paymentHistory?: PaymentHistoryEntry[];
+}
+
+interface RelatedBill {
+  dueDate?: string;
+}
+
 /**
  * Calculate next payment date for a debt
- * @param {Object} debt - The debt object
- * @param {Object} relatedBill - Related bill object (optional)
- * @returns {string|null} ISO date string or null
+ * @param debt - The debt object
+ * @param relatedBill - Related bill object (optional)
+ * @returns ISO date string or null
  */
-export function calculateNextPaymentDate(debt, relatedBill) {
+export function calculateNextPaymentDate(debt: Debt, relatedBill?: RelatedBill | null): string | null {
   // Use bill due date if available
   if (relatedBill?.dueDate) {
     return relatedBill.dueDate;
