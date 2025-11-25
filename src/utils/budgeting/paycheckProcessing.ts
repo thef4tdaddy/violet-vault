@@ -11,8 +11,12 @@ import {
 } from "../common/balanceCalculator";
 import logger from "../common/logger";
 
+interface BalanceItem {
+  currentBalance?: string | number;
+}
+
 interface BalanceCollection {
-  data?: Array<{ currentBalance?: string | number }>;
+  data?: BalanceItem[];
 }
 
 /**
@@ -32,13 +36,17 @@ export const getCurrentBalances = async (
   const currentSavings = savingsGoalsQuery.data || [];
 
   const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
-    (sum: number, env: { currentBalance: string | number }) =>
-      sum + (parseFloat(env.currentBalance.toString()) || 0),
+    (sum: number, env: BalanceItem) => {
+      const balance = env.currentBalance;
+      return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
+    },
     0
   );
   const currentTotalSavingsBalance = currentSavings.reduce(
-    (sum: number, saving: { currentBalance: string | number }) =>
-      sum + (parseFloat(saving.currentBalance.toString()) || 0),
+    (sum: number, saving: BalanceItem) => {
+      const balance = saving.currentBalance;
+      return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
+    },
     0
   );
   const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
