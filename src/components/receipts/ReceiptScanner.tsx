@@ -8,16 +8,22 @@ import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-interface ReceiptData {
-  amount?: number;
-  merchant?: string;
-  date?: string;
-  category?: string;
-  [key: string]: unknown;
+interface ReceiptProcessedData {
+  merchant: string | null;
+  total: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+  rawText: string;
+  processingTime: number;
+  imageData: { file: File; preview: string };
 }
 
 interface ReceiptScannerProps {
-  onReceiptProcessed: (data: ReceiptData) => void;
+  onReceiptProcessed: (data: ReceiptProcessedData) => void;
   onClose: () => void;
 }
 

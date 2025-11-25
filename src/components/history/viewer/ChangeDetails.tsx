@@ -11,15 +11,17 @@ interface Change {
   [key: string]: unknown;
 }
 
+interface Commit {
+  hash?: string;
+  message?: string;
+  author?: string;
+  timestamp?: string | number;
+  parentHash?: string;
+  [key: string]: unknown;
+}
+
 interface CommitDetails {
-  commit: {
-    hash?: string;
-    message?: string;
-    author?: string;
-    timestamp?: string | number;
-    parentHash?: string;
-    [key: string]: unknown;
-  };
+  commit?: Commit;
   changes: Change[];
 }
 
