@@ -78,17 +78,19 @@ export const createSetAuthenticated =
       hasEncryptionKey: !!sessionData.encryptionKey,
     });
 
-    setAuthState((prev) => ({
-      ...prev,
-      user: userData,
-      isAuthenticated: true,
-      isUnlocked: true,
-      budgetId: userData.budgetId,
-      encryptionKey: sessionData.encryptionKey || null,
-      salt: sessionData.salt || null,
-      lastActivity: Date.now(),
-      error: null,
-    }));
+    setAuthState(
+      (prev: AuthContextState): AuthContextState => ({
+        ...prev,
+        user: userData,
+        isAuthenticated: true,
+        isUnlocked: true,
+        budgetId: userData.budgetId ?? null,
+        encryptionKey: sessionData.encryptionKey ?? null,
+        salt: sessionData.salt ?? null,
+        lastActivity: Date.now(),
+        error: null,
+      })
+    );
   };
 
 export const createClearAuth = (setAuthState: SetAuthState) => (): void => {
@@ -103,13 +105,17 @@ export const createUpdateUser =
       userName: updatedUserData.userName,
     });
 
-    setAuthState((prev) => ({
-      ...prev,
-      user: {
-        ...prev.user,
-        ...updatedUserData,
-      },
-    }));
+    setAuthState(
+      (prev: AuthContextState): AuthContextState => ({
+        ...prev,
+        user: prev.user
+          ? {
+              ...prev.user,
+              ...updatedUserData,
+            }
+          : null,
+      })
+    );
   };
 
 export const createSetLoading =

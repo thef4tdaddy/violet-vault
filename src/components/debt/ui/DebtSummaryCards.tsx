@@ -1,11 +1,17 @@
 import PageSummaryCard from "../../ui/PageSummaryCard";
 import { getIcon } from "@/utils";
+import type { DebtStats } from "@/types/debt";
+
+interface DebtSummaryCardsProps {
+  stats: DebtStats;
+  onDueSoonClick: () => void;
+}
 
 /**
  * Debt overview summary cards
  * Pure UI component for displaying debt statistics
  */
-const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
+const DebtSummaryCards = ({ stats, onDueSoonClick }: DebtSummaryCardsProps) => {
   const cards = [
     {
       key: "total-debt",

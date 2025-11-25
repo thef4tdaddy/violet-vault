@@ -3,7 +3,7 @@
  * Extracted from useSmartCategoryAnalysis.js to reduce complexity
  */
 import { useMemo } from "react";
-import type { Transaction } from "@/types/finance";
+import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 import {
   analyzeUncategorizedTransactions,
   analyzeUnusedCategories,
@@ -14,8 +14,8 @@ interface AnalysisSettings {
 }
 
 export const useTransactionAnalysis = (
-  filteredTransactions: Transaction[],
-  allTransactions: Transaction[],
+  filteredTransactions: TransactionForStats[],
+  allTransactions: TransactionForStats[],
   settings: AnalysisSettings
 ) => {
   return useMemo(() => {

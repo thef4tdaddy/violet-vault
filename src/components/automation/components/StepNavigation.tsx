@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const StepNavigation = ({ currentStep, onStepChange }) => {
+interface StepNavigationProps {
+  currentStep: number;
+  onStepChange?: (step: number) => void;
+}
+
+const StepNavigation = ({ currentStep, onStepChange }: StepNavigationProps) => {
   const steps = [
     { number: 1, title: "Rule Type & Name" },
     { number: 2, title: "Trigger & Schedule" },

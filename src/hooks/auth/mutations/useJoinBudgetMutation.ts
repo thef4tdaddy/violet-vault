@@ -190,8 +190,14 @@ export const useJoinBudgetMutation = () => {
           const syncDelay = 2500;
           await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
-          const { useBudgetStore } = await import("../../../stores/ui/uiStore");
-          const budgetState = (useBudgetStore as { getState: () => { cloudSyncEnabled: boolean; startBackgroundSync: (sessionData?: unknown) => Promise<void> } }).getState();
+          const uiStoreModule = await import("../../../stores/ui/uiStore");
+          const useBudgetStore = uiStoreModule.useBudgetStore as unknown as {
+            getState: () => {
+              cloudSyncEnabled: boolean;
+              startBackgroundSync: (sessionData?: unknown) => Promise<void>;
+            };
+          };
+          const budgetState = useBudgetStore.getState();
 
           if (budgetState.cloudSyncEnabled) {
             await budgetState.startBackgroundSync(result.sessionData ?? undefined);

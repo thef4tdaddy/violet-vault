@@ -308,11 +308,11 @@ const UnassignedCashModal = () => {
   /* eslint-disable @typescript-eslint/ban-ts-comment */
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
   const isUnassignedCashModalOpen: boolean = useBudgetStore(
-    (state) => state.isUnassignedCashModalOpen
+    (state: { isUnassignedCashModalOpen?: boolean }) => state.isUnassignedCashModalOpen
   );
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
   const closeUnassignedCashModal: () => void = useBudgetStore(
-    (state) => state.closeUnassignedCashModal
+    (state: { closeUnassignedCashModal?: () => void }) => state.closeUnassignedCashModal
   );
   /* eslint-enable @typescript-eslint/ban-ts-comment */
   const {
