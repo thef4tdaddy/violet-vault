@@ -118,7 +118,7 @@ const BudgetHistoryViewer = ({ onClose }: BudgetHistoryViewerProps) => {
             filter={filter}
             updateFilter={updateFilter}
             loading={loading}
-            exportHistory={exportHistory}
+            exportHistory={() => exportHistory({} as Record<string, unknown>)}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

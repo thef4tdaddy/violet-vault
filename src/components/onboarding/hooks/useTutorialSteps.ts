@@ -125,10 +125,10 @@ export const useTutorialSteps = () => {
   );
 
   const getCurrentStepElement = useCallback(
-    (currentStep) => {
+    (currentStep: number): HTMLElement | null => {
       const step = tutorialSteps[currentStep];
       if (!step?.target) return null;
-      return document.querySelector(step.target);
+      return document.querySelector(step.target) as HTMLElement | null;
     },
     [tutorialSteps]
   );

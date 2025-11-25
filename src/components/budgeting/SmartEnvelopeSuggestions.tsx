@@ -49,7 +49,7 @@ interface SmartEnvelopeSuggestionsProps {
   transactions?: Transaction[];
   envelopes?: Envelope[];
   onCreateEnvelope: (envelope: Partial<Envelope>) => void;
-  onUpdateEnvelope: (envelope: Envelope) => void;
+  onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => void;
   onDismissSuggestion: (suggestion: unknown) => void;
   dateRange?: string;
   showDismissed?: boolean;

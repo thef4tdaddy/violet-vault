@@ -68,7 +68,7 @@ class PWAManager {
     try {
       // Let Vite PWA plugin handle the registration automatically
       // We just need to get the registration for update detection
-      this.registration = await navigator.serviceWorker.getRegistration();
+      this.registration = (await navigator.serviceWorker.getRegistration()) ?? null;
 
       if (this.registration) {
         logger.info("📱 Service Worker registration found", {
@@ -85,7 +85,7 @@ class PWAManager {
         // Check if there's already a waiting service worker
         if (this.registration.waiting) {
           logger.info("⏳ Service Worker already waiting");
-          this.uiStore.getState().setUpdateAvailable(true);
+          this.uiStore?.getState().setUpdateAvailable(true);
         }
       } else {
         logger.info("⏳ Waiting for service worker registration...");
@@ -115,7 +115,7 @@ class PWAManager {
         if (navigator.serviceWorker.controller) {
           // New service worker is ready to activate
           logger.info("✅ New service worker installed and ready");
-          this.uiStore.getState().setUpdateAvailable(true);
+          this.uiStore?.getState().setUpdateAvailable(true);
         } else {
           // First time install
           logger.info("🎉 Service worker installed for the first time");
@@ -254,9 +254,11 @@ class PWAManager {
 
         // Show patch notes after a short delay to allow app to fully load
         setTimeout(() => {
-          this.uiStore
-            ?.getState()
-            .loadPatchNotesForUpdate(versionCheck.lastSeenVersion, versionCheck.currentVersion);
+          if (versionCheck.lastSeenVersion) {
+            this.uiStore
+              ?.getState()
+              .loadPatchNotesForUpdate(versionCheck.lastSeenVersion, versionCheck.currentVersion);
+          }
         }, 2000); // 2 second delay
       } else if (versionCheck.isFirstTime) {
         logger.info("👋 First time user detected, not showing patch notes");

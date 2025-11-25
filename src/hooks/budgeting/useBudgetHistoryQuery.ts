@@ -104,7 +104,9 @@ export const useBudgetCommitDetails = (commitHash: string) => {
 
         return { commit, changes };
       } catch (error) {
-        logger.warn("Failed to fetch commit details:", error);
+        logger.warn("Failed to fetch commit details:", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         return null;
       }
     },
@@ -133,7 +135,9 @@ export const useBudgetHistoryStats = () => {
           lastCommitAuthor: lastCommit?.author,
         };
       } catch (error) {
-        logger.warn("Failed to fetch budget history stats:", error);
+        logger.warn("Failed to fetch budget history stats:", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         return {
           totalCommits: 0,
           lastCommitDate: null,
