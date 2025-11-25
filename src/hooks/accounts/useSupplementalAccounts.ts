@@ -96,7 +96,7 @@ const useSupplementalAccounts = ({
     releaseLock,
     breakLock,
     isLoading: lockLoading,
-  } = useEditLock("supplemental_account", editingAccount?.id ?? undefined, {
+  } = useEditLock("supplemental_account", editingAccount?.id ?? "", {
     autoAcquire: !!editingAccount,
     autoRelease: true,
     showToasts: true,
@@ -126,7 +126,7 @@ const useSupplementalAccounts = ({
   };
 
   const populateFormForEdit = (account: Account) => {
-    setAccountForm(populateFormFromAccount(getAccountForHelper(account)));
+    setAccountForm(populateFormFromAccount(getAccountForHelper(account) as never));
   };
 
   // CRUD Operations
@@ -195,7 +195,7 @@ const useSupplementalAccounts = ({
       lastUpdated?: string;
       transactions?: unknown[];
     }) => void;
-    startAccountEdit(accountForEdit, populateFn, setEditingAccountFn, setShowAddModal);
+    startAccountEdit(accountForEdit as never, populateFn, setEditingAccountFn, setShowAddModal);
   };
 
   const handleCloseModal = () => {
@@ -260,7 +260,7 @@ const useSupplementalAccounts = ({
       transactions?: unknown[];
     }) => { envelopeId: string; amount: string; description: string };
     startAccountTransfer(
-      accountForHelper,
+      accountForHelper as never,
       setTransferringAccountFn,
       setTransferForm,
       setShowTransferModal,
@@ -269,7 +269,7 @@ const useSupplementalAccounts = ({
   };
 
   const handleTransfer = () => {
-    const validation = validateTransferForm(transferForm, transferringAccount);
+    const validation = validateTransferForm(transferForm, transferringAccount as never);
     if (!validation.isValid) {
       globalToast.showError(validation.message, "Transfer Error", 8000);
       return;

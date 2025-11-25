@@ -3,19 +3,20 @@
  * Extracted from useTransactionLedger to reduce complexity
  */
 import { useState } from "react";
+import type { Transaction as FinanceTransaction } from "@/types/finance";
 
 export const useLedgerState = () => {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const [splittingTransaction, setSplittingTransaction] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [envelopeFilter, setEnvelopeFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
+  const [splittingTransaction, setSplittingTransaction] = useState<FinanceTransaction | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [envelopeFilter, setEnvelopeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const handleFilterChange = (key: string, value: string) => {
     switch (key) {

@@ -283,9 +283,9 @@ export const processBills = (
  * Categorize and calculate totals for bills
  */
 export const categorizeBillsWithTotals = (bills: BillRecord[]) => {
-  const categorizedBills = categorizeBills(
-    bills as unknown as Bill[]
-  ) as unknown as ReturnType<typeof categorizeBills>;
+  const categorizedBills = categorizeBills(bills as unknown as Bill[]) as unknown as ReturnType<
+    typeof categorizeBills
+  >;
   const totals = calculateBillTotals(categorizedBills);
   return { categorizedBills, totals };
 };
@@ -316,10 +316,7 @@ export const getFilteredBills = (
   filterOptions: FilterOptions
 ): BillRecord[] => {
   const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
-  return filterBills(
-    billsToFilter as unknown as Bill[],
-    filterOptions
-  ) as unknown as BillRecord[];
+  return filterBills(billsToFilter as unknown as Bill[], filterOptions) as unknown as BillRecord[];
 };
 
 /**

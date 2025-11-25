@@ -82,11 +82,11 @@ const useSavingsGoals = (options: UseSavingsGoalsOptions = {}) => {
   const helpers = useMemo(
     () =>
       createSavingsGoalHelpers(savingsGoals, {
-        addSavingsGoalMutation,
-        updateSavingsGoalMutation,
-        deleteSavingsGoalMutation,
-        addContributionMutation,
-        distributeFundsMutation,
+        addSavingsGoalMutation: addSavingsGoalMutation as never,
+        updateSavingsGoalMutation: updateSavingsGoalMutation as never,
+        deleteSavingsGoalMutation: deleteSavingsGoalMutation as never,
+        addContributionMutation: addContributionMutation as never,
+        distributeFundsMutation: distributeFundsMutation as never,
       }),
     [
       savingsGoals,

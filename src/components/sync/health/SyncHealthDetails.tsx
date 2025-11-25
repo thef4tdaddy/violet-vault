@@ -16,19 +16,22 @@ interface RecoveryResult {
   success: boolean;
   message?: string;
   error?: string;
+  details?: unknown;
+  [key: string]: unknown;
 }
 
 /**
  * Current sync health status
  */
 interface SyncStatus {
-  status: "CHECKING" | "HEALTHY" | "ISSUES_DETECTED" | "ERROR" | "CRITICAL_FAILURE";
-  isHealthy: boolean | null;
-  lastChecked: string | null;
-  isLoading: boolean;
+  status: "CHECKING" | "HEALTHY" | "ISSUES_DETECTED" | "ERROR" | "CRITICAL_FAILURE" | string;
+  isHealthy?: boolean | null;
+  lastChecked?: string | null;
+  isLoading?: boolean;
   failedTests?: number;
   error?: string;
   fullResults?: unknown;
+  [key: string]: unknown;
 }
 
 /**
@@ -55,7 +58,7 @@ const SyncHealthDetails: React.FC<SyncHealthDetailsProps> = ({
   onResetData,
 }) => {
   const statusDescription = getStatusDescription(syncStatus, isBackgroundSyncing);
-  const lastCheckedText = formatLastChecked(syncStatus.lastChecked);
+  const lastCheckedText = formatLastChecked(syncStatus.lastChecked ?? null);
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
@@ -107,9 +110,9 @@ const SyncHealthDetails: React.FC<SyncHealthDetailsProps> = ({
           <div className="bg-gradient-to-r from-yellow-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-yellow-200 shadow-sm">
             <p className="text-xs font-bold text-orange-800">
               {syncStatus.failedTests} validation test
-              {syncStatus.failedTests > 1 ? "s" : ""} failed
+              {(syncStatus.failedTests ?? 0) > 1 ? "s" : ""} failed
             </p>
-            {syncStatus.fullResults && (
+            {syncStatus.fullResults !== undefined && syncStatus.fullResults !== null && (
               <p className="text-xs text-orange-700 font-medium mt-1">
                 Run full validation to see detailed results
               </p>
@@ -140,11 +143,14 @@ const SyncHealthDetails: React.FC<SyncHealthDetailsProps> = ({
             >
               {formattedRecoveryResult.message}
             </p>
-            {formattedRecoveryResult.details && (
-              <p className="text-xs text-gray-600 font-medium mt-1">
-                {String(formattedRecoveryResult.details)}
-              </p>
-            )}
+            {formattedRecoveryResult.details !== undefined &&
+              formattedRecoveryResult.details !== null && (
+                <p className="text-xs text-gray-600 font-medium mt-1">
+                  {typeof formattedRecoveryResult.details === "string"
+                    ? formattedRecoveryResult.details
+                    : JSON.stringify(formattedRecoveryResult.details)}
+                </p>
+              )}
           </div>
         )}
 

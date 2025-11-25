@@ -6,7 +6,11 @@ import logger from "@/utils/common/logger";
 import type { ProcessedSavingsGoal } from "@/utils/savings/savingsCalculations";
 
 interface MutationHandler {
-  mutateAsync: (...args: unknown[]) => Promise<unknown>;
+  mutateAsync: (...args: never[]) => Promise<unknown>;
+  isPending?: boolean;
+  isError?: boolean;
+  error?: Error | null;
+  [key: string]: unknown;
 }
 
 interface MutationHelpers {
