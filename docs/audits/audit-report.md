@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 5 | +5 |
-| TypeScript Errors | 63 | +63 |
-| TypeScript Strict Mode Errors | 482 | +482 |
+| ESLint Issues | 5 | 0 |
+| TypeScript Errors | 62 | -1 |
+| TypeScript Strict Mode Errors | 481 | -1 |
 
-*Last updated: 2025-11-25 19:03:20 UTC*
+*Last updated: 2025-11-25 19:08:35 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -70,7 +70,6 @@
 - 2 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 2 errors in `src/components/bills/BillTable.tsx`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
-- 1 errors in `src/utils/common/lazyImport.ts`
 - 1 errors in `src/hooks/debts/useDebtDashboard.ts`
 - 1 errors in `src/hooks/common/useTransactions.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckHistory.ts`
@@ -96,7 +95,7 @@
 | Count | Error Code |
 |---|---|
 | 24 | `TS2345` |
-| 23 | `TS2322` |
+| 22 | `TS2322` |
 | 6 | `TS2769` |
 | 2 | `TS2719` |
 | 2 | `TS2694` |
@@ -270,14 +269,6 @@ src/hooks/transactions/useTransactionLedger.ts(203,18): error TS2345: Argument o
   Types of property 'envelopeId' are incompatible.
     Type 'string | number' is not assignable to type 'string'.
       Type 'number' is not assignable to type 'string'.
-src/utils/common/lazyImport.ts(11,5): error TS2322: Type 'Promise<{ default: never; } | { default: () => any; } | { default: T; }>' is not assignable to type 'Promise<{ default: () => any; }>'.
-  Type '{ default: never; } | { default: () => any; } | { default: T; }' is not assignable to type '{ default: () => any; }'.
-    Type '{ default: T; }' is not assignable to type '{ default: () => any; }'.
-      Types of property 'default' are incompatible.
-        Type 'T' is not assignable to type '() => any'.
-          Type 'ComponentType<unknown>' is not assignable to type '() => any'.
-            Type 'ComponentClass<unknown, any>' is not assignable to type '() => any'.
-              Type 'ComponentClass<unknown, any>' provides no match for the signature '(): any'.
 src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'DebtAccount' is not assignable to parameter of type 'Debt'.
   Types of property 'nextPaymentDate' are incompatible.
     Type 'string | Date' is not assignable to type 'string'.
@@ -417,7 +408,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/utils/common/toastHelpers.ts`
 - 1 errors in `src/utils/common/testBudgetHistory.ts`
 - 1 errors in `src/utils/common/ocrProcessor.ts`
-- 1 errors in `src/utils/common/lazyImport.ts`
 - 1 errors in `src/utils/common/highlight.ts`
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 1 errors in `src/utils/common/budgetHistoryTracker.ts`
@@ -509,7 +499,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 118 | `TS2322` |
+| 117 | `TS2322` |
 | 104 | `TS2345` |
 | 54 | `TS7031` |
 | 40 | `TS7005` |
@@ -1726,14 +1716,6 @@ src/utils/common/budgetHistoryTracker.ts(109,41): error TS2345: Argument of type
       Type 'null' is not assignable to type 'string | undefined'.
 src/utils/common/fixAutoAllocateUndefined.ts(66,37): error TS18046: 'error' is of type 'unknown'.
 src/utils/common/highlight.ts(285,73): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/common/lazyImport.ts(11,5): error TS2322: Type 'Promise<{ default: never; } | { default: () => null; } | { default: T; }>' is not assignable to type 'Promise<{ default: () => null; }>'.
-  Type '{ default: never; } | { default: () => null; } | { default: T; }' is not assignable to type '{ default: () => null; }'.
-    Type '{ default: T; }' is not assignable to type '{ default: () => null; }'.
-      Types of property 'default' are incompatible.
-        Type 'T' is not assignable to type '() => null'.
-          Type 'ComponentType<unknown>' is not assignable to type '() => null'.
-            Type 'ComponentClass<unknown, any>' is not assignable to type '() => null'.
-              Type 'ComponentClass<unknown, any>' provides no match for the signature '(): null'.
 src/utils/common/ocrProcessor.ts(349,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
