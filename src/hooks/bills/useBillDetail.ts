@@ -70,12 +70,11 @@ export const useBillDetail = ({
       return null;
     }
 
+    if (!bill.dueDate) return null;
     const parsed =
-      bill.dueDate && typeof bill.dueDate === "object" && "getTime" in bill.dueDate
+      typeof bill.dueDate === "object" && "getTime" in bill.dueDate
         ? (bill.dueDate as Date)
-        : new Date(
-            typeof bill.dueDate === "number" ? bill.dueDate : bill.dueDate ? `${bill.dueDate}` : ""
-          );
+        : new Date(typeof bill.dueDate === "number" ? bill.dueDate : `${bill.dueDate}`);
 
     if (isNaN(parsed.getTime())) {
       logger.warn("Invalid bill due date received", { billId: bill.id, dueDate: bill.dueDate });

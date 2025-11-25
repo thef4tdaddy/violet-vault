@@ -291,7 +291,14 @@ const MainContent = ({
   );
 
   // Payday prediction
-  usePaydayPrediction(paycheckHistory as UiStore["paycheckHistory"] | null, !!currentUser);
+  usePaydayPrediction(
+    paycheckHistory as unknown as Array<{
+      date: string | Date;
+      amount: number;
+      [key: string]: unknown;
+    }> | null,
+    !!currentUser
+  );
 
   const navigateToAuth = useCallback(() => {
     navigate("/auth" + location.search);

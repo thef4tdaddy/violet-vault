@@ -168,7 +168,7 @@ export const ModalContent = ({
       {/* Bill Connection */}
       {allBills.length > 0 && (
         <BillConnectionSelector
-          allBills={allBills as unknown as import("@/types/bills").Bill[]}
+          allBills={allBills as unknown as import("@/db/types").Bill[]}
           selectedBillId={formData.billId}
           onBillSelection={onBillSelection}
           onCreateBill={onCreateBill}

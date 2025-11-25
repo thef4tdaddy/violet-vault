@@ -56,7 +56,10 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
   });
 
   const historyHook = usePaycheckHistory({
-    onDeletePaycheck,
+    onDeletePaycheck: async (id: string | number) => {
+      const paycheck = paycheckHistory.find((p) => p.id === id);
+      if (paycheck) await onDeletePaycheck(paycheck);
+    },
   });
 
   // Calculate allocation preview
@@ -84,8 +87,18 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
 
       {/* Paycheck History */}
       <PaycheckHistory
-        paycheckHistory={paycheckHistory as unknown as PaycheckHistoryItem[]}
-        onDeletePaycheck={historyHook.handleDeletePaycheck}
+        paycheckHistory={
+          paycheckHistory as unknown as Array<{
+            id: string | number;
+            payerName?: string;
+            amount?: number;
+          }>
+        }
+        onDeletePaycheck={
+          historyHook.handleDeletePaycheck as unknown as (
+            paycheck: PaycheckHistoryItem
+          ) => void | Promise<void>
+        }
         deletingPaycheckId={historyHook.deletingPaycheckId}
       />
     </div>

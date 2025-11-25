@@ -42,7 +42,9 @@ const SavingsGoals = ({
     onAddGoal,
     onUpdateGoal,
     onDeleteGoal,
-    onDistributeToGoals,
+    onDistributeToGoals: onDistributeToGoals as unknown as (
+      distribution: unknown
+    ) => void | Promise<void>,
   });
 
   return (
@@ -131,7 +133,7 @@ const SavingsGoals = ({
             {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
-                goal={goal}
+                goal={goal as unknown as import("@/db/types").SavingsGoal & { color?: string }}
                 onEdit={handleEditGoal}
                 onDelete={handleDeleteGoal}
                 priorities={SAVINGS_PRIORITIES}
