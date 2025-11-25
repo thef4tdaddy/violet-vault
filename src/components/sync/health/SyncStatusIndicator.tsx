@@ -10,6 +10,7 @@ interface SyncStatus {
   status: string;
   isLoading?: boolean;
   failedTests?: number;
+  [key: string]: unknown;
 }
 
 interface SyncStatusIndicatorProps {
