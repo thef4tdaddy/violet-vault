@@ -4,7 +4,7 @@ import { useTransactionForm } from "./useTransactionForm";
 import { useTransactionFormValidated } from "./useTransactionFormValidated";
 import { useTransactionImport } from "./useTransactionImport";
 import { suggestEnvelope } from "@/utils/transactions/envelopeMatching";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { useShallow } from "zustand/react/shallow";
@@ -33,7 +33,7 @@ export const useTransactionLedger = (currentUser: unknown) => {
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore(
     useShallow(
-      (state: {
+      (state: UiStore & {
         setAllTransactions?: (transactions: unknown[]) => void;
         updateBill?: (bill: unknown) => void;
       }) => ({

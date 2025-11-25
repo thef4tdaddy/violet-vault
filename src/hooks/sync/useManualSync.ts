@@ -87,14 +87,17 @@ export const useManualSync = (): UseManualSyncReturn => {
       const syncResult = await cloudSyncService.forceSync();
       if (syncResult && syncResult.success) {
         setLastSyncTime(new Date());
+        const direction = "direction" in syncResult ? syncResult.direction : "upload";
+        const counts =
+          "counts" in syncResult ? (syncResult.counts as Record<string, number>) : undefined;
         logger.info("✅ Manual sync completed (upload)", {
-          direction: syncResult.direction || "upload",
-          changesUploaded: syncResult.counts || {},
+          direction: direction || "upload",
+          changesUploaded: counts ?? {},
         });
         return {
           success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
+          direction,
+          counts,
           message: "Local changes uploaded to cloud successfully",
         };
       }
@@ -128,9 +131,12 @@ export const useManualSync = (): UseManualSyncReturn => {
 
       const syncResult = await cloudSyncService.forceSync();
       if (syncResult && syncResult.success) {
+        const direction = "direction" in syncResult ? syncResult.direction : "download";
+        const counts =
+          "counts" in syncResult ? (syncResult.counts as Record<string, number>) : undefined;
         logger.info("✅ Manual sync completed (download)", {
-          direction: syncResult.direction || "download",
-          changesDownloaded: syncResult.counts || {},
+          direction: direction || "download",
+          changesDownloaded: counts ?? {},
         });
         await queryClient.invalidateQueries();
         await Promise.all([
@@ -145,8 +151,8 @@ export const useManualSync = (): UseManualSyncReturn => {
         logger.info("✅ Manual download sync completed successfully:", syncResult);
         return {
           success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
+          direction,
+          counts,
           message: "Remote changes downloaded and applied successfully",
         };
       }
@@ -173,15 +179,20 @@ export const useManualSync = (): UseManualSyncReturn => {
       if (syncResult && syncResult.success) {
         await queryClient.invalidateQueries();
         setLastSyncTime(new Date());
+        const direction = "direction" in syncResult ? syncResult.direction : "full";
+        const counts =
+          "counts" in syncResult ? (syncResult.counts as Record<string, number>) : undefined;
         logger.info("✅ Full bidirectional sync completed successfully:", syncResult);
         return {
           success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
-          message: `Full sync completed (${syncResult.direction})`,
+          direction,
+          counts,
+          message: `Full sync completed (${direction})`,
         };
       }
-      throw new Error(syncResult?.error || "Full sync failed");
+      throw new Error(
+        ("error" in syncResult ? syncResult.error : undefined) || "Full sync failed"
+      );
     } catch (error) {
       logger.error("❌ Full sync failed:", error);
       setSyncError((error as Error).message);
