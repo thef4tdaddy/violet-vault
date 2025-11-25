@@ -63,8 +63,8 @@ const useEnvelopeEdit = ({
     releaseLock,
     breakLock,
     isLoading: lockLoading,
-  } = useEditLock("envelope", envelope?.id, {
-    autoAcquire: isOpen && envelope?.id,
+  } = useEditLock("envelope", String(envelope?.id || ""), {
+    autoAcquire: isOpen && !!envelope?.id,
     autoRelease: true,
     showToasts: true,
   });
@@ -110,8 +110,8 @@ const useEnvelopeEdit = ({
 
   // Use envelope form hook with enhanced handlers
   const formHook = useEnvelopeForm({
-    envelope,
-    existingEnvelopes,
+    envelope: envelope as unknown as Record<string, unknown> | null,
+    existingEnvelopes: existingEnvelopes as unknown as Record<string, unknown>[],
     onSave: handleSave,
     onClose: handleClose,
     currentUser,

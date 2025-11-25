@@ -424,7 +424,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Save main document with resilience and timeout
         logger.info("🚀 [CHUNKED SYNC] About to save main document to Firebase");
-        await Promise.race<void>([
+        await Promise.race([
           this.resilience.execute(
             () => {
               logger.debug("🚀 [CHUNKED SYNC] Calling setDoc for main document");
@@ -494,7 +494,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
           // Commit batch with resilience and timeout
           logger.debug(`🚀 [CHUNKED SYNC] About to commit batch ${batchNumber}`);
-          await Promise.race<void>([
+          await Promise.race([
             this.resilience.execute(
               () => {
                 logger.debug(`🚀 [CHUNKED SYNC] Calling batch.commit() for batch ${batchNumber}`);

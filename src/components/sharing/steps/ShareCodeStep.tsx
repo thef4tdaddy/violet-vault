@@ -47,7 +47,7 @@ const ShareCodeStep: React.FC<ShareCodeStepProps> = ({
               className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-black transition-colors border-2 border-black"
               title="Scan QR Code"
             >
-              {renderIcon("QrCode", "h-5 w-5")}
+              {renderIcon("QrCode", { className: "h-5 w-5" })}
             </Button>
           </div>
 

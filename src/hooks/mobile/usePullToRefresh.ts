@@ -16,7 +16,7 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0);
   const startY = useRef(0);
   const currentY = useRef(0);
-  const containerRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!enabled || isRefreshing) return;
