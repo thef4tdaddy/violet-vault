@@ -14,7 +14,10 @@ interface PaycheckHistoryItem {
  * Custom hook for payday prediction and notifications
  * Extracts payday prediction logic from MainLayout component
  */
-const usePaydayPrediction = (paycheckHistory: PaycheckHistoryItem[] | null, isUnlocked: boolean) => {
+const usePaydayPrediction = (
+  paycheckHistory: PaycheckHistoryItem[] | null,
+  isUnlocked: boolean
+) => {
   const { showPayday } = useToast();
 
   // Check for payday predictions and show notifications

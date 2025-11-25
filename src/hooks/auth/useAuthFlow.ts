@@ -69,12 +69,14 @@ const useAuthFlow = () => {
           return await handleExistingUserLogin(password, login);
         }
 
-        if (isSharedBudgetJoin) {
+        if (isSharedBudgetJoin && userData) {
           return await handleSharedBudgetJoin(password, userData, login);
         }
 
-        // New user setup flow
-        return await handleNewUserSetup(password, userData, login);
+        // New user setup flow - userData is guaranteed to be non-null here
+        if (userData) {
+          return await handleNewUserSetup(password, userData, login);
+        }
       } catch (error) {
         logger.error("❌ Setup error:", error);
 

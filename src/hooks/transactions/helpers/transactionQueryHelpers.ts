@@ -46,10 +46,12 @@ const compareNumbers = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc")
  * Compare two string values
  */
 const compareStrings = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
+  const aStr = String(aVal ?? "");
+  const bStr = String(bVal ?? "");
   if (sortOrder === "desc") {
-    return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+    return bStr > aStr ? 1 : bStr < aStr ? -1 : 0;
   }
-  return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+  return aStr > bStr ? 1 : aStr < bStr ? -1 : 0;
 };
 
 /**

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { useLayoutData } from "@/hooks/layout";
 import useDataManagement from "@/hooks/common/useDataManagement";
@@ -135,7 +135,11 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
 
   // Toast notifications
   const toasts = useToastStore((state) => state.toasts);
-  const removeToast = useToastStore((state) => state.removeToast);
+  const removeToastById = useToastStore((state) => state.removeToast);
+  const removeToast = useCallback(
+    (id: string | number) => removeToastById(typeof id === "string" ? parseInt(id, 10) : id),
+    [removeToastById]
+  );
 
   // Log auth changes
   useEffect(() => {
@@ -233,10 +237,7 @@ const MainContent = ({
   isLocalOnlyMode,
   securityManager,
 }: MainContentProps): ReactNode => {
-  const resetAllData = useBudgetStore(
-    (state: Record<string, unknown>) =>
-      (state as Record<string, unknown>).resetAllData as () => void
-  );
+  const resetAllData = useBudgetStore((state: UiStore) => state.resetAllData);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -253,7 +254,7 @@ const MainContent = ({
 
   // Navigation helper
   const setActiveView = (view: string): void => {
-    const path = viewToPathMap[view] || "/";
+    const path = viewToPathMap[view as keyof typeof viewToPathMap] || "/";
     navigate(path);
   };
 
@@ -284,15 +285,20 @@ const MainContent = ({
   useOnboardingAutoComplete();
 
   // UI state
-  const isOnline = useBudgetStore(
-    (state: Record<string, unknown>) => (state as Record<string, unknown>).isOnline as boolean
-  );
+  const isOnline = useBudgetStore((state: UiStore) => state.isOnline);
   const isSyncing = useBudgetStore(
-    (state: Record<string, unknown>) => (state as Record<string, unknown>).isSyncing as boolean
+    (state: UiStore & { isSyncing?: boolean }) => state.isSyncing ?? false
   );
 
   // Payday prediction
-  usePaydayPrediction(paycheckHistory, !!currentUser);
+  usePaydayPrediction(
+    paycheckHistory as unknown as Array<{
+      date: string | Date;
+      amount: number;
+      [key: string]: unknown;
+    }> | null,
+    !!currentUser
+  );
 
   const navigateToAuth = useCallback(() => {
     navigate("/auth" + location.search);
@@ -486,7 +492,7 @@ const MainContentLayoutView = ({
           }}
           onSync={onManualSync}
           onChangePassword={onChangePassword as unknown as (password: string) => void}
-          currentUser={currentUser}
+          currentUser={currentUser as { userName?: string; userColor?: string }}
           isLocalOnlyMode={isLocalOnlyMode}
           securityManager={securityManager}
           onUpdateProfile={onUpdateProfile}

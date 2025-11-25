@@ -1,6 +1,17 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+interface SwipeState {
+  isSwipeActive: boolean;
+  swipeProgress: number;
+  swipeDirection: "left" | "right" | null;
+}
+
+interface SwipeIndicatorOverlayProps {
+  swipeState: SwipeState;
+  unassignedCash: number;
+}
+
 /**
  * Swipe indicator overlay component for envelope interactions
  * Shows visual feedback during swipe gestures
@@ -8,7 +19,7 @@ import { getIcon } from "../../../utils";
  * Part of Issue #160 - Swipe gestures for envelope interactions
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
-const SwipeIndicatorOverlay = ({ swipeState, unassignedCash }) => {
+const SwipeIndicatorOverlay = ({ swipeState, unassignedCash }: SwipeIndicatorOverlayProps) => {
   if (!swipeState.isSwipeActive || swipeState.swipeProgress <= 0.2) {
     return null;
   }

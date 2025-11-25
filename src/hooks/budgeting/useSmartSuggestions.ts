@@ -46,6 +46,43 @@ const applyBudgetChange = async (
   }
 };
 
+// Helper to calculate suggestion statistics
+const calculateSuggestionStats = (
+  suggestions: Array<{
+    priority: string;
+    type: string;
+    data?: { currentAmount?: number; suggestedAmount?: number };
+  }>,
+  dismissedCount: number
+) => {
+  const total = suggestions.length;
+  const priority = suggestions.reduce(
+    (acc: Record<string, number>, s) => {
+      acc[s.priority] = (acc[s.priority] || 0) + 1;
+      return acc;
+    },
+    { high: 0, medium: 0, low: 0 }
+  );
+  const type = suggestions.reduce((acc: Record<string, number>, s) => {
+    acc[s.type] = (acc[s.type] || 0) + 1;
+    return acc;
+  }, {});
+  const savings = suggestions.reduce(
+    (sum: number, s) =>
+      s.type === "decrease_envelope" && s.data?.currentAmount && s.data?.suggestedAmount
+        ? sum + (Number(s.data.currentAmount) - Number(s.data.suggestedAmount))
+        : sum,
+    0
+  );
+  return {
+    totalSuggestions: total,
+    priorityCounts: priority,
+    typeCounts: type,
+    potentialSavings: savings,
+    dismissedCount,
+  };
+};
+
 interface UseSmartSuggestionsParams {
   transactions?: Transaction[];
   envelopes?: Envelope[];
@@ -73,83 +110,58 @@ const useSmartSuggestions = ({
   const [analysisSettings, setAnalysisSettings] = useState(DEFAULT_ANALYSIS_SETTINGS);
   const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
   const [showSettings, setShowSettings] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    // Initialize from localStorage, default to expanded (false)
-    return localStorageService.getSmartSuggestionsCollapsed();
-  });
-
-  // Persist collapse state to localStorage
+  const [isCollapsed, setIsCollapsed] = useState(() =>
+    localStorageService.getSmartSuggestionsCollapsed()
+  );
   useEffect(() => {
     localStorageService.setSmartSuggestionsCollapsed(isCollapsed);
   }, [isCollapsed]);
 
-  // Generate suggestions based on current data and settings
   const suggestions = useMemo(() => {
     try {
-      // Transform Transaction type from db/types to suggestionUtils type
-      const transformedTransactions = transactions.map((t) => ({
+      const txns = transactions.map((t) => ({
         amount: t.amount,
         envelopeId: t.envelopeId,
         category: t.category,
         description: t.description,
         date: typeof t.date === "string" ? t.date : t.date.toISOString().split("T")[0],
       }));
-
-      // Transform Envelope type from db/types to suggestionUtils type
-      const transformedEnvelopes = envelopes.map((e) => ({
+      const envs = envelopes.map((e) => ({
         id: e.id,
         name: e.name,
         category: e.category,
         monthlyAmount: e.monthlyBudget,
         currentBalance: e.currentBalance,
       }));
-
-      return generateAllSuggestions(
-        transformedTransactions,
-        transformedEnvelopes,
-        analysisSettings,
-        dateRange,
-        {
-          dismissedSuggestions,
-          showDismissed,
-        }
-      );
+      return generateAllSuggestions(txns, envs, analysisSettings, dateRange, {
+        dismissedSuggestions,
+        showDismissed,
+      });
     } catch (error) {
       logger.error("Error generating smart suggestions:", error);
       return [];
     }
   }, [transactions, envelopes, analysisSettings, dateRange, dismissedSuggestions, showDismissed]);
 
-  // Toggle collapse state
-  const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
-
-  // Update analysis settings
+  const toggleCollapse = useCallback(() => setIsCollapsed((prev) => !prev), []);
   const updateAnalysisSettings = useCallback(
-    (newSettings: Partial<typeof DEFAULT_ANALYSIS_SETTINGS>) => {
-      setAnalysisSettings((prev) => ({ ...prev, ...newSettings }));
-    },
+    (newSettings: Partial<typeof DEFAULT_ANALYSIS_SETTINGS>) =>
+      setAnalysisSettings((prev) => ({ ...prev, ...newSettings })),
     []
   );
-
-  // Reset analysis settings to defaults
-  const resetAnalysisSettings = useCallback(() => {
-    setAnalysisSettings(DEFAULT_ANALYSIS_SETTINGS);
-  }, []);
-
-  // Dismiss suggestion
+  const resetAnalysisSettings = useCallback(
+    () => setAnalysisSettings(DEFAULT_ANALYSIS_SETTINGS),
+    []
+  );
   const handleDismissSuggestion = useCallback(
     (suggestionId: string) => {
       setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
       onDismissSuggestion?.(suggestionId);
-
       globalToast.showInfo("Suggestion dismissed", "Dismissed", 5000);
     },
     [onDismissSuggestion]
   );
 
-  // Apply suggestion action
   const handleApplySuggestion = useCallback(
     async (suggestion: {
       id: string;
@@ -165,7 +177,6 @@ const useSmartSuggestions = ({
               onCreateEnvelope
             );
             break;
-
           case "increase_budget":
             await applyBudgetChange(
               suggestion as unknown as {
@@ -180,7 +191,6 @@ const useSmartSuggestions = ({
               "increase"
             );
             break;
-
           case "decrease_budget":
             await applyBudgetChange(
               suggestion as unknown as {
@@ -195,13 +205,10 @@ const useSmartSuggestions = ({
               "decrease"
             );
             break;
-
           default:
             logger.warn("Unknown suggestion action:", { action: suggestion.action });
             return;
         }
-
-        // Auto-dismiss after applying
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
@@ -212,72 +219,28 @@ const useSmartSuggestions = ({
     [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
   );
 
-  // Clear all dismissed suggestions
   const clearDismissedSuggestions = useCallback(() => {
     setDismissedSuggestions(new Set());
     globalToast.showInfo("All dismissed suggestions cleared", "Cleared", 5000);
   }, []);
-
-  // Refresh suggestions (useful for manual refresh)
   const refreshSuggestions = useCallback(() => {
-    // Force re-render by updating a timestamp or clearing dismissed
     setDismissedSuggestions(new Set());
     globalToast.showInfo("Suggestions refreshed", "Refreshed", 5000);
   }, []);
+  const toggleSettings = useCallback(() => setShowSettings((prev) => !prev), []);
 
-  // Toggle settings panel
-  const toggleSettings = useCallback(() => {
-    setShowSettings((prev) => !prev);
-  }, []);
-
-  // Get suggestion statistics
-  const suggestionStats = useMemo(() => {
-    const totalSuggestions = suggestions.length;
-    const priorityCounts = suggestions.reduce(
-      (acc: Record<string, number>, s: { priority: string }) => {
-        acc[s.priority] = (acc[s.priority] || 0) + 1;
-        return acc;
-      },
-      { high: 0, medium: 0, low: 0 }
-    );
-
-    const typeCounts = suggestions.reduce((acc: Record<string, number>, s: { type: string }) => {
-      acc[s.type] = (acc[s.type] || 0) + 1;
-      return acc;
-    }, {});
-
-    const potentialSavings = suggestions.reduce(
-      (
-        sum: number,
-        s: { type: string; data: { currentAmount?: number; suggestedAmount?: number } }
-      ) => {
-        if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
-          return sum + (Number(s.data.currentAmount) - Number(s.data.suggestedAmount));
-        }
-        return sum;
-      },
-      0
-    );
-
-    return {
-      totalSuggestions,
-      priorityCounts,
-      typeCounts,
-      potentialSavings,
-      dismissedCount: dismissedSuggestions.size,
-    };
-  }, [suggestions, dismissedSuggestions.size]);
+  const suggestionStats = useMemo(
+    () => calculateSuggestionStats(suggestions, dismissedSuggestions.size),
+    [suggestions, dismissedSuggestions.size]
+  );
 
   return {
-    // State
     suggestions,
     analysisSettings,
     dismissedSuggestions,
     showSettings,
     isCollapsed,
     suggestionStats,
-
-    // Actions
     toggleCollapse,
     updateAnalysisSettings,
     resetAnalysisSettings,
@@ -286,8 +249,6 @@ const useSmartSuggestions = ({
     clearDismissedSuggestions,
     refreshSuggestions,
     toggleSettings,
-
-    // Computed values
     hasSuggestions: suggestions.length > 0,
     highPrioritySuggestions: suggestions.filter((s) => s.priority === "high"),
     mediumPrioritySuggestions: suggestions.filter((s) => s.priority === "medium"),

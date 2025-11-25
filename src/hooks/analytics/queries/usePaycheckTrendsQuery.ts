@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 
 interface PaycheckItem {
@@ -13,11 +13,11 @@ interface PaycheckItem {
  */
 export const usePaycheckTrendsQuery = () => {
   // Get data from Zustand store
-  const { paycheckHistory } = useBudgetStore(
-    useShallow((state: { paycheckHistory?: PaycheckItem[] }) => ({
+  const { paycheckHistory } = useUiStore(
+    useShallow((state: UiStore) => ({
       paycheckHistory: state.paycheckHistory || [],
     }))
-  );
+  ) as { paycheckHistory: PaycheckItem[] };
 
   return useQuery({
     queryKey: queryKeys.paycheckPredictions(),

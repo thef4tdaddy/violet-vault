@@ -65,14 +65,14 @@ export const useExecutionHistory = (initialHistory: ExecutionRecord[] = []) => {
         if (filters.dateFrom) {
           const fromDate = new Date(filters.dateFrom);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate
+            (execution) => execution.executedAt && new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (filters.dateTo) {
           const toDate = new Date(filters.dateTo);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) <= toDate
+            (execution) => execution.executedAt && new Date(execution.executedAt) <= toDate
           );
         }
 

@@ -95,7 +95,10 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
 
   // Determine the effective budget ID
   const effectiveBudgetId = useMemo(() => {
-    return isLocalOnlyMode ? localOnlyUser?.budgetId : authFlow.budgetId;
+    if (isLocalOnlyMode) {
+      return localOnlyUser?.budgetId ?? null;
+    }
+    return authFlow.budgetId ?? null;
   }, [isLocalOnlyMode, localOnlyUser?.budgetId, authFlow.budgetId]);
 
   // Comprehensive authentication state

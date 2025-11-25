@@ -334,8 +334,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions as unknown as import("@/types/bills").Transaction[]}
-        envelopes={envelopes as unknown as import("@/types/bills").Envelope[]}
+        transactions={safeTransactions as unknown as import("@/types/finance").Transaction[]}
+        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
         onUpdateBill={
           handleUpdateBill as unknown as (
             bill: import("@/types/bills").Bill

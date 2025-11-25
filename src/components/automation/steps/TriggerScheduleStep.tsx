@@ -2,7 +2,17 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
 
-const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
+interface RuleData {
+  trigger: string;
+  priority: number;
+}
+
+interface TriggerScheduleStepProps {
+  ruleData: RuleData;
+  updateRuleData: (updates: Partial<RuleData>) => void;
+}
+
+const TriggerScheduleStep = ({ ruleData, updateRuleData }: TriggerScheduleStepProps) => {
   return (
     <div className="space-y-6">
       <div>
