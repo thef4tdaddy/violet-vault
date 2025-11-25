@@ -2,7 +2,12 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const ArchivingHeader = ({ onRefresh, isLoading }) => {
+interface ArchivingHeaderProps {
+  onRefresh: () => void;
+  isLoading: boolean;
+}
+
+const ArchivingHeader: React.FC<ArchivingHeaderProps> = ({ onRefresh, isLoading }) => {
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
       <div className="flex items-start justify-between">

@@ -14,7 +14,13 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
  * Addresses GitHub issue #539 - empty envelopes with no details
  * Refactored using extracted components and custom hook for better maintainability
  */
-const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
+
+interface EnvelopeIntegrityCheckerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const EnvelopeIntegrityChecker: React.FC<EnvelopeIntegrityCheckerProps> = ({ isOpen, onClose }) => {
   // Use extracted hook for all logic
   const {
     report,
