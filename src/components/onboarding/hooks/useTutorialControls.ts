@@ -2,15 +2,20 @@ import { useCallback } from "react";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
 import logger from "../../../utils/common/logger";
 
+interface TutorialStep {
+  action?: () => void;
+  [key: string]: unknown;
+}
+
 /**
  * Hook for tutorial control functions
  * Extracted from OnboardingTutorial.jsx to reduce complexity
  */
 export const useTutorialControls = (
-  tutorialSteps,
-  currentStep,
-  setCurrentStep,
-  setShowTutorial
+  tutorialSteps: TutorialStep[],
+  currentStep: number,
+  setCurrentStep: (step: number) => void,
+  setShowTutorial: (show: boolean) => void
 ) => {
   const endTutorialStep = useOnboardingStore((state) => state.endTutorialStep);
   const markStepComplete = useOnboardingStore((state) => state.markStepComplete);

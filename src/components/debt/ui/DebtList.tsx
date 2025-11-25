@@ -126,6 +126,13 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
         ? { text: "Deferred", className: "bg-yellow-100 text-yellow-700 border border-yellow-300" }
         : { text: "Active", className: "bg-blue-100 text-blue-700 border border-blue-300" };
 
+  interface RelationshipItem {
+    className: string;
+    icon: string;
+    label: string;
+    name: string;
+  }
+
   const {
     config,
     IconComponent,
@@ -146,7 +153,7 @@ const DebtCard = ({ debt, onClick }: DebtCardProps) => {
       type: "next_payment",
       value: nextPaymentValue,
     },
-    relationships: { hasRelationships: false, items: [] },
+    relationships: { hasRelationships: false, items: [] as RelationshipItem[] },
     canQuickPay: false,
     handleRecordPayment: () => {},
   };

@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react";
  * Extracted from OnboardingTutorial.jsx to reduce complexity
  */
 export const useTutorialHighlight = () => {
-  const highlightElement = useCallback((element) => {
+  const highlightElement = useCallback((element: HTMLElement | null) => {
     if (element) {
       // Apply visual highlighting
       element.style.position = "relative";
@@ -32,7 +32,7 @@ export const useTutorialHighlight = () => {
     }
   }, []);
 
-  const removeHighlight = useCallback((element) => {
+  const removeHighlight = useCallback((element: HTMLElement | null) => {
     if (element) {
       element.style.position = "";
       element.style.zIndex = "";
@@ -42,7 +42,7 @@ export const useTutorialHighlight = () => {
     }
   }, []);
 
-  const useHighlightEffect = (shouldHighlight, element) => {
+  const useHighlightEffect = (shouldHighlight: boolean, element: HTMLElement | null) => {
     useEffect(() => {
       if (shouldHighlight && element) {
         // Add small delay to allow for route navigation and DOM updates

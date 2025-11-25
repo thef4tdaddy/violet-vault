@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, memo } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { usePrompt } from "@/hooks/common/usePrompt";
 import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
 import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
@@ -19,8 +19,8 @@ interface SummaryCardProps {
   value: number;
   color: string;
   onClick?: () => void;
-  clickable: boolean;
-  isNegative: boolean;
+  clickable?: boolean;
+  isNegative?: boolean;
   subtitle?: string;
   dataTour?: string;
 }
@@ -30,9 +30,7 @@ interface SummaryCardProps {
  * Now uses TanStack Query hooks for data loading
  */
 const SummaryCards = () => {
-  const openUnassignedCashModal = useBudgetStore(
-    (state: { openUnassignedCashModal: () => void }) => state.openUnassignedCashModal
-  );
+  const openUnassignedCashModal = useBudgetStore((state: UiStore) => state.openUnassignedCashModal);
   const { unassignedCash } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();

@@ -166,10 +166,10 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     });
 
     // Cleanup
-    await budgetDb.envelopes.where("id").equals(testData.envelope.id).delete();
-    await budgetDb.transactions.where("id").equals(testData.transaction.id).delete();
-    await budgetDb.bills.where("id").equals(testData.bill.id).delete();
-    await budgetDb.debts.where("id").equals(testData.debt.id).delete();
+    await budgetDb.envelopes.where("id").equals(testData.envelope.id!).delete();
+    await budgetDb.transactions.where("id").equals(testData.transaction.id!).delete();
+    await budgetDb.bills.where("id").equals(testData.bill.id!).delete();
+    await budgetDb.debts.where("id").equals(testData.debt.id!).delete();
   } catch (error) {
     results.push({
       flow: "Complete Data Flow",
@@ -304,10 +304,10 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     const directionResults = [];
     for (const scenario of scenarios) {
       try {
-        const result = await cloudSyncService.determineSyncDirection(
-          scenario.dexie,
-          scenario.firestore
-        );
+        // Skip null scenarios or provide empty default
+        const firestoreData =
+          scenario.firestore ?? createDataCollectionSnapshot({ lastModified: 0 });
+        const result = await cloudSyncService.determineSyncDirection(scenario.dexie, firestoreData);
         const correct = result.direction === scenario.expected;
         directionResults.push(`${scenario.name}: ${correct ? "✅" : "❌"}`);
       } catch {

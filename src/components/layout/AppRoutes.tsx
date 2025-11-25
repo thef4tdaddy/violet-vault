@@ -10,12 +10,19 @@ import { routeConfig } from "./routeConfig";
 // Lazy load API Documentation (dev-only)
 const APIDocumentation = lazy(() => import("../api-docs/APIDocumentation"));
 
+interface AppRoutesProps {
+  budget: Record<string, unknown>;
+  currentUser: Record<string, unknown>;
+  totalBiweeklyNeed: number;
+  setActiveView: (view: string) => void;
+}
+
 /**
  * Application Routes Component
  * Handles both marketing (/) and app (/app/*) routes
  * Landing page at root, full app under /app/ prefix
  */
-const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }: AppRoutesProps) => {
   const commonProps = {
     budget,
     currentUser,
