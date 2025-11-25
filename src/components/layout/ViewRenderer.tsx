@@ -251,8 +251,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
         onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-        onDistributeToGoals={(amount: number, goals: unknown[]) => {
-          const distribution = { amount, goals };
+        onDistributeToGoals={(distribution: unknown) => {
           savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
             logger.error("Failed to distribute funds:", err);
           });

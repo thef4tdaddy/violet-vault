@@ -134,7 +134,15 @@ const SavingsGoals = ({
             {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
-                goal={{ ...goal, color: goal.color || "#a855f7" }}
+                goal={{
+                  ...goal,
+                  color: goal.color || "#a855f7",
+                  targetDate: goal.targetDate
+                    ? goal.targetDate instanceof Date
+                      ? goal.targetDate.toISOString()
+                      : String(goal.targetDate)
+                    : undefined,
+                }}
                 onEdit={handleEditGoal}
                 onDelete={handleDeleteGoal}
                 priorities={SAVINGS_PRIORITIES}
