@@ -254,7 +254,25 @@ class ChunkedSyncService implements IChunkedSyncService {
    * GitHub Issue #576 Phase 1: Enhanced data validation
    */
   async createManifest(chunkMap: Record<string, unknown>, metadata: Record<string, unknown> = {}) {
-    const manifest = {
+    const manifest: {
+      version: string;
+      timestamp: number;
+      chunks: Record<
+        string,
+        {
+          size: number;
+          itemCount: number;
+          type: string;
+          checksum: string;
+        }
+      >;
+      metadata: ManifestMetadata;
+      validation: {
+        manifestChecksum: string;
+        minChunkSize: number;
+        minIVSize: number;
+      };
+    } = {
       version: "2.0",
       timestamp: Date.now(),
       chunks: {},
@@ -262,7 +280,7 @@ class ChunkedSyncService implements IChunkedSyncService {
         totalChunks: 0,
         totalSize: 0,
         ...metadata,
-      } as Record<string, unknown>,
+      } as ManifestMetadata,
       validation: {
         manifestChecksum: "", // Will be calculated after chunk processing
         minChunkSize: 16, // Minimum encrypted chunk size
@@ -281,9 +299,8 @@ class ChunkedSyncService implements IChunkedSyncService {
         type: Array.isArray(data) ? "array" : "object",
         checksum, // GitHub Issue #576: Add chunk checksum for validation
       };
-      const metadata = manifest.metadata as ManifestMetadata;
-      metadata.totalSize += size;
-      metadata.totalChunks++;
+      manifest.metadata.totalSize += size;
+      manifest.metadata.totalChunks++;
     }
 
     // Generate manifest checksum for integrity validation
@@ -432,7 +449,7 @@ class ChunkedSyncService implements IChunkedSyncService {
             },
             "saveMainDocument",
             "saveMainDocument"
-          ),
+          ) as Promise<void>,
           new Promise<void>((_, reject) =>
             setTimeout(() => reject(new Error("Main document save timed out")), 30000)
           ),
@@ -502,7 +519,7 @@ class ChunkedSyncService implements IChunkedSyncService {
               },
               "saveChunkBatch",
               `saveChunkBatch-${batchNumber}`
-            ),
+            ) as Promise<void>,
             new Promise<void>((_, reject) =>
               setTimeout(() => reject(new Error(`Batch ${batchNumber} commit timed out`)), 45000)
             ),
@@ -587,11 +604,11 @@ class ChunkedSyncService implements IChunkedSyncService {
             }
 
             // Decrypt manifest with optimization support
-            manifest = await encryptionUtils.decryptOptimized(
+            manifest = (await encryptionUtils.decryptOptimized(
               encryptedDataBytes,
               this.encryptionKey,
               ivBytes
-            );
+            )) as ManifestType;
           } catch (decryptError) {
             logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
               error: decryptError instanceof Error ? decryptError.message : String(decryptError),

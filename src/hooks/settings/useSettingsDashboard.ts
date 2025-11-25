@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "../../stores/ui/uiStore";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
@@ -100,8 +100,8 @@ export const useSettingsDashboardUI = () => {
  * Extracts cloud sync toggle and manual sync operations
  */
 export const useCloudSyncManager = () => {
-  const cloudSyncEnabled = useBudgetStore((state) => state.cloudSyncEnabled);
-  const setCloudSyncEnabled = useBudgetStore((state) => state.setCloudSyncEnabled);
+  const cloudSyncEnabled = useBudgetStore((state: UiStore) => state.cloudSyncEnabled);
+  const setCloudSyncEnabled = useBudgetStore((state: UiStore) => state.setCloudSyncEnabled);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleToggleCloudSync = useCallback(async () => {

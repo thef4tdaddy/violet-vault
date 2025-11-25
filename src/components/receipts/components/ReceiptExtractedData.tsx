@@ -3,15 +3,40 @@ import { getIcon } from "../../../utils";
 import ExtractedDataField from "./ExtractedDataField";
 import ExtractedItemsList from "./ExtractedItemsList";
 
+interface ExtractedDataConfidence {
+  merchant?: number;
+  total?: number;
+  date?: number;
+  tax?: number;
+  subtotal?: number;
+}
+
+interface ExtractedData {
+  merchant?: string;
+  total?: number;
+  date?: string;
+  tax?: number;
+  subtotal?: number;
+  processingTime?: number;
+  items?: unknown[];
+  confidence: ExtractedDataConfidence;
+}
+
+interface ReceiptExtractedDataProps {
+  extractedData: ExtractedData | null | undefined;
+}
+
 /**
  * Receipt Extracted Data Component (Refactored)
  * Displays OCR results with confidence indicators and UI standards compliance
  * Reduced from 108 lines to ~35 lines by extracting reusable components
  */
-const ReceiptExtractedData = ({ extractedData }) => {
+const ReceiptExtractedData = ({ extractedData }: ReceiptExtractedDataProps) => {
   if (!extractedData) return null;
 
-  const formatCurrency = (value) => (value ? `$${value.toFixed(2)}` : null);
+  const formatCurrency = (value: number): string => {
+    return value ? `$${value.toFixed(2)}` : "";
+  };
 
   return (
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-green-100/40 backdrop-blur-sm">
@@ -26,23 +51,23 @@ const ReceiptExtractedData = ({ extractedData }) => {
         <div className="space-y-3">
           <ExtractedDataField
             label="Merchant"
-            value={extractedData.merchant}
-            confidence={extractedData.confidence.merchant}
+            value={extractedData.merchant ?? ""}
+            confidence={extractedData.confidence.merchant ?? 0}
             fieldName="merchant"
           />
 
           <ExtractedDataField
             label="Total Amount"
-            value={extractedData.total}
-            confidence={extractedData.confidence.total}
+            value={extractedData.total ?? 0}
+            confidence={extractedData.confidence.total ?? 0}
             fieldName="total"
-            formatter={formatCurrency}
+            formatter={(val) => formatCurrency(Number(val)) || val}
           />
 
           <ExtractedDataField
             label="Date"
-            value={extractedData.date}
-            confidence={extractedData.confidence.date}
+            value={extractedData.date ?? ""}
+            confidence={extractedData.confidence.date ?? 0}
             fieldName="date"
           />
         </div>
@@ -52,9 +77,9 @@ const ReceiptExtractedData = ({ extractedData }) => {
             <ExtractedDataField
               label="Tax"
               value={extractedData.tax}
-              confidence={extractedData.confidence.tax}
+              confidence={extractedData.confidence.tax ?? 0}
               fieldName="tax"
-              formatter={formatCurrency}
+              formatter={(val) => formatCurrency(Number(val)) || val}
             />
           )}
 
@@ -62,9 +87,9 @@ const ReceiptExtractedData = ({ extractedData }) => {
             <ExtractedDataField
               label="Subtotal"
               value={extractedData.subtotal}
-              confidence={extractedData.confidence.subtotal}
+              confidence={extractedData.confidence.subtotal ?? 0}
               fieldName="subtotal"
-              formatter={formatCurrency}
+              formatter={(val) => formatCurrency(Number(val)) || val}
             />
           )}
 

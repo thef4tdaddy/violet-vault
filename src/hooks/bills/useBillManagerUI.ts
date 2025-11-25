@@ -91,7 +91,7 @@ export function useBillManagerUI({
   );
 
   const selectAllBills = useCallback(() => {
-    const allBillIds = new Set(filteredBills.map((bill: { id: string }) => bill.id));
+    const allBillIds = new Set((filteredBills as Array<{ id: string }>).map((bill) => bill.id));
     setSelectedBills(allBillIds);
   }, [filteredBills, setSelectedBills]);
 

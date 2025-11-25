@@ -8,6 +8,7 @@ interface Envelope {
   id: string | number;
   name?: string;
   currentBalance?: number;
+  [key: string]: unknown;
 }
 
 interface User {
@@ -63,8 +64,8 @@ const useEnvelopeEdit = ({
     releaseLock,
     breakLock,
     isLoading: lockLoading,
-  } = useEditLock("envelope", String(envelope?.id || ""), {
-    autoAcquire: isOpen && !!envelope?.id,
+  } = useEditLock("envelope", envelope?.id != null ? String(envelope.id) : "", {
+    autoAcquire: isOpen && envelope?.id != null,
     autoRelease: true,
     showToasts: true,
   });
