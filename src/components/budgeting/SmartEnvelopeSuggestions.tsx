@@ -2,11 +2,11 @@ import React from "react";
 import { getIcon } from "../../utils";
 import { Button } from "@/components/ui";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
-import SuggestionsList from "./suggestions/SuggestionsList";
+import SuggestionsList, { type Suggestion } from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
 import { globalToast } from "../../stores/ui/toastStore";
 import type { Envelope, Transaction } from "../../db/types";
-import type { Suggestion } from "@/utils/budgeting/suggestionUtils";
+import type { SuggestionStats } from "./suggestions/SuggestionSettings";
 
 interface IconBadgeProps {
   isCollapsed: boolean;
@@ -33,24 +33,32 @@ interface CollapsedViewProps {
   suggestions: Suggestion[];
 }
 
+interface AnalysisSettings {
+  minAmount: number;
+  minTransactions: number;
+  overspendingThreshold: number;
+  bufferPercentage: number;
+  [key: string]: unknown;
+}
+
 interface ExpandedViewProps {
   showSettings: boolean;
-  analysisSettings: unknown;
-  updateAnalysisSettings: (settings: unknown) => void;
+  analysisSettings: AnalysisSettings;
+  updateAnalysisSettings: (settings: Partial<AnalysisSettings>) => void;
   resetAnalysisSettings: () => void;
   refreshSuggestions: () => void;
-  suggestionStats: unknown;
+  suggestionStats: SuggestionStats;
   suggestions: Suggestion[];
-  handleApplySuggestion: (suggestion: unknown) => void;
-  handleDismissSuggestion: (suggestion: unknown) => void;
+  handleApplySuggestion: (suggestion: Suggestion) => void;
+  handleDismissSuggestion: (suggestionId: string) => void;
 }
 
 interface SmartEnvelopeSuggestionsProps {
   transactions?: Transaction[];
   envelopes?: Envelope[];
   onCreateEnvelope: (envelope: Partial<Envelope>) => void;
-  onUpdateEnvelope: (envelope: Envelope) => void;
-  onDismissSuggestion: (suggestion: unknown) => void;
+  onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => void;
+  onDismissSuggestion: (suggestionId: string) => void;
   dateRange?: string;
   showDismissed?: boolean;
   className?: string;
@@ -164,34 +172,18 @@ const ExpandedView = ({
     {showSettings && (
       <div className="mb-6">
         <SuggestionSettings
-          settings={
-            analysisSettings as unknown as {
-              minAmount: number;
-              minTransactions: number;
-              overspendingThreshold: number;
-              bufferPercentage: number;
-              [key: string]: unknown;
-            }
-          }
+          settings={analysisSettings}
           onUpdateSettings={updateAnalysisSettings}
           onResetSettings={resetAnalysisSettings}
           onRefresh={refreshSuggestions}
-          suggestionStats={
-            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
-          }
+          suggestionStats={suggestionStats}
         />
       </div>
     )}
     <SuggestionsList
-      suggestions={suggestions as unknown as import("./suggestions/SuggestionsList").Suggestion[]}
-      onApplySuggestion={
-        handleApplySuggestion as unknown as (
-          suggestion: import("./suggestions/SuggestionsList").Suggestion
-        ) => void
-      }
-      onDismissSuggestion={(suggestion: import("./suggestions/SuggestionsList").Suggestion) =>
-        handleDismissSuggestion(suggestion.id)
-      }
+      suggestions={suggestions}
+      onApplySuggestion={handleApplySuggestion}
+      onDismissSuggestion={(suggestion: Suggestion) => handleDismissSuggestion(suggestion.id)}
       isCompact={false}
     />
   </>
@@ -225,9 +217,7 @@ const SmartEnvelopeSuggestions = ({
     transactions,
     envelopes,
     onCreateEnvelope,
-    onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => {
-      return onUpdateEnvelope(envelopeId, updates);
-    },
+    onUpdateEnvelope,
     onDismissSuggestion,
     dateRange,
     showDismissed,
@@ -278,16 +268,16 @@ const SmartEnvelopeSuggestions = ({
       ) : (
         <ExpandedView
           showSettings={showSettings}
-          analysisSettings={analysisSettings}
-          updateAnalysisSettings={updateAnalysisSettings}
+          analysisSettings={analysisSettings as AnalysisSettings}
+          updateAnalysisSettings={
+            updateAnalysisSettings as (settings: Partial<AnalysisSettings>) => void
+          }
           resetAnalysisSettings={resetAnalysisSettings}
           refreshSuggestions={refreshSuggestions}
-          suggestionStats={
-            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
-          }
+          suggestionStats={suggestionStats as SuggestionStats}
           suggestions={typedSuggestions}
-          handleApplySuggestion={handleApplySuggestion}
-          handleDismissSuggestion={handleDismissSuggestion}
+          handleApplySuggestion={handleApplySuggestion as (suggestion: Suggestion) => void}
+          handleDismissSuggestion={handleDismissSuggestion as (suggestionId: string) => void}
         />
       )}
     </div>

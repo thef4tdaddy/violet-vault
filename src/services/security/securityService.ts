@@ -70,7 +70,9 @@ class SecurityService {
       const saved = localStorage.getItem(this.storageKeys.settings);
       return saved ? JSON.parse(saved) : this.getDefaultSettings();
     } catch (error) {
-      logger.warn("Failed to load security settings, using defaults:", error);
+      logger.warn("Failed to load security settings, using defaults:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return this.getDefaultSettings();
     }
   }
@@ -82,7 +84,9 @@ class SecurityService {
     try {
       localStorage.setItem(this.storageKeys.settings, JSON.stringify(settings));
     } catch (error) {
-      logger.error("Failed to save security settings:", error);
+      logger.error("Failed to save security settings:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -94,7 +98,9 @@ class SecurityService {
       const saved = localStorage.getItem(this.storageKeys.events);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      logger.warn("Failed to load security events:", error);
+      logger.warn("Failed to load security events:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -187,7 +193,9 @@ class SecurityService {
       JSON.stringify(securityEvent);
       return securityEvent;
     } catch (error) {
-      logger.warn("Failed to create security event, using minimal version:", error);
+      logger.warn("Failed to create security event, using minimal version:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
 
       // Use minimal version if serialization fails
       return {
@@ -220,7 +228,9 @@ class SecurityService {
         id: securityEvent.id,
       });
     } catch (error) {
-      logger.error("Failed to log security event:", error);
+      logger.error("Failed to log security event:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -260,7 +270,9 @@ class SecurityService {
         .slice(-limit)
         .reverse();
     } catch (error) {
-      logger.error("Failed to get security events by type:", error);
+      logger.error("Failed to get security events by type:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -271,11 +283,11 @@ class SecurityService {
   getSecurityStats(): SecurityStats {
     try {
       const events = this.loadSecurityEvents();
-      const stats = {
+      const stats: SecurityStats = {
         total: events.length,
         today: 0,
         thisWeek: 0,
-        byType: {},
+        byType: {} as Record<string, number>,
       };
 
       const now = new Date();
@@ -298,7 +310,9 @@ class SecurityService {
 
       return stats;
     } catch (error) {
-      logger.error("Failed to get security statistics:", error);
+      logger.error("Failed to get security statistics:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return { total: 0, today: 0, thisWeek: 0, byType: {} };
     }
   }

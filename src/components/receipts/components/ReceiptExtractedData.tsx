@@ -4,14 +4,39 @@ import ExtractedDataField from "./ExtractedDataField";
 import ExtractedItemsList from "./ExtractedItemsList";
 
 /**
+ * Props interface for extracted receipt data
+ */
+interface ExtractedDataProps {
+  merchant: string;
+  total: number;
+  date: string;
+  tax?: number;
+  subtotal?: number;
+  processingTime: number;
+  items: unknown[];
+  confidence: {
+    merchant: number;
+    total: number;
+    date: number;
+    tax?: number;
+    subtotal?: number;
+  };
+}
+
+interface ReceiptExtractedDataProps {
+  extractedData: ExtractedDataProps | null;
+}
+
+/**
  * Receipt Extracted Data Component (Refactored)
  * Displays OCR results with confidence indicators and UI standards compliance
  * Reduced from 108 lines to ~35 lines by extracting reusable components
  */
-const ReceiptExtractedData = ({ extractedData }) => {
+const ReceiptExtractedData: React.FC<ReceiptExtractedDataProps> = ({ extractedData }) => {
   if (!extractedData) return null;
 
-  const formatCurrency = (value) => (value ? `$${value.toFixed(2)}` : null);
+  const formatCurrency = (value: string | number): string | number =>
+    typeof value === "number" ? `$${value.toFixed(2)}` : value;
 
   return (
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-green-100/40 backdrop-blur-sm">

@@ -1,22 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-
-interface Transaction {
-  description: string;
-  [key: string]: unknown;
-}
-
-interface VirtualRow {
-  start: number;
-  [key: string]: unknown;
-}
+import type { Transaction } from "@/types/finance";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 interface DeleteConfirmationProps {
   transaction: Transaction;
   onConfirm: () => void;
   onCancel: () => void;
-  virtualRow: VirtualRow;
+  virtualRow: VirtualItem;
   gridTemplate: string;
 }
 

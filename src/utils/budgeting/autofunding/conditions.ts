@@ -11,6 +11,7 @@ import { CONDITION_TYPES, TRIGGER_TYPES } from "./rules.ts";
  */
 export interface Envelope {
   id: string;
+  name?: string;
   currentBalance: number;
   [key: string]: unknown;
 }
@@ -234,7 +235,7 @@ export const shouldRuleExecute = (rule: Rule, context: ExecutionContext): boolea
 
   // Check conditions for conditional rules
   if (rule.type === "conditional") {
-    return evaluateConditions(rule.config.conditions, context);
+    return evaluateConditions(rule.config?.conditions || [], context);
   }
 
   return true;
@@ -374,20 +375,26 @@ export const getConditionDescription = (
       return `Unassigned cash > $${condition.value}`;
 
     case CONDITION_TYPES.DATE_RANGE: {
-      const startDate = new Date(condition.startDate).toLocaleDateString();
-      const endDate = new Date(condition.endDate).toLocaleDateString();
+      const startDate = condition.startDate
+        ? new Date(condition.startDate).toLocaleDateString()
+        : "Unknown";
+      const endDate = condition.endDate
+        ? new Date(condition.endDate).toLocaleDateString()
+        : "Unknown";
       return `Between ${startDate} and ${endDate}`;
     }
 
     case CONDITION_TYPES.TRANSACTION_AMOUNT: {
-      const operators = {
+      const operators: Record<string, string> = {
         greater_than: ">",
         less_than: "<",
         equals: "=",
         greater_than_or_equal: "≥",
         less_than_or_equal: "≤",
       };
-      const operator = operators[condition.operator] || condition.operator;
+      const operator = condition.operator
+        ? operators[condition.operator] || condition.operator
+        : "=";
       return `Transaction amount ${operator} $${condition.value}`;
     }
 

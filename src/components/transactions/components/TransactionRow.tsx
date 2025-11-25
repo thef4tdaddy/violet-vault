@@ -8,12 +8,13 @@ import {
   formatTransactionDate,
   getEnvelopeDisplay,
 } from "../../../utils/transactions/tableHelpers";
-import type { Transaction } from "@/types/finance";
+import type { Transaction, Envelope } from "@/types/finance";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 interface TransactionRowProps {
   transaction: Transaction;
-  envelopes: unknown[];
-  virtualRow: { index: number; start: number };
+  envelopes: Envelope[];
+  virtualRow: VirtualItem;
   columnStyles?: typeof COLUMN_STYLES;
   gridTemplate: string;
   onEdit: (transaction: Transaction) => void;
@@ -36,7 +37,7 @@ const TransactionRow = ({
   onDeleteClick,
   onHistoryClick,
 }: TransactionRowProps) => {
-  const envelope = findEnvelopeForTransaction(transaction, envelopes as never);
+  const envelope = findEnvelopeForTransaction(transaction, envelopes);
   const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(
     transaction.amount
   );

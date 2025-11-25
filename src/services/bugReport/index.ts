@@ -104,8 +104,8 @@ export class BugReportService {
       });
 
       return {
-        success: true,
         ...result,
+        success: true,
         reportData: {
           title: reportData.title,
           hasScreenshot: !!dataCollection.screenshot,
@@ -117,7 +117,8 @@ export class BugReportService {
 
       // Fallback: Save locally
       try {
-        await this.saveReportLocally(options, error);
+        const errorToSave = error instanceof Error ? error : new Error(String(error));
+        await this.saveReportLocally(options, errorToSave);
       } catch (saveError) {
         logger.error("Failed to save report locally", saveError);
       }
@@ -428,7 +429,7 @@ export class BugReportService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -454,7 +455,7 @@ export class BugReportService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -479,7 +480,7 @@ export class BugReportService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -510,7 +511,7 @@ export class BugReportService {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       };
     }

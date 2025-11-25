@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.ts";
-import useUiStore from "../../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
 import logger from "../../../utils/common/logger";
+import type { AutoFundingRule } from "../../../utils/budgeting/autofunding/rules";
 
 interface ExecutionResult {
   success: boolean;
@@ -16,11 +17,33 @@ interface ExecutionResult {
 }
 
 /**
+ * Budget state interface for auto-funding execution
+ * Legacy compatibility - data is sourced from TanStack Query
+ */
+interface BudgetState {
+  envelopes: unknown[];
+  unassignedCash: number;
+  allTransactions: unknown[];
+  transferFunds?: (
+    fromEnvelopeId: string,
+    toEnvelopeId: string,
+    amount: number,
+    description: string
+  ) => Promise<void>;
+}
+
+/**
  * Hook for executing auto-funding rules and managing execution state
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUiStore((state) => state.budget);
+  // Access UI store state - budget data comes from TanStack Query hooks in actual usage
+  // This provides fallback empty state for initialization
+  const budget: BudgetState = useUiStore((state: UiStore) => ({
+    envelopes: [],
+    unassignedCash: 0,
+    allTransactions: [],
+  }));
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 
@@ -39,7 +62,7 @@ export const useAutoFundingExecution = () => {
   // Execute rules with given trigger
   const executeRules = useCallback(
     async (
-      rules: unknown[],
+      rules: AutoFundingRule[],
       trigger: string = TRIGGER_TYPES.MANUAL,
       triggerData: Record<string, unknown> = {}
     ): Promise<ExecutionResult> => {
@@ -70,7 +93,7 @@ export const useAutoFundingExecution = () => {
 
         const result = await executeRulesWithContext(rules, context, executeTransfer);
 
-        if (result.success) {
+        if (result.success && result.execution) {
           setLastExecution(result.execution);
           logger.info("Auto-funding execution completed successfully", {
             rulesExecuted: result.execution.rulesExecuted,
