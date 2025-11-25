@@ -1,10 +1,18 @@
 import { useState, useCallback } from "react";
-import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.ts";
-import useUiStore from "../../../stores/ui/uiStore";
+import { TRIGGER_TYPES, type AutoFundingRule } from "../../../utils/budgeting/autofunding/rules.ts";
+import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
+import type { ExecutionContext, Envelope } from "../../../utils/budgeting/autofunding/conditions";
 import logger from "../../../utils/common/logger";
+
+interface BudgetData {
+  envelopes?: Envelope[];
+  unassignedCash?: number;
+  allTransactions?: unknown[];
+  transferFunds?: (from: string, to: string, amount: number, description?: string) => Promise<void>;
+}
 
 interface ExecutionResult {
   success: boolean;
@@ -15,17 +23,38 @@ interface ExecutionResult {
   };
 }
 
+interface ExecutionRecord {
+  id: string;
+  trigger: string;
+  executedAt: string;
+  rulesExecuted: number;
+  totalFunded: number;
+  remainingCash: number;
+  initialCash: number;
+  success?: boolean;
+}
+
+// Extended store interface for legacy budget property
+interface ExtendedUiStore extends UiStore {
+  budget?: BudgetData;
+}
+
 /**
  * Hook for executing auto-funding rules and managing execution state
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUiStore((state: ExtendedUiStore) => state.budget) as BudgetData | undefined;
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 
   // Use focused sub-hooks
-  const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budget);
+  const budgetWithDefaults: BudgetData = budget ?? {
+    envelopes: [],
+    unassignedCash: 0,
+    allTransactions: [],
+  };
+  const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budgetWithDefaults);
   const {
     executeTransfer,
     simulateExecution,
@@ -33,13 +62,15 @@ export const useAutoFundingExecution = () => {
     validatePlannedTransfers,
     calculateImpact,
     canExecuteRules,
-  } = useExecutionUtils(budget);
-  const { getExecutionSummary } = useExecutionSummary(lastExecution);
+  } = useExecutionUtils(
+    budgetWithDefaults as BudgetData & { transferFunds: BudgetData["transferFunds"] }
+  );
+  const { getExecutionSummary } = useExecutionSummary(lastExecution as ExecutionRecord | null);
 
   // Execute rules with given trigger
   const executeRules = useCallback(
     async (
-      rules: unknown[],
+      rules: AutoFundingRule[],
       trigger: string = TRIGGER_TYPES.MANUAL,
       triggerData: Record<string, unknown> = {}
     ): Promise<ExecutionResult> => {
@@ -51,13 +82,12 @@ export const useAutoFundingExecution = () => {
       setIsExecuting(true);
 
       try {
-        const context = {
+        const context: ExecutionContext = {
           trigger,
           currentDate: new Date().toISOString(),
           data: {
-            envelopes: budget.envelopes || [],
-            unassignedCash: budget.unassignedCash || 0,
-            transactions: budget.allTransactions || [],
+            envelopes: budgetWithDefaults.envelopes ?? [],
+            unassignedCash: budgetWithDefaults.unassignedCash ?? 0,
             ...triggerData,
           },
         };
@@ -70,7 +100,7 @@ export const useAutoFundingExecution = () => {
 
         const result = await executeRulesWithContext(rules, context, executeTransfer);
 
-        if (result.success) {
+        if (result.success && result.execution) {
           setLastExecution(result.execution);
           logger.info("Auto-funding execution completed successfully", {
             rulesExecuted: result.execution.rulesExecuted,
@@ -90,7 +120,7 @@ export const useAutoFundingExecution = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting, executeRulesWithContext, executeTransfer]
+    [budgetWithDefaults, isExecuting, executeRulesWithContext, executeTransfer]
   );
 
   return {

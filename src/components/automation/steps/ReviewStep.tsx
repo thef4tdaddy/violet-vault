@@ -1,9 +1,11 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
+import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules";
+import type { Envelope } from "../../../types/finance";
+import type { AutoFundingRule } from "../../../utils/budgeting/autofunding/rules";
 
 // Get display name for rule type
-const getRuleTypeLabel = (type) => {
+const getRuleTypeLabel = (type: string): string => {
   const labels = {
     [RULE_TYPES.FIXED_AMOUNT]: "Fixed Amount",
     [RULE_TYPES.PERCENTAGE]: "Percentage",
@@ -14,7 +16,7 @@ const getRuleTypeLabel = (type) => {
 };
 
 // Get display name for trigger type
-const getTriggerTypeLabel = (trigger) => {
+const getTriggerTypeLabel = (trigger: string): string => {
   const labels = {
     [TRIGGER_TYPES.MANUAL]: "Manual",
     [TRIGGER_TYPES.INCOME_DETECTED]: "Income Detected",
@@ -25,7 +27,12 @@ const getTriggerTypeLabel = (trigger) => {
 };
 
 // Field row component
-const FieldRow = ({ label, value }) => (
+interface FieldRowProps {
+  label: string;
+  value: string | number;
+}
+
+const FieldRow = ({ label, value }: FieldRowProps) => (
   <div className="flex justify-between">
     <span className="text-blue-700">{label}:</span>
     <span className="font-medium text-blue-900">{value}</span>
@@ -33,37 +40,55 @@ const FieldRow = ({ label, value }) => (
 );
 
 // Amount field component
-const AmountField = ({ amount }) => {
+interface AmountFieldProps {
+  amount: number | null | undefined;
+}
+
+const AmountField = ({ amount }: AmountFieldProps) => {
   if (!amount || amount <= 0) return null;
 
   return <FieldRow label="Amount" value={`$${amount.toFixed(2)}`} />;
 };
 
 // Percentage field component
-const PercentageField = ({ percentage }) => {
+interface PercentageFieldProps {
+  percentage: number | null | undefined;
+}
+
+const PercentageField = ({ percentage }: PercentageFieldProps) => {
   if (!percentage || percentage <= 0) return null;
 
   return <FieldRow label="Percentage" value={`${percentage}%`} />;
 };
 
 // Single target field component
-const SingleTargetField = ({ targetId, envelopes }) => {
+interface SingleTargetFieldProps {
+  targetId: string | null | undefined;
+  envelopes: Envelope[];
+}
+
+const SingleTargetField = ({ targetId, envelopes }: SingleTargetFieldProps) => {
   if (!targetId) return null;
 
-  const targetName = envelopes.find((e) => e.id === targetId)?.name || "Unknown";
+  const targetName = envelopes.find((e: Envelope) => e.id === targetId)?.name || "Unknown";
   return <FieldRow label="Target" value={targetName} />;
 };
 
 // Multiple targets field component
-const MultipleTargetsField = ({ targetIds, envelopes }) => {
+interface MultipleTargetsFieldProps {
+  targetIds: string[] | null | undefined;
+  envelopes: Envelope[];
+}
+
+const MultipleTargetsField = ({ targetIds, envelopes }: MultipleTargetsFieldProps) => {
   if (!targetIds || targetIds.length === 0) return null;
 
   return (
     <div>
       <span className="text-blue-700">Targets:</span>
       <div className="mt-1">
-        {targetIds.map((id) => {
-          const envelope = envelopes.find((e) => e.id === id);
+        {targetIds.map((id: string) => {
+          const envelope = envelopes.find((e: Envelope) => e.id === id);
           return envelope ? (
             <span
               key={id}
@@ -79,7 +104,11 @@ const MultipleTargetsField = ({ targetIds, envelopes }) => {
 };
 
 // Description section component
-const DescriptionSection = ({ description }) => {
+interface DescriptionSectionProps {
+  description: string | null | undefined;
+}
+
+const DescriptionSection = ({ description }: DescriptionSectionProps) => {
   if (!description) return null;
 
   return (
@@ -90,7 +119,12 @@ const DescriptionSection = ({ description }) => {
   );
 };
 
-const ReviewStep = ({ ruleData, envelopes }) => {
+interface ReviewStepProps {
+  ruleData: AutoFundingRule;
+  envelopes: Envelope[];
+}
+
+const ReviewStep = ({ ruleData, envelopes }: ReviewStepProps) => {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">

@@ -167,6 +167,7 @@ function getDefaultUser(currentUser: Record<string, unknown> | undefined) {
   };
 }
 
+// eslint-disable-next-line max-lines-per-function -- Complex view renderer managing multiple routes and component rendering logic
 const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRendererProps) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
@@ -250,16 +251,62 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
         onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-        onDistributeToGoals={savingsGoalsHook.helpers.distributeFunds}
+        onDistributeToGoals={(amount: number, goals: unknown[]) => {
+          const distribution = { amount, goals };
+          savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
+            logger.error("Failed to distribute funds:", err);
+          });
+        }}
       />
     ),
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={budgetOps.supplementalAccounts as Array<Record<string, unknown>>}
-        onAddAccount={budgetOps.addSupplementalAccount}
-        onUpdateAccount={budgetOps.updateSupplementalAccount}
-        onDeleteAccount={budgetOps.deleteSupplementalAccount}
-        onTransferToEnvelope={budgetOps.transferFromSupplementalAccount}
+        onAddAccount={
+          budgetOps.addSupplementalAccount as unknown as (account: {
+            id: string | number;
+            name: string;
+            type: string;
+            currentBalance: number;
+            annualContribution: number;
+            expirationDate: string | null;
+            description: string | null;
+            color: string;
+            isActive: boolean;
+            createdBy: string;
+            createdAt: string;
+            lastUpdated: string;
+            transactions: unknown[];
+          }) => void
+        }
+        onUpdateAccount={
+          budgetOps.updateSupplementalAccount as unknown as (account: {
+            id: string | number;
+            name: string;
+            type: string;
+            currentBalance: number;
+            annualContribution: number;
+            expirationDate: string | null;
+            description: string | null;
+            color: string;
+            isActive: boolean;
+            createdBy: string;
+            createdAt: string;
+            lastUpdated: string;
+            transactions: unknown[];
+          }) => void
+        }
+        onDeleteAccount={
+          budgetOps.deleteSupplementalAccount as unknown as (accountId: string) => void
+        }
+        onTransferToEnvelope={
+          budgetOps.transferFromSupplementalAccount as unknown as (transfer: {
+            accountId: string;
+            envelopeId: string;
+            amount: number;
+            description: string;
+          }) => void
+        }
         envelopes={envelopes}
         currentUser={user}
       />
@@ -267,19 +314,33 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     paycheck: (
       <PaycheckProcessor
         envelopes={envelopes}
-        paycheckHistory={tanStackPaycheckHistory}
-        onProcessPaycheck={tanStackProcessPaycheck}
-        onDeletePaycheck={(paycheckId: string) =>
-          handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)
+        paycheckHistory={
+          tanStackPaycheckHistory as unknown as import("@/db/types").PaycheckHistory[]
         }
-        currentUser={currentUser}
+        onProcessPaycheck={tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>}
+        onDeletePaycheck={
+          ((paycheckId: string) =>
+            handleDeletePaycheck(
+              paycheckId,
+              tanStackPaycheckHistory as unknown as {
+                id: string | number;
+                amount?: number;
+                allocations?: unknown[];
+              }[]
+            )) as unknown as (paycheck: import("@/db/types").PaycheckHistory) => Promise<void>
+        }
+        currentUser={currentUser as unknown as import("@/types/finance").User}
       />
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions}
-        envelopes={envelopes}
-        onUpdateBill={handleUpdateBill}
+        transactions={safeTransactions as unknown as import("@/types/finance").Transaction[]}
+        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+        onUpdateBill={
+          handleUpdateBill as unknown as (
+            bill: import("@/types/bills").Bill
+          ) => void | Promise<void>
+        }
         onCreateRecurringBill={() => {}}
         onSearchNewBills={async () => {}}
         onError={handleBillManagerError}

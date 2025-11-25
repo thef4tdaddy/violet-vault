@@ -53,10 +53,7 @@ export const trackStoreAction = (actionName: string, storeName: string = "unknow
 /**
  * Warn about dangerous useEffect patterns
  */
-export const warnDangerousUseEffect = (
-  hookName: string,
-  dependencies: unknown[]
-): void => {
+export const warnDangerousUseEffect = (hookName: string, dependencies: unknown[]): void => {
   if (import.meta?.env?.MODE !== "development") return;
 
   const storeActionDeps = dependencies.filter(
@@ -129,7 +126,7 @@ export const initializeReactErrorDetector = (): void => {
 /**
  * Enhanced store wrapper that adds monitoring
  */
-export const wrapStoreForMonitoring = (store, storeName) => {
+export const wrapStoreForMonitoring = <T extends object>(store: T, storeName: string): T => {
   if (import.meta?.env?.MODE !== "development") return store;
 
   return new Proxy(store, {
@@ -138,15 +135,15 @@ export const wrapStoreForMonitoring = (store, storeName) => {
 
       // Monitor function calls (store actions)
       if (typeof value === "function" && typeof prop === "string") {
-        return function (...args) {
+        return function (this: unknown, ...args: unknown[]) {
           trackStoreAction(prop, storeName);
-          return value.apply(this, args);
+          return (value as (...args: unknown[]) => unknown).apply(this, args);
         };
       }
 
       return value;
     },
-  });
+  }) as T;
 };
 
 export default {

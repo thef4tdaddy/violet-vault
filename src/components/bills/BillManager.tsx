@@ -4,7 +4,7 @@
  * UI-only component using useBillManager hook for business logic
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
@@ -23,11 +23,12 @@ interface Transaction {
   [key: string]: unknown;
 }
 
-interface Envelope {
+import type { Envelope as EnvelopeFromTypes } from "@/types/bills";
+
+type Envelope = EnvelopeFromTypes & {
   id: string | number;
-  name?: string;
   [key: string]: unknown;
-}
+};
 
 interface BillManagerProps {
   transactions?: Transaction[];
@@ -179,7 +180,16 @@ const BillManager: React.FC<BillManagerProps> = ({
 
       {/* View Tabs and Filters */}
       <BillViewTabs
-        viewModes={viewModes}
+        viewModes={
+          viewModes as unknown as Array<{
+            id: string;
+            label: string;
+            count?: number;
+            icon?: React.ComponentType<{ className?: string }>;
+            disabled?: boolean;
+            color?: "blue" | "green" | "red" | "amber" | "purple" | "cyan" | "gray";
+          }>
+        }
         viewMode={viewMode}
         setViewMode={setViewMode}
         filterOptions={filterOptions}

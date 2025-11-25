@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
 import { useShareCodeValidation } from "@/hooks/sharing/useShareCodeValidation";
 import { useBudgetJoining } from "@/hooks/sharing/useBudgetJoining";
@@ -9,12 +9,18 @@ import UserSetupStep from "./steps/UserSetupStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+interface JoinBudgetModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onJoinSuccess: () => void;
+}
+
 /**
  * Join Budget Modal - Enter share codes or scan QR codes to join budgets
  * Refactored to use custom hooks and step components for better maintainability
  * Addresses GitHub Issue #580 - Two-factor authentication for joining
  */
-const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
+const JoinBudgetModal: React.FC<JoinBudgetModalProps> = ({ isOpen, onClose, onJoinSuccess }) => {
   const [shareCode, setShareCode] = useState("");
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");

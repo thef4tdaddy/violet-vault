@@ -3,37 +3,66 @@
  * Common calculations, validations, and helper functions for settings
  */
 
+interface CloudSyncSettings {
+  enabled: boolean;
+  apiEndpoint?: string;
+}
+
+interface SecuritySettings {
+  autoLockTimeout?: number;
+  maxLoginAttempts?: number;
+}
+
+interface SettingsChange {
+  path: string;
+  oldValue: unknown;
+  newValue: unknown;
+  type: "modified";
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+interface StorageUsage {
+  bytes: number;
+  readable: string;
+}
+
 /**
  * Environment Configuration Helpers
  */
-export const getLocalOnlyMode = () => {
+export const getLocalOnlyMode = (): boolean => {
   return import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 };
 
-export const isDevelopmentMode = () => {
+export const isDevelopmentMode = (): boolean => {
   return import.meta.env.NODE_ENV === "development";
 };
 
-export const isProductionMode = () => {
+export const isProductionMode = (): boolean => {
   return import.meta.env.NODE_ENV === "production";
 };
 
 /**
  * Settings Validation Utilities
  */
-export const validateCloudSyncSettings = (settings) => {
-  const errors = [];
+export const validateCloudSyncSettings = (settings: unknown): ValidationResult => {
+  const errors: string[] = [];
 
-  if (!settings) {
+  if (!settings || typeof settings !== "object") {
     errors.push("Settings object is required");
     return { isValid: false, errors };
   }
 
-  if (typeof settings.enabled !== "boolean") {
+  const settingsObj = settings as CloudSyncSettings;
+
+  if (typeof settingsObj.enabled !== "boolean") {
     errors.push("Cloud sync enabled must be a boolean");
   }
 
-  if (settings.enabled && !settings.apiEndpoint) {
+  if (settingsObj.enabled && !settingsObj.apiEndpoint) {
     errors.push("API endpoint is required when cloud sync is enabled");
   }
 
@@ -43,24 +72,26 @@ export const validateCloudSyncSettings = (settings) => {
   };
 };
 
-export const validateSecuritySettings = (settings) => {
-  const errors = [];
+export const validateSecuritySettings = (settings: unknown): ValidationResult => {
+  const errors: string[] = [];
 
-  if (!settings) {
+  if (!settings || typeof settings !== "object") {
     errors.push("Security settings object is required");
     return { isValid: false, errors };
   }
 
+  const settingsObj = settings as SecuritySettings;
+
   if (
-    settings.autoLockTimeout &&
-    (settings.autoLockTimeout < 60 || settings.autoLockTimeout > 3600)
+    settingsObj.autoLockTimeout &&
+    (settingsObj.autoLockTimeout < 60 || settingsObj.autoLockTimeout > 3600)
   ) {
     errors.push("Auto-lock timeout must be between 60 and 3600 seconds");
   }
 
   if (
-    settings.maxLoginAttempts &&
-    (settings.maxLoginAttempts < 3 || settings.maxLoginAttempts > 10)
+    settingsObj.maxLoginAttempts &&
+    (settingsObj.maxLoginAttempts < 3 || settingsObj.maxLoginAttempts > 10)
   ) {
     errors.push("Max login attempts must be between 3 and 10");
   }
@@ -74,7 +105,7 @@ export const validateSecuritySettings = (settings) => {
 /**
  * Settings Calculations
  */
-export const calculateStorageUsage = (data) => {
+export const calculateStorageUsage = (data: unknown): StorageUsage => {
   if (!data) return { bytes: 0, readable: "0 B" };
 
   const jsonString = JSON.stringify(data);
@@ -86,7 +117,7 @@ export const calculateStorageUsage = (data) => {
   };
 };
 
-export const formatBytes = (bytes, decimals = 2) => {
+export const formatBytes = (bytes: number, decimals = 2): string => {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
@@ -129,16 +160,25 @@ export const getDefaultSettingsState = () => ({
 /**
  * Settings Comparison Utilities
  */
-export const compareSettings = (settings1, settings2) => {
-  const changes = [];
+export const compareSettings = (
+  settings1: Record<string, unknown>,
+  settings2: Record<string, unknown>
+): SettingsChange[] => {
+  const changes: SettingsChange[] = [];
 
-  const compare = (obj1, obj2, path = "") => {
+  const compare = (
+    obj1: Record<string, unknown>,
+    obj2: Record<string, unknown>,
+    path = ""
+  ): void => {
     for (const key in obj1) {
       const currentPath = path ? `${path}.${key}` : key;
 
       if (typeof obj1[key] === "object" && obj1[key] !== null) {
         if (typeof obj2[key] === "object" && obj2[key] !== null) {
-          compare(obj1[key], obj2[key], currentPath);
+          const val1 = obj1[key] as Record<string, unknown>;
+          const val2 = obj2[key] as Record<string, unknown>;
+          compare(val1, val2, currentPath);
         } else {
           changes.push({
             path: currentPath,
@@ -165,19 +205,22 @@ export const compareSettings = (settings1, settings2) => {
 /**
  * Settings Export/Import Helpers
  */
-export const sanitizeSettingsForExport = (settings) => {
+export const sanitizeSettingsForExport = (
+  settings: Record<string, unknown>
+): Record<string, unknown> => {
   // Remove sensitive data before export
   const sanitized = { ...settings };
 
   // Remove any keys that might contain sensitive data
   const sensitiveKeys = ["encryptionKey", "password", "apiKey", "token"];
 
-  const removeSensitiveData = (obj) => {
+  const removeSensitiveData = (obj: Record<string, unknown>): void => {
     for (const key in obj) {
       if (sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive.toLowerCase()))) {
         delete obj[key];
       } else if (typeof obj[key] === "object" && obj[key] !== null) {
-        removeSensitiveData(obj[key]);
+        const nestedObj = obj[key] as Record<string, unknown>;
+        removeSensitiveData(nestedObj);
       }
     }
   };
@@ -186,32 +229,34 @@ export const sanitizeSettingsForExport = (settings) => {
   return sanitized;
 };
 
-export const validateImportedSettings = (importedData) => {
-  const errors = [];
+export const validateImportedSettings = (importedData: unknown): ValidationResult => {
+  const errors: string[] = [];
 
-  if (!importedData || typeof importedData !== "object") {
+  if (!importedData || typeof importedData !== "object" || importedData === null) {
     errors.push("Invalid settings format - must be a JSON object");
     return { isValid: false, errors };
   }
 
+  const dataObj = importedData as Record<string, unknown>;
+
   // Check for required structure
   const requiredSections = ["general", "security", "sync"];
   for (const section of requiredSections) {
-    if (!importedData[section]) {
+    if (!dataObj[section]) {
       errors.push(`Missing required section: ${section}`);
     }
   }
 
   // Validate each section if present
-  if (importedData.security) {
-    const securityValidation = validateSecuritySettings(importedData.security);
+  if (dataObj.security) {
+    const securityValidation = validateSecuritySettings(dataObj.security);
     if (!securityValidation.isValid) {
       errors.push(...securityValidation.errors);
     }
   }
 
-  if (importedData.sync) {
-    const syncValidation = validateCloudSyncSettings(importedData.sync);
+  if (dataObj.sync) {
+    const syncValidation = validateCloudSyncSettings(dataObj.sync);
     if (!syncValidation.isValid) {
       errors.push(...syncValidation.errors);
     }

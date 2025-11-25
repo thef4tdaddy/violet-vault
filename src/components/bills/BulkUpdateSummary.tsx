@@ -2,11 +2,27 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 
+interface Summary {
+  hasChanges: boolean;
+  changedBills: number;
+  totalAmountChange: number;
+}
+
+interface BulkUpdateSummaryProps {
+  summary: Summary;
+  onClose: () => void;
+  handleSubmit: () => void;
+}
+
 /**
  * Summary and action buttons for BulkBillUpdateModal
  * Extracted to reduce complexity
  */
-const BulkUpdateSummary = ({ summary, onClose, handleSubmit }) => {
+const BulkUpdateSummary: React.FC<BulkUpdateSummaryProps> = ({
+  summary,
+  onClose,
+  handleSubmit,
+}) => {
   return (
     <div className="mt-6 pt-4 border-t-2 border-black">
       <div className="flex items-center justify-between">

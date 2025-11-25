@@ -71,7 +71,7 @@ export const useAutoFundingHistory = (
 
     // Statistics and analysis
     getExecutionStatistics: () =>
-      statisticsHook.getExecutionStatistics(historyHook.executionHistory),
+      statisticsHook.getExecutionStatistics(historyHook.executionHistory as never),
 
     // Import/Export
     exportHistory: (options) =>

@@ -2,6 +2,21 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
+import type { Envelope } from "@/db/types";
+import type { Bill } from "@/types/bills";
+
+interface EnvelopeWithStatus extends Envelope {
+  status?: string;
+  envelopeName?: string;
+  available?: number;
+  envelopeType?: string;
+}
+
+interface EnvelopeStatusDisplayProps {
+  envelope: EnvelopeWithStatus;
+  bills: Bill[];
+  utilizationColorClass: string;
+}
 
 /**
  * Envelope status display component
@@ -10,8 +25,12 @@ import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelop
  * Part of EnvelopeItem refactoring for ESLint compliance
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
-const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
-  const getStatusIcon = (status) => {
+const EnvelopeStatusDisplay = ({
+  envelope,
+  bills,
+  utilizationColorClass,
+}: EnvelopeStatusDisplayProps) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "overdue":
       case "overspent":
@@ -29,8 +48,12 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
   };
 
   const renderBalanceInfo = () => {
+    const available = envelope.available ?? 0;
     if (envelope.envelopeType === ENVELOPE_TYPES.BILL) {
-      const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+      const displayInfo = getBillEnvelopeDisplayInfo(
+        envelope,
+        bills as unknown as Parameters<typeof getBillEnvelopeDisplayInfo>[1]
+      );
       if (displayInfo) {
         const { displayText } = displayInfo;
         return (
@@ -38,10 +61,10 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
             <p className="text-xs text-gray-500">{displayText?.primaryStatus || "Balance"}</p>
             <p
               className={`text-lg font-semibold ${
-                envelope.available >= 0 ? "text-green-600" : "text-red-600"
+                available >= 0 ? "text-green-600" : "text-red-600"
               }`}
             >
-              ${envelope.available.toFixed(2)}
+              ${available.toFixed(2)}
             </p>
           </>
         );
@@ -53,11 +76,9 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
       <>
         <p className="text-xs text-gray-500">Available</p>
         <p
-          className={`text-lg font-semibold ${
-            envelope.available >= 0 ? "text-green-600" : "text-red-600"
-          }`}
+          className={`text-lg font-semibold ${available >= 0 ? "text-green-600" : "text-red-600"}`}
         >
-          ${envelope.available.toFixed(2)}
+          ${available.toFixed(2)}
         </p>
       </>
     );
@@ -67,7 +88,7 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2">
-          {getStatusIcon(envelope.status)}
+          {getStatusIcon(envelope.status ?? "")}
           <h3 className="font-black text-black text-base">{envelope.envelopeName}</h3>
         </div>
         <span className={`px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}>

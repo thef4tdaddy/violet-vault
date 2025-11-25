@@ -235,6 +235,7 @@ const getSavingsGoalSortValue = (goal: ProcessedSavingsGoal, sortBy: string) => 
 /**
  * Compare two values for sorting
  */
+// eslint-disable-next-line complexity -- Complex comparison logic handling multiple value types
 const compareSortValues = (aVal: unknown, bVal: unknown, sortOrder: "asc" | "desc"): number => {
   // Handle null/undefined values
   if (aVal == null && bVal == null) return 0;

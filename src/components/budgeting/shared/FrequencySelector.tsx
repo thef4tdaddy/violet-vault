@@ -3,6 +3,15 @@ import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
 
+interface FrequencySelectorProps {
+  selectedFrequency: string;
+  onFrequencyChange: (value: string) => void;
+  label?: string;
+  disabled?: boolean;
+  error?: string | null;
+  className?: string;
+}
+
 /**
  * Shared component for frequency selection
  * Used across envelope and bill forms
@@ -14,7 +23,7 @@ const FrequencySelector = ({
   disabled = false,
   error = null,
   className = "",
-}) => {
+}: FrequencySelectorProps) => {
   const frequencies = getFrequencyOptions();
 
   return (

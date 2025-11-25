@@ -10,7 +10,7 @@ interface AnalysisSettings {
   [key: string]: unknown;
 }
 
-interface SuggestionStats {
+export interface SuggestionStats {
   totalSuggestions: number;
   priorityCounts: {
     high: number;

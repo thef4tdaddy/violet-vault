@@ -6,12 +6,18 @@ import { useLocalOnlyMode } from "../common/useLocalOnlyMode";
 /**
  * Authentication state interface
  */
+interface LocalOnlyUser {
+  budgetId?: string;
+  userName?: string;
+  userColor?: string;
+}
+
 interface AuthenticationState {
   isUnlocked: boolean;
   isAuthenticated: boolean;
   currentUser: unknown;
   isLocalOnlyMode: boolean;
-  localOnlyUser: unknown;
+  localOnlyUser: LocalOnlyUser | null;
   isLocked: boolean;
   canUnlock: boolean;
   isReady: boolean;
@@ -34,10 +40,17 @@ interface AuthOperations {
   handleSetup: (userDataOrPassword: unknown) => Promise<void>;
   handleLogout: () => void;
   handleChangePassword: (oldPass: string, newPass: string) => Promise<void>;
-  handleUpdateProfile: (updatedProfile: unknown) => void;
+  handleUpdateProfile: (updatedProfile: UserProfile) => Promise<void>;
   lockApp: () => void;
   unlockApp: (_password: string) => void;
   checkSecurityStatus: () => void;
+}
+
+interface UserProfile {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
 }
 
 /**
@@ -49,7 +62,7 @@ interface UseAuthenticationManagerReturn extends AuthenticationState, AuthOperat
   _internal: {
     authFlow: ReturnType<typeof useAuthFlow>;
     securityManager: ReturnType<typeof useSecurityManager>;
-    localOnlyMode: { isLocalOnlyMode: boolean; localOnlyUser: unknown };
+    localOnlyMode: { isLocalOnlyMode: boolean; localOnlyUser: LocalOnlyUser | null };
   };
 }
 
@@ -82,7 +95,10 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
 
   // Determine the effective budget ID
   const effectiveBudgetId = useMemo(() => {
-    return isLocalOnlyMode ? localOnlyUser?.budgetId : authFlow.budgetId;
+    if (isLocalOnlyMode) {
+      return localOnlyUser?.budgetId ?? null;
+    }
+    return authFlow.budgetId ?? null;
   }, [isLocalOnlyMode, localOnlyUser?.budgetId, authFlow.budgetId]);
 
   // Comprehensive authentication state
@@ -129,7 +145,9 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
   const authOperations: AuthOperations = {
     // Setup & Login
     handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
-      await authFlow.handleSetup(userDataOrPassword);
+      await authFlow.handleSetup(
+        userDataOrPassword as string | { password: string; budgetId?: string }
+      );
     },
     handleLogout: authFlow.handleLogout,
     handleChangePassword: authFlow.handleChangePassword,

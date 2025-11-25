@@ -64,14 +64,14 @@ export const getTemplateOptions = (template: string): Partial<ExportOptions> | n
 export const executeExport = async (
   format: string,
   handlers: {
-    exportToPDF: (a: unknown, b: unknown, t: string) => Promise<void>;
+    exportToPDF: (a: unknown, b: unknown, t: unknown) => Promise<void>;
     exportToCSV: (a: unknown) => Promise<void>;
     exportChartImages: () => Promise<void>;
   },
   data: {
     analyticsData: unknown;
     balanceData: unknown;
-    timeFilter: string;
+    timeFilter: unknown;
   }
 ): Promise<void> => {
   switch (format) {

@@ -8,6 +8,9 @@ import React from "react";
 // Auth types
 export * from "./auth";
 
+// Sync types
+export * from "./sync";
+
 // Common utility types
 export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;

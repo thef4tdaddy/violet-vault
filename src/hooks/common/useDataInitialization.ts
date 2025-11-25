@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 import { budgetDb } from "../../db/budgetDb";
 
@@ -36,8 +36,8 @@ async function fixAutoAllocateUndefinedValues() {
  */
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
-  const [initError, setInitError] = useState(null);
-  const cloudSyncEnabled = useBudgetStore((state) => state.cloudSyncEnabled);
+  const [initError, setInitError] = useState<string | null>(null);
+  const cloudSyncEnabled = useBudgetStore((state: UiStore) => state.cloudSyncEnabled);
 
   useEffect(() => {
     const initializeServices = async () => {
@@ -64,7 +64,7 @@ const useDataInitialization = () => {
         logger.debug("✅ Background services initialized");
       } catch (error) {
         logger.error("❌ Failed to initialize background services", error);
-        setInitError(error.message);
+        setInitError((error as Error)?.message ?? "Unknown error");
       }
     };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "@/utils";
@@ -239,7 +239,9 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
                         : "bg-purple-600 hover:bg-purple-700 text-white"
                     }`}
                   >
-                    {copied ? renderIcon("Check", "h-5 w-5") : renderIcon("Copy", "h-5 w-5")}
+                    {copied
+                      ? renderIcon("Check", { className: "h-5 w-5" })
+                      : renderIcon("Copy", { className: "h-5 w-5" })}
                   </Button>
                 </div>
               </div>
@@ -260,7 +262,7 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
                     onClick={copyShareUrl}
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-black transition-colors border-2 border-black"
                   >
-                    {renderIcon("Copy", "h-4 w-4")}
+                    {renderIcon("Copy", { className: "h-4 w-4" })}
                   </Button>
                 </div>
               </div>
@@ -268,7 +270,7 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
               {/* Budget Info */}
               <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  {renderIcon("Shield", "h-5 w-5 text-green-600 mt-0.5")}
+                  {renderIcon("Shield", { className: "h-5 w-5 text-green-600 mt-0.5" })}
                   <div>
                     <h4 className="font-black text-green-800 text-sm">DETERMINISTIC BUDGET</h4>
                     <p className="text-xs text-green-700 mt-1">
@@ -299,14 +301,14 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
                   onClick={generateShareCode}
                   className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black"
                 >
-                  {renderIcon("RefreshCw", "h-4 w-4 mr-2")}
+                  {renderIcon("RefreshCw", { className: "h-4 w-4 mr-2" })}
                   NEW CODE
                 </Button>
                 <Button
                   onClick={generateNewCode}
                   className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black"
                 >
-                  {renderIcon("Shuffle", "h-4 w-4 mr-2")}
+                  {renderIcon("Shuffle", { className: "h-4 w-4 mr-2" })}
                   NEW CODE
                 </Button>
               </div>
@@ -317,7 +319,7 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
                 onClick={generateShareCode}
                 className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-black transition-colors border-2 border-black"
               >
-                {renderIcon("Share", "h-5 w-5 mr-2")}
+                {renderIcon("Share", { className: "h-5 w-5 mr-2" })}
                 GENERATE SHARE CODE
               </Button>
             </div>

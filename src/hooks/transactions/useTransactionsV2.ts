@@ -4,12 +4,17 @@
  * Created for Issue #508 - replaces the monolithic useTransactions.js
  */
 import { useEffect } from "react";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import { useTransactionData } from "./useTransactionData";
 import { useTransactionOperations } from "./useTransactionOperations";
 import { createEnhancedOperations } from "./useTransactionsV2Helpers";
 import logger from "@/utils/common/logger";
+
+// Extended store type for legacy transaction operations
+interface ExtendedUiStore extends UiStore {
+  updateTransactions?: (transactions: unknown[]) => void;
+}
 
 interface UseTransactionsV2Options {
   dateRange?: { start: string; end: string };
@@ -53,9 +58,9 @@ const useTransactionsV2 = (options: UseTransactionsV2Options = {}) => {
   } = options;
 
   // Get UI state from Zustand (for legacy compatibility)
-  const budgetStore = useBudgetStore(
-    useShallow((state) => ({
-      updateTransactions: (state as Record<string, unknown>).updateTransactions,
+  const budgetStore = useUiStore(
+    useShallow((state: ExtendedUiStore) => ({
+      updateTransactions: state.updateTransactions,
     }))
   );
 
@@ -81,7 +86,7 @@ const useTransactionsV2 = (options: UseTransactionsV2Options = {}) => {
 
   // Sync with Zustand store for backward compatibility
   useEffect(() => {
-    if (dataHook.isSuccess && dataHook.allTransactions) {
+    if (dataHook.isSuccess && dataHook.allTransactions && Array.isArray(dataHook.allTransactions)) {
       // Update Zustand store with fresh data
       budgetStore.updateTransactions?.(dataHook.allTransactions);
 

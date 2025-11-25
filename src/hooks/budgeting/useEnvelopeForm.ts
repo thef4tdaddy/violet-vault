@@ -53,26 +53,18 @@ const useEnvelopeForm = ({
   const updateFormField = useCallback(
     (field: string, value: unknown) => {
       setFormData((prev) => {
-        // Only mark dirty if value actually changed
         if (prev[field as keyof typeof prev] !== value) {
           setIsDirty(true);
         }
-
         const newData = { ...prev, [field]: value };
-
-        // Clear related errors when field is updated
         if (errors[field as keyof typeof errors]) {
           setErrors((prevErrors) => {
             const { [field]: _removed, ...remainingErrors } = prevErrors as Record<string, unknown>;
             return remainingErrors;
           });
         }
-
-        // Handle special cases for dependent fields
         if (field === "envelopeType") {
-          // Validate type change compatibility
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const compatibility = validateEnvelopeTypeChange(String(value), envelope as any);
+          const compatibility = validateEnvelopeTypeChange(String(value), envelope as never);
           if (!compatibility.isValid) {
             setErrors((prevErrors) => ({
               ...prevErrors,
@@ -84,7 +76,6 @@ const useEnvelopeForm = ({
             });
           }
         }
-
         return newData;
       });
     },
@@ -99,10 +90,9 @@ const useEnvelopeForm = ({
 
   // Form validation
   const validateForm = useCallback(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const validation = validateEnvelopeForm(
       formData,
-      existingEnvelopes as any,
+      existingEnvelopes as never,
       envelope?.id as string | undefined
     );
     setErrors(validation.errors);

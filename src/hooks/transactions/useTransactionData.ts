@@ -106,7 +106,7 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
   /**
    * Main transactions query
    */
-  const transactionsQuery = useQuery({
+  const transactionsQuery = useQuery<Transaction[], Error>({
     queryKey: queryKeys.transactionsList({
       dateRange,
       envelopeId,
@@ -120,7 +120,7 @@ const useTransactionData = (options: UseTransactionDataOptions = {}) => {
     queryFn: () => fetchTransactionsFromDb(budgetDb, logger),
     enabled,
     staleTime,
-    refetchInterval,
+    refetchInterval: refetchInterval ?? undefined,
   });
 
   /**

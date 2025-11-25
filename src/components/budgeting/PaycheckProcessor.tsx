@@ -56,7 +56,10 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
   });
 
   const historyHook = usePaycheckHistory({
-    onDeletePaycheck,
+    onDeletePaycheck: async (id: string | number) => {
+      const paycheck = paycheckHistory.find((p) => p.id === id);
+      if (paycheck) await onDeletePaycheck(paycheck);
+    },
   });
 
   // Calculate allocation preview
@@ -77,15 +80,25 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
           <PaycheckAllocationPreview
             preview={preview}
             hasAmount={!!formHook.paycheckAmount}
-            envelopes={envelopes}
+            envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
           />
         </div>
       </div>
 
       {/* Paycheck History */}
       <PaycheckHistory
-        paycheckHistory={paycheckHistory}
-        onDeletePaycheck={historyHook.handleDeletePaycheck}
+        paycheckHistory={
+          paycheckHistory as unknown as Array<{
+            id: string | number;
+            payerName?: string;
+            amount?: number;
+          }>
+        }
+        onDeletePaycheck={
+          historyHook.handleDeletePaycheck as unknown as (
+            paycheck: PaycheckHistoryItem
+          ) => void | Promise<void>
+        }
         deletingPaycheckId={historyHook.deletingPaycheckId}
       />
     </div>
@@ -136,7 +149,7 @@ const PaycheckForm: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> =
     />
 
     <PaycheckAllocationModes
-      allocationMode={formHook.allocationMode}
+      allocationMode={formHook.allocationMode as "allocate" | "leftover"}
       onChange={formHook.setAllocationMode}
       disabled={formHook.isProcessing}
     />

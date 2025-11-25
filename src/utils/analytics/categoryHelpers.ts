@@ -14,9 +14,11 @@ export interface CategoryStat {
 }
 
 export interface TransactionForStats {
+  id?: string | number;
   category?: string;
   amount: number;
   date: string;
+  description?: string;
 }
 
 /**

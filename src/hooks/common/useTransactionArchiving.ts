@@ -88,21 +88,24 @@ const useTransactionArchiving = () => {
   /**
    * Get archived analytics data
    */
-  const getArchivedAnalytics = useCallback(async (period = "yearly", category = null) => {
-    try {
-      const archiver = createArchiver();
-      return await archiver.getArchivedAnalytics(period, category);
-    } catch (error) {
-      logger.error("Failed to retrieve archived analytics", { error });
-      throw error;
-    }
-  }, []);
+  const getArchivedAnalytics = useCallback(
+    async (period: string = "yearly", category: string | null = null) => {
+      try {
+        const archiver = createArchiver();
+        return await archiver.getArchivedAnalytics(period, category);
+      } catch (error) {
+        logger.error("Failed to retrieve archived analytics", { error });
+        throw error;
+      }
+    },
+    []
+  );
 
   /**
    * Restore archived transactions (emergency function)
    */
   const restoreArchive = useCallback(
-    async (archiveId) => {
+    async (archiveId: string) => {
       try {
         logger.warn("Restoring archived transactions", { archiveId });
         const archiver = createArchiver();
@@ -123,7 +126,7 @@ const useTransactionArchiving = () => {
   /**
    * Calculate potential storage savings
    */
-  const calculateSavings = useCallback((transactionCount) => {
+  const calculateSavings = useCallback((transactionCount: number) => {
     // Rough estimate: each transaction ~0.5KB, archives compress to ~30% of original
     const originalSize = transactionCount * 0.5; // KB
     const archivedSize = originalSize * 0.3; // KB

@@ -3,13 +3,21 @@ import { Select, Checkbox } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface ArchivingConfigurationProps {
+  selectedPeriod: number;
+  isArchiving: boolean;
+  showAdvancedOptions: boolean;
+  handlePeriodChange: (period: string) => void;
+  toggleAdvancedOptions: () => void;
+}
+
 const ArchivingConfiguration = ({
   selectedPeriod,
   isArchiving,
   showAdvancedOptions,
   handlePeriodChange,
   toggleAdvancedOptions,
-}) => {
+}: ArchivingConfigurationProps) => {
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Archive Configuration</h3>

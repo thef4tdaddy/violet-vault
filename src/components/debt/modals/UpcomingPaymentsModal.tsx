@@ -5,7 +5,7 @@ import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 // Type definitions
-interface UpcomingPayment {
+export interface UpcomingPayment {
   debtId: string;
   debtName: string;
   dueDate: string;

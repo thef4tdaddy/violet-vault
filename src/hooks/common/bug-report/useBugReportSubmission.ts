@@ -31,7 +31,10 @@ interface BugReportSubmissionState {
  */
 interface BugReportSubmissionActions {
   submitReport: () => Promise<boolean>;
-  quickReport: (description: string, severity?: string) => Promise<unknown>;
+  quickReport: (
+    description: string,
+    severity?: "low" | "medium" | "high" | "critical"
+  ) => Promise<unknown>;
   initializeHighlightSession: () => Promise<void>;
   getHighlightSessionData: () => Promise<{
     sessionUrl: string;
@@ -106,7 +109,7 @@ export const useBugReportSubmissionV2 = (
     setSubmitResult({
       success: true,
       submissionId: result.successfulProvider || "unknown",
-      url: null,
+      url: undefined,
       provider: result.successfulProvider,
       screenshotStatus: null,
     });
@@ -176,7 +179,8 @@ export const useBugReportSubmissionV2 = (
         : handleFailedSubmission(submission.error!);
     } catch (error) {
       logger.error("Bug report submission failed", error);
-      setSubmitError(error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setSubmitError(errorMessage);
       return false;
     } finally {
       setIsSubmitting(false);

@@ -5,7 +5,7 @@ import type { BillEnvelopeResult } from "../../utils/budgeting/billEnvelopeCalcu
 import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
 
 // Helper to get progress bar color based on funding percentage
-const getProgressBarColor = (progress) => {
+const getProgressBarColor = (progress: number): string => {
   if (progress >= 100) return "bg-green-500";
   if (progress >= 75) return "bg-blue-500";
   if (progress >= 50) return "bg-yellow-500";
@@ -13,7 +13,7 @@ const getProgressBarColor = (progress) => {
 };
 
 // Helper to get days until bill color class
-const getDaysUntilColor = (days) => {
+const getDaysUntilColor = (days: number): string => {
   if (days <= 3) return "text-red-600 font-medium";
   if (days <= 7) return "text-orange-600";
   return "text-gray-500";
@@ -88,7 +88,14 @@ const StatusDisplay = ({
   currentBalance,
 }: {
   targetMonthlyAmount: number;
-  nextBill?: { amount: number; frequency?: string };
+  nextBill?: {
+    id?: string;
+    name?: string;
+    amount?: number;
+    dueDate?: string;
+    category?: string;
+    frequency?: string;
+  } | null;
   remainingToFund: number;
   currentBalance: number;
 }) => (
@@ -100,9 +107,9 @@ const StatusDisplay = ({
         </span>
       )}
     </div>
-    {remainingToFund <= 0 && currentBalance > nextBill?.amount && (
+    {remainingToFund <= 0 && nextBill?.amount && currentBalance > nextBill.amount && (
       <div className="text-green-600 font-medium">
-        ${(currentBalance - (nextBill?.amount || 0)).toFixed(2)} surplus available
+        ${(currentBalance - nextBill.amount).toFixed(2)} surplus available
       </div>
     )}
   </div>

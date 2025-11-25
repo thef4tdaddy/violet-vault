@@ -18,7 +18,7 @@ interface TransactionRowProps {
   gridTemplate: string;
   onEdit: (transaction: Transaction) => void;
   onSplit: (transaction: Transaction) => void;
-  onDeleteClick: (transactionId: string) => void;
+  onDeleteClick: (transaction: Transaction) => void;
   onHistoryClick: (transaction: Transaction) => void;
 }
 
@@ -36,7 +36,7 @@ const TransactionRow = ({
   onDeleteClick,
   onHistoryClick,
 }: TransactionRowProps) => {
-  const envelope = findEnvelopeForTransaction(transaction, envelopes);
+  const envelope = findEnvelopeForTransaction(transaction, envelopes as never);
   const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(
     transaction.amount
   );

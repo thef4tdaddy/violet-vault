@@ -20,7 +20,7 @@ const QuickFundModal = ({
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (amount: number) => void;
-  envelope: unknown;
+  envelope: { id: string; name: string; [key: string]: unknown };
   suggestedAmount: number;
   unassignedCash: number;
 }) => {
@@ -50,13 +50,13 @@ const QuickFundModal = ({
       });
 
       if (confirmed) {
-        onConfirm(envelope.id, unassignedCash);
+        onConfirm(unassignedCash);
         onClose();
       }
       return;
     }
 
-    onConfirm(envelope.id, amount);
+    onConfirm(amount);
     onClose();
   };
 
@@ -87,7 +87,7 @@ const QuickFundModal = ({
         </div>
 
         <QuickFundForm
-          envelope={envelope}
+          envelope={envelope as { id: string; name: string; [key: string]: unknown }}
           amount={amount}
           setAmount={setAmount}
           unassignedCash={unassignedCash}

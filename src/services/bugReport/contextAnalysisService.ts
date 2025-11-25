@@ -120,9 +120,16 @@ export class ContextAnalysisService {
         typeof PageDetectionService.getScreenContext
       >,
       userLocation: "unknown",
-      ui: { modals: [], forms: [], buttons: [], inputs: [] } as ReturnType<
-        typeof UIStateService.getUIState
-      >,
+      ui: {
+        modals: [],
+        drawers: [],
+        tabs: [],
+        forms: [],
+        buttons: [],
+        inputs: [],
+        loading: [],
+        interactions: [],
+      } as ReturnType<typeof UIStateService.getUIState>,
       performance: { available: false },
       accessibility: { available: false },
       data: { available: false },
@@ -253,7 +260,7 @@ export class ContextAnalysisService {
   static getHeadingStructure(): HeadingStructure {
     try {
       const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-      const structure = {};
+      const structure: Record<string, number> = {};
 
       headings.forEach((heading) => {
         const level = heading.tagName.toLowerCase();

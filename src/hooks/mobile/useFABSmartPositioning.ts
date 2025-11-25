@@ -10,7 +10,7 @@ export const useFABSmartPositioning = () => {
   const originalViewportHeight = useRef(window.innerHeight);
 
   useEffect(() => {
-    let resizeTimeout;
+    let resizeTimeout: ReturnType<typeof setTimeout>;
 
     const handleResize = () => {
       // Debounce resize events

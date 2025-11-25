@@ -86,7 +86,12 @@ const DebtDashboard = () => {
               setFilterOptions={setFilterOptions}
               setShowUpcomingPaymentsModal={setShowUpcomingPaymentsModal}
               handleDebtClick={handleDebtClick}
-              handleRecordPayment={handleRecordPayment}
+              handleRecordPayment={
+                handleRecordPayment as unknown as (
+                  debt: import("@/types/debt").DebtAccount,
+                  amount: number
+                ) => void
+              }
               handleAddDebt={handleAddDebt}
             />
           )}
@@ -107,19 +112,26 @@ const DebtDashboard = () => {
 
       {selectedDebt && isDebtFeatureEnabled("ENABLE_DEBT_DETAIL_MODAL") && (
         <DebtDetailModal
-          debt={selectedDebt}
+          debt={selectedDebt as unknown as Record<string, unknown> & { id: string }}
           isOpen={!!selectedDebt}
           onClose={() => setSelectedDebt(null)}
           onDelete={handleDeleteDebt}
-          onRecordPayment={handleRecordPayment}
-          onEdit={handleEditDebt}
+          onRecordPayment={async (debtId: string, amount: number) => {
+            await handleRecordPayment(debtId, {
+              amount,
+              date: new Date().toISOString().split("T")[0],
+            });
+          }}
+          onEdit={handleEditDebt as unknown as (debt: Record<string, unknown>) => void}
         />
       )}
 
       <UpcomingPaymentsModal
         isOpen={showUpcomingPaymentsModal}
         onClose={() => setShowUpcomingPaymentsModal(false)}
-        upcomingPayments={upcomingPayments}
+        upcomingPayments={
+          upcomingPayments as unknown as import("./modals/UpcomingPaymentsModal").UpcomingPayment[]
+        }
       />
     </div>
   );

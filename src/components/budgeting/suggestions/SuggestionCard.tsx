@@ -3,7 +3,11 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
 type SuggestionPriority = "high" | "medium" | "low";
-type SuggestionType = "new_envelope" | "merchant_pattern" | "increase_envelope" | "decrease_envelope";
+type SuggestionType =
+  | "new_envelope"
+  | "merchant_pattern"
+  | "increase_envelope"
+  | "decrease_envelope";
 type SuggestionAction = "create_envelope" | "increase_budget" | "decrease_budget";
 
 interface Suggestion {

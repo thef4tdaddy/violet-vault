@@ -4,6 +4,8 @@ import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
 
+type ColorType = "blue" | "red" | "orange" | "green" | "purple" | "indigo" | "teal";
+
 interface HintConfig {
   icon: string;
   title: string;
@@ -17,7 +19,7 @@ interface HintConfig {
     primary: boolean;
   }>;
   step: string;
-  color: string;
+  color: ColorType;
 }
 
 interface CustomMessage {
@@ -166,8 +168,8 @@ const HINT_CONFIGS: Record<string, HintConfig> = {
   },
 };
 
-// Color classes for hint UI
-const COLOR_CLASSES = {
+// Color classes for hint containers
+const COLOR_CLASSES: Record<ColorType, string> = {
   blue: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-300",
   red: "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-300",
   orange:
@@ -182,7 +184,7 @@ const COLOR_CLASSES = {
 };
 
 // Button color classes for hint actions
-const BUTTON_COLOR_CLASSES = {
+const BUTTON_COLOR_CLASSES: Record<ColorType, string> = {
   blue: "bg-blue-500 hover:bg-blue-600 text-blue-700 hover:text-blue-800",
   red: "bg-red-500 hover:bg-red-600 text-red-700 hover:text-red-800",
   orange: "bg-orange-500 hover:bg-orange-600 text-orange-700 hover:text-orange-800",

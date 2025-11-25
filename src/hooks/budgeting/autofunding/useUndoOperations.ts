@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import useUiStore from "../../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
 import type { ExecutionRecord } from "./useExecutionHistory";
 import type { RuleExecutionResult, UndoStackEntry as AutofundingUndoStackEntry } from "./types";
@@ -179,6 +179,16 @@ const createUndoRecord = (executionId: string, totalAmount: number): ExecutionRe
   };
 };
 
+// Interface for budget operations needed by undo
+interface BudgetOperations {
+  transferFunds: (
+    fromId: string,
+    toId: string,
+    amount: number,
+    description: string
+  ) => Promise<void>;
+}
+
 /**
  * Hook for managing auto-funding undo operations
  * Extracted from useAutoFundingHistory.js to reduce complexity
@@ -187,7 +197,7 @@ export const useUndoOperations = (
   initialUndoStack: UndoStackItem[] = [],
   addToHistory: (record: ExecutionRecord) => void
 ) => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUiStore((state: UiStore & { budget?: BudgetOperations }) => state.budget);
   const [undoStack, setUndoStack] = useState<UndoStackItem[]>(initialUndoStack);
 
   // Add execution to undo stack if it has successful transfers
@@ -238,7 +248,7 @@ export const useUndoOperations = (
     async (transfer: UndoTransfer) => {
       try {
         // Reverse the transfer: move money back from target to source
-        await budget.transferFunds(
+        await budget?.transferFunds(
           transfer.toEnvelopeId,
           transfer.fromEnvelopeId,
           transfer.amount,

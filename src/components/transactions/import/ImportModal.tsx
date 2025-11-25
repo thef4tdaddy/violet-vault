@@ -1,3 +1,4 @@
+import React from "react";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 import FileUploader from "./FileUploader";

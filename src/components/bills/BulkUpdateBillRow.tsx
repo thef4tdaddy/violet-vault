@@ -21,7 +21,7 @@ type BillEntity = Record<string, unknown> & {
 /**
  * Update mode type
  */
-type UpdateMode = "amount" | "date" | "both";
+type UpdateMode = "amounts" | "dates" | "both";
 
 /**
  * Props for BulkUpdateBillRow component
@@ -44,7 +44,10 @@ const BulkUpdateBillRow: React.FC<BulkUpdateBillRowProps> = ({
   updateChange,
 }) => {
   const billHasChanges = hasChanges(change);
-  const amountChange = formatAmountChange(change?.originalAmount, change?.amount);
+  const amountChange = formatAmountChange(
+    change?.originalAmount,
+    change?.amount
+  ) as unknown as import("./BulkUpdateBillRowComponents").AmountChange;
 
   return (
     <div
@@ -56,7 +59,7 @@ const BulkUpdateBillRow: React.FC<BulkUpdateBillRowProps> = ({
       }`}
     >
       <div className="flex items-center justify-between">
-        <BillInfo bill={bill} />
+        <BillInfo bill={bill as unknown as import("@/types/bills").Bill} />
 
         <div className="flex items-center gap-4">
           {shouldShowAmountField(updateMode) && (

@@ -5,25 +5,35 @@ import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 /**
- * @typedef {Object} SyncConflict
- * @property {boolean} hasConflict - Whether a conflict exists
- * @property {Object} [cloudUser] - User who made changes on cloud
- * @property {string} [cloudUser.userName] - Name of the cloud user
- * @property {string} [cloudUser.id] - ID of the cloud user
+ * Sync conflict details
  */
+interface SyncConflict {
+  hasConflict: boolean;
+  cloudUser?: {
+    userName?: string;
+    id?: string;
+  };
+}
+
+/**
+ * Conflict resolution modal component props
+ */
+interface ConflictResolutionModalProps {
+  syncConflicts: SyncConflict | null;
+  onResolveConflict: () => void;
+  onDismiss: () => void;
+}
 
 /**
  * Conflict resolution modal component
  * Displays when sync conflicts are detected between local and cloud data
  * Extracted from Layout.jsx for better organization
- *
- * @param {Object} props - Component props
- * @param {SyncConflict|null} props.syncConflicts - Conflict details including cloud user info
- * @param {Function} props.onResolveConflict - Callback to resolve conflict by loading cloud data
- * @param {Function} props.onDismiss - Callback to dismiss conflict and keep local data
- * @returns {React.ReactElement|null} Modal element or null if no conflict
  */
-const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
+const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
+  syncConflicts,
+  onResolveConflict,
+  onDismiss,
+}) => {
   const shouldRender = Boolean(syncConflicts?.hasConflict);
   const modalRef = useModalAutoScroll(shouldRender);
 

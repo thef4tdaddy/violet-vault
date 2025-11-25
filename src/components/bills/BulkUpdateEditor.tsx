@@ -4,6 +4,13 @@ import { getIcon } from "../../utils";
 import BulkUpdateBillRow from "./BulkUpdateBillRow";
 import type { Bill } from "@/types/bills";
 
+type BillEntity = Record<string, unknown> & {
+  id: string;
+  name?: string;
+};
+
+type UpdateMode = "amounts" | "dates" | "both";
+
 interface BillChanges {
   [billId: string]: {
     amount?: number;
@@ -15,7 +22,7 @@ interface BillChanges {
 interface BulkUpdateEditorProps {
   selectedBills: Bill[];
   changes: BillChanges;
-  updateMode: string;
+  updateMode: UpdateMode;
   updateChange: (billId: string, field: string, value: number | string) => void;
   applyBulkChange: (field: string, value: number | string) => void;
   resetChanges: () => void;
@@ -91,9 +98,9 @@ const BulkUpdateEditor: React.FC<BulkUpdateEditorProps> = ({
           {selectedBills.map((bill) => (
             <BulkUpdateBillRow
               key={bill.id}
-              bill={bill}
+              bill={bill as unknown as BillEntity}
               change={changes[bill.id]}
-              updateMode={updateMode}
+              updateMode={updateMode as UpdateMode}
               updateChange={updateChange}
             />
           ))}

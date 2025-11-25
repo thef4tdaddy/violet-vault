@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
@@ -27,7 +27,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   onUpdateBills,
   onError,
 }) => {
-  const [updateMode, setUpdateMode] = useState("amounts");
+  const [updateMode, setUpdateMode] = useState<"amounts" | "dates" | "both">("amounts");
 
   const {
     changes,
@@ -37,7 +37,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
     updateChange,
     applyBulkChange,
     resetChanges,
-  } = useBulkBillUpdate(selectedBills, isOpen);
+  } = useBulkBillUpdate(selectedBills as unknown as import("@/domain/schemas/bill").Bill[], isOpen);
 
   // Initialize changes when modal opens
   useEffect(() => {
@@ -64,10 +64,10 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   const confirmChanges = async () => {
     try {
       const updatedBills = transformBillsForUpdate(selectedBills, changes);
-      await onUpdateBills(updatedBills);
+      await onUpdateBills(updatedBills as Bill[]);
       onClose();
     } catch (error) {
-      onError?.(error.message || "Failed to update bills");
+      onError?.((error as Error)?.message || "Failed to update bills");
     }
   };
 

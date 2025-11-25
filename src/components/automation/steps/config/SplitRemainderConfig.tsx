@@ -32,7 +32,7 @@ const SplitRemainderConfig: React.FC<SplitRemainderConfigProps> = ({
         </p>
         <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
           {envelopes.map((envelope: Envelope) => {
-            const isSelected = ruleData.config.targetIds?.includes(envelope.id) || false;
+            const isSelected = ruleData.config.targetIds?.includes(String(envelope.id)) || false;
             return (
               <div
                 key={envelope.id}

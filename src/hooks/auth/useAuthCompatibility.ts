@@ -2,6 +2,26 @@ import { useAuthManager } from "./useAuthManager";
 import logger from "../../utils/common/logger";
 import { encryptionUtils } from "../../utils/security/encryption";
 
+interface JoinData {
+  budgetId: string;
+  password: string;
+  userInfo: {
+    userName?: string;
+    email?: string;
+    userColor?: string;
+    [key: string]: unknown;
+  };
+  sharedBy: string;
+  shareCode?: string;
+}
+
+interface UpdatedProfile {
+  userName?: string;
+  userColor?: string;
+  email?: string;
+  displayName?: string;
+}
+
 /**
  * Compatibility wrapper for components still using the old authStore interface
  *
@@ -27,12 +47,12 @@ export const useAuthCompatibility = () => {
 
     // Action methods (matching old authStore)
     login: async (password: string, userData: unknown = null) => {
-      const result = await authManager.login(password, userData);
+      const result = await authManager.login(password, userData as Record<string, unknown> | null);
       return result;
     },
 
     joinBudgetWithShareCode: async (joinData: unknown) => {
-      const result = await authManager.joinBudget(joinData);
+      const result = await authManager.joinBudget(joinData as JoinData);
       return result;
     },
 
@@ -41,7 +61,7 @@ export const useAuthCompatibility = () => {
     },
 
     updateUser: (updatedUser: unknown) => {
-      authManager.updateUser(updatedUser);
+      authManager.updateUser(updatedUser as Partial<UpdatedProfile>);
     },
 
     changePassword: async (oldPassword: string, newPassword: string) => {
@@ -50,7 +70,7 @@ export const useAuthCompatibility = () => {
     },
 
     updateProfile: async (updatedProfile: unknown) => {
-      const result = await authManager.updateProfile(updatedProfile);
+      const result = await authManager.updateProfile(updatedProfile as UpdatedProfile);
       return result;
     },
 

@@ -4,12 +4,11 @@
  */
 import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
-import type { Transaction } from "../../db/types";
-import type { Suggestion } from "./categoryHelpers";
+import type { Suggestion, TransactionForStats } from "./categoryHelpers";
 
 interface MerchantPattern {
   merchant: string;
-  transactions: Transaction[];
+  transactions: TransactionForStats[];
   totalAmount: number;
   avgAmount: number;
 }
@@ -24,11 +23,12 @@ interface AnalysisSettings {
  * Analyze uncategorized transactions and suggest categories
  */
 export const analyzeUncategorizedTransactions = (
-  transactions: Transaction[],
+  transactions: TransactionForStats[],
   settings: AnalysisSettings
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
-  const { minTransactionCount, minAmount } = settings;
+  const minTransactionCount = settings.minTransactionCount ?? 3;
+  const minAmount = settings.minAmount ?? 20;
 
   // Group uncategorized transactions by merchant
   const uncategorizedTransactions = transactions.filter(
@@ -82,7 +82,7 @@ export const analyzeUncategorizedTransactions = (
         suggestedAmount: pattern.avgAmount,
         data: {
           merchant: pattern.merchant,
-          transactionIds: pattern.transactions.map((t) => t.id),
+          transactionIds: pattern.transactions.map((t) => String(t.id ?? "")),
           suggestedCategory,
         },
       });
@@ -96,12 +96,12 @@ export const analyzeUncategorizedTransactions = (
  * Analyze unused categories and suggest removal
  */
 export const analyzeUnusedCategories = (
-  transactions: Transaction[],
-  filteredTransactions: Transaction[],
+  transactions: TransactionForStats[],
+  filteredTransactions: TransactionForStats[],
   settings: AnalysisSettings
 ): Suggestion[] => {
   const suggestions: Suggestion[] = [];
-  const { unusedCategoryThreshold } = settings;
+  const unusedCategoryThreshold = settings.unusedCategoryThreshold ?? 3;
 
   const recentDate = new Date();
   recentDate.setMonth(recentDate.getMonth() - unusedCategoryThreshold);
@@ -128,7 +128,7 @@ export const analyzeUnusedCategories = (
         suggestedAmount: 0,
         data: {
           categoryName: category,
-          transactionIds: totalUsage.map((t) => t.id),
+          transactionIds: totalUsage.map((t) => String(t.id ?? "")),
         },
       });
     }

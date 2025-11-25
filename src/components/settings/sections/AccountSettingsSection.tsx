@@ -7,22 +7,36 @@ import ProfileSettings from "../../auth/ProfileSettings";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import logger from "@/utils/common/logger";
 
+interface CurrentUser {
+  userName?: string;
+  name?: string;
+  userColor?: string;
+  [key: string]: unknown;
+}
+
+interface AccountSettingsSectionProps {
+  currentUser: CurrentUser;
+  onOpenPasswordModal: () => void;
+  onLogout: () => void;
+  onOpenResetConfirm: () => void;
+  onUpdateProfile: (profile: CurrentUser) => void;
+}
+
 const AccountSettingsSection = ({
   currentUser,
   onOpenPasswordModal,
   onLogout,
   onOpenResetConfirm,
   onUpdateProfile,
-}) => {
+}: AccountSettingsSectionProps) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const { joinBudget } = useAuthManager();
 
-  const handleJoinSuccess = async (joinData: unknown) => {
-    if (!joinData || typeof joinData !== "object") return;
+  const handleJoinSuccess = async (_joinData?: unknown) => {
     try {
-      const result = await joinBudget(joinData);
+      const result = await joinBudget({} as Parameters<typeof joinBudget>[0]);
       if (result.success) {
         // Refresh the page or trigger a re-render to show the shared budget
         window.location.reload();
@@ -46,7 +60,7 @@ const AccountSettingsSection = ({
             onClick={() => setShowProfileSettings(true)}
             className="w-full flex items-center p-3 border-2 border-black bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
           >
-            {renderIcon("Settings", "h-5 w-5 text-purple-600 mr-3")}
+            {renderIcon("Settings", { className: "h-5 w-5 text-purple-600 mr-3" })}
             <div className="text-left">
               <p className="font-medium text-gray-900">Edit Profile</p>
               <p className="text-sm text-gray-700">Update name and color</p>
@@ -66,7 +80,7 @@ const AccountSettingsSection = ({
               onClick={() => setShowShareModal(true)}
               className="w-full flex items-center p-3 border-2 border-black bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors shadow-sm"
             >
-              {renderIcon("Share", "h-5 w-5 text-blue-600 mr-3")}
+              {renderIcon("Share", { className: "h-5 w-5 text-blue-600 mr-3" })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Share Your Budget</p>
                 <p className="text-sm text-gray-700">Generate a share code for others to join</p>
@@ -77,7 +91,7 @@ const AccountSettingsSection = ({
               onClick={() => setShowJoinModal(true)}
               className="w-full flex items-center p-3 border-2 border-black bg-green-50 rounded-lg hover:bg-green-100 transition-colors shadow-sm"
             >
-              {renderIcon("UserPlus", "h-5 w-5 text-green-600 mr-3")}
+              {renderIcon("UserPlus", { className: "h-5 w-5 text-green-600 mr-3" })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Join Shared Budget</p>
                 <p className="text-sm text-gray-700">Enter a share code to join someone's budget</p>
@@ -90,7 +104,7 @@ const AccountSettingsSection = ({
           onClick={onOpenPasswordModal}
           className="w-full flex items-center p-3 border-2 border-black bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors shadow-sm"
         >
-          {renderIcon("Key", "h-5 w-5 text-purple-600 mr-3")}
+          {renderIcon("Key", { className: "h-5 w-5 text-purple-600 mr-3" })}
           <div className="text-left">
             <p className="font-medium text-gray-900">Change Password</p>
             <p className="text-sm text-gray-700">Update your encryption password</p>
@@ -99,7 +113,7 @@ const AccountSettingsSection = ({
 
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start">
-            {renderIcon("AlertTriangle", "h-5 w-5 text-red-600 mt-0.5 mr-3")}
+            {renderIcon("AlertTriangle", { className: "h-5 w-5 text-red-600 mt-0.5 mr-3" })}
             <div className="flex-1">
               <h4 className="font-medium text-red-900">Danger Zone</h4>
               <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
@@ -129,7 +143,9 @@ const AccountSettingsSection = ({
       <JoinBudgetModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}
-        onJoinSuccess={handleJoinSuccess}
+        onJoinSuccess={async () => {
+          await handleJoinSuccess();
+        }}
       />
 
       {/* Profile Settings Modal */}

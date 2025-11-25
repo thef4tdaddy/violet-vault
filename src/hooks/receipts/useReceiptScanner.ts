@@ -1,26 +1,66 @@
-import { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { processReceiptImage } from "../../utils/common/ocrProcessor";
 import logger from "../../utils/common/logger";
+
+// Define types for the hook
+interface UploadedImage {
+  file: File;
+  url: string;
+  name: string;
+  size: number;
+}
+
+interface ReceiptData {
+  total: string | null;
+  merchant: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+}
+
+interface ExtendedReceiptData extends ReceiptData {
+  rawText: string;
+  processingTime: number;
+}
+
+interface ReceiptProcessedData {
+  merchant: string | null;
+  total: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+  rawText: string;
+  processingTime: number;
+  imageData: UploadedImage;
+}
+
+type OnReceiptProcessedCallback = (data: ReceiptProcessedData) => void;
 
 /**
  * Receipt Scanner Hook
  * Manages all receipt scanning state and business logic
  * Extracted from ReceiptScanner component for better organization
  */
-export const useReceiptScanner = (onReceiptProcessed) => {
+export const useReceiptScanner = (onReceiptProcessed?: OnReceiptProcessedCallback) => {
   // State management
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [extractedData, setExtractedData] = useState(null);
-  const [error, setError] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(null);
+  const [extractedData, setExtractedData] = useState<ExtendedReceiptData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
 
   // Refs for file inputs
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // File validation utility
-  const validateFile = useCallback((file) => {
+  const validateFile = useCallback((file: File) => {
     if (!file) return { valid: false, error: null };
 
     if (!file.type.startsWith("image/")) {
@@ -42,7 +82,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Handle file upload with OCR processing
   const handleFileUpload = useCallback(
-    async (file) => {
+    async (file: File) => {
       const validation = validateFile(file);
       if (!validation.valid) {
         setError(validation.error);
@@ -55,12 +95,13 @@ export const useReceiptScanner = (onReceiptProcessed) => {
       try {
         // Create preview URL
         const imageUrl = URL.createObjectURL(file);
-        setUploadedImage({
+        const newUploadedImage: UploadedImage = {
           file,
           url: imageUrl,
           name: file.name,
           size: file.size,
-        });
+        };
+        setUploadedImage(newUploadedImage);
 
         logger.info("🧾 Processing receipt image...", {
           fileName: file.name,
@@ -90,7 +131,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Handle drag and drop
   const handleDrop = useCallback(
-    (e) => {
+    (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       const files = Array.from(e.dataTransfer.files);
       if (files.length > 0) {
@@ -100,13 +141,13 @@ export const useReceiptScanner = (onReceiptProcessed) => {
     [handleFileUpload]
   );
 
-  const handleDragOver = useCallback((e) => {
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   }, []);
 
   // Handle file input change
   const handleFileInputChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
         handleFileUpload(e.target.files[0]);
       }
@@ -116,7 +157,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
 
   // Confirm and create transaction
   const handleConfirmReceipt = useCallback(() => {
-    if (extractedData && onReceiptProcessed) {
+    if (extractedData && onReceiptProcessed && uploadedImage) {
       onReceiptProcessed({
         ...extractedData,
         imageData: uploadedImage,
@@ -136,7 +177,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
     if (uploadedImage?.url) {
       URL.revokeObjectURL(uploadedImage.url);
     }
-  }, [uploadedImage?.url]);
+  }, [uploadedImage]);
 
   // Toggle image preview
   const toggleImagePreview = useCallback(() => {

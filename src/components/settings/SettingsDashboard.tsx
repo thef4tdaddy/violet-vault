@@ -21,6 +21,100 @@ const SecuritySettings = lazy(() => import("./SecuritySettings"));
 const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
 /**
+ * Helper component to render all settings modals
+ */
+const SettingsModals = ({
+  showPasswordModal,
+  showActivityFeed,
+  showLocalOnlySettings,
+  showSecuritySettings,
+  showEnvelopeChecker,
+  showLocalDataSecurity,
+  activityFeedModalRef,
+  securityManager,
+  onChangePassword,
+  onClosePasswordModal,
+  onCloseActivityFeed,
+  onCloseLocalOnlySettings,
+  onCloseSecuritySettings,
+  onCloseEnvelopeChecker,
+  onCloseLocalDataSecurity,
+}: {
+  showPasswordModal: boolean;
+  showActivityFeed: boolean;
+  showLocalOnlySettings: boolean;
+  showSecuritySettings: boolean;
+  showEnvelopeChecker: boolean;
+  showLocalDataSecurity: boolean;
+  activityFeedModalRef: React.RefObject<HTMLDivElement>;
+  securityManager: unknown;
+  onChangePassword: (password: string) => void;
+  onClosePasswordModal: () => void;
+  onCloseActivityFeed: () => void;
+  onCloseLocalOnlySettings: () => void;
+  onCloseSecuritySettings: () => void;
+  onCloseEnvelopeChecker: () => void;
+  onCloseLocalDataSecurity: () => void;
+}) => {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      {showPasswordModal && (
+        <ChangePasswordModal
+          isOpen={showPasswordModal}
+          onClose={onClosePasswordModal}
+          onChangePassword={
+            onChangePassword as unknown as (
+              current: string,
+              newPass: string
+            ) => Promise<{ success: boolean; message?: string }>
+          }
+        />
+      )}
+      {showActivityFeed && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60 overflow-y-auto">
+          <div
+            ref={activityFeedModalRef}
+            className="glassmorphism rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative border-2 border-black my-auto"
+          >
+            <ModalCloseButton
+              onClick={onCloseActivityFeed}
+              className="absolute top-4 right-4 z-10"
+            />
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
+              <ActivityFeed />
+            </div>
+          </div>
+        </div>
+      )}
+      {showLocalOnlySettings && (
+        <LocalOnlyModeSettings
+          isOpen={showLocalOnlySettings}
+          onClose={onCloseLocalOnlySettings}
+          onModeSwitch={(mode) => {
+            if (mode === "standard") {
+              window.location.reload();
+            }
+          }}
+        />
+      )}
+      {showSecuritySettings && securityManager && (
+        <SecuritySettings isOpen={showSecuritySettings} onClose={onCloseSecuritySettings} />
+      )}
+      {showEnvelopeChecker && (
+        <EnvelopeIntegrityChecker isOpen={showEnvelopeChecker} onClose={onCloseEnvelopeChecker} />
+      )}
+      {showLocalDataSecurity && (
+        <LocalDataSecurityWarning
+          onClose={onCloseLocalDataSecurity}
+          onAcknowledge={onCloseLocalDataSecurity}
+          forceShow={true}
+        />
+      )}
+    </Suspense>
+  );
+};
+
+/**
  * Unified Settings Dashboard - Refactored with extracted components
  * Consolidated all app settings into organized sections with standardized UI
  */
@@ -153,66 +247,23 @@ const SettingsDashboard = ({
         onConfirm={handleResetConfirmAction(onClose, onResetEncryption)}
       />
 
-      <Suspense fallback={<LoadingSpinner />}>
-        {/* Password Change Modal */}
-        {showPasswordModal && (
-          <ChangePasswordModal
-            isOpen={showPasswordModal}
-            onClose={closePasswordModal}
-            onChangePassword={onChangePassword}
-          />
-        )}
-
-        {/* Activity Feed Modal */}
-        {showActivityFeed && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60 overflow-y-auto">
-            <div
-              ref={activityFeedModalRef}
-              className="glassmorphism rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative border-2 border-black my-auto"
-            >
-              <ModalCloseButton
-                onClick={closeActivityFeed}
-                className="absolute top-4 right-4 z-10"
-              />
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
-                <ActivityFeed />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Local-Only Mode Settings */}
-        {showLocalOnlySettings && (
-          <LocalOnlyModeSettings
-            isOpen={showLocalOnlySettings}
-            onClose={closeLocalOnlySettings}
-            onModeSwitch={(mode) => {
-              if (mode === "standard") {
-                window.location.reload();
-              }
-            }}
-          />
-        )}
-
-        {/* Security Settings */}
-        {showSecuritySettings && securityManager && (
-          <SecuritySettings isOpen={showSecuritySettings} onClose={closeSecuritySettings} />
-        )}
-
-        {/* Envelope Integrity Checker */}
-        {showEnvelopeChecker && (
-          <EnvelopeIntegrityChecker isOpen={showEnvelopeChecker} onClose={closeEnvelopeChecker} />
-        )}
-
-        {/* Local Data Security Warning */}
-        {showLocalDataSecurity && (
-          <LocalDataSecurityWarning
-            onClose={() => setShowLocalDataSecurity(false)}
-            onAcknowledge={() => setShowLocalDataSecurity(false)}
-            forceShow={true}
-          />
-        )}
-      </Suspense>
+      <SettingsModals
+        showPasswordModal={showPasswordModal}
+        showActivityFeed={showActivityFeed}
+        showLocalOnlySettings={showLocalOnlySettings}
+        showSecuritySettings={showSecuritySettings}
+        showEnvelopeChecker={showEnvelopeChecker}
+        showLocalDataSecurity={showLocalDataSecurity}
+        activityFeedModalRef={activityFeedModalRef}
+        securityManager={securityManager}
+        onChangePassword={onChangePassword}
+        onClosePasswordModal={closePasswordModal}
+        onCloseActivityFeed={closeActivityFeed}
+        onCloseLocalOnlySettings={closeLocalOnlySettings}
+        onCloseSecuritySettings={closeSecuritySettings}
+        onCloseEnvelopeChecker={closeEnvelopeChecker}
+        onCloseLocalDataSecurity={() => setShowLocalDataSecurity(false)}
+      />
     </>
   );
 };

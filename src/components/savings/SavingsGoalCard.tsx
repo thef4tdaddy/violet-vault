@@ -33,7 +33,12 @@ interface SavingsGoalCardProps {
   priorities: Priority[];
 }
 
-const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, onEdit, onDelete, priorities }) => {
+const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
+  goal,
+  onEdit,
+  onDelete,
+  priorities,
+}) => {
   const getProgressPercentage = (current: number, target: number): number => {
     return target > 0 ? (current / target) * 100 : 0;
   };

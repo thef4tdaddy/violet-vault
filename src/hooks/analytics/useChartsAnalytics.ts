@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import logger from "../../utils/common/logger";
 
 /**
@@ -36,7 +36,7 @@ export const useChartsAnalytics = (initialTimeFilter = "3months", initialFocus =
   }, [initialTimeFilter, normalizeDateRange]);
 
   const handleDateRangeChange = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLSelectElement>): void => {
       const nextValue = normalizeDateRange(e.target.value);
       setDateRange(nextValue);
       logger.debug("Date range changed:", { value: nextValue });
@@ -44,11 +44,11 @@ export const useChartsAnalytics = (initialTimeFilter = "3months", initialFocus =
     [normalizeDateRange]
   );
 
-  const handleChartTypeChange = useCallback((type) => {
+  const handleChartTypeChange = useCallback((type: string) => {
     setChartType(type);
   }, []);
 
-  const handleTabChange = useCallback((tabId) => {
+  const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
   }, []);
 

@@ -91,8 +91,7 @@ export const useBudgetJoining = () => {
       return true;
     } catch (error) {
       logger.error("Failed to join budget", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to join budget";
+      const errorMessage = error instanceof Error ? error.message : "Failed to join budget";
       showErrorToast(errorMessage);
       return false;
     } finally {

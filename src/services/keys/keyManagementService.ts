@@ -108,7 +108,9 @@ class KeyManagementService {
             logger.debug("Clipboard auto-cleared after timeout");
           }
         } catch (err) {
-          logger.warn("Could not auto-clear clipboard:", err);
+          logger.warn("Could not auto-clear clipboard:", {
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }, clearTimeoutSeconds * 1000);
 
@@ -339,23 +341,34 @@ class KeyManagementService {
           throw new Error("Import password required for protected key file");
         }
 
+        if (!keyFileData.exportSalt) {
+          throw new Error("Export salt missing from protected key file");
+        }
+
         // Derive key from import password using the salt
         const importKeyData = await encryptionUtils.deriveKeyFromSalt(
           importPassword,
           new Uint8Array(keyFileData.exportSalt)
         );
 
+        if (!keyFileData.encryptedKey) {
+          throw new Error("Encrypted key missing from protected key file");
+        }
+
         // Decrypt the key and salt
         const decryptedData = await encryptionUtils.decrypt(
           keyFileData.encryptedKey,
           importKeyData.key,
-          keyFileData.iv
+          keyFileData.iv as number[]
         );
         const parsedData = JSON.parse(decryptedData);
 
         keyData = new Uint8Array(parsedData.key);
         saltData = new Uint8Array(parsedData.salt);
       } else {
+        if (!keyFileData.key || !keyFileData.salt) {
+          throw new Error("Key or salt missing from unprotected key file");
+        }
         keyData = new Uint8Array(keyFileData.key);
         saltData = new Uint8Array(keyFileData.salt);
       }

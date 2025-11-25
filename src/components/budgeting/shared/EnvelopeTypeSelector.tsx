@@ -3,6 +3,13 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG } from "../../../constants/categories";
 
+interface EnvelopeTypeSelectorProps {
+  selectedType: string;
+  onTypeChange: (type: string) => void;
+  excludeTypes?: string[];
+  disabled?: boolean;
+}
+
 /**
  * Shared component for envelope type selection
  * Used in both Create and Edit envelope modals
@@ -12,8 +19,8 @@ const EnvelopeTypeSelector = ({
   onTypeChange,
   excludeTypes = [],
   disabled = false,
-}) => {
-  const getIconName = (type) => {
+}: EnvelopeTypeSelectorProps) => {
+  const getIconName = (type: string): string => {
     switch (type) {
       case ENVELOPE_TYPES.BILL:
         return "FileText";

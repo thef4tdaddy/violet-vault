@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import useUiStore from "../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../stores/ui/uiStore";
 // import { budgetDb } from "../../db/budgetDb"; // TODO: Use for local sync operations
 import logger from "../../utils/common/logger";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
@@ -8,6 +8,12 @@ interface FirebaseSyncService {
   start: (config: unknown) => void;
   forceSync: () => Promise<unknown>;
   isRunning: boolean;
+}
+
+// Interface for budget operations available in legacy store
+interface BudgetOperations {
+  getActiveUsers?: () => User[];
+  getRecentActivity?: () => ActivityItem[];
 }
 
 interface User {
@@ -54,7 +60,7 @@ const useFirebaseSync = ({
   budgetId,
   currentUser,
 }: UseFirebaseSyncProps): UseFirebaseSyncReturn => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUiStore((state: UiStore & { budget?: BudgetOperations }) => state.budget);
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState<User[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);

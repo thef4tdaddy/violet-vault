@@ -2,7 +2,28 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const ArchivingPreviewResults = ({ showPreview, previewData, onClosePreview }) => {
+interface PreviewData {
+  totalCount: number;
+  totalAmount: number;
+  categories: Record<string, { count: number; amount: number }>;
+  dateRange: {
+    earliest?: string;
+    latest?: string;
+  };
+  cutoffDate: string;
+}
+
+interface ArchivingPreviewResultsProps {
+  showPreview: boolean;
+  previewData: PreviewData | null;
+  onClosePreview: () => void;
+}
+
+const ArchivingPreviewResults = ({
+  showPreview,
+  previewData,
+  onClosePreview,
+}: ArchivingPreviewResultsProps) => {
   if (!showPreview || !previewData) return null;
 
   return (

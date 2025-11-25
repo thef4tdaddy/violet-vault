@@ -2,15 +2,15 @@
  * TanStack Query hooks for budget data
  */
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { queryKeys } from "../../../utils/common/queryClient";
 import { queryFunctions } from "./queryFunctions";
 
-const computeLoadingState = (queries) => {
+const computeLoadingState = (queries: UseQueryResult[]): boolean => {
   return queries.some((query) => query.isLoading);
 };
 
-const computeErrorState = (queries) => {
+const computeErrorState = (queries: UseQueryResult[]): Error | null => {
   return queries.find((query) => query.error)?.error || null;
 };
 

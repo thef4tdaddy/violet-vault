@@ -355,8 +355,16 @@ const BillTable: React.FC<BillTableProps> = ({
         {filteredBills.length === 0 && (
           <BillTableEmptyState
             viewMode={viewMode}
-            filteredBills={filteredBills}
-            categorizedBills={categorizedBills}
+            filteredBills={filteredBills as unknown as import("@/types/bills").Bill[]}
+            categorizedBills={
+              categorizedBills as unknown as {
+                upcoming?: import("@/types/bills").Bill[];
+                overdue?: import("@/types/bills").Bill[];
+                paid?: import("@/types/bills").Bill[];
+                all?: import("@/types/bills").Bill[];
+                [key: string]: import("@/types/bills").Bill[] | undefined;
+              }
+            }
           />
         )}
       </div>

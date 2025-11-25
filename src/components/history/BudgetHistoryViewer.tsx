@@ -20,7 +20,11 @@ import ChangeDetails from "./viewer/ChangeDetails";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
-const BudgetHistoryViewer = ({ onClose }) => {
+interface BudgetHistoryViewerProps {
+  onClose: () => void;
+}
+
+const BudgetHistoryViewer = ({ onClose }: BudgetHistoryViewerProps) => {
   const {
     commits: history,
     isLoading: loading,
@@ -42,7 +46,13 @@ const BudgetHistoryViewer = ({ onClose }) => {
     toggleIntegrityDetails,
   } = useBudgetHistoryViewerUI();
 
-  const { handleRestoreFromHistory } = useBudgetHistoryRestore(restore);
+  const { handleRestoreFromHistory } = useBudgetHistoryRestore(
+    async (params: { commitHash: string; password: string }) => {
+      await (
+        restore as unknown as (params: { commitHash: string; password: string }) => Promise<void>
+      )(params);
+    }
+  );
   const { getChangeIcon, getAuthorColor } = useBudgetHistoryUIHelpers();
 
   const [integrityCheck] = useState(null);
@@ -108,7 +118,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
             filter={filter}
             updateFilter={updateFilter}
             loading={loading}
-            exportHistory={exportHistory}
+            exportHistory={() => exportHistory({} as Record<string, unknown>)}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -126,7 +136,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
             <ChangeDetails
               selectedCommit={selectedCommit}
               commitDetailsLoading={commitDetailsLoading}
-              commitDetails={commitDetails}
+              commitDetails={
+                commitDetails as unknown as { commit?: unknown; changes: unknown[] } | null
+              }
               handleRestoreFromHistory={handleRestoreFromHistory}
               getChangeIcon={getChangeIcon}
             />

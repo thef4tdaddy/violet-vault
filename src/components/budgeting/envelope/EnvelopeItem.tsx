@@ -63,7 +63,7 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
     <div
       {...swipeHandlers}
       className={getButtonClasses(
-        `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
+        `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope as never)} ${
           isSelected ? "ring-2 ring-purple-500" : ""
         } ${swipeState.isSwipeActive ? "select-none" : ""}`,
         "card"

@@ -9,7 +9,7 @@ import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import useBills from "@/hooks/bills/useBills";
 import { useBillOperations } from "@/hooks/bills/useBillOperations";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import {
   handleSearchNewBills,
@@ -40,6 +40,13 @@ interface BudgetState {
   allTransactions: Transaction[];
   envelopes: Envelope[];
   bills: Bill[];
+}
+
+// Extended UiStore interface for legacy compatibility
+interface ExtendedUiStore extends UiStore {
+  allTransactions?: Transaction[];
+  envelopes?: Envelope[];
+  bills?: Bill[];
 }
 
 interface UseBillManagerOptions {
@@ -91,10 +98,10 @@ export const useBillManager = ({
   );
 
   const budget = useBudgetStore(
-    useShallow((state: BudgetState) => ({
-      allTransactions: state.allTransactions,
-      envelopes: state.envelopes,
-      bills: state.bills,
+    useShallow((state: ExtendedUiStore) => ({
+      allTransactions: state.allTransactions ?? [],
+      envelopes: state.envelopes ?? [],
+      bills: state.bills ?? [],
     }))
   ) as BudgetState;
 
@@ -194,7 +201,9 @@ export const useBillManager = ({
   );
 
   const uiActions = createUIActions({
-    setSelectedBills: uiState.setSelectedBills as (bills: Bill[]) => void,
+    setSelectedBills: ((bills: Set<string>) => {
+      uiState.setSelectedBills(bills);
+    }) as unknown as (bills: Set<string>) => void,
     setViewMode: uiState.setViewMode,
     setShowBillDetail: uiState.setShowBillDetail as (bill: Bill | null) => void,
     setShowAddBillModal: uiState.setShowAddBillModal,

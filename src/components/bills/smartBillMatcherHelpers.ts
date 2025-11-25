@@ -42,14 +42,14 @@ export const COMPANY_MAPPINGS = {
 };
 
 // Helper functions for SmartBillMatcher
-export const getConfidenceColor = (confidence) => {
+export const getConfidenceColor = (confidence: number): string => {
   if (confidence >= 90) return "text-green-600 bg-green-100";
   if (confidence >= 70) return "text-blue-600 bg-blue-100";
   if (confidence >= 50) return "text-yellow-600 bg-yellow-100";
   return "text-gray-600 bg-gray-100";
 };
 
-export const getConfidenceIcon = (confidence) => {
+export const getConfidenceIcon = (confidence: number): string => {
   if (confidence >= 90) return "CheckCircle";
   if (confidence >= 70) return "Target";
   return "Zap";

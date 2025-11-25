@@ -30,13 +30,10 @@ export const useExecutionStatistics = () => {
         .reduce((sum: number, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
 
       // Group by trigger
-      const byTrigger = executionHistory.reduce(
-        (acc: Record<string, number>, execution) => {
-          acc[execution.trigger] = (acc[execution.trigger] || 0) + 1;
-          return acc;
-        },
-        {}
-      );
+      const byTrigger = executionHistory.reduce((acc: Record<string, number>, execution) => {
+        acc[execution.trigger] = (acc[execution.trigger] || 0) + 1;
+        return acc;
+      }, {});
 
       // Group by date (last 30 days)
       const last30Days = new Date();

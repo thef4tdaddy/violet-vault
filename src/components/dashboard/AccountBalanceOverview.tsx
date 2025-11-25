@@ -3,15 +3,34 @@ import { getIcon } from "../../utils";
 import EditableBalance from "../ui/EditableBalance";
 import { Button, StylizedButtonText } from "../ui";
 
+interface AccountBalanceOverviewProps {
+  actualBalance: number;
+  totalVirtualBalance: number;
+  totalEnvelopeBalance: number;
+  totalSavingsBalance: number;
+  unassignedCash: number;
+  difference: number;
+  isBalanced: boolean;
+  onUpdateBalance: (newBalance: number) => Promise<void>;
+  onOpenReconcileModal: () => void;
+  onAutoReconcileDifference: (difference: number) => void;
+}
+
+interface DifferenceCardStyles {
+  bg: string;
+  text: string;
+  icon: string;
+}
+
 // Helper functions to reduce complexity
-const getDifferenceCardStyles = (isBalanced, difference) => {
+const getDifferenceCardStyles = (isBalanced: boolean, difference: number): DifferenceCardStyles => {
   if (isBalanced) return { bg: "bg-green-50", text: "text-green-900", icon: "text-green-600" };
   if (Math.abs(difference) > 10)
     return { bg: "bg-red-50", text: "text-red-900", icon: "text-red-600" };
   return { bg: "bg-yellow-50", text: "text-yellow-900", icon: "text-yellow-600" };
 };
 
-const getDifferenceMessage = (isBalanced, difference) => {
+const getDifferenceMessage = (isBalanced: boolean, difference: number): string => {
   if (isBalanced) return "Accounts are balanced!";
   return difference > 0 ? "Extra money available" : "Virtual balance exceeds actual";
 };
@@ -27,7 +46,7 @@ const AccountBalanceOverview = ({
   onUpdateBalance,
   onOpenReconcileModal,
   onAutoReconcileDifference,
-}) => {
+}: AccountBalanceOverviewProps) => {
   const diffStyles = getDifferenceCardStyles(isBalanced, difference);
 
   return (

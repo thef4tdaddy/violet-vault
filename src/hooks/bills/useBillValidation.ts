@@ -1,18 +1,20 @@
 import { useCallback } from "react";
 import { validateBillSafe } from "@/domain/schemas/bill.ts";
+import type { Bill } from "@/types/bills";
+import type { Envelope } from "@/types/finance";
 
 /**
  * Hook for bill data validation operations
  * Extracted from useBillOperations.js to reduce complexity
  * Now using Zod schemas for runtime validation (Issue #412)
  */
-export const useBillValidation = (envelopes = []) => {
+export const useBillValidation = (envelopes: Envelope[] = []) => {
   /**
    * Validate bill data before operations using Zod schema
    * Additional envelope validation for data integrity
    */
   const validateBillData = useCallback(
-    (bill) => {
+    (bill: Partial<Bill>) => {
       // First validate with Zod schema
       const zodResult = validateBillSafe(bill);
 
@@ -27,9 +29,9 @@ export const useBillValidation = (envelopes = []) => {
       }
 
       // Then add envelope-specific validation
-      const errors = [];
+      const errors: string[] = [];
 
-      if (bill.envelopeId && !envelopes.find((env) => env.id === bill.envelopeId)) {
+      if (bill.envelopeId && !envelopes.find((env: Envelope) => env.id === bill.envelopeId)) {
         errors.push("Assigned envelope does not exist");
       }
 
@@ -45,7 +47,7 @@ export const useBillValidation = (envelopes = []) => {
    * Generate bill modification history entry
    */
   const createModificationHistory = useCallback(
-    (type, changes) => ({
+    (type: string, changes: Record<string, unknown>) => ({
       timestamp: new Date().toISOString(),
       type,
       changes,

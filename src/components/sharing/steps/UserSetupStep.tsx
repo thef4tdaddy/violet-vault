@@ -1,5 +1,36 @@
+import React from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "../../../utils";
+
+// Define interfaces for component props
+interface CreatorInfo {
+  userName?: string;
+  userColor?: string;
+  createdAt?: number;
+}
+
+interface ShareInfo {
+  createdBy: string;
+  createdAt: number;
+  expiresAt: number;
+  userCount: string;
+}
+
+interface UserSetupStepProps {
+  shareInfo: ShareInfo;
+  creatorInfo: CreatorInfo | null;
+  password: string;
+  setPassword: (password: string) => void;
+  showPassword: boolean;
+  setShowPassword: (show: boolean) => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  userColor: string;
+  onGenerateRandomColor: () => void;
+  onJoin: () => void;
+  onBack: () => void;
+  isJoining: boolean;
+}
 
 /**
  * User Setup Step - Step 2 of join budget flow
@@ -19,19 +50,14 @@ const UserSetupStep = ({
   onJoin,
   onBack,
   isJoining,
-}) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onJoin();
-  };
-
+}: UserSetupStepProps) => {
   return (
     <>
       {/* Share Info Display */}
       <div>
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            {renderIcon("CheckCircle", "h-5 w-5 text-green-600")}
+            {renderIcon("CheckCircle", { className: "h-5 w-5 text-green-600" })}
             <h4 className="font-black text-green-800 uppercase tracking-wide text-sm">
               Valid Share Code
             </h4>
@@ -48,7 +74,7 @@ const UserSetupStep = ({
                 )}
               </p>
               <p className="text-xs text-green-600 mt-2">
-                Enter the same password they used to join their budget
+                Enter same password they used to join their budget
               </p>
             </>
           ) : (
@@ -75,14 +101,14 @@ const UserSetupStep = ({
             <input
               type="text"
               value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserName(e.target.value)}
               placeholder="Enter your name"
               className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg text-sm"
               maxLength={20}
               required
             />
             <p className="text-xs text-purple-900">
-              This is how others will see you in the shared budget
+              This is how others will see you in shared budget
             </p>
           </div>
         </div>
@@ -114,7 +140,7 @@ const UserSetupStep = ({
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 className="w-full px-4 py-3 pr-12 bg-white border-2 border-black rounded-lg text-sm"
                 required
@@ -124,7 +150,7 @@ const UserSetupStep = ({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
               >
-                {renderIcon(showPassword ? "EyeOff" : "Eye", "h-5 w-5")}
+                {renderIcon(showPassword ? "EyeOff" : "Eye", { className: "h-5 w-5" })}
               </Button>
             </div>
             <p className="text-xs text-purple-900">
@@ -144,7 +170,10 @@ const UserSetupStep = ({
           Back
         </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            onJoin();
+          }}
           disabled={!password || !userName.trim() || isJoining}
           className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-black transition-colors border-2 border-black disabled:cursor-not-allowed"
         >

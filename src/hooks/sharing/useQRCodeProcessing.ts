@@ -2,6 +2,12 @@ import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 
+interface CreatorInfo {
+  userName: string;
+  userColor: string;
+  createdAt?: string | number | null;
+}
+
 /**
  * Custom hook for QR code processing logic
  * Extracted from JoinBudgetModal to reduce complexity
@@ -9,7 +15,12 @@ import logger from "../../utils/common/logger";
 export const useQRCodeProcessing = () => {
   const { showErrorToast } = useToastHelpers();
 
-  const processQRData = (qrData, setShareCode, setCreatorInfo, validateShareCode) => {
+  const processQRData = (
+    qrData: string,
+    setShareCode: (code: string) => void,
+    setCreatorInfo: (info: CreatorInfo) => void,
+    validateShareCode: (code: string) => void
+  ) => {
     try {
       const parsed = shareCodeUtils.parseQRData(qrData);
       if (parsed && parsed.shareCode) {

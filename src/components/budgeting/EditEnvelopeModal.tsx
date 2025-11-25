@@ -63,11 +63,15 @@ const EditEnvelopeModal = ({
     isExpired,
   } = useEnvelopeEdit({
     isOpen,
-    envelope,
-    existingEnvelopes,
-    onSave: onUpdateEnvelope,
+    envelope: envelope as unknown as import("@/db/types").Envelope | null,
+    existingEnvelopes: (existingEnvelopes || []) as Array<{
+      id: string | number;
+      name?: string;
+      currentBalance?: number;
+    }>,
+    onSave: onUpdateEnvelope as (envelopeData: unknown) => Promise<void>,
     onClose,
-    onDelete: onDeleteEnvelope,
+    onDelete: onDeleteEnvelope as (envelopeId: string | number) => Promise<void>,
     currentUser,
   });
 
@@ -87,10 +91,24 @@ const EditEnvelopeModal = ({
 
   if (!isOpen || !envelope) return null;
 
-  // Ensure envelope has an id (typed as EnvelopeRef) before comparing
-  const isUnassignedCash = (envelope as { id?: string }).id === "unassigned";
+  const envelopeId = (envelope as { id?: string }).id;
+  const isUnassignedCash = envelopeId === "unassigned";
+  const modalProps = {
+    formData,
+    errors,
+    calculatedAmounts,
+    canEdit,
+    canDelete,
+    canSubmit,
+    isLoading,
+    isUnassignedCash,
+    envelopeId,
+    onUpdateField: updateFormField,
+    onDelete: handleDeleteClick,
+    onCancel: handleClose,
+    onSubmit: handleSubmit,
+  };
 
-  // Mobile slide-up modal
   if (isMobile || _forceMobileMode) {
     return (
       <>
@@ -103,36 +121,19 @@ const EditEnvelopeModal = ({
           backdrop={true}
         >
           <div className="px-6 pb-6">
-            <ModalContent
-              formData={formData}
-              errors={errors}
-              calculatedAmounts={calculatedAmounts}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              canSubmit={canSubmit}
-              isLoading={isLoading}
-              isUnassignedCash={isUnassignedCash}
-              envelopeId={envelope?.id}
-              onUpdateField={updateFormField}
-              onDelete={handleDeleteClick}
-              onCancel={handleClose}
-              onSubmit={handleSubmit}
-            />
+            <ModalContent {...modalProps} />
           </div>
         </SlideUpModal>
-
-        {/* Delete Confirmation Modal */}
         <DeleteEnvelopeModal
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteConfirm}
-          envelope={envelope}
+          envelope={envelope as unknown as import("@/types/finance").Envelope | null}
         />
       </>
     );
   }
 
-  // Desktop centered modal - use Portal to render at document root
   const modalContent = (
     <>
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100] overflow-y-auto">
@@ -152,23 +153,8 @@ const EditEnvelopeModal = ({
             onClose={handleClose}
           />
 
-          {/* Form Content */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <ModalContent
-              formData={formData}
-              errors={errors}
-              calculatedAmounts={calculatedAmounts}
-              canEdit={canEdit}
-              canDelete={canDelete}
-              canSubmit={canSubmit}
-              isLoading={isLoading}
-              isUnassignedCash={isUnassignedCash}
-              envelopeId={envelope?.id}
-              onUpdateField={updateFormField}
-              onDelete={handleDeleteClick}
-              onCancel={handleClose}
-              onSubmit={handleSubmit}
-            />
+            <ModalContent {...modalProps} />
           </div>
         </div>
       </div>
@@ -178,7 +164,7 @@ const EditEnvelopeModal = ({
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
-        envelope={envelope}
+        envelope={envelope as unknown as import("@/types/finance").Envelope | null}
       />
     </>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   validatePaycheckForm,
   getPayerPrediction,
@@ -83,6 +83,7 @@ const validateFormAndAllocations = (
  * Custom hook for managing paycheck processing state and operations
  * Handles form validation, allocations, and paycheck transactions
  */
+// eslint-disable-next-line max-lines-per-function -- Complex hook managing paycheck processing with form validation and allocations
 const usePaycheckProcessor = ({
   envelopes = [],
   paycheckHistory = [],

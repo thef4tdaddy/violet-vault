@@ -27,9 +27,17 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
   const { addTransactionAsync } = useTransactions();
   const { envelopes } = useEnvelopes();
 
-  const [transactionForm, setTransactionForm] = useState({
+  const [transactionForm, setTransactionForm] = useState<{
+    description: string;
+    amount: string;
+    date: string;
+    envelopeId: string;
+    category: string;
+    type: "income" | "expense" | "transfer";
+    notes: string;
+  }>({
     description: receiptData?.merchant || "",
-    amount: receiptData?.total || 0,
+    amount: receiptData?.total?.toString() || "0",
     date: receiptData?.date || new Date().toISOString().split("T")[0],
     envelopeId: "",
     category: "shopping",
@@ -43,11 +51,14 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
   // Auto-suggest envelope based on merchant
   useEffect(() => {
     if (receiptData?.merchant && envelopes.length > 0) {
-      const suggestedEnvelope = suggestEnvelopeForMerchant(receiptData.merchant, envelopes);
+      const suggestedEnvelope = suggestEnvelopeForMerchant(
+        receiptData.merchant,
+        envelopes as unknown as Envelope[]
+      );
       if (suggestedEnvelope) {
         setTransactionForm((prev) => ({
           ...prev,
-          envelopeId: suggestedEnvelope.envelope.id,
+          envelopeId: suggestedEnvelope.envelope.id as string,
           category: suggestedEnvelope.category,
         }));
       }
@@ -93,12 +104,12 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
       } as Parameters<typeof addTransactionAsync>[0]);
 
       // Save the receipt with reference to transaction
-      const receipt = await addReceiptAsync({
+      const newReceipt = await addReceiptAsync({
         merchant: receiptData.merchant,
         amount: receiptData.total,
         date: receiptData.date,
-        transactionId: transaction.id,
-        imageData: receiptData.imageData,
+        transactionId: transaction.id?.toString(),
+        imageData: { url: receiptData.imageData },
         ocrData: {
           rawText: receiptData.rawText,
           confidence: receiptData.confidence,
@@ -109,14 +120,11 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
         },
       });
 
-      logger.info("✅ Receipt converted to transaction successfully", {
-        transactionId: transaction.id,
-        receiptId: receipt.id,
-        merchant: receiptData.merchant,
-        amount: receiptData.total,
-      });
-
-      return { success: true, transaction, receipt };
+      return {
+        success: true,
+        transaction: newReceipt.id,
+        receipt: newReceipt,
+      };
     } catch (error) {
       logger.error("❌ Failed to create transaction from receipt:", error);
       return {

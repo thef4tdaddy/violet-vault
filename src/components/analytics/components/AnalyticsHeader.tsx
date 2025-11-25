@@ -1,12 +1,22 @@
-import React from "react";
+import React, { type ChangeEvent } from "react";
 import { Select, Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../../utils";
+
+interface AnalyticsHeaderProps {
+  dateRange: string;
+  handleDateRangeChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+  handleExport: () => void;
+}
 
 /**
  * Analytics header component with title and controls
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => {
+const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = ({
+  dateRange,
+  handleDateRangeChange,
+  handleExport,
+}) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>

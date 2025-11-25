@@ -43,17 +43,22 @@ const addDebtToDb = async (debtData: {
     ? { status: "active", ...debtData }
     : { id: crypto.randomUUID(), status: "active", ...debtData };
 
-  await budgetDb.debts.put(debt);
+  await budgetDb.debts.put(debt as never);
 
   await BudgetHistoryTracker.trackDebtChange({
     debtId: debt.id as string,
     changeType: "add",
-    previousData: null,
+    previousData: null as never,
     newData: debt as never,
     author: debtData.author || "Unknown User",
   });
 
-  return debt;
+  // Fetch the complete debt from DB to return proper type
+  const savedDebt = await budgetDb.debts.get(debt.id as string);
+  if (!savedDebt) {
+    throw new Error("Failed to retrieve saved debt");
+  }
+  return savedDebt;
 };
 
 // Mutation function for updating a debt
@@ -78,8 +83,8 @@ const updateDebtInDb = async ({
   await BudgetHistoryTracker.trackDebtChange({
     debtId: id,
     changeType: "modify",
-    previousData: previousData || null,
-    newData: newData || null,
+    previousData: (previousData || null) as never,
+    newData: (newData || null) as never,
     author,
   });
 
@@ -102,8 +107,8 @@ const deleteDebtFromDb = async ({
     await BudgetHistoryTracker.trackDebtChange({
       debtId: id,
       changeType: "delete",
-      previousData: previousData,
-      newData: null,
+      previousData: previousData as never,
+      newData: null as never,
       author,
     });
   }

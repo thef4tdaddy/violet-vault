@@ -14,6 +14,7 @@ interface User {
   userColor?: string;
   email?: string;
   displayName?: string;
+  [key: string]: unknown;
 }
 
 interface UserProfile {
@@ -21,43 +22,45 @@ interface UserProfile {
   userColor?: string;
   email?: string;
   displayName?: string;
+  [key: string]: unknown;
 }
 
 interface SecurityManager {
   isLocked?: boolean;
   hasEncryptionKey?: boolean;
+  lockApp: () => void;
 }
 
 interface SettingsSectionRendererProps {
   // General Settings Props
-  isLocalOnlyMode?: boolean;
-  cloudSyncEnabled?: boolean;
-  isSyncing?: boolean;
-  onOpenLocalOnlySettings?: () => void;
-  onToggleCloudSync?: () => void;
-  onManualSync?: () => void;
+  isLocalOnlyMode: boolean;
+  cloudSyncEnabled: boolean;
+  isSyncing: boolean;
+  onOpenLocalOnlySettings: () => void;
+  onToggleCloudSync: () => void;
+  onManualSync: () => void;
 
   // Account Settings Props
-  currentUser?: User;
-  onOpenPasswordModal?: () => void;
-  onLogout?: () => void;
-  onOpenResetConfirm?: () => void;
-  onUpdateProfile?: (profile: UserProfile) => void;
+  currentUser: User;
+  onOpenPasswordModal: () => void;
+  onLogout: () => void;
+  onOpenResetConfirm: () => void;
+  onUpdateProfile: (profile: UserProfile) => void;
 
   // Security Settings Props
-  securityManager?: SecurityManager;
-  onOpenSecuritySettings?: () => void;
-  onShowLocalDataSecurity?: () => void;
+  securityManager: SecurityManager;
+  onOpenSecuritySettings: () => void;
+  onShowLocalDataSecurity: () => void;
 
   // Data Management Props
-  onOpenActivityFeed?: () => void;
-  onExport?: () => void;
-  onImport?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSync?: () => void;
+  onOpenActivityFeed: () => void;
+  onExport: () => void;
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSync: () => void;
 
   // Dev Tools Props
-  onOpenEnvelopeChecker?: () => void;
-  onCreateTestHistory?: () => void;
+  onOpenEnvelopeChecker: () => void;
+  onCreateTestHistory: () => void;
 }
 
 /**

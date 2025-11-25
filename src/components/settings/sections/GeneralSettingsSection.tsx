@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import useUiStore from "../../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import pwaManager from "../../../utils/pwa/pwaManager";
 import logger from "../../../utils/common/logger";
 
@@ -283,7 +283,7 @@ const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
   onToggleCloudSync,
   onManualSync,
 }) => {
-  const manualInstall = useUiStore((state) => state.manualInstall);
+  const manualInstall = useUiStore((state: UiStore) => state.manualInstall);
   const pwaStatus = usePwaStatus();
   const [isInstalling, setIsInstalling] = useState(false);
 
@@ -300,7 +300,9 @@ const GeneralSettingsSection: React.FC<GeneralSettingsSectionProps> = ({
           not_available: "Installation not available on this browser",
           declined: "Installation cancelled",
         };
-        logger.info("Manual PWA install:", messages[result.reason] || "Installation failed");
+        logger.info("Manual PWA install:", {
+          message: messages[result.reason] || "Installation failed",
+        });
       }
     } catch (error) {
       logger.error("Manual PWA install failed:", error);

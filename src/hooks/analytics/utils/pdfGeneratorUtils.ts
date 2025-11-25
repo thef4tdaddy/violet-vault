@@ -11,6 +11,22 @@ interface ExportOptions {
   includeInsights: boolean;
 }
 
+interface AnalyticsData {
+  totalIncome?: number;
+  totalExpenses?: number;
+  netAmount?: number;
+}
+
+interface BalanceData {
+  envelopeAnalysis?: Array<{
+    name?: string;
+    monthlyBudget?: number;
+    spent?: number;
+    currentBalance?: number;
+    utilizationRate?: number;
+  }>;
+}
+
 type PDFDocument = {
   internal: { pageSize: { height: number } };
   addPage: () => void;
@@ -56,8 +72,8 @@ export interface PDFSectionConfig {
   margin: number;
   pageHeight: number;
   checkPageBreak: (height?: number) => void;
-  analyticsData: unknown;
-  balanceData: unknown;
+  analyticsData: AnalyticsData;
+  balanceData: BalanceData;
   exportOptions: ExportOptions;
   setExportProgress: (progress: number) => void;
 }

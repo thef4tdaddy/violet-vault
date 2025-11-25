@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "@/components/ui";
 import { useUserSetup } from "@/hooks/auth/useUserSetup";
 import type { UserSetupPayload } from "@/hooks/auth/useUserSetup";
@@ -27,7 +27,6 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const authManager = useAuthManager();
   const joinBudget = authManager.joinBudget as (data: unknown) => Promise<{ success: boolean }>;
-
   const handleSetupComplete = useCallback(
     async (payload: UserSetupPayload) => {
       if (!onSetupComplete) {
@@ -36,7 +35,6 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
         });
         return;
       }
-
       await onSetupComplete(payload);
     },
     [onSetupComplete]
@@ -70,21 +68,18 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     setUserColor,
   } = useUserSetup(handleSetupComplete);
 
-  const handleJoinSuccess = async (joinData: unknown) => {
-    logger.info("Join budget successful, setting up auth", joinData as Record<string, unknown>);
-
-    try {
-      const result = await joinBudget(joinData);
-      if (result.success) {
-        // Don't call onSetupComplete for shared budget joins -
-        // the auth state is already set by joinBudget
-        logger.auth("Shared budget join completed - auth state already set");
-        // The AuthGateway will automatically hide once shouldShowAuthGateway returns false
+  const handleJoinSuccess = useCallback(
+    async (_joinData?: unknown) => {
+      logger.info("Join budget successful, setting up auth", _joinData as Record<string, unknown>);
+      try {
+        const result = await joinBudget(_joinData || {});
+        if (result.success) logger.auth("Shared budget join completed - auth state already set");
+      } catch (error) {
+        logger.error("Failed to complete join budget setup", error);
       }
-    } catch (error) {
-      logger.error("Failed to complete join budget setup", error);
-    }
-  };
+    },
+    [joinBudget]
+  );
 
   return (
     <UserSetupLayout>
@@ -112,7 +107,9 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
 
             {isReturningUser ? (
               <ReturningUserActions
-                onSubmit={handleStep1Continue}
+                onSubmit={() =>
+                  handleStep1Continue({ preventDefault: () => {} } as React.FormEvent)
+                }
                 onChangeProfile={switchToChangeProfile}
                 onStartFresh={clearSavedProfile}
                 isLoading={isLoading}

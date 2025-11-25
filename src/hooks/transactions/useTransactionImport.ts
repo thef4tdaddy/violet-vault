@@ -75,7 +75,16 @@ export const useTransactionImport = (
     setImportStep(3);
 
     // Process transactions
-    const processedTransactions = await processTransactions(importData, fieldMapping);
+    const processedTransactions = await processTransactions(
+      importData as unknown[] | { data?: unknown[] },
+      fieldMapping as {
+        amount: string;
+        date: string;
+        description: string;
+        category: string;
+        notes: string;
+      }
+    );
 
     // Import transactions first
     onBulkImport(processedTransactions);
@@ -98,7 +107,13 @@ export const useTransactionImport = (
     resetImport();
 
     // Enhanced success message including auto-funding results
-    const message = generateSuccessMessage(processedTransactions, importData, autoFundingPromises);
+    const message = generateSuccessMessage(
+      processedTransactions as Array<{ amount: number }>,
+      importData as { clearExisting?: boolean },
+      autoFundingPromises as Array<{
+        result: { execution: { totalFunded: number; rulesExecuted: number } };
+      }>
+    );
     globalToast.showInfo(message, "Import Update", 5000);
   };
 

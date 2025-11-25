@@ -147,17 +147,25 @@ const initializeApp = () => {
       const validateLocalDataExists = (localData: Record<string, unknown>) => {
         if (!localData) return false;
 
+        const envelopes = localData.envelopes as unknown[] | undefined;
+        const transactions = localData.transactions as unknown[] | undefined;
+        const bills = localData.bills as unknown[] | undefined;
+        const debts = localData.debts as unknown[] | undefined;
         return (
-          (localData.envelopes && localData.envelopes.length > 0) ||
-          (localData.transactions && localData.transactions.length > 0) ||
-          (localData.bills && localData.bills.length > 0) ||
-          (localData.debts && localData.debts.length > 0)
+          (envelopes && envelopes.length > 0) ||
+          (transactions && transactions.length > 0) ||
+          (bills && bills.length > 0) ||
+          (debts && debts.length > 0)
         );
       };
 
       const logLocalDataStats = (localData: Record<string, unknown>) => {
+        const envelopes = (localData.envelopes as unknown[] | undefined)?.length || 0;
+        const transactions = (localData.transactions as unknown[] | undefined)?.length || 0;
+        const bills = (localData.bills as unknown[] | undefined)?.length || 0;
+        const debts = (localData.debts as unknown[] | undefined)?.length || 0;
         logger.info(
-          `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`
+          `📊 Found: ${envelopes} envelopes, ${transactions} transactions, ${bills} bills, ${debts} debts`
         );
       };
 
@@ -175,7 +183,7 @@ const initializeApp = () => {
         logger.info("🧹 Cleared all cloud data");
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const result = await cloudSyncService.forcePushToCloud();
+        const result = await cloudSyncService.forcePushData();
         logger.info("🚀 Force pushed local data to cloud:", result);
 
         return result;
@@ -192,7 +200,8 @@ const initializeApp = () => {
 
           // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
           logger.info("🔍 Checking local data before clearing cloud...");
-          const localData = await cloudSyncService.fetchDexieData();
+          const dexieData = await cloudSyncService.fetchDexieData();
+          const localData = dexieData as unknown as Record<string, unknown>;
 
           if (!validateLocalDataExists(localData)) {
             const errorMsg =
@@ -204,7 +213,13 @@ const initializeApp = () => {
           logger.info("✅ Local data verified - safe to proceed with cloud reset");
           logLocalDataStats(localData);
 
-          const result = await performCloudReset(cloudSyncService);
+          const result = await performCloudReset(
+            cloudSyncService as unknown as {
+              stop: () => void;
+              clearAllData: () => Promise<void>;
+              forcePushData: () => Promise<{ success: boolean; error?: string }>;
+            }
+          );
 
           if (result.success) {
             logger.info(

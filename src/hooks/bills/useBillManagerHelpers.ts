@@ -12,6 +12,7 @@ import {
 } from "@/utils/bills/billCalculations";
 import { generateBillSuggestions } from "@/utils/common/billDiscovery";
 import logger from "@/utils/common/logger";
+import type { Bill } from "@/types/bills";
 
 interface BillRecord {
   id: string;
@@ -257,9 +258,9 @@ export const processBills = (
 ): BillRecord[] => {
   return combinedBills.map((bill, index) => {
     // Handle recurring bill logic using utility
-    const processedBill = processRecurringBill(bill, (updatedBill) => {
+    const processedBill = processRecurringBill(bill as unknown as Bill, (updatedBill) => {
       if (onUpdateBill) {
-        onUpdateBill(updatedBill);
+        onUpdateBill(updatedBill as unknown as BillRecord);
       } else {
         updateBillMutation({
           billId: updatedBill.id,
@@ -273,7 +274,7 @@ export const processBills = (
     });
 
     // Apply calculations (days until due, urgency)
-    const calculatedBill = processBillCalculations(processedBill) as unknown as BillRecord;
+    const calculatedBill = processBillCalculations(processedBill as never) as unknown as BillRecord;
     return normalizeBillForUI(calculatedBill, index);
   });
 };

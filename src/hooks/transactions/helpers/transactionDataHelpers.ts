@@ -141,12 +141,12 @@ interface BudgetDb {
 }
 
 /**
- * Logger interface
+ * Logger interface - matches the actual logger utility signatures
  */
 interface Logger {
-  debug: (msg: string, data?: unknown) => void;
-  warn: (msg: string) => void;
-  error: (msg: string, error: unknown) => void;
+  debug: (msg: string, data?: Record<string, unknown>) => void;
+  warn: (msg: string, data?: Record<string, unknown>) => void;
+  error: (msg: string, error?: unknown, data?: Record<string, unknown>) => void;
 }
 
 /**

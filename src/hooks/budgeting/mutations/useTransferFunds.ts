@@ -36,18 +36,21 @@ export const useTransferFunds = () => {
         throw new Error("Source or target envelope not found");
       }
 
-      if (fromEnvelope.currentBalance < amount) {
+      if ((fromEnvelope?.currentBalance ?? 0) < amount) {
         throw new Error("Insufficient balance in source envelope");
       }
 
+      const fromBalance = fromEnvelope?.currentBalance ?? 0;
+      const toBalance = toEnvelope?.currentBalance ?? 0;
+
       // Update balances in Dexie directly
       await budgetDb.envelopes.update(fromEnvelopeId, {
-        currentBalance: fromEnvelope.currentBalance - amount,
+        currentBalance: fromBalance - amount,
         lastModified: Date.now(),
       });
 
       await budgetDb.envelopes.update(toEnvelopeId, {
-        currentBalance: toEnvelope.currentBalance + amount,
+        currentBalance: toBalance + amount,
         lastModified: Date.now(),
       });
 
@@ -67,11 +70,11 @@ export const useTransferFunds = () => {
 
       // Apply optimistic updates to cache
       await optimisticHelpers.updateEnvelope(queryClient, fromEnvelopeId, {
-        currentBalance: fromEnvelope.currentBalance - amount,
+        currentBalance: fromBalance - amount,
       });
 
       await optimisticHelpers.updateEnvelope(queryClient, toEnvelopeId, {
-        currentBalance: toEnvelope.currentBalance + amount,
+        currentBalance: toBalance + amount,
       });
 
       await optimisticHelpers.addTransaction(queryClient, transaction);

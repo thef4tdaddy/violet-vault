@@ -246,9 +246,16 @@ export const useFABStore = create<FABState>()(
           // Computed values are now accessed directly in selectors
 
           // Debug method
-          getDebugInfo: () => {
+          getDebugInfo: (): {
+            currentScreen: string;
+            isVisible: boolean;
+            isExpanded: boolean;
+            primaryActionsCount: number;
+            secondaryActionsCount: number;
+            defaultActionsWithHandlers: number;
+          } => {
             // Safe external store access (prevents React error #185)
-            const state = useFABStore.getState();
+            const state = useFABStore.getState() as FABState;
             return {
               currentScreen: state.currentScreen,
               isVisible: state.isVisible,

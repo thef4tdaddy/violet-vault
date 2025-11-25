@@ -331,19 +331,25 @@ export const ICON_REGISTRY = {
 };
 
 // Get icon component by name
-export const getIcon = (iconName, fallback = FileText) => {
+export const getIcon = (
+  iconName: string | undefined | null,
+  fallback: React.ComponentType<{ className?: string }> = FileText
+): React.ComponentType<{ className?: string }> => {
   if (!iconName) return fallback;
-  return ICON_REGISTRY[iconName] || fallback;
+  return ICON_REGISTRY[iconName as keyof typeof ICON_REGISTRY] || fallback;
 };
 
 // Get icon name from component (reverse lookup)
-export const getIconName = (iconComponent) => {
+export const getIconName = (iconComponent: React.ComponentType): string | null => {
   const entry = Object.entries(ICON_REGISTRY).find(([_, component]) => component === iconComponent);
   return entry ? entry[0] : null;
 };
 
 // Render icon with consistent props
-export const renderIcon = (iconName, props = {}) => {
+export const renderIcon = (
+  iconName: string | undefined | null,
+  props: Record<string, unknown> = {}
+): React.ReactElement | null => {
   const IconComponent = getIcon(iconName);
   return IconComponent ? React.createElement(IconComponent, props) : null;
 };

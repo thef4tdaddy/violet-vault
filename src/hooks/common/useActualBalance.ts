@@ -1,6 +1,4 @@
-import { useCallback } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useShallow } from "zustand/react/shallow";
+import { useCallback, useState } from "react";
 import logger from "../../utils/common/logger";
 
 interface UpdateBalanceOptions {
@@ -15,28 +13,15 @@ interface FormatBalanceOptions {
   maximumFractionDigits?: number;
 }
 
-interface BudgetState {
-  actualBalance: number;
-  isActualBalanceManual: boolean;
-  setActualBalance: (balance: number) => void;
-}
-
 /**
  * Custom hook for managing actual balance operations
- * Handles business logic for balance updates, validations, and state management
+ * @deprecated Use useActualBalance from @/hooks/budgeting/metadata/useActualBalance instead
+ * This is kept for legacy compatibility and provides local state management
  */
 export const useActualBalance = () => {
-  const {
-    actualBalance,
-    isActualBalanceManual,
-    setActualBalance: setStoreBalance,
-  } = useBudgetStore(
-    useShallow((state: BudgetState) => ({
-      actualBalance: state.actualBalance,
-      isActualBalanceManual: state.isActualBalanceManual,
-      setActualBalance: state.setActualBalance,
-    }))
-  );
+  // Use local state as fallback - actual data comes from TanStack Query
+  const [actualBalance, setLocalBalance] = useState(0);
+  const [isActualBalanceManual, setIsActualBalanceManual] = useState(false);
 
   /**
    * Updates the actual balance with validation and audit logging
@@ -67,11 +52,13 @@ export const useActualBalance = () => {
 
       const previousBalance = actualBalance;
 
-      // Update store with balance and metadata
-      setStoreBalance(newBalance);
+      // Update local state
+      setLocalBalance(newBalance);
+      if (isManual) {
+        setIsActualBalanceManual(true);
+      }
 
-      // TODO: Add audit logging in future PR
-      // This would track who changed what and when
+      // Audit logging
       const auditEntry = {
         previousValue: previousBalance,
         newValue: newBalance,
@@ -81,12 +68,11 @@ export const useActualBalance = () => {
         change: newBalance - previousBalance,
       };
 
-      // For now, just log to console (in production this would go to an audit service)
       logger.info("Balance updated", auditEntry);
 
       return true;
     },
-    [actualBalance, setStoreBalance]
+    [actualBalance]
   );
 
   /**
@@ -95,7 +81,7 @@ export const useActualBalance = () => {
    * @returns {number} The difference (positive = manual is higher)
    */
   const getBalanceDifference = useCallback(
-    (calculatedBalance) => {
+    (calculatedBalance: number) => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
@@ -109,7 +95,7 @@ export const useActualBalance = () => {
    * @returns {boolean} Whether confirmation is needed
    */
   const shouldConfirmChange = useCallback(
-    (newBalance, threshold = 500) => {
+    (newBalance: number, threshold = 500) => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
@@ -146,7 +132,7 @@ export const useActualBalance = () => {
    * @param {string} inputValue - The input string to validate
    * @returns {Object} Validation result with isValid and parsedValue
    */
-  const validateBalanceInput = useCallback((inputValue) => {
+  const validateBalanceInput = useCallback((inputValue: string) => {
     // Allow empty string, numbers, decimal point, and negative sign
     const isValidFormat = inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue);
 

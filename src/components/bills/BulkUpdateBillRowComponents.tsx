@@ -8,9 +8,14 @@ interface BillChange {
   originalDueDate?: string;
 }
 
-interface AmountChange {
+export interface AmountChange {
   hasChange: boolean;
   original: number;
+  updated?: number;
+  difference?: string;
+  differenceFormatted?: string;
+  isIncrease?: boolean;
+  isDecrease?: boolean;
 }
 
 interface AmountUpdateFieldProps {
@@ -63,7 +68,11 @@ export const AmountUpdateField: React.FC<AmountUpdateFieldProps> = ({
 /**
  * Date input field component for bulk update
  */
-export const DateUpdateField: React.FC<DateUpdateFieldProps> = ({ change, billId, updateChange }) => {
+export const DateUpdateField: React.FC<DateUpdateFieldProps> = ({
+  change,
+  billId,
+  updateChange,
+}) => {
   return (
     <div className="flex items-center gap-2">
       {React.createElement(getIcon("Calendar"), {
@@ -87,7 +96,9 @@ export const DateUpdateField: React.FC<DateUpdateFieldProps> = ({ change, billId
 export const BillInfo: React.FC<BillInfoProps> = ({ bill }) => {
   return (
     <div className="flex-1">
-      <h5 className="font-bold text-gray-900">{bill.provider || bill.description}</h5>
+      <h5 className="font-bold text-gray-900">
+        {bill.provider || (bill as { description?: string }).description || bill.name}
+      </h5>
       <p className="text-sm text-purple-800 font-medium">{bill.category}</p>
     </div>
   );

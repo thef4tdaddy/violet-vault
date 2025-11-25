@@ -65,132 +65,107 @@ interface UseManualSyncReturn {
 export const useManualSync = (): UseManualSyncReturn => {
   const queryClient = useQueryClient();
   const [isUploadingSyncInProgress, setIsUploadingSync] = useState(false);
-  const [isDownloadingSyncInProgress, setIsDownloadingSync] = useState(false);
+  const [isDownloadingSyncInProgress, _setIsDownloadingSync] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
 
-  const forceUploadSync = useCallback(async (): Promise<SyncResult> => {
-    if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
-      logger.warn("Sync already in progress, skipping upload sync");
-      return { success: false, error: "Sync already in progress" };
-    }
-    setIsUploadingSync(true);
-    setSyncError(null);
-    try {
-      logger.info("🔄 Starting manual upload sync (Dexie → Firebase)...");
-      if (!cloudSyncService?.isRunning) {
-        throw new Error(
-          "Cloud sync service is not running. Please check your connection and authentication."
-        );
-      }
+  // Helper function to process sync results (pure function, no dependencies)
+  const processSyncResult = (syncResult: unknown, defaultDirection: string) => {
+    const direction =
+      "direction" in (syncResult as Record<string, unknown>)
+        ? (syncResult as { direction: string }).direction
+        : defaultDirection;
+    const counts =
+      "counts" in (syncResult as Record<string, unknown>)
+        ? ((syncResult as { counts: Record<string, number> }).counts as Record<string, number>)
+        : undefined;
+    return { direction, counts };
+  };
 
-      const syncResult = await cloudSyncService.forceSync();
-      if (syncResult && syncResult.success) {
-        setLastSyncTime(new Date());
-        logger.info("✅ Manual sync completed (upload)", {
-          direction: syncResult.direction || "upload",
-          changesUploaded: syncResult.counts || {},
-        });
-        return {
-          success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
-          message: "Local changes uploaded to cloud successfully",
-        };
+  const executeSync = useCallback(
+    async (direction: string, onSuccess?: () => Promise<void>): Promise<SyncResult> => {
+      if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
+        return { success: false, error: "Sync already in progress" };
       }
-      throw new Error(syncResult?.error || "Upload sync failed");
-    } catch (error) {
-      logger.error("❌ Manual upload sync failed:", error);
-      setSyncError((error as Error).message);
-      return {
-        success: false,
-        error: (error as Error).message,
-      };
-    } finally {
-      setIsUploadingSync(false);
+      setIsUploadingSync(true);
+      setSyncError(null);
+      try {
+        if (!cloudSyncService?.isRunning) {
+          throw new Error(
+            "Cloud sync service is not running. Please check your connection and authentication."
+          );
+        }
+        const syncResult = await cloudSyncService.forceSync();
+        if (syncResult && syncResult.success) {
+          setLastSyncTime(new Date());
+          const { direction: resultDirection, counts } = processSyncResult(syncResult, direction);
+          if (onSuccess) await onSuccess();
+          return {
+            success: true,
+            direction: resultDirection,
+            counts,
+            message: `Sync completed (${direction})`,
+          };
+        }
+        throw new Error(syncResult?.error || `${direction} sync failed`);
+      } catch (error) {
+        setSyncError((error as Error).message);
+        return { success: false, error: (error as Error).message };
+      } finally {
+        setIsUploadingSync(false);
+      }
+    },
+    [isUploadingSyncInProgress, isDownloadingSyncInProgress]
+  );
+
+  const forceUploadSync = useCallback(async (): Promise<SyncResult> => {
+    logger.info("🔄 Starting manual upload sync (Dexie → Firebase)...");
+    const result = await executeSync("upload");
+    if (result.success) {
+      logger.info("✅ Manual sync completed (upload)", {
+        direction: result.direction || "upload",
+        changesUploaded: result.counts ?? {},
+      });
+      return { ...result, message: "Local changes uploaded to cloud successfully" };
     }
-  }, [isUploadingSyncInProgress, isDownloadingSyncInProgress]);
+    logger.error("❌ Manual upload sync failed:", result.error);
+    return result;
+  }, [executeSync]);
 
   const forceDownloadSync = useCallback(async (): Promise<SyncResult> => {
-    if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
-      logger.warn("Sync already in progress, skipping download sync");
-      return { success: false, error: "Sync already in progress" };
+    logger.info("🔄 Starting manual download sync (Firebase → Dexie → TanStack)...");
+    const refetchQueries = async () => {
+      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: queryKeys.envelopes }),
+        queryClient.refetchQueries({ queryKey: queryKeys.transactions }),
+        queryClient.refetchQueries({ queryKey: queryKeys.bills }),
+        queryClient.refetchQueries({ queryKey: queryKeys.debts }),
+        queryClient.refetchQueries({ queryKey: queryKeys.budgetMetadata }),
+        queryClient.refetchQueries({ queryKey: queryKeys.budgetHistory }),
+      ]);
+    };
+    const result = await executeSync("download", refetchQueries);
+    if (result.success) {
+      logger.info("✅ Manual download sync completed successfully");
+      return { ...result, message: "Remote changes downloaded and applied successfully" };
     }
-    setIsDownloadingSync(true);
-    setSyncError(null);
-    try {
-      logger.info("🔄 Starting manual download sync (Firebase → Dexie → TanStack)...");
-      if (!cloudSyncService?.isRunning) {
-        throw new Error(
-          "Cloud sync service is not running. Please check your connection and authentication."
-        );
-      }
-
-      const syncResult = await cloudSyncService.forceSync();
-      if (syncResult && syncResult.success) {
-        logger.info("✅ Manual sync completed (download)", {
-          direction: syncResult.direction || "download",
-          changesDownloaded: syncResult.counts || {},
-        });
-        await queryClient.invalidateQueries();
-        await Promise.all([
-          queryClient.refetchQueries({ queryKey: queryKeys.envelopes }),
-          queryClient.refetchQueries({ queryKey: queryKeys.transactions }),
-          queryClient.refetchQueries({ queryKey: queryKeys.bills }),
-          queryClient.refetchQueries({ queryKey: queryKeys.debts }),
-          queryClient.refetchQueries({ queryKey: queryKeys.budgetMetadata }),
-          queryClient.refetchQueries({ queryKey: queryKeys.budgetHistory }),
-        ]);
-        setLastSyncTime(new Date());
-        logger.info("✅ Manual download sync completed successfully:", syncResult);
-        return {
-          success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
-          message: "Remote changes downloaded and applied successfully",
-        };
-      }
-      throw new Error(syncResult?.error || "Download sync failed");
-    } catch (error) {
-      logger.error("❌ Manual download sync failed:", error);
-      setSyncError((error as Error).message);
-      return {
-        success: false,
-        error: (error as Error).message,
-      };
-    } finally {
-      setIsDownloadingSync(false);
-    }
-  }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, queryClient]);
+    logger.error("❌ Manual download sync failed:", result.error);
+    return result;
+  }, [executeSync, queryClient]);
 
   const forceFullSync = useCallback(async (): Promise<SyncResult> => {
-    if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
-      logger.warn("Sync already in progress, skipping full sync");
-      return { success: false, error: "Sync already in progress" };
+    const invalidateAll = async () => {
+      await queryClient.invalidateQueries();
+    };
+    const result = await executeSync("full", invalidateAll);
+    if (result.success) {
+      logger.info("✅ Full bidirectional sync completed successfully");
+    } else {
+      logger.error("❌ Full sync failed:", result.error);
     }
-    try {
-      const syncResult = await cloudSyncService.forceSync();
-      if (syncResult && syncResult.success) {
-        await queryClient.invalidateQueries();
-        setLastSyncTime(new Date());
-        logger.info("✅ Full bidirectional sync completed successfully:", syncResult);
-        return {
-          success: true,
-          direction: syncResult.direction,
-          counts: syncResult.counts,
-          message: `Full sync completed (${syncResult.direction})`,
-        };
-      }
-      throw new Error(syncResult?.error || "Full sync failed");
-    } catch (error) {
-      logger.error("❌ Full sync failed:", error);
-      setSyncError((error as Error).message);
-      return {
-        success: false,
-        error: (error as Error).message,
-      };
-    }
-  }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, queryClient]);
+    return result;
+  }, [executeSync, queryClient]);
 
   const getSyncStatus = useCallback((): SyncStatus => {
     return {

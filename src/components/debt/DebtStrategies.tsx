@@ -3,12 +3,17 @@ import { getIcon } from "../../utils";
 import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
+import type { DebtAccount } from "../../types/debt";
+
+interface DebtStrategiesProps {
+  debts: DebtAccount[];
+}
 
 /**
  * Debt Payment Strategies Component
  * Pure UI component - all business logic handled by useDebtStrategies hook
  */
-const DebtStrategies = ({ debts }) => {
+const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
   const {
     avalancheStrategy,
     snowballStrategy,
@@ -105,7 +110,18 @@ const DebtStrategies = ({ debts }) => {
       )}
 
       {/* Payment Impact Analysis */}
-      <PaymentImpactTable paymentImpact={paymentImpact} />
+      <PaymentImpactTable
+        paymentImpact={
+          paymentImpact as unknown as Array<{
+            strategy: string;
+            monthlyPayment: number;
+            totalInterest: number;
+            payoffDate: string;
+            totalPaid: number;
+            savings: number;
+          }>
+        }
+      />
     </div>
   );
 };

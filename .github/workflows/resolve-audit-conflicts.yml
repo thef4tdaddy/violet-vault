@@ -1,0 +1,53 @@
+name: Resolve Audit Report Conflicts
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'docs/audits/audit-report.md'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-conflicts:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.state == 'open'
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Check for conflicts
+        id: check
+        run: |
+          git fetch origin develop:develop
+          if git merge-tree $(git merge-base HEAD develop) HEAD develop | grep -q 'docs/audits/audit-report.md'; then
+            echo "has_conflict=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_conflict=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR with resolution instructions
+        if: steps.check.outputs.has_conflict == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Audit Report Conflict Detected**\n\n' +
+                    'The `docs/audits/audit-report.md` file has a merge conflict. ' +
+                    'This file is auto-generated and should always use the version from `develop`.\n\n' +
+                    '**To resolve:**\n' +
+                    '1. Checkout your branch locally\n' +
+                    '2. Run: `git checkout --theirs docs/audits/audit-report.md`\n' +
+                    '3. Run: `git add docs/audits/audit-report.md && git commit -m "chore: resolve audit report conflict"`\n' +
+                    '4. Push your changes\n\n' +
+                    'Or merge `develop` into your branch and accept the develop version when prompted.'
+            })
+

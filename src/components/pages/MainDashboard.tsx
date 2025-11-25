@@ -78,7 +78,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   // Get recent transactions
   const recentTransactions = getRecentTransactions(transactions, 10);
 
-  const handleUpdateBalance = async (newBalance) => {
+  const handleUpdateBalance = async (newBalance: number) => {
     await updateActualBalance(newBalance, {
       isManual: true,
       author: "Family Member", // Generic name for family budgeting
@@ -155,7 +155,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
 
       {/* Recent Transactions */}
       <RecentTransactionsWidget
-        transactions={recentTransactions}
+        transactions={recentTransactions as never}
         getEnvelopeOptions={getEnvelopeOptions}
       />
 

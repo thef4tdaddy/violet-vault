@@ -3,7 +3,35 @@ import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
 
-const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => {
+interface ReceiptItem {
+  description: string;
+  amount: number;
+}
+
+interface ReceiptDataType {
+  items?: ReceiptItem[];
+  [key: string]: unknown;
+}
+
+interface TransactionForm {
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  notes: string;
+}
+
+interface ReceiptDataStepProps {
+  receiptData: ReceiptDataType;
+  transactionForm: TransactionForm;
+  handleFormChange: (field: string, value: string | number) => void;
+}
+
+const ReceiptDataStep = ({
+  receiptData,
+  transactionForm,
+  handleFormChange,
+}: ReceiptDataStepProps) => {
   return (
     <div className="space-y-6">
       <div>

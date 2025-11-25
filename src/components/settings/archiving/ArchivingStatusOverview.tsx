@@ -1,12 +1,37 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+interface CurrentStats {
+  totalTransactions: number;
+  oldTransactions: number;
+  veryOldTransactions: number;
+}
+
+interface PotentialSavings {
+  savingsMB: number;
+  savingsPercent: number;
+}
+
+interface ArchivingStatus {
+  currentStats: CurrentStats;
+  urgency: string;
+  suggestedAction: string;
+  potentialSavings?: PotentialSavings;
+}
+
+interface ArchivingStatusOverviewProps {
+  archivingStatus: ArchivingStatus | null;
+  needsArchiving: boolean;
+  getUrgencyColor: (urgency: string) => string;
+  getUrgencyIcon: (urgency: string) => React.ComponentType<{ className?: string }>;
+}
+
 const ArchivingStatusOverview = ({
   archivingStatus,
   needsArchiving,
   getUrgencyColor,
   getUrgencyIcon,
-}) => {
+}: ArchivingStatusOverviewProps) => {
   if (!archivingStatus) return null;
 
   return (

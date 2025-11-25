@@ -15,6 +15,8 @@ import {
   createLockSessionOperation,
   createUpdateActivityOperation,
 } from "./authOperations";
+import type { LoginResult, AuthContext } from "./authOperations";
+import type { UseMutationResult } from "@tanstack/react-query";
 
 /**
  * Unified auth manager hook that combines AuthContext and TanStack Query operations
@@ -46,11 +48,20 @@ export const useAuthManager = () => {
   // Create auth operations
   const login = createLoginOperation(loginMutation);
   const joinBudget = createJoinBudgetOperation(joinBudgetMutation);
-  const logout = createLogoutOperation(logoutMutation);
-  const changePassword = createChangePasswordOperation(changePasswordMutation, authContext);
+  const logout = createLogoutOperation(
+    logoutMutation as unknown as UseMutationResult<{ success: boolean }, Error, void, unknown>
+  );
+  const changePassword = createChangePasswordOperation(
+    changePasswordMutation as unknown as UseMutationResult<
+      LoginResult,
+      Error,
+      { oldPassword: string; newPassword: string }
+    >,
+    authContext as unknown as AuthContext
+  );
   const updateProfile = createUpdateProfileOperation(updateProfileMutation);
-  const lockSession = createLockSessionOperation(authContext);
-  const updateActivity = createUpdateActivityOperation(authContext);
+  const lockSession = createLockSessionOperation(authContext as unknown as AuthContext);
+  const updateActivity = createUpdateActivityOperation(authContext as unknown as AuthContext);
 
   // Create legacy compatibility interface
   const legacyInterface = {
@@ -92,7 +103,7 @@ export const useAuthManager = () => {
 
     // Utilities
     shouldShowAuthGateway: () => !isAuthenticated,
-    createPasswordValidator: (password) => ({
+    createPasswordValidator: (password: string) => ({
       password,
       enabled: !!password && password.length > 0,
     }),

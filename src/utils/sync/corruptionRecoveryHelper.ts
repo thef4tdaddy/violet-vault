@@ -4,41 +4,11 @@
  */
 import { detectLocalData, hasLocalData } from "./dataDetectionHelper";
 import logger from "@/utils/common/logger";
-
-interface DataDetectionDetails {
-  databaseOpen: boolean;
-  samplesFound?: {
-    envelopes: boolean;
-    transactions: boolean;
-    bills: boolean;
-  };
-  envelopes: number;
-  transactions: number;
-  bills: number;
-  savingsGoals: number;
-  paychecks: number;
-  cache: number;
-  lastOptimized: number;
-  error?: unknown;
-}
-
-interface DataDetectionResult {
-  hasData: boolean;
-  totalItems: number;
-  details: DataDetectionDetails;
-  recommendation: string;
-}
-
-interface SafeCloudDataResetResult {
-  success: boolean;
-  error?: string;
-  safetyAbort?: boolean;
-  detectionDetails?: DataDetectionResult;
-  message?: string;
-  localDataConfirmed?: boolean;
-  readyForCloudReset?: boolean;
-  exception?: string;
-}
+import type {
+  DataDetectionResult,
+  DataDetectionDetails,
+  SafeCloudDataResetResult,
+} from "@/types/sync";
 
 // Extend Window interface to include custom debug functions
 declare global {

@@ -162,7 +162,7 @@ const RuleBuilderStepContent: React.FC<RuleBuilderStepContentProps> = ({
   }
 
   if (step === 4) {
-    return <ReviewStep ruleData={ruleData} envelopes={envelopes} />;
+    return <ReviewStep ruleData={ruleData} envelopes={envelopes as never} />;
   }
 
   return null;

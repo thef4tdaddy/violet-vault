@@ -1,10 +1,29 @@
+import React from "react";
 import { BudgetVsActualChart } from "../../charts";
+
+interface EnvelopeHealth {
+  id?: string;
+  name: string;
+  status?: "critical" | "warning" | "overfunded" | "healthy" | string;
+  currentBalance?: number;
+  monthlyBudget?: number;
+  healthScore?: number;
+}
+
+interface BudgetVsActualData {
+  [key: string]: unknown;
+}
+
+interface HealthTabProps {
+  envelopeHealth: EnvelopeHealth[] | null | undefined;
+  budgetVsActual: BudgetVsActualData[] | null | undefined;
+}
 
 /**
  * Health tab content for analytics - envelope health monitoring
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const HealthTab = ({ envelopeHealth, budgetVsActual }) => {
+const HealthTab: React.FC<HealthTabProps> = ({ envelopeHealth, budgetVsActual }) => {
   return (
     <div className="space-y-6">
       {/* Envelope Health Overview */}

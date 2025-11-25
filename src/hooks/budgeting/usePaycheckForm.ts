@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import {
   getUniquePayers,
@@ -6,6 +6,7 @@ import {
   calculatePaycheckAllocation,
 } from "../../utils/budgeting/paycheckAllocationUtils";
 import logger from "../../utils/common/logger";
+import type { PaycheckHistory } from "@/db/types";
 
 /**
  * Hook to initialize new payer state for first-time users
@@ -29,6 +30,7 @@ const useInitializeNewPayerState = (
  * Custom hook for paycheck form state management
  * Handles all form-related state and logic
  */
+// eslint-disable-next-line max-lines-per-function -- Complex hook managing form state, validation, and paycheck processing logic
 export const usePaycheckForm = ({
   paycheckHistory,
   currentUser,
@@ -64,7 +66,7 @@ export const usePaycheckForm = ({
   const initialRender = useRef(true);
 
   // Computed values
-  const uniquePayers = getUniquePayers(paycheckHistory, tempPayers);
+  const uniquePayers = getUniquePayers(paycheckHistory as PaycheckHistory[], tempPayers);
 
   // Initialize add new payer state for new users
   useInitializeNewPayerState(uniquePayers.length, setShowAddNewPayer, initialRender);
@@ -72,12 +74,17 @@ export const usePaycheckForm = ({
   // Form handlers
   const handlePayerChange = (selectedPayer: string) => {
     setPayerName(selectedPayer);
-
-    // Smart prediction: suggest the most recent paycheck amount for this payer
-    const prediction = getPayerPrediction(selectedPayer, paycheckHistory);
+    const prediction = getPayerPrediction(selectedPayer, paycheckHistory as PaycheckHistory[]);
     if (prediction && !paycheckAmount) {
       setPaycheckAmount(prediction.mostRecent.toString());
     }
+  };
+
+  const addNewPayerToList = (trimmedName: string) => {
+    setTempPayers((prev) => [...prev, trimmedName]);
+    setPayerName(trimmedName);
+    setNewPayerName("");
+    setShowAddNewPayer(false);
   };
 
   const handleAddNewPayer = () => {
@@ -86,19 +93,52 @@ export const usePaycheckForm = ({
     }
   };
 
-  const addNewPayerToList = (trimmedName: string) => {
-    // Add to temp payers list so it shows in dropdown (session-only, not persisted)
-    setTempPayers((prev) => [...prev, trimmedName]);
-    // Set as current selection
-    setPayerName(trimmedName);
-    setNewPayerName("");
-    // Hide the add new payer form and show dropdown
-    setShowAddNewPayer(false);
-  };
-
   const handleAmountChange = (value: string) => {
     setPaycheckAmount(value);
     setShowPreview(false);
+  };
+
+  const calculateEnvelopeAllocations = (
+    allocationPreview: ReturnType<typeof calculatePaycheckAllocation>
+  ): Array<{ envelopeId: string; amount: number }> => {
+    if (allocationPreview?.mode !== "allocate") return [];
+    return Object.entries(allocationPreview.allocations || {}).map(([envelopeId, allocation]) => ({
+      envelopeId,
+      amount: Math.round(Number(allocation || 0) * 100) / 100,
+    }));
+  };
+
+  const processPaycheckData = async (amount: number) => {
+    const allocationPreview = calculatePaycheckAllocation(
+      amount,
+      allocationMode,
+      envelopes as Array<{
+        id: string;
+        name: string;
+        category: string;
+        archived: boolean;
+        lastModified: number;
+        [key: string]: unknown;
+      }>
+    );
+    const envelopeAllocations = calculateEnvelopeAllocations(allocationPreview);
+    const totalAllocated = envelopeAllocations.reduce(
+      (sum, allocation) => sum + allocation.amount,
+      0
+    );
+    const leftoverAmount =
+      allocationPreview?.mode === "allocate" ? Math.max(0, amount - totalAllocated) : amount;
+    const allocationDebug =
+      allocationPreview && allocationPreview.mode === "allocate"
+        ? (allocationPreview as { debugInfo?: unknown }).debugInfo
+        : undefined;
+
+    return {
+      envelopeAllocations,
+      leftoverAmount,
+      allocationSummary: allocationPreview?.summary,
+      allocationDebug,
+    };
   };
 
   const handleProcessPaycheck = async () => {
@@ -108,26 +148,8 @@ export const usePaycheckForm = ({
     setIsProcessing(true);
 
     try {
-      const allocationPreview = calculatePaycheckAllocation(amount, allocationMode, envelopes);
-      const envelopeAllocations: Array<{ envelopeId: string; amount: number }> =
-        allocationPreview?.mode === "allocate"
-          ? Object.entries(allocationPreview.allocations || {}).map(([envelopeId, allocation]) => ({
-              envelopeId,
-              amount: Math.round(Number(allocation || 0) * 100) / 100,
-            }))
-          : [];
-
-      const totalAllocated = envelopeAllocations.reduce((sum, allocation) => {
-        return sum + allocation.amount;
-      }, 0);
-
-      const leftoverAmount =
-        allocationPreview?.mode === "allocate" ? Math.max(0, amount - totalAllocated) : amount;
-
-      const allocationDebug =
-        allocationPreview && allocationPreview.mode === "allocate"
-          ? (allocationPreview as { debugInfo?: unknown }).debugInfo
-          : undefined;
+      const { envelopeAllocations, leftoverAmount, allocationSummary, allocationDebug } =
+        await processPaycheckData(amount);
 
       const result = await onProcessPaycheck({
         amount,
@@ -135,12 +157,12 @@ export const usePaycheckForm = ({
         mode: allocationMode,
         date: new Date().toISOString(),
         envelopeAllocations,
-        allocationSummary: allocationPreview?.summary,
+        allocationSummary,
         allocationDebug,
         leftoverAmount,
       });
 
-      logger.debug("Paycheck processed:", result);
+      logger.debug("Paycheck processed:", result as Record<string, unknown>);
       handlePostProcessCleanup(payerName.trim());
       globalToast.showSuccess("Paycheck processed successfully!");
     } catch (error) {
@@ -152,7 +174,6 @@ export const usePaycheckForm = ({
   };
 
   const handlePostProcessCleanup = (processedPayerName: string) => {
-    // Clean up temp payers - once a paycheck is processed, the payer is now in history
     setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
     setPaycheckAmount("");
     setShowPreview(false);
@@ -164,50 +185,46 @@ export const usePaycheckForm = ({
     setNewPayerName("");
   };
 
-  // Validation
+  type EnvelopeType = {
+    id: string;
+    name: string;
+    category: string;
+    archived: boolean;
+    lastModified: number;
+    [key: string]: unknown;
+  };
+
   const allocationPreview = useMemo(() => {
     const amount = parseFloat(paycheckAmount);
-    if (!amount || amount <= 0) {
-      return null;
-    }
-
-    return calculatePaycheckAllocation(amount, allocationMode, envelopes);
+    if (!amount || amount <= 0) return null;
+    return calculatePaycheckAllocation(amount, allocationMode, envelopes as EnvelopeType[]);
   }, [paycheckAmount, allocationMode, envelopes]);
 
   const canSubmit = paycheckAmount && payerName.trim() && !isProcessing;
+  const getPayerPredictionHelper = (payer: string) =>
+    getPayerPrediction(payer, paycheckHistory as PaycheckHistory[]);
 
   return {
-    // Form state
     paycheckAmount,
     payerName,
     allocationMode,
     isProcessing,
     showPreview,
     canSubmit,
-
-    // Payer state
     uniquePayers,
     newPayerName,
     showAddNewPayer,
-
-    // Form handlers
     setPaycheckAmount: handleAmountChange,
     setPayerName,
     setAllocationMode,
     setNewPayerName,
     setShowPreview,
     setShowAddNewPayer,
-
-    // Actions
     handlePayerChange,
     handleAddNewPayer,
     handleProcessPaycheck,
     resetForm,
-
-    // Utilities
-    getPayerPrediction: (payer: string) => getPayerPrediction(payer, paycheckHistory),
-
-    // Preview data
+    getPayerPrediction: getPayerPredictionHelper,
     allocationPreview,
   };
 };

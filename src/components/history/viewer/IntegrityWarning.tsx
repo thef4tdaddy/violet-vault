@@ -2,11 +2,38 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
-const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrityDetails }) => {
+interface IntegrityCheck {
+  valid: boolean;
+  totalCommits?: number;
+  message: string;
+  brokenAt?: string;
+  details?: {
+    lastValidCommit?: {
+      hash: string;
+      message: string;
+    };
+    suspiciousCommit?: {
+      shortHash: string;
+      message: string;
+    };
+  };
+}
+
+interface IntegrityWarningProps {
+  integrityCheck: IntegrityCheck | null;
+  showIntegrityDetails: boolean;
+  toggleIntegrityDetails: () => void;
+}
+
+const IntegrityWarning: React.FC<IntegrityWarningProps> = ({
+  integrityCheck,
+  showIntegrityDetails,
+  toggleIntegrityDetails,
+}) => {
   if (!integrityCheck) return null;
 
   // Integrity Success
-  if (integrityCheck.valid && integrityCheck.totalCommits > 0) {
+  if (integrityCheck.valid && integrityCheck.totalCommits && integrityCheck.totalCommits > 0) {
     return (
       <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
         <div className="flex items-center">
