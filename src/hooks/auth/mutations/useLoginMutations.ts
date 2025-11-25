@@ -49,7 +49,13 @@ const startBackgroundSyncAfterLogin = async (isNewUser: boolean) => {
 
     await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
-    const { useBudgetStore } = await import("../../../stores/ui/uiStore");
+    const uiStoreModule = await import("../../../stores/ui/uiStore");
+    const useBudgetStore = uiStoreModule.useBudgetStore as unknown as {
+      getState: () => {
+        cloudSyncEnabled: boolean;
+        startBackgroundSync: () => Promise<void>;
+      };
+    };
     const budgetState = useBudgetStore.getState();
 
     if (budgetState.cloudSyncEnabled) {

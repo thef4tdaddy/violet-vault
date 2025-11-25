@@ -3,7 +3,7 @@ import { useAutoFundingRules } from "@/hooks/budgeting/autofunding/useAutoFundin
 import { useAutoFundingExecution } from "@/hooks/budgeting/autofunding/useAutoFundingExecution";
 import { useAutoFundingData } from "@/hooks/budgeting/autofunding/useAutoFundingData";
 import { useAutoFundingHistory } from "@/hooks/budgeting/autofunding/useAutoFundingHistory";
-import { useBudgetStore } from "@/stores/ui/uiStore";
+import useUiStore from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import type {
   UseAutoFundingRulesReturn,
@@ -32,13 +32,13 @@ import logger from "@/utils/common/logger";
  * Refactored from original useAutoFunding.js for Issue #506 - Logic ↔ UI separation
  */
 export const useAutoFunding = () => {
-  type BudgetSelector = {
+  interface BudgetSelector {
     envelopes?: Envelope[];
     unassignedCash?: number;
     allTransactions?: Transaction[];
-  };
+  }
 
-  const budget = useBudgetStore(
+  const budget = useUiStore(
     useShallow((state: BudgetSelector) => ({
       envelopes: state.envelopes,
       unassignedCash: state.unassignedCash,

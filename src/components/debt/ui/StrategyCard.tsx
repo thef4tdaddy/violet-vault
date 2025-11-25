@@ -1,11 +1,33 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
+interface DebtItem {
+  id: string;
+  name: string;
+  priority: number;
+  interestRate: number;
+  currentBalance?: number;
+  minimumPayment?: number;
+}
+
+interface Strategy {
+  name: string;
+  description: string;
+  debts: DebtItem[];
+  totalInterest: number;
+  payoffTime: number;
+}
+
+interface StrategyCardProps {
+  strategy: Strategy;
+  isRecommended?: boolean;
+}
+
 /**
  * Card component for displaying debt payoff strategy details
  * Pure UI component - receives strategy data as props
  */
-const StrategyCard = ({ strategy, isRecommended = false }) => {
+const StrategyCard = ({ strategy, isRecommended = false }: StrategyCardProps) => {
   if (!strategy || !strategy.debts.length) {
     return (
       <div className="bg-white rounded-xl p-6 border border-gray-200">
@@ -75,7 +97,7 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
           Priority Order
         </h4>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {debts.slice(0, 5).map((debt) => (
+          {debts.slice(0, 5).map((debt: DebtItem) => (
             <div
               key={debt.id}
               className="flex items-center justify-between bg-gray-50 rounded-lg p-3"

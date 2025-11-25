@@ -3,6 +3,19 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import type { LockDocument } from "@/services/editLockService";
+
+interface EnvelopeModalHeaderProps {
+  title?: string;
+  subtitle?: string;
+  lockLoading?: boolean;
+  isLocked?: boolean;
+  isOwnLock?: boolean;
+  isExpired?: boolean;
+  lock?: LockDocument | null;
+  onBreakLock?: () => void;
+  onClose?: () => void;
+}
 
 const EnvelopeModalHeader = ({
   title = "Edit Envelope",
@@ -14,7 +27,7 @@ const EnvelopeModalHeader = ({
   lock = null,
   onBreakLock,
   onClose,
-}) => {
+}: EnvelopeModalHeaderProps) => {
   return (
     <>
       {/* Header */}

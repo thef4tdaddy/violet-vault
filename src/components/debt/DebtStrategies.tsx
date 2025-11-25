@@ -3,12 +3,17 @@ import { getIcon } from "../../utils";
 import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
+import type { DebtAccount } from "../../types/debt";
+
+interface DebtStrategiesProps {
+  debts: DebtAccount[];
+}
 
 /**
  * Debt Payment Strategies Component
  * Pure UI component - all business logic handled by useDebtStrategies hook
  */
-const DebtStrategies = ({ debts }) => {
+const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
   const {
     avalancheStrategy,
     snowballStrategy,

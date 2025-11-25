@@ -30,9 +30,9 @@ export const useUpdateProfileMutation = () => {
         }
 
         // Update localStorage profile
-        const profileData = {
-          userName: updatedProfile.userName,
-          userColor: updatedProfile.userColor,
+        const profileData: { userName: string; userColor: string } = {
+          userName: updatedProfile.userName ?? "",
+          userColor: updatedProfile.userColor ?? "",
         };
         localStorageService.setUserProfile(profileData);
 
@@ -63,7 +63,7 @@ export const useUpdateProfileMutation = () => {
       }
     },
     onSuccess: (result) => {
-      if (result.success) {
+      if (result.success && result.profile) {
         updateUser(result.profile);
       }
     },
