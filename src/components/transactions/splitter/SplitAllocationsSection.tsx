@@ -18,7 +18,7 @@ interface SplitAllocationsSectionProps {
   splitAllocations: SplitAllocation[];
   availableCategories: string[];
   envelopes: Envelope[];
-  onUpdateSplit: (id: string, updates: Record<string, unknown>) => void;
+  onUpdateSplit: (id: string, field: string, value: string | number) => void;
   onRemoveSplit: (id: string) => void;
   onAddSplit: () => void;
   onSmartSplit: () => void;

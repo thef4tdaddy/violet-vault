@@ -36,22 +36,40 @@ export const useTransactionFilters = ({
 
     return transactions
       .filter((transaction) => {
+        // Cast to validation-compatible format
+        const txn = transaction as unknown as {
+          amount: number;
+          description: string;
+          date?: string | number;
+          envelopeId?: string;
+          [key: string]: unknown;
+        };
         return (
           isValidTransaction(transaction) &&
-          matchesSearchTerm(transaction as ValidationTransaction, searchTerm) &&
-          matchesTypeFilter(transaction as ValidationTransaction, typeFilter) &&
-          matchesEnvelopeFilter(transaction as ValidationTransaction, envelopeFilter) &&
-          matchesDateFilter(transaction as ValidationTransaction, dateFilter)
+          matchesSearchTerm(txn, searchTerm) &&
+          matchesTypeFilter(txn, typeFilter) &&
+          matchesEnvelopeFilter(txn, envelopeFilter) &&
+          matchesDateFilter(txn, dateFilter)
         );
       })
-      .sort((a, b) =>
-        compareTransactions(
-          a as ValidationTransaction,
-          b as ValidationTransaction,
-          sortBy,
-          sortOrder
-        )
-      );
+      .sort((a, b) => {
+        // Cast to validation-compatible format
+        const txnA = a as unknown as {
+          amount: number;
+          description: string;
+          date?: string | number;
+          envelopeId?: string;
+          [key: string]: unknown;
+        };
+        const txnB = b as unknown as {
+          amount: number;
+          description: string;
+          date?: string | number;
+          envelopeId?: string;
+          [key: string]: unknown;
+        };
+        return compareTransactions(txnA, txnB, sortBy, sortOrder);
+      });
   }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
 
   return filteredTransactions;

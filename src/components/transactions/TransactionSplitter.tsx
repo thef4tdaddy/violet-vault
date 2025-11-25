@@ -80,10 +80,8 @@ const TransactionSplitter = ({
 
   // Wrapper for updateSplit to match SplitAllocationsSection signature
   const handleUpdateSplit = React.useCallback(
-    (id: string, updates: Record<string, unknown>) => {
-      Object.entries(updates).forEach(([field, value]) => {
-        splitter.updateSplit(id, field as keyof import("@/types/finance").SplitAllocation, value);
-      });
+    (id: string, field: string, value: string | number) => {
+      splitter.updateSplit(id, field as keyof import("@/types/finance").SplitAllocation, value);
     },
     [splitter]
   );
