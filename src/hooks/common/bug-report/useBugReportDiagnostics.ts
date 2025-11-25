@@ -24,7 +24,7 @@ interface BugReportDiagnosticsActions {
  * Extracted from useBugReportV2.ts to reduce complexity
  */
 export const useBugReportDiagnosticsV2 = () => {
-  const [diagnostics, setDiagnostics] = useState(null);
+  const [diagnostics, setDiagnostics] = useState<unknown>(null);
 
   /**
    * Run diagnostics on bug reporting system
@@ -37,9 +37,10 @@ export const useBugReportDiagnosticsV2 = () => {
       return diagnosticResults;
     } catch (error) {
       logger.error("Diagnostics failed", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       const failedDiagnostics = {
         success: false,
-        error: error.message,
+        error: errorMessage,
         timestamp: new Date().toISOString(),
       };
       setDiagnostics(failedDiagnostics);
