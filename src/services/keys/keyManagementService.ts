@@ -108,7 +108,9 @@ class KeyManagementService {
             logger.debug("Clipboard auto-cleared after timeout");
           }
         } catch (err) {
-          logger.warn("Could not auto-clear clipboard:", err);
+          logger.warn("Could not auto-clear clipboard:", {
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }, clearTimeoutSeconds * 1000);
 

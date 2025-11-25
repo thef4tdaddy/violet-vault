@@ -70,7 +70,9 @@ class SecurityService {
       const saved = localStorage.getItem(this.storageKeys.settings);
       return saved ? JSON.parse(saved) : this.getDefaultSettings();
     } catch (error) {
-      logger.warn("Failed to load security settings, using defaults:", error);
+      logger.warn("Failed to load security settings, using defaults:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return this.getDefaultSettings();
     }
   }
@@ -94,7 +96,9 @@ class SecurityService {
       const saved = localStorage.getItem(this.storageKeys.events);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      logger.warn("Failed to load security events:", error);
+      logger.warn("Failed to load security events:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -187,7 +191,9 @@ class SecurityService {
       JSON.stringify(securityEvent);
       return securityEvent;
     } catch (error) {
-      logger.warn("Failed to create security event, using minimal version:", error);
+      logger.warn("Failed to create security event, using minimal version:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
 
       // Use minimal version if serialization fails
       return {
@@ -271,11 +277,11 @@ class SecurityService {
   getSecurityStats(): SecurityStats {
     try {
       const events = this.loadSecurityEvents();
-      const stats = {
+      const stats: SecurityStats = {
         total: events.length,
         today: 0,
         thisWeek: 0,
-        byType: {},
+        byType: {} as Record<string, number>,
       };
 
       const now = new Date();
