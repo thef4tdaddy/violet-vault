@@ -1,10 +1,16 @@
 import { useState, useCallback } from "react";
 import { TRIGGER_TYPES, type AutoFundingRule } from "../../../utils/budgeting/autofunding/rules.ts";
-import useUiStore from "../../../stores/ui/uiStore";
+import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
 import logger from "../../../utils/common/logger";
+
+interface BudgetData {
+  envelopes?: unknown[];
+  unassignedCash?: number;
+  allTransactions?: unknown[];
+}
 
 interface ExecutionResult {
   success: boolean;
@@ -15,12 +21,19 @@ interface ExecutionResult {
   };
 }
 
+// Extended store interface for legacy budget property
+interface ExtendedUiStore extends UiStore {
+  budget?: BudgetData;
+}
+
 /**
  * Hook for executing auto-funding rules and managing execution state
  * Extracted from useAutoFunding.js for Issue #506
  */
 export const useAutoFundingExecution = () => {
-  const budget = useUiStore((state) => state.budget);
+  const budget = useUiStore(
+    (state: ExtendedUiStore) => state.budget
+  ) as BudgetData | undefined;
   const [isExecuting, setIsExecuting] = useState(false);
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 

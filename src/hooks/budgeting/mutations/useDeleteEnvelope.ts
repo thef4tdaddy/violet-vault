@@ -23,17 +23,18 @@ export const useDeleteEnvelope = () => {
     mutationFn: async ({ envelopeId, deleteBillsToo = false }: DeleteEnvelopeData) => {
       // Get the envelope to check if it has money
       const envelope = await budgetDb.envelopes.get(envelopeId);
+      const envelopeBalance = envelope?.currentBalance ?? 0;
 
-      if (envelope && envelope.currentBalance > 0) {
+      if (envelope && envelopeBalance > 0) {
         // Transfer the money to unassigned cash before deletion
         const { getUnassignedCash, setUnassignedCash } = await import("../../../db/budgetDb");
         const currentUnassignedCash = await getUnassignedCash();
-        const newUnassignedCash = currentUnassignedCash + envelope.currentBalance;
+        const newUnassignedCash = currentUnassignedCash + envelopeBalance;
 
         await setUnassignedCash(newUnassignedCash);
 
         logger.info(
-          `Transferred $${envelope.currentBalance.toFixed(2)} from deleted envelope "${envelope.name}" to unassigned cash`
+          `Transferred $${envelopeBalance.toFixed(2)} from deleted envelope "${envelope.name}" to unassigned cash`
         );
       }
 
@@ -68,8 +69,8 @@ export const useDeleteEnvelope = () => {
 
           // Remove envelope connection from bills
           for (const bill of connectedBills) {
-            await budgetDb.bills.update(bill.id, { envelopeId: null });
-            await optimisticHelpers.updateBill(queryClient, bill.id, { envelopeId: null });
+            await budgetDb.bills.update(bill.id, { envelopeId: undefined });
+            await optimisticHelpers.updateBill(queryClient, bill.id, { envelopeId: undefined });
           }
         }
       }
