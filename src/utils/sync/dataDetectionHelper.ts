@@ -4,6 +4,10 @@
  */
 import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
+import type { DataDetectionResult, DataDetectionDetails } from "@/types/sync";
+
+// Re-export types for backward compatibility
+export type { DataDetectionResult, DataDetectionDetails };
 
 /**
  * Comprehensive local data detection with detailed logging
@@ -110,12 +114,13 @@ export const detectLocalData = async () => {
  * Quick data check for safety operations
  * Returns boolean result with minimal logging
  */
-export const hasLocalData = async () => {
+export const hasLocalData = async (): Promise<boolean> => {
   try {
     const stats = await budgetDb.getDatabaseStats();
     return stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
   } catch (error) {
-    logger.warn("⚠️ Quick data check failed:", error.message);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logger.warn("⚠️ Quick data check failed:", { error: errorMsg });
     return false; // Assume no data for safety
   }
 };

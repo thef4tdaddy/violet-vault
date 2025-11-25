@@ -68,8 +68,10 @@ export class SyncMutex extends BaseMutex {
 
     // Clear queue and resolve all pending operations
     while (this.queue.length > 0) {
-      const { resolve } = this.queue.shift();
-      resolve();
+      const item = this.queue.shift();
+      if (item) {
+        item.resolve();
+      }
     }
   }
 
@@ -77,7 +79,7 @@ export class SyncMutex extends BaseMutex {
    * Update sync operation metrics
    * @private
    */
-  _updateMetrics(duration) {
+  _updateMetrics(duration: number): void {
     this.syncMetrics.operationsCompleted++;
     this.syncMetrics.totalLockTime += duration;
     this.syncMetrics.averageLockTime = Math.round(

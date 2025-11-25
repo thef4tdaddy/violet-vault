@@ -3,7 +3,7 @@ import { storeRegistry } from "../stores/storeRegistry.ts";
 import { expect } from "vitest";
 
 // Generic type for Zustand store hooks
-type StoreHook<T = unknown> = {
+type StoreHook<T> = {
   (): T;
   getState: () => T;
 };
@@ -11,7 +11,7 @@ type StoreHook<T = unknown> = {
 /**
  * Utility for testing Zustand stores
  */
-export class StoreTestHelper<T = unknown> {
+export class StoreTestHelper<T extends Record<string, unknown>> {
   storeHook: StoreHook<T>;
   storeName: string;
   initialState: T | null;
@@ -34,7 +34,7 @@ export class StoreTestHelper<T = unknown> {
   /**
    * Reset store to initial state
    */
-  reset() {
+  reset(): void {
     const state = this.storeHook.getState();
     if (
       state &&
@@ -51,11 +51,17 @@ export class StoreTestHelper<T = unknown> {
   /**
    * Execute action and return new state
    */
-  async executeAction(actionName: string, ...args: unknown[]): Promise<T> {
+  async executeAction<K extends keyof T>(
+    actionName: K,
+    ...args: T[K] extends (...a: infer Args) => unknown ? Args : never[]
+  ): Promise<T> {
     const { result } = renderHook(() => this.storeHook());
 
     await act(async () => {
-      await result.current[actionName](...args);
+      const action = result.current[actionName];
+      if (typeof action === "function") {
+        await (action as (...a: unknown[]) => Promise<unknown>)(...args);
+      }
     });
 
     return result.current;
@@ -64,12 +70,12 @@ export class StoreTestHelper<T = unknown> {
   /**
    * Assert state matches expected values
    */
-  assertState(expected: Record<string, unknown>): void {
+  assertState(expected: Partial<T>): void {
     const currentState = this.storeHook.getState();
 
     Object.entries(expected).forEach(([key, value]) => {
       if (typeof expect !== "undefined") {
-        expect(currentState[key]).toEqual(value);
+        expect(currentState[key as keyof T]).toEqual(value);
       }
     });
   }
@@ -77,7 +83,7 @@ export class StoreTestHelper<T = unknown> {
   /**
    * Get current state snapshot
    */
-  getState() {
+  getState(): T {
     return this.storeHook.getState();
   }
 }
@@ -85,7 +91,7 @@ export class StoreTestHelper<T = unknown> {
 /**
  * Create a test helper for a store
  */
-export const createStoreTestHelper = <T = unknown>(
+export const createStoreTestHelper = <T extends Record<string, unknown>>(
   storeHook: StoreHook<T>,
   storeName: string
 ): StoreTestHelper<T> => {
@@ -95,6 +101,6 @@ export const createStoreTestHelper = <T = unknown>(
 /**
  * Reset all registered stores (for test cleanup)
  */
-export const resetAllStores = () => {
+export const resetAllStores = (): void => {
   storeRegistry.resetAll();
 };
