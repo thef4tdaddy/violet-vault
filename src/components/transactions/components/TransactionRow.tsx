@@ -10,10 +10,16 @@ import {
 } from "../../../utils/transactions/tableHelpers";
 import type { Transaction } from "@/types/finance";
 
+interface VirtualRow {
+  index: number;
+  start: number;
+  [key: string]: unknown;
+}
+
 interface TransactionRowProps {
   transaction: Transaction;
   envelopes: unknown[];
-  virtualRow: { index: number; start: number };
+  virtualRow: VirtualRow;
   columnStyles?: typeof COLUMN_STYLES;
   gridTemplate: string;
   onEdit: (transaction: Transaction) => void;

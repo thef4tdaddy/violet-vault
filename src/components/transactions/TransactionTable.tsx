@@ -371,7 +371,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       {/* Transaction History Modal */}
       {historyTransaction && (
         <ObjectHistoryViewer
-          objectId={historyTransaction.id}
+          objectId={String(historyTransaction.id)}
           objectType="Transaction"
           objectName={historyTransaction.description}
           onClose={closeHistory}

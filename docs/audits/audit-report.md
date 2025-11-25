@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 37 | 0 |
-| TypeScript Strict Mode Errors | 213 | 0 |
+| TypeScript Errors | 33 | -4 |
+| TypeScript Strict Mode Errors | 209 | -4 |
 
-*Last updated: 2025-11-25 23:25:19 UTC*
+*Last updated: 2025-11-25 23:32:56 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -39,13 +39,12 @@
 ### Detailed Lint Report
 ```
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:52:9 - 1 - The 'budgetWithDefaults' logical expression could make the dependencies of useCallback Hook (at line 123) change on every render. To fix this, wrap the initialization of 'budgetWithDefaults' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
-/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:100:29 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
+/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:104:29 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
 ```
 
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 3 errors in `src/components/transactions/TransactionTable.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/hooks/bills/useBillManagerHelpers.ts`
@@ -57,7 +56,7 @@
 - 1 errors in `src/hooks/bills/useBillDetail.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
 - 1 errors in `src/components/ui/ConfirmModal.tsx`
-- 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
+- 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
 - 1 errors in `src/components/savings/SavingsGoals.tsx`
@@ -67,7 +66,6 @@
 - 1 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 1 errors in `src/components/layout/MainLayout.tsx`
 - 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
-- 1 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
@@ -77,11 +75,10 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 21 | `TS2322` |
-| 10 | `TS2345` |
+| 19 | `TS2322` |
+| 9 | `TS2345` |
 | 3 | `TS2769` |
 | 1 | `TS2741` |
-| 1 | `TS2719` |
 | 1 | `TS18047` |
 
 ### Detailed Type Error Report
@@ -104,9 +101,6 @@ src/components/budgeting/PaycheckProcessor.tsx(90,9): error TS2322: Type '{ id: 
 src/components/budgeting/PaydayPrediction.tsx(105,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Object literal may only specify known properties, and 'title' does not exist in type 'Attributes & { className?: string; }'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(288,11): error TS2322: Type '{ totalSuggestions: number; priorityCounts: Record<string, number>; typeCounts: Record<string, number>; potentialSavings: number; dismissedCount: number; }' is not assignable to type 'SuggestionStats'.
-  Types of property 'priorityCounts' are incompatible.
-    Type 'Record<string, number>' is missing the following properties from type '{ high: number; medium: number; low: number; }': high, medium, low
 src/components/history/BudgetHistoryViewer.tsx(139,15): error TS2322: Type '{ commit?: unknown; changes: unknown[]; }' is not assignable to type 'CommitDetails'.
   Types of property 'commit' are incompatible.
     Type 'unknown' is not assignable to type 'Commit'.
@@ -160,25 +154,17 @@ src/components/transactions/TransactionLedger.tsx(183,7): error TS2322: Type 'un
 src/components/transactions/TransactionLedger.tsx(189,7): error TS2322: Type '(data: unknown[]) => void' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
+  Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number | ""; isOriginalItem?: boolean; originalItem?: unknown; }' is not assignable to type 'Split'.
+    Types of property 'envelopeId' are incompatible.
+      Type 'string | number' is not assignable to type 'string'.
+        Type 'number' is not assignable to type 'string'.
 src/components/transactions/TransactionTable.tsx(124,21): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to type 'Transaction'.
   Index signature for type 'string' is missing in type 'Transaction'.
 src/components/transactions/TransactionTable.tsx(127,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
   Index signature for type 'string' is missing in type 'VirtualItem'.
-src/components/transactions/TransactionTable.tsx(374,11): error TS2322: Type 'string | number' is not assignable to type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(111,13): error TS2322: Type '{ [key: string]: unknown; id: string | number; description?: string; amount?: number; category?: string; }' is not assignable to type 'Split'.
-  Types of property 'id' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(122,13): error TS2322: Type '(id: string, updates: Record<string, unknown>) => void' is not assignable to type '(id: string, field: string, value: string | number) => void'.
-  Types of parameters 'updates' and 'field' are incompatible.
-    Type 'string' is not assignable to type 'Record<string, unknown>'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(127,13): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
-  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
-    Types of property 'id' are incompatible.
-      Type 'string | number' is not assignable to type 'string'.
-        Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitterHeader.tsx(42,37): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
+src/components/transactions/TransactionTable.tsx(135,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
+  Index signature for type 'string' is missing in type 'VirtualItem'.
 src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Argument of type 'unknown' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
@@ -210,7 +196,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 4 errors in `src/components/layout/ViewRenderer.tsx`
-- 3 errors in `src/components/transactions/splitter/SplitAllocationsSection.tsx`
 - 3 errors in `src/components/transactions/TransactionTable.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
@@ -242,7 +227,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
-- 2 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
 - 2 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
@@ -304,8 +288,8 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
 - 1 errors in `src/components/ui/ConfirmModal.tsx`
-- 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 1 errors in `src/components/transactions/splitter/SplitTotals.tsx`
+- 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 1 errors in `src/components/settings/archiving/ArchivingResult.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
@@ -340,6 +324,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/budgeting/envelope/EnvelopeModalHeader.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
+- 1 errors in `src/components/budgeting/SmartEnvelopeSuggestions.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
@@ -366,8 +351,8 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 81 | `TS2322` |
-| 61 | `TS2345` |
+| 79 | `TS2322` |
+| 60 | `TS2345` |
 | 17 | `TS7031` |
 | 11 | `TS7006` |
 | 11 | `TS2769` |
@@ -376,10 +361,10 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 | 4 | `TS18046` |
 | 3 | `TS2783` |
 | 2 | `TS2722` |
-| 2 | `TS2719` |
 | 2 | `TS2339` |
 | 2 | `TS18047` |
 | 1 | `TS7016` |
+| 1 | `TS2719` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
 
@@ -508,9 +493,6 @@ src/components/budgeting/PaydayPrediction.tsx(105,11): error TS2769: No overload
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(230,5): error TS2322: Type '(envelope: Partial<Envelope>) => void' is not assignable to type '(data: unknown) => void | Promise<void>'.
   Types of parameters 'envelope' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'Partial<Envelope>'.
-src/components/budgeting/SmartEnvelopeSuggestions.tsx(288,11): error TS2322: Type '{ totalSuggestions: number; priorityCounts: Record<string, number>; typeCounts: Record<string, number>; potentialSavings: number; dismissedCount: number; }' is not assignable to type 'SuggestionStats'.
-  Types of property 'priorityCounts' are incompatible.
-    Type 'Record<string, number>' is missing the following properties from type '{ high: number; medium: number; low: number; }': high, medium, low
 src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(11,36): error TS7031: Binding element 'envelope' implicitly has an 'any' type.
 src/components/budgeting/envelope/EnvelopeGridView.tsx(101,30): error TS2345: Argument of type '(envelope: { id: string; [key: string]: unknown; }) => JSX.Element' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => Element'.
   Types of parameters 'envelope' and 'value' are incompatible.
@@ -688,26 +670,18 @@ src/components/transactions/TransactionLedger.tsx(189,7): error TS2322: Type '(d
 src/components/transactions/TransactionLedger.tsx(491,7): error TS2322: Type 'Dispatch<SetStateAction<TransactionFormData>>' is not assignable to type '(form: unknown) => void'.
   Types of parameters 'value' and 'form' are incompatible.
     Type 'unknown' is not assignable to type 'SetStateAction<TransactionFormData>'.
+src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean | undefined; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
+  Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number | ""; isOriginalItem?: boolean; originalItem?: unknown; }' is not assignable to type 'Split'.
+    Types of property 'envelopeId' are incompatible.
+      Type 'string | number' is not assignable to type 'string | undefined'.
+        Type 'number' is not assignable to type 'string'.
 src/components/transactions/TransactionTable.tsx(124,21): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Transaction' is not assignable to type 'Transaction'.
   Index signature for type 'string' is missing in type 'Transaction'.
 src/components/transactions/TransactionTable.tsx(127,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
   Index signature for type 'string' is missing in type 'VirtualItem'.
-src/components/transactions/TransactionTable.tsx(374,11): error TS2322: Type 'string | number' is not assignable to type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(111,13): error TS2322: Type '{ [key: string]: unknown; id: string | number; description?: string | undefined; amount?: number | undefined; category?: string | undefined; }' is not assignable to type 'Split'.
-  Types of property 'id' are incompatible.
-    Type 'string | number' is not assignable to type 'string'.
-      Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(122,13): error TS2322: Type '(id: string, updates: Record<string, unknown>) => void' is not assignable to type '(id: string, field: string, value: string | number) => void'.
-  Types of parameters 'updates' and 'field' are incompatible.
-    Type 'string' is not assignable to type 'Record<string, unknown>'.
-src/components/transactions/splitter/SplitAllocationsSection.tsx(127,13): error TS2719: Type 'Envelope[]' is not assignable to type 'Envelope[]'. Two different types with this name exist, but they are unrelated.
-  Type 'Envelope' is not assignable to type 'Envelope'. Two different types with this name exist, but they are unrelated.
-    Types of property 'id' are incompatible.
-      Type 'string | number' is not assignable to type 'string'.
-        Type 'number' is not assignable to type 'string'.
+src/components/transactions/TransactionTable.tsx(135,21): error TS2322: Type 'VirtualItem' is not assignable to type 'VirtualRow'.
+  Index signature for type 'string' is missing in type 'VirtualItem'.
 src/components/transactions/splitter/SplitTotals.tsx(5,24): error TS7031: Binding element 'totals' implicitly has an 'any' type.
-src/components/transactions/splitter/SplitterHeader.tsx(42,37): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
 src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Argument of type '{}' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
