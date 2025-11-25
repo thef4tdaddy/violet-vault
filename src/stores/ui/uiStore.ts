@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -92,6 +92,67 @@ import {
   type BeforeInstallPromptEvent,
   type ImmerSet,
 } from "./uiStoreActions.ts";
+
+// UiStore interface - declared before use in storeInitializer
+export interface UiStore {
+  biweeklyAllocation: number;
+  paycheckHistory: Array<{
+    id: string;
+    amount: number;
+    date: string;
+    payerName?: string;
+    notes?: string;
+  }>;
+  isActualBalanceManual: boolean;
+  cloudSyncEnabled: boolean;
+  isOnline: boolean;
+  isUnassignedCashModalOpen: boolean;
+  dataLoaded: boolean;
+  updateAvailable: boolean;
+  isUpdating: boolean;
+  showInstallPrompt: boolean;
+  installPromptEvent: BeforeInstallPromptEvent | null;
+  showPatchNotes: boolean;
+  patchNotesData: {
+    version: string;
+    notes: string[];
+    fromVersion?: string;
+    toVersion?: string;
+    isUpdate?: boolean;
+  } | null;
+  loadingPatchNotes: boolean;
+
+  // Basic actions
+  setBiweeklyAllocation: (amount: number) => void;
+  openUnassignedCashModal: () => void;
+  closeUnassignedCashModal: () => void;
+  setPaycheckHistory: (history: UiStore["paycheckHistory"]) => void;
+  setDataLoaded: (loaded: boolean) => void;
+  setOnlineStatus: (status: boolean) => void;
+  setCloudSyncEnabled: (enabled: boolean) => void;
+
+  // PWA Update actions
+  setUpdateAvailable: (available: boolean) => void;
+  setIsUpdating: (updating: boolean) => void;
+  showInstallModal: () => void;
+  hideInstallModal: () => void;
+  setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void;
+  updateApp: () => Promise<void>;
+  installApp: () => Promise<boolean>;
+  manualInstall: () => Promise<{ success: boolean; reason: string }>;
+  dismissInstallPrompt: () => void;
+
+  // Patch notes actions
+  showPatchNotesModal: (patchNotesData: { version: string; notes: string[] }) => void;
+  hidePatchNotesModal: () => void;
+  loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<unknown>;
+
+  // Other actions
+  runMigrationIfNeeded: () => Promise<void>;
+  startBackgroundSync: () => Promise<void>;
+  resetAllData: () => void;
+  setDebts: () => void;
+}
 
 interface StoreState {
   biweeklyAllocation: number;
@@ -293,17 +354,19 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
 
 const base = subscribeWithSelector(immer(storeInitializer));
 
-let useUiStore;
+// Store type - declared after base for proper typing
+type UiStoreType = UseBoundStore<StoreApi<UiStore>>;
+let useUiStore: UiStoreType;
 
 if (LOCAL_ONLY_MODE) {
   // No persistence when running in local-only mode
-  useUiStore = create(base);
+  useUiStore = create<UiStore>()(base as never);
 } else {
-  useUiStore = create(
+  useUiStore = create<UiStore>()(
     devtools(
-      persist(base, {
+      persist(base as never, {
         name: "violet-vault-ui-store",
-        partialize: (state) => ({
+        partialize: (state: UiStore) => ({
           // UI and app state only (data arrays handled by TanStack Query → Dexie)
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
@@ -320,75 +383,20 @@ if (LOCAL_ONLY_MODE) {
         }),
       }),
       { name: "violet-vault-ui-devtools" }
-    )
+    ) as never
   );
 }
 
 // Add PWA install and update actions after store creation (they need useUiStore reference)
 import { createUpdateAppAction, createInstallAppAction } from "./uiStoreActions.ts";
-Object.assign(useUiStore.getState(), createUpdateAppAction(useUiStore.setState));
-Object.assign(useUiStore.getState(), createInstallAppAction(useUiStore.setState, useUiStore));
-
-// Create and export the store type
-export interface UiStore {
-  biweeklyAllocation: number;
-  paycheckHistory: Array<{
-    id: string;
-    amount: number;
-    date: string;
-    payerName?: string;
-    notes?: string;
-  }>;
-  isActualBalanceManual: boolean;
-  cloudSyncEnabled: boolean;
-  isOnline: boolean;
-  isUnassignedCashModalOpen: boolean;
-  dataLoaded: boolean;
-  updateAvailable: boolean;
-  isUpdating: boolean;
-  showInstallPrompt: boolean;
-  installPromptEvent: BeforeInstallPromptEvent | null;
-  showPatchNotes: boolean;
-  patchNotesData: {
-    version: string;
-    notes: string[];
-    fromVersion?: string;
-    toVersion?: string;
-    isUpdate?: boolean;
-  } | null;
-  loadingPatchNotes: boolean;
-
-  // Basic actions
-  setBiweeklyAllocation: (amount: number) => void;
-  openUnassignedCashModal: () => void;
-  closeUnassignedCashModal: () => void;
-  setPaycheckHistory: (history: UiStore["paycheckHistory"]) => void;
-  setDataLoaded: (loaded: boolean) => void;
-  setOnlineStatus: (status: boolean) => void;
-  setCloudSyncEnabled: (enabled: boolean) => void;
-
-  // PWA Update actions
-  setUpdateAvailable: (available: boolean) => void;
-  setIsUpdating: (updating: boolean) => void;
-  showInstallModal: () => void;
-  hideInstallModal: () => void;
-  setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void;
-  updateApp: () => Promise<void>;
-  installApp: () => Promise<boolean>;
-  manualInstall: () => Promise<{ success: boolean; reason: string }>;
-  dismissInstallPrompt: () => void;
-
-  // Patch notes actions
-  showPatchNotesModal: (patchNotesData: { version: string; notes: string[] }) => void;
-  hidePatchNotesModal: () => void;
-  loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<unknown>;
-
-  // Other actions
-  runMigrationIfNeeded: () => Promise<void>;
-  startBackgroundSync: () => Promise<void>;
-  resetAllData: () => void;
-  setDebts: () => void;
-}
+Object.assign(
+  useUiStore.getState(),
+  createUpdateAppAction(useUiStore.setState as unknown as ImmerSet<UiStore>)
+);
+Object.assign(
+  useUiStore.getState(),
+  createInstallAppAction(useUiStore.setState as unknown as ImmerSet<UiStore>, useUiStore)
+);
 
 export default useUiStore;
 

@@ -3,11 +3,27 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { formatFileSize } from "../../../utils/receipts/receiptHelpers";
 
+interface UploadedImage {
+  url: string;
+  name: string;
+  size: number;
+}
+
+interface ReceiptImagePreviewProps {
+  uploadedImage: UploadedImage | null;
+  showImagePreview: boolean;
+  onTogglePreview: () => void;
+}
+
 /**
  * Receipt Image Preview Component
  * Shows uploaded image with toggle visibility and UI standards compliance
  */
-const ReceiptImagePreview = ({ uploadedImage, showImagePreview, onTogglePreview }) => {
+const ReceiptImagePreview = ({
+  uploadedImage,
+  showImagePreview,
+  onTogglePreview,
+}: ReceiptImagePreviewProps) => {
   if (!uploadedImage) return null;
 
   return (

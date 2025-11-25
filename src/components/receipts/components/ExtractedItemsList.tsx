@@ -2,7 +2,18 @@
  * Extracted Items List Component
  * Displays receipt line items in a scrollable container
  */
-const ExtractedItemsList = ({ items }) => {
+
+interface ReceiptItem {
+  description: string;
+  amount: number;
+  rawLine?: string;
+}
+
+interface ExtractedItemsListProps {
+  items: ReceiptItem[];
+}
+
+const ExtractedItemsList = ({ items }: ExtractedItemsListProps) => {
   if (!items || items.length === 0) return null;
 
   return (
@@ -13,7 +24,7 @@ const ExtractedItemsList = ({ items }) => {
       </h4>
       <div className="glassmorphism rounded-lg p-3 border border-white/20 bg-white/20 backdrop-blur-sm max-h-32 overflow-y-auto">
         <div className="space-y-1">
-          {items.slice(0, 5).map((item, index) => (
+          {items.slice(0, 5).map((item: ReceiptItem, index: number) => (
             <div
               key={index}
               className="flex justify-between text-sm py-1 px-2 glassmorphism rounded border border-white/10 bg-white/10"

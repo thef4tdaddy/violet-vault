@@ -6,12 +6,12 @@ import type { UseMutationResult } from "@tanstack/react-query";
  * Separated to reduce function complexity and improve maintainability
  */
 
-interface LoginData {
+export interface LoginData {
   password: string;
   userData?: unknown;
 }
 
-interface LoginResult {
+export interface LoginResult {
   success: boolean;
   user?: {
     userName?: string;
@@ -51,19 +51,20 @@ interface ChangePasswordResult {
   error?: string;
 }
 
-interface UpdateProfileData {
+export interface UpdateProfileInput {
   userName?: string;
   userColor?: string;
   email?: string;
   displayName?: string;
 }
 
-interface UpdateProfileResult {
+export interface UpdateProfileResult {
   success: boolean;
   error?: string;
+  profile?: UpdateProfileInput;
 }
 
-interface AuthContext {
+export interface AuthContext {
   user?: {
     userName?: string;
     userColor?: string;
@@ -202,9 +203,14 @@ export const createChangePasswordOperation =
  */
 export const createUpdateProfileOperation =
   (
-    updateProfileMutation: UseMutationResult<UpdateProfileResult, Error, UpdateProfileData, unknown>
+    updateProfileMutation: UseMutationResult<
+      UpdateProfileResult,
+      Error,
+      UpdateProfileInput,
+      unknown
+    >
   ) =>
-  async (updatedProfile: UpdateProfileData) => {
+  async (updatedProfile: UpdateProfileInput) => {
     try {
       logger.auth("AuthManager: Starting profile update", {
         userName: updatedProfile.userName,

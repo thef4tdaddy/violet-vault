@@ -1,5 +1,6 @@
 import logger from "../common/logger";
 import { checkForVersionUpdate } from "../common/version";
+import type { BeforeInstallPromptEvent } from "../../stores/ui/uiStoreActions";
 
 /**
  * PWA Manager
@@ -18,11 +19,6 @@ interface UIStore {
   hideInstallModal: () => void;
   updateAvailable?: boolean;
   installPromptEvent?: BeforeInstallPromptEvent | null;
-}
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 class PWAManager {
