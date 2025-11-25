@@ -9,14 +9,23 @@ import logger from "../../../utils/common/logger.ts";
 import localStorageService from "../../../services/storage/localStorageService";
 import type { Transaction } from "@/db/types";
 
+interface EnvelopeFilters {
+  [key: string]: unknown;
+}
+
+interface DateRange {
+  start: Date;
+  end: Date;
+}
+
 export const useBudgetUtilities = () => {
   const queryClient = useQueryClient();
 
   // Prefetch utilities
   const prefetchData = {
-    envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(queryClient, filters),
+    envelopes: (filters: EnvelopeFilters) => prefetchHelpers.prefetchEnvelopes(queryClient, filters),
     dashboard: () => prefetchHelpers.prefetchDashboard(queryClient),
-    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(queryClient, dateRange),
+    transactions: (dateRange: DateRange) => prefetchHelpers.prefetchTransactions(queryClient, dateRange),
   };
 
   // Sync utilities

@@ -3,15 +3,25 @@ import { useConfirm } from "../common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
+interface Paycheck {
+  id: string | number;
+  payerName: string;
+  amount: number;
+}
+
+interface UsePaycheckHistoryProps {
+  onDeletePaycheck?: (id: string | number) => Promise<void>;
+}
+
 /**
  * Custom hook for paycheck history management
  * Handles history operations and delete functionality
  */
-export const usePaycheckHistory = ({ onDeletePaycheck }) => {
-  const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
+export const usePaycheckHistory = ({ onDeletePaycheck }: UsePaycheckHistoryProps) => {
+  const [deletingPaycheckId, setDeletingPaycheckId] = useState<string | number | null>(null);
   const confirm = useConfirm();
 
-  const handleDeletePaycheck = async (paycheck) => {
+  const handleDeletePaycheck = async (paycheck: Paycheck) => {
     if (!onDeletePaycheck) return;
 
     const isConfirmed = await confirm({

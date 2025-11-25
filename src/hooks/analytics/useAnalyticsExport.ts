@@ -1,11 +1,23 @@
 import { useCallback } from "react";
 
+interface AnalyticsData {
+  dateRange: unknown;
+  metrics: unknown;
+  monthlyTrends: unknown;
+  envelopeSpending: unknown;
+  categoryBreakdown: unknown;
+}
+
+interface CurrentUser {
+  userName?: string;
+}
+
 /**
  * Hook for handling analytics data export functionality
  * Extracts export logic from components
  */
 export const useAnalyticsExport = () => {
-  const exportAnalyticsData = useCallback((data, currentUser) => {
+  const exportAnalyticsData = useCallback((data: AnalyticsData, currentUser: CurrentUser | null) => {
     const { dateRange, metrics, monthlyTrends, envelopeSpending, categoryBreakdown } = data;
 
     const dataToExport = {

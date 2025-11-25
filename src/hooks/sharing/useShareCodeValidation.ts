@@ -4,19 +4,32 @@ import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 import { isValidShareCode } from "../../utils/validation";
 
+interface ShareInfo {
+  createdBy: string;
+  createdAt: number;
+  expiresAt: number;
+  userCount: string;
+}
+
+interface CreatorInfo {
+  userName: string;
+  userColor: string;
+  createdAt?: number;
+}
+
 /**
  * Custom hook for share code validation logic
  * Extracted from JoinBudgetModal to reduce complexity
  */
 export const useShareCodeValidation = () => {
-  const [shareInfo, setShareInfo] = useState(null);
-  const [creatorInfo, setCreatorInfo] = useState(null);
+  const [shareInfo, setShareInfo] = useState<ShareInfo | null>(null);
+  const [creatorInfo, setCreatorInfo] = useState<CreatorInfo | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   // eslint-disable-next-line no-architecture-violations/no-architecture-violations -- Wrapper function for hook-level validation
-  const validateShareCode = async (code) => {
+  const validateShareCode = async (code: string) => {
     if (!isValidShareCode(code)) {
       return false;
     }

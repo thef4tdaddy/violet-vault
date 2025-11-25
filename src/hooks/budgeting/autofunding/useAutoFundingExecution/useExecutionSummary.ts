@@ -1,10 +1,27 @@
 import { useCallback } from "react";
 
+interface ExecutionResult {
+  success: boolean;
+  [key: string]: unknown;
+}
+
+interface ExecutionRecord {
+  id: string;
+  trigger: string;
+  executedAt: string;
+  rulesExecuted: number;
+  totalFunded: number;
+  remainingCash: number;
+  initialCash: number;
+  success?: boolean;
+  results?: ExecutionResult[];
+}
+
 /**
  * Hook for execution summary utilities
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
-export const useExecutionSummary = (lastExecution) => {
+export const useExecutionSummary = (lastExecution: ExecutionRecord | null) => {
   // Get execution summary for display
   const getExecutionSummary = useCallback(() => {
     if (!lastExecution) {

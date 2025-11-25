@@ -2,11 +2,16 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 
+interface ReceiptErrorStateProps {
+  error: string;
+  onRetry: () => void;
+}
+
 /**
  * Receipt Error State Component
  * Shows error messages with retry functionality and UI standards compliance
  */
-const ReceiptErrorState = ({ error, onRetry }) => {
+const ReceiptErrorState: React.FC<ReceiptErrorStateProps> = ({ error, onRetry }) => {
   return (
     <div className="glassmorphism rounded-lg p-4 mb-4 border-2 border-black bg-red-100/40 backdrop-blur-sm">
       <div className="flex items-center gap-3">

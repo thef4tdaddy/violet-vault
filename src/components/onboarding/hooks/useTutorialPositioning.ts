@@ -1,11 +1,21 @@
 import { useCallback } from "react";
 
+interface TutorialStep {
+  position?: "top" | "bottom" | "left" | "right" | "center";
+}
+
+interface TooltipPosition {
+  top: number | string;
+  left: number | string;
+  transform: string;
+}
+
 /**
  * Hook for calculating tutorial tooltip positioning
  * Extracted from OnboardingTutorial.jsx to reduce complexity
  */
 export const useTutorialPositioning = () => {
-  const getTooltipPosition = useCallback((element, step) => {
+  const getTooltipPosition = useCallback((element: HTMLElement | null, step: TutorialStep): TooltipPosition => {
     if (!element || step.position === "center") {
       return {
         top: "50%",
