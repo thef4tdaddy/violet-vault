@@ -89,7 +89,7 @@ interface AddBillModalProps {
 
 interface BillModalState {
   isMobile: boolean;
-  modalRef: RefObject<HTMLDivElement>;
+  modalRef: RefObject<HTMLDivElement | null>;
   formData: BillFormData;
   isSubmitting: boolean;
   categories: string[];
@@ -203,7 +203,7 @@ const useBillModalState = ({
 
   useEffect(() => {
     if (isOpen && budgetId && currentUser) {
-      initializeEditLocks(budgetId, currentUser);
+      initializeEditLocks(budgetId ?? "", currentUser);
     }
   }, [isOpen, budgetId, currentUser]);
 

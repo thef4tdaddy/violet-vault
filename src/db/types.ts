@@ -122,7 +122,7 @@ export interface AuditLogEntry {
 export interface CacheEntry {
   key: string;
   value: unknown;
-  expiresAt: number;
+  expiresAt: number | null;
   category: string;
   // Additional cache properties
   size?: number;
@@ -151,9 +151,12 @@ export interface BudgetCommit {
   timestamp: number;
   message: string;
   author: string;
-  parentHash?: string;
+  parentHash?: string | null;
   deviceFingerprint?: string;
-  // Additional commit properties
+  // Additional commit properties for encrypted data
+  encryptedSnapshot?: number[];
+  iv?: number[];
+  snapshotData?: string;
   changes?: Record<string, unknown>;
   [key: string]: unknown;
 }

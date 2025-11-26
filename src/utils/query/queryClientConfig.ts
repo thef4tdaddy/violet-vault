@@ -55,14 +55,14 @@ export const createQueryClient = () => {
 
     // Query cache with global error handling
     queryCache: new QueryCache({
-      onError: (error: unknown, query: Query) => {
+      onError: (error: Error, query: Query<unknown, unknown, unknown, readonly unknown[]>) => {
         logger.error("Query error", error, {
           queryKey: query.queryKey,
           source: "queryClient",
         });
         // Error logging is handled by logger, no need for direct H usage
       },
-      onSuccess: (_data: unknown, query: Query) => {
+      onSuccess: (_data: unknown, query: Query<unknown, unknown, unknown, readonly unknown[]>) => {
         // Optional: Track successful queries in development
         if (import.meta.env.DEV) {
           logger.debug("Query success", {

@@ -149,15 +149,20 @@ const CategoryBarChart = ({
           <Tooltip content={tooltipRenderer} />
           {showLegend && <Legend />}
 
-          {barConfig.map((barProps, index) => (
-            <Bar
-              key={barProps.dataKey}
-              radius={chartTypeConfigs.bar.radius}
-              maxBarSize={maxBarSize}
-              fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
-              {...barProps}
-            />
-          ))}
+          {barConfig.map((barProps, index) => {
+            const { fill: barFill, dataKey, ...restBarProps } = barProps;
+            const fillColor = (barFill as string) || getColorByCategory(String(dataKey), index);
+            return (
+              <Bar
+                key={String(dataKey)}
+                dataKey={String(dataKey)}
+                radius={chartTypeConfigs.bar.radius}
+                maxBarSize={maxBarSize}
+                fill={fillColor}
+                {...restBarProps}
+              />
+            );
+          })}
         </BarChart>
       )}
     </ChartContainer>

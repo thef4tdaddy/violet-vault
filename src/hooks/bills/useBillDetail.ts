@@ -38,7 +38,7 @@ interface PaymentData {
 }
 
 interface BillDetailParams {
-  bill: BillFromTypes;
+  bill: BillFromTypes | null;
   onDelete: (billId: string) => void;
   onMarkPaid: (billId: string, paymentData: PaymentData) => void;
   onClose: () => void;

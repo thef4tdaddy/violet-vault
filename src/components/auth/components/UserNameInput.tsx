@@ -1,3 +1,10 @@
+interface UserNameInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
+
 /**
  * User Name Input Component
  * Name input field with proper labeling and validation
@@ -8,7 +15,7 @@ const UserNameInput = ({
   onChange,
   disabled = false,
   placeholder = "e.g., Sarah, John, etc.",
-}) => {
+}: UserNameInputProps) => {
   return (
     <div>
       <label className="block text-base font-black text-black mb-3 uppercase tracking-wider">

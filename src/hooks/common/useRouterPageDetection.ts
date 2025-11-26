@@ -19,7 +19,7 @@ export const useRouterPageDetection = () => {
     const isPWA = process.env.REACT_APP_BUILD_TARGET === "pwa";
 
     // Map URL path to view name using existing config
-    const currentView = pathToViewMap[pathname] || "unknown";
+    const currentView = (pathToViewMap as Record<string, string>)[pathname] || "unknown";
 
     // Determine if this is an app route or potential marketing route
     const isAppRoute = Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
@@ -63,7 +63,7 @@ export const useRouterPageDetection = () => {
         activity: "Activity History",
       };
 
-      const viewName = viewNames[currentView] || currentView;
+      const viewName = (viewNames as Record<string, string>)[currentView] || currentView;
       return isPWA ? `PWA: ${viewName}` : `App: ${viewName}`;
     };
 

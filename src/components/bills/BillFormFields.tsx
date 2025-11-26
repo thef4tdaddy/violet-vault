@@ -98,7 +98,7 @@ const BillFormFields = ({
           label="Notes"
           value={formData.notes}
           onChange={(e) => updateField("notes", e.target.value)}
-          disabled={editingBill && !canEdit}
+          disabled={!!editingBill && !canEdit}
           rows={3}
           placeholder="Additional notes about this bill..."
         />

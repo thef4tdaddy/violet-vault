@@ -91,8 +91,8 @@ export const useTransactionImport = (
 
     // Process auto-funding for income transactions
     const autoFundingPromises: unknown[] = [];
-    const incomeTransactions = processedTransactions.filter(
-      (t: { amount: number }) => t.amount > 0
+    const incomeTransactions = (processedTransactions as Array<{ amount: number }>).filter(
+      (t) => t.amount > 0
     );
 
     if (incomeTransactions.length > 0) {

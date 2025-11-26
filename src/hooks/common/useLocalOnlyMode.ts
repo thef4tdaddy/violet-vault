@@ -1,6 +1,12 @@
 import { useState, useCallback } from "react";
 import logger from "../../utils/common/logger";
 
+interface LocalOnlyUser {
+  budgetId?: string;
+  userName?: string;
+  userColor?: string;
+}
+
 /**
  * DEPRECATED: Legacy local-only mode hook
  * Now replaced by cloudSyncEnabled toggle in budgetStore
@@ -8,11 +14,11 @@ import logger from "../../utils/common/logger";
  */
 export const useLocalOnlyMode = () => {
   const [_loading, _setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Stub values - local-only mode is now handled by cloudSyncEnabled toggle
-  const isLocalOnlyMode = false;
-  const localOnlyUser = null;
+  const isLocalOnlyMode = false as const;
+  const localOnlyUser: LocalOnlyUser | null = null;
   const isInitialized = true;
 
   // Stub implementations - all return no-op or default values

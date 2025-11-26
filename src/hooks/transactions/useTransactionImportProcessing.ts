@@ -6,7 +6,7 @@ import logger from "../../utils/common/logger";
  * Hook for processing and importing transactions
  * Extracted from useTransactionImport.js for better maintainability
  */
-export const useTransactionImportProcessing = (currentUser: { userName?: string }) => {
+export const useTransactionImportProcessing = (currentUser: { userName?: string } | undefined) => {
   const [importProgress, setImportProgress] = useState(0);
   const [autoFundingResults, setAutoFundingResults] = useState<unknown[]>([]);
 

@@ -42,7 +42,7 @@ export const BillDetailPaymentHistory: React.FC<BillDetailPaymentHistoryProps> =
               <div>
                 <p className="text-sm font-medium">${payment.amount?.toFixed(2)}</p>
                 <p className="text-xs text-gray-600">
-                  {new Date(payment.paidDate || payment.date).toLocaleDateString()}
+                  {new Date(payment.paidDate ?? payment.date ?? "").toLocaleDateString()}
                 </p>
               </div>
               <div className="text-right">
