@@ -39,7 +39,9 @@ export const useQRCodeProcessing = () => {
         return true;
       }
     } catch (error) {
-      logger.warn("Failed to parse QR data", { error: error instanceof Error ? error.message : String(error) });
+      logger.warn("Failed to parse QR data", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
     return false;
   };

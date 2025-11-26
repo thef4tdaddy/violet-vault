@@ -80,7 +80,7 @@ class PatchNotesManager {
     );
 
     const match = changelog.match(versionRegex);
-    if (!match) {
+    if (!match || match.index === undefined) {
       logger.warn(`No changelog entry found for version ${version}`);
       return this.getFallbackPatchNotes(version);
     }

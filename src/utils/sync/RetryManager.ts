@@ -168,7 +168,15 @@ export class RetryManager {
       maxRetries: config.maxRetries,
     });
 
-    if (attempt === config.maxRetries || !shouldRetryError(error)) {
+    // Convert unknown error to RetryableError interface
+    const retryableError = {
+      name: error instanceof Error ? error.name : undefined,
+      message: error instanceof Error ? error.message : String(error),
+      code: (error as { code?: string }).code,
+      status: (error as { status?: number }).status,
+    };
+
+    if (attempt === config.maxRetries || !shouldRetryError(retryableError)) {
       logger.error(
         `❌ ${this.name}: ${config.operationName} failed after ${config.maxRetries} attempts`
       );

@@ -76,7 +76,7 @@ export class SyncQueue {
         reject,
       };
 
-      this._addToQueue(operationType, queueItem);
+      this._addToQueue(operationType, queueItem as QueueItem<unknown>);
       this._scheduleProcessing(operationType);
 
       logger.debug(`📥 ${this.name}: Enqueued ${operationType}`, {

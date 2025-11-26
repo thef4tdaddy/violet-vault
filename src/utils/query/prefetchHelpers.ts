@@ -51,10 +51,17 @@ export const prefetchHelpers = {
           }
 
           // Fallback to direct database query
-          const cached = await budgetDb.getEnvelopesByCategory(
-            filters.category ?? undefined,
-            filters.includeArchived
-          );
+          let cached: Awaited<ReturnType<typeof budgetDb.getEnvelopesByCategory>>;
+          if (filters.category) {
+            cached = await budgetDb.getEnvelopesByCategory(
+              filters.category,
+              filters.includeArchived
+            );
+          } else if (filters.includeArchived) {
+            cached = await budgetDb.envelopes.toArray();
+          } else {
+            cached = await budgetDb.getActiveEnvelopes();
+          }
 
           if (cached && cached.length > 0) {
             return cached;

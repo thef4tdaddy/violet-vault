@@ -346,6 +346,8 @@ export const preloadOCR = async (): Promise<void> => {
     await ocrProcessor.initialize();
     logger.info("🔍 OCR preloaded successfully");
   } catch (error) {
-    logger.warn("Failed to preload OCR:", { error: error instanceof Error ? error.message : String(error) });
+    logger.warn("Failed to preload OCR:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };

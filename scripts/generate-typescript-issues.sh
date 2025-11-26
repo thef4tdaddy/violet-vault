@@ -13,6 +13,7 @@ cd "$PROJECT_ROOT"
 # Parse arguments
 MODE="${1:-normal}" # 'normal' or 'strict'
 MAX_ERRORS="${2:-}" # Optional: limit to last N errors
+ERRORS_PER_ISSUE="${3:-}" # Optional: number of errors per issue (defaults to 120)
 
 # Determine which results file to use
 if [ "$MODE" = "strict" ]; then
@@ -71,10 +72,30 @@ fi
 
 echo "🚀 Generating GitHub issues for ${MODE_LABEL} TypeScript errors..."
 echo ""
+
+# Prompt for errors per issue if not provided
+if [ -z "$ERRORS_PER_ISSUE" ]; then
+  echo "How many problems per issue? (default: 120)"
+  read -r ERRORS_PER_ISSUE_INPUT
+  if [ -n "$ERRORS_PER_ISSUE_INPUT" ]; then
+    ERRORS_PER_ISSUE="$ERRORS_PER_ISSUE_INPUT"
+  else
+    ERRORS_PER_ISSUE="120"
+  fi
+fi
+
+# Validate ERRORS_PER_ISSUE is a number
+if ! [[ "$ERRORS_PER_ISSUE" =~ ^[0-9]+$ ]]; then
+  echo "❌ Error: Errors per issue must be a positive number"
+  exit 1
+fi
+
+echo ""
 echo "Configuration:"
 echo "  Repository: $GITHUB_REPO"
 echo "  Results file: $RESULTS_FILE"
 echo "  Mode: $MODE_LABEL"
+echo "  Errors per issue: $ERRORS_PER_ISSUE"
 if [ -n "$MAX_ERRORS" ]; then
   echo "  Max errors: $MAX_ERRORS (last N errors)"
 fi
@@ -82,11 +103,9 @@ echo "  Using: GitHub CLI (gh)"
 echo ""
 
 # Run the Node.js script
-if [ -n "$MAX_ERRORS" ]; then
-  node "$SCRIPT_DIR/generate-typescript-issues.js" "$MODE" "$MAX_ERRORS"
-else
-  node "$SCRIPT_DIR/generate-typescript-issues.js" "$MODE"
-fi
+# Pass arguments: MODE, MAX_ERRORS (or empty), ERRORS_PER_ISSUE
+# Always pass all three for consistent parsing
+node "$SCRIPT_DIR/generate-typescript-issues.js" "$MODE" "${MAX_ERRORS:-}" "${ERRORS_PER_ISSUE:-}"
 
 echo ""
 echo "✅ Done!"
