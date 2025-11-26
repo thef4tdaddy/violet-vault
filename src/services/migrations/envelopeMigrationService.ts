@@ -75,7 +75,7 @@ export const convertSupplementalAccountToEnvelope = (
   const accountId =
     typeof account.id === "string"
       ? account.id
-      : `supplemental_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      : `supplemental_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
   return {
     id: accountId,
@@ -207,7 +207,7 @@ const migrateSupplementalAccounts = async (result: MigrationResult): Promise<voi
         const accountId =
           typeof account.id === "string"
             ? account.id
-            : `supplemental_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            : `supplemental_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
         // Check if an envelope with this ID already exists
         const existingEnvelope = await budgetDb.envelopes.get(accountId);
