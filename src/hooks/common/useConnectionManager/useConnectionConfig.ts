@@ -3,7 +3,7 @@
  * Extracted from useConnectionManager.js for better maintainability
  */
 export const useConnectionConfig = () => {
-  const getConnectionConfig = (entityType) => {
+  const getConnectionConfig = (entityType: string) => {
     switch (entityType) {
       case "bill":
         return {

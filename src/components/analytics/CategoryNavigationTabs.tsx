@@ -3,7 +3,7 @@ import { getIcon } from "@/utils/icons";
 
 interface CategoryNavigationTabsProps {
   activeTab: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (tabId: "suggestions" | "analysis" | "settings") => void;
   suggestionCount: number;
   categoryCount: number;
 }

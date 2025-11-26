@@ -1,7 +1,11 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const CashFlowSummary = ({ cashFlow }) => {
+interface CashFlowData {
+  unassignedCash?: number;
+}
+
+const CashFlowSummary = ({ cashFlow }: { cashFlow: CashFlowData }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">

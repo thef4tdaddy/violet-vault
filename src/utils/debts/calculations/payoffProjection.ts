@@ -3,16 +3,22 @@
  * Isolated to prevent temporal dead zone issues during minification
  */
 
+interface DebtInput {
+  currentBalance?: string | number;
+  minimumPayment?: string | number;
+  interestRate?: string | number;
+}
+
 /**
  * Calculate payoff projection for a debt
  * @param {Object} debt - The debt object
  * @returns {Object} Payoff projection with monthsToPayoff, totalInterest, payoffDate
  */
-export function calculatePayoffProjection(debt) {
+export function calculatePayoffProjection(debt: DebtInput) {
   // Ensure we have valid numeric values
-  const currentBalance = parseFloat(debt.currentBalance) || 0;
-  const minimumPayment = parseFloat(debt.minimumPayment) || 0;
-  const interestRate = parseFloat(debt.interestRate) || 0;
+  const currentBalance = parseFloat(String(debt.currentBalance)) || 0;
+  const minimumPayment = parseFloat(String(debt.minimumPayment)) || 0;
+  const interestRate = parseFloat(String(debt.interestRate)) || 0;
 
   // Return null projection if missing essential data
   if (currentBalance <= 0 || minimumPayment <= 0 || interestRate <= 0) {

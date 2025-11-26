@@ -33,7 +33,7 @@ export const extractMerchantName = (description: string | null | undefined): str
  * Suggest bill category based on name patterns
  * Simplified from complex if-chain to pattern matching
  */
-export const suggestBillCategory = (billName) => {
+export const suggestBillCategory = (billName: string): string | null => {
   const name = billName.toLowerCase();
 
   for (const [category, patterns] of Object.entries(BILL_CATEGORY_PATTERNS)) {

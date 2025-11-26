@@ -6,7 +6,7 @@ export const useBillDiscoveryState = (
   isOpen: boolean = false
 ) => {
   const [selectedBills, setSelectedBills] = useState<Set<string>>(new Set());
-  const [billEnvelopeMap, setBillEnvelopeMap] = useState({});
+  const [billEnvelopeMap, setBillEnvelopeMap] = useState<Record<string, string>>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Pre-populate envelope suggestions when modal opens

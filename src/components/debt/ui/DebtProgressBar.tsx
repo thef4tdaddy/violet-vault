@@ -1,8 +1,15 @@
+interface DebtProgressData {
+  hasProgress: boolean;
+  percentage: number;
+  remaining?: number;
+  original?: number;
+}
+
 /**
  * Progress bar component for displaying debt payoff progress
  * Pure UI component - receives progress data as props
  */
-const DebtProgressBar = ({ progressData }) => {
+const DebtProgressBar = ({ progressData }: { progressData: DebtProgressData }) => {
   if (!progressData.hasProgress) {
     return null;
   }

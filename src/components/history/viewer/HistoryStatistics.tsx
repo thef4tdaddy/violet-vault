@@ -1,7 +1,17 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const HistoryStatistics = ({ statistics }) => {
+interface HistoryStatisticsData {
+  totalCommits?: number;
+  dateRange?: {
+    newest?: string | Date | null;
+    oldest?: string | Date | null;
+  };
+  authorBreakdown?: Record<string, number>;
+  actionBreakdown?: Record<string, number>;
+}
+
+const HistoryStatistics = ({ statistics }: { statistics: HistoryStatisticsData | null }) => {
   if (!statistics) return null;
 
   return (

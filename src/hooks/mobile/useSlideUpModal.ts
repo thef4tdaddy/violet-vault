@@ -1,5 +1,13 @@
 import { useState, useCallback } from "react";
 
+interface SlideUpModalConfig {
+  height?: string;
+  title?: string;
+  showHandle?: boolean;
+  backdrop?: boolean;
+  [key: string]: unknown;
+}
+
 /**
  * Custom hook for managing slide-up modal state
  *
@@ -8,7 +16,7 @@ import { useState, useCallback } from "react";
  *
  * Part of Issue #164 - Implement Slide-Up Modals for Mobile Flows
  */
-const useSlideUpModal = (initialConfig = {}) => {
+const useSlideUpModal = (initialConfig: SlideUpModalConfig = {}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState({
     height: "three-quarters",
@@ -38,7 +46,7 @@ const useSlideUpModal = (initialConfig = {}) => {
     [isOpen, openModal, closeModal]
   );
 
-  const updateConfig = useCallback((newConfig) => {
+  const updateConfig = useCallback((newConfig: Partial<SlideUpModalConfig>) => {
     setConfig((prev) => ({ ...prev, ...newConfig }));
   }, []);
 

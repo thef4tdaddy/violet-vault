@@ -2,7 +2,16 @@ import React from "react";
 import { getIcon } from "../../../utils/icons";
 import { formatCurrency } from "../../../utils/transactions/splitterHelpers";
 
-const SplitTotals = ({ totals }) => {
+interface SplitTotalsData {
+  original: number;
+  allocated: number;
+  remaining: number;
+  isValid: boolean;
+  isOverAllocated: boolean;
+  isUnderAllocated: boolean;
+}
+
+const SplitTotals = ({ totals }: { totals: SplitTotalsData }) => {
   const {
     original,
     allocated,

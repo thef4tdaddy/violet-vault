@@ -4,7 +4,11 @@ import IntegrityStatusIndicator from "../IntegrityStatusIndicator";
 import HelpTooltip from "../../ui/HelpTooltip";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
-const HistoryHeader = ({ onClose }) => {
+interface HistoryHeaderProps {
+  onClose: () => void;
+}
+
+const HistoryHeader = ({ onClose }: HistoryHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex-1">

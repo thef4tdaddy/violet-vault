@@ -1,7 +1,18 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const ArchivingResult = ({ lastResult }) => {
+interface ArchivingResultData {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  stats?: {
+    processed?: number;
+    archived?: number;
+    aggregated?: number;
+  };
+}
+
+const ArchivingResult = ({ lastResult }: { lastResult: ArchivingResultData | null }) => {
   if (!lastResult) return null;
 
   return (

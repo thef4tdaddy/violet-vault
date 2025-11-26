@@ -33,7 +33,9 @@ const BAR_SERIES = [
   { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
 ];
 
-const SERIES_BY_TYPE = {
+type ChartType = "line" | "area" | "bar";
+
+const SERIES_BY_TYPE: Record<ChartType, typeof LINE_SERIES> = {
   line: LINE_SERIES,
   area: AREA_SERIES,
   bar: BAR_SERIES,
@@ -43,8 +45,8 @@ interface TrendLineChartProps {
   title?: string;
   subtitle?: ReactNode;
   data?: Array<Record<string, unknown>>;
-  chartType?: string;
-  type?: string;
+  chartType?: ChartType | string;
+  type?: ChartType | string;
   height?: number;
   [key: string]: unknown;
 }
@@ -58,7 +60,7 @@ const TrendLineChart = ({
   height = 300,
   ...props
 }: TrendLineChartProps) => {
-  const resolvedType = type || chartType || "line";
+  const resolvedType = (type || chartType || "line") as ChartType;
   const chartData = Array.isArray(data) ? data : [];
   const series = SERIES_BY_TYPE[resolvedType] || SERIES_BY_TYPE.line;
 
