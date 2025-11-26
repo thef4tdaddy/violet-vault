@@ -74,7 +74,7 @@ export const optimisticHelpers = {
         ...newEnvelope,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as Envelope;
 
       // Update TanStack Query cache - envelope list
       queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
@@ -194,7 +194,7 @@ export const optimisticHelpers = {
         ...newTransaction,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as Transaction;
 
       // Update TanStack Query cache - transaction lists
       queryClient.setQueriesData(
@@ -308,7 +308,7 @@ export const optimisticHelpers = {
         ...newGoal,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as SavingsGoal;
 
       // Add to database
       await budgetDb.savingsGoals.add(goalWithTimestamp);

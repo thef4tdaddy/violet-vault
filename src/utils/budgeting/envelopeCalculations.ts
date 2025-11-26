@@ -89,6 +89,7 @@ interface TotalsAccumulator {
   totalBiweeklyNeed: number;
   billsDueCount: number;
   envelopeCount: number;
+  [key: string]: unknown;
 }
 
 interface EnvelopeTotals {

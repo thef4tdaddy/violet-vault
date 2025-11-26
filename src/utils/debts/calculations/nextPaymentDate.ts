@@ -11,7 +11,7 @@ interface PaymentHistoryEntry {
 
 interface Debt {
   paymentDueDate?: string;
-  nextPaymentDate?: string;
+  nextPaymentDate?: string | Date;
   paymentFrequency?: string;
   paymentHistory?: PaymentHistoryEntry[];
 }
@@ -41,7 +41,9 @@ export function calculateNextPaymentDate(
   }
 
   if (debt.nextPaymentDate) {
-    return debt.nextPaymentDate;
+    return typeof debt.nextPaymentDate === "string"
+      ? debt.nextPaymentDate
+      : debt.nextPaymentDate.toISOString();
   }
 
   // Calculate based on payment frequency and last payment

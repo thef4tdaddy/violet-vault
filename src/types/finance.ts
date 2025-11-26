@@ -59,6 +59,7 @@ export interface Transaction {
   source?: string;
   fromEnvelopeId?: string | number;
   toEnvelopeId?: string | number;
+  [key: string]: unknown;
 }
 
 /**
@@ -68,8 +69,8 @@ export interface Envelope {
   id: string | number;
   name: string;
   category?: string;
-  currentBalance: number;
-  targetAmount: number;
+  currentBalance?: number;
+  targetAmount?: number;
   color?: string;
   icon?: string;
   description?: string;
@@ -78,6 +79,7 @@ export interface Envelope {
   lastActivity?: string;
   priority?: number;
   isArchived?: boolean;
+  [key: string]: unknown;
 }
 
 /**
@@ -91,6 +93,7 @@ export interface SplitAllocation {
   envelopeId: string | number | "";
   isOriginalItem?: boolean;
   originalItem?: unknown;
+  [key: string]: unknown;
 }
 
 /**

@@ -94,6 +94,7 @@ interface Bill {
   id: string;
   name: string;
   amount: number;
+  [key: string]: unknown;
 }
 
 interface ModalContentProps {
@@ -168,7 +169,7 @@ export const ModalContent = ({
       {/* Bill Connection */}
       {allBills.length > 0 && (
         <BillConnectionSelector
-          allBills={allBills as unknown as import("@/db/types").Bill[]}
+          allBills={allBills}
           selectedBillId={formData.billId}
           onBillSelection={onBillSelection}
           onCreateBill={onCreateBill}

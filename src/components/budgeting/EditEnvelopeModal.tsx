@@ -11,6 +11,7 @@ import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
 interface EnvelopeRef {
   id: string;
+  [key: string]: unknown;
 }
 
 interface EditEnvelopeModalProps {

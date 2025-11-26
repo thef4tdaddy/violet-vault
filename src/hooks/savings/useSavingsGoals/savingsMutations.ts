@@ -24,12 +24,12 @@ export const useAddSavingsGoalMutation = () => {
   return useMutation({
     mutationKey: ["savingsGoals", "add"],
     mutationFn: async (goalData: NewSavingsGoalData) => {
-      const newGoal: SavingsGoal = {
+      const newGoal = {
         id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         ...goalData,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as SavingsGoal;
 
       // Apply optimistic update first
       await optimisticHelpers.addSavingsGoal(newGoal);
