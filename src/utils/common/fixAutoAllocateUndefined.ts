@@ -63,7 +63,7 @@ export async function fixAutoAllocateUndefined() {
     return { success: true, fixed: fixedCount };
   } catch (error) {
     logger.error("❌ Auto-allocate fix failed:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 

@@ -49,7 +49,7 @@ interface UseSyncHealthIndicatorReturn {
   isBackgroundSyncing: boolean;
   isRecovering: boolean;
   recoveryResult: RecoveryResult | null;
-  dropdownRef: RefObject<HTMLDivElement>;
+  dropdownRef: RefObject<HTMLDivElement | null>;
   setShowDetails: (show: boolean) => void;
   checkSyncHealth: () => Promise<void>;
   runFullValidation: () => Promise<void>;

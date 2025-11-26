@@ -161,13 +161,15 @@ class FirebaseSyncService {
       throw new Error("Firebase auth not initialized");
     }
 
+    const auth = this.auth; // Store in local variable for type narrowing
+
     return new Promise<boolean>((resolve, reject) => {
       const timeout = setTimeout(() => {
         unsubscribe();
         resolve(false);
       }, 10000);
 
-      const unsubscribe = onAuthStateChanged(this.auth, async (user) => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
         try {
           clearTimeout(timeout);
 

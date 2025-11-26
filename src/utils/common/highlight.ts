@@ -282,7 +282,7 @@ export const captureError = (error: Error, context: Record<string, unknown> = {}
   } catch (highlightError) {
     // Fallback to local storage and retry mechanism
     errorFallback.addError(error, context);
-    logger.warn("Highlight.io blocked, using fallback error reporting", highlightError);
+    logger.warn("Highlight.io blocked, using fallback error reporting", { error: highlightError instanceof Error ? highlightError.message : String(highlightError) });
   }
 };
 

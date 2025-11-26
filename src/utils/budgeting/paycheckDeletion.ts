@@ -31,7 +31,7 @@ export const reverseEnvelopeAllocations = async (envelopeAllocations?: EnvelopeA
   for (const allocation of envelopeAllocations) {
     const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
     if (envelope) {
-      const newBalance = envelope.currentBalance - allocation.amount;
+      const newBalance = (envelope.currentBalance ?? 0) - allocation.amount;
       await budgetDb.envelopes.update(allocation.envelopeId, {
         currentBalance: Math.max(0, newBalance),
       });

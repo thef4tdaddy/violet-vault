@@ -84,7 +84,7 @@ export const useToastStore = create<ToastState>((set, _get) => {
     },
 
     clearAllToasts: () => {
-      set({ toasts: [] } as ToastState);
+      set((state) => ({ ...state, toasts: [] }));
     },
 
     // Convenience methods for different toast types

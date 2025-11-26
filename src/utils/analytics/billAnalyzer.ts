@@ -68,7 +68,7 @@ export const analyzeBillCategorization = (bills: BillItem[], _settings: Settings
     // Group by suggested bill type
     const billTypePatterns: Record<string, BillItem[]> = {};
     uncategorizedBills.forEach((bill) => {
-      const suggestedType = suggestBillCategory(bill.name);
+    const suggestedType = suggestBillCategory(bill.name ?? "");
       if (suggestedType) {
         if (!billTypePatterns[suggestedType]) {
           billTypePatterns[suggestedType] = [];
