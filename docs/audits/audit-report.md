@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | +1 |
-| TypeScript Errors | 28 | +28 |
-| TypeScript Strict Mode Errors | 183 | +183 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 23 | -5 |
+| TypeScript Strict Mode Errors | 180 | -3 |
 
-*Last updated: 2025-11-26 02:34:07 UTC*
+*Last updated: 2025-11-26 02:40:54 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -48,16 +48,13 @@
 
 ### Files with Most Type Errors
 - 3 errors in `src/utils/query/optimisticHelpers.ts`
-- 3 errors in `src/components/layout/ViewRenderer.tsx`
-- 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
+- 2 errors in `src/components/layout/ViewRenderer.tsx`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/hooks/savings/useSavingsGoals/savingsMutations.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
-- 1 errors in `src/hooks/bills/useBillOperations.ts`
-- 1 errors in `src/components/ui/SecurityAlert.tsx`
-- 1 errors in `src/components/transactions/TransactionSplitter.tsx`
+- 1 errors in `src/hooks/bills/useBillForm.ts`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
 - 1 errors in `src/components/savings/SavingsGoals.tsx`
@@ -72,10 +69,8 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 14 | `TS2322` |
-| 9 | `TS2345` |
-| 2 | `TS2339` |
-| 1 | `TS6133` |
+| 13 | `TS2322` |
+| 8 | `TS2345` |
 | 1 | `TS2741` |
 | 1 | `TS2740` |
 
@@ -101,12 +96,6 @@ src/components/layout/ViewRenderer.tsx(337,9): error TS2322: Type 'import("/home
     Types of property 'id' are incompatible.
       Type 'string | number' is not assignable to type 'string'.
         Type 'number' is not assignable to type 'string'.
-src/components/layout/ViewRenderer.tsx(338,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]' is not assignable to type 'Envelope[]'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'Envelope'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'string'.
-          Type 'number' is not assignable to type 'string'.
 src/components/receipts/ReceiptButton.tsx(160,11): error TS2322: Type '{ merchant: string; total: string; date: string; time: string; tax: string; subtotal: string; items: { description: string; amount: number; rawLine: string; }[]; confidence: Record<string, string>; rawText?: string; processingTime?: number; }' is not assignable to type 'ReceiptData'.
   Types of property 'total' are incompatible.
     Type 'string' is not assignable to type 'number'.
@@ -138,16 +127,8 @@ src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'un
 src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void>' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
-src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
-  Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number | ""; isOriginalItem?: boolean; originalItem?: unknown; }' is not assignable to type 'Split'.
-    Types of property 'envelopeId' are incompatible.
-      Type 'string | number' is not assignable to type 'string'.
-        Type 'number' is not assignable to type 'string'.
-src/components/ui/SecurityAlert.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
-src/hooks/bills/useBillOperations.ts(42,77): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
-  Property 'targetAmount' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
-src/hooks/budgeting/useEnvelopesQuery.ts(130,25): error TS2339: Property 'localeCompare' does not exist on type 'unknown'.
-src/hooks/budgeting/useEnvelopesQuery.ts(132,25): error TS2339: Property 'localeCompare' does not exist on type 'unknown'.
+src/hooks/bills/useBillForm.ts(55,9): error TS2322: Type 'string | number' is not assignable to type 'string'.
+  Type 'number' is not assignable to type 'string'.
 src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type '() => Promise<BudgetRecord | null>' is not assignable to parameter of type '() => Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
   Type 'Promise<BudgetRecord>' is not assignable to type 'Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
     Type 'BudgetRecord' has no properties in common with type '{ actualBalance?: number; unassignedCash?: number; }'.
@@ -169,9 +150,9 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 ### Files with Most Strict Mode Errors
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 4 errors in `src/components/layout/ViewRenderer.tsx`
 - 3 errors in `src/utils/query/optimisticHelpers.ts`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
+- 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailModal.tsx`
@@ -189,9 +170,7 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 2 errors in `src/hooks/transactions/useTransactionImport.ts`
 - 2 errors in `src/hooks/transactions/useTransactionFileUpload.ts`
 - 2 errors in `src/hooks/common/useRouterPageDetection.ts`
-- 2 errors in `src/hooks/budgeting/useEnvelopesQuery.ts`
 - 2 errors in `src/hooks/budgeting/useBudgetHistoryQuery.ts`
-- 2 errors in `src/hooks/bills/useBillOperations.ts`
 - 2 errors in `src/hooks/auth/useAuthenticationManager.ts`
 - 2 errors in `src/hooks/auth/useAuthManager.ts`
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
@@ -200,6 +179,7 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
 - 2 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 2 errors in `src/components/budgeting/DeleteEnvelopeModal.tsx`
 - 2 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 2 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
@@ -248,15 +228,15 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 1 errors in `src/hooks/bills/useBulkBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBills/index.ts`
+- 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
+- 1 errors in `src/hooks/bills/useBillForm.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 1 errors in `src/hooks/auth/authOperations.ts`
 - 1 errors in `src/hooks/analytics/utils/csvImageExportUtils.ts`
 - 1 errors in `src/hooks/analytics/useTransactionFiltering.ts`
 - 1 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
-- 1 errors in `src/components/ui/SecurityAlert.tsx`
-- 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
@@ -300,21 +280,20 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 70 | `TS2322` |
-| 63 | `TS2345` |
+| 69 | `TS2322` |
+| 62 | `TS2345` |
 | 8 | `TS2769` |
+| 7 | `TS18048` |
 | 6 | `TS7006` |
-| 6 | `TS18046` |
-| 5 | `TS18048` |
 | 4 | `TS7053` |
 | 4 | `TS7031` |
+| 4 | `TS18046` |
 | 3 | `TS2783` |
 | 3 | `TS2719` |
 | 2 | `TS2722` |
 | 2 | `TS2339` |
 | 2 | `TS18047` |
 | 1 | `TS7016` |
-| 1 | `TS6133` |
 | 1 | `TS2740` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
@@ -421,6 +400,8 @@ src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,53): error TS2345: Arg
   Type 'undefined' is not assignable to type 'string'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(173,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
   Type 'undefined' is not assignable to type 'string | null'.
+src/components/budgeting/DeleteEnvelopeModal.tsx(111,14): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
+src/components/budgeting/DeleteEnvelopeModal.tsx(114,42): error TS18048: 'envelope.currentBalance' is possibly 'undefined'.
 src/components/budgeting/EnvelopeGrid.tsx(440,7): error TS2322: Type 'TotalsAccumulator' is not assignable to type '{ [key: string]: unknown; totalBalance: number; totalUpcoming: number; totalAllocated: number; envelopeCount: number; totalSpent: number; totalBiweeklyNeed: number; billsDueCount: number; totalBudget?: number | undefined; totalAvailable?: number | undefined; }'.
   Index signature for type 'string' is missing in type 'TotalsAccumulator'.
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(230,5): error TS2322: Type '(envelope: Partial<Envelope>) => void' is not assignable to type '(data: unknown) => void | Promise<void>'.
@@ -511,12 +492,6 @@ src/components/layout/ViewRenderer.tsx(337,9): error TS2322: Type 'import("/home
     Types of property 'id' are incompatible.
       Type 'string | number' is not assignable to type 'string'.
         Type 'number' is not assignable to type 'string'.
-src/components/layout/ViewRenderer.tsx(338,9): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]' is not assignable to type 'Envelope[]'.
-  Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'Envelope'.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope' is not assignable to type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope'.
-      Types of property 'id' are incompatible.
-        Type 'string | number' is not assignable to type 'string'.
-          Type 'number' is not assignable to type 'string'.
 src/components/mobile/FABActionMenu.tsx(124,11): error TS2719: Type 'FABAction' is not assignable to type 'FABAction'. Two different types with this name exist, but they are unrelated.
   Types of property 'action' are incompatible.
     Type '(() => void) | null' is not assignable to type '(() => void) | undefined'.
@@ -594,12 +569,6 @@ src/components/transactions/TransactionLedger.tsx(518,7): error TS2322: Type '(m
 src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void> | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
-src/components/transactions/TransactionSplitter.tsx(120,19): error TS2322: Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number; isOriginalItem?: boolean | undefined; originalItem?: unknown; }[]' is not assignable to type 'Split[]'.
-  Type '{ id: string; description: string; amount: number; category: string; envelopeId: string | number | ""; isOriginalItem?: boolean; originalItem?: unknown; }' is not assignable to type 'Split'.
-    Types of property 'envelopeId' are incompatible.
-      Type 'string | number' is not assignable to type 'string | undefined'.
-        Type 'number' is not assignable to type 'string'.
-src/components/ui/SecurityAlert.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/hooks/analytics/useAnalyticsIntegration.ts(129,36): error TS7006: Parameter 'newTimeFilter' implicitly has an 'any' type.
 src/hooks/analytics/useTransactionFiltering.ts(15,23): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.
   No index signature with a parameter of type 'string' was found on type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.
@@ -633,10 +602,10 @@ src/hooks/auth/useAuthenticationManager.ts(102,39): error TS2339: Property 'budg
 src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
+src/hooks/bills/useBillForm.ts(55,9): error TS2322: Type 'string | number' is not assignable to type 'string'.
+  Type 'number' is not assignable to type 'string'.
 src/hooks/bills/useBillManagerDisplayLogic.ts(36,26): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/hooks/bills/useBillOperations.ts(42,77): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
-  Property 'targetAmount' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
 src/hooks/bills/useBillOperations.ts(68,7): error TS2322: Type '(updatedBills: Bill[]) => Promise<BulkOperationResult>' is not assignable to type '(updatedBills: unknown[]) => Promise<{ success: boolean; successCount: number; errorCount: number; errors: string[]; message: string; }>'.
   Types of parameters 'updatedBills' and 'updatedBills' are incompatible.
     Type 'unknown[]' is not assignable to type 'Bill[]'.
@@ -654,8 +623,6 @@ src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of t
   Types of property 'parentHash' are incompatible.
     Type 'string | null' is not assignable to type 'string | undefined'.
       Type 'null' is not assignable to type 'string | undefined'.
-src/hooks/budgeting/useEnvelopesQuery.ts(130,18): error TS18046: 'aValue' is of type 'unknown'.
-src/hooks/budgeting/useEnvelopesQuery.ts(132,18): error TS18046: 'bValue' is of type 'unknown'.
 src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overload matches this call.
   Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
     Argument of type 'Date | undefined' is not assignable to parameter of type 'string | number | Date'.

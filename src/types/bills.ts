@@ -57,10 +57,11 @@ export interface BillFormData {
 
 // Envelope interface (simplified for bill forms)
 export interface Envelope {
-  id: string;
+  id: string | number;
   name: string;
   category?: string;
   currentBalance?: number;
+  targetAmount?: number;
   billId?: string;
   [key: string]: unknown;
 }

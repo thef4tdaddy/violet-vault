@@ -114,8 +114,8 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
 
       // Apply sorting
       filteredEnvelopes.sort((a, b) => {
-        let aValue = a[sortBy];
-        let bValue = b[sortBy];
+        let aValue: unknown = a[sortBy as keyof typeof a];
+        let bValue: unknown = b[sortBy as keyof typeof b];
 
         // Handle numeric values
         if (typeof aValue === "number" && typeof bValue === "number") {
@@ -123,13 +123,13 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
         }
 
         // Handle string values
-        aValue = String(aValue || "").toLowerCase();
-        bValue = String(bValue || "").toLowerCase();
+        const aStr = String(aValue || "").toLowerCase();
+        const bStr = String(bValue || "").toLowerCase();
 
         if (sortOrder === "asc") {
-          return aValue.localeCompare(bValue);
+          return aStr.localeCompare(bStr);
         } else {
-          return bValue.localeCompare(aValue);
+          return bStr.localeCompare(aStr);
         }
       });
 

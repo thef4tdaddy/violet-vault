@@ -69,8 +69,8 @@ export interface Envelope {
   id: string | number;
   name: string;
   category?: string;
-  currentBalance: number;
-  targetAmount: number;
+  currentBalance?: number;
+  targetAmount?: number;
   color?: string;
   icon?: string;
   description?: string;

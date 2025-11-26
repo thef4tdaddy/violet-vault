@@ -86,10 +86,11 @@ const TransactionSplitter = ({
     [splitter]
   );
 
-  // Convert splitAllocations to ensure id is string
+  // Convert splitAllocations to ensure id and envelopeId are strings
   const splitAllocationsForSection = splitter.splitAllocations.map((split) => ({
     ...split,
     id: String(split.id),
+    envelopeId: split.envelopeId ? String(split.envelopeId) : undefined,
   }));
 
   // Convert envelopes to ensure id is string
