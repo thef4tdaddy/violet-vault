@@ -124,8 +124,8 @@ const addSections = (config: PDFSectionConfig): number => {
  * Generate complete PDF report
  */
 export const generatePDFReport = async (
-  analyticsData: unknown,
-  balanceData: unknown,
+  analyticsData: AnalyticsData,
+  balanceData: BalanceData,
   timeFilter: string,
   exportOptions: ExportOptions,
   setExportProgress: (progress: number) => void

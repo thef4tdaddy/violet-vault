@@ -315,26 +315,38 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
       <PaycheckProcessor
         envelopes={envelopes}
         paycheckHistory={
-          tanStackPaycheckHistory as unknown as import("@/db/types").PaycheckHistory[]
+          tanStackPaycheckHistory as unknown as Array<{
+            id: string | number;
+            payerName?: string;
+            amount?: number;
+          }>
         }
         onProcessPaycheck={tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>}
-        onDeletePaycheck={
-          ((paycheckId: string) =>
-            handleDeletePaycheck(
-              paycheckId,
-              tanStackPaycheckHistory as unknown as {
-                id: string | number;
-                amount?: number;
-                allocations?: unknown[];
-              }[]
-            )) as unknown as (paycheck: import("@/db/types").PaycheckHistory) => Promise<void>
-        }
-        currentUser={currentUser as unknown as import("@/types/finance").User}
+        onDeletePaycheck={async (paycheck: { id: string | number }) => {
+          await handleDeletePaycheck(
+            paycheck.id,
+            tanStackPaycheckHistory as unknown as Array<{
+              id: string | number;
+              amount: number;
+              mode?: string;
+              envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
+              allocations?: unknown[];
+            }>
+          );
+        }}
+        currentUser={currentUser as unknown as { userName: string }}
       />
     ),
     bills: (
       <BillManager
-        transactions={safeTransactions as unknown as import("@/types/finance").Transaction[]}
+        transactions={
+          safeTransactions as unknown as Array<{
+            id: string;
+            date: Date | string;
+            amount: number;
+            [key: string]: unknown;
+          }>
+        }
         envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
         onUpdateBill={
           handleUpdateBill as unknown as (

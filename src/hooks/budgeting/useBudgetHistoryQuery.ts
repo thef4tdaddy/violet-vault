@@ -11,18 +11,18 @@ import logger from "../../utils/common/logger";
  * This replaces the Zustand-based budget history implementation
  */
 
-export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
+export const useBudgetCommits = (options?: Record<string, unknown>) => {
   const queryClient = useQueryClient();
 
   const commitsQuery = useQuery({
-    queryKey: queryKeys.budgetCommits(options as Record<string, unknown> | undefined),
+    queryKey: queryKeys.budgetCommits(options),
     queryFn: async () => {
       try {
         // Query budget commits table directly
         const commits = await budgetDb.budgetCommits.orderBy("timestamp").reverse().toArray();
         return commits || [];
       } catch (error) {
-        logger.warn("Failed to fetch budget commits:", error);
+        logger.warn("Failed to fetch budget commits:", error as Record<string, unknown>);
         return [];
       }
     },
@@ -90,26 +90,14 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
   };
 };
 
+import type { BudgetCommit, BudgetChange } from "../../db/types";
+
 export const useBudgetCommitDetails = (commitHash: string | null) => {
   return useQuery({
     queryKey: queryKeys.budgetCommit(commitHash ?? ""),
     queryFn: async (): Promise<{
-      commit?: {
-        hash?: string;
-        message?: string;
-        author?: string;
-        timestamp?: string | number;
-        parentHash?: string;
-        [key: string]: unknown;
-      };
-      changes: Array<{
-        type?: string;
-        changeType?: string;
-        entityType?: string;
-        description?: string;
-        diff?: Record<string, { from: unknown; to: unknown }>;
-        [key: string]: unknown;
-      }>;
+      commit?: BudgetCommit;
+      changes: BudgetChange[];
     } | null> => {
       if (!commitHash) return null;
 

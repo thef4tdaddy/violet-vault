@@ -50,7 +50,7 @@ export const useTransactionImport = (
     clearExistingData,
     processTransactions,
     generateSuccessMessage,
-  } = useTransactionImportProcessing(currentUser);
+  } = useTransactionImportProcessing(currentUser as { userName?: string } | undefined);
 
   const handleImport = async () => {
     if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {

@@ -190,7 +190,8 @@ const SyncDebugToolsSection: React.FC<SyncDebugToolsSectionProps> = ({ isDebugMo
                 });
                 if (confirmed) {
                   try {
-                    const result = await window.forceCloudDataReset();
+                    const result =
+                      window.forceCloudDataReset && (await window.forceCloudDataReset());
                     logger.info("🛡️ SUCCESS:", result as unknown as Record<string, unknown>);
                   } catch (error) {
                     logger.error("🛡️ ERROR:", error as Record<string, unknown>);

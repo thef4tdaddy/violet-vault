@@ -25,6 +25,14 @@ import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
+/**
+ * Lock data structure for edit locking
+ */
+interface LockData {
+  expiresAt?: unknown;
+  userName?: string;
+}
+
 interface SmartSuggestionState {
   smartBillDetails: BillSuggestion | null;
   resolvedIconName: string;
@@ -98,7 +106,7 @@ interface BillModalState {
   canEdit: boolean;
   isLocked: boolean;
   isOwnLock: boolean;
-  lock: unknown;
+  lock: LockData | null | undefined;
   breakLock: () => Promise<unknown> | void;
   smartBillDetails: BillSuggestion | null;
   resolvedIconName: string;

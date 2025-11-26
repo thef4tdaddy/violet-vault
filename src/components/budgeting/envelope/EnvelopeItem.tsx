@@ -75,8 +75,16 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = ({
         envelope={envelope}
         isCollapsed={isCollapsed}
         onSelect={onSelect}
-        onEdit={onEdit}
-        onViewHistory={onViewHistory}
+        onEdit={
+          onEdit as
+            | ((envelope: { id: string; name: string; category: string; color?: string }) => void)
+            | undefined
+        }
+        onViewHistory={
+          onViewHistory as
+            | ((envelope: { id: string; name: string; category: string; color?: string }) => void)
+            | undefined
+        }
         onToggleCollapse={() => {}} // Disabled when viewMode controls collapse
       />
 

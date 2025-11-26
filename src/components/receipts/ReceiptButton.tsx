@@ -52,7 +52,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptBut
       try {
         await preloadOCR();
       } catch (error) {
-        logger.warn("Failed to preload OCR:", error);
+        logger.warn("Failed to preload OCR:", error as Record<string, unknown>);
       } finally {
         setIsPreloading(false);
       }
@@ -157,20 +157,28 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptBut
       {/* Receipt to Transaction Modal */}
       {showTransactionModal && receiptData && (
         <ReceiptToTransactionModal
-          receiptData={
-            receiptData as unknown as {
-              merchant: string | null;
-              total: string | null;
-              date: string | null;
-              time: string | null;
-              tax: string | null;
-              subtotal: string | null;
-              items: Array<{ description: string; amount: number; rawLine: string }>;
-              confidence: Record<string, string>;
-              rawText?: string;
-              processingTime?: number;
-            }
-          }
+          receiptData={{
+            merchant: receiptData.merchant ?? undefined,
+            total: receiptData.total
+              ? Number.isFinite(parseFloat(receiptData.total))
+                ? parseFloat(receiptData.total)
+                : undefined
+              : undefined,
+            date: receiptData.date ?? undefined,
+            rawText: receiptData.rawText,
+            processingTime: receiptData.processingTime,
+            items: receiptData.items,
+            tax: receiptData.tax
+              ? Number.isFinite(parseFloat(receiptData.tax))
+                ? parseFloat(receiptData.tax)
+                : undefined
+              : undefined,
+            subtotal: receiptData.subtotal
+              ? Number.isFinite(parseFloat(receiptData.subtotal))
+                ? parseFloat(receiptData.subtotal)
+                : undefined
+              : undefined,
+          }}
           onComplete={handleTransactionComplete as unknown as () => void}
           onClose={handleCloseTransactionModal}
         />

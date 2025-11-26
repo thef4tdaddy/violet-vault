@@ -53,7 +53,12 @@ const TabContent = ({
   envelopes,
 }: TabContentProps) => {
   if (activeTab === "overview") {
-    return <OverviewTab monthlyTrends={monthlyTrends} envelopeSpending={envelopeSpending} />;
+    return (
+      <OverviewTab
+        monthlyTrends={monthlyTrends as Array<Record<string, unknown>>}
+        envelopeSpending={envelopeSpending as Array<Record<string, unknown>>}
+      />
+    );
   }
 
   if (activeTab === "spending") {

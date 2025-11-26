@@ -16,6 +16,15 @@ import {
 } from "./utils/envelopeAnalysisUtils";
 
 /**
+ * Input parameters for useAnalyticsData hook
+ */
+interface UseAnalyticsDataInput {
+  transactions?: unknown[];
+  envelopes?: unknown[];
+  timeFilter?: string;
+}
+
+/**
  * Custom hook for analytics data processing
  * Extracted from ChartsAndAnalytics.jsx for better reusability
  * Issue #151 - ChartsAndAnalytics refactoring
@@ -24,7 +33,7 @@ export const useAnalyticsData = ({
   transactions = [],
   envelopes = [],
   timeFilter = "thisMonth",
-}) => {
+}: UseAnalyticsDataInput) => {
   // Validate and sanitize props to prevent runtime errors
   const safeTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),

@@ -27,7 +27,18 @@ const App = () => {
     uiStoreApiRef.current = {
       setUpdateAvailable: (available: boolean) =>
         useUiStore.getState().setUpdateAvailable(available),
-      getState: useUiStore.getState,
+      getState: () => {
+        const state = useUiStore.getState();
+        return {
+          setUpdateAvailable: state.setUpdateAvailable,
+          setInstallPromptEvent: state.setInstallPromptEvent,
+          showInstallModal: state.showInstallModal,
+          installPromptEvent: state.installPromptEvent,
+          loadPatchNotesForUpdate: async (fromVersion: string, toVersion: string) => {
+            await state.loadPatchNotesForUpdate(fromVersion, toVersion);
+          },
+        };
+      },
       hideInstallModal: () => useUiStore.getState().hideInstallModal(),
       get updateAvailable() {
         return useUiStore.getState().updateAvailable;
@@ -60,7 +71,15 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <div className="font-sans">
-            <MainLayout firebaseSync={cloudSyncService} />
+            <MainLayout
+              firebaseSync={
+                cloudSyncService as unknown as {
+                  start: (config: unknown) => void;
+                  forceSync: () => Promise<unknown>;
+                  isRunning: boolean;
+                }
+              }
+            />
             <ConfirmProvider />
             <PromptProvider />
 

@@ -236,7 +236,12 @@ export class VioletVaultDB extends Dexie {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
-    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
+    if (
+      cached &&
+      cached.expiresAt !== null &&
+      cached.expiresAt > now &&
+      now - (cached.expiresAt - maxAge) < maxAge
+    ) {
       return cached.value;
     }
     return null;

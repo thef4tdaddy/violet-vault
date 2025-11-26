@@ -112,7 +112,21 @@ const BudgetHistoryViewer = ({ onClose }: BudgetHistoryViewerProps) => {
             toggleIntegrityDetails={toggleIntegrityDetails}
           />
 
-          <HistoryStatistics statistics={statistics} />
+          <HistoryStatistics
+            statistics={
+              statistics
+                ? {
+                    totalCommits: statistics.totalCommits,
+                    dateRange:
+                      statistics.lastCommitDate !== null
+                        ? {
+                            newest: new Date(statistics.lastCommitDate),
+                          }
+                        : undefined,
+                  }
+                : null
+            }
+          />
 
           <HistoryControls
             filter={filter}
