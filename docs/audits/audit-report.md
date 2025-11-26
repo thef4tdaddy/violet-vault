@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 3 | +1 |
+| ESLint Issues | 3 | 0 |
 | TypeScript Errors | 19 | 0 |
-| TypeScript Strict Mode Errors | 101 | -4 |
+| TypeScript Strict Mode Errors | 99 | -2 |
 
-*Last updated: 2025-11-26 11:58:08 UTC*
+*Last updated: 2025-11-26 12:04:15 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -206,14 +206,12 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 1 errors in `src/components/accounts/SupplementalAccounts.tsx`
-- 1 errors in `src/components/accounts/ExpirationAlert.tsx`
-- 1 errors in `src/components/accounts/AccountsGrid.tsx`
 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
 | 44 | `TS2322` |
-| 33 | `TS2345` |
+| 31 | `TS2345` |
 | 6 | `TS2769` |
 | 4 | `TS18048` |
 | 3 | `TS18047` |
@@ -237,10 +235,6 @@ src/App.tsx(63,25): error TS2322: Type 'CloudSyncService' is not assignable to t
     Type '(config: SyncConfig) => void' is not assignable to type '(config: unknown) => void'.
       Types of parameters 'config' and 'config' are incompatible.
         Type 'unknown' is not assignable to type 'SyncConfig'.
-src/components/accounts/AccountsGrid.tsx(68,66): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string | undefined'.
-  Type 'null' is not assignable to type 'string | undefined'.
-src/components/accounts/ExpirationAlert.tsx(31,57): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string | undefined'.
-  Type 'null' is not assignable to type 'string | undefined'.
 src/components/accounts/SupplementalAccounts.tsx(157,11): error TS2322: Type '(accountId: string) => Promise<void>' is not assignable to type '(accountId: string | number) => void'.
   Types of parameters 'accountId' and 'accountId' are incompatible.
     Type 'string | number' is not assignable to type 'string'.
