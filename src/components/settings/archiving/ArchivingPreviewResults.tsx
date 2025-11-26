@@ -7,10 +7,10 @@ interface PreviewData {
   totalAmount: number;
   categories: Record<string, { count: number; amount: number }>;
   dateRange: {
-    earliest?: string;
-    latest?: string;
+    earliest: Date | null;
+    latest: Date | null;
   };
-  cutoffDate: string;
+  cutoffDate: Date;
 }
 
 interface ArchivingPreviewResultsProps {

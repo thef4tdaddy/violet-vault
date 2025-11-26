@@ -6,13 +6,13 @@ import { useFABLoadingStates } from "@/hooks/mobile/useFABLoadingStates";
 import { hapticFeedback } from "@/utils/ui/touchFeedback";
 
 /**
- * FAB Action interface
+ * FAB Action interface - matches the store's FABAction interface
  */
 interface FABAction {
-  id?: string;
+  id: string;
   label: string;
   icon: string;
-  action?: () => void;
+  action: (() => void) | null;
   color: string;
 }
 
@@ -120,11 +120,11 @@ const FABActionMenu: React.FC = () => {
     >
       {secondaryActions.map((action, index) => (
         <FABActionButton
-          key={action.id || action.label}
+          key={action.id}
           action={action}
           index={index}
           onActionClick={handleActionClick}
-          isLoading={isActionLoading(action.id || action.label)}
+          isLoading={isActionLoading(action.id)}
         />
       ))}
     </div>

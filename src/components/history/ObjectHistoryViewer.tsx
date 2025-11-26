@@ -36,11 +36,11 @@ const ObjectHistoryViewer = ({
     const objectHistory = allCommits.filter((commit): commit is BudgetCommit => {
       // For now, include all commits as we need commit details to filter properly
       // This could be optimized later by adding object-specific tracking
-      return (
+      return Boolean(
         commit.message &&
-        (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
-          commit.message.includes(objectId) ||
-          commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
+          (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
+            commit.message.includes(objectId) ||
+            commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
       );
     });
 

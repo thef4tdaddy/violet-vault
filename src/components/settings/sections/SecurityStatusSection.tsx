@@ -1,17 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils/icons";
-
-interface SecuritySettings {
-  autoLockEnabled: boolean;
-  [key: string]: unknown;
-}
-
-interface SecurityEvent {
-  id?: string;
-  type?: string;
-  timestamp?: number;
-  [key: string]: unknown;
-}
+import type { SecuritySettings, SecurityEvent } from "@/services/security/securityService";
 
 interface SecurityStatusSectionProps {
   isLocked: boolean;

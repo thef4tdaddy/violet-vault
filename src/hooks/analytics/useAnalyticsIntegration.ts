@@ -126,7 +126,7 @@ export const useAnalyticsIntegration = ({
   );
 
   // Data refresh utility
-  const refreshData = useCallback((newTimeFilter) => {
+  const refreshData = useCallback((newTimeFilter: string) => {
     logger.debug("Refreshing analytics data", { newTimeFilter });
   }, []);
 

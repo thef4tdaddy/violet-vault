@@ -91,7 +91,7 @@ interface PayoffProjectionProps {
     expectedPayoff: string;
     totalInterest: string;
     payoffDate: string;
-  };
+  } | null;
 }
 
 export const PayoffProjection = ({ payoffDisplay }: PayoffProjectionProps) => {

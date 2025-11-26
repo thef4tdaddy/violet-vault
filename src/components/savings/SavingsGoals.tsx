@@ -133,7 +133,7 @@ const SavingsGoals = ({
             {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
-                goal={goal as unknown as import("@/db/types").SavingsGoal & { color?: string }}
+                goal={goal}
                 onEdit={handleEditGoal}
                 onDelete={handleDeleteGoal}
                 priorities={SAVINGS_PRIORITIES}

@@ -12,9 +12,9 @@ interface EnvelopeOption {
 
 interface NewTransaction {
   type?: string;
-  amount?: string | number;
+  amount?: string;
   description?: string;
-  envelopeId?: string | number;
+  envelopeId?: string;
   date?: string;
 }
 

@@ -11,6 +11,12 @@ interface ExtractedDataConfidence {
   subtotal?: number;
 }
 
+interface ReceiptItem {
+  description: string;
+  amount: number;
+  rawLine?: string;
+}
+
 interface ExtractedData {
   merchant?: string;
   total?: number;
@@ -18,7 +24,7 @@ interface ExtractedData {
   tax?: number;
   subtotal?: number;
   processingTime?: number;
-  items?: unknown[];
+  items?: ReceiptItem[];
   confidence: ExtractedDataConfidence;
 }
 
@@ -102,7 +108,7 @@ const ReceiptExtractedData = ({ extractedData }: ReceiptExtractedDataProps) => {
         </div>
       </div>
 
-      <ExtractedItemsList items={extractedData.items} />
+      <ExtractedItemsList items={extractedData.items ?? []} />
     </div>
   );
 };

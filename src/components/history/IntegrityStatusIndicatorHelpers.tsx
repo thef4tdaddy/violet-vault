@@ -182,7 +182,7 @@ export const SecurityReportDetails = ({
           <div>
             <span className="text-gray-600">Risk Level:</span>
             <span
-              className={`ml-2 font-medium capitalize ${getRiskLevelColor(securityReport.riskLevel)}`}
+              className={`ml-2 font-medium capitalize ${getRiskLevelColor(securityReport.riskLevel ?? "unknown")}`}
             >
               {securityReport.riskLevel}
             </span>

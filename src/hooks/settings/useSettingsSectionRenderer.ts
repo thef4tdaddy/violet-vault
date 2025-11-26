@@ -48,7 +48,7 @@ interface SettingsSectionRendererProps {
   onUpdateProfile: (profile: UserProfile) => void;
 
   // Security Settings Props
-  securityManager: SecurityManager;
+  securityManager: SecurityManager | null;
   onOpenSecuritySettings: () => void;
   onShowLocalDataSecurity: () => void;
 
