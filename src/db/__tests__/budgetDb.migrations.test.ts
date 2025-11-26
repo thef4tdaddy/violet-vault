@@ -19,7 +19,7 @@ describe("VioletVaultDB - Migration Tests", () => {
   describe("Schema Version Management", () => {
     it("should have correct current version", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(7);
+      expect(db.verno).toBe(8);
       expect(db.name).toBe("VioletVault");
     });
 
@@ -91,6 +91,16 @@ describe("VioletVaultDB - Migration Tests", () => {
       // Check for compound indexes
       expect(indexNames).toContain("[category+archived]");
       expect(indexNames).toContain("[category+name]");
+    });
+
+    it("should have envelopeType index for savings/supplemental filtering (v8)", () => {
+      const db = new VioletVaultDB();
+      const schema = db.envelopes.schema;
+      const indexNames = schema.indexes.map((idx) => idx.name);
+
+      // Version 8 adds envelopeType index for Issue #1335
+      expect(indexNames).toContain("envelopeType");
+      expect(indexNames).toContain("[envelopeType+archived]");
     });
 
     it("should support compound indexes on transactions", () => {
@@ -443,17 +453,17 @@ describe("VioletVaultDB - Migration Tests", () => {
   });
 
   describe("Version History", () => {
-    it("should document version 7 as current version", () => {
+    it("should document version 8 as current version", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(7);
+      expect(db.verno).toBe(8);
     });
 
-    it("should have all version 7 tables", () => {
+    it("should have all version 8 tables", () => {
       const db = new VioletVaultDB();
       const tables = db.tables.map((t) => t.name);
 
-      // Version 7 includes all these tables
-      const v7Tables = [
+      // Version 8 includes all these tables (same as v7, with updated envelope indexes)
+      const v8Tables = [
         "budget",
         "envelopes",
         "transactions",
@@ -470,7 +480,7 @@ describe("VioletVaultDB - Migration Tests", () => {
         "autoBackups",
       ];
 
-      v7Tables.forEach((tableName) => {
+      v8Tables.forEach((tableName) => {
         expect(tables).toContain(tableName);
       });
     });

@@ -88,6 +88,14 @@ export class VioletVaultDB extends Dexie {
       autoBackups: "id, timestamp, type, syncType, [type+timestamp], [syncType+timestamp]",
     });
 
+    // Version 8: Issue #1335 - Add envelopeType index for savings/supplemental envelope migration
+    // savingsGoals table is now deprecated - data should be migrated to envelopes with envelopeType: "savings"
+    this.version(8).stores({
+      // Add envelopeType index to envelopes table for filtering by type
+      envelopes:
+        "id, name, category, archived, lastModified, envelopeType, [category+archived], [category+name], [envelopeType+archived]",
+    });
+
     // Enhanced hooks for automatic timestamping across all tables
 
     const addTimestampHooks = <T, TKey>(table: Table<T, TKey>) => {

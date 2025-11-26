@@ -67,7 +67,8 @@ export const ENVELOPE_TYPES = {
   BILL: "bill",
   VARIABLE: "variable",
   SAVINGS: "savings",
-  SINKING_FUND: "sinking_fund",
+  SINKING_FUND: "sinking_fund", // @deprecated - Use SAVINGS with targetDate instead
+  SUPPLEMENTAL: "supplemental", // For HSA, FSA, and other supplemental accounts
 } as const;
 
 export type EnvelopeType = (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES];
@@ -114,7 +115,7 @@ export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
   },
   [ENVELOPE_TYPES.SAVINGS]: {
     name: "Savings Goal Envelope",
-    description: "Long-term savings targets",
+    description: "Long-term savings targets with optional target date",
     color: "green",
     borderColor: "border-green-500",
     bgColor: "bg-green-50",
@@ -124,8 +125,9 @@ export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
     displayFormat: "Target: ${amount}",
   },
   [ENVELOPE_TYPES.SINKING_FUND]: {
+    // @deprecated - Use SAVINGS with targetDate instead
     name: "Sinking Fund Envelope",
-    description: "Save for specific goals with target amounts and dates",
+    description: "Save for specific goals with target amounts and dates (deprecated - use Savings)",
     color: "teal",
     borderColor: "border-teal-500",
     bgColor: "bg-teal-50",
@@ -133,6 +135,17 @@ export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
     icon: "Wallet",
     fundingMethod: "target", // Uses targetAmount with deadline
     displayFormat: "Goal: ${amount}",
+  },
+  [ENVELOPE_TYPES.SUPPLEMENTAL]: {
+    name: "Supplemental Account",
+    description: "HSA, FSA, and other supplemental benefit accounts",
+    color: "purple",
+    borderColor: "border-purple-500",
+    bgColor: "bg-purple-50",
+    textColor: "text-purple-700",
+    icon: "CreditCard",
+    fundingMethod: "contribution", // Uses annualContribution
+    displayFormat: "Balance: ${amount}",
   },
 };
 
