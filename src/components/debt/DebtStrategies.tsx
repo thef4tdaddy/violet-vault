@@ -5,6 +5,36 @@ import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
 import type { DebtAccount } from "../../types/debt";
 
+// Internal types that match the hook's return types
+interface StrategyDebt {
+  id: string;
+  name: string;
+  priority: number;
+  interestRate: number;
+  currentBalance?: number;
+  minimumPayment?: number;
+}
+
+interface Strategy {
+  name: string;
+  description: string;
+  debts: StrategyDebt[];
+  totalInterest: number;
+  payoffTime: number;
+}
+
+interface PaymentImpactScenario {
+  extraPayment: number;
+  avalanche: {
+    timeSavings: number;
+    interestSavings: number;
+  };
+  snowball: {
+    timeSavings: number;
+    interestSavings: number;
+  };
+}
+
 interface DebtStrategiesProps {
   debts: DebtAccount[];
 }
@@ -14,6 +44,17 @@ interface DebtStrategiesProps {
  * Pure UI component - all business logic handled by useDebtStrategies hook
  */
 const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
+  // Convert DebtAccount[] to the format expected by the hook
+  const normalizedDebts = debts.map((debt) => ({
+    id: debt.id,
+    name: debt.name,
+    type: debt.type,
+    status: debt.status,
+    currentBalance: debt.currentBalance ?? debt.balance,
+    minimumPayment: debt.minimumPayment,
+    interestRate: debt.interestRate,
+  }));
+
   const {
     avalancheStrategy,
     snowballStrategy,
@@ -22,7 +63,7 @@ const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
     insights,
     recommendationText,
     hasDebts,
-  } = useDebtStrategies(debts);
+  } = useDebtStrategies(normalizedDebts);
 
   if (!hasDebts) {
     return (
@@ -56,11 +97,11 @@ const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
       {/* Strategy Cards */}
       <div className="grid md:grid-cols-2 gap-6">
         <StrategyCard
-          strategy={avalancheStrategy}
+          strategy={avalancheStrategy as Strategy}
           isRecommended={recommendation?.strategy === "avalanche"}
         />
         <StrategyCard
-          strategy={snowballStrategy}
+          strategy={snowballStrategy as Strategy}
           isRecommended={recommendation?.strategy === "snowball"}
         />
       </div>
@@ -110,18 +151,7 @@ const DebtStrategies = ({ debts }: DebtStrategiesProps) => {
       )}
 
       {/* Payment Impact Analysis */}
-      <PaymentImpactTable
-        paymentImpact={
-          paymentImpact as unknown as Array<{
-            strategy: string;
-            monthlyPayment: number;
-            totalInterest: number;
-            payoffDate: string;
-            totalPaid: number;
-            savings: number;
-          }>
-        }
-      />
+      <PaymentImpactTable paymentImpact={paymentImpact as PaymentImpactScenario[]} />
     </div>
   );
 };

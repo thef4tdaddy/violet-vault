@@ -33,16 +33,29 @@ interface CollapsedViewProps {
   suggestions: Suggestion[];
 }
 
+interface AnalysisSettings {
+  minAmount: number;
+  minTransactions: number;
+  overspendingThreshold: number;
+  bufferPercentage: number;
+  [key: string]: unknown;
+}
+
 interface ExpandedViewProps {
   showSettings: boolean;
-  analysisSettings: unknown;
-  updateAnalysisSettings: (settings: unknown) => void;
+  analysisSettings: AnalysisSettings;
+  updateAnalysisSettings: (settings: Partial<AnalysisSettings>) => void;
   resetAnalysisSettings: () => void;
   refreshSuggestions: () => void;
-  suggestionStats: unknown;
+  suggestionStats: import("./suggestions/SuggestionSettings").SuggestionStats | null;
   suggestions: Suggestion[];
-  handleApplySuggestion: (suggestion: unknown) => void;
-  handleDismissSuggestion: (suggestion: unknown) => void;
+  handleApplySuggestion: (suggestion: {
+    id: string;
+    action: string;
+    data: Record<string, unknown>;
+    [key: string]: unknown;
+  }) => Promise<void>;
+  handleDismissSuggestion: (suggestionId: string) => void;
 }
 
 interface SmartEnvelopeSuggestionsProps {
@@ -164,21 +177,11 @@ const ExpandedView = ({
     {showSettings && (
       <div className="mb-6">
         <SuggestionSettings
-          settings={
-            analysisSettings as unknown as {
-              minAmount: number;
-              minTransactions: number;
-              overspendingThreshold: number;
-              bufferPercentage: number;
-              [key: string]: unknown;
-            }
-          }
+          settings={analysisSettings}
           onUpdateSettings={updateAnalysisSettings}
           onResetSettings={resetAnalysisSettings}
           onRefresh={refreshSuggestions}
-          suggestionStats={
-            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
-          }
+          suggestionStats={suggestionStats}
         />
       </div>
     )}
@@ -278,13 +281,11 @@ const SmartEnvelopeSuggestions = ({
       ) : (
         <ExpandedView
           showSettings={showSettings}
-          analysisSettings={analysisSettings}
+          analysisSettings={analysisSettings as AnalysisSettings}
           updateAnalysisSettings={updateAnalysisSettings}
           resetAnalysisSettings={resetAnalysisSettings}
           refreshSuggestions={refreshSuggestions}
-          suggestionStats={
-            suggestionStats as unknown as import("./suggestions/SuggestionSettings").SuggestionStats
-          }
+          suggestionStats={suggestionStats}
           suggestions={typedSuggestions}
           handleApplySuggestion={handleApplySuggestion}
           handleDismissSuggestion={handleDismissSuggestion}

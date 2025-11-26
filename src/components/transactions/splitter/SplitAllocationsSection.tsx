@@ -3,19 +3,21 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import SplitAllocationRow from "./SplitAllocationRow";
 
-interface SplitAllocation {
-  id: string | number;
-  [key: string]: unknown;
+interface Split {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  envelopeId?: string;
 }
 
 interface Envelope {
-  id: string | number;
+  id: string;
   name: string;
-  [key: string]: unknown;
 }
 
 interface SplitAllocationsSectionProps {
-  splitAllocations: SplitAllocation[];
+  splitAllocations: Split[];
   availableCategories: string[];
   envelopes: Envelope[];
   onUpdateSplit: (id: string, field: string, value: string | number) => void;
@@ -108,22 +110,12 @@ const SplitAllocationsSection: React.FC<SplitAllocationsSectionProps> = ({
         {splitAllocations.map((split, index) => (
           <SplitAllocationRow
             key={split.id}
-            split={
-              split as unknown as {
-                id: string | number;
-                description?: string;
-                amount?: number;
-                category?: string;
-                [key: string]: unknown;
-              }
-            }
+            split={split}
             index={index}
             canRemove={splitAllocations.length > 1}
-            onUpdate={
-              onUpdateSplit as unknown as (id: string, updates: Record<string, unknown>) => void
-            }
+            onUpdate={onUpdateSplit}
             onRemove={onRemoveSplit}
-            availableCategories={availableCategories as unknown as string[]}
+            availableCategories={availableCategories}
             envelopes={envelopes}
           />
         ))}

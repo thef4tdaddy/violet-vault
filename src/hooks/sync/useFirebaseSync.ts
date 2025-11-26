@@ -132,12 +132,12 @@ const useFirebaseSync = ({
 
   // Update activity data from Firebase sync
   useEffect(() => {
-    if (!budget || !budget.getActiveUsers || !budget.getRecentActivity) return;
+    if (!budget?.getActiveUsers || !budget?.getRecentActivity) return;
 
     const updateActivityData = (): void => {
       try {
-        const users = budget.getActiveUsers();
-        const activity = budget.getRecentActivity();
+        const users = budget.getActiveUsers?.();
+        const activity = budget.getRecentActivity?.();
         logger.debug("🔄 Updating activity data:", {
           users: users?.length || 0,
           activity: activity?.length || 0,
