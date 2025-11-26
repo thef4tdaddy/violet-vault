@@ -164,7 +164,17 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
         isOpen={showReconcileModal}
         onClose={closeReconcileModal}
         newTransaction={newTransaction}
-        onUpdateTransaction={updateNewTransaction}
+        onUpdateTransaction={
+          updateNewTransaction as (
+            updates: Partial<{
+              type?: string;
+              amount?: string;
+              description?: string;
+              envelopeId?: string;
+              date?: string;
+            }>
+          ) => void
+        }
         onReconcile={onReconcileTransaction}
         getEnvelopeOptions={getEnvelopeOptions}
       />

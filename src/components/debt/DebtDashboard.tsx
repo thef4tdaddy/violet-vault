@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from "react";
 import { useDebtDashboard } from "@/hooks/debts/useDebtDashboard";
 import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
 import AddDebtModal from "./modals/AddDebtModal";
@@ -63,7 +64,12 @@ const DebtDashboard = () => {
 
       {/* Filters - Outside white block */}
       {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-        <DebtFilters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
+        <DebtFilters
+          filterOptions={filterOptions as Record<string, string | boolean>}
+          setFilterOptions={
+            setFilterOptions as Dispatch<SetStateAction<Record<string, string | boolean>>>
+          }
+        />
       )}
 
       {/* Floating Tabs (no background container) */}
