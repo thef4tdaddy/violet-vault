@@ -11,6 +11,8 @@ type BillEntity = Record<string, unknown> & {
 
 type UpdateMode = "amounts" | "dates" | "both";
 
+type BillField = "amount" | "dueDate";
+
 interface BillChanges {
   [billId: string]: {
     amount?: number;
@@ -23,8 +25,8 @@ interface BulkUpdateEditorProps {
   selectedBills: Bill[];
   changes: BillChanges;
   updateMode: UpdateMode;
-  updateChange: (billId: string, field: string, value: number | string) => void;
-  applyBulkChange: (field: string, value: number | string) => void;
+  updateChange: (billId: string, field: BillField, value: number | string) => void;
+  applyBulkChange: (field: BillField, value: number | string) => void;
   resetChanges: () => void;
 }
 
