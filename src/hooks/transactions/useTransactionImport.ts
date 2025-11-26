@@ -1,3 +1,4 @@
+import type React from "react";
 import { useTransactionFileUpload } from "./useTransactionFileUpload";
 import { useTransactionImportProcessing } from "./useTransactionImportProcessing";
 import { globalToast } from "../../stores/ui/toastStore";
@@ -34,7 +35,10 @@ export const useTransactionImport = (
     setImportStep: (step: number) => void;
     fieldMapping: FieldMapping;
     setFieldMapping: (mapping: FieldMapping) => void;
-    handleFileUpload: (file: File) => Promise<void>;
+    handleFileUpload: (
+      event: React.ChangeEvent<HTMLInputElement>,
+      options?: { clearExisting?: boolean }
+    ) => void;
     resetImport: () => void;
   };
 

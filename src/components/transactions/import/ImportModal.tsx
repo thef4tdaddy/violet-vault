@@ -21,10 +21,10 @@ interface ImportModalProps {
   onClose: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: DataRow[];
-  setImportData: (data: DataRow[]) => void;
-  fieldMapping: FieldMapping;
-  setFieldMapping: (mapping: FieldMapping) => void;
+  importData: unknown[];
+  setImportData: (data: unknown[]) => void;
+  fieldMapping: FieldMapping | Record<string, string | undefined>;
+  setFieldMapping: (mapping: FieldMapping | Record<string, string | undefined>) => void;
   importProgress: {
     current: number;
     total: number;

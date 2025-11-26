@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 2 | +1 |
+| ESLint Issues | 3 | +1 |
 | TypeScript Errors | 19 | 0 |
-| TypeScript Strict Mode Errors | 105 | -18 |
+| TypeScript Strict Mode Errors | 101 | -4 |
 
-*Last updated: 2025-11-26 11:48:41 UTC*
+*Last updated: 2025-11-26 11:58:08 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -30,15 +30,18 @@
 - 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
+- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/ImportModal.tsx`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 2 | `react-hooks/exhaustive-deps` |
 | 2 | `max-lines-per-function` |
+| 1 | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/components/transactions/import/ImportModal.tsx:8:6 - 1 - 'DataRow' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 /home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts:53:30 - 1 - Arrow function has too many lines (157). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts:82:6 - 1 - React Hook useMemo has a missing dependency: 'bill'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:52:9 - 1 - The 'budgetWithDefaults' logical expression could make the dependencies of useCallback Hook (at line 123) change on every render. To fix this, wrap the initialization of 'budgetWithDefaults' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
@@ -49,7 +52,7 @@
 
 ### Files with Most Type Errors
 - 3 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 2 errors in `src/components/transactions/TransactionLedger.tsx`
+- 2 errors in `src/components/transactions/import/ImportModal.tsx`
 - 2 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/components/auth/AuthGateway.tsx`
 - 2 errors in `src/components/analytics/components/TabContent.tsx`
@@ -65,8 +68,9 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 10 | `TS2322` |
+| 9 | `TS2322` |
 | 8 | `TS2345` |
+| 1 | `TS6196` |
 | 1 | `TS2741` |
 
 ### Detailed Type Error Report
@@ -115,12 +119,11 @@ src/components/receipts/components/ReceiptActionButtons.tsx(36,44): error TS2345
 src/components/settings/TransactionArchiving.tsx(106,9): error TS2322: Type '{ totalCount: number; cutoffDate: Date; categories: Record<string, { count: number; amount: number; }>; envelopes: Record<string, { count: number; amount: number; }>; totalAmount: number; dateRange: { ...; }; }' is not assignable to type 'PreviewData'.
   The types of 'dateRange.earliest' are incompatible between these types.
     Type 'Date' is not assignable to type 'string'.
-src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
-  Type 'unknown' is not assignable to type 'DataRow'.
-    Index signature for type 'string' is missing in type '{}'.
-src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void>' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
-  Types of parameters 'data' and 'event' are incompatible.
-    Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/import/ImportModal.tsx(8,6): error TS6196: 'DataRow' is declared but never used.
+src/components/transactions/import/ImportModal.tsx(78,13): error TS2322: Type 'unknown[]' is not assignable to type 'ImportData | DataRow[]'.
+  Type 'unknown[]' is not assignable to type 'DataRow[]'.
+    Type 'unknown' is not assignable to type 'DataRow'.
+      Index signature for type 'string' is missing in type '{}'.
 src/hooks/common/usePrompt.ts(117,20): error TS2345: Argument of type 'string | void' is not assignable to parameter of type 'string'.
   Type 'void' is not assignable to type 'string'.
 src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type '() => Promise<BudgetRecord | null>' is not assignable to parameter of type '() => Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
@@ -134,8 +137,7 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 5 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 4 errors in `src/components/transactions/TransactionLedger.tsx`
+- 3 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/utils/security/keyExport.ts`
@@ -150,6 +152,7 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 - 2 errors in `src/hooks/auth/useAuthManager.ts`
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
 - 2 errors in `src/db/budgetDb.ts`
+- 2 errors in `src/components/transactions/import/ImportModal.tsx`
 - 2 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 2 errors in `src/components/receipts/ReceiptButton.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
@@ -209,7 +212,7 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 49 | `TS2322` |
+| 44 | `TS2322` |
 | 33 | `TS2345` |
 | 6 | `TS2769` |
 | 4 | `TS18048` |
@@ -219,6 +222,7 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 | 2 | `TS2339` |
 | 2 | `TS18046` |
 | 1 | `TS7016` |
+| 1 | `TS6196` |
 | 1 | `TS2349` |
 
 ### Detailed Strict Mode Report
@@ -384,12 +388,6 @@ src/components/receipts/ReceiptScanner.tsx(61,5): error TS2345: Argument of type
     Type 'ReceiptProcessedData' is not assignable to type '{ merchant: string | null; total: string | null; date: string | null; time: string | null; tax: string | null; subtotal: string | null; items: { description: string; amount: number; rawLine: string; }[]; confidence: Record<...>; rawText: string; processingTime: number; imageData: { ...; }; }'.
       Types of property 'imageData' are incompatible.
         Property 'preview' is missing in type 'UploadedImage' but required in type '{ file: File; preview: string; }'.
-src/components/receipts/ReceiptScanner.tsx(91,15): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
-  Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
-    Type 'null' is not assignable to type 'HTMLInputElement'.
-src/components/receipts/ReceiptScanner.tsx(92,15): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
-  Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
-    Type 'null' is not assignable to type 'HTMLInputElement'.
 src/components/receipts/ReceiptScanner.tsx(110,17): error TS2322: Type '{ merchant?: string | undefined; total?: number | undefined; date?: string | undefined; tax?: number | undefined; subtotal?: number | undefined; processingTime?: number | undefined; items?: unknown[] | undefined; confidence: { ...; }; } | null | undefined' is not assignable to type 'ExtractedData | null | undefined'.
   Type '{ merchant?: string | undefined; total?: number | undefined; date?: string | undefined; tax?: number | undefined; subtotal?: number | undefined; processingTime?: number | undefined; items?: unknown[] | undefined; confidence: { ...; }; }' is not assignable to type 'ExtractedData'.
     Types of property 'items' are incompatible.
@@ -409,20 +407,10 @@ src/components/settings/TransactionArchiving.tsx(106,9): error TS2322: Type '{ t
         Type 'null' is not assignable to type 'string | undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/components/settings/sections/SyncDebugToolsSection.tsx(193,42): error TS18048: 'window.forceCloudDataReset' is possibly 'undefined'.
-src/components/transactions/TransactionLedger.tsx(505,7): error TS2322: Type 'Dispatch<SetStateAction<TransactionFormData>>' is not assignable to type '(form: unknown) => void'.
-  Types of parameters 'value' and 'form' are incompatible.
-    Type 'unknown' is not assignable to type 'SetStateAction<TransactionFormData>'.
-src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'unknown[]' is not assignable to type 'DataRow[]'.
-  Type 'unknown' is not assignable to type 'DataRow'.
-src/components/transactions/TransactionLedger.tsx(518,7): error TS2322: Type '(mapping: Record<string, string>) => void' is not assignable to type '(mapping: FieldMapping) => void'.
-  Types of parameters 'mapping' and 'mapping' are incompatible.
-    Type 'FieldMapping' is not assignable to type 'Record<string, string>'.
-      'string' index signatures are incompatible.
-        Type 'string | undefined' is not assignable to type 'string'.
-          Type 'undefined' is not assignable to type 'string'.
-src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void> | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
-  Types of parameters 'data' and 'event' are incompatible.
-    Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
+src/components/transactions/import/ImportModal.tsx(8,6): error TS6196: 'DataRow' is declared but never used.
+src/components/transactions/import/ImportModal.tsx(78,13): error TS2322: Type 'unknown[]' is not assignable to type 'ImportData | DataRow[]'.
+  Type 'unknown[]' is not assignable to type 'DataRow[]'.
+    Type 'unknown' is not assignable to type 'DataRow'.
 src/db/budgetDb.ts(239,19): error TS18047: 'cached.expiresAt' is possibly 'null'.
 src/db/budgetDb.ts(239,52): error TS18047: 'cached.expiresAt' is possibly 'null'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(160,5): error TS2322: Type 'unknown' is not assignable to type 'AnalyticsData'.
@@ -481,7 +469,7 @@ src/hooks/settings/useSettingsSectionRenderer.ts(117,11): error TS2769: No overl
   The last overload gave the following error.
     Type 'SecurityManager | null' is not assignable to type 'SecurityManager'.
       Type 'null' is not assignable to type 'SecurityManager'.
-src/hooks/transactions/useTransactionImport.ts(49,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; } | undefined'.
+src/hooks/transactions/useTransactionImport.ts(53,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ userName?: string | undefined; } | undefined'.
 src/services/bugReport/errorTrackingService.ts(106,26): error TS2322: Type '(event: ErrorEvent) => void' is not assignable to type '{ handleEvent: (event: Event) => void; } | ((event: Event) => void)'.
   Type '(event: ErrorEvent) => void' is not assignable to type '(event: Event) => void'.
     Types of parameters 'event' and 'event' are incompatible.
