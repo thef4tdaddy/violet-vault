@@ -68,8 +68,8 @@ if [ -n "$TS_FILES" ]; then
   echo "🔍 Running TypeScript normal mode check on staged files..."
   # Run normal mode check (checks entire project but we only fail if errors exceed threshold)
   # This is necessary because TypeScript's type system requires project-wide analysis
-  # Use --no-strict to override tsconfig.json strict mode for normal mode check
-  TYPECHECK_OUTPUT=$(npx tsc --noEmit --no-strict --allowJs false 2>&1 || true)
+  # Use tsconfig.normal.json which extends tsconfig.json but sets strict: false
+  TYPECHECK_OUTPUT=$(npx tsc --project tsconfig.normal.json --noEmit 2>&1 || true)
   ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | { grep "error TS" || true; } | wc -l | tr -d ' ')
   # Pre-commit threshold: Zero tolerance - no normal mode errors allowed
   # Status: 0/0/0 achieved (ESLint/TS normal/TS strict)

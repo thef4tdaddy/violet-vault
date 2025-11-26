@@ -11,8 +11,8 @@ echo "✅ ESLint passed!"
 
 echo "🔍 Running TypeScript normal mode check before push..."
 # Ignore tsc exit code - we only care about error count vs threshold
-# Use --no-strict to override tsconfig.json strict mode for normal mode check
-TYPECHECK_OUTPUT=$(npx tsc --noEmit --no-strict --allowJs false 2>&1 || true)
+# Use tsconfig.normal.json which extends tsconfig.json but sets strict: false
+TYPECHECK_OUTPUT=$(npx tsc --project tsconfig.normal.json --noEmit 2>&1 || true)
 ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | { grep "error TS" || true; } | wc -l | tr -d ' ')
 # Normal mode threshold: Zero tolerance - no normal mode errors allowed
 # Status: 0/0/0 achieved (ESLint/TS normal/TS strict)
