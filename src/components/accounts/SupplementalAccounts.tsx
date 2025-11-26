@@ -154,7 +154,9 @@ const SupplementalAccounts = ({
           accounts={typedAccounts}
           showBalances={showBalances}
           onEdit={startEdit as unknown as (account: Account) => void}
-          onDelete={(accountId: string | number) => void handleDelete(String(accountId))}
+          onDelete={(accountId: string | number) => {
+            handleDelete(String(accountId));
+          }}
           onStartTransfer={startTransfer as unknown as (account: Account) => void}
         />
       </div>
