@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | +1 |
-| TypeScript Errors | 19 | +19 |
-| TypeScript Strict Mode Errors | 123 | +123 |
+| ESLint Issues | 2 | +1 |
+| TypeScript Errors | 19 | 0 |
+| TypeScript Strict Mode Errors | 105 | -18 |
 
-*Last updated: 2025-11-26 11:38:39 UTC*
+*Last updated: 2025-11-26 11:48:41 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -27,18 +27,19 @@
 ## Lint Audit
 
 ### Files with Most Issues
+- 2 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
-- 1 issues in `/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts`
 
 ### Issue Count by Category
 | Count | Rule ID |
 |---|---|
 | 2 | `react-hooks/exhaustive-deps` |
-| 1 | `max-lines-per-function` |
+| 2 | `max-lines-per-function` |
 
 ### Detailed Lint Report
 ```
+/home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts:53:30 - 1 - Arrow function has too many lines (157). Maximum allowed is 150. (max-lines-per-function)
 /home/runner/work/violet-vault/violet-vault/src/hooks/bills/useBillDetail.ts:82:6 - 1 - React Hook useMemo has a missing dependency: 'bill'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts:52:9 - 1 - The 'budgetWithDefaults' logical expression could make the dependencies of useCallback Hook (at line 123) change on every render. To fix this, wrap the initialization of 'budgetWithDefaults' in its own useMemo() Hook. (react-hooks/exhaustive-deps)
 /home/runner/work/violet-vault/violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:104:29 - 1 - Arrow function has too many lines (151). Maximum allowed is 150. (max-lines-per-function)
@@ -133,15 +134,12 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
-- 12 errors in `src/hooks/bills/useBillDetail.ts`
 - 5 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
-- 4 errors in `src/components/analytics/components/TabContent.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/utils/security/keyExport.ts`
 - 2 errors in `src/utils/dataManagement/firebaseUtils.ts`
-- 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 2 errors in `src/utils/bills/billUpdateHelpers.ts`
 - 2 errors in `src/services/firebaseMessaging.ts`
 - 2 errors in `src/services/editLockService.ts`
@@ -157,10 +155,10 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
 - 2 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
-- 2 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 2 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 2 errors in `src/components/bills/AddBillModal.tsx`
 - 2 errors in `src/components/auth/UserIndicator.tsx`
+- 2 errors in `src/components/analytics/components/TabContent.tsx`
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 2 errors in `src/App.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
@@ -211,16 +209,15 @@ src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ 
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 51 | `TS2322` |
-| 38 | `TS2345` |
-| 13 | `TS18047` |
+| 49 | `TS2322` |
+| 33 | `TS2345` |
 | 6 | `TS2769` |
 | 4 | `TS18048` |
+| 3 | `TS18047` |
 | 2 | `TS2722` |
 | 2 | `TS2719` |
 | 2 | `TS2339` |
 | 2 | `TS18046` |
-| 1 | `TS7053` |
 | 1 | `TS7016` |
 | 1 | `TS2349` |
 
@@ -250,14 +247,11 @@ src/components/analytics/AnalyticsDashboard.tsx(170,5): error TS2322: Type 'Norm
   Type 'NormalizedEnvelope' is not assignable to type 'never'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,32): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/analytics/components/TabContent.tsx(56,25): error TS2322: Type 'unknown[] | undefined' is not assignable to type 'Record<string, unknown>[]'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>[]'.
-src/components/analytics/components/TabContent.tsx(56,55): error TS2322: Type 'EnvelopeSpendingEntry[] | undefined' is not assignable to type 'Record<string, unknown>[]'.
-  Type 'undefined' is not assignable to type 'Record<string, unknown>[]'.
-src/components/analytics/components/TabContent.tsx(113,32): error TS2322: Type 'AnalyticsData | null | undefined' is not assignable to type 'AnalyticsData'.
-  Type 'undefined' is not assignable to type 'AnalyticsData'.
-src/components/analytics/components/TabContent.tsx(113,62): error TS2322: Type 'Record<string, unknown> | null | undefined' is not assignable to type 'BalanceData'.
-  Type 'undefined' is not assignable to type 'BalanceData'.
+src/components/analytics/components/TabContent.tsx(56,25): error TS2322: Type 'unknown[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'unknown' is not assignable to type 'Record<string, unknown>'.
+src/components/analytics/components/TabContent.tsx(56,55): error TS2322: Type 'EnvelopeSpendingEntry[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'EnvelopeSpendingEntry' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'EnvelopeSpendingEntry'.
 src/components/auth/KeyManagementSettings.tsx(166,11): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
@@ -300,10 +294,6 @@ src/components/bills/modals/BillDetailModal.tsx(140,11): error TS2322: Type '(e:
   Types of parameters 'e' and 'e' are incompatible.
     Type 'FormEvent<Element>' is not assignable to type 'FormEvent<HTMLFormElement>'.
       Type 'Element' is missing the following properties from type 'HTMLFormElement': acceptCharset, action, autocomplete, elements, and 148 more.
-src/components/bills/modals/BillDetailStats.tsx(24,82): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'string | number'.
-  Type 'undefined' is not assignable to type 'string | number'.
-src/components/bills/modals/BillDetailStats.tsx(51,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-  Type 'undefined' is not assignable to type 'string'.
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,53): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(173,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
@@ -458,20 +448,6 @@ src/hooks/auth/useAuthManager.ts(62,54): error TS2345: Argument of type 'UseMuta
                 Index signature for type 'string' is missing in type 'UpdateProfileInput'.
 src/hooks/auth/useAuthenticationManager.ts(99,29): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthenticationManager.ts(102,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
-src/hooks/bills/useBillDetail.ts(144,17): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(150,54): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(151,24): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(157,65): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(167,54): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(174,49): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(175,24): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(177,60): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(185,55): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(187,12): error TS2345: Argument of type 'Bill | null' is not assignable to parameter of type 'Bill'.
-  Type 'null' is not assignable to type 'Bill'.
-src/hooks/bills/useBillDetail.ts(192,15): error TS18047: 'bill' is possibly 'null'.
-src/hooks/bills/useBillDetail.ts(194,25): error TS2345: Argument of type 'Bill | null' is not assignable to parameter of type 'Bill'.
-  Type 'null' is not assignable to type 'Bill'.
 src/hooks/bills/useBillOperations.ts(68,7): error TS2322: Type '(updatedBills: Bill[]) => Promise<BulkOperationResult>' is not assignable to type '(updatedBills: unknown[]) => Promise<{ success: boolean; successCount: number; errorCount: number; errors: string[]; message: string; }>'.
   Types of parameters 'updatedBills' and 'updatedBills' are incompatible.
     Type 'unknown[]' is not assignable to type 'Bill[]'.
@@ -541,10 +517,6 @@ src/services/firebaseMessaging.ts(294,38): error TS2345: Argument of type 'strin
   Type 'undefined' is not assignable to type 'string'.
 src/utils/bills/billUpdateHelpers.ts(106,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billUpdateHelpers.ts(107,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/utils/budgeting/envelopeCalculations.ts(111,63): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-  Type 'undefined' is not assignable to type 'string'.
-src/utils/budgeting/envelopeCalculations.ts(522,24): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Record<FrequencyType, number>'.
-  No index signature with a parameter of type 'string' was found on type 'Record<FrequencyType, number>'.
 src/utils/common/testBudgetHistory.ts(47,39): error TS2345: Argument of type '{ hash: string; timestamp: number; message: string; author: string; parentHash: null; encryptedSnapshot: string; deviceFingerprint: string; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'encryptedSnapshot' are incompatible.
     Type 'string' is not assignable to type 'number[]'.

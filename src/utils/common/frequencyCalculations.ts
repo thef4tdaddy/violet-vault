@@ -179,11 +179,14 @@ export function getFrequencyOptions(usePrecise = true): FrequencyOption[] {
 
 /**
  * Get display text for a frequency value
- * @param {string} frequency - The frequency to get display text for
- * @param {number} customFrequency - Custom multiplier for the frequency
+ * @param {string|undefined} frequency - The frequency to get display text for
+ * @param {number|null|undefined} customFrequency - Custom multiplier for the frequency
  * @returns {string} Human readable frequency text
  */
-export function getFrequencyDisplayText(frequency: string, customFrequency = 1): string {
+export function getFrequencyDisplayText(
+  frequency: string | undefined,
+  customFrequency: number | null | undefined = 1
+): string {
   if (!frequency) return "Not set";
 
   const baseLabels: FrequencyLabels = {

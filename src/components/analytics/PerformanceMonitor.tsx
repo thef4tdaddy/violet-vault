@@ -9,8 +9,8 @@ import PerformanceTabContent from "./performance/PerformanceTabContent";
 import { AnalyticsData, BalanceData } from "@/types/analytics";
 
 interface PerformanceMonitorProps {
-  analyticsData: AnalyticsData;
-  balanceData: BalanceData;
+  analyticsData: AnalyticsData | null | undefined;
+  balanceData: BalanceData | null | undefined;
 }
 
 /**
