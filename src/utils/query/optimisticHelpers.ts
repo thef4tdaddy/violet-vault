@@ -70,7 +70,7 @@ export const optimisticHelpers = {
     newEnvelope: Omit<Envelope, "lastModified" | "createdAt">
   ) => {
     try {
-      const envelopeWithTimestamp: Envelope = {
+      const envelopeWithTimestamp = {
         ...newEnvelope,
         createdAt: Date.now(),
         lastModified: Date.now(),
@@ -190,7 +190,7 @@ export const optimisticHelpers = {
     newTransaction: Omit<Transaction, "lastModified" | "createdAt">
   ) => {
     try {
-      const transactionWithTimestamp: Transaction = {
+      const transactionWithTimestamp = {
         ...newTransaction,
         createdAt: Date.now(),
         lastModified: Date.now(),
@@ -304,7 +304,7 @@ export const optimisticHelpers = {
    */
   addSavingsGoal: async (newGoal: Omit<SavingsGoal, "lastModified" | "createdAt">) => {
     try {
-      const goalWithTimestamp: SavingsGoal = {
+      const goalWithTimestamp = {
         ...newGoal,
         createdAt: Date.now(),
         lastModified: Date.now(),

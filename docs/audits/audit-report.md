@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 16 | -5 |
-| TypeScript Strict Mode Errors | 172 | -5 |
+| TypeScript Errors | 15 | -1 |
+| TypeScript Strict Mode Errors | 171 | -1 |
 
-*Last updated: 2025-11-26 02:54:39 UTC*
+*Last updated: 2025-11-26 03:02:46 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -50,7 +50,6 @@
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/layout/ViewRenderer.tsx`
-- 1 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
@@ -64,7 +63,7 @@
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 11 | `TS2322` |
+| 10 | `TS2322` |
 | 4 | `TS2345` |
 | 1 | `TS2741` |
 
@@ -120,8 +119,6 @@ src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(d
 src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type '() => Promise<BudgetRecord | null>' is not assignable to parameter of type '() => Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
   Type 'Promise<BudgetRecord>' is not assignable to type 'Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
     Type 'BudgetRecord' has no properties in common with type '{ actualBalance?: number; unassignedCash?: number; }'.
-src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'string | Date' is not assignable to type 'string'.
-  Type 'Date' is not assignable to type 'string'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -174,7 +171,6 @@ src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'strin
 - 1 errors in `src/utils/pwa/patchNotesManager.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
-- 1 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 1 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 1 errors in `src/utils/dataManagement/backupUtils.ts`
 - 1 errors in `src/utils/common/toastHelpers.ts`
@@ -256,7 +252,7 @@ src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'strin
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 67 | `TS2322` |
+| 66 | `TS2322` |
 | 57 | `TS2345` |
 | 8 | `TS2769` |
 | 7 | `TS18048` |
@@ -695,8 +691,6 @@ src/utils/common/transactionArchiving.ts(255,11): error TS2322: Type 'null' is n
 src/utils/common/transactionArchiving.ts(423,9): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/dataManagement/backupUtils.ts(45,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'string | Date' is not assignable to type 'string | null'.
-  Type 'Date' is not assignable to type 'string'.
 src/utils/debts/debtCalculations.ts(94,5): error TS2322: Type 'string | null' is not assignable to type 'string | Date | undefined'.
   Type 'null' is not assignable to type 'string | Date | undefined'.
 src/utils/pageDetection/pageIdentifier.ts(37,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.

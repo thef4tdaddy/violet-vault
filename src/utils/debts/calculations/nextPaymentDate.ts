@@ -41,7 +41,9 @@ export function calculateNextPaymentDate(
   }
 
   if (debt.nextPaymentDate) {
-    return debt.nextPaymentDate;
+    return typeof debt.nextPaymentDate === "string"
+      ? debt.nextPaymentDate
+      : debt.nextPaymentDate.toISOString();
   }
 
   // Calculate based on payment frequency and last payment
