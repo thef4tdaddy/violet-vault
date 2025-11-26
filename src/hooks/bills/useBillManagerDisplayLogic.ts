@@ -33,7 +33,7 @@ const createSummaryCard = (
 
 export function useBillManagerDisplayLogic(selectedBills: Set<string>) {
   const getBillIcon = useCallback((bill: { iconName?: string }) => {
-    return getIconByName(bill.iconName) || "FileText";
+    return getIconByName(bill.iconName ?? "") || "FileText";
   }, []);
 
   const getUrgencyColors = useCallback((urgency: string) => {

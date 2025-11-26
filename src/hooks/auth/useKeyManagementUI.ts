@@ -47,7 +47,7 @@ interface KeyManagementUIState {
   keyFingerprint: string;
   copiedToClipboard: boolean;
   importResult: ImportResult | null;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 /**

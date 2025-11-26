@@ -21,7 +21,7 @@ export const clearFirebaseData = async () => {
  * @param {Object} authConfig - Auth configuration containing budgetId, encryptionKey, and currentUser
  * authConfig is needed because sync service is stopped before import
  */
-export const forcePushToCloud = async (authConfig = null) => {
+export const forcePushToCloud = async (authConfig: unknown = null) => {
   try {
     logger.info("🛑 Stopping sync service before clean restart...");
     cloudSyncService.stop();

@@ -3,7 +3,7 @@ import { useExecutionHistory } from "./useExecutionHistory";
 import type { ExecutionRecord } from "./useExecutionHistory";
 import { useUndoOperations, type UndoOperationEntry } from "./useUndoOperations";
 import { useExecutionStatistics } from "./useExecutionStatistics";
-import { useHistoryExport } from "./useHistoryExport";
+import { useHistoryExport, type ExportOptions } from "./useHistoryExport";
 import logger from "../../../utils/common/logger";
 
 /**
@@ -74,7 +74,7 @@ export const useAutoFundingHistory = (
       statisticsHook.getExecutionStatistics(historyHook.executionHistory as never),
 
     // Import/Export
-    exportHistory: (options) =>
+    exportHistory: (options?: ExportOptions) =>
       exportHook.exportHistory(
         historyHook.executionHistory as never[],
         undoHook.undoStack,

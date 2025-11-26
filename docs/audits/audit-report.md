@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 24 | 0 |
-| TypeScript Strict Mode Errors | 171 | 0 |
+| TypeScript Errors | 25 | +1 |
+| TypeScript Strict Mode Errors | 160 | -11 |
 
-*Last updated: 2025-11-26 03:30:32 UTC*
+*Last updated: 2025-11-26 03:40:52 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -53,6 +53,7 @@
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
+- 1 errors in `src/hooks/common/usePrompt.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 1 errors in `src/components/receipts/ReceiptButton.tsx`
@@ -70,7 +71,7 @@
 | Count | Error Code |
 |---|---|
 | 12 | `TS2322` |
-| 8 | `TS2345` |
+| 9 | `TS2345` |
 | 2 | `TS2741` |
 | 1 | `TS2769` |
 | 1 | `TS2740` |
@@ -147,6 +148,8 @@ src/hooks/bills/useBillManagerHelpers.ts(319,22): error TS2345: Argument of type
     Index signature for type 'string' is missing in type 'Bill'.
 src/hooks/bills/useBillOperations.ts(42,77): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope[]' is not assignable to parameter of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope[]'.
   Property 'targetAmount' is missing in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Envelope' but required in type 'import("/home/runner/work/violet-vault/violet-vault/src/types/finance").Envelope'.
+src/hooks/common/usePrompt.ts(117,20): error TS2345: Argument of type 'string | void' is not assignable to parameter of type 'string'.
+  Type 'void' is not assignable to type 'string'.
 src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type '() => Promise<BudgetRecord | null>' is not assignable to parameter of type '() => Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
   Type 'Promise<BudgetRecord>' is not assignable to type 'Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
     Type 'BudgetRecord' has no properties in common with type '{ actualBalance?: number; unassignedCash?: number; }'.
@@ -171,6 +174,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/utils/security/keyExport.ts`
 - 2 errors in `src/utils/query/queryClientConfig.ts`
 - 2 errors in `src/utils/debts/debtCalculations.ts`
+- 2 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 2 errors in `src/utils/common/transactionArchiving.ts`
 - 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 2 errors in `src/utils/bills/billUpdateHelpers.ts`
@@ -212,7 +216,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/utils/query/backgroundSyncService.ts`
 - 1 errors in `src/utils/pwa/patchNotesManager.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
-- 1 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 1 errors in `src/utils/dataManagement/backupUtils.ts`
 - 1 errors in `src/utils/common/toastHelpers.ts`
 - 1 errors in `src/utils/common/testBudgetHistory.ts`
@@ -234,20 +237,8 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 1 errors in `src/hooks/debts/useDebtModalLogic.ts`
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
-- 1 errors in `src/hooks/common/usePrompt.ts`
-- 1 errors in `src/hooks/common/useImportData.ts`
-- 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
-- 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
-- 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingHistory.ts`
 - 1 errors in `src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
-- 1 errors in `src/hooks/bills/useBulkBillOperations.ts`
-- 1 errors in `src/hooks/bills/useBills/index.ts`
-- 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
-- 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
-- 1 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
-- 1 errors in `src/hooks/auth/authOperations.ts`
-- 1 errors in `src/hooks/analytics/utils/csvImageExportUtils.ts`
 - 1 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 1 errors in `src/components/pages/MainDashboard.tsx`
 - 1 errors in `src/components/layout/MainLayout.tsx`
@@ -276,19 +267,19 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 67 | `TS2322` |
-| 59 | `TS2345` |
+| 66 | `TS2322` |
+| 54 | `TS2345` |
 | 9 | `TS2769` |
 | 5 | `TS7053` |
-| 5 | `TS7006` |
 | 5 | `TS18048` |
 | 4 | `TS7031` |
 | 4 | `TS18046` |
-| 3 | `TS2783` |
+| 2 | `TS7006` |
 | 2 | `TS2722` |
 | 2 | `TS2339` |
 | 2 | `TS18047` |
 | 1 | `TS7016` |
+| 1 | `TS2783` |
 | 1 | `TS2741` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
@@ -543,12 +534,8 @@ src/components/transactions/TransactionLedger.tsx(518,7): error TS2322: Type '(m
 src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void> | undefined' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
-src/hooks/analytics/utils/csvImageExportUtils.ts(97,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(160,5): error TS2322: Type 'unknown' is not assignable to type 'AnalyticsData'.
 src/hooks/analytics/utils/pdfGeneratorUtils.ts(161,5): error TS2322: Type 'unknown' is not assignable to type 'BalanceData'.
-src/hooks/auth/authOperations.ts(103,18): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
-src/hooks/auth/mutations/usePasswordMutations.ts(70,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string | null'.
-  Type 'undefined' is not assignable to type 'string | null'.
 src/hooks/auth/useAuthManager.ts(49,38): error TS2345: Argument of type 'UseMutationResult<LoginResult, Error, LoginMutationVariables, unknown>' is not assignable to parameter of type 'UseMutationResult<LoginResult, Error, LoginData, unknown>'.
   Type 'Override<MutationObserverIdleResult<LoginResult, Error, LoginMutationVariables, unknown>, { mutate: UseMutateFunction<LoginResult, Error, LoginMutationVariables, unknown>; }> & { ...; }' is not assignable to type 'UseMutationResult<LoginResult, Error, LoginData, unknown>'.
     Type 'Override<MutationObserverIdleResult<LoginResult, Error, LoginMutationVariables, unknown>, { mutate: UseMutateFunction<LoginResult, Error, LoginMutationVariables, unknown>; }> & { ...; }' is not assignable to type 'Override<MutationObserverIdleResult<LoginResult, Error, LoginData, unknown>, { mutate: UseMutateFunction<LoginResult, Error, LoginData, unknown>; }> & { ...; }'.
@@ -570,11 +557,6 @@ src/hooks/auth/useAuthManager.ts(62,54): error TS2345: Argument of type 'UseMuta
                 Index signature for type 'string' is missing in type 'UpdateProfileInput'.
 src/hooks/auth/useAuthenticationManager.ts(99,29): error TS2339: Property 'budgetId' does not exist on type 'never'.
 src/hooks/auth/useAuthenticationManager.ts(102,39): error TS2339: Property 'budgetId' does not exist on type 'never'.
-src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
-  Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
-    Type 'null' is not assignable to type 'HTMLInputElement'.
-src/hooks/bills/useBillManagerDisplayLogic.ts(36,26): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-  Type 'undefined' is not assignable to type 'string'.
 src/hooks/bills/useBillManagerHelpers.ts(286,44): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill[]' is not assignable to parameter of type 'Bill[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to type 'Bill'.
     Index signature for type 'string' is missing in type 'Bill'.
@@ -587,14 +569,10 @@ src/hooks/bills/useBillOperations.ts(68,7): error TS2322: Type '(updatedBills: B
   Types of parameters 'updatedBills' and 'updatedBills' are incompatible.
     Type 'unknown[]' is not assignable to type 'Bill[]'.
       Type 'unknown' is not assignable to type 'Bill'.
-src/hooks/bills/useBills/index.ts(43,5): error TS2783: 'upcomingBills' is specified more than once, so this usage will be overwritten.
-src/hooks/bills/useBulkBillOperations.ts(31,39): error TS7006: Parameter 'bill' implicitly has an 'any' type.
 src/hooks/budgeting/autofunding/useAutoFundingExecution.ts(66,5): error TS2345: Argument of type 'BudgetData & { transferFunds: ((from: string, to: string, amount: number, description?: string | undefined) => Promise<void>) | undefined; }' is not assignable to parameter of type 'Budget'.
   Types of property 'transferFunds' are incompatible.
     Type '((from: string, to: string, amount: number, description?: string | undefined) => Promise<void>) | undefined' is not assignable to type '(from: string, to: string, amount: number, description?: string | undefined) => Promise<void>'.
       Type 'undefined' is not assignable to type '(from: string, to: string, amount: number, description?: string | undefined) => Promise<void>'.
-src/hooks/budgeting/autofunding/useAutoFundingHistory.ts(77,21): error TS7006: Parameter 'options' implicitly has an 'any' type.
-src/hooks/budgeting/useBudgetData/queryFunctions.ts(66,66): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(25,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/budgeting/useBudgetHistoryQuery.ts(63,40): error TS2345: Argument of type '{ hash: string; message: string; author: string; parentHash: string | null; deviceFingerprint: string; encryptedSnapshot: number[]; iv: number[]; timestamp: number; }' is not assignable to parameter of type 'BudgetCommit'.
   Types of property 'parentHash' are incompatible.
@@ -611,9 +589,6 @@ src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overloa
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
     Argument of type 'Date | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
-src/hooks/common/useBugReport.ts(60,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
-src/hooks/common/usePrompt.ts(109,12): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/hooks/common/useRouterPageDetection.ts(22,25): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
   No index signature with a parameter of type 'string' was found on type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
 src/hooks/common/useRouterPageDetection.ts(66,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ dashboard: string; envelopes: string; savings: string; supplemental: string; paycheck: string; bills: string; transactions: string; debts: string; analytics: string; automation: string; activity: string; }'.
@@ -713,6 +688,7 @@ src/utils/common/transactionArchiving.ts(255,11): error TS2322: Type 'null' is n
 src/utils/common/transactionArchiving.ts(423,9): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/dataManagement/backupUtils.ts(45,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
+src/utils/dataManagement/firebaseUtils.ts(40,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SyncConfig | null | undefined'.
 src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'DebtAccount' is not assignable to parameter of type 'Debt'.
   Types of property 'nextPaymentDate' are incompatible.
     Type 'string | Date | undefined' is not assignable to type 'string | undefined'.

@@ -63,7 +63,9 @@ export const queryFunctions = {
 
       return sorted || [];
     } catch (error) {
-      logger.warn("Failed to fetch paycheck history from Dexie", error);
+      logger.warn("Failed to fetch paycheck history from Dexie", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   },
