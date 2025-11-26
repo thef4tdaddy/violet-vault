@@ -56,12 +56,16 @@ const calculateSuggestionStats = (
   dismissedCount: number
 ) => {
   const total = suggestions.length;
+  const priorityInit = { high: 0, medium: 0, low: 0 };
   const priority = suggestions.reduce(
-    (acc: Record<string, number>, s) => {
-      acc[s.priority] = (acc[s.priority] || 0) + 1;
+    (acc, s) => {
+      const key = s.priority as keyof typeof priorityInit;
+      if (key in acc) {
+        acc[key] = (acc[key] || 0) + 1;
+      }
       return acc;
     },
-    { high: 0, medium: 0, low: 0 }
+    { ...priorityInit }
   );
   const type = suggestions.reduce((acc: Record<string, number>, s) => {
     acc[s.type] = (acc[s.type] || 0) + 1;

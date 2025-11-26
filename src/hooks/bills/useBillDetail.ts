@@ -66,15 +66,12 @@ export const useBillDetail = ({
 
   // Computed values
   const normalizedDueDate = useMemo(() => {
-    if (!bill?.dueDate) {
+    if (!bill || !bill.dueDate) {
       return null;
     }
 
-    const dueDate = bill.dueDate;
-    const parsed =
-      typeof dueDate === "object" && "getTime" in dueDate
-        ? (dueDate as Date)
-        : new Date(typeof dueDate === "number" ? dueDate : `${dueDate}`);
+    // bill.dueDate is a string in the Bill interface
+    const parsed = new Date(bill.dueDate);
 
     if (isNaN(parsed.getTime())) {
       logger.warn("Invalid bill due date received", { billId: bill.id, dueDate: bill.dueDate });

@@ -9,11 +9,12 @@ import {
   getEnvelopeDisplay,
 } from "../../../utils/transactions/tableHelpers";
 import type { Transaction } from "@/types/finance";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 interface TransactionRowProps {
   transaction: Transaction;
   envelopes: unknown[];
-  virtualRow: { index: number; start: number };
+  virtualRow: VirtualItem;
   columnStyles?: typeof COLUMN_STYLES;
   gridTemplate: string;
   onEdit: (transaction: Transaction) => void;

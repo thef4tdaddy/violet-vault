@@ -22,6 +22,17 @@ import type { User, Transaction, Envelope } from "../../types/finance";
 import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
+type DataRow = Record<string, unknown>;
+
+interface FieldMapping {
+  date?: string;
+  description?: string;
+  amount?: string;
+  category?: string;
+  notes?: string;
+  [key: string]: string | undefined;
+}
+
 type SupplementalAccount = Array<{ id: string | number; name: string; type?: string }>;
 
 type FilterState = Record<string, string | boolean>;
@@ -70,17 +81,20 @@ interface TransactionLedgerViewProps {
   onCloseImportModal: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: unknown[];
-  setImportData: (data: unknown[]) => void;
-  fieldMapping: Record<string, string>;
-  setFieldMapping: (mapping: Record<string, string>) => void;
+  importData: DataRow[];
+  setImportData: (data: DataRow[]) => void;
+  fieldMapping: FieldMapping;
+  setFieldMapping: (mapping: FieldMapping) => void;
   importProgress: {
     current: number;
     total: number;
     percentage: number;
   };
   onImport: () => void;
-  onFileUpload: (data: unknown[]) => void;
+  onFileUpload: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    options: { clearExisting: boolean }
+  ) => void;
 }
 
 const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({

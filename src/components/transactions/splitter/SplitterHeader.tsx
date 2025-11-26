@@ -39,7 +39,7 @@ const SplitterHeader: React.FC<SplitterHeaderProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <div className="bg-white/20 p-2 rounded-xl mr-3 border-2 border-white/30 shadow-md">
-            {renderIcon("Scissors", "h-5 w-5 text-white")}
+            {renderIcon("Scissors", { className: "h-5 w-5 text-white" })}
           </div>
           <div>
             <h2 className="text-xl font-black text-white">SPLIT TRANSACTION</h2>
