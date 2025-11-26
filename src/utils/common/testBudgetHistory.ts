@@ -11,13 +11,12 @@ export const createTestBudgetHistory = async () => {
     logger.info("🧪 Creating test budget history commits...");
 
     // Create a test commit
-    const testCommit = {
+    const testCommit: import("../../db/types.ts").BudgetCommit = {
       hash: "test_commit_" + Date.now(),
       timestamp: Date.now(),
       message: "Test commit for family collaboration",
       author: "test_user",
-      parentHash: null,
-      encryptedSnapshot: "encrypted_test_data",
+      parentHash: undefined,
       deviceFingerprint: "test_device",
     };
 

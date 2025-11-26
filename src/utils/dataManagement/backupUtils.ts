@@ -42,6 +42,6 @@ export const backupCurrentData = async () => {
     localStorage.setItem(`dexie_backup_${timestamp}`, JSON.stringify(currentData));
     logger.info("Current Dexie data backed up successfully");
   } catch (backupError) {
-    logger.warn("Failed to create backup", backupError);
+    logger.warn("Failed to create backup", backupError as Record<string, unknown>);
   }
 };

@@ -81,7 +81,9 @@ export function enrichDebt(
   relatedTransactions: Transaction[] = []
 ): DebtAccount {
   // Calculate next payment date (provide null for relatedBill parameter)
-  const nextPaymentDate = calculateNextPaymentDate(debt, null);
+  const nextPaymentDateResult = calculateNextPaymentDate(debt, null);
+  // Convert null to undefined to match DebtAccount.nextPaymentDate type
+  const nextPaymentDate = nextPaymentDateResult ?? undefined;
 
   // Calculate payoff projection
   const payoffInfo = calculatePayoffProjection(debt) as unknown as PayoffProjection;

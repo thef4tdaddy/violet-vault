@@ -52,7 +52,7 @@ export const prefetchHelpers = {
 
           // Fallback to direct database query
           const cached = await budgetDb.getEnvelopesByCategory(
-            filters.category ?? undefined,
+            filters.category || "",
             filters.includeArchived
           );
 

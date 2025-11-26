@@ -202,6 +202,7 @@ export const getReceiptFormChanges = (
 
   if (
     receiptData.total !== undefined &&
+    receiptData.total !== null &&
     transactionForm.amount !== undefined &&
     Math.abs(receiptData.total - transactionForm.amount) > 0.01
   ) {
