@@ -33,7 +33,15 @@ const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }: ReceiptActi
       <Button
         onClick={onConfirm}
         className="glassmorphism flex-1 px-6 py-3 rounded-lg transition-colors border-2 border-black bg-purple-600/80 hover:bg-purple-700/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={!hasMinimumExtractedData(extractedData)}
+        disabled={
+          !hasMinimumExtractedData({
+            ...extractedData,
+            total:
+              typeof extractedData.total === "string"
+                ? parseFloat(extractedData.total)
+                : extractedData.total,
+          })
+        }
       >
         <span className="font-black text-white">
           <span className="text-base">C</span>REATE <span className="text-base">T</span>RANSACTION

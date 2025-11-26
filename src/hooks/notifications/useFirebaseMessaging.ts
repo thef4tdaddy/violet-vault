@@ -95,7 +95,10 @@ export const useFirebaseMessaging = () => {
         logger.info("📱 FCM token obtained successfully");
       }
 
-      return tokenResult;
+      return {
+        ...tokenResult,
+        token: tokenResult.token ?? undefined,
+      };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       logger.error("Failed to request permission and get token", err);

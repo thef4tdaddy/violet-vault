@@ -103,7 +103,23 @@ const TransactionArchiving = () => {
 
       <ArchivingPreviewResults
         showPreview={showPreview}
-        previewData={previewData}
+        previewData={
+          previewData
+            ? {
+                totalCount: previewData.totalCount,
+                totalAmount: previewData.totalAmount,
+                categories: previewData.categories,
+                dateRange: {
+                  earliest: previewData.dateRange.earliest?.toISOString(),
+                  latest: previewData.dateRange.latest?.toISOString(),
+                },
+                cutoffDate:
+                  previewData.cutoffDate instanceof Date
+                    ? previewData.cutoffDate.toISOString()
+                    : String(previewData.cutoffDate),
+              }
+            : null
+        }
         onClosePreview={closePreview}
       />
 

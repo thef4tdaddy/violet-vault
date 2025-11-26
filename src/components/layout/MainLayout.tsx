@@ -494,7 +494,7 @@ const MainContentLayoutView = ({
           onChangePassword={onChangePassword as unknown as (password: string) => void}
           currentUser={currentUser as { userName?: string; userColor?: string }}
           isLocalOnlyMode={isLocalOnlyMode}
-          securityManager={securityManager}
+          securityManager={securityManager as { lockApp: () => void } | null}
           onUpdateProfile={onUpdateProfile}
         />
       )}
