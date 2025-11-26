@@ -27,6 +27,17 @@ export interface Envelope {
   // Connection properties
   billId?: string;
   debtId?: string;
+  // Savings goal properties (for envelopeType: "savings")
+  priority?: "low" | "medium" | "high";
+  isPaused?: boolean;
+  isCompleted?: boolean;
+  targetDate?: Date | string;
+  monthlyContribution?: number;
+  // Supplemental account properties (for envelopeType: "supplemental")
+  annualContribution?: number;
+  expirationDate?: Date | string | null;
+  isActive?: boolean;
+  accountType?: string; // FSA, HSA, etc.
   [key: string]: unknown;
 }
 

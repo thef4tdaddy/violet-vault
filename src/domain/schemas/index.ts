@@ -59,11 +59,15 @@ export {
 export {
   EnvelopeSchema,
   EnvelopePartialSchema,
+  EnvelopeTypeSchema,
+  EnvelopePrioritySchema,
   validateEnvelope,
   validateEnvelopeSafe,
   validateEnvelopePartial,
   type Envelope,
   type EnvelopePartial,
+  type EnvelopeType,
+  type EnvelopePriority,
 } from "./envelope";
 
 export {

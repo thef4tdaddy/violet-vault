@@ -2,13 +2,33 @@
  * Envelope Domain Schema
  * Runtime validation for budget envelope entities
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
+ * Updated for Issue #1335: Database Schema Migration for Savings Goals and Supplemental Accounts
  */
 
 import { z } from "zod";
 
 /**
+ * Envelope type enum for classification
+ */
+export const EnvelopeTypeSchema = z.enum([
+  "bill",
+  "variable",
+  "savings",
+  "sinking_fund", // @deprecated - Use "savings" with targetDate instead
+  "supplemental",
+]);
+export type EnvelopeType = z.infer<typeof EnvelopeTypeSchema>;
+
+/**
+ * Priority enum for savings goals
+ */
+export const EnvelopePrioritySchema = z.enum(["low", "medium", "high"]);
+export type EnvelopePriority = z.infer<typeof EnvelopePrioritySchema>;
+
+/**
  * Zod schema for Envelope validation
  * Represents budget allocation containers (e.g., "Groceries", "Gas")
+ * Now also supports savings goals and supplemental accounts as envelope types
  */
 export const EnvelopeSchema = z.object({
   id: z.string().min(1, "Envelope ID is required"),
@@ -23,6 +43,25 @@ export const EnvelopeSchema = z.object({
   currentBalance: z.number().min(0, "Current balance cannot be negative").optional(),
   targetAmount: z.number().min(0, "Target amount cannot be negative").optional(),
   description: z.string().max(500, "Description must be 500 characters or less").optional(),
+  // Envelope type classification
+  envelopeType: EnvelopeTypeSchema.optional(),
+  autoAllocate: z.boolean().optional(),
+  monthlyBudget: z.number().min(0).optional(),
+  biweeklyAllocation: z.number().min(0).optional(),
+  // Connection properties
+  billId: z.string().optional(),
+  debtId: z.string().optional(),
+  // Savings goal properties (for envelopeType: "savings")
+  priority: EnvelopePrioritySchema.optional(),
+  isPaused: z.boolean().optional(),
+  isCompleted: z.boolean().optional(),
+  targetDate: z.union([z.date(), z.string()]).optional(),
+  monthlyContribution: z.number().min(0).optional(),
+  // Supplemental account properties (for envelopeType: "supplemental")
+  annualContribution: z.number().min(0).optional(),
+  expirationDate: z.union([z.date(), z.string(), z.null()]).optional(),
+  isActive: z.boolean().optional(),
+  accountType: z.string().optional(), // FSA, HSA, etc.
 });
 
 /**
