@@ -44,7 +44,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }: AddDebtModalPr
 
   useEffect(() => {
     setLockData({
-      userName: editLock.lockedBy,
+      userName: editLock.lockedBy ?? "",
       expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
       isExpired: editLock.isExpired,
     });

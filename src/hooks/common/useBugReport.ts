@@ -57,7 +57,9 @@ const useBugReport = (options: BugReportOptions = {}) => {
 
       setIsModalOpen(true);
     } catch (error) {
-      logger.warn("Error opening bug report modal", error);
+      logger.warn("Error opening bug report modal", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       setIsModalOpen(true); // Still open modal even if initialization fails
     }
   };

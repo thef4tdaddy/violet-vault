@@ -37,7 +37,7 @@ const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
   const shouldRender = Boolean(syncConflicts?.hasConflict);
   const modalRef = useModalAutoScroll(shouldRender);
 
-  if (!shouldRender) return null;
+  if (!shouldRender || !syncConflicts) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">

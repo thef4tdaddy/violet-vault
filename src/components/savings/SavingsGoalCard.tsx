@@ -9,8 +9,8 @@ interface SavingsGoal {
   name: string;
   currentAmount: number;
   targetAmount: number;
-  targetDate?: string;
-  color: string;
+  targetDate?: string | Date;
+  color?: string;
   priority: string;
   description?: string;
 }
@@ -43,10 +43,10 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
     return target > 0 ? (current / target) * 100 : 0;
   };
 
-  const getTimeRemaining = (targetDate?: string): TimeRemaining | null => {
+  const getTimeRemaining = (targetDate?: string | Date): TimeRemaining | null => {
     if (!targetDate) return null;
     const today = new Date();
-    const target = new Date(targetDate);
+    const target = targetDate instanceof Date ? targetDate : new Date(targetDate);
     const diffTime = target.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 

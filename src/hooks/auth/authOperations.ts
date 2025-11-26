@@ -100,7 +100,7 @@ export const createLoginOperation =
         return { success: true, data: result };
       } else {
         logger.auth("AuthManager: Login failed", { error: result.error });
-        return { success: false, error: result.error, ...result };
+        return { ...result, success: false, error: result.error };
       }
     } catch (error) {
       logger.error("AuthManager: Login error", error);

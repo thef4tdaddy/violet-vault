@@ -145,7 +145,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
 
           <div className="text-xs text-gray-500">
             Last checked:{" "}
-            {securityReport ? new Date(securityReport.timestamp).toLocaleString() : "Never"}
+            {securityReport?.timestamp
+              ? new Date(securityReport.timestamp).toLocaleString()
+              : "Never"}
           </div>
         </div>
       )}

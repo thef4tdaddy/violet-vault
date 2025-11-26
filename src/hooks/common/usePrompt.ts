@@ -106,7 +106,7 @@ export const usePromptModal = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = useCallback(
-    async (value) => {
+    async (value: string) => {
       if (!resolver) return;
 
       // Handle async confirmation if needed

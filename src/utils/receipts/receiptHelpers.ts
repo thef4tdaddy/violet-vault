@@ -7,9 +7,9 @@ import { getIcon } from "../index";
 
 // Define types
 interface ReceiptData {
-  merchant?: string;
-  total?: number;
-  date?: string;
+  merchant?: string | null;
+  total?: number | null;
+  date?: string | null;
   [key: string]: unknown;
 }
 

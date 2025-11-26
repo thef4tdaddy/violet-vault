@@ -17,7 +17,7 @@ interface UndoStackEntry {
   [key: string]: unknown;
 }
 
-interface ExportOptions {
+export interface ExportOptions {
   includeUndoStack?: boolean;
   dateFrom?: string;
   dateTo?: string;

@@ -75,7 +75,7 @@ export const useDebtModalLogic = (
   const debtFormHook = useDebtForm(debt, isOpen, connectedBill, connectedEnvelope);
 
   // Edit locking for the debt (only when editing existing debt)
-  const editLockHook = useEditLock("debt", debt?.id, {
+  const editLockHook = useEditLock("debt", debt?.id ?? "", {
     autoAcquire: !!(isOpen && debt?.id),
     autoRelease: true,
     showToasts: true,

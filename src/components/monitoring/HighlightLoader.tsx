@@ -19,7 +19,9 @@ const HighlightLoader = () => {
         logger.debug("Highlight.io loaded and initialized via lazy loader");
       } catch (error) {
         // Graceful fallback - monitoring is not critical for app functionality
-        logger.warn("Failed to load Highlight.io monitoring", error);
+        logger.warn("Failed to load Highlight.io monitoring", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     };
 

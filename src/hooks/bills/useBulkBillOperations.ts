@@ -28,7 +28,7 @@ export const useBulkBillOperations = ({
    */
   const handleBulkUpdate = useCallback(
     async (updatedBills: Bill[]) => {
-      const updateSingleBill = async (bill) => {
+      const updateSingleBill = async (bill: Bill) => {
         logger.debug("Updating bill", {
           billId: bill.id,
           provider: bill.provider,

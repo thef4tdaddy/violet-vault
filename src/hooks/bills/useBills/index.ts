@@ -41,7 +41,20 @@ const useBills = (options: { daysAhead?: number; [key: string]: unknown } = {}) 
     // Data
     bills,
     upcomingBills,
-    ...analytics,
+    // Spread analytics except upcomingBills which is already defined above
+    upcomingBillsCount: analytics.upcomingBills,
+    totalBills: analytics.totalBills,
+    paidBills: analytics.paidBills,
+    unpaidBills: analytics.unpaidBills,
+    overdueBills: analytics.overdueBills,
+    totalAmount: analytics.totalAmount,
+    paidAmount: analytics.paidAmount,
+    unpaidAmount: analytics.unpaidAmount,
+    overdueAmount: analytics.overdueAmount,
+    upcomingAmount: analytics.upcomingAmount,
+    categoryBreakdown: analytics.categoryBreakdown,
+    overdueBillsList: analytics.overdueBillsList,
+    upcomingBillsList: analytics.upcomingBillsList,
     availableCategories,
 
     // Loading states

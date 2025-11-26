@@ -272,7 +272,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
       const jsonString = JSON.stringify(data);
       return new Blob([jsonString]).size;
     } catch (error) {
-      logger.warn("Failed to estimate data size", error);
+      logger.warn("Failed to estimate data size", { error: error instanceof Error ? error.message : String(error) });
       return 0;
     }
   }

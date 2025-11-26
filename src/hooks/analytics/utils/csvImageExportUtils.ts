@@ -94,7 +94,9 @@ export const exportChartAsImage = async (
       }
     }, "image/png");
   } catch (error) {
-    logger.warn(`Failed to export chart: ${chartName}`, error);
+    logger.warn(`Failed to export chart: ${chartName}`, {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };
 

@@ -229,7 +229,7 @@ const shouldShowSelector = (
 
 interface UniversalConnectionManagerProps {
   entityType: string;
-  entityId: string;
+  entityId: string | null;
   canEdit?: boolean;
   theme?: ThemeName;
   showSelector?: boolean;
@@ -249,9 +249,12 @@ export const UniversalConnectionManager = ({
 }: UniversalConnectionManagerProps) => {
   const managerProps = useConnectionManager(
     entityType as "bill" | "envelope" | "debt",
-    entityId
+    entityId ?? ""
   ) as unknown as ConnectionManagerProps;
   const config = managerProps.getConnectionConfig();
+
+  // Don't render if no entityId provided
+  if (!entityId) return null;
 
   return (
     <div className="space-y-4">

@@ -43,7 +43,7 @@ const useLongPress = (callback: (event: unknown) => void, threshold = 500) => {
 const useKeyboardNavigation = (
   isExpanded: boolean,
   setExpanded: (expanded: boolean) => void,
-  containerRef: React.RefObject<HTMLElement>
+  containerRef: React.RefObject<HTMLElement | null>
 ) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,7 +96,7 @@ const useKeyboardNavigation = (
 export const useFABBehavior = () => {
   const { isExpanded, primaryAction, secondaryActions } = useFABSelectors();
   const { setExpanded } = useFABActions();
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   // Event handlers
   const handlePrimaryClick = useCallback(() => {

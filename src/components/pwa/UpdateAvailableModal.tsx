@@ -34,7 +34,9 @@ const usePatchNotes = (shouldFetch: boolean) => {
           logger.info("Loaded patch notes for version popup", { version: APP_VERSION });
         }
       } catch (error) {
-        logger.warn("Could not load patch notes for popup", error);
+        logger.warn("Could not load patch notes for popup", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       } finally {
         setLoadingNotes(false);
       }

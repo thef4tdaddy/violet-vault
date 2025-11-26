@@ -163,7 +163,7 @@ const performImport = async (
   };
 
   // Pass sync config to force push since sync service will be stopped during import
-  await forcePushToCloud(syncConfig as unknown);
+  await forcePushToCloud(syncConfig);
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
   // Force UI refresh by invalidating all queries

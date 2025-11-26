@@ -45,7 +45,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }: DebtSummaryCardsProps) => {
       color: "yellow" as const,
       subtext: `${stats.dueSoonCount} payments this week`,
       alert: stats.dueSoonCount > 0,
-      onClick: stats.dueSoonCount > 0 ? onDueSoonClick : null,
+      onClick: stats.dueSoonCount > 0 ? onDueSoonClick : undefined,
     },
   ];
 

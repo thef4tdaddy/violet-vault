@@ -2,11 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import type { VirtualItem } from "@tanstack/react-virtual";
-
-interface Transaction {
-  description: string;
-  [key: string]: unknown;
-}
+import type { Transaction } from "@/types/finance";
 
 interface DeleteConfirmationProps {
   transaction: Transaction;
