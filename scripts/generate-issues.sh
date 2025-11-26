@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Generate GitHub issues for TypeScript errors (normal or strict mode)
+# Generate GitHub issues for TypeScript errors or ESLint problems
 # This script wraps the Node.js script and provides a convenient interface
 
 set -e
@@ -11,23 +11,46 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Parse arguments
-MODE="${1:-normal}" # 'normal' or 'strict'
-MAX_ERRORS="${2:-}" # Optional: limit to last N errors
-ERRORS_PER_ISSUE="${3:-}" # Optional: number of errors per issue (defaults to 120)
+ISSUE_TYPE="${1:-typescript}" # 'typescript' or 'eslint'
+MODE="${2:-normal}" # For TypeScript: 'normal' or 'strict'
+MAX_ERRORS="${3:-}" # Optional: limit to last N errors
+ERRORS_PER_ISSUE="${4:-}" # Optional: number of errors per issue (defaults to 120)
+
+# Validate issue type
+if [ "$ISSUE_TYPE" != "typescript" ] && [ "$ISSUE_TYPE" != "eslint" ]; then
+  echo "❌ Error: Issue type must be 'typescript' or 'eslint'"
+  echo ""
+  echo "Usage:"
+  echo "  ./scripts/generate-issues.sh typescript [normal|strict] [maxErrors] [errorsPerIssue]"
+  echo "  ./scripts/generate-issues.sh eslint [maxErrors] [errorsPerIssue]"
+  exit 1
+fi
 
 # Determine which results file to use
-if [ "$MODE" = "strict" ]; then
-  RESULTS_FILE="docs/audits/typecheck-strict-results.txt"
-  MODE_LABEL="strict mode"
+if [ "$ISSUE_TYPE" = "eslint" ]; then
+  RESULTS_FILE="docs/audits/lint-results.json"
+  MODE_LABEL="ESLint"
+  # For ESLint, shift mode to be maxErrors
+  if [ -n "$MODE" ] && [ "$MODE" != "normal" ] && [ "$MODE" != "strict" ]; then
+    MAX_ERRORS="$MODE"
+    MODE=""
+  fi
 else
-  RESULTS_FILE="docs/audits/typecheck-results.txt"
-  MODE_LABEL="normal"
+  if [ "$MODE" = "strict" ]; then
+    RESULTS_FILE="docs/audits/typecheck-strict-results.txt"
+    MODE_LABEL="strict mode TypeScript"
+  else
+    RESULTS_FILE="docs/audits/typecheck-results.txt"
+    MODE_LABEL="normal TypeScript"
+  fi
 fi
 
 # Check if results file exists
 if [ ! -f "$RESULTS_FILE" ]; then
   echo "❌ Error: ${MODE_LABEL} results file not found: $RESULTS_FILE"
-  if [ "$MODE" = "strict" ]; then
+  if [ "$ISSUE_TYPE" = "eslint" ]; then
+    echo "   Run: npm run lint:json"
+  elif [ "$MODE" = "strict" ]; then
     echo "   Run: npm run typecheck:strict"
   else
     echo "   Run: npm run typecheck"
@@ -70,7 +93,7 @@ if [ "$NODE_VERSION" -lt 18 ]; then
   echo "   You may need to install node-fetch: npm install node-fetch"
 fi
 
-echo "🚀 Generating GitHub issues for ${MODE_LABEL} TypeScript errors..."
+echo "🚀 Generating GitHub issues for ${MODE_LABEL} issues..."
 echo ""
 
 # Prompt for errors per issue if not provided
@@ -94,7 +117,10 @@ echo ""
 echo "Configuration:"
 echo "  Repository: $GITHUB_REPO"
 echo "  Results file: $RESULTS_FILE"
-echo "  Mode: $MODE_LABEL"
+echo "  Issue type: $ISSUE_TYPE"
+if [ "$ISSUE_TYPE" = "typescript" ]; then
+  echo "  Mode: $MODE"
+fi
 echo "  Errors per issue: $ERRORS_PER_ISSUE"
 if [ -n "$MAX_ERRORS" ]; then
   echo "  Max errors: $MAX_ERRORS (last N errors)"
@@ -103,9 +129,9 @@ echo "  Using: GitHub CLI (gh)"
 echo ""
 
 # Run the Node.js script
-# Pass arguments: MODE, MAX_ERRORS (or empty), ERRORS_PER_ISSUE
-# Always pass all three for consistent parsing
-node "$SCRIPT_DIR/generate-typescript-issues.js" "$MODE" "${MAX_ERRORS:-}" "${ERRORS_PER_ISSUE:-}"
+# Pass arguments: ISSUE_TYPE, MODE, MAX_ERRORS (or empty), ERRORS_PER_ISSUE
+# Always pass all four for consistent parsing
+node "$SCRIPT_DIR/generate-issues.js" "$ISSUE_TYPE" "${MODE:-normal}" "${MAX_ERRORS:-}" "${ERRORS_PER_ISSUE:-}"
 
 echo ""
 echo "✅ Done!"

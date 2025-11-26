@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Generate GitHub issues for TypeScript errors (normal and strict mode)
- * Groups errors into issues with ~100-150 errors per issue
+ * Generate GitHub issues for TypeScript errors or ESLint problems
+ * Supports: TypeScript (normal/strict mode) and ESLint
+ * Groups errors into issues with configurable errors per issue
  */
 
 import fs from "fs";
@@ -16,6 +17,7 @@ const __dirname = path.dirname(__filename);
 // File paths
 const NORMAL_RESULTS_FILE = path.join(__dirname, "../docs/audits/typecheck-results.txt");
 const STRICT_RESULTS_FILE = path.join(__dirname, "../docs/audits/typecheck-strict-results.txt");
+const ESLINT_RESULTS_FILE = path.join(__dirname, "../docs/audits/lint-results.json");
 const AGENT_PROMPT_FILE = path.join(
   __dirname,
   "../docs/development/agent-prompt-typescript-strict.md"
@@ -28,7 +30,7 @@ const GITHUB_REPO = process.env.GITHUB_REPO || "thef4tdaddy/violet-vault";
 /**
  * Parse TypeScript errors from results file
  */
-function parseErrors(resultsFile) {
+function parseTypeScriptErrors(resultsFile) {
   if (!fs.existsSync(resultsFile)) {
     return { errorsByFile: {}, allErrors: [] };
   }
@@ -66,10 +68,65 @@ function parseErrors(resultsFile) {
 }
 
 /**
+ * Parse ESLint problems from JSON results file
+ */
+function parseESLintProblems(resultsFile) {
+  if (!fs.existsSync(resultsFile)) {
+    return { errorsByFile: {}, allErrors: [] };
+  }
+
+  const content = fs.readFileSync(resultsFile, "utf-8");
+  const eslintData = JSON.parse(content);
+
+  const errorsByFile = {};
+  const allErrors = [];
+
+  for (const fileResult of eslintData) {
+    if (!fileResult.messages || fileResult.messages.length === 0) {
+      continue;
+    }
+
+    // Convert absolute paths to relative paths
+    let filePath = fileResult.filePath;
+    if (filePath.startsWith(process.cwd())) {
+      filePath = path.relative(process.cwd(), filePath);
+    }
+
+    if (!errorsByFile[filePath]) {
+      errorsByFile[filePath] = [];
+    }
+
+    for (const message of fileResult.messages) {
+      // Only include errors and warnings (severity 2 and 1)
+      if (message.severity >= 1) {
+        const error = {
+          file: filePath,
+          line: message.line || 0,
+          col: message.column || 0,
+          code: message.ruleId || "unknown",
+          message: message.message,
+          severity: message.severity === 2 ? "error" : "warning",
+          fullLine: `${filePath}:${message.line}:${message.column} ${message.severity === 2 ? "error" : "warning"} ${message.message} ${message.ruleId || ""}`,
+        };
+
+        errorsByFile[filePath].push(error);
+        allErrors.push(error);
+      }
+    }
+  }
+
+  return { errorsByFile, allErrors };
+}
+
+/**
  * Get agent prompt template (without worktree section)
  * Includes all rules and instructions from the agent prompt document
  */
-function getAgentPrompt() {
+function getAgentPrompt(issueType = "TypeScript") {
+  if (issueType === "ESLint") {
+    return "Follow ESLint best practices and fix all linting issues. Use `npm run lint:fix` to auto-fix issues where possible.";
+  }
+
   if (!fs.existsSync(AGENT_PROMPT_FILE)) {
     return "See docs/development/agent-prompt-typescript-strict.md for instructions.";
   }
@@ -132,7 +189,7 @@ function getAgentPrompt() {
 /**
  * Group errors into batches for issues
  */
-function groupErrorsIntoBatches(errorsByFile, errorsPerIssue = ERRORS_PER_ISSUE) {
+function groupErrorsIntoBatches(errorsByFile, errorsPerIssue = DEFAULT_ERRORS_PER_ISSUE) {
   const batches = [];
   let currentBatch = {
     files: [],
@@ -180,18 +237,18 @@ function formatErrorList(errors, errorType = "TypeScript") {
   }
 
   const lines = [];
-  lines.push(`## Files with ${errorType} Errors\n`);
-  lines.push(`**Total Errors**: ${errors.length}\n`);
-  lines.push("### Error Summary by File\n");
+  lines.push(`## Files with ${errorType} Issues\n`);
+  lines.push(`**Total Issues**: ${errors.length}\n`);
+  lines.push("### Issue Summary by File\n");
 
   // Sort files by error count
   const sortedFiles = Object.entries(byFile).sort(([, a], [, b]) => b.length - a.length);
 
   for (const [file, fileErrors] of sortedFiles) {
-    lines.push(`\n#### \`${file}\` (${fileErrors.length} errors)`);
+    lines.push(`\n#### \`${file}\` (${fileErrors.length} issues)`);
     lines.push("");
 
-    // Group by error code
+    // Group by error code/rule
     const byCode = {};
     for (const error of fileErrors) {
       if (!byCode[error.code]) {
@@ -203,7 +260,9 @@ function formatErrorList(errors, errorType = "TypeScript") {
     for (const [code, codeErrors] of Object.entries(byCode).sort(
       (a, b) => b[1].length - a[1].length
     )) {
-      lines.push(`**${code}** (${codeErrors.length} occurrences):`);
+      const severityLabel =
+        errorType === "ESLint" && codeErrors[0].severity ? ` (${codeErrors[0].severity})` : "";
+      lines.push(`**${code}**${severityLabel} (${codeErrors.length} occurrences):`);
       for (const error of codeErrors.slice(0, 10)) {
         // Show first 10 of each type
         lines.push(`- Line ${error.line}:${error.col} - ${error.message}`);
@@ -226,16 +285,17 @@ async function createGitHubIssue(
   batchNumber,
   totalBatches,
   agentPrompt,
-  errorType = "TypeScript",
+  issueType = "TypeScript",
   mode = "normal"
 ) {
-  const modeLabel = mode === "strict" ? "Strict Mode" : "Normal";
-  const title = `Fix TypeScript ${modeLabel} Errors (Batch ${batchNumber}/${totalBatches}) - ${batch.errorCount} errors in ${batch.files.length} files`;
+  const modeLabel = mode === "strict" ? "Strict Mode" : mode === "normal" ? "Normal" : "";
+  const typeLabel = issueType === "ESLint" ? "ESLint" : "TypeScript";
+  const title = `Fix ${typeLabel} ${modeLabel ? modeLabel + " " : ""}Issues (Batch ${batchNumber}/${totalBatches}) - ${batch.errorCount} issues in ${batch.files.length} files`;
 
   const body = [
-    `# TypeScript ${modeLabel} Error Fixing - Batch ${batchNumber}/${totalBatches}`,
+    `# ${typeLabel} ${modeLabel ? modeLabel + " " : ""}Issue Fixing - Batch ${batchNumber}/${totalBatches}`,
     "",
-    `**Total Errors**: ${batch.errorCount}`,
+    `**Total Issues**: ${batch.errorCount}`,
     `**Total Files**: ${batch.files.length}`,
     "",
     "---",
@@ -245,13 +305,13 @@ async function createGitHubIssue(
     batch.files
       .map(
         (file, idx) =>
-          `${idx + 1}. \`${file}\` (${batch.errors.filter((e) => e.file === file).length} errors)`
+          `${idx + 1}. \`${file}\` (${batch.errors.filter((e) => e.file === file).length} issues)`
       )
       .join("\n"),
     "",
     "---",
     "",
-    formatErrorList(batch.errors, errorType),
+    formatErrorList(batch.errors, typeLabel),
     "",
     "---",
     "",
@@ -268,23 +328,31 @@ async function createGitHubIssue(
     "- [ ] Read and understood all agent instructions above",
     "- [ ] Created feature branch for this batch",
     "- [ ] Fixed all files in this batch",
-    "- [ ] Verified normal TypeScript errors remain at 0",
+    issueType === "ESLint"
+      ? "- [ ] Verified ESLint issues for these files are resolved"
+      : "- [ ] Verified normal TypeScript errors remain at 0",
     "- [ ] Verified ESLint errors remain at 0",
-    mode === "strict"
+    issueType === "TypeScript" && mode === "strict"
       ? "- [ ] Verified strict mode errors for these files are resolved"
-      : "- [ ] Verified normal TypeScript errors for these files are resolved",
+      : issueType === "TypeScript"
+        ? "- [ ] Verified normal TypeScript errors for these files are resolved"
+        : "",
     "- [ ] All changes committed with descriptive messages",
     "- [ ] Branch pushed and ready for review",
     "",
     "---",
     "",
-    `*This issue was automatically generated from ${modeLabel.toLowerCase()} type checking results*`,
+    `*This issue was automatically generated from ${modeLabel ? modeLabel.toLowerCase() + " " : ""}${typeLabel.toLowerCase()} results*`,
   ].join("\n");
 
   const labels = [
-    "typescript",
-    mode === "strict" ? "strict-mode" : "typescript-normal",
-    "type-safety",
+    issueType === "ESLint" ? "eslint" : "typescript",
+    issueType === "TypeScript" && mode === "strict"
+      ? "strict-mode"
+      : issueType === "TypeScript"
+        ? "typescript-normal"
+        : "linting",
+    issueType === "ESLint" ? "code-quality" : "type-safety",
     "technical-debt",
     `batch-${batchNumber}`,
   ];
@@ -292,7 +360,10 @@ async function createGitHubIssue(
   try {
     // Use GitHub CLI to create the issue
     // Create a temporary file for the body (gh CLI can handle long bodies better this way)
-    const tempFile = path.join(__dirname, `../.temp-issue-body-${mode}-${batchNumber}.md`);
+    const tempFile = path.join(
+      __dirname,
+      `../.temp-issue-body-${issueType.toLowerCase()}-${mode}-${batchNumber}.md`
+    );
 
     try {
       fs.writeFileSync(tempFile, body, "utf-8");
@@ -353,40 +424,53 @@ async function createGitHubIssue(
  * Main function
  */
 async function main() {
-  const mode = process.argv[2] || "normal"; // 'normal' or 'strict'
+  const issueType = process.argv[2] || "typescript"; // 'typescript' or 'eslint'
+  const mode = process.argv[3] || "normal"; // For TypeScript: 'normal' or 'strict'
 
   // Parse optional arguments: maxErrors and errorsPerIssue
-  // Arguments: [mode, maxErrors (optional), errorsPerIssue (optional)]
+  // Arguments: [issueType, mode, maxErrors (optional), errorsPerIssue (optional)]
   // Empty strings are passed for missing optional args
   let maxErrors = null;
   let errorsPerIssue = DEFAULT_ERRORS_PER_ISSUE;
 
-  // argv[3] = maxErrors (optional, can be empty string)
-  if (process.argv[3] && process.argv[3].trim() !== "") {
-    const parsed = parseInt(process.argv[3], 10);
+  // argv[4] = maxErrors (optional, can be empty string)
+  if (process.argv[4] && process.argv[4].trim() !== "") {
+    const parsed = parseInt(process.argv[4], 10);
     if (!isNaN(parsed) && parsed > 0) {
       maxErrors = parsed;
     }
   }
 
-  // argv[4] = errorsPerIssue (optional, can be empty string)
-  if (process.argv[4] && process.argv[4].trim() !== "") {
-    const parsed = parseInt(process.argv[4], 10);
+  // argv[5] = errorsPerIssue (optional, can be empty string)
+  if (process.argv[5] && process.argv[5].trim() !== "") {
+    const parsed = parseInt(process.argv[5], 10);
     if (!isNaN(parsed) && parsed > 0) {
       errorsPerIssue = parsed;
     }
   }
 
-  const resultsFile = mode === "strict" ? STRICT_RESULTS_FILE : NORMAL_RESULTS_FILE;
-  const modeLabel = mode === "strict" ? "strict mode" : "normal";
+  // Determine which results file to use
+  let resultsFile;
+  let modeLabel;
+  let parseFunction;
 
-  console.log(`📊 Parsing ${modeLabel} TypeScript errors...`);
-  const { errorsByFile, allErrors } = parseErrors(resultsFile);
+  if (issueType === "eslint") {
+    resultsFile = ESLINT_RESULTS_FILE;
+    modeLabel = "ESLint";
+    parseFunction = parseESLintProblems;
+  } else {
+    resultsFile = mode === "strict" ? STRICT_RESULTS_FILE : NORMAL_RESULTS_FILE;
+    modeLabel = mode === "strict" ? "strict mode TypeScript" : "normal TypeScript";
+    parseFunction = parseTypeScriptErrors;
+  }
+
+  console.log(`📊 Parsing ${modeLabel} issues...`);
+  const { errorsByFile, allErrors } = parseFunction(resultsFile);
 
   let errorsToProcess = allErrors;
   if (maxErrors && allErrors.length > maxErrors) {
     // Take the last N errors (most recent/relevant)
-    console.log(`⚠️  Limiting to last ${maxErrors} errors (out of ${allErrors.length} total)`);
+    console.log(`⚠️  Limiting to last ${maxErrors} issues (out of ${allErrors.length} total)`);
     errorsToProcess = allErrors.slice(-maxErrors);
 
     // Rebuild errorsByFile with limited errors
@@ -403,19 +487,19 @@ async function main() {
   const totalErrors = errorsToProcess.length;
   const totalFiles = Object.keys(errorsByFile).length;
 
-  console.log(`Found ${totalErrors} errors across ${totalFiles} files`);
-  console.log(`Using ${errorsPerIssue} errors per issue`);
+  console.log(`Found ${totalErrors} issues across ${totalFiles} files`);
+  console.log(`Using ${errorsPerIssue} issues per issue`);
 
-  console.log(`\n📦 Grouping errors into batches...`);
+  console.log(`\n📦 Grouping issues into batches...`);
   const batches = groupErrorsIntoBatches(errorsByFile, errorsPerIssue);
 
   console.log(`Created ${batches.length} batches:`);
   batches.forEach((batch, idx) => {
-    console.log(`  Batch ${idx + 1}: ${batch.errorCount} errors in ${batch.files.length} files`);
+    console.log(`  Batch ${idx + 1}: ${batch.errorCount} issues in ${batch.files.length} files`);
   });
 
   console.log("\n📝 Loading agent prompt template...");
-  const agentPrompt = getAgentPrompt();
+  const agentPrompt = getAgentPrompt(issueType === "eslint" ? "ESLint" : "TypeScript");
 
   console.log("\n🚀 Creating GitHub issues...");
   const createdIssues = [];
@@ -430,7 +514,7 @@ async function main() {
         i + 1,
         batches.length,
         agentPrompt,
-        "TypeScript",
+        issueType === "eslint" ? "ESLint" : "TypeScript",
         mode
       );
       createdIssues.push(issue);
@@ -464,7 +548,7 @@ async function main() {
 // Run if called directly
 if (
   import.meta.url === `file://${process.argv[1]}` ||
-  process.argv[1]?.endsWith("generate-typescript-issues.js")
+  process.argv[1]?.endsWith("generate-issues.js")
 ) {
   main().catch((error) => {
     console.error("Fatal error:", error);
@@ -472,4 +556,4 @@ if (
   });
 }
 
-export { parseErrors, groupErrorsIntoBatches, createGitHubIssue };
+export { parseTypeScriptErrors, parseESLintProblems, groupErrorsIntoBatches, createGitHubIssue };
