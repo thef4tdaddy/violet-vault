@@ -56,7 +56,11 @@ const BillDetailModal: React.FC<BillDetailModalProps> = ({
 
   if (!isOpen || !bill) return null;
 
-  const statusIconName = getBillStatusIcon(bill.status, statusInfo.isOverdue, statusInfo.isDueSoon);
+  const statusIconName = getBillStatusIcon(
+    bill.status ?? "",
+    statusInfo.isOverdue,
+    statusInfo.isDueSoon
+  );
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">

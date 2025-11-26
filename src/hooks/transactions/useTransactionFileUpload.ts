@@ -24,7 +24,7 @@ export const useTransactionFileUpload = () => {
     event: React.ChangeEvent<HTMLInputElement>,
     options: FileUploadOptions = {}
   ) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (!file) return;
 
     // Store the clear option for later use during import
@@ -56,7 +56,8 @@ export const useTransactionFileUpload = () => {
         setImportStep(2);
         setFieldMapping(autoDetectFieldMapping(parsedData as never) as Record<string, string>);
       } catch (error) {
-        globalToast.showError("Error parsing file: " + error.message, "Parse Error", 8000);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        globalToast.showError("Error parsing file: " + errorMessage, "Parse Error", 8000);
       }
     };
 

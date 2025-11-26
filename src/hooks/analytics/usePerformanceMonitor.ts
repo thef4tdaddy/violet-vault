@@ -14,7 +14,10 @@ import { AnalyticsData, BalanceData, PerformanceEntry } from "@/types/analytics"
  * Hook for calculating financial performance metrics and monitoring
  * Extracts complex performance logic from PerformanceMonitor component
  */
-export const usePerformanceMonitor = (analyticsData: AnalyticsData, balanceData: BalanceData) => {
+export const usePerformanceMonitor = (
+  analyticsData: AnalyticsData | null | undefined,
+  balanceData: BalanceData | null | undefined
+) => {
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState("overview");
   const [performanceHistory, setPerformanceHistory] = useState<PerformanceEntry[]>([]);

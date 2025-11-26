@@ -38,7 +38,7 @@ interface PaymentData {
 }
 
 interface BillDetailParams {
-  bill: BillFromTypes;
+  bill: BillFromTypes | null;
   onDelete: (billId: string) => void;
   onMarkPaid: (billId: string, paymentData: PaymentData) => void;
   onClose: () => void;
@@ -133,6 +133,11 @@ export const useBillDetail = ({
   const handleMarkPaid = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!bill) {
+      logger.warn("Cannot mark null bill as paid");
+      return;
+    }
+
     try {
       const amount = parseFloat(paymentAmount);
       if (amount <= 0) {
@@ -161,6 +166,11 @@ export const useBillDetail = ({
   };
 
   const handleDelete = async () => {
+    if (!bill) {
+      logger.warn("Cannot delete null bill");
+      return;
+    }
+
     try {
       const confirmed = await confirm({
         title: "Delete Bill",
@@ -182,12 +192,20 @@ export const useBillDetail = ({
   };
 
   const handleEdit = () => {
+    if (!bill) {
+      logger.warn("Cannot edit null bill");
+      return;
+    }
     logger.debug("Opening bill edit modal", { billId: bill.id });
     onClose();
     onEdit(bill);
   };
 
   const handleCreateRecurring = () => {
+    if (!bill) {
+      logger.warn("Cannot create recurring from null bill");
+      return;
+    }
     logger.debug("Creating recurring bill from one-time bill", {
       billId: bill.id,
     });

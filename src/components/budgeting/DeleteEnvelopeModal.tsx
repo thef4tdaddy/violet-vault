@@ -108,11 +108,11 @@ const DeleteEnvelopeModal: React.FC<DeleteEnvelopeModalProps> = ({
             )}
 
             {/* Balance Warning */}
-            {envelope.currentBalance > 0 && (
+            {(envelope.currentBalance ?? 0) > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <p className="text-sm text-blue-800">
-                  💰 This envelope has ${envelope.currentBalance.toFixed(2)}. The money will be
-                  transferred to unassigned cash.
+                  💰 This envelope has ${(envelope.currentBalance ?? 0).toFixed(2)}. The money will
+                  be transferred to unassigned cash.
                 </p>
               </div>
             )}

@@ -22,16 +22,7 @@ import type { User, Transaction, Envelope } from "../../types/finance";
 import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
-type DataRow = Record<string, unknown>;
-
-interface FieldMapping {
-  date?: string;
-  description?: string;
-  amount?: string;
-  category?: string;
-  notes?: string;
-  [key: string]: string | undefined;
-}
+// Types used in interface definitions
 
 type SupplementalAccount = Array<{ id: string | number; name: string; type?: string }>;
 
@@ -81,10 +72,10 @@ interface TransactionLedgerViewProps {
   onCloseImportModal: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: DataRow[];
-  setImportData: (data: DataRow[]) => void;
-  fieldMapping: FieldMapping;
-  setFieldMapping: (mapping: FieldMapping) => void;
+  importData: unknown[];
+  setImportData: (data: unknown[]) => void;
+  fieldMapping: Record<string, string | undefined>;
+  setFieldMapping: (mapping: Record<string, string | undefined>) => void;
   importProgress: {
     current: number;
     total: number;
@@ -502,7 +493,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       onCloseModal={handleCloseModal}
       editingTransaction={editingTransaction as Transaction | null}
       transactionForm={transactionForm}
-      setTransactionForm={setTransactionForm}
+      setTransactionForm={setTransactionForm as (form: unknown) => void}
       supplementalAccounts={supplementalAccounts}
       onSubmitTransaction={handleSubmitTransaction}
       onSuggestEnvelope={suggestEnvelopeForComponent}
@@ -514,19 +505,13 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       setImportStep={setImportStep}
       importData={importData as unknown as unknown[]}
       setImportData={() => {}}
-      fieldMapping={fieldMapping as Record<string, string>}
-      setFieldMapping={setFieldMapping as (mapping: Record<string, string>) => void}
+      fieldMapping={fieldMapping}
+      setFieldMapping={setFieldMapping}
       importProgress={
         importProgress as unknown as { current: number; total: number; percentage: number }
       }
       onImport={handleImport}
-      onFileUpload={(data: unknown[]) => {
-        // Convert the data array back to a File object for handleFileUpload
-        if (data && data.length > 0 && typeof data[0] === "object" && data[0] instanceof File) {
-          return handleFileUpload(data[0] as File);
-        }
-        // logger.error('Invalid file data passed to onFileUpload'); // Assuming logger is not defined, so commenting out
-      }}
+      onFileUpload={handleFileUpload}
     />
   );
 };

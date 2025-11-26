@@ -21,10 +21,10 @@
  * ```
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
-export const useModalAutoScroll = (isOpen: boolean) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+export const useModalAutoScroll = (isOpen: boolean): RefObject<HTMLDivElement | null> => {
+  const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isOpen && modalRef.current) {

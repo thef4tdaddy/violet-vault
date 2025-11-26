@@ -232,7 +232,9 @@ export const calculateAccountTotals = (accounts: Account[] = []): AccountTotalsR
  * @param {string} expirationDate - ISO date string
  * @returns {number|null} Days until expiration, null if no date
  */
-export const calculateDaysUntilExpiration = (expirationDate: string | undefined): number | null => {
+export const calculateDaysUntilExpiration = (
+  expirationDate: string | null | undefined
+): number | null => {
   if (!expirationDate) return null;
 
   const today = new Date();

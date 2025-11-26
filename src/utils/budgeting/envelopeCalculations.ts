@@ -1,5 +1,9 @@
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
+import {
+  BIWEEKLY_MULTIPLIER,
+  FREQUENCY_MULTIPLIERS,
+  type FrequencyType,
+} from "../../constants/frequency";
 
 // Define types for our functions
 export interface Envelope {
@@ -108,7 +112,7 @@ interface EnvelopeBalanceMetrics {
 const BILL_LOOKAHEAD_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
 const getEnvelopeType = (envelope: Pick<Envelope, "envelopeType" | "category">): string => {
-  return envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+  return envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category ?? "");
 };
 
 const collectEnvelopeTransactions = (
@@ -519,7 +523,8 @@ export const calculateBiweeklyNeeds = (bills: Bill[]): number => {
 
   // Calculate total first - convert to monthly then to biweekly
   bills.forEach((bill: Bill) => {
-    const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency || ""] || 12;
+    const frequency = (bill.frequency ?? "monthly") as FrequencyType;
+    const multiplier = FREQUENCY_MULTIPLIERS[frequency] ?? 12;
     const annualAmount = bill.amount * multiplier;
     const monthlyAmount = annualAmount / 12;
     const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER; // Simple monthly / 2

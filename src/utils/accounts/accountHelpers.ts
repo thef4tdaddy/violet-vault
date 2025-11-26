@@ -341,7 +341,7 @@ export const filterAccounts = (
 };
 
 // Helper function for expiration calculation (imported from validation)
-const calculateDaysUntilExpiration = (expirationDate: string): number | null => {
+const calculateDaysUntilExpiration = (expirationDate: string | null | undefined): number | null => {
   if (!expirationDate) return null;
 
   const today = new Date();

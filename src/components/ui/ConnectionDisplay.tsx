@@ -229,7 +229,7 @@ const shouldShowSelector = (
 
 interface UniversalConnectionManagerProps {
   entityType: string;
-  entityId: string | null;
+  entityId: string | null | undefined;
   canEdit?: boolean;
   theme?: ThemeName;
   showSelector?: boolean;

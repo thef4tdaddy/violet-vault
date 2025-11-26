@@ -15,7 +15,7 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
   const queryClient = useQueryClient();
 
   const commitsQuery = useQuery({
-    queryKey: queryKeys.budgetCommits(options),
+    queryKey: queryKeys.budgetCommits(options as Record<string, unknown> | undefined),
     queryFn: async () => {
       try {
         // Query budget commits table directly

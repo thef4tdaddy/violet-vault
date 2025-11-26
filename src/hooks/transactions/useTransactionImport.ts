@@ -1,3 +1,4 @@
+import type React from "react";
 import { useTransactionFileUpload } from "./useTransactionFileUpload";
 import { useTransactionImportProcessing } from "./useTransactionImportProcessing";
 import { globalToast } from "../../stores/ui/toastStore";
@@ -34,7 +35,10 @@ export const useTransactionImport = (
     setImportStep: (step: number) => void;
     fieldMapping: FieldMapping;
     setFieldMapping: (mapping: FieldMapping) => void;
-    handleFileUpload: (file: File) => Promise<void>;
+    handleFileUpload: (
+      event: React.ChangeEvent<HTMLInputElement>,
+      options?: { clearExisting?: boolean }
+    ) => void;
     resetImport: () => void;
   };
 
@@ -91,8 +95,8 @@ export const useTransactionImport = (
 
     // Process auto-funding for income transactions
     const autoFundingPromises: unknown[] = [];
-    const incomeTransactions = processedTransactions.filter(
-      (t: { amount: number }) => t.amount > 0
+    const incomeTransactions = (processedTransactions as Array<{ amount: number }>).filter(
+      (t) => t.amount > 0
     );
 
     if (incomeTransactions.length > 0) {

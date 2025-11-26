@@ -72,11 +72,11 @@ export const getBillStatusIcon = (
 
 /**
  * Format bill amount for display
- * @param {number|string} amount - Bill amount
+ * @param {number|string|undefined} amount - Bill amount
  * @returns {string} Formatted amount string
  */
-export const formatBillAmount = (amount: number | string): string => {
-  const numAmount = parseFloat(String(amount) || "0");
+export const formatBillAmount = (amount: number | string | undefined): string => {
+  const numAmount = parseFloat(String(amount ?? 0) || "0");
   return numAmount.toFixed(2);
 };
 
