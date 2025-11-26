@@ -1,13 +1,23 @@
 import type { ReactNode } from "react";
 import ComposedFinancialChart from "./ComposedFinancialChart";
 
-const LINE_SERIES = [
+interface ChartSeriesItem {
+  type: string;
+  dataKey: string;
+  name: string;
+  stroke?: string;
+  fill?: string;
+  fillOpacity?: number;
+  strokeWidth?: number;
+}
+
+const LINE_SERIES: ChartSeriesItem[] = [
   { type: "line", dataKey: "income", name: "Income", stroke: "#10b981", strokeWidth: 3 },
   { type: "line", dataKey: "expenses", name: "Expenses", stroke: "#ef4444", strokeWidth: 3 },
   { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
 ];
 
-const AREA_SERIES = [
+const AREA_SERIES: ChartSeriesItem[] = [
   {
     type: "area",
     dataKey: "income",
@@ -27,7 +37,7 @@ const AREA_SERIES = [
   { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
 ];
 
-const BAR_SERIES = [
+const BAR_SERIES: ChartSeriesItem[] = [
   { type: "bar", dataKey: "income", name: "Income", fill: "#10b981" },
   { type: "bar", dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
   { type: "line", dataKey: "net", name: "Net", stroke: "#6366f1", strokeWidth: 3 },
@@ -35,7 +45,7 @@ const BAR_SERIES = [
 
 type ChartType = "line" | "area" | "bar";
 
-const SERIES_BY_TYPE: Record<ChartType, typeof LINE_SERIES> = {
+const SERIES_BY_TYPE: Record<ChartType, ChartSeriesItem[]> = {
   line: LINE_SERIES,
   area: AREA_SERIES,
   bar: BAR_SERIES,

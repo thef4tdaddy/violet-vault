@@ -1,10 +1,15 @@
 import EnvelopeSummaryCards from "../EnvelopeSummaryCards";
 
 interface EnvelopeTotals {
+  totalBalance: number;
+  totalUpcoming: number;
+  totalAllocated: number;
+  envelopeCount: number;
+  totalSpent: number;
+  totalBiweeklyNeed: number;
+  billsDueCount: number;
   totalBudget?: number;
-  totalSpent?: number;
   totalAvailable?: number;
-  envelopeCount?: number;
   [key: string]: unknown;
 }
 

@@ -7,6 +7,7 @@ interface BillForStats {
   amount?: number;
   dueDate?: string | Date | null;
   frequency?: string;
+  customFrequency?: number | null;
 }
 
 /**

@@ -4,11 +4,11 @@
 
 | Category | Current | Change |
 |----------|---------|--------|
-| ESLint Issues | 1 | -1 |
-| TypeScript Errors | 53 | 0 |
-| TypeScript Strict Mode Errors | 219 | 0 |
+| ESLint Issues | 1 | 0 |
+| TypeScript Errors | 41 | -12 |
+| TypeScript Strict Mode Errors | 207 | -12 |
 
-*Last updated: 2025-11-26 00:16:56 UTC*
+*Last updated: 2025-11-26 00:28:30 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -52,16 +52,11 @@
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 2 errors in `src/hooks/bills/useBillManagerHelpers.ts`
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 2 errors in `src/components/layout/AppWrapper.tsx`
-- 2 errors in `src/components/charts/TrendLineChart.tsx`
-- 2 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
 - 1 errors in `src/utils/debts/debtCalculations.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBillDetail.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
-- 1 errors in `src/components/ui/ConfirmModal.tsx`
-- 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
@@ -70,28 +65,24 @@
 - 1 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 1 errors in `src/components/receipts/ReceiptButton.tsx`
 - 1 errors in `src/components/onboarding/OnboardingTutorial.tsx`
-- 1 errors in `src/components/history/viewer/HistoryStatistics.tsx`
 - 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
-- 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
 - 1 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
-- 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
-- 1 errors in `src/components/analytics/CategoryNavigationTabs.tsx`
 - 1 errors in `src/App.tsx`
 
 ### Type Error Breakdown by Category
 | Count | Error Code |
 |---|---|
-| 27 | `TS2322` |
-| 12 | `TS2345` |
-| 4 | `TS2339` |
-| 3 | `TS2769` |
-| 3 | `TS2739` |
+| 24 | `TS2322` |
+| 10 | `TS2345` |
 | 2 | `TS2741` |
+| 1 | `TS6133` |
+| 1 | `TS2769` |
+| 1 | `TS2740` |
 | 1 | `TS2719` |
 | 1 | `TS18047` |
 
@@ -102,8 +93,6 @@ src/App.tsx(30,7): error TS2322: Type '() => UiStore' is not assignable to type 
     The types returned by 'loadPatchNotesForUpdate(...)' are incompatible between these types.
       Type 'Promise<unknown>' is not assignable to type 'Promise<void>'.
         Type 'unknown' is not assignable to type 'void'.
-src/components/analytics/CategoryNavigationTabs.tsx(42,38): error TS2345: Argument of type 'string' is not assignable to parameter of type '"analysis" | "settings" | "suggestions"'.
-src/components/bills/modals/BillDetailStats.tsx(50,61): error TS2339: Property 'customFrequency' does not exist on type 'BillForStats'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(171,11): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill[]' is not assignable to type 'Bill[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill' is not assignable to type 'Bill'.
     Index signature for type 'string' is missing in type 'Bill'.
@@ -117,20 +106,8 @@ src/components/budgeting/PaycheckProcessor.tsx(90,9): error TS2322: Type '{ id: 
 src/components/budgeting/PaydayPrediction.tsx(105,11): error TS2769: No overload matches this call.
   The last overload gave the following error.
     Object literal may only specify known properties, and 'title' does not exist in type 'Attributes & { className?: string; }'.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(59,63): error TS2339: Property 'totalUpcoming' does not exist on type 'EnvelopeForSummary'.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(63,60): error TS2339: Property 'totalOverdue' does not exist on type 'EnvelopeForSummary'.
-src/components/budgeting/envelope/EnvelopeGridView.tsx(92,24): error TS2322: Type 'unknown' is not assignable to type 'EnvelopeTotals'.
-  Index signature for type 'string' is missing in type '{}'.
+src/components/budgeting/envelope/EnvelopeGridView.tsx(92,24): error TS2740: Type '{}' is missing the following properties from type 'EnvelopeTotals': totalBalance, totalUpcoming, totalAllocated, envelopeCount, and 3 more.
 src/components/budgeting/envelope/EnvelopeItem.tsx(97,34): error TS2741: Property 'totalSpent' is missing in type 'Envelope' but required in type 'EnvelopeForSummary'.
-src/components/budgeting/envelope/EnvelopeSummary.tsx(14,29): error TS2739: Type 'EnvelopeTotals' is missing the following properties from type 'EnvelopeTotals': totalBalance, totalUpcoming, totalAllocated, totalBiweeklyNeed, billsDueCount
-src/components/charts/TrendLineChart.tsx(40,3): error TS2322: Type '({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; fillOpacity?: undefined; })[]' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]'.
-  Type '{ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; fillOpacity?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-    Type '{ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-      Property 'strokeWidth' is optional in type '{ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; }' but required in type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-src/components/charts/TrendLineChart.tsx(41,3): error TS2322: Type '({ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; })[]' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]'.
-  Type '{ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-    Type '{ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-      Property 'stroke' is optional in type '{ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; }' but required in type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
 src/components/debt/DebtStrategies.tsx(25,25): error TS2345: Argument of type 'DebtAccount[]' is not assignable to parameter of type 'Debt[]'.
   Type 'DebtAccount' is not assignable to type 'Debt'.
     Property 'currentBalance' is optional in type 'DebtAccount' but required in type 'Debt'.
@@ -146,9 +123,6 @@ src/components/history/BudgetHistoryViewer.tsx(139,15): error TS2322: Type '{ co
   Types of property 'commit' are incompatible.
     Type 'unknown' is not assignable to type 'Commit'.
       Index signature for type 'string' is missing in type '{}'.
-src/components/history/viewer/HistoryStatistics.tsx(68,73): error TS2339: Property 'storageSize' does not exist on type 'HistoryStatisticsData'.
-src/components/layout/AppWrapper.tsx(26,24): error TS2739: Type 'FirebaseSync' is missing the following properties from type 'FirebaseSyncService': start, forceSync, isRunning
-src/components/layout/AppWrapper.tsx(31,24): error TS2739: Type 'FirebaseSync' is missing the following properties from type 'FirebaseSyncService': start, forceSync, isRunning
 src/components/layout/ViewRenderer.tsx(325,15): error TS2345: Argument of type '{ id: string | number; amount?: number; allocations?: unknown[]; }[]' is not assignable to parameter of type 'PaycheckHistory[]'.
   Type '{ id: string | number; amount?: number; allocations?: unknown[]; }' is not assignable to type 'PaycheckHistory'.
     Property 'amount' is optional in type '{ id: string | number; amount?: number; allocations?: unknown[]; }' but required in type 'PaycheckHistory'.
@@ -218,14 +192,7 @@ src/components/transactions/splitter/SplitAllocationsSection.tsx(127,13): error 
     Types of property 'id' are incompatible.
       Type 'string | number' is not assignable to type 'string'.
         Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitterHeader.tsx(42,37): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
-src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Argument of type 'unknown' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
-src/components/ui/SecurityAlert.tsx(99,22): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Argument of type 'string | number | bigint | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | ComponentType<...>' is not assignable to parameter of type 'string | FunctionComponent<{ className?: string; }> | ComponentClass<{ className?: string; }, any>'.
-      Type 'number' is not assignable to type 'string | FunctionComponent<{ className?: string; }> | ComponentClass<{ className?: string; }, any>'.
+src/components/ui/SecurityAlert.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/hooks/bills/useBillDetail.ts(75,51): error TS18047: 'dueDate' is possibly 'null'.
 src/hooks/bills/useBillManagerHelpers.ts(286,44): error TS2345: Argument of type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill[]' is not assignable to parameter of type 'Bill[]'.
   Type 'import("/home/runner/work/violet-vault/violet-vault/src/types/bills").Bill' is not assignable to type 'Bill'.
@@ -260,7 +227,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
-- 3 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 3 errors in `src/components/bills/AddBillModal.tsx`
 - 2 errors in `src/utils/security/keyExport.ts`
@@ -285,13 +251,11 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
 - 2 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 2 errors in `src/components/receipts/ReceiptButton.tsx`
-- 2 errors in `src/components/layout/AppWrapper.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
-- 2 errors in `src/components/charts/TrendLineChart.tsx`
 - 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
 - 2 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
-- 2 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
+- 2 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 2 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
@@ -346,8 +310,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/hooks/analytics/useTransactionFiltering.ts`
 - 1 errors in `src/hooks/analytics/useAnalyticsIntegration.ts`
 - 1 errors in `src/components/ui/SecurityAlert.tsx`
-- 1 errors in `src/components/ui/ConfirmModal.tsx`
-- 1 errors in `src/components/transactions/splitter/SplitterHeader.tsx`
 - 1 errors in `src/components/transactions/TransactionLedger.tsx`
 - 1 errors in `src/components/sync/ConflictResolutionModal.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
@@ -360,7 +322,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 1 errors in `src/components/monitoring/HighlightLoader.tsx`
 - 1 errors in `src/components/mobile/FABActionMenu.tsx`
-- 1 errors in `src/components/history/viewer/HistoryStatistics.tsx`
 - 1 errors in `src/components/history/ObjectHistoryViewer.tsx`
 - 1 errors in `src/components/history/IntegrityStatusIndicatorHelpers.tsx`
 - 1 errors in `src/components/history/IntegrityStatusIndicator.tsx`
@@ -370,7 +331,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/debt/DebtDashboard.tsx`
 - 1 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
-- 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeModalHeader.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
@@ -385,7 +345,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
-- 1 errors in `src/components/analytics/CategoryNavigationTabs.tsx`
 - 1 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 1 errors in `src/components/accounts/ExpirationAlert.tsx`
 - 1 errors in `src/components/accounts/AccountsGrid.tsx`
@@ -393,21 +352,21 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 ### Strict Mode Error Breakdown
 | Count | Error Code |
 |---|---|
-| 91 | `TS2322` |
-| 66 | `TS2345` |
-| 11 | `TS2769` |
+| 89 | `TS2322` |
+| 64 | `TS2345` |
+| 9 | `TS2769` |
 | 7 | `TS18048` |
 | 6 | `TS7053` |
 | 6 | `TS7006` |
-| 6 | `TS2339` |
 | 4 | `TS7031` |
 | 4 | `TS2722` |
 | 4 | `TS18046` |
 | 3 | `TS2783` |
-| 3 | `TS2739` |
 | 2 | `TS2719` |
+| 2 | `TS2339` |
 | 2 | `TS18047` |
 | 1 | `TS7016` |
+| 1 | `TS6133` |
 | 1 | `TS2741` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
@@ -436,7 +395,6 @@ src/components/analytics/AnalyticsDashboard.tsx(169,5): error TS2322: Type 'unkn
   Type 'unknown' is not assignable to type 'never'.
 src/components/analytics/AnalyticsDashboard.tsx(170,5): error TS2322: Type 'NormalizedEnvelope[]' is not assignable to type 'never[]'.
   Type 'NormalizedEnvelope' is not assignable to type 'never'.
-src/components/analytics/CategoryNavigationTabs.tsx(42,38): error TS2345: Argument of type 'string' is not assignable to parameter of type '"analysis" | "settings" | "suggestions"'.
 src/components/analytics/CategorySuggestionsTab.tsx(93,32): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/analytics/components/TabContent.tsx(113,32): error TS2322: Type 'AnalyticsData | null | undefined' is not assignable to type 'AnalyticsData'.
@@ -507,11 +465,10 @@ src/components/bills/modals/BillDetailSections.tsx(45,29): error TS2769: No over
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
-src/components/bills/modals/BillDetailStats.tsx(23,82): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'string | number'.
+src/components/bills/modals/BillDetailStats.tsx(24,82): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'string | number'.
   Type 'undefined' is not assignable to type 'string | number'.
-src/components/bills/modals/BillDetailStats.tsx(50,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/components/bills/modals/BillDetailStats.tsx(51,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/bills/modals/BillDetailStats.tsx(50,61): error TS2339: Property 'customFrequency' does not exist on type 'BillForStats'.
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,53): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/budgeting/CreateEnvelopeModalComponents.tsx(171,11): error TS2322: Type 'import("/home/runner/work/violet-vault/violet-vault/src/db/types").Bill[]' is not assignable to type 'Bill[]'.
@@ -542,8 +499,6 @@ src/components/budgeting/SmartEnvelopeSuggestions.tsx(289,11): error TS2322: Typ
 src/components/budgeting/SmartEnvelopeSuggestions.tsx(290,11): error TS2322: Type '(suggestionId: string) => void' is not assignable to type '(suggestion: unknown) => void'.
   Types of parameters 'suggestionId' and 'suggestion' are incompatible.
     Type 'unknown' is not assignable to type 'string'.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(59,63): error TS2339: Property 'totalUpcoming' does not exist on type 'EnvelopeForSummary'.
-src/components/budgeting/envelope/EnvelopeActivitySummary.tsx(63,60): error TS2339: Property 'totalOverdue' does not exist on type 'EnvelopeForSummary'.
 src/components/budgeting/envelope/EnvelopeGridView.tsx(92,24): error TS2322: Type 'unknown' is not assignable to type 'EnvelopeTotals'.
 src/components/budgeting/envelope/EnvelopeGridView.tsx(101,30): error TS2345: Argument of type '(envelope: { id: string; [key: string]: unknown; }) => JSX.Element' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => Element'.
   Types of parameters 'envelope' and 'value' are incompatible.
@@ -557,7 +512,6 @@ src/components/budgeting/envelope/EnvelopeItem.tsx(79,9): error TS2322: Type '((
 src/components/budgeting/envelope/EnvelopeItem.tsx(97,34): error TS2741: Property 'totalSpent' is missing in type 'Envelope' but required in type 'EnvelopeForSummary'.
 src/components/budgeting/envelope/EnvelopeModalHeader.tsx(70,31): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
   Type 'undefined' is not assignable to type '() => void'.
-src/components/budgeting/envelope/EnvelopeSummary.tsx(14,29): error TS2739: Type 'EnvelopeTotals' is missing the following properties from type 'EnvelopeTotals': totalBalance, totalUpcoming, totalAllocated, totalBiweeklyNeed, billsDueCount
 src/components/budgeting/paycheck/AllocationPreview.tsx(147,51): error TS18048: 'allocation.monthlyAmount' is possibly 'undefined'.
 src/components/budgeting/paycheck/AllocationPreview.tsx(149,44): error TS18048: 'allocation.monthlyAmount' is possibly 'undefined'.
 src/components/budgeting/suggestions/SuggestionsList.tsx(128,19): error TS2322: Type '(suggestion: import("/home/runner/work/violet-vault/violet-vault/src/components/budgeting/suggestions/SuggestionsList").Suggestion) => void' is not assignable to type '(suggestion: Suggestion) => void'.
@@ -575,16 +529,6 @@ src/components/charts/CategoryBarChart.tsx(153,14): error TS2769: No overload ma
     Type '{}' is not assignable to type 'string'.
 src/components/charts/CategoryBarChart.tsx(157,15): error TS2783: 'fill' is specified more than once, so this usage will be overwritten.
 src/components/charts/CategoryBarChart.tsx(157,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/components/charts/TrendLineChart.tsx(40,3): error TS2322: Type '({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; fillOpacity?: undefined; })[]' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]'.
-  Type '{ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; fillOpacity?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-    Type '{ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-      Types of property 'strokeWidth' are incompatible.
-        Type 'undefined' is not assignable to type 'number'.
-src/components/charts/TrendLineChart.tsx(41,3): error TS2322: Type '({ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; })[]' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]'.
-  Type '{ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; } | { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; fill?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-    Type '{ type: string; dataKey: string; name: string; fill: string; stroke?: undefined; strokeWidth?: undefined; }' is not assignable to type '{ type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }'.
-      Types of property 'stroke' are incompatible.
-        Type 'undefined' is not assignable to type 'string'.
 src/components/debt/DebtDashboard.tsx(66,52): error TS2322: Type 'Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>' is not assignable to type 'Dispatch<SetStateAction<Record<string, string | boolean>>>'.
   Type 'SetStateAction<Record<string, string | boolean>>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
     Type 'Record<string, string | boolean>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
@@ -639,9 +583,6 @@ src/components/history/IntegrityStatusIndicatorHelpers.tsx(185,75): error TS2345
   Type 'undefined' is not assignable to type 'string'.
 src/components/history/ObjectHistoryViewer.tsx(39,7): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.
-src/components/history/viewer/HistoryStatistics.tsx(68,73): error TS2339: Property 'storageSize' does not exist on type 'HistoryStatisticsData'.
-src/components/layout/AppWrapper.tsx(26,24): error TS2739: Type 'FirebaseSync' is missing the following properties from type 'FirebaseSyncService': start, forceSync, isRunning
-src/components/layout/AppWrapper.tsx(31,24): error TS2739: Type 'FirebaseSync' is missing the following properties from type 'FirebaseSyncService': start, forceSync, isRunning
 src/components/layout/ViewRenderer.tsx(321,9): error TS2322: Type '(paycheck: PaycheckHistory) => Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => Promise<void>'.
   Types of parameters 'paycheck' and 'paycheck' are incompatible.
     Property 'lastModified' is missing in type 'PaycheckHistoryItem' but required in type 'PaycheckHistory'.
@@ -771,14 +712,7 @@ src/components/transactions/splitter/SplitAllocationsSection.tsx(127,13): error 
     Types of property 'id' are incompatible.
       Type 'string | number' is not assignable to type 'string'.
         Type 'number' is not assignable to type 'string'.
-src/components/transactions/splitter/SplitterHeader.tsx(42,37): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, unknown>'.
-src/components/ui/ConfirmModal.tsx(55,30): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Argument of type '{}' is not assignable to parameter of type 'string | FunctionComponent<{ className: string; }> | ComponentClass<{ className: string; }, any>'.
-src/components/ui/SecurityAlert.tsx(99,22): error TS2769: No overload matches this call.
-  The last overload gave the following error.
-    Argument of type 'string | number | bigint | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | ComponentType<...>' is not assignable to parameter of type 'string | FunctionComponent<{ className?: string | undefined; }> | ComponentClass<{ className?: string | undefined; }, any>'.
-      Type 'number' is not assignable to type 'string | FunctionComponent<{ className?: string | undefined; }> | ComponentClass<{ className?: string | undefined; }, any>'.
+src/components/ui/SecurityAlert.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
 src/hooks/analytics/useAnalyticsIntegration.ts(129,36): error TS7006: Parameter 'newTimeFilter' implicitly has an 'any' type.
 src/hooks/analytics/useTransactionFiltering.ts(15,23): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.
   No index signature with a parameter of type 'string' was found on type '{ 7: Date; 30: Date; 90: Date; "6months": Date; }'.

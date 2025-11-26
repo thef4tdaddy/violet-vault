@@ -9,6 +9,8 @@ interface EnvelopeForSummary {
   currentBalance?: number;
   progress?: number;
   lastFunded?: string | Date | null;
+  totalUpcoming?: number;
+  totalOverdue?: number;
 }
 
 /**
@@ -56,11 +58,11 @@ const EnvelopeActivitySummary = ({ envelope }: { envelope: EnvelopeForSummary })
       </div>
       <div className="text-center">
         <p className="text-gray-500">Upcoming</p>
-        <p className="font-medium text-orange-600">${envelope.totalUpcoming.toFixed(2)}</p>
+        <p className="font-medium text-orange-600">${(envelope.totalUpcoming ?? 0).toFixed(2)}</p>
       </div>
       <div className="text-center">
         <p className="text-gray-500">Overdue</p>
-        <p className="font-medium text-red-700">${envelope.totalOverdue.toFixed(2)}</p>
+        <p className="font-medium text-red-700">${(envelope.totalOverdue ?? 0).toFixed(2)}</p>
       </div>
     </div>
   );

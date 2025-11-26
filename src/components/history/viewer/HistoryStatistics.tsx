@@ -9,6 +9,7 @@ interface HistoryStatisticsData {
   };
   authorBreakdown?: Record<string, number>;
   actionBreakdown?: Record<string, number>;
+  storageSize?: number;
 }
 
 const HistoryStatistics = ({ statistics }: { statistics: HistoryStatisticsData | null }) => {
@@ -65,7 +66,9 @@ const HistoryStatistics = ({ statistics }: { statistics: HistoryStatisticsData |
           })}
           <div>
             <p className="text-sm text-gray-700">Storage Size</p>
-            <p className="text-xs text-gray-900">{Math.round(statistics.storageSize / 1024)} KB</p>
+            <p className="text-xs text-gray-900">
+              {statistics.storageSize ? Math.round(statistics.storageSize / 1024) : 0} KB
+            </p>
           </div>
         </div>
       </div>

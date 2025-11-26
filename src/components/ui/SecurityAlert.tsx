@@ -1,5 +1,7 @@
-import React, { createElement } from "react";
+import React, { createElement, ComponentType } from "react";
 import { getIcon as getIconFromRegistry } from "@/utils/icons";
+
+type IconComponentType = ComponentType<{ className?: string }>;
 
 /**
  * Shared security alert component for consistent messaging across security interfaces
@@ -7,7 +9,7 @@ import { getIcon as getIconFromRegistry } from "@/utils/icons";
  *
  * @param {string} type - 'error' | 'warning' | 'success' | 'info'
  * @param {string} message - Alert message text
- * @param {React.Component} icon - Optional custom icon (defaults based on type)
+ * @param {React.Component} icon - Optional custom icon component (defaults based on type)
  * @param {boolean} dismissible - Whether alert can be dismissed
  * @param {Function} onDismiss - Handler for dismissing alert
  * @param {string} variant - 'standard' | 'fullscreen' for different contexts
@@ -15,7 +17,7 @@ import { getIcon as getIconFromRegistry } from "@/utils/icons";
 interface SecurityAlertProps {
   type?: "error" | "warning" | "success" | "info";
   message: string;
-  icon?: React.ReactNode;
+  icon?: IconComponentType;
   dismissible?: boolean;
   onDismiss?: () => void;
   variant?: "standard" | "fullscreen";
@@ -32,19 +34,19 @@ const SecurityAlert = ({
   className = "",
 }: SecurityAlertProps) => {
   // Icon mapping based on alert type
-  const getIcon = () => {
+  const getIcon = (): IconComponentType => {
     if (CustomIcon) return CustomIcon;
 
     switch (type) {
       case "error":
-        return getIconFromRegistry("AlertCircle");
+        return getIconFromRegistry("AlertCircle") as IconComponentType;
       case "warning":
-        return getIconFromRegistry("AlertTriangle");
+        return getIconFromRegistry("AlertTriangle") as IconComponentType;
       case "success":
-        return getIconFromRegistry("CheckCircle");
+        return getIconFromRegistry("CheckCircle") as IconComponentType;
       case "info":
       default:
-        return getIconFromRegistry("Info");
+        return getIconFromRegistry("Info") as IconComponentType;
     }
   };
 
@@ -103,7 +105,7 @@ const SecurityAlert = ({
 
       {dismissible && onDismiss && (
         <button onClick={onDismiss} className={`ml-2 hover:opacity-75 ${colors.icon}`}>
-          {createElement(getIconFromRegistry("X"), {
+          {createElement(getIconFromRegistry("X") as IconComponentType, {
             className: "h-3 w-3",
           })}
         </button>

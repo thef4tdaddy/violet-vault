@@ -1,16 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, ComponentType } from "react";
 import { getIcon } from "@/utils";
 import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+type IconComponentType = ComponentType<{ className?: string }>;
+
 /**
  * Get appropriate icon for modal type
  */
-const getModalIcon = (icon: unknown, destructive: boolean) => {
-  if (icon) return icon;
-  if (destructive) return getIcon("Trash2");
-  return getIcon("AlertTriangle");
+const getModalIcon = (icon: unknown, destructive: boolean): IconComponentType => {
+  if (icon && typeof icon === "function") return icon as IconComponentType;
+  if (destructive) return getIcon("Trash2") as IconComponentType;
+  return getIcon("AlertTriangle") as IconComponentType;
 };
 
 /**

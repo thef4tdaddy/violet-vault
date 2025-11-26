@@ -1,7 +1,10 @@
 import { useLocation } from "react-router-dom";
 import MainLayout from "./MainLayout";
 
-interface FirebaseSync {
+interface FirebaseSyncService {
+  start: (config: unknown) => void;
+  forceSync: () => Promise<unknown>;
+  isRunning: boolean;
   isOnline?: boolean;
   status?: string;
   [key: string]: unknown;
@@ -12,7 +15,7 @@ interface FirebaseSync {
  * Determines whether to show MainLayout (for /app routes) or standalone pages
  * Allows PWA to bypass marketing and go straight to app functionality
  */
-const AppWrapper = ({ firebaseSync }: { firebaseSync: FirebaseSync }) => {
+const AppWrapper = ({ firebaseSync }: { firebaseSync: FirebaseSyncService }) => {
   const location = useLocation();
 
   // Determine if this is an app route that needs MainLayout
