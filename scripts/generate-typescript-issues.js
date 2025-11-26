@@ -20,7 +20,7 @@ const AGENT_PROMPT_FILE = path.join(
   __dirname,
   "../docs/development/agent-prompt-typescript-strict.md"
 );
-const ERRORS_PER_ISSUE = 120; // Target ~100-150 errors per issue
+const DEFAULT_ERRORS_PER_ISSUE = 120; // Default target ~100-150 errors per issue
 
 // GitHub configuration
 const GITHUB_REPO = process.env.GITHUB_REPO || "thef4tdaddy/violet-vault";
@@ -354,7 +354,28 @@ async function createGitHubIssue(
  */
 async function main() {
   const mode = process.argv[2] || "normal"; // 'normal' or 'strict'
-  const maxErrors = process.argv[3] ? parseInt(process.argv[3], 10) : null; // Optional: limit total errors
+
+  // Parse optional arguments: maxErrors and errorsPerIssue
+  // Arguments: [mode, maxErrors (optional), errorsPerIssue (optional)]
+  // Empty strings are passed for missing optional args
+  let maxErrors = null;
+  let errorsPerIssue = DEFAULT_ERRORS_PER_ISSUE;
+
+  // argv[3] = maxErrors (optional, can be empty string)
+  if (process.argv[3] && process.argv[3].trim() !== "") {
+    const parsed = parseInt(process.argv[3], 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      maxErrors = parsed;
+    }
+  }
+
+  // argv[4] = errorsPerIssue (optional, can be empty string)
+  if (process.argv[4] && process.argv[4].trim() !== "") {
+    const parsed = parseInt(process.argv[4], 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      errorsPerIssue = parsed;
+    }
+  }
 
   const resultsFile = mode === "strict" ? STRICT_RESULTS_FILE : NORMAL_RESULTS_FILE;
   const modeLabel = mode === "strict" ? "strict mode" : "normal";
@@ -383,9 +404,10 @@ async function main() {
   const totalFiles = Object.keys(errorsByFile).length;
 
   console.log(`Found ${totalErrors} errors across ${totalFiles} files`);
+  console.log(`Using ${errorsPerIssue} errors per issue`);
 
-  console.log("\n📦 Grouping errors into batches...");
-  const batches = groupErrorsIntoBatches(errorsByFile);
+  console.log(`\n📦 Grouping errors into batches...`);
+  const batches = groupErrorsIntoBatches(errorsByFile, errorsPerIssue);
 
   console.log(`Created ${batches.length} batches:`);
   batches.forEach((batch, idx) => {
