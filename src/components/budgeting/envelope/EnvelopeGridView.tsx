@@ -54,7 +54,18 @@ function EnvelopeGridView({
   children,
 }: {
   className: string;
-  totals: unknown;
+  totals: {
+    totalBalance: number;
+    totalUpcoming: number;
+    totalAllocated: number;
+    envelopeCount: number;
+    totalSpent: number;
+    totalBiweeklyNeed: number;
+    billsDueCount: number;
+    totalBudget?: number;
+    totalAvailable?: number;
+    [key: string]: unknown;
+  };
   unassignedCash: number;
   filterOptions: unknown;
   setFilterOptions: (opts: unknown) => void;

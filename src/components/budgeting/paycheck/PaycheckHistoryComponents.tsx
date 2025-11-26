@@ -4,7 +4,7 @@ import { formatPaycheckAmount } from "@/utils/budgeting/paycheckUtils";
 import { Button } from "@/components/ui";
 
 interface PaycheckHistoryItem {
-  id: string;
+  id: string | number;
   payerName?: string;
   allocationMode?: string;
   amount?: number;

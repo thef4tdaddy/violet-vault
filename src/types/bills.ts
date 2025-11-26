@@ -37,6 +37,7 @@ export interface Bill {
   status?: BillStatus;
   createdAt?: string;
   updatedAt?: string;
+  [key: string]: unknown;
 }
 
 // Bill form data interface
@@ -61,6 +62,7 @@ export interface Envelope {
   category?: string;
   currentBalance?: number;
   billId?: string;
+  [key: string]: unknown;
 }
 
 // Bill form hook options interface

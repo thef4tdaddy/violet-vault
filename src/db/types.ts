@@ -27,6 +27,7 @@ export interface Envelope {
   // Connection properties
   billId?: string;
   debtId?: string;
+  [key: string]: unknown;
 }
 
 export interface Transaction {
@@ -43,6 +44,7 @@ export interface Transaction {
   merchant?: string;
   receiptUrl?: string;
   notes?: string;
+  [key: string]: unknown;
 }
 
 export interface Bill {
@@ -60,6 +62,7 @@ export interface Bill {
   // Additional bill properties
   description?: string;
   paymentMethod?: string;
+  [key: string]: unknown;
 }
 
 export interface SavingsGoal {
@@ -77,6 +80,7 @@ export interface SavingsGoal {
   // Additional savings goal properties
   description?: string;
   monthlyContribution?: number;
+  [key: string]: unknown;
 }
 
 export interface PaycheckHistory {
@@ -98,6 +102,7 @@ export interface PaycheckHistory {
   deductions?: Record<string, number>;
   netAmount?: number;
   processedBy?: string;
+  [key: string]: unknown;
 }
 
 export interface AuditLogEntry {
@@ -111,6 +116,7 @@ export interface AuditLogEntry {
   userName?: string;
   changes?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface CacheEntry {
@@ -137,6 +143,7 @@ export interface Debt {
   dueDate?: Date;
   originalBalance?: number;
   envelopeId?: string;
+  [key: string]: unknown;
 }
 
 export interface BudgetCommit {

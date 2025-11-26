@@ -60,6 +60,7 @@ const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 interface EnvelopeRef {
   id: string;
   name: string;
+  [key: string]: unknown;
 }
 
 const EnvelopeModals = ({

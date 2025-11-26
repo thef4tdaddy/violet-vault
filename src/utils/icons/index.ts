@@ -333,8 +333,8 @@ export const ICON_REGISTRY = {
 // Get icon component by name
 export const getIcon = (
   iconName: string | undefined | null,
-  fallback: React.ComponentType<{ className?: string }> = FileText
-): React.ComponentType<{ className?: string }> => {
+  fallback: React.ComponentType<{ className?: string; title?: string }> = FileText
+): React.ComponentType<{ className?: string; title?: string }> => {
   if (!iconName) return fallback;
   return ICON_REGISTRY[iconName as keyof typeof ICON_REGISTRY] || fallback;
 };
