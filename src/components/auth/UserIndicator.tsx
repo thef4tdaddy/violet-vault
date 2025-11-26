@@ -12,12 +12,7 @@ interface UserIndicatorProps {
     [key: string]: unknown;
   } | null;
   onUserChange?: () => void;
-  onUpdateProfile?: (updates: {
-    userName: string;
-    userColor: string;
-    budgetId?: string;
-    [key: string]: unknown;
-  }) => Promise<void>;
+  onUpdateProfile?: (updates: Record<string, unknown>) => Promise<void> | void;
   onOpenSettings?: (section?: string) => void;
 }
 
@@ -68,7 +63,9 @@ const UserIndicator = memo(
                 <div className="absolute top-full mt-2 right-0 z-[110] bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                   <Button
                     onClick={() => {
-                      onOpenSettings?.("account");
+                      // Note: onOpenSettings is undefined here since we're in !onOpenSettings block
+                      // This button shows the profile modal instead
+                      setShowProfileModal(true);
                       setShowDropdown(false);
                     }}
                     className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -113,7 +110,7 @@ const UserIndicator = memo(
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
           currentUser={currentUser}
-          onUpdateProfile={onUpdateProfile}
+          onUpdateProfile={onUpdateProfile ?? (() => Promise.resolve())}
         />
 
         <KeyManagementSettings

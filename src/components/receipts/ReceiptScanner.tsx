@@ -8,6 +8,33 @@ import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 
+/**
+ * Internal interface matching the hook's UploadedImage type
+ */
+interface UploadedImageData {
+  file: File;
+  url: string;
+  name: string;
+  size: number;
+}
+
+/**
+ * Data returned from the receipt scanner hook
+ */
+interface HookReceiptData {
+  merchant: string | null;
+  total: string | null;
+  date: string | null;
+  time: string | null;
+  tax: string | null;
+  subtotal: string | null;
+  items: Array<{ description: string; amount: number; rawLine: string }>;
+  confidence: Record<string, string>;
+  rawText: string;
+  processingTime: number;
+  imageData: UploadedImageData;
+}
+
 interface ReceiptProcessedData {
   merchant: string | null;
   total: string | null;
@@ -38,6 +65,17 @@ interface ReceiptScannerProps {
  * - Maintainability: Single-responsibility components with clear interfaces
  */
 const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) => {
+  // Create a wrapper that transforms hook data to the expected format
+  const handleReceiptProcessed = (data: HookReceiptData): void => {
+    onReceiptProcessed({
+      ...data,
+      imageData: {
+        file: data.imageData.file,
+        preview: data.imageData.url, // Map url to preview
+      },
+    });
+  };
+
   const {
     // State
     isProcessing,
@@ -57,21 +95,7 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
     handleConfirmReceipt,
     resetScanner,
     toggleImagePreview,
-  } = useReceiptScanner(
-    onReceiptProcessed as unknown as (data: {
-      merchant: string | null;
-      total: string | null;
-      date: string | null;
-      time: string | null;
-      tax: string | null;
-      subtotal: string | null;
-      items: Array<{ description: string; amount: number; rawLine: string }>;
-      confidence: Record<string, string>;
-      rawText: string;
-      processingTime: number;
-      imageData: { file: File; preview: string };
-    }) => void
-  );
+  } = useReceiptScanner(handleReceiptProcessed);
 
   const modalRef = useModalAutoScroll(true);
 
@@ -108,30 +132,49 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
 
               <ReceiptExtractedData
                 extractedData={
-                  extractedData as unknown as
-                    | {
-                        merchant?: string;
-                        total?: number;
-                        date?: string;
-                        tax?: number;
-                        subtotal?: number;
-                        processingTime?: number;
-                        items?: unknown[];
+                  extractedData
+                    ? {
+                        merchant: extractedData.merchant ?? undefined,
+                        total: extractedData.total ? parseFloat(extractedData.total) : undefined,
+                        date: extractedData.date ?? undefined,
+                        tax: extractedData.tax ? parseFloat(extractedData.tax) : undefined,
+                        subtotal: extractedData.subtotal
+                          ? parseFloat(extractedData.subtotal)
+                          : undefined,
+                        processingTime: extractedData.processingTime,
+                        items: extractedData.items,
                         confidence: {
-                          merchant?: number;
-                          total?: number;
-                          date?: number;
-                          tax?: number;
-                          subtotal?: number;
-                        };
+                          merchant: extractedData.confidence.merchant
+                            ? parseFloat(extractedData.confidence.merchant)
+                            : undefined,
+                          total: extractedData.confidence.total
+                            ? parseFloat(extractedData.confidence.total)
+                            : undefined,
+                          date: extractedData.confidence.date
+                            ? parseFloat(extractedData.confidence.date)
+                            : undefined,
+                          tax: extractedData.confidence.tax
+                            ? parseFloat(extractedData.confidence.tax)
+                            : undefined,
+                          subtotal: extractedData.confidence.subtotal
+                            ? parseFloat(extractedData.confidence.subtotal)
+                            : undefined,
+                        },
                       }
-                    | null
-                    | undefined
+                    : null
                 }
               />
 
               <ReceiptActionButtons
-                extractedData={extractedData}
+                extractedData={
+                  extractedData as unknown as {
+                    merchant?: string | null;
+                    total?: string | null;
+                    date?: string | null;
+                    items?: Array<{ description: string; amount: number }>;
+                    [key: string]: unknown;
+                  }
+                }
                 onReset={resetScanner}
                 onConfirm={handleConfirmReceipt}
               />

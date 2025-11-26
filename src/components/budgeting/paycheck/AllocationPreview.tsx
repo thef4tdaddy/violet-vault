@@ -144,11 +144,14 @@ const AllocationPreview: React.FC<AllocationPreviewProps> = ({
               </div>
               <div className="text-right">
                 <div className="font-bold text-gray-900">${allocation.amount.toFixed(2)}</div>
-                {allocationMode === "allocate" && allocation.monthlyAmount > 0 && (
-                  <div className="text-xs text-gray-500">
-                    {((allocation.amount / allocation.monthlyAmount) * 100).toFixed(0)}% of monthly
-                  </div>
-                )}
+                {allocationMode === "allocate" &&
+                  allocation.monthlyAmount !== undefined &&
+                  allocation.monthlyAmount > 0 && (
+                    <div className="text-xs text-gray-500">
+                      {((allocation.amount / allocation.monthlyAmount) * 100).toFixed(0)}% of
+                      monthly
+                    </div>
+                  )}
               </div>
             </div>
           ))}
