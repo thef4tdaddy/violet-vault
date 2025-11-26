@@ -262,10 +262,16 @@ export const BillIconSelector: React.FC<BillIconSelectorProps> = ({
               } ${isReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               title={iconName}
             >
-              {React.createElement(IconComponent, {
-                className: `h-5 w-5 ${isSelected ? "text-blue-600" : "text-gray-600"}`,
-                "data-testid": `bill-icon-option-${iconName}`,
-              })}
+              {React.createElement(
+                IconComponent as React.ComponentType<{
+                  className?: string;
+                  "data-testid"?: string;
+                }>,
+                {
+                  className: `h-5 w-5 ${isSelected ? "text-blue-600" : "text-gray-600"}`,
+                  "data-testid": `bill-icon-option-${iconName}`,
+                }
+              )}
             </Button>
           );
         })}

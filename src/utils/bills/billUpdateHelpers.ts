@@ -103,8 +103,11 @@ export const executeBillUpdate = async (
       updates,
     });
   } catch (error) {
-    logger.warn("TanStack updateBill failed, using Zustand fallback", error);
-    budget?.updateBill(bill);
+    const errorInfo = error instanceof Error ? { message: error.message } : { error };
+    logger.warn("TanStack updateBill failed, using Zustand fallback", errorInfo);
+    if (budget?.updateBill) {
+      budget.updateBill(bill);
+    }
   }
 };
 
@@ -264,7 +267,10 @@ export const formatAmountChange = (
 /**
  * Format date change for display
  */
-export const formatDateChange = (originalDate: string, newDate: string): DateChange | null => {
+export const formatDateChange = (
+  originalDate: string | undefined,
+  newDate: string | undefined
+): DateChange | null => {
   if (!originalDate || !newDate) return null;
 
   const original = new Date(originalDate).toLocaleDateString();

@@ -36,7 +36,7 @@ interface MainContentProps {
     };
   } | null;
   loading: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   onTabChange: (tab: string) => void;
   onToggleAdvanced: () => void;
   onTogglePasswordVisibility: (type: string) => void;

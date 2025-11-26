@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
 
 interface ViewHeaderProps {
   rules: AutoFundingRule[];
@@ -10,13 +11,13 @@ interface ViewTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   rules: AutoFundingRule[];
-  displayHistory: unknown[];
+  displayHistory: ExecutionHistoryEntry[];
 }
 
 interface ViewContentProps {
   activeTab: string;
   rules: AutoFundingRule[];
-  displayHistory: unknown[];
+  displayHistory: ExecutionHistoryEntry[];
   showExecutionDetails: string | null;
   setShowExecutionDetails: (show: string | null) => void;
   handleCreateRule: () => void;
@@ -35,7 +36,7 @@ interface ViewContentProps {
     isExecuting: boolean;
   }>;
   HistoryTabComponent: React.ComponentType<{
-    executionHistory: unknown[];
+    executionHistory: ExecutionHistoryEntry[];
     showExecutionDetails: string | null;
     onToggleDetails: (show: string | null) => void;
   }>;

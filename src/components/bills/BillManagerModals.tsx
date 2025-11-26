@@ -112,7 +112,9 @@ const BillManagerModals: React.FC<BillManagerModalsProps> = ({
           editingBill={(editingBill || undefined) as never}
           onAddBill={addBill as never}
           onUpdateBill={updateBill as never}
-          onDeleteBill={deleteBill}
+          onDeleteBill={(id: unknown, deleteEnvelope?: boolean) =>
+            deleteBill(String(id), deleteEnvelope)
+          }
           onError={onError}
         />
       )}

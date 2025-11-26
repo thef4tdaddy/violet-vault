@@ -129,7 +129,7 @@ interface RuleBuilderStepContentProps {
   errors: RuleValidationErrors;
   updateRuleData: (updates: Partial<AutoFundingRule>) => void;
   updateConfig: (configUpdates: Partial<AutoFundingRule["config"]>) => void;
-  toggleTargetEnvelope: (envelopeId: string) => void;
+  toggleTargetEnvelope: (envelopeId: string | number) => void;
 }
 
 const RuleBuilderStepContent: React.FC<RuleBuilderStepContentProps> = ({
@@ -231,7 +231,7 @@ interface UseRuleBuilderReturn {
   handlePreviousStep: () => void;
   handleUpdateRuleData: (updates: Partial<AutoFundingRule>) => void;
   handleUpdateConfig: (updates: Partial<AutoFundingRule["config"]>) => void;
-  handleToggleTargetEnvelope: (envelopeId: string) => void;
+  handleToggleTargetEnvelope: (envelopeId: string | number) => void;
   handleSave: () => Promise<void>;
 }
 
@@ -274,13 +274,14 @@ const useRuleBuilder = ({
     }));
   }, []);
 
-  const handleToggleTargetEnvelope = useCallback((envelopeId: string) => {
+  const handleToggleTargetEnvelope = useCallback((envelopeId: string | number) => {
+    const envelopeIdStr = String(envelopeId);
     setRuleData((prev) => {
       const currentIds = new Set(prev.config?.targetIds?.map((id) => id.toString()) ?? []);
-      if (currentIds.has(envelopeId)) {
-        currentIds.delete(envelopeId);
+      if (currentIds.has(envelopeIdStr)) {
+        currentIds.delete(envelopeIdStr);
       } else {
-        currentIds.add(envelopeId);
+        currentIds.add(envelopeIdStr);
       }
 
       return {

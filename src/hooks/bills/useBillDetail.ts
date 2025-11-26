@@ -130,7 +130,7 @@ export const useBillDetail = ({
   }, [bill?.isPaid, isOverdue, isDueSoon, daysUntilDue, normalizedDueDate]);
 
   // Actions
-  const handleMarkPaid = async (e: FormEvent<HTMLFormElement>) => {
+  const handleMarkPaid = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!bill) {

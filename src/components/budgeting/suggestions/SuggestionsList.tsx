@@ -20,7 +20,6 @@ export interface Suggestion {
   action: SuggestionAction;
   suggestedAmount: number;
   impact: string;
-  [key: string]: unknown;
 }
 
 interface SuggestionsListProps {

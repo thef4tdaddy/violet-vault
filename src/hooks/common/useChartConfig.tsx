@@ -138,7 +138,7 @@ export const useChartConfig = () => {
         activeDot: { r: 6 },
       },
       bar: {
-        radius: [4, 4, 0, 0],
+        radius: [4, 4, 0, 0] as [number, number, number, number],
         maxBarSize: 60,
       },
       area: {

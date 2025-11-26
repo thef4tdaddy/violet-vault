@@ -90,7 +90,7 @@ const CategorySuggestionsTab = ({
                 onClick={() => onApplySuggestion(suggestion)}
                 className="flex items-center gap-1 px-3 py-1 bg-linear-to-r from-emerald-500 to-green-600 text-white rounded-lg text-xs font-bold hover:from-emerald-600 hover:to-green-700 transition-all border-2 border-black shadow-md hover:shadow-lg"
               >
-                {getActionIcon(suggestion.action)}
+                {getActionIcon(suggestion.action ?? "default")}
                 Apply
               </Button>
               <Button
