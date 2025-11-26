@@ -34,7 +34,7 @@ export const identifyCurrentPage = (): PageType => {
 
     return "unknown";
   } catch (_error) {
-    logger.warn("Error identifying current page", _error);
+    logger.warn("Error identifying current page", _error as Record<string, unknown>);
     return "unknown";
   }
 };

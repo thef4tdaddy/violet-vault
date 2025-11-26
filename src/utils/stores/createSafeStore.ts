@@ -179,7 +179,7 @@ export const createSafeStore = <T extends object>({
   };
 
   const middlewareStack = buildMiddlewareStack(
-    storeInitializer,
+    storeInitializer as unknown as StateCreator<Record<string, unknown>>,
     {
       enablePersist,
       persistedKeys,

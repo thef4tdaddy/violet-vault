@@ -123,7 +123,9 @@ class ActivityLogger {
         }
       }
     } catch (error) {
-      logger.warn("Failed to get user profile from localStorage:", { error: error instanceof Error ? error.message : String(error) });
+      logger.warn("Failed to get user profile from localStorage:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     return null;
