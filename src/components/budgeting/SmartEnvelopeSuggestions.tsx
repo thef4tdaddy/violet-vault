@@ -227,7 +227,7 @@ const SmartEnvelopeSuggestions = ({
   } = useSmartSuggestions({
     transactions,
     envelopes,
-    onCreateEnvelope,
+    onCreateEnvelope: (data: unknown) => onCreateEnvelope(data as Partial<Envelope>),
     onUpdateEnvelope: (envelopeId: string, updates: Record<string, unknown>) => {
       return onUpdateEnvelope(envelopeId, updates);
     },

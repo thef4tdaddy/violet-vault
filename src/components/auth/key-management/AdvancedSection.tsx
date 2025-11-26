@@ -4,7 +4,7 @@ import { getIcon } from "../../../utils";
 
 interface AdvancedSectionProps {
   showAdvanced: boolean;
-  keyFingerprint: string;
+  keyFingerprint: string | null;
   onToggleAdvanced: () => void;
 }
 

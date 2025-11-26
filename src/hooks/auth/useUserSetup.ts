@@ -251,8 +251,8 @@ export const useUserSetup = (onSetupComplete: (payload: SetupPayload) => Promise
   };
 
   // Handle final "Create Budget" button click (step 3)
-  const handleCreateBudget = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleCreateBudget = async (e?: FormEvent) => {
+    e?.preventDefault();
     logger.debug("🚀 Create Budget button clicked", {
       step,
       masterPassword: !!masterPassword,

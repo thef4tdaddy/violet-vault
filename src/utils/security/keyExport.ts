@@ -265,7 +265,8 @@ export const keyExportUtils = {
             await navigator.clipboard.writeText("");
           }
         } catch (error) {
-          logger.warn("Could not auto-clear clipboard:", error);
+          const errorInfo = error instanceof Error ? { message: error.message } : { error };
+          logger.warn("Could not auto-clear clipboard:", errorInfo);
         }
       }, clearAfterMs);
 
@@ -316,6 +317,7 @@ export const keyExportUtils = {
    */
   async generateQRCode(keyData: ExportedKeyData): Promise<string> {
     try {
+      // Dynamic import of qrcode module
       const QRCode = await import("qrcode");
       const keyString = JSON.stringify(keyData);
 

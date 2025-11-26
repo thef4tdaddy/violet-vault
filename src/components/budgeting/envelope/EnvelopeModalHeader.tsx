@@ -67,7 +67,7 @@ const EnvelopeModalHeader = ({
                 Break Lock
               </Button>
             )}
-            <ModalCloseButton onClick={onClose} />
+            <ModalCloseButton onClick={onClose ?? (() => {})} />
           </div>
         </div>
       </div>

@@ -166,7 +166,7 @@ class FirebaseMessagingService {
    * Get FCM registration token
    */
   async getRegistrationToken(): Promise<string | null> {
-    if (!this.isAvailable()) {
+    if (!this.isAvailable() || !this.messaging) {
       throw new Error("Firebase Messaging not initialized");
     }
 
@@ -291,7 +291,7 @@ class FirebaseMessagingService {
         silent: false,
       };
 
-      const notif = new Notification(title, notificationOptions);
+      const notif = new Notification(title ?? "Violet Vault", notificationOptions);
 
       // Auto-close after 10 seconds unless requireInteraction is true
       if (!notificationOptions.requireInteraction) {

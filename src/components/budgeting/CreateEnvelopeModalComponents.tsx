@@ -170,7 +170,7 @@ export const ModalContent = ({
       {allBills.length > 0 && (
         <BillConnectionSelector
           allBills={allBills}
-          selectedBillId={formData.billId}
+          selectedBillId={formData.billId ?? null}
           onBillSelection={onBillSelection}
           onCreateBill={onCreateBill}
           disabled={isLoading}

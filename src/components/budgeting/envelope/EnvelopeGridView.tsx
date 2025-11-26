@@ -73,7 +73,7 @@ function EnvelopeGridView({
   viewMode: string;
   setViewMode: (mode: string) => void;
   handleViewHistory: (env: unknown) => void;
-  sortedEnvelopes: unknown[];
+  sortedEnvelopes: Array<{ id: string; [key: string]: unknown }>;
   handleEnvelopeSelect: (id: string) => void;
   handleEnvelopeEdit: (env: unknown) => void;
   handleQuickFund: (id: string, amount: number) => void;
@@ -109,7 +109,7 @@ function EnvelopeGridView({
           onViewHistory={handleViewHistory}
           viewMode={viewMode}
         />
-        {sortedEnvelopes.map((envelope: { id: string; [key: string]: unknown }) => (
+        {sortedEnvelopes.map((envelope) => (
           <EnvelopeItem
             key={envelope.id}
             envelope={envelope as never}

@@ -1,4 +1,4 @@
-import { cloudSyncService } from "../../services/cloudSyncService.ts";
+import { cloudSyncService, type SyncConfig } from "../../services/cloudSyncService.ts";
 import logger from "../common/logger";
 
 export const clearFirebaseData = async () => {
@@ -12,7 +12,8 @@ export const clearFirebaseData = async () => {
     // Metadata is stored in the budget table instead
     logger.info("No separate sync metadata table to clear");
   } catch (error) {
-    logger.warn("Failed to clear Firebase data, proceeding with import", error);
+    const errorInfo = error instanceof Error ? { message: error.message } : { error };
+    logger.warn("Failed to clear Firebase data, proceeding with import", errorInfo);
   }
 };
 
@@ -21,7 +22,7 @@ export const clearFirebaseData = async () => {
  * @param {Object} authConfig - Auth configuration containing budgetId, encryptionKey, and currentUser
  * authConfig is needed because sync service is stopped before import
  */
-export const forcePushToCloud = async (authConfig: unknown = null) => {
+export const forcePushToCloud = async (authConfig: SyncConfig | null = null) => {
   try {
     logger.info("🛑 Stopping sync service before clean restart...");
     cloudSyncService.stop();

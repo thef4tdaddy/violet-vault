@@ -8,7 +8,7 @@ interface ImportSectionProps {
   showImportPassword: boolean;
   showVaultPassword: boolean;
   loading: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   onUpdatePassword: (field: string, value: string) => void;
   onTogglePasswordVisibility: (field: string) => void;
   onFileImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
