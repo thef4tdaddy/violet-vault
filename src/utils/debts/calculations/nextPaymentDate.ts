@@ -11,7 +11,7 @@ interface PaymentHistoryEntry {
 
 interface Debt {
   paymentDueDate?: string;
-  nextPaymentDate?: string;
+  nextPaymentDate?: string | Date;
   paymentFrequency?: string;
   paymentHistory?: PaymentHistoryEntry[];
 }

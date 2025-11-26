@@ -5,10 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
-| TypeScript Errors | 21 | -2 |
-| TypeScript Strict Mode Errors | 177 | -3 |
+| TypeScript Errors | 16 | -5 |
+| TypeScript Strict Mode Errors | 172 | -5 |
 
-*Last updated: 2025-11-26 02:47:07 UTC*
+*Last updated: 2025-11-26 02:54:39 UTC*
 
 ## Table of Contents
 - [Lint Audit](#lint-audit)
@@ -47,14 +47,11 @@
 ## Typecheck Audit
 
 ### Files with Most Type Errors
-- 3 errors in `src/utils/query/optimisticHelpers.ts`
 - 2 errors in `src/components/transactions/TransactionLedger.tsx`
 - 2 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/layout/ViewRenderer.tsx`
-- 1 errors in `src/utils/debts/debtCalculations.ts`
-- 1 errors in `src/hooks/savings/useSavingsGoals/savingsMutations.ts`
+- 1 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
-- 1 errors in `src/hooks/bills/useBillForm.ts`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
 - 1 errors in `src/components/savings/SavingsGoals.tsx`
@@ -68,9 +65,8 @@
 | Count | Error Code |
 |---|---|
 | 11 | `TS2322` |
-| 8 | `TS2345` |
+| 4 | `TS2345` |
 | 1 | `TS2741` |
-| 1 | `TS2740` |
 
 ### Detailed Type Error Report
 ```
@@ -107,9 +103,11 @@ src/components/savings/SavingsGoals.tsx(136,17): error TS2322: Type 'SavingsGoal
   Types of property 'targetDate' are incompatible.
     Type 'Date' is not assignable to type 'string'.
 src/components/settings/SecuritySettings.tsx(74,16): error TS2322: Type '{ isLocked: boolean; securitySettings: SecuritySettings; securityEvents: SecurityEvent[]; timeUntilAutoLock: () => "Active"; }' is not assignable to type 'SecurityStatusSectionProps'.
-  Types of property 'securitySettings' are incompatible.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecuritySettings' is not assignable to type 'SecuritySettings'.
-      Index signature for type 'string' is missing in type 'SecuritySettings'.
+  Types of property 'securityEvents' are incompatible.
+    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecurityEvent[]' is not assignable to type 'SecurityEvent[]'.
+      Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecurityEvent' is not assignable to type 'SecurityEvent'.
+        Types of property 'timestamp' are incompatible.
+          Type 'string' is not assignable to type 'number'.
 src/components/settings/TransactionArchiving.tsx(106,9): error TS2322: Type '{ totalCount: number; cutoffDate: Date; categories: Record<string, { count: number; amount: number; }>; envelopes: Record<string, { count: number; amount: number; }>; totalAmount: number; dateRange: { ...; }; }' is not assignable to type 'PreviewData'.
   The types of 'dateRange.earliest' are incompatible between these types.
     Type 'Date' is not assignable to type 'string'.
@@ -119,22 +117,11 @@ src/components/transactions/TransactionLedger.tsx(515,7): error TS2322: Type 'un
 src/components/transactions/TransactionLedger.tsx(523,7): error TS2322: Type '(data: unknown[]) => Promise<void>' is not assignable to type '(event: ChangeEvent<HTMLInputElement>, options: { clearExisting: boolean; }) => void'.
   Types of parameters 'data' and 'event' are incompatible.
     Type 'ChangeEvent<HTMLInputElement>' is missing the following properties from type 'unknown[]': length, pop, push, concat, and 29 more.
-src/hooks/bills/useBillForm.ts(55,9): error TS2322: Type 'string | number' is not assignable to type 'string'.
-  Type 'number' is not assignable to type 'string'.
 src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type '() => Promise<BudgetRecord | null>' is not assignable to parameter of type '() => Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
   Type 'Promise<BudgetRecord>' is not assignable to type 'Promise<{ actualBalance?: number; unassignedCash?: number; }>'.
     Type 'BudgetRecord' has no properties in common with type '{ actualBalance?: number; unassignedCash?: number; }'.
-src/hooks/savings/useSavingsGoals/savingsMutations.ts(27,13): error TS2740: Type '{ createdAt: number; lastModified: number; id: string; }' is missing the following properties from type 'SavingsGoal': name, category, priority, targetAmount, and 3 more.
-src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'DebtAccount' is not assignable to parameter of type 'Debt'.
-  Types of property 'nextPaymentDate' are incompatible.
-    Type 'string | Date' is not assignable to type 'string'.
-      Type 'Date' is not assignable to type 'string'.
-src/utils/query/optimisticHelpers.ts(86,36): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'Envelope'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'Envelope': id, name, category, archived
-src/utils/query/optimisticHelpers.ts(209,39): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'Transaction'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'Transaction': id, date, amount, envelopeId, and 2 more.
-src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'SavingsGoal'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'SavingsGoal': id, name, category, priority, and 4 more.
+src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'string | Date' is not assignable to type 'string'.
+  Type 'Date' is not assignable to type 'string'.
 ```
 
 ## Typecheck Strict Mode Audit
@@ -142,7 +129,6 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 ### Files with Most Strict Mode Errors
 - 4 errors in `src/components/transactions/TransactionLedger.tsx`
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
-- 3 errors in `src/utils/query/optimisticHelpers.ts`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
@@ -150,7 +136,6 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 3 errors in `src/components/bills/AddBillModal.tsx`
 - 2 errors in `src/utils/security/keyExport.ts`
 - 2 errors in `src/utils/query/queryClientConfig.ts`
-- 2 errors in `src/utils/debts/debtCalculations.ts`
 - 2 errors in `src/utils/common/transactionArchiving.ts`
 - 2 errors in `src/utils/budgeting/envelopeCalculations.ts`
 - 2 errors in `src/utils/bills/billUpdateHelpers.ts`
@@ -188,6 +173,8 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 1 errors in `src/utils/query/backgroundSyncService.ts`
 - 1 errors in `src/utils/pwa/patchNotesManager.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
+- 1 errors in `src/utils/debts/debtCalculations.ts`
+- 1 errors in `src/utils/debts/calculations/nextPaymentDate.ts`
 - 1 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 1 errors in `src/utils/dataManagement/backupUtils.ts`
 - 1 errors in `src/utils/common/toastHelpers.ts`
@@ -204,7 +191,6 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 1 errors in `src/services/activityLogger.ts`
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
-- 1 errors in `src/hooks/savings/useSavingsGoals/savingsMutations.ts`
 - 1 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
 - 1 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
@@ -221,7 +207,6 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 - 1 errors in `src/hooks/bills/useBills/index.ts`
 - 1 errors in `src/hooks/bills/useBillOperations.ts`
 - 1 errors in `src/hooks/bills/useBillManagerDisplayLogic.ts`
-- 1 errors in `src/hooks/bills/useBillForm.ts`
 - 1 errors in `src/hooks/auth/useKeyManagementUI.ts`
 - 1 errors in `src/hooks/auth/mutations/usePasswordMutations.ts`
 - 1 errors in `src/hooks/auth/authOperations.ts`
@@ -272,7 +257,7 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 | Count | Error Code |
 |---|---|
 | 67 | `TS2322` |
-| 61 | `TS2345` |
+| 57 | `TS2345` |
 | 8 | `TS2769` |
 | 7 | `TS18048` |
 | 6 | `TS7006` |
@@ -285,7 +270,6 @@ src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ 
 | 2 | `TS2339` |
 | 2 | `TS18047` |
 | 1 | `TS7016` |
-| 1 | `TS2740` |
 | 1 | `TS2352` |
 | 1 | `TS2349` |
 
@@ -525,9 +509,11 @@ src/components/savings/SavingsGoals.tsx(136,17): error TS2322: Type 'SavingsGoal
     Type 'Date | undefined' is not assignable to type 'string | undefined'.
       Type 'Date' is not assignable to type 'string'.
 src/components/settings/SecuritySettings.tsx(74,16): error TS2322: Type '{ isLocked: boolean; securitySettings: SecuritySettings; securityEvents: SecurityEvent[]; timeUntilAutoLock: () => "Active" | null; }' is not assignable to type 'SecurityStatusSectionProps'.
-  Types of property 'securitySettings' are incompatible.
-    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecuritySettings' is not assignable to type 'SecuritySettings'.
-      Index signature for type 'string' is missing in type 'SecuritySettings'.
+  Types of property 'securityEvents' are incompatible.
+    Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecurityEvent[]' is not assignable to type 'SecurityEvent[]'.
+      Type 'import("/home/runner/work/violet-vault/violet-vault/src/services/security/securityService").SecurityEvent' is not assignable to type 'SecurityEvent'.
+        Types of property 'timestamp' are incompatible.
+          Type 'string' is not assignable to type 'number'.
 src/components/settings/SettingsDashboard.tsx(233,5): error TS2322: Type 'SecurityManager | null' is not assignable to type 'SecurityManager'.
   Type 'null' is not assignable to type 'SecurityManager'.
 src/components/settings/TransactionArchiving.tsx(106,9): error TS2322: Type '{ totalCount: number; cutoffDate: Date; categories: Record<string, { count: number; amount: number; }>; envelopes: Record<string, { count: number; amount: number; }>; totalAmount: number; dateRange: { ...; }; } | null' is not assignable to type 'PreviewData | null'.
@@ -585,8 +571,6 @@ src/hooks/auth/useAuthenticationManager.ts(102,39): error TS2339: Property 'budg
 src/hooks/auth/useKeyManagementUI.ts(164,5): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
   Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
     Type 'null' is not assignable to type 'HTMLInputElement'.
-src/hooks/bills/useBillForm.ts(55,9): error TS2322: Type 'string | number' is not assignable to type 'string'.
-  Type 'number' is not assignable to type 'string'.
 src/hooks/bills/useBillManagerDisplayLogic.ts(36,26): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/hooks/bills/useBillOperations.ts(68,7): error TS2322: Type '(updatedBills: Bill[]) => Promise<BulkOperationResult>' is not assignable to type '(updatedBills: unknown[]) => Promise<{ success: boolean; successCount: number; errorCount: number; errors: string[]; message: string; }>'.
@@ -632,7 +616,6 @@ src/hooks/notifications/useFirebaseMessaging.ts(98,7): error TS2322: Type 'Token
   Types of property 'token' are incompatible.
     Type 'string | null | undefined' is not assignable to type 'string | undefined'.
       Type 'null' is not assignable to type 'string | undefined'.
-src/hooks/savings/useSavingsGoals/savingsMutations.ts(27,13): error TS2740: Type '{ createdAt: number; lastModified: number; id: string; }' is missing the following properties from type 'SavingsGoal': name, category, priority, targetAmount, and 3 more.
 src/hooks/sharing/useQRCodeProcessing.ts(42,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/hooks/sync/useSyncHealthIndicator.ts(200,5): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
@@ -712,21 +695,13 @@ src/utils/common/transactionArchiving.ts(255,11): error TS2322: Type 'null' is n
 src/utils/common/transactionArchiving.ts(423,9): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/dataManagement/backupUtils.ts(45,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'DebtAccount' is not assignable to parameter of type 'Debt'.
-  Types of property 'nextPaymentDate' are incompatible.
-    Type 'string | Date | undefined' is not assignable to type 'string | undefined'.
-      Type 'Date' is not assignable to type 'string'.
+src/utils/debts/calculations/nextPaymentDate.ts(44,5): error TS2322: Type 'string | Date' is not assignable to type 'string | null'.
+  Type 'Date' is not assignable to type 'string'.
 src/utils/debts/debtCalculations.ts(94,5): error TS2322: Type 'string | null' is not assignable to type 'string | Date | undefined'.
   Type 'null' is not assignable to type 'string | Date | undefined'.
 src/utils/pageDetection/pageIdentifier.ts(37,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/pwa/patchNotesManager.ts(89,24): error TS18048: 'match.index' is possibly 'undefined'.
 src/utils/query/backgroundSyncService.ts(92,20): error TS18046: 'restoreError' is of type 'unknown'.
-src/utils/query/optimisticHelpers.ts(86,36): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'Envelope'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'Envelope': id, name, category, archived
-src/utils/query/optimisticHelpers.ts(209,39): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'Transaction'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'Transaction': id, date, amount, envelopeId, and 2 more.
-src/utils/query/optimisticHelpers.ts(314,39): error TS2345: Argument of type '{ createdAt: number; lastModified: number; }' is not assignable to parameter of type 'SavingsGoal'.
-  Type '{ createdAt: number; lastModified: number; }' is missing the following properties from type 'SavingsGoal': id, name, category, priority, and 4 more.
 src/utils/query/prefetchHelpers.ts(55,13): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/utils/query/queryClientConfig.ts(58,7): error TS2322: Type '(error: unknown, query: Query) => void' is not assignable to type '(error: Error, query: Query<unknown, unknown, unknown, readonly unknown[]>) => void'.

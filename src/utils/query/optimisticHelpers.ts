@@ -70,11 +70,11 @@ export const optimisticHelpers = {
     newEnvelope: Omit<Envelope, "lastModified" | "createdAt">
   ) => {
     try {
-      const envelopeWithTimestamp = {
+      const envelopeWithTimestamp: Envelope = {
         ...newEnvelope,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as Envelope;
 
       // Update TanStack Query cache - envelope list
       queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
@@ -190,11 +190,11 @@ export const optimisticHelpers = {
     newTransaction: Omit<Transaction, "lastModified" | "createdAt">
   ) => {
     try {
-      const transactionWithTimestamp = {
+      const transactionWithTimestamp: Transaction = {
         ...newTransaction,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as Transaction;
 
       // Update TanStack Query cache - transaction lists
       queryClient.setQueriesData(
@@ -304,11 +304,11 @@ export const optimisticHelpers = {
    */
   addSavingsGoal: async (newGoal: Omit<SavingsGoal, "lastModified" | "createdAt">) => {
     try {
-      const goalWithTimestamp = {
+      const goalWithTimestamp: SavingsGoal = {
         ...newGoal,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      };
+      } as SavingsGoal;
 
       // Add to database
       await budgetDb.savingsGoals.add(goalWithTimestamp);
