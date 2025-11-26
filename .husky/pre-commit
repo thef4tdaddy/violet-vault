@@ -50,7 +50,8 @@ printf 'Linting:\n%s\n' "$CODE_FILES"
 # Run ESLint on just the staged JS/TS files
 # (xargs handles spaces/newlines safely)
 # Zero tolerance: no warnings allowed (0/0/0 achieved)
-printf '%s\n' "$CODE_FILES" | xargs npx eslint --config configs/linting/eslint.config.js --max-warnings 0 --
+# --no-warn-ignored: Suppress warnings about ignored files (e.g., test files in __tests__)
+printf '%s\n' "$CODE_FILES" | xargs npx eslint --config configs/linting/eslint.config.js --max-warnings 0 --no-warn-ignored --
 ESLINT_STATUS=$?
 
 if [ $ESLINT_STATUS -ne 0 ]; then
