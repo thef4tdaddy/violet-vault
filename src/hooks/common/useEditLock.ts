@@ -29,7 +29,11 @@ interface EditLockServiceUser {
 /**
  * Hook for managing edit locks on budget items
  */
-function useEditLock(recordType: string, recordId: string, options: UseEditLockOptions = {}) {
+function useEditLock(
+  recordType: string | null,
+  recordId: string | null,
+  options: UseEditLockOptions = {}
+) {
   const [lock, setLock] = useState<LockDocument | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isOwnLock, setIsOwnLock] = useState(false);

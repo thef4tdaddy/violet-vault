@@ -35,7 +35,7 @@ const BACKDROP_OPACITY = 0.5;
 
 // Apply drag transform to modal and backdrop
 function applyDragTransform(
-  modalRef: React.RefObject<HTMLDivElement>,
+  modalRef: React.RefObject<HTMLDivElement | null>,
   deltaY: number,
   backdrop: boolean
 ) {
@@ -54,7 +54,7 @@ function applyDragTransform(
 }
 
 // Reset drag transform to original position
-function resetDragTransform(modalRef: React.RefObject<HTMLDivElement>, backdrop: boolean) {
+function resetDragTransform(modalRef: React.RefObject<HTMLDivElement | null>, backdrop: boolean) {
   if (!modalRef.current) return;
 
   modalRef.current.style.transform = "translateY(0)";
@@ -94,15 +94,15 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ title, onClose, closeFeedback
   </div>
 );
 
-const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement> }) => (
+const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement | null> }) => (
   <div ref={handleRef} className="flex justify-center pt-3 pb-2 cursor-pointer">
     <div className="w-12 h-1 bg-gray-300 rounded-full" />
   </div>
 );
 
 interface ModalPanelProps {
-  modalRef: React.RefObject<HTMLDivElement>;
-  handleRef: React.RefObject<HTMLDivElement>;
+  modalRef: React.RefObject<HTMLDivElement | null>;
+  handleRef: React.RefObject<HTMLDivElement | null>;
   height: ModalHeight;
   isOpen: boolean;
   isAnimating: boolean;
@@ -181,7 +181,7 @@ interface DragState {
 // Process drag move logic
 function processDragMove(
   dragState: DragState,
-  modalRef: React.RefObject<HTMLDivElement>,
+  modalRef: React.RefObject<HTMLDivElement | null>,
   touch: React.Touch,
   backdrop: boolean,
   setDragState: React.Dispatch<React.SetStateAction<DragState>>
@@ -205,7 +205,7 @@ function processDragMove(
 // Process drag end logic
 function processDragEnd(
   dragState: DragState,
-  modalRef: React.RefObject<HTMLDivElement>,
+  modalRef: React.RefObject<HTMLDivElement | null>,
   backdrop: boolean,
   onClose: (() => void) | undefined,
   setDragState: React.Dispatch<React.SetStateAction<DragState>>
@@ -232,7 +232,7 @@ function processDragEnd(
 
 // Hook to manage drag state for swipe-to-dismiss
 function useDragHandlers(
-  modalRef: React.RefObject<HTMLDivElement>,
+  modalRef: React.RefObject<HTMLDivElement | null>,
   backdrop: boolean,
   onClose?: () => void
 ) {

@@ -2,15 +2,16 @@
 
 ## Summary
 
-| Category | Current | Change |
-|----------|---------|--------|
-| ESLint Issues | 3 | +2 |
-| TypeScript Errors | 18 | +4 |
-| TypeScript Strict Mode Errors | 87 | -33 |
+| Category                      | Current | Change |
+| ----------------------------- | ------- | ------ |
+| ESLint Issues                 | 3       | +2     |
+| TypeScript Errors             | 18      | +4     |
+| TypeScript Strict Mode Errors | 87      | -33    |
 
-*Last updated: 2025-11-26 17:38:46 UTC*
+_Last updated: 2025-11-26 17:38:46 UTC_
 
 ## Table of Contents
+
 - [Lint Audit](#lint-audit)
   - [Files with Most Issues](#files-with-most-issues)
   - [Issue Count by Category](#issue-count-by-category)
@@ -27,19 +28,22 @@
 ## Lint Audit
 
 ### Files with Most Issues
+
 - 2 issues in `violet-vault/src/hooks/bills/useBillDetail.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/useSmartSuggestions.ts`
 - 1 issues in `violet-vault/src/hooks/budgeting/autofunding/useAutoFundingExecution.ts`
 - 1 issues in `violet-vault/src/components/transactions/import/ImportModal.tsx`
 
 ### Issue Count by Category
-| Count | Rule ID |
-|---|---|
-| 2 | `react-hooks/exhaustive-deps` |
-| 2 | `max-lines-per-function` |
-| 1 | `@typescript-eslint/no-unused-vars` |
+
+| Count | Rule ID                             |
+| ----- | ----------------------------------- |
+| 2     | `react-hooks/exhaustive-deps`       |
+| 2     | `max-lines-per-function`            |
+| 1     | `@typescript-eslint/no-unused-vars` |
 
 ### Detailed Lint Report
+
 ```
 violet-vault/src/components/transactions/import/ImportModal.tsx:8:6 - 1 - 'DataRow' is defined but never used. Allowed unused vars must match /^_/u. (@typescript-eslint/no-unused-vars)
 violet-vault/src/hooks/bills/useBillDetail.ts:53:30 - 1 - Arrow function has too many lines (157). Maximum allowed is 150. (max-lines-per-function)
@@ -51,6 +55,7 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:104:29 - 1 - Arrow funct
 ## Typecheck Audit
 
 ### Files with Most Type Errors
+
 - 3 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 2 errors in `src/components/transactions/import/ImportModal.tsx`
 - 2 errors in `src/components/layout/ViewRenderer.tsx`
@@ -65,14 +70,16 @@ violet-vault/src/hooks/budgeting/useSmartSuggestions.ts:104:29 - 1 - Arrow funct
 - 1 errors in `src/App.tsx`
 
 ### Type Error Breakdown by Category
+
 | Count | Error Code |
-|---|---|
-| 9 | `TS2322` |
-| 7 | `TS2345` |
-| 1 | `TS6196` |
-| 1 | `TS2741` |
+| ----- | ---------- |
+| 9     | `TS2322`   |
+| 7     | `TS2345`   |
+| 1     | `TS6196`   |
+| 1     | `TS2741`   |
 
 ### Detailed Type Error Report
+
 ```
 src/App.tsx(30,7): error TS2322: Type '() => UiStore' is not assignable to type '() => { setUpdateAvailable: (available: boolean) => void; setInstallPromptEvent: (event: BeforeInstallPromptEvent) => void; showInstallModal: () => void; installPromptEvent: BeforeInstallPromptEvent; loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<...>; }'.
   Call signature return types 'UiStore' and '{ setUpdateAvailable: (available: boolean) => void; setInstallPromptEvent: (event: BeforeInstallPromptEvent) => void; showInstallModal: () => void; installPromptEvent: BeforeInstallPromptEvent; loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<...>; }' are incompatible.
@@ -133,6 +140,7 @@ src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type
 ## Typecheck Strict Mode Audit
 
 ### Files with Most Strict Mode Errors
+
 - 3 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
 - 3 errors in `src/components/layout/ViewRenderer.tsx`
@@ -192,21 +200,23 @@ src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type
 - 1 errors in `src/components/accounts/SupplementalAccounts.tsx`
 
 ### Strict Mode Error Breakdown
+
 | Count | Error Code |
-|---|---|
-| 43 | `TS2322` |
-| 24 | `TS2345` |
-| 6 | `TS2769` |
-| 3 | `TS18048` |
-| 2 | `TS2722` |
-| 2 | `TS2719` |
-| 2 | `TS2339` |
-| 2 | `TS18047` |
-| 1 | `TS7016` |
-| 1 | `TS6196` |
-| 1 | `TS2349` |
+| ----- | ---------- |
+| 43    | `TS2322`   |
+| 24    | `TS2345`   |
+| 6     | `TS2769`   |
+| 3     | `TS18048`  |
+| 2     | `TS2722`   |
+| 2     | `TS2719`   |
+| 2     | `TS2339`   |
+| 2     | `TS18047`  |
+| 1     | `TS7016`   |
+| 1     | `TS6196`   |
+| 1     | `TS2349`   |
 
 ### Detailed Strict Mode Report
+
 ```
 src/App.tsx(30,7): error TS2322: Type '() => UiStore' is not assignable to type '() => { setUpdateAvailable: (available: boolean) => void; setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void; showInstallModal: () => void; installPromptEvent: BeforeInstallPromptEvent | null; loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<...>; }'.
   Call signature return types 'UiStore' and '{ setUpdateAvailable: (available: boolean) => void; setInstallPromptEvent: (event: BeforeInstallPromptEvent | null) => void; showInstallModal: () => void; installPromptEvent: BeforeInstallPromptEvent | null; loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<...>; }' are incompatible.
@@ -488,4 +498,3 @@ src/utils/security/keyExport.ts(268,58): error TS2345: Argument of type 'unknown
 src/utils/security/keyExport.ts(319,35): error TS7016: Could not find a declaration file for module 'qrcode'. 'violet-vault/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
   Try `npm i --save-dev @types/qrcode` if it exists or add a new declaration (.d.ts) file containing `declare module 'qrcode';`
 ```
-
