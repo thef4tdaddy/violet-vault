@@ -155,6 +155,7 @@ export interface BudgetCommit {
   deviceFingerprint?: string;
   // Additional commit properties
   changes?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface BudgetChange {
@@ -167,6 +168,7 @@ export interface BudgetChange {
   // Additional change properties
   oldValue?: unknown;
   newValue?: unknown;
+  [key: string]: unknown;
 }
 
 export interface BudgetBranch {
