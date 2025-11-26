@@ -1,7 +1,14 @@
 import { useCallback } from "react";
 
-interface TutorialStep {
-  position?: "top" | "bottom" | "left" | "right" | "center";
+export type StepPosition = "top" | "bottom" | "left" | "right" | "center";
+
+export interface TutorialStep {
+  id: string;
+  title: string;
+  description: string;
+  target: string | null;
+  position: StepPosition;
+  action: () => void;
 }
 
 interface TooltipPosition {

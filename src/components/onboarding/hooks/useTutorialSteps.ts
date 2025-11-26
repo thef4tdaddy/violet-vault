@@ -2,6 +2,9 @@ import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
 import logger from "../../../utils/common/logger";
+import { TutorialStep, StepPosition } from "./useTutorialPositioning";
+
+export type { TutorialStep, StepPosition };
 
 /**
  * Hook for managing tutorial step configuration and navigation
@@ -12,7 +15,7 @@ export const useTutorialSteps = () => {
   const startTutorialStep = useOnboardingStore((state) => state.startTutorialStep);
 
   // Tutorial steps configuration
-  const tutorialSteps = useMemo(
+  const tutorialSteps = useMemo<TutorialStep[]>(
     () => [
       {
         id: "welcome",
@@ -20,7 +23,7 @@ export const useTutorialSteps = () => {
         description:
           "Let's take a quick tour to get you started with envelope budgeting and personal finance tracking.",
         target: null,
-        position: "center",
+        position: "center" as StepPosition,
         action: () => logger.info("Welcome step shown"),
       },
       {
