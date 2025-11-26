@@ -162,7 +162,7 @@ export const DEFAULT_ICON_OPTIONS: BillIconOption[] = [
 export const getBillIconOptions = (category = ""): BillIconOption[] => {
   const normalizedCategory = category.toLowerCase().trim();
 
-  const categoryIconSets = {
+  const categoryIconSets: Record<string, BillIconOption[]> = {
     utilities: ICON_OPTIONS_BY_CATEGORY.utilities,
     housing: ICON_OPTIONS_BY_CATEGORY.housing,
     transportation: ICON_OPTIONS_BY_CATEGORY.transportation,

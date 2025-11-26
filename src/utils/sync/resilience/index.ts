@@ -49,7 +49,11 @@ export const createSyncResilience = (
     /**
      * Execute sync operation with full resilience stack
      */
-    async execute(operation, operationType = "sync", operationName = "unknown") {
+    async execute(
+      operation: () => Promise<unknown>,
+      operationType = "sync",
+      operationName = "unknown"
+    ) {
       // Queue the operation for debouncing
       return await syncQueue.enqueue(operationType, async (_data) => {
         // Execute through circuit breaker

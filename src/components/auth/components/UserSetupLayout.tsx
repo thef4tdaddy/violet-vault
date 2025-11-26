@@ -1,9 +1,16 @@
+import React from "react";
+
 /**
  * User Setup Layout Component
  * Main layout structure with background pattern and container styling
  * Extracted from UserSetup for better organization and ESLint compliance
  */
-const UserSetupLayout = ({ children }) => {
+
+interface UserSetupLayoutProps {
+  children: React.ReactNode;
+}
+
+const UserSetupLayout = ({ children }: UserSetupLayoutProps) => {
   return (
     <div className="min-h-screen bg-purple-900 flex items-center justify-center p-4">
       {/* Background Pattern */}

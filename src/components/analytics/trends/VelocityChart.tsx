@@ -10,8 +10,13 @@ import {
 } from "recharts";
 import { velocityTooltipFormatter, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 import { getIcon } from "../../../utils";
+import type { SpendingVelocity } from "@/types/analytics";
 
-const VelocityChart = ({ spendingVelocity = [] }) => {
+interface VelocityChartProps {
+  spendingVelocity?: SpendingVelocity[];
+}
+
+const VelocityChart = ({ spendingVelocity = [] }: VelocityChartProps) => {
   const hasData = spendingVelocity && spendingVelocity.length > 0;
 
   return (

@@ -1,7 +1,18 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const HistoryStatistics = ({ statistics }) => {
+interface HistoryStatisticsData {
+  totalCommits?: number;
+  dateRange?: {
+    newest?: string | Date | null;
+    oldest?: string | Date | null;
+  };
+  authorBreakdown?: Record<string, number>;
+  actionBreakdown?: Record<string, number>;
+  storageSize?: number;
+}
+
+const HistoryStatistics = ({ statistics }: { statistics: HistoryStatisticsData | null }) => {
   if (!statistics) return null;
 
   return (
@@ -55,7 +66,9 @@ const HistoryStatistics = ({ statistics }) => {
           })}
           <div>
             <p className="text-sm text-gray-700">Storage Size</p>
-            <p className="text-xs text-gray-900">{Math.round(statistics.storageSize / 1024)} KB</p>
+            <p className="text-xs text-gray-900">
+              {statistics.storageSize ? Math.round(statistics.storageSize / 1024) : 0} KB
+            </p>
           </div>
         </div>
       </div>

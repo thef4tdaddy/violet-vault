@@ -1,8 +1,13 @@
+interface DebtCardProgressData {
+  hasProgress: boolean;
+  percentage: number;
+}
+
 /**
  * Progress bar component for debt card display
  * Pure UI component - receives progress data as props
  */
-const DebtCardProgressBar = ({ progressData }) => {
+const DebtCardProgressBar = ({ progressData }: { progressData: DebtCardProgressData }) => {
   if (!progressData.hasProgress) {
     return <div className="text-xs text-gray-500">No progress data</div>;
   }

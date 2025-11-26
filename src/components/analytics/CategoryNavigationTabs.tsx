@@ -1,11 +1,21 @@
+import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils/icons";
 
+type TabId = "suggestions" | "analysis" | "settings";
+
 interface CategoryNavigationTabsProps {
   activeTab: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (tabId: TabId) => void;
   suggestionCount: number;
   categoryCount: number;
+}
+
+interface TabConfig {
+  id: TabId;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  count?: number;
 }
 
 const CategoryNavigationTabs = ({
@@ -14,7 +24,7 @@ const CategoryNavigationTabs = ({
   suggestionCount,
   categoryCount,
 }: CategoryNavigationTabsProps) => {
-  const tabs = [
+  const tabs: TabConfig[] = [
     {
       id: "suggestions",
       name: "Suggestions",

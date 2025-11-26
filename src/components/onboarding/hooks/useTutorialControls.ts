@@ -1,11 +1,7 @@
 import { useCallback } from "react";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
 import logger from "../../../utils/common/logger";
-
-interface TutorialStep {
-  action?: () => void;
-  [key: string]: unknown;
-}
+import { TutorialStep } from "./useTutorialPositioning";
 
 /**
  * Hook for tutorial control functions

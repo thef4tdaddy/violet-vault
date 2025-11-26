@@ -2,11 +2,15 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
+interface ReceiptScannerHeaderProps {
+  onClose: () => void;
+}
+
 /**
  * Receipt Scanner Header Component
  * Extracted from ReceiptScanner with UI standards compliance
  */
-const ReceiptScannerHeader = ({ onClose }) => {
+const ReceiptScannerHeader = ({ onClose }: ReceiptScannerHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3">

@@ -5,6 +5,10 @@
 | Category | Current | Change |
 |----------|---------|--------|
 | ESLint Issues | 1 | 0 |
+| TypeScript Errors | 41 | -12 |
+| TypeScript Strict Mode Errors | 207 | -12 |
+
+*Last updated: 2025-11-26 00:28:30 UTC*
 | TypeScript Errors | 30 | -3 |
 | TypeScript Strict Mode Errors | 207 | -2 |
 
@@ -67,6 +71,8 @@
 - 1 errors in `src/components/onboarding/OnboardingTutorial.tsx`
 - 1 errors in `src/components/layout/MainLayout.tsx`
 - 1 errors in `src/components/history/BudgetHistoryViewer.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
+- 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
@@ -192,8 +198,8 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 4 errors in `src/components/receipts/ReceiptScanner.tsx`
 - 4 errors in `src/components/layout/ViewRenderer.tsx`
 - 3 errors in `src/components/mobile/SlideUpModal.tsx`
+- 3 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 3 errors in `src/components/charts/CategoryBarChart.tsx`
-- 3 errors in `src/components/budgeting/envelope/EnvelopeItem.tsx`
 - 3 errors in `src/components/bills/modals/BillDetailModal.tsx`
 - 3 errors in `src/components/bills/AddBillModal.tsx`
 - 2 errors in `src/utils/security/keyExport.ts`
@@ -218,10 +224,11 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/hooks/analytics/utils/pdfGeneratorUtils.ts`
 - 2 errors in `src/components/settings/sections/SyncDebugToolsSection.tsx`
 - 2 errors in `src/components/receipts/ReceiptButton.tsx`
-- 2 errors in `src/components/history/BudgetHistoryViewer.tsx`
 - 2 errors in `src/components/debt/DebtDashboardComponents.tsx`
 - 2 errors in `src/components/budgeting/paycheck/AllocationPreview.tsx`
+- 2 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 2 errors in `src/components/budgeting/CreateEnvelopeModalComponents.tsx`
+- 2 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 2 errors in `src/components/bills/BulkBillUpdateModal.tsx`
 - 2 errors in `src/components/bills/BillFormFields.tsx`
 - 2 errors in `src/components/auth/components/UserNameInput.tsx`
@@ -231,7 +238,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 2 errors in `src/components/analytics/AnalyticsDashboard.tsx`
 - 2 errors in `src/App.tsx`
 - 1 errors in `src/utils/transactions/operations.ts`
-- 1 errors in `src/utils/sync/resilience/index.ts`
 - 1 errors in `src/utils/sync/SyncQueue.ts`
 - 1 errors in `src/utils/sync/RetryManager.ts`
 - 1 errors in `src/utils/stores/createSafeStore.ts`
@@ -239,7 +245,6 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/utils/query/backgroundSyncService.ts`
 - 1 errors in `src/utils/pwa/patchNotesManager.ts`
 - 1 errors in `src/utils/pageDetection/pageIdentifier.ts`
-- 1 errors in `src/utils/debts/calculations/payoffProjection.ts`
 - 1 errors in `src/utils/dataManagement/firebaseUtils.ts`
 - 1 errors in `src/utils/dataManagement/backupUtils.ts`
 - 1 errors in `src/utils/common/toastHelpers.ts`
@@ -249,8 +254,7 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/utils/common/fixAutoAllocateUndefined.ts`
 - 1 errors in `src/utils/common/budgetHistoryTracker.ts`
 - 1 errors in `src/utils/budgeting/paycheckDeletion.ts`
-- 1 errors in `src/utils/billIcons/iconOptions.ts`
-- 1 errors in `src/utils/analytics/categoryPatterns.ts`
+- 1 errors in `src/utils/analytics/billAnalyzer.ts`
 - 1 errors in `src/stores/ui/toastStore.ts`
 - 1 errors in `src/services/typedChunkedSyncService.ts`
 - 1 errors in `src/services/firebaseSyncService.ts`
@@ -258,14 +262,12 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/hooks/sync/useSyncHealthIndicator.ts`
 - 1 errors in `src/hooks/sharing/useQRCodeProcessing.ts`
 - 1 errors in `src/hooks/notifications/useFirebaseMessaging.ts`
-- 1 errors in `src/hooks/mobile/useSlideUpModal.ts`
 - 1 errors in `src/hooks/mobile/useFABBehavior.ts`
 - 1 errors in `src/hooks/layout/usePaycheckOperations.ts`
 - 1 errors in `src/hooks/debts/useDebtModalLogic.ts`
 - 1 errors in `src/hooks/dashboard/useMainDashboard.ts`
 - 1 errors in `src/hooks/common/usePrompt.ts`
 - 1 errors in `src/hooks/common/useImportData.ts`
-- 1 errors in `src/hooks/common/useConnectionManager/useConnectionConfig.ts`
 - 1 errors in `src/hooks/common/useBugReport.ts`
 - 1 errors in `src/hooks/budgeting/usePaycheckFormValidated.ts`
 - 1 errors in `src/hooks/budgeting/useBudgetData/queryFunctions.ts`
@@ -286,12 +288,10 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/transactions/TransactionTable.tsx`
 - 1 errors in `src/components/transactions/TransactionSplitter.tsx`
 - 1 errors in `src/components/sync/ConflictResolutionModal.tsx`
-- 1 errors in `src/components/settings/archiving/ArchivingResult.tsx`
 - 1 errors in `src/components/settings/TransactionArchiving.tsx`
 - 1 errors in `src/components/settings/SettingsDashboard.tsx`
 - 1 errors in `src/components/settings/SecuritySettings.tsx`
 - 1 errors in `src/components/savings/SavingsGoals.tsx`
-- 1 errors in `src/components/receipts/components/ReceiptScannerHeader.tsx`
 - 1 errors in `src/components/receipts/components/ReceiptExtractedData.tsx`
 - 1 errors in `src/components/receipts/components/ReceiptActionButtons.tsx`
 - 1 errors in `src/components/pwa/UpdateAvailableModal.tsx`
@@ -307,15 +307,11 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/history/IntegrityStatusIndicatorHelpers.tsx`
 - 1 errors in `src/components/history/IntegrityStatusIndicator.tsx`
 - 1 errors in `src/components/debt/ui/DebtSummaryCards.tsx`
-- 1 errors in `src/components/debt/ui/DebtProgressBar.tsx`
-- 1 errors in `src/components/debt/ui/DebtCardProgressBar.tsx`
 - 1 errors in `src/components/debt/modals/DebtFormFields.tsx`
 - 1 errors in `src/components/debt/modals/DebtDetailModal.tsx`
 - 1 errors in `src/components/debt/modals/AddDebtModal.tsx`
 - 1 errors in `src/components/debt/DebtDashboard.tsx`
-- 1 errors in `src/components/charts/TrendLineChart.tsx`
 - 1 errors in `src/components/budgeting/suggestions/SuggestionsList.tsx`
-- 1 errors in `src/components/budgeting/envelope/EnvelopeSummary.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeModalHeader.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeGridView.tsx`
 - 1 errors in `src/components/budgeting/envelope/EnvelopeActivitySummary.tsx`
@@ -323,21 +319,15 @@ src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'Debt
 - 1 errors in `src/components/budgeting/PaydayPrediction.tsx`
 - 1 errors in `src/components/budgeting/PaycheckProcessor.tsx`
 - 1 errors in `src/components/budgeting/EditEnvelopeModal.tsx`
-- 1 errors in `src/components/budgeting/CashFlowSummary.tsx`
 - 1 errors in `src/components/bills/modals/BulkUpdateConfirmModal.tsx`
-- 1 errors in `src/components/bills/modals/BillDetailStats.tsx`
 - 1 errors in `src/components/bills/modals/BillDetailSections.tsx`
 - 1 errors in `src/components/bills/BillManagerModals.tsx`
 - 1 errors in `src/components/bills/BillFormSections.tsx`
-- 1 errors in `src/components/bills/BillDiscoveryModal.tsx`
 - 1 errors in `src/components/automation/AutoFundingView.tsx`
 - 1 errors in `src/components/automation/AutoFundingRuleBuilder.tsx`
 - 1 errors in `src/components/auth/key-management/MainContent.tsx`
-- 1 errors in `src/components/auth/components/UserSetupLayout.tsx`
 - 1 errors in `src/components/auth/UserSetup.tsx`
 - 1 errors in `src/components/auth/KeyManagementSettings.tsx`
-- 1 errors in `src/components/analytics/TrendAnalysisCharts.tsx`
-- 1 errors in `src/components/analytics/SmartCategoryManager.tsx`
 - 1 errors in `src/components/analytics/CategorySuggestionsTab.tsx`
 - 1 errors in `src/components/accounts/SupplementalAccounts.tsx`
 - 1 errors in `src/components/accounts/ExpirationAlert.tsx`
@@ -432,8 +422,6 @@ src/components/bills/AddBillModal.tsx(257,5): error TS2322: Type 'RefObject<HTML
   Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
     Type 'null' is not assignable to type 'HTMLDivElement'.
 src/components/bills/AddBillModal.tsx(316,13): error TS2322: Type 'unknown' is not assignable to type 'LockData | null | undefined'.
-src/components/bills/BillDiscoveryModal.tsx(76,23): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-  No index signature with a parameter of type 'string' was found on type '{}'.
 src/components/bills/BillFormFields.tsx(89,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/bills/BillFormFields.tsx(101,11): error TS2322: Type 'boolean | null | undefined' is not assignable to type 'boolean | undefined'.
@@ -465,7 +453,10 @@ src/components/bills/modals/BillDetailSections.tsx(45,29): error TS2769: No over
   Overload 2 of 4, '(value: string | number): Date', gave the following error.
     Argument of type 'string | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
-src/components/bills/modals/BillDetailStats.tsx(10,35): error TS7031: Binding element 'bill' implicitly has an 'any' type.
+src/components/bills/modals/BillDetailStats.tsx(24,82): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'string | number'.
+  Type 'undefined' is not assignable to type 'string | number'.
+src/components/bills/modals/BillDetailStats.tsx(51,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
 src/components/bills/modals/BulkUpdateConfirmModal.tsx(74,53): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
 src/components/budgeting/CashFlowSummary.tsx(4,28): error TS7031: Binding element 'cashFlow' implicitly has an 'any' type.
@@ -518,8 +509,6 @@ src/components/charts/CategoryBarChart.tsx(153,14): error TS2769: No overload ma
     Type '{}' is not assignable to type 'string'.
 src/components/charts/CategoryBarChart.tsx(157,15): error TS2783: 'fill' is specified more than once, so this usage will be overwritten.
 src/components/charts/CategoryBarChart.tsx(157,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
-src/components/charts/TrendLineChart.tsx(63,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ line: { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]; area: ({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { ...; })[]; bar: ({ ...; } | { ...; })[]; }'.
-  No index signature with a parameter of type 'string' was found on type '{ line: { type: string; dataKey: string; name: string; stroke: string; strokeWidth: number; }[]; area: ({ type: string; dataKey: string; name: string; stroke: string; fill: string; fillOpacity: number; strokeWidth?: undefined; } | { ...; })[]; bar: ({ ...; } | { ...; })[]; }'.
 src/components/debt/DebtDashboard.tsx(66,52): error TS2322: Type 'Dispatch<SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>>' is not assignable to type 'Dispatch<SetStateAction<Record<string, string | boolean>>>'.
   Type 'SetStateAction<Record<string, string | boolean>>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
     Type 'Record<string, string | boolean>' is not assignable to type 'SetStateAction<{ type: string; status: string; sortBy: string; sortOrder: string; }>'.
@@ -538,12 +527,12 @@ src/components/debt/modals/DebtDetailModal.tsx(89,27): error TS2322: Type '{ exp
   Type 'null' is not assignable to type '{ expectedPayoff: string; totalInterest: string; payoffDate: string; }'.
 src/components/debt/modals/DebtFormFields.tsx(96,11): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-src/components/debt/ui/DebtCardProgressBar.tsx(5,32): error TS7031: Binding element 'progressData' implicitly has an 'any' type.
-src/components/debt/ui/DebtProgressBar.tsx(5,28): error TS7031: Binding element 'progressData' implicitly has an 'any' type.
 src/components/debt/ui/DebtSummaryCards.tsx(63,11): error TS2322: Type '(() => void) | null | undefined' is not assignable to type '(() => void) | undefined'.
   Type 'null' is not assignable to type '(() => void) | undefined'.
 src/components/history/BudgetHistoryViewer.tsx(62,28): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
   Type 'null' is not assignable to type 'string'.
+src/components/history/BudgetHistoryViewer.tsx(115,30): error TS2322: Type '{ totalCommits: number; lastCommitDate: number; lastCommitMessage: string; lastCommitAuthor: string; } | { totalCommits: number; lastCommitDate: null; lastCommitMessage: null; lastCommitAuthor: null; } | undefined' is not assignable to type 'HistoryStatisticsData | null'.
+  Type 'undefined' is not assignable to type 'HistoryStatisticsData | null'.
 src/components/history/BudgetHistoryViewer.tsx(139,15): error TS2322: Type '{ commit?: unknown; changes: unknown[]; } | null' is not assignable to type 'CommitDetails | null'.
   Type '{ commit?: unknown; changes: unknown[]; }' is not assignable to type 'CommitDetails'.
     Types of property 'commit' are incompatible.
@@ -752,7 +741,6 @@ src/hooks/budgeting/usePaycheckFormValidated.ts(62,26): error TS2769: No overloa
     Argument of type 'Date | undefined' is not assignable to parameter of type 'string | number'.
       Type 'undefined' is not assignable to type 'string | number'.
 src/hooks/common/useBugReport.ts(60,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/hooks/common/useConnectionManager/useConnectionConfig.ts(6,32): error TS7006: Parameter 'entityType' implicitly has an 'any' type.
 src/hooks/common/useImportData.ts(166,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'null | undefined'.
 src/hooks/common/usePrompt.ts(109,12): error TS7006: Parameter 'value' implicitly has an 'any' type.
 src/hooks/common/useRouterPageDetection.ts(22,25): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "/app": string; "/app/dashboard": string; "/app/envelopes": string; "/app/savings": string; "/app/supplemental": string; "/app/paycheck": string; "/app/bills": string; "/app/transactions": string; "/app/debts": string; "/app/analytics": string; "/app/automation": string; "/app/activity": string; }'.
@@ -767,7 +755,6 @@ src/hooks/layout/usePaycheckOperations.ts(61,11): error TS2345: Argument of type
       Type 'BudgetRecord' has no properties in common with type '{ actualBalance?: number | undefined; unassignedCash?: number | undefined; }'.
 src/hooks/mobile/useFABBehavior.ts(127,50): error TS2345: Argument of type 'RefObject<null>' is not assignable to parameter of type 'RefObject<HTMLElement>'.
   Type 'null' is not assignable to type 'HTMLElement'.
-src/hooks/mobile/useSlideUpModal.ts(41,37): error TS7006: Parameter 'newConfig' implicitly has an 'any' type.
 src/hooks/notifications/useFirebaseMessaging.ts(98,7): error TS2322: Type 'TokenResult' is not assignable to type 'PermissionResult'.
   Types of property 'token' are incompatible.
     Type 'string | null | undefined' is not assignable to type 'string | undefined'.
@@ -827,9 +814,8 @@ src/services/firebaseSyncService.ts(170,46): error TS2345: Argument of type 'Aut
 src/services/typedChunkedSyncService.ts(275,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/stores/ui/toastStore.ts(87,11): error TS2352: Conversion of type '{ toasts: never[]; }' to type 'ToastState' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ toasts: never[]; }' is missing the following properties from type 'ToastState': addToast, removeToast, clearAllToasts, showSuccess, and 4 more.
-src/utils/analytics/categoryPatterns.ts(36,37): error TS7006: Parameter 'billName' implicitly has an 'any' type.
-src/utils/billIcons/iconOptions.ts(179,10): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
-  No index signature with a parameter of type 'string' was found on type '{ utilities: BillIconOption[]; housing: BillIconOption[]; transportation: BillIconOption[]; insurance: BillIconOption[]; ... 6 more ...; business: BillIconOption[]; }'.
+src/utils/analytics/billAnalyzer.ts(71,49): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
 src/utils/bills/billUpdateHelpers.ts(106,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/bills/billUpdateHelpers.ts(107,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 src/utils/budgeting/envelopeCalculations.ts(110,63): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
@@ -852,7 +838,6 @@ src/utils/common/transactionArchiving.ts(255,11): error TS2322: Type 'null' is n
 src/utils/common/transactionArchiving.ts(423,9): error TS2322: Type 'null' is not assignable to type 'number'.
 src/utils/dataManagement/backupUtils.ts(45,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
 src/utils/dataManagement/firebaseUtils.ts(15,74): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Record<string, unknown> | undefined'.
-src/utils/debts/calculations/payoffProjection.ts(11,43): error TS7006: Parameter 'debt' implicitly has an 'any' type.
 src/utils/debts/debtCalculations.ts(84,52): error TS2345: Argument of type 'DebtAccount' is not assignable to parameter of type 'Debt'.
   Types of property 'nextPaymentDate' are incompatible.
     Type 'string | Date | undefined' is not assignable to type 'string | undefined'.

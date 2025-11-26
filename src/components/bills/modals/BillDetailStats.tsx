@@ -3,11 +3,18 @@ import { getIcon } from "../../../utils";
 import { formatBillAmount } from "../../../utils/bills/billDetailUtils";
 import { getFrequencyDisplayText } from "../../../utils/common/frequencyCalculations";
 
+interface BillForStats {
+  amount?: number;
+  dueDate?: string | Date | null;
+  frequency?: string;
+  customFrequency?: number | null;
+}
+
 /**
  * Main stats section for BillDetailModal
  * Extracted to reduce modal complexity
  */
-export const BillDetailStats = ({ bill }) => {
+export const BillDetailStats = ({ bill }: { bill: BillForStats }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
       <div className="bg-purple-50 rounded-xl p-4">
