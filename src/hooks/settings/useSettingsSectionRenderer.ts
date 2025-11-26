@@ -113,11 +113,13 @@ const useSettingsSectionRenderer = (props: SettingsSectionRendererProps) => {
         });
 
       case "security":
-        return React.createElement(SecuritySettingsSection, {
-          securityManager,
-          onOpenSecuritySettings,
-          onShowLocalDataSecurity,
-        });
+        return securityManager
+          ? React.createElement(SecuritySettingsSection, {
+              securityManager,
+              onOpenSecuritySettings,
+              onShowLocalDataSecurity,
+            })
+          : null;
 
       case "data":
         return React.createElement(DataManagementSection, {

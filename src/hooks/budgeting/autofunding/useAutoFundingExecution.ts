@@ -55,6 +55,15 @@ export const useAutoFundingExecution = () => {
     allTransactions: [],
   };
   const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budgetWithDefaults);
+  // Provide a default no-op transferFunds if not present
+  const budgetForExecution = {
+    ...budgetWithDefaults,
+    transferFunds:
+      budgetWithDefaults.transferFunds ??
+      (async () => {
+        logger.warn("transferFunds not available - operation skipped");
+      }),
+  };
   const {
     executeTransfer,
     simulateExecution,
@@ -62,9 +71,7 @@ export const useAutoFundingExecution = () => {
     validatePlannedTransfers,
     calculateImpact,
     canExecuteRules,
-  } = useExecutionUtils(
-    budgetWithDefaults as BudgetData & { transferFunds: BudgetData["transferFunds"] }
-  );
+  } = useExecutionUtils(budgetForExecution);
   const { getExecutionSummary } = useExecutionSummary(lastExecution as ExecutionRecord | null);
 
   // Execute rules with given trigger
