@@ -52,7 +52,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptBut
       try {
         await preloadOCR();
       } catch (error) {
-        logger.warn("Failed to preload OCR:", error);
+        logger.warn("Failed to preload OCR:", error as Record<string, unknown>);
       } finally {
         setIsPreloading(false);
       }
@@ -157,20 +157,16 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptBut
       {/* Receipt to Transaction Modal */}
       {showTransactionModal && receiptData && (
         <ReceiptToTransactionModal
-          receiptData={
-            receiptData as unknown as {
-              merchant: string | null;
-              total: string | null;
-              date: string | null;
-              time: string | null;
-              tax: string | null;
-              subtotal: string | null;
-              items: Array<{ description: string; amount: number; rawLine: string }>;
-              confidence: Record<string, string>;
-              rawText?: string;
-              processingTime?: number;
-            }
-          }
+          receiptData={{
+            merchant: receiptData.merchant ?? undefined,
+            total: receiptData.total ? parseFloat(receiptData.total) : undefined,
+            date: receiptData.date ?? undefined,
+            rawText: receiptData.rawText,
+            processingTime: receiptData.processingTime,
+            items: receiptData.items,
+            tax: receiptData.tax ? parseFloat(receiptData.tax) : undefined,
+            subtotal: receiptData.subtotal ? parseFloat(receiptData.subtotal) : undefined,
+          }}
           onComplete={handleTransactionComplete as unknown as () => void}
           onClose={handleCloseTransactionModal}
         />

@@ -128,7 +128,11 @@ class EditLockService {
       const existingLock = await this.getLock(recordType, recordId);
       const lockAction = await handleExistingLock(
         existingLock as { userId: string; userName: string; expiresAt: { toDate(): Date } } | null,
-        this.currentUser,
+        this.currentUser as {
+          userName?: string;
+          id?: string;
+          budgetId?: string;
+        } | null as unknown as { userName?: string; id?: string; budgetId?: string },
         async () => {
           await this.releaseLock(recordType, recordId);
         }
@@ -372,7 +376,7 @@ class EditLockService {
     // Release all owned locks
     for (const [, lock] of this.locks) {
       const lockDoc = lock as LockDocument;
-      if (lockDoc.userId === this.currentUser?.userId) {
+      if (lockDoc.userId === this.currentUser?.userId && lockDoc.recordType && lockDoc.recordId) {
         this.releaseLock(lockDoc.recordType, lockDoc.recordId);
       }
     }

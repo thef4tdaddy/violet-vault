@@ -35,7 +35,9 @@ export interface ConsoleLogEntry {
  */
 interface ErrorListener {
   type: string;
-  handler: ((event: Event) => void) | { handleEvent: (event: Event) => void };
+  handler:
+    | ((event: Event | ErrorEvent | PromiseRejectionEvent) => void)
+    | { handleEvent: (event: Event) => void };
 }
 
 /**
@@ -103,8 +105,14 @@ export class ErrorTrackingService {
 
       // Store listeners for cleanup
       this.errorListeners.push(
-        { type: "error", handler: errorHandler },
-        { type: "unhandledrejection", handler: rejectionHandler }
+        {
+          type: "error",
+          handler: errorHandler as (event: Event | ErrorEvent | PromiseRejectionEvent) => void,
+        },
+        {
+          type: "unhandledrejection",
+          handler: rejectionHandler as (event: Event | ErrorEvent | PromiseRejectionEvent) => void,
+        }
       );
 
       // Intercept console methods to capture logs
@@ -214,7 +222,7 @@ export class ErrorTrackingService {
         captureEnabled: this.isInitialized,
       };
     } catch (error) {
-      logger.warn("Error collecting recent errors", error);
+      logger.warn("Error collecting recent errors", error as Record<string, unknown>);
       return {
         recentErrors: [],
         consoleLogs: [],

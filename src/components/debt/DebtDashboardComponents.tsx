@@ -6,6 +6,15 @@ import DebtList from "./ui/DebtList";
 import { DebtStats, DebtAccount } from "../../types/debt";
 import DebtStrategies from "./DebtStrategies";
 
+// Use the same Debt type that DebtList uses internally
+type Debt = {
+  id: string;
+  name: string;
+  creditor: string;
+  type: string;
+  [key: string]: unknown;
+};
+
 interface FilterOptions {
   type: string;
   status: string;
@@ -20,8 +29,8 @@ interface OverviewTabProps {
   filterOptions: FilterOptions;
   setFilterOptions: (options: FilterOptions) => void;
   setShowUpcomingPaymentsModal: (show: boolean) => void;
-  handleDebtClick: (debt: DebtAccount) => void;
-  handleRecordPayment: (debt: DebtAccount, amount: number) => void;
+  handleDebtClick: (debt: DebtAccount | Debt) => void;
+  handleRecordPayment: (debt: DebtAccount | Debt, amount: number) => void;
   handleAddDebt: () => void;
   debtTypes?: Record<string, string>;
   debtsByType?: Record<string, DebtAccount[]>;

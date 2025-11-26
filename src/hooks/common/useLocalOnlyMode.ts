@@ -17,7 +17,7 @@ export const useLocalOnlyMode = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Stub values - local-only mode is now handled by cloudSyncEnabled toggle
-  const isLocalOnlyMode = false as const;
+  const isLocalOnlyMode: boolean = false;
   const localOnlyUser: LocalOnlyUser | null = null;
   const isInitialized = true;
 

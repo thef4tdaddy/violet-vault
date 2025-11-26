@@ -5,8 +5,6 @@ import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
 
-type DataRow = Record<string, unknown>;
-
 interface FieldMapping {
   date?: string;
   description?: string;
@@ -21,7 +19,7 @@ interface ImportModalProps {
   onClose: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: unknown[];
+  importData: Record<string, unknown>[] | { data: Record<string, unknown>[] };
   setImportData: (data: unknown[]) => void;
   fieldMapping: FieldMapping | Record<string, string | undefined>;
   setFieldMapping: (mapping: FieldMapping | Record<string, string | undefined>) => void;
@@ -52,6 +50,11 @@ const ImportModal: React.FC<ImportModalProps> = ({
 }) => {
   const modalRef = useModalAutoScroll(isOpen);
 
+  // Normalize importData to always be an array
+  const normalizedImportData: Record<string, unknown>[] = Array.isArray(importData)
+    ? importData
+    : importData.data;
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -75,7 +78,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
 
         {importStep === 2 && (
           <FieldMapper
-            importData={importData}
+            importData={normalizedImportData}
             fieldMapping={fieldMapping}
             setFieldMapping={setFieldMapping}
             onBack={() => setImportStep(1)}
@@ -84,7 +87,10 @@ const ImportModal: React.FC<ImportModalProps> = ({
         )}
 
         {importStep === 3 && (
-          <ImportProgress importData={importData} importProgress={importProgress.percentage} />
+          <ImportProgress
+            importData={normalizedImportData}
+            importProgress={importProgress.percentage}
+          />
         )}
       </div>
     </div>

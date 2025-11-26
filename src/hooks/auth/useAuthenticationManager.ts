@@ -95,11 +95,11 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
 
   // Determine the effective budget ID
   const effectiveBudgetId = useMemo(() => {
-    if (isLocalOnlyMode) {
-      return localOnlyUser?.budgetId ?? null;
+    if (isLocalOnlyMode && localOnlyUser) {
+      return (localOnlyUser as { budgetId?: string }).budgetId ?? null;
     }
     return authFlow.budgetId ?? null;
-  }, [isLocalOnlyMode, localOnlyUser?.budgetId, authFlow.budgetId]);
+  }, [isLocalOnlyMode, localOnlyUser, authFlow.budgetId]);
 
   // Comprehensive authentication state
   const authenticationState = useMemo<AuthenticationState>(

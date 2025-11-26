@@ -15,7 +15,13 @@ import {
   createLockSessionOperation,
   createUpdateActivityOperation,
 } from "./authOperations";
-import type { LoginResult, AuthContext } from "./authOperations";
+import type {
+  LoginResult,
+  AuthContext,
+  LoginData,
+  UpdateProfileResult,
+  UpdateProfileInput,
+} from "./authOperations";
 import type { UseMutationResult } from "@tanstack/react-query";
 
 /**
@@ -46,7 +52,9 @@ export const useAuthManager = () => {
     logoutMutation.isPending;
 
   // Create auth operations
-  const login = createLoginOperation(loginMutation);
+  const login = createLoginOperation(
+    loginMutation as unknown as UseMutationResult<LoginResult, Error, LoginData, unknown>
+  );
   const joinBudget = createJoinBudgetOperation(joinBudgetMutation);
   const logout = createLogoutOperation(
     logoutMutation as unknown as UseMutationResult<{ success: boolean }, Error, void, unknown>
@@ -59,7 +67,14 @@ export const useAuthManager = () => {
     >,
     authContext as unknown as AuthContext
   );
-  const updateProfile = createUpdateProfileOperation(updateProfileMutation);
+  const updateProfile = createUpdateProfileOperation(
+    updateProfileMutation as unknown as UseMutationResult<
+      UpdateProfileResult,
+      Error,
+      UpdateProfileInput,
+      unknown
+    >
+  );
   const lockSession = createLockSessionOperation(authContext as unknown as AuthContext);
   const updateActivity = createUpdateActivityOperation(authContext as unknown as AuthContext);
 
