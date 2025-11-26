@@ -136,9 +136,7 @@ const BudgetHistoryViewer = ({ onClose }: BudgetHistoryViewerProps) => {
             <ChangeDetails
               selectedCommit={selectedCommit}
               commitDetailsLoading={commitDetailsLoading}
-              commitDetails={
-                commitDetails as unknown as { commit?: unknown; changes: unknown[] } | null
-              }
+              commitDetails={commitDetails ?? null}
               handleRestoreFromHistory={handleRestoreFromHistory}
               getChangeIcon={getChangeIcon}
             />

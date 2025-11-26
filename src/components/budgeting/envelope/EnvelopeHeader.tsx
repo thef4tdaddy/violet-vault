@@ -13,9 +13,9 @@ interface Envelope {
 interface EnvelopeHeaderProps {
   envelope: Envelope;
   isCollapsed: boolean;
-  onSelect: (envelopeId: string) => void;
-  onEdit: (envelope: Envelope) => void;
-  onViewHistory: (envelope: Envelope) => void;
+  onSelect?: (envelopeId: string) => void;
+  onEdit?: (envelope: Envelope) => void;
+  onViewHistory?: (envelope: Envelope) => void;
   onToggleCollapse: () => void;
 }
 

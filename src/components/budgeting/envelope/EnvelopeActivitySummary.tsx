@@ -3,7 +3,7 @@ import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
 interface EnvelopeForSummary {
   envelopeType?: string;
-  totalSpent: number;
+  totalSpent?: number;
   monthlyBudget?: number;
   targetAmount?: number;
   currentBalance?: number;
@@ -28,7 +28,7 @@ const EnvelopeActivitySummary = ({ envelope }: { envelope: EnvelopeForSummary })
         <div className="flex xl:flex-col items-center xl:items-stretch justify-between xl:justify-start bg-rose-50 rounded-lg p-3 xl:p-4 border border-rose-200">
           <p className="text-sm font-medium text-rose-700 xl:mb-2">Spent (30d)</p>
           <p className="text-lg xl:text-xl font-bold text-rose-700 whitespace-nowrap">
-            ${envelope.totalSpent.toFixed(2)}
+            ${(envelope.totalSpent ?? 0).toFixed(2)}
           </p>
         </div>
         {/* Monthly Budget Box */}
@@ -54,7 +54,7 @@ const EnvelopeActivitySummary = ({ envelope }: { envelope: EnvelopeForSummary })
     <div className="grid grid-cols-3 gap-2 text-xs">
       <div className="text-center">
         <p className="text-gray-500">Spent</p>
-        <p className="font-medium text-red-600">${envelope.totalSpent.toFixed(2)}</p>
+        <p className="font-medium text-red-600">${(envelope.totalSpent ?? 0).toFixed(2)}</p>
       </div>
       <div className="text-center">
         <p className="text-gray-500">Upcoming</p>

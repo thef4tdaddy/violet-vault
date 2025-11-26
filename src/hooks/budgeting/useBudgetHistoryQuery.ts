@@ -90,10 +90,27 @@ export const useBudgetCommits = (options: Record<string, unknown> = {}) => {
   };
 };
 
-export const useBudgetCommitDetails = (commitHash: string) => {
+export const useBudgetCommitDetails = (commitHash: string | null) => {
   return useQuery({
-    queryKey: queryKeys.budgetCommit(commitHash),
-    queryFn: async () => {
+    queryKey: queryKeys.budgetCommit(commitHash ?? ""),
+    queryFn: async (): Promise<{
+      commit?: {
+        hash?: string;
+        message?: string;
+        author?: string;
+        timestamp?: string | number;
+        parentHash?: string;
+        [key: string]: unknown;
+      };
+      changes: Array<{
+        type?: string;
+        changeType?: string;
+        entityType?: string;
+        description?: string;
+        diff?: Record<string, { from: unknown; to: unknown }>;
+        [key: string]: unknown;
+      }>;
+    } | null> => {
       if (!commitHash) return null;
 
       try {

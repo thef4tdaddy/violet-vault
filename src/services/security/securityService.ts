@@ -9,6 +9,7 @@ export interface SecuritySettings {
   clipboardClearTimeout: number;
   securityLoggingEnabled: boolean;
   lockOnPageHide: boolean;
+  [key: string]: unknown;
 }
 
 /**

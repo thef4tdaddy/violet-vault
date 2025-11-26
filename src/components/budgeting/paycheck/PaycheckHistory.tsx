@@ -7,7 +7,7 @@ import {
 } from "./PaycheckHistoryComponents";
 
 interface PaycheckHistoryItem {
-  id: string;
+  id: string | number;
   payerName?: string;
   allocationMode?: string;
   amount?: number;

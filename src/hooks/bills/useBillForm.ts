@@ -52,7 +52,7 @@ export const useBillForm = ({
       });
 
       if (billEnvelopes.length > 0) {
-        initialData.selectedEnvelope = billEnvelopes[0].id;
+        initialData.selectedEnvelope = String(billEnvelopes[0].id);
       }
 
       setFormData(initialData);
