@@ -55,11 +55,13 @@ export function usePaycheckFormValidated({
         date:
           typeof paycheck.date === "string"
             ? paycheck.date
-            : paycheck.processedAt
-              ? typeof paycheck.processedAt === "string"
+            : paycheck.date instanceof Date
+              ? paycheck.date.toISOString().split("T")[0]
+              : typeof paycheck.processedAt === "string"
                 ? paycheck.processedAt
-                : new Date(paycheck.processedAt).toISOString().split("T")[0]
-              : new Date(paycheck.date).toISOString().split("T")[0],
+                : paycheck.processedAt instanceof Date
+                  ? paycheck.processedAt.toISOString().split("T")[0]
+                  : new Date().toISOString().split("T")[0],
         amount: paycheck.amount?.toString() || "",
         source: paycheck.payerName || paycheck.source || "",
         allocations: allocationsObj,

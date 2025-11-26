@@ -58,7 +58,14 @@ export const usePaycheckOperations = () => {
               update: (id: string | number, data: unknown) => Promise<void>;
             };
           },
-          getBudgetMetadata
+          async () => {
+            const metadata = await getBudgetMetadata();
+            if (!metadata) return null;
+            return {
+              actualBalance: (metadata as { actualBalance?: number }).actualBalance,
+              unassignedCash: (metadata as { unassignedCash?: number }).unassignedCash,
+            };
+          }
         );
 
         // Update budget metadata

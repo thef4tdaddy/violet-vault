@@ -55,12 +55,16 @@ export const useBillOperations = ({
     },
     [handlePayBill]
   );
-  const { handleBulkUpdate, handleBulkPayment } = useBulkBillOperations({
+  const { handleBulkUpdate: handleBulkUpdateTyped, handleBulkPayment } = useBulkBillOperations({
     updateBill,
     onUpdateBill,
     budget,
     handlePayBill: payBillCore,
   });
+  // Wrap handleBulkUpdate to accept unknown[] as expected by useBillOperationWrappers
+  const handleBulkUpdate = async (updatedBills: unknown[]) => {
+    return handleBulkUpdateTyped(updatedBills as Bill[]);
+  };
 
   // Use wrapper functions with error handling and processing state
   const { wrappedHandleBulkUpdate, wrappedHandlePayBill, wrappedHandleBulkPayment, isProcessing } =
