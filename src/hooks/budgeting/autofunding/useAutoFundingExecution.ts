@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { TRIGGER_TYPES, type AutoFundingRule } from "../../../utils/budgeting/autofunding/rules.ts";
 import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
 import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
@@ -49,11 +49,15 @@ export const useAutoFundingExecution = () => {
   const [lastExecution, setLastExecution] = useState<ExecutionResult["execution"] | null>(null);
 
   // Use focused sub-hooks
-  const budgetWithDefaults: BudgetData = budget ?? {
-    envelopes: [],
-    unassignedCash: 0,
-    allTransactions: [],
-  };
+  const budgetWithDefaults: BudgetData = useMemo(
+    () =>
+      budget ?? {
+        envelopes: [],
+        unassignedCash: 0,
+        allTransactions: [],
+      },
+    [budget]
+  );
   const { executeRulesWithContext, executeSingleRule } = useRuleExecution(budgetWithDefaults);
   // Provide a default no-op transferFunds if not present
   const budgetForExecution = {

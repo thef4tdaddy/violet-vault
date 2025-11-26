@@ -72,7 +72,7 @@ interface TransactionLedgerViewProps {
   onCloseImportModal: () => void;
   importStep: number;
   setImportStep: (step: number) => void;
-  importData: unknown[];
+  importData: unknown;
   setImportData: (data: unknown[]) => void;
   fieldMapping: Record<string, string | undefined>;
   setFieldMapping: (mapping: Record<string, string | undefined>) => void;
@@ -185,7 +185,7 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
       onClose={onCloseImportModal}
       importStep={importStep}
       setImportStep={setImportStep}
-      importData={importData}
+      importData={importData as { data: Record<string, unknown>[] }}
       setImportData={() => {}}
       fieldMapping={fieldMapping}
       setFieldMapping={setFieldMapping}
@@ -503,7 +503,7 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       onCloseImportModal={handleCloseImportModal}
       importStep={importStep}
       setImportStep={setImportStep}
-      importData={importData as unknown as unknown[]}
+      importData={importData as { data: Record<string, unknown>[] }}
       setImportData={() => {}}
       fieldMapping={fieldMapping}
       setFieldMapping={setFieldMapping}

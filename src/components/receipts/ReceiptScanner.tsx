@@ -7,11 +7,12 @@ import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { mapExtractedDataForDisplay } from "./utils/receiptHelpers";
 
 /**
  * Internal interface matching the hook's UploadedImage type
  */
-interface UploadedImageData {
+export interface UploadedImageData {
   file: File;
   url: string;
   name: string;
@@ -21,7 +22,7 @@ interface UploadedImageData {
 /**
  * Data returned from the receipt scanner hook
  */
-interface HookReceiptData {
+export interface HookReceiptData {
   merchant: string | null;
   total: string | null;
   date: string | null;
@@ -35,7 +36,7 @@ interface HookReceiptData {
   imageData: UploadedImageData;
 }
 
-interface ReceiptProcessedData {
+export interface ReceiptProcessedData {
   merchant: string | null;
   total: string | null;
   date: string | null;
@@ -130,40 +131,7 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
                 onTogglePreview={toggleImagePreview}
               />
 
-              <ReceiptExtractedData
-                extractedData={
-                  extractedData
-                    ? {
-                        merchant: extractedData.merchant ?? undefined,
-                        total: extractedData.total ? parseFloat(extractedData.total) : undefined,
-                        date: extractedData.date ?? undefined,
-                        tax: extractedData.tax ? parseFloat(extractedData.tax) : undefined,
-                        subtotal: extractedData.subtotal
-                          ? parseFloat(extractedData.subtotal)
-                          : undefined,
-                        processingTime: extractedData.processingTime,
-                        items: extractedData.items,
-                        confidence: {
-                          merchant: extractedData.confidence.merchant
-                            ? parseFloat(extractedData.confidence.merchant)
-                            : undefined,
-                          total: extractedData.confidence.total
-                            ? parseFloat(extractedData.confidence.total)
-                            : undefined,
-                          date: extractedData.confidence.date
-                            ? parseFloat(extractedData.confidence.date)
-                            : undefined,
-                          tax: extractedData.confidence.tax
-                            ? parseFloat(extractedData.confidence.tax)
-                            : undefined,
-                          subtotal: extractedData.confidence.subtotal
-                            ? parseFloat(extractedData.confidence.subtotal)
-                            : undefined,
-                        },
-                      }
-                    : null
-                }
-              />
+              <ReceiptExtractedData extractedData={mapExtractedDataForDisplay(extractedData)} />
 
               <ReceiptActionButtons
                 extractedData={

@@ -15,6 +15,24 @@ import {
   calculateFinancialMetrics,
 } from "./utils/envelopeAnalysisUtils";
 
+import { Transaction as BaseTransaction } from "../../types/finance";
+
+interface AnalyticsTransaction extends Omit<Partial<BaseTransaction>, "envelopeId"> {
+  date?: string;
+  amount?: number;
+  envelopeId?: string;
+  category?: string;
+}
+
+interface AnalyticsEnvelope {
+  id: string;
+  name: string;
+  monthlyAmount?: number;
+  currentBalance?: number;
+  spendingHistory?: Array<{ amount: number }>;
+  color?: string;
+}
+
 /**
  * Input parameters for useAnalyticsData hook
  */
@@ -36,10 +54,31 @@ export const useAnalyticsData = ({
 }: UseAnalyticsDataInput) => {
   // Validate and sanitize props to prevent runtime errors
   const safeTransactions = useMemo(
-    () => (Array.isArray(transactions) ? transactions : []),
+    () =>
+      Array.isArray(transactions)
+        ? (transactions.map((t) => {
+            const tx = t as Record<string, unknown>;
+            return {
+              ...tx,
+              envelopeId: tx.envelopeId ? String(tx.envelopeId) : undefined,
+            };
+          }) as AnalyticsTransaction[])
+        : [],
     [transactions]
   );
-  const safeEnvelopes = useMemo(() => (Array.isArray(envelopes) ? envelopes : []), [envelopes]);
+  const safeEnvelopes = useMemo(
+    () =>
+      Array.isArray(envelopes)
+        ? (envelopes.map((e) => {
+            const env = e as Record<string, unknown>;
+            return {
+              ...env,
+              id: env.id ? String(env.id) : "",
+            };
+          }) as AnalyticsEnvelope[])
+        : [],
+    [envelopes]
+  );
 
   // Memoized date range calculations using timeFilter
   const getDateRange = useMemo(() => getDateRangeStart(timeFilter), [timeFilter]);

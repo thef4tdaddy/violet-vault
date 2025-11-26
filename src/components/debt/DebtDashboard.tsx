@@ -91,13 +91,13 @@ const DebtDashboard = () => {
               filterOptions={filterOptions}
               setFilterOptions={setFilterOptions}
               setShowUpcomingPaymentsModal={setShowUpcomingPaymentsModal}
-              handleDebtClick={handleDebtClick}
-              handleRecordPayment={
-                handleRecordPayment as unknown as (
-                  debt: import("@/types/debt").DebtAccount,
-                  amount: number
-                ) => void
-              }
+              handleDebtClick={(
+                debt: import("@/types/debt").DebtAccount | import("./DebtDashboardComponents").Debt
+              ) => handleDebtClick(debt as import("@/types/debt").DebtAccount)}
+              handleRecordPayment={(
+                debt: import("@/types/debt").DebtAccount | import("./DebtDashboardComponents").Debt,
+                amount: number
+              ) => handleRecordPayment(debt.id, { amount })}
               handleAddDebt={handleAddDebt}
             />
           )}
@@ -128,7 +128,9 @@ const DebtDashboard = () => {
               date: new Date().toISOString().split("T")[0],
             });
           }}
-          onEdit={handleEditDebt as unknown as (debt: Record<string, unknown>) => void}
+          onEdit={(debt: Record<string, unknown>) =>
+            handleEditDebt(debt as unknown as import("@/types/debt").DebtAccount)
+          }
         />
       )}
 

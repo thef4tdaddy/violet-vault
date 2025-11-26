@@ -116,7 +116,7 @@ function useEditLock(
   // Auto-release lock on unmount
   useEffect(() => {
     return () => {
-      if (autoRelease && isOwnLock) {
+      if (autoRelease && isOwnLock && recordType && recordId) {
         editLockService.releaseLock(recordType, recordId);
       }
     };
@@ -146,7 +146,7 @@ function useEditLock(
    * Attempt to break an expired lock
    */
   const breakLock = useCallback(async () => {
-    if (!lock || isOwnLock) return { success: false };
+    if (!lock || isOwnLock || !recordType || !recordId) return { success: false };
     if (!isLockExpired(lock)) {
       if (showToasts) {
         addToast({

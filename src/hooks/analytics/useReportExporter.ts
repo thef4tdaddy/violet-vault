@@ -43,8 +43,10 @@ export const useReportExporter = () => {
   const exportToPDF = useCallback(
     async (analyticsData: unknown, balanceData: unknown, timeFilter: unknown) => {
       await generatePDFReport(
-        analyticsData,
-        balanceData,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        analyticsData as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        balanceData as any,
         timeFilter as string,
         exportOptions,
         setExportProgress

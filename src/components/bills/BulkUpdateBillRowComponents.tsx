@@ -22,13 +22,13 @@ interface AmountUpdateFieldProps {
   change: BillChange | undefined;
   amountChange: AmountChange | undefined;
   billId: string;
-  updateChange: (billId: string, field: string, value: number | string) => void;
+  updateChange: (billId: string, field: "amount" | "dueDate", value: number | string) => void;
 }
 
 interface DateUpdateFieldProps {
   change: BillChange | undefined;
   billId: string;
-  updateChange: (billId: string, field: string, value: number | string) => void;
+  updateChange: (billId: string, field: "amount" | "dueDate", value: number | string) => void;
 }
 
 interface BillInfoProps {

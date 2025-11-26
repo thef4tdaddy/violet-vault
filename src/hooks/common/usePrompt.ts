@@ -114,7 +114,7 @@ export const usePromptModal = () => {
         setIsLoading(true);
         try {
           const result = await config.onConfirm(value);
-          resolver(result !== undefined ? result : value);
+          resolver((result !== undefined ? result : value) as string | null);
         } catch (error) {
           logger.error("Prompt confirmation action failed:", error);
           resolver(null);

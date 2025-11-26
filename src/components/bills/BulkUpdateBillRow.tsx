@@ -30,7 +30,7 @@ interface BulkUpdateBillRowProps {
   bill: BillEntity;
   change: BillChange | undefined;
   updateMode: UpdateMode;
-  updateChange: (billId: string, field: string, value: string | number) => void;
+  updateChange: (billId: string, field: "amount" | "dueDate", value: string | number) => void;
 }
 
 /**

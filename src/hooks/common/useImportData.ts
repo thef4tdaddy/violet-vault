@@ -152,8 +152,8 @@ const performImport = async (
 
   // Convert AuthConfig to the format expected by forcePushToCloud
   const syncConfig = {
-    budgetId: authConfig.budgetId,
-    encryptionKey: authConfig.encryptionKey,
+    budgetId: authConfig.budgetId || undefined,
+    encryptionKey: authConfig.encryptionKey || undefined,
     currentUser: authConfig.currentUser
       ? {
           userName: authConfig.currentUser.userName,

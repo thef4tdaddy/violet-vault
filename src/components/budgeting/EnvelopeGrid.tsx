@@ -449,7 +449,7 @@ const UnifiedEnvelopeManager = ({
       handleViewHistory={(env: unknown) => {
         uiState.handleViewHistory(env as EnvelopeRef);
       }}
-      sortedEnvelopes={sortedEnvelopes}
+      sortedEnvelopes={sortedEnvelopes as unknown as Array<{ id: string; [key: string]: unknown }>}
       handleEnvelopeSelect={uiState.handleEnvelopeSelect}
       handleEnvelopeEdit={(env: unknown) => {
         uiState.handleEnvelopeEdit(env as EnvelopeRef);

@@ -10,7 +10,7 @@ interface UploadedImage {
   size: number;
 }
 
-interface ReceiptData {
+export interface ReceiptData {
   total: string | null;
   merchant: string | null;
   date: string | null;
@@ -21,7 +21,7 @@ interface ReceiptData {
   confidence: Record<string, string>;
 }
 
-interface ExtendedReceiptData extends ReceiptData {
+export interface ExtendedReceiptData extends ReceiptData {
   rawText: string;
   processingTime: number;
 }

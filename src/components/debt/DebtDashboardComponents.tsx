@@ -7,7 +7,7 @@ import { DebtStats, DebtAccount } from "../../types/debt";
 import DebtStrategies from "./DebtStrategies";
 
 // Use the same Debt type that DebtList uses internally
-type Debt = {
+export type Debt = {
   id: string;
   name: string;
   creditor: string;

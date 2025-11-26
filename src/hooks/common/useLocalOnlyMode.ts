@@ -1,11 +1,7 @@
 import { useState, useCallback } from "react";
 import logger from "../../utils/common/logger";
 
-interface LocalOnlyUser {
-  budgetId?: string;
-  userName?: string;
-  userColor?: string;
-}
+import type { LocalOnlyUser } from "../../types/auth";
 
 /**
  * DEPRECATED: Legacy local-only mode hook
