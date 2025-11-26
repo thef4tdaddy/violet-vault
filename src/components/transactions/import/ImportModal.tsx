@@ -50,10 +50,15 @@ const ImportModal: React.FC<ImportModalProps> = ({
 }) => {
   const modalRef = useModalAutoScroll(isOpen);
 
-  // Normalize importData to always be an array
+  // Normalize importData to always be an array with fallback for safety
   const normalizedImportData: Record<string, unknown>[] = Array.isArray(importData)
     ? importData
-    : importData.data;
+    : importData &&
+        typeof importData === "object" &&
+        "data" in importData &&
+        Array.isArray(importData.data)
+      ? importData.data
+      : [];
 
   if (!isOpen) return null;
 

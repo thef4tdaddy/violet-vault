@@ -159,13 +159,25 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }: ReceiptBut
         <ReceiptToTransactionModal
           receiptData={{
             merchant: receiptData.merchant ?? undefined,
-            total: receiptData.total ? parseFloat(receiptData.total) : undefined,
+            total: receiptData.total
+              ? Number.isFinite(parseFloat(receiptData.total))
+                ? parseFloat(receiptData.total)
+                : undefined
+              : undefined,
             date: receiptData.date ?? undefined,
             rawText: receiptData.rawText,
             processingTime: receiptData.processingTime,
             items: receiptData.items,
-            tax: receiptData.tax ? parseFloat(receiptData.tax) : undefined,
-            subtotal: receiptData.subtotal ? parseFloat(receiptData.subtotal) : undefined,
+            tax: receiptData.tax
+              ? Number.isFinite(parseFloat(receiptData.tax))
+                ? parseFloat(receiptData.tax)
+                : undefined
+              : undefined,
+            subtotal: receiptData.subtotal
+              ? Number.isFinite(parseFloat(receiptData.subtotal))
+                ? parseFloat(receiptData.subtotal)
+                : undefined
+              : undefined,
           }}
           onComplete={handleTransactionComplete as unknown as () => void}
           onClose={handleCloseTransactionModal}
