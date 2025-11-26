@@ -9,25 +9,23 @@ fi
 
 echo "✅ ESLint passed!"
 
-echo "🔍 Running TypeScript type check before push..."
+echo "🔍 Running TypeScript strict mode check before push..."
 # Ignore tsc exit code - we only care about error count vs threshold
-TYPECHECK_OUTPUT=$(npx tsc --noEmit 2>&1 || true)
+TYPECHECK_OUTPUT=$(npx tsc --noEmit --strict --allowJs false 2>&1 || true)
 ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | { grep "error TS" || true; } | wc -l | tr -d ' ')
-# TODO: Reduce threshold back to 50 once the type compatibility issues between 
-# Transaction/Bill/Envelope type definitions are resolved (tracked in Issue #1289)
-# The 72 remaining errors are due to multiple type definitions for the same entities
-# across different files (e.g., src/db/types.ts vs src/types/finance.ts)
-ERROR_THRESHOLD=75
+# Strict mode threshold: Start with 20, gradually reduce as errors are fixed
+# Current status: Sub-100 strict errors (target: 0)
+ERROR_THRESHOLD=20
 
 if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
-  echo "❌ TypeScript errors exceed threshold! ($ERROR_COUNT > $ERROR_THRESHOLD)"
+  echo "❌ TypeScript strict mode errors exceed threshold! ($ERROR_COUNT > $ERROR_THRESHOLD)"
   echo "📊 Current errors: $ERROR_COUNT"
   echo "📈 Threshold: $ERROR_THRESHOLD"
-  echo "🔧 Run: npm run typecheck to see all errors"
+  echo "🔧 Run: npm run typecheck:strict to see all errors"
   exit 1
 fi
 
-echo "✅ TypeScript check passed! ($ERROR_COUNT/$ERROR_THRESHOLD errors)"
+echo "✅ TypeScript strict mode check passed! ($ERROR_COUNT/$ERROR_THRESHOLD errors)"
 
 echo "🏗️ Running production build before push..."
 if ! npm run build; then

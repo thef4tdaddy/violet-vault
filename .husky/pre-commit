@@ -60,6 +60,33 @@ fi
 
 echo "✅ ESLint passed for staged files"
 
+echo "🔍 Running TypeScript strict mode check on staged files..."
+# Check if any TS/TSX files are staged
+TS_FILES="$(printf '%s\n' "$CODE_FILES" | grep -E '\.(ts|tsx)$' || true)"
+
+if [ -n "$TS_FILES" ]; then
+  # Run strict mode check (checks entire project but we only fail if errors exceed threshold)
+  # This is necessary because TypeScript's type system requires project-wide analysis
+  TYPECHECK_OUTPUT=$(npx tsc --noEmit --strict --allowJs false 2>&1 || true)
+  ERROR_COUNT=$(echo "$TYPECHECK_OUTPUT" | { grep "error TS" || true; } | wc -l | tr -d ' ')
+  # Pre-commit threshold: Allow up to 25 strict errors (slightly higher than pre-push)
+  # This prevents blocking commits while still encouraging fixes
+  ERROR_THRESHOLD=25
+
+  if [ "$ERROR_COUNT" -gt "$ERROR_THRESHOLD" ]; then
+    echo "❌ TypeScript strict mode errors exceed threshold! ($ERROR_COUNT > $ERROR_THRESHOLD)"
+    echo "📊 Current errors: $ERROR_COUNT"
+    echo "📈 Threshold: $ERROR_THRESHOLD"
+    echo "🔧 Run: npm run typecheck:strict to see all errors"
+    echo "💡 Fix errors in staged files or reduce overall error count"
+    exit 1
+  fi
+
+  echo "✅ TypeScript strict mode check passed! ($ERROR_COUNT/$ERROR_THRESHOLD errors)"
+else
+  echo "✅ No TypeScript files staged, skipping strict mode check"
+fi
+
 echo "🏗️ Running npm run build..."
 if ! npm run build; then
   echo "❌ Build failed. Fix build errors before committing."
