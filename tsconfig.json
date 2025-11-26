@@ -18,8 +18,8 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Type checking - gradual adoption mode */
-    "strict": false,
+    /* Type checking - strict mode enabled (0/0/0 achieved) */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
@@ -40,6 +40,14 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "build", "original-app", "**/*.test.ts", "**/*.test.tsx", "**/test/**"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "original-app",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/test/**"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
