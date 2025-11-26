@@ -445,7 +445,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           this.resilience.execute(
             () => {
               logger.debug("🚀 [CHUNKED SYNC] Calling setDoc for main document");
-              return setDoc(doc(db, "budgets", this.budgetId), mainDocument);
+              return setDoc(doc(db, "budgets", this.budgetId as string), mainDocument);
             },
             "saveMainDocument",
             "saveMainDocument"
@@ -561,7 +561,7 @@ class ChunkedSyncService implements IChunkedSyncService {
 
         // Load main document with resilience
         const mainDoc = (await this.resilience.execute(
-          () => getDoc(doc(db, "budgets", this.budgetId)),
+          () => getDoc(doc(db, "budgets", this.budgetId as string)),
           "loadMainDocument",
           "loadMainDocument"
         )) as DocumentSnapshot<Record<string, unknown>>;
