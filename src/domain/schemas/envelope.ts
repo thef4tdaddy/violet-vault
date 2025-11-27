@@ -116,7 +116,7 @@ export const SupplementalAccountSchema = EnvelopeSchema.extend({
   annualContribution: z.number().min(0, "Annual contribution cannot be negative").optional(),
   expirationDate: z.union([z.date(), z.string(), z.null()]).optional(),
   isActive: z.boolean().default(true),
-  accountType: z.string().optional(), // FSA, HSA, 529, IRA, 401K, other
+  accountType: SupplementalAccountTypeSchema.optional(),
 });
 
 /**

@@ -232,6 +232,32 @@ describe("Envelope Schema Tests", () => {
       const result = SupplementalAccountSchema.safeParse(invalidAccount);
       expect(result.success).toBe(false);
     });
+
+    it("should reject invalid account type values", () => {
+      const invalidAccount = {
+        ...validSupplementalAccount,
+        accountType: "INVALID_TYPE",
+      };
+
+      const result = SupplementalAccountSchema.safeParse(invalidAccount);
+      expect(result.success).toBe(false);
+    });
+
+    it("should validate all valid account types", () => {
+      const accountTypes = ["FSA", "HSA", "529", "IRA", "401K", "other"] as const;
+
+      for (const accountType of accountTypes) {
+        const account = {
+          ...validSupplementalAccount,
+          accountType,
+        };
+        const result = SupplementalAccountSchema.safeParse(account);
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.accountType).toBe(accountType);
+        }
+      }
+    });
   });
 
   describe("validateSupplementalAccount", () => {
