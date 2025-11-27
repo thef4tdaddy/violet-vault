@@ -93,7 +93,7 @@ interface LegacySupplementalAccount {
 
 /**
  * Convert a legacy savings goal to an envelope with envelopeType: "savings"
- * 
+ *
  * Note: Validation failures are logged but data is still imported to prevent data loss.
  * This is intentional for import functionality - we prioritize preserving user data
  * over strict validation, allowing the app to handle any inconsistencies at runtime.
@@ -132,7 +132,7 @@ const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
 
 /**
  * Convert a legacy supplemental account to an envelope with envelopeType: "supplemental"
- * 
+ *
  * Note: Validation failures are logged but data is still imported to prevent data loss.
  * This is intentional for import functionality - we prioritize preserving user data
  * over strict validation, allowing the app to handle any inconsistencies at runtime.
@@ -173,7 +173,7 @@ const convertSupplementalAccountToEnvelope = (account: LegacySupplementalAccount
 /**
  * Validate imported envelopes with EnvelopeSchema
  * Returns validated envelopes, logging warnings for invalid ones
- * 
+ *
  * Note: Validation failures are logged but data is still imported to prevent data loss.
  * This is intentional for import functionality - we prioritize preserving user data
  * over strict validation, allowing the app to handle any inconsistencies at runtime.
