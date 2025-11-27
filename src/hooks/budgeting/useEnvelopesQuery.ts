@@ -47,6 +47,16 @@ const DEFAULT_EXCLUDED_TYPES = [
   ENVELOPE_TYPES.SUPPLEMENTAL,
 ];
 
+// Valid envelope types from ENVELOPE_TYPES constant
+const VALID_ENVELOPE_TYPES = Object.values(ENVELOPE_TYPES);
+
+/**
+ * Validate if an envelope type is a known valid type
+ */
+const isValidEnvelopeType = (envelopeType: string | undefined): boolean => {
+  return !!envelopeType && VALID_ENVELOPE_TYPES.includes(envelopeType as (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES]);
+};
+
 /**
  * Transform database envelopes to application envelopes with computed properties
  */
@@ -54,8 +64,10 @@ const transformEnvelopes = (dbEnvelopes: DbEnvelope[]): Envelope[] => {
   return dbEnvelopes.map((dbEnvelope) => ({
     ...dbEnvelope,
     color: undefined,
-    envelopeType:
-      dbEnvelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(dbEnvelope.category || "expenses"),
+    // Use database envelopeType if it's valid, otherwise auto-classify
+    envelopeType: isValidEnvelopeType(dbEnvelope.envelopeType)
+      ? dbEnvelope.envelopeType!
+      : AUTO_CLASSIFY_ENVELOPE_TYPE(dbEnvelope.category || "expenses"),
     status: "active",
     utilizationRate: 0,
     available: dbEnvelope.currentBalance || 0,
@@ -65,13 +77,16 @@ const transformEnvelopes = (dbEnvelopes: DbEnvelope[]): Envelope[] => {
 };
 
 /**
- * Apply envelope type filtering
+ * Apply envelope type filtering.
+ * Note: When `envelopeTypes` is provided, it takes precedence over `excludeEnvelopeTypes`.
+ * This allows for explicit inclusion filtering to override default exclusions.
  */
 const filterByEnvelopeType = (
   envelopes: Envelope[],
   envelopeTypes?: string[],
   excludeEnvelopeTypes?: string[]
 ): Envelope[] => {
+  // Include filter takes precedence over exclude filter
   if (envelopeTypes && envelopeTypes.length > 0) {
     return envelopes.filter((env) => envelopeTypes.includes(env.envelopeType));
   }
