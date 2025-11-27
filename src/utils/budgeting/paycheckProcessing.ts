@@ -1,8 +1,10 @@
 /**
  * Paycheck processing utilities
  * Extracted from paycheckMutations.js for better maintainability
+ * Updated for Issue #1340: Creates proper transaction records for paycheck processing
  */
 
+import { v4 as uuidv4 } from "uuid";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
 import {
   calculatePaycheckBalances,
@@ -10,13 +12,21 @@ import {
   type CurrentBalances,
 } from "../common/balanceCalculator";
 import logger from "../common/logger";
+import { createPaycheckTransactions } from "@/services/transactions/paycheckTransactionService";
 
 interface BalanceItem {
   currentBalance?: string | number;
+  name?: string;
 }
 
 interface BalanceCollection {
   data?: BalanceItem[];
+}
+
+interface EnvelopeAllocationWithName {
+  envelopeId: string;
+  envelopeName?: string;
+  amount: number;
 }
 
 /**
@@ -96,13 +106,15 @@ export const processEnvelopeAllocations = async (
 };
 
 /**
- * Create and save paycheck history record
+ * Create and save paycheck history record with transaction references
+ * Updated for Issue #1340: Links paycheck record to created transactions
  */
 export const createPaycheckRecord = async (
   paycheckData: { amount: number; payerName?: string; mode: string; notes?: string },
   currentBalances: { unassignedCash: number; actualBalance: number },
   newBalances: { unassignedCash: number; actualBalance: number },
-  allocations: Array<{ envelopeId: string; amount: number }>
+  allocations: Array<{ envelopeId: string; envelopeName?: string; amount: number }>,
+  transactionIds?: { incomeTransactionId: string; transferTransactionIds: string[] }
 ) => {
   const paycheckRecord = {
     id: `paycheck_${Date.now()}`,
@@ -119,6 +131,9 @@ export const createPaycheckRecord = async (
     actualBalanceAfter: newBalances.actualBalance,
     envelopeAllocations: allocations,
     notes: paycheckData.notes || "",
+    // Transaction IDs for audit trail (Issue #1340)
+    incomeTransactionId: transactionIds?.incomeTransactionId,
+    transferTransactionIds: transactionIds?.transferTransactionIds || [],
   };
 
   // Save paycheck record to Dexie
@@ -127,41 +142,121 @@ export const createPaycheckRecord = async (
   logger.info("Paycheck processing completed successfully", {
     paycheckId: paycheckRecord.id,
     finalBalances: newBalances,
+    incomeTransactionId: transactionIds?.incomeTransactionId,
+    transferTransactionIds: transactionIds?.transferTransactionIds,
   });
 
   return paycheckRecord;
 };
 
 /**
- * Process paycheck with balance calculations and allocations
+ * Prepare allocations with envelope names for transaction creation
+ * Helper function to reduce main processPaycheck statement count
+ */
+const prepareAllocationsWithNames = async (
+  envelopeAllocations:
+    | Array<{ envelopeId: string; envelopeName?: string; amount: number }>
+    | undefined
+): Promise<EnvelopeAllocationWithName[]> => {
+  const allocations: EnvelopeAllocationWithName[] =
+    envelopeAllocations?.map((alloc) => ({
+      envelopeId: alloc.envelopeId,
+      envelopeName: alloc.envelopeName,
+      amount: alloc.amount,
+    })) || [];
+
+  // Enrich allocations with envelope names if not provided
+  for (const alloc of allocations) {
+    if (!alloc.envelopeName) {
+      const envelope = await budgetDb.envelopes.get(alloc.envelopeId);
+      if (envelope) {
+        alloc.envelopeName = envelope.name;
+      }
+    }
+  }
+
+  return allocations;
+};
+
+/**
+ * Create paycheck transaction records
+ * Returns transaction IDs for audit trail, or undefined if creation fails
+ */
+const createTransactionsForPaycheck = async (
+  paycheckId: string,
+  paycheckData: { amount: number; payerName?: string; notes?: string },
+  allocations: EnvelopeAllocationWithName[]
+): Promise<{ incomeTransactionId: string; transferTransactionIds: string[] } | undefined> => {
+  try {
+    const transactionResult = await createPaycheckTransactions(
+      {
+        paycheckId,
+        amount: paycheckData.amount,
+        payerName: paycheckData.payerName,
+        notes: paycheckData.notes,
+      },
+      allocations
+    );
+
+    const transactionIds = {
+      incomeTransactionId: transactionResult.incomeTransactionId,
+      transferTransactionIds: transactionResult.transferTransactionIds,
+    };
+
+    logger.info("Created paycheck transactions", {
+      paycheckId,
+      incomeTransactionId: transactionIds.incomeTransactionId,
+      transferCount: transactionIds.transferTransactionIds.length,
+    });
+
+    return transactionIds;
+  } catch (error) {
+    logger.error("Failed to create paycheck transactions", error, {
+      paycheckId,
+      amount: paycheckData.amount,
+    });
+    // Return undefined - paycheck processing will continue without transaction records
+    return undefined;
+  }
+};
+
+/**
+ * Process paycheck with balance calculations, allocations, and transaction creation
+ * Updated for Issue #1340: Creates proper transaction records
+ *
+ * Flow:
+ * 1. Create income transaction to "unassigned"
+ * 2. Create transfer transactions from unassigned to envelopes (if allocations set)
+ * 3. Update envelope balances
+ * 4. Update budget metadata
+ * 5. Create paycheck history record with transaction references
  */
 export const processPaycheck = async (
   paycheckData: {
     amount: number;
     mode: string;
-    envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
+    envelopeAllocations?: Array<{ envelopeId: string; envelopeName?: string; amount: number }>;
     notes?: string;
     payerName?: string;
   },
   envelopesQuery: BalanceCollection,
   savingsGoalsQuery: BalanceCollection
 ) => {
+  // Use uuidv4() for guaranteed uniqueness to prevent collisions
+  const paycheckId = `paycheck_${uuidv4()}`;
+
   logger.info("Starting paycheck processing", {
+    paycheckId,
     amount: paycheckData.amount,
     mode: paycheckData.mode,
     allocations: paycheckData.envelopeAllocations?.length || 0,
-    paycheckData,
   });
 
   // Get current balances
   const currentBalances = await getCurrentBalances(envelopesQuery, savingsGoalsQuery);
 
-  // Prepare allocations for calculator
-  const allocations =
-    paycheckData.envelopeAllocations?.map((alloc: { envelopeId: string; amount: number }) => ({
-      envelopeId: alloc.envelopeId,
-      amount: alloc.amount,
-    })) || [];
+  // Prepare allocations with envelope names for transaction creation
+  const allocations = await prepareAllocationsWithNames(paycheckData.envelopeAllocations);
 
   // Use centralized balance calculator to ensure consistency
   const newBalances = calculatePaycheckBalances(
@@ -171,13 +266,7 @@ export const processPaycheck = async (
       unassignedCash: number;
       isActualBalanceManual: boolean;
     },
-    paycheckData as {
-      amount: number;
-      mode: string;
-      envelopeAllocations?: Array<{ envelopeId: string; amount: number }>;
-      notes?: string;
-      payerName?: string;
-    },
+    paycheckData,
     allocations
   );
 
@@ -196,9 +285,11 @@ export const processPaycheck = async (
     actualBalance: `${currentBalances.actualBalance} → ${newBalances.actualBalance}`,
     unassignedCash: `${currentBalances.unassignedCash} → ${newBalances.unassignedCash}`,
     paycheckAmount: paycheckData.amount,
-    paycheckMode: paycheckData.mode,
     allocationsCount: allocations.length,
   });
+
+  // Issue #1340: Create transaction records for paycheck
+  const transactionIds = await createTransactionsForPaycheck(paycheckId, paycheckData, allocations);
 
   // Update budget metadata in Dexie using calculated balances
   await setBudgetMetadata({
@@ -206,17 +297,16 @@ export const processPaycheck = async (
     unassignedCash: newBalances.unassignedCash,
   });
 
-  logger.info("Budget metadata updated in Dexie with validated balances");
-
   // Update envelope balances in Dexie if allocating
   await processEnvelopeAllocations(allocations);
 
-  // Create paycheck history record
+  // Create paycheck history record with transaction references
   const paycheckRecord = await createPaycheckRecord(
     paycheckData,
     currentBalances,
     newBalances,
-    allocations
+    allocations,
+    transactionIds
   );
 
   // Log the successful paycheck processing
@@ -226,7 +316,7 @@ export const processPaycheck = async (
     totalAllocated,
     unassignedCash: newBalances.unassignedCash,
     actualBalance: newBalances.actualBalance,
-    virtualBalance: newBalances.virtualBalance,
+    incomeTransactionId: transactionIds?.incomeTransactionId,
   });
 
   return paycheckRecord;

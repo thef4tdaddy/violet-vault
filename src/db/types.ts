@@ -55,6 +55,12 @@ export interface Transaction {
   merchant?: string;
   receiptUrl?: string;
   notes?: string;
+  // Paycheck-related metadata for internal transfers
+  isInternalTransfer?: boolean;
+  paycheckId?: string;
+  // Transfer-specific fields
+  fromEnvelopeId?: string;
+  toEnvelopeId?: string;
   [key: string]: unknown;
 }
 
@@ -113,6 +119,9 @@ export interface PaycheckHistory {
   deductions?: Record<string, number>;
   netAmount?: number;
   processedBy?: string;
+  // Transaction IDs for audit trail (Issue #1340)
+  incomeTransactionId?: string;
+  transferTransactionIds?: string[];
   [key: string]: unknown;
 }
 

@@ -39,6 +39,12 @@ export const TransactionSchema = z
     description: z.string().max(500, "Description must be 500 characters or less").optional(),
     merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
     receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+    // Paycheck-related metadata for internal transfers
+    isInternalTransfer: z.boolean().optional(),
+    paycheckId: z.string().optional(),
+    // Transfer-specific fields
+    fromEnvelopeId: z.string().optional(),
+    toEnvelopeId: z.string().optional(),
   })
   .refine(
     (data) => {

@@ -96,6 +96,13 @@ export class VioletVaultDB extends Dexie {
         "id, name, category, archived, lastModified, envelopeType, [category+archived], [category+name], [envelopeType+archived]",
     });
 
+    // Version 9: Issue #1340 - Add paycheckId and isInternalTransfer indexes for paycheck transaction tracking
+    this.version(9).stores({
+      // Add paycheckId and isInternalTransfer indexes to transactions table for paycheck queries
+      transactions:
+        "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer]",
+    });
+
     // Enhanced hooks for automatic timestamping across all tables
 
     const addTimestampHooks = <T, TKey>(table: Table<T, TKey>) => {

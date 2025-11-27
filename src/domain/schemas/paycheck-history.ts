@@ -46,6 +46,9 @@ export const PaycheckHistorySchema = z
     allocationMode: z.string().optional(),
     totalAllocated: z.number().optional(),
     remainingAmount: z.number().optional(),
+    // Transaction IDs for audit trail (Issue #1340)
+    incomeTransactionId: z.string().optional(),
+    transferTransactionIds: z.array(z.string()).optional(),
   })
   .refine((data) => data.processedAt || data.date, {
     message: "Either processedAt or date is required",
