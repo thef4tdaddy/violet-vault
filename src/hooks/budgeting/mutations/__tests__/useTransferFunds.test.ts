@@ -239,7 +239,9 @@ describe("useTransferFunds - CRUD Tests", () => {
       const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
 
       await act(async () => {
-        await expect(mutationFn(transferData)).rejects.toThrow("Insufficient balance");
+        await expect(mutationFn(transferData)).rejects.toThrow(
+          "Insufficient balance in source envelope"
+        );
       });
 
       // Verify no database updates were made (rollback scenario)

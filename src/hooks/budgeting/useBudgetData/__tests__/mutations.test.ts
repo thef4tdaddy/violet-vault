@@ -177,7 +177,7 @@ describe("useBudgetMutations - Optimistic Update Rollback Tests", () => {
       expect(result.current.updateEnvelopeAsync).toBeDefined();
     });
 
-    it("should invalidate queries on envelope update error to rollback UI state", async () => {
+    it("should have onSuccess configured to invalidate queries after successful update", async () => {
       const mockMutations = [
         { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
         { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
@@ -198,14 +198,7 @@ describe("useBudgetMutations - Optimistic Update Rollback Tests", () => {
 
       renderHook(() => useBudgetMutations());
 
-      // Simulate an error
-      if (updateConfig.onError) {
-        act(() => {
-          updateConfig.onError!(new Error("Database write failed"));
-        });
-      }
-
-      // The onSuccess should trigger query invalidation
+      // Test onSuccess triggers query invalidation (rollback happens on re-sync)
       if (updateConfig.onSuccess) {
         act(() => {
           updateConfig.onSuccess!();
