@@ -223,15 +223,15 @@ describe("Concurrent Operation Tests", () => {
       (budgetDb.bulkUpsertTransactions as Mock).mockResolvedValue(true);
       (budgetDb.clearCacheCategory as Mock).mockResolvedValue(true);
 
-      // Expenses must be negative per schema convention
+      // Pass positive values - createMockTransaction handles negation internally
       const batch1 = Array.from({ length: 10 }, (_, i) =>
-        createMockTransaction(`tx-b1-${i}`, -(i + 1))
+        createMockTransaction(`tx-b1-${i}`, i + 1)
       );
       const batch2 = Array.from({ length: 10 }, (_, i) =>
-        createMockTransaction(`tx-b2-${i}`, -(i + 1))
+        createMockTransaction(`tx-b2-${i}`, i + 1)
       );
       const batch3 = Array.from({ length: 10 }, (_, i) =>
-        createMockTransaction(`tx-b3-${i}`, -(i + 1))
+        createMockTransaction(`tx-b3-${i}`, i + 1)
       );
 
       // Save all batches concurrently
@@ -246,9 +246,10 @@ describe("Concurrent Operation Tests", () => {
     });
 
     it("should handle mixed read/write operations concurrently", async () => {
+      // Pass positive values - createMockTransaction handles negation internally
       const mockTransactions = [
-        createMockTransaction("tx-existing", -100),
-        createMockTransaction("tx-existing-2", -200),
+        createMockTransaction("tx-existing", 100),
+        createMockTransaction("tx-existing-2", 200),
       ];
 
       (budgetDb.getTransactionsByDateRange as Mock).mockResolvedValue(mockTransactions);
@@ -260,12 +261,12 @@ describe("Concurrent Operation Tests", () => {
         end: new Date("2024-01-31"),
       };
 
-      // Mix read and write operations - expenses must be negative
+      // Mix read and write operations - use positive values as createMockTransaction handles negation
       const operations = [
         budgetDatabaseService.getTransactions({ dateRange }),
-        budgetDatabaseService.saveTransactions([createMockTransaction("tx-new-1", -50)]),
+        budgetDatabaseService.saveTransactions([createMockTransaction("tx-new-1", 50)]),
         budgetDatabaseService.getTransactions({ dateRange }),
-        budgetDatabaseService.saveTransactions([createMockTransaction("tx-new-2", -75)]),
+        budgetDatabaseService.saveTransactions([createMockTransaction("tx-new-2", 75)]),
         budgetDatabaseService.getTransactions({ dateRange }),
       ];
 
