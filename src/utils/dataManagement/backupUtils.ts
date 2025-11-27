@@ -7,6 +7,11 @@ import { validateDebtSafe } from "@/domain/schemas/debt";
 import { validatePaycheckHistorySafe } from "@/domain/schemas/paycheck-history";
 
 /**
+ * Maximum number of warnings to include in logs to avoid log bloat
+ */
+const MAX_WARNINGS_IN_LOG = 10;
+
+/**
  * Type for backup data keys that can be validated
  */
 type BackupDataKey = "envelopes" | "transactions" | "bills" | "debts" | "paycheckHistory";
@@ -22,11 +27,18 @@ interface BackupValidationResult {
 }
 
 /**
+ * Type for Zod safe parse result
+ */
+interface SafeParseResult {
+  success: boolean;
+}
+
+/**
  * Helper function to validate an array of items with a schema validator
  */
 const validateItems = (
   items: unknown[] | undefined,
-  validator: (item: unknown) => { success: boolean },
+  validator: (item: unknown) => SafeParseResult,
   itemType: string
 ): { valid: number; invalid: number; warnings: string[] } => {
   const result = { valid: 0, invalid: 0, warnings: [] as string[] };
@@ -142,7 +154,7 @@ export const backupCurrentData = async () => {
     if (!validation.isValid) {
       logger.warn("⚠️ Backup data contains invalid items", {
         invalidCounts: validation.invalidCounts,
-        warnings: validation.warnings.slice(0, 10), // Limit warnings in log
+        warnings: validation.warnings.slice(0, MAX_WARNINGS_IN_LOG),
       });
     }
 

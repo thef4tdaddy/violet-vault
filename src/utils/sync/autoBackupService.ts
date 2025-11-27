@@ -19,6 +19,43 @@ import { validatePaycheckHistorySafe } from "@/domain/schemas/paycheck-history";
 import type { Envelope, Transaction, Bill, Debt, PaycheckHistory } from "@/db/types";
 
 /**
+ * Validation result for restore items
+ */
+interface RestoreValidationResult<T> {
+  validItems: T[];
+  skippedCount: number;
+}
+
+/**
+ * Helper function to validate items during restore and log warnings for invalid items
+ */
+const validateRestoreItems = <T>(
+  items: unknown[] | undefined,
+  validator: (item: unknown) => { success: boolean; error?: { issues?: unknown[] } },
+  itemType: string
+): RestoreValidationResult<T> => {
+  const validItems: T[] = [];
+  let skippedCount = 0;
+
+  if (!items?.length) return { validItems, skippedCount };
+
+  for (const item of items) {
+    const result = validator(item);
+    if (result.success) {
+      validItems.push(item as T);
+    } else {
+      skippedCount++;
+      logger.warn(`⚠️ Skipping invalid ${itemType} during restore`, {
+        [`${itemType}Id`]: (item as { id?: string })?.id ?? "unknown",
+        errors: result.error?.issues,
+      });
+    }
+  }
+
+  return { validItems, skippedCount };
+};
+
+/**
  * Backup data structure for v2.0 data model
  * All savings goals and supplemental accounts are stored as envelopes with envelopeType
  */
@@ -186,101 +223,24 @@ class AutoBackupService {
 
       const data = (backup as unknown as Backup).data;
 
-      // Validate all data types with Zod schemas before restore
-      const validatedEnvelopes: Envelope[] = [];
-      const validatedTransactions: Transaction[] = [];
-      const validatedBills: Bill[] = [];
-      const validatedDebts: Debt[] = [];
-      const validatedPaycheckHistory: PaycheckHistory[] = [];
-
-      // Track skipped items for logging
-      const skippedCounts = {
-        envelopes: 0,
-        transactions: 0,
-        bills: 0,
-        debts: 0,
-        paycheckHistory: 0,
-      };
-
-      // Validate envelopes
-      if (data?.envelopes?.length) {
-        for (const envelope of data.envelopes) {
-          const result = validateEnvelopeSafe(envelope);
-          if (result.success) {
-            validatedEnvelopes.push(envelope);
-          } else {
-            skippedCounts.envelopes++;
-            logger.warn("⚠️ Skipping invalid envelope during restore", {
-              envelopeId: (envelope as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
-
-      // Validate transactions
-      if (data?.transactions?.length) {
-        for (const transaction of data.transactions) {
-          const result = validateTransactionSafe(transaction);
-          if (result.success) {
-            validatedTransactions.push(transaction);
-          } else {
-            skippedCounts.transactions++;
-            logger.warn("⚠️ Skipping invalid transaction during restore", {
-              transactionId: (transaction as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
-
-      // Validate bills
-      if (data?.bills?.length) {
-        for (const bill of data.bills) {
-          const result = validateBillSafe(bill);
-          if (result.success) {
-            validatedBills.push(bill);
-          } else {
-            skippedCounts.bills++;
-            logger.warn("⚠️ Skipping invalid bill during restore", {
-              billId: (bill as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
-
-      // Validate debts
-      if (data?.debts?.length) {
-        for (const debt of data.debts) {
-          const result = validateDebtSafe(debt);
-          if (result.success) {
-            validatedDebts.push(debt);
-          } else {
-            skippedCounts.debts++;
-            logger.warn("⚠️ Skipping invalid debt during restore", {
-              debtId: (debt as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
-
-      // Validate paycheck history
-      if (data?.paycheckHistory?.length) {
-        for (const paycheck of data.paycheckHistory) {
-          const result = validatePaycheckHistorySafe(paycheck);
-          if (result.success) {
-            validatedPaycheckHistory.push(paycheck);
-          } else {
-            skippedCounts.paycheckHistory++;
-            logger.warn("⚠️ Skipping invalid paycheck history during restore", {
-              paycheckId: (paycheck as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
+      // Validate all data types with Zod schemas before restore using helper function
+      const envelopeResult = validateRestoreItems<Envelope>(
+        data?.envelopes,
+        validateEnvelopeSafe,
+        "envelope"
+      );
+      const transactionResult = validateRestoreItems<Transaction>(
+        data?.transactions,
+        validateTransactionSafe,
+        "transaction"
+      );
+      const billResult = validateRestoreItems<Bill>(data?.bills, validateBillSafe, "bill");
+      const debtResult = validateRestoreItems<Debt>(data?.debts, validateDebtSafe, "debt");
+      const paycheckResult = validateRestoreItems<PaycheckHistory>(
+        data?.paycheckHistory,
+        validatePaycheckHistorySafe,
+        "paycheck"
+      );
 
       // Restore data in transaction for consistency
       await budgetDb.transaction(
@@ -302,13 +262,14 @@ class AutoBackupService {
           await budgetDb.paycheckHistory.clear();
 
           // Restore validated data (includes savings goals and supplemental accounts)
-          if (validatedEnvelopes.length) await budgetDb.envelopes.bulkAdd(validatedEnvelopes);
-          if (validatedTransactions.length)
-            await budgetDb.transactions.bulkAdd(validatedTransactions);
-          if (validatedBills.length) await budgetDb.bills.bulkAdd(validatedBills);
-          if (validatedDebts.length) await budgetDb.debts.bulkAdd(validatedDebts);
-          if (validatedPaycheckHistory.length)
-            await budgetDb.paycheckHistory.bulkAdd(validatedPaycheckHistory);
+          if (envelopeResult.validItems.length)
+            await budgetDb.envelopes.bulkAdd(envelopeResult.validItems);
+          if (transactionResult.validItems.length)
+            await budgetDb.transactions.bulkAdd(transactionResult.validItems);
+          if (billResult.validItems.length) await budgetDb.bills.bulkAdd(billResult.validItems);
+          if (debtResult.validItems.length) await budgetDb.debts.bulkAdd(debtResult.validItems);
+          if (paycheckResult.validItems.length)
+            await budgetDb.paycheckHistory.bulkAdd(paycheckResult.validItems);
 
           // Restore metadata
           if (data?.metadata) {
@@ -324,16 +285,16 @@ class AutoBackupService {
       logger.production("✅ Successfully restored from backup", {
         backupId,
         timestamp: new Date(backup.timestamp).toISOString(),
-        envelopesRestored: validatedEnvelopes.length,
-        envelopesSkipped: skippedCounts.envelopes,
-        transactionsRestored: validatedTransactions.length,
-        transactionsSkipped: skippedCounts.transactions,
-        billsRestored: validatedBills.length,
-        billsSkipped: skippedCounts.bills,
-        debtsRestored: validatedDebts.length,
-        debtsSkipped: skippedCounts.debts,
-        paycheckHistoryRestored: validatedPaycheckHistory.length,
-        paycheckHistorySkipped: skippedCounts.paycheckHistory,
+        envelopesRestored: envelopeResult.validItems.length,
+        envelopesSkipped: envelopeResult.skippedCount,
+        transactionsRestored: transactionResult.validItems.length,
+        transactionsSkipped: transactionResult.skippedCount,
+        billsRestored: billResult.validItems.length,
+        billsSkipped: billResult.skippedCount,
+        debtsRestored: debtResult.validItems.length,
+        debtsSkipped: debtResult.skippedCount,
+        paycheckHistoryRestored: paycheckResult.validItems.length,
+        paycheckHistorySkipped: paycheckResult.skippedCount,
       });
 
       return true;
