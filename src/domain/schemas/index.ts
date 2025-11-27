@@ -183,13 +183,19 @@ export {
   BackupTypeSchema,
   SyncTypeSchema,
   AutoBackupPartialSchema,
+  BackupDataSchema,
+  BackupMetadataSchema,
   validateAutoBackup,
   validateAutoBackupSafe,
   validateAutoBackupPartial,
+  validateBackupData,
+  validateBackupDataSafe,
   type AutoBackup,
   type AutoBackupPartial,
   type BackupType,
   type SyncType,
+  type BackupData,
+  type BackupMetadata,
 } from "./backup";
 
 // Version Control Schemas & Types

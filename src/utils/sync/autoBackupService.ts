@@ -2,15 +2,58 @@
  * Automatic Backup Service - Safety net before cloud operations
  * GitHub Issue #576 Phase 3: Automatic local backup before cloud ops
  * Updated for Issue #1337: Backup/Restore uses envelope-based model (v2.0)
+ * Enhanced for Issue #1342: Backup/Restore Validation Enhancement
  * - Savings goals are stored as envelopes with envelopeType: "savings"
  * - Supplemental accounts are stored as envelopes with envelopeType: "supplemental"
  * - No separate savingsGoals array in backup data
+ * - All data types validated during restore with Zod schemas
  */
 
 import logger from "../common/logger";
 import { budgetDb } from "../../db/budgetDb";
 import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
+import { validateTransactionSafe } from "@/domain/schemas/transaction";
+import { validateBillSafe } from "@/domain/schemas/bill";
+import { validateDebtSafe } from "@/domain/schemas/debt";
+import { validatePaycheckHistorySafe } from "@/domain/schemas/paycheck-history";
 import type { Envelope, Transaction, Bill, Debt, PaycheckHistory } from "@/db/types";
+
+/**
+ * Validation result for restore items
+ */
+interface RestoreValidationResult<T> {
+  validItems: T[];
+  skippedCount: number;
+}
+
+/**
+ * Helper function to validate items during restore and log warnings for invalid items
+ */
+const validateRestoreItems = <T>(
+  items: unknown[] | undefined,
+  validator: (item: unknown) => { success: boolean; error?: { issues?: unknown[] } },
+  itemType: string
+): RestoreValidationResult<T> => {
+  const validItems: T[] = [];
+  let skippedCount = 0;
+
+  if (!items?.length) return { validItems, skippedCount };
+
+  for (const item of items) {
+    const result = validator(item);
+    if (result.success) {
+      validItems.push(item as T);
+    } else {
+      skippedCount++;
+      logger.warn(`⚠️ Skipping invalid ${itemType} during restore`, {
+        [`${itemType}Id`]: (item as { id?: string })?.id ?? "unknown",
+        errors: result.error?.issues,
+      });
+    }
+  }
+
+  return { validItems, skippedCount };
+};
 
 /**
  * Backup data structure for v2.0 data model
@@ -167,7 +210,7 @@ class AutoBackupService {
   /**
    * Restore data from backup (v2.0 data model)
    * All savings goals and supplemental accounts are restored as envelopes with envelopeType
-   * Validates all restored envelopes with Zod schemas
+   * Validates all restored data with Zod schemas (Issue #1342)
    */
   async restoreFromBackup(backupId: string): Promise<boolean> {
     try {
@@ -180,21 +223,24 @@ class AutoBackupService {
 
       const data = (backup as unknown as Backup).data;
 
-      // Validate envelopes with Zod schemas before restore
-      const validatedEnvelopes: Envelope[] = [];
-      if (data?.envelopes?.length) {
-        for (const envelope of data.envelopes) {
-          const result = validateEnvelopeSafe(envelope);
-          if (result.success) {
-            validatedEnvelopes.push(envelope);
-          } else {
-            logger.warn("⚠️ Skipping invalid envelope during restore", {
-              envelopeId: (envelope as { id?: string })?.id ?? "unknown",
-              errors: result.error?.issues,
-            });
-          }
-        }
-      }
+      // Validate all data types with Zod schemas before restore using helper function
+      const envelopeResult = validateRestoreItems<Envelope>(
+        data?.envelopes,
+        validateEnvelopeSafe,
+        "envelope"
+      );
+      const transactionResult = validateRestoreItems<Transaction>(
+        data?.transactions,
+        validateTransactionSafe,
+        "transaction"
+      );
+      const billResult = validateRestoreItems<Bill>(data?.bills, validateBillSafe, "bill");
+      const debtResult = validateRestoreItems<Debt>(data?.debts, validateDebtSafe, "debt");
+      const paycheckResult = validateRestoreItems<PaycheckHistory>(
+        data?.paycheckHistory,
+        validatePaycheckHistorySafe,
+        "paycheck"
+      );
 
       // Restore data in transaction for consistency
       await budgetDb.transaction(
@@ -215,13 +261,15 @@ class AutoBackupService {
           await budgetDb.debts.clear();
           await budgetDb.paycheckHistory.clear();
 
-          // Restore validated envelopes (includes savings goals and supplemental accounts)
-          if (validatedEnvelopes.length) await budgetDb.envelopes.bulkAdd(validatedEnvelopes);
-          if (data?.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
-          if (data?.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
-          if (data?.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
-          if (data?.paycheckHistory?.length)
-            await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
+          // Restore validated data (includes savings goals and supplemental accounts)
+          if (envelopeResult.validItems.length)
+            await budgetDb.envelopes.bulkAdd(envelopeResult.validItems);
+          if (transactionResult.validItems.length)
+            await budgetDb.transactions.bulkAdd(transactionResult.validItems);
+          if (billResult.validItems.length) await budgetDb.bills.bulkAdd(billResult.validItems);
+          if (debtResult.validItems.length) await budgetDb.debts.bulkAdd(debtResult.validItems);
+          if (paycheckResult.validItems.length)
+            await budgetDb.paycheckHistory.bulkAdd(paycheckResult.validItems);
 
           // Restore metadata
           if (data?.metadata) {
@@ -237,8 +285,16 @@ class AutoBackupService {
       logger.production("✅ Successfully restored from backup", {
         backupId,
         timestamp: new Date(backup.timestamp).toISOString(),
-        envelopesRestored: validatedEnvelopes.length,
-        envelopesSkipped: (data?.envelopes?.length || 0) - validatedEnvelopes.length,
+        envelopesRestored: envelopeResult.validItems.length,
+        envelopesSkipped: envelopeResult.skippedCount,
+        transactionsRestored: transactionResult.validItems.length,
+        transactionsSkipped: transactionResult.skippedCount,
+        billsRestored: billResult.validItems.length,
+        billsSkipped: billResult.skippedCount,
+        debtsRestored: debtResult.validItems.length,
+        debtsSkipped: debtResult.skippedCount,
+        paycheckHistoryRestored: paycheckResult.validItems.length,
+        paycheckHistorySkipped: paycheckResult.skippedCount,
       });
 
       return true;
