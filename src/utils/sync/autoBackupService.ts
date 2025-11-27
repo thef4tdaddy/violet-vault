@@ -189,7 +189,7 @@ class AutoBackupService {
             validatedEnvelopes.push(envelope);
           } else {
             logger.warn("⚠️ Skipping invalid envelope during restore", {
-              envelopeId: envelope.id,
+              envelopeId: (envelope as { id?: string })?.id ?? "unknown",
               errors: result.error?.issues,
             });
           }

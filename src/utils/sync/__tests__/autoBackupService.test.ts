@@ -284,10 +284,10 @@ describe("AutoBackupService (v2.0 data model)", () => {
 
       // Ensure savingsGoals is not in the tables list
       const tablesArray = tablesList as unknown[];
-      const hassSavingsGoals = tablesArray.some(
+      const hasSavingsGoals = tablesArray.some(
         (table) => table && (table as { name?: string }).name === "savingsGoals"
       );
-      expect(hassSavingsGoals).toBe(false);
+      expect(hasSavingsGoals).toBe(false);
     });
   });
 
