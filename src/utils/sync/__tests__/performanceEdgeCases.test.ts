@@ -104,23 +104,27 @@ const generateLargeBillDataset = (count: number): Bill[] => {
 };
 
 const generateLargeDebtDataset = (count: number): Debt[] => {
-  // Use valid debt types from the schema
+  // Use all valid debt types from DebtTypeSchema
   const validTypes: Debt["type"][] = [
     "mortgage",
     "auto",
     "credit_card",
+    "chapter13",
     "student",
     "personal",
     "business",
     "other",
   ];
 
+  // Use all valid debt statuses from DebtStatusSchema
+  const validStatuses: Debt["status"][] = ["active", "paid_off", "deferred", "default"];
+
   return Array.from({ length: count }, (_, i) => ({
     id: `debt-${i}`,
     name: `Debt ${i}`,
     creditor: `Creditor ${i}`,
     type: validTypes[i % validTypes.length],
-    status: ["active", "paid_off"][i % 2] as Debt["status"],
+    status: validStatuses[i % validStatuses.length],
     currentBalance: Math.floor(Math.random() * 10000),
     minimumPayment: Math.floor(Math.random() * 200) + 25,
     lastModified: Date.now(),
@@ -143,6 +147,7 @@ describe("Performance Edge Cases", () => {
   const LARGE_RECORD_COUNT = 1000;
   const MEDIUM_RECORD_COUNT = 500;
   const SMALL_RECORD_COUNT = 100;
+  const MAX_MEMORY_INCREASE_BYTES = 100 * 1024 * 1024; // 100MB threshold
 
   // Generate test datasets
   const largeEnvelopes = generateLargeEnvelopeDataset(MEDIUM_RECORD_COUNT);
@@ -312,21 +317,23 @@ describe("Performance Edge Cases", () => {
 
   describe("Memory Usage with Large Datasets", () => {
     it("should not exceed memory bounds when processing large datasets", async () => {
-      // Note: In browser/Node.js, we can check heap usage
-      // This test verifies the code doesn't create memory leaks
-      const initialMemory = (process.memoryUsage?.() || { heapUsed: 0 }).heapUsed;
+      // Skip test if process.memoryUsage is not available (browser environments)
+      if (typeof process === "undefined" || typeof process.memoryUsage !== "function") {
+        return;
+      }
+
+      const initialMemory = process.memoryUsage().heapUsed;
 
       // Process large dataset multiple times
       for (let i = 0; i < 5; i++) {
         await autoBackupService.collectAllData();
       }
 
-      const finalMemory = (process.memoryUsage?.() || { heapUsed: 0 }).heapUsed;
+      const finalMemory = process.memoryUsage().heapUsed;
       const memoryIncrease = finalMemory - initialMemory;
 
       // Memory should not grow excessively (allow for some growth, but not unbounded)
-      // 100MB is a reasonable threshold for test environments
-      expect(memoryIncrease).toBeLessThan(100 * 1024 * 1024);
+      expect(memoryIncrease).toBeLessThan(MAX_MEMORY_INCREASE_BYTES);
     });
 
     it("should handle repeated backup operations without memory leaks", async () => {
