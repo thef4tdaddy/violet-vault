@@ -2,6 +2,11 @@
  * Savings Goal Domain Schema
  * Runtime validation for savings goal entities
  * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
+ *
+ * @deprecated This schema is deprecated in favor of EnvelopeSchema with envelopeType: "savings".
+ * Use SavingsEnvelopeSchema from envelope.ts for new implementations.
+ * This schema is retained for backward compatibility during migration.
+ * See Issue #1335: Database Schema Migration for Savings Goals and Supplemental Accounts
  */
 
 import { z } from "zod";
@@ -15,6 +20,9 @@ export type Priority = z.infer<typeof PrioritySchema>;
 /**
  * Zod schema for SavingsGoal validation
  * Represents savings targets with deadlines and contribution tracking
+ *
+ * @deprecated Use SavingsEnvelopeSchema from envelope.ts instead.
+ * Migrate to EnvelopeSchema with envelopeType: "savings" for new implementations.
  */
 export const SavingsGoalSchema = z.object({
   id: z.string().min(1, "Savings goal ID is required"),
