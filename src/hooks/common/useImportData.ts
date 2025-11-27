@@ -1,21 +1,28 @@
 import React, { useCallback } from "react";
-import { useAuthManager } from "../auth/useAuthManager";
-import { useConfirm } from "./useConfirm";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
-import logger from "../../utils/common/logger";
-import { readFileContent } from "../../utils/dataManagement/fileUtils";
-import { validateImportedData } from "../../utils/dataManagement/validationUtils";
-import { backupCurrentData } from "../../utils/dataManagement/backupUtils";
-import { clearAllDexieData, importDataToDexie } from "../../utils/dataManagement/dexieUtils";
-import { clearFirebaseData, forcePushToCloud } from "../../utils/dataManagement/firebaseUtils";
-import { queryClient } from "../../utils/common/queryClient";
-import type { UserData } from "../../types/auth";
-import type { Envelope, Transaction } from "../../types/finance";
-import type { Bill } from "../../types/bills";
-import type { DebtAccount } from "../../types/debt";
-import type { SavingsGoal } from "../../domain/schemas/savings-goal";
-import type { AuditLogEntry } from "../../domain/schemas/audit-log";
-import type { PaycheckHistory } from "../../domain/schemas/paycheck-history";
+import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useConfirm } from "@/hooks/common/useConfirm";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import logger from "@/utils/common/logger";
+import { readFileContent } from "@/utils/dataManagement/fileUtils";
+import { validateImportedData } from "@/utils/dataManagement/validationUtils";
+import { backupCurrentData } from "@/utils/dataManagement/backupUtils";
+import { clearAllDexieData, importDataToDexie } from "@/utils/dataManagement/dexieUtils";
+import { clearFirebaseData, forcePushToCloud } from "@/utils/dataManagement/firebaseUtils";
+import { queryClient } from "@/utils/common/queryClient";
+import type { UserData } from "@/types/auth";
+import type { Envelope, Transaction } from "@/types/finance";
+import type { Bill } from "@/types/bills";
+import type { DebtAccount } from "@/types/debt";
+import type { SavingsGoal } from "@/domain/schemas/savings-goal";
+import type { AuditLogEntry } from "@/domain/schemas/audit-log";
+import type { PaycheckHistory } from "@/domain/schemas/paycheck-history";
+
+/**
+ * Interface for envelope with optional envelopeType for counting
+ */
+interface EnvelopeWithType extends Envelope {
+  envelopeType?: string;
+}
 
 // Define validated data structure
 interface ValidatedImportData {
@@ -25,24 +32,31 @@ interface ValidatedImportData {
   auditLog?: AuditLogEntry[];
   allTransactions?: Transaction[];
   savingsGoals?: SavingsGoal[];
+  supplementalAccounts?: unknown[];
   paycheckHistory?: PaycheckHistory[];
   [key: string]: unknown; // Allow additional properties
 }
 
-// Define import counts structure
+// Define import counts structure - updated for envelope-based model
 interface ImportCounts {
   envelopes: number;
+  savingsEnvelopes: number;
+  supplementalEnvelopes: number;
+  legacySavingsGoals: number;
+  legacySupplementalAccounts: number;
   bills: number;
   debts: number;
   auditLog: number;
   transactions: number;
 }
 
-// Define import result structure
+// Define import result structure - updated to include savings/supplemental counts
 interface ImportResult {
   success: boolean;
   imported: {
     envelopes: number;
+    savingsEnvelopes: number;
+    supplementalEnvelopes: number;
     bills: number;
     transactions: number;
     savingsGoals: number;
@@ -59,16 +73,91 @@ interface AuthConfig {
   currentUser: UserData | null;
 }
 
-const getImportCounts = (validatedData: ValidatedImportData): ImportCounts => ({
-  envelopes: validatedData.envelopes?.length || 0,
-  bills: validatedData.bills?.length || 0,
-  debts: validatedData.debts?.length || 0,
-  auditLog: validatedData.auditLog?.length || 0,
-  transactions: validatedData.allTransactions?.length || 0,
-});
+/**
+ * Get import counts including envelope-based savings and supplemental accounts
+ */
+const getImportCounts = (validatedData: ValidatedImportData): ImportCounts => {
+  const envelopes = (validatedData.envelopes || []) as EnvelopeWithType[];
 
-const buildBaseMessage = (counts: ImportCounts): string =>
-  `Import ${counts.envelopes} envelopes, ${counts.bills} bills, ${counts.debts} debts, ${counts.auditLog} audit entries, and ${counts.transactions} transactions?\n\nThis will replace your current data.`;
+  // Count envelopes by type
+  const savingsEnvelopes = envelopes.filter((e) => e.envelopeType === "savings").length;
+  const supplementalEnvelopes = envelopes.filter((e) => e.envelopeType === "supplemental").length;
+  const regularEnvelopes = envelopes.length - savingsEnvelopes - supplementalEnvelopes;
+
+  // Count legacy arrays that will be converted
+  const legacySavingsGoals = validatedData.savingsGoals?.length || 0;
+  const legacySupplementalAccounts = (validatedData.supplementalAccounts as unknown[])?.length || 0;
+
+  return {
+    envelopes: regularEnvelopes,
+    savingsEnvelopes,
+    supplementalEnvelopes,
+    legacySavingsGoals,
+    legacySupplementalAccounts,
+    bills: validatedData.bills?.length || 0,
+    debts: validatedData.debts?.length || 0,
+    auditLog: validatedData.auditLog?.length || 0,
+    transactions: validatedData.allTransactions?.length || 0,
+  };
+};
+
+/**
+ * Build base message for import confirmation - updated for envelope-based model
+ */
+const buildBaseMessage = (counts: ImportCounts): string => {
+  const parts: string[] = [];
+
+  // Regular envelopes
+  if (counts.envelopes > 0) {
+    parts.push(`${counts.envelopes} envelopes`);
+  }
+
+  // Savings (both from envelopes and legacy conversion)
+  const totalSavings = counts.savingsEnvelopes + counts.legacySavingsGoals;
+  if (totalSavings > 0) {
+    if (counts.legacySavingsGoals > 0 && counts.savingsEnvelopes > 0) {
+      parts.push(
+        `${totalSavings} savings goals (${counts.savingsEnvelopes} as envelopes, ${counts.legacySavingsGoals} legacy → converted)`
+      );
+    } else if (counts.legacySavingsGoals > 0) {
+      parts.push(`${counts.legacySavingsGoals} savings goals (legacy → converted to envelopes)`);
+    } else {
+      parts.push(`${counts.savingsEnvelopes} savings goals`);
+    }
+  }
+
+  // Supplemental accounts (both from envelopes and legacy conversion)
+  const totalSupplemental = counts.supplementalEnvelopes + counts.legacySupplementalAccounts;
+  if (totalSupplemental > 0) {
+    if (counts.legacySupplementalAccounts > 0 && counts.supplementalEnvelopes > 0) {
+      parts.push(
+        `${totalSupplemental} supplemental accounts (${counts.supplementalEnvelopes} as envelopes, ${counts.legacySupplementalAccounts} legacy → converted)`
+      );
+    } else if (counts.legacySupplementalAccounts > 0) {
+      parts.push(
+        `${counts.legacySupplementalAccounts} supplemental accounts (legacy → converted to envelopes)`
+      );
+    } else {
+      parts.push(`${counts.supplementalEnvelopes} supplemental accounts`);
+    }
+  }
+
+  if (counts.bills > 0) {
+    parts.push(`${counts.bills} bills`);
+  }
+  if (counts.debts > 0) {
+    parts.push(`${counts.debts} debts`);
+  }
+  if (counts.auditLog > 0) {
+    parts.push(`${counts.auditLog} audit entries`);
+  }
+  if (counts.transactions > 0) {
+    parts.push(`${counts.transactions} transactions`);
+  }
+
+  const summary = parts.length > 0 ? parts.join(", ") : "no data";
+  return `Import ${summary}?\n\nThis will replace your current data.`;
+};
 
 const buildMismatchWarning = (
   importBudgetId: string | undefined,
@@ -125,18 +214,27 @@ const handleConfirmation = async (
   });
 };
 
-const buildImportResult = (validatedData: ValidatedImportData): ImportResult => ({
-  success: true,
-  imported: {
-    envelopes: validatedData.envelopes?.length || 0,
-    bills: validatedData.bills?.length || 0,
-    transactions: validatedData.allTransactions?.length || 0,
-    savingsGoals: validatedData.savingsGoals?.length || 0,
-    debts: validatedData.debts?.length || 0,
-    paycheckHistory: validatedData.paycheckHistory?.length || 0,
-    auditLog: validatedData.auditLog?.length || 0,
-  },
-});
+/**
+ * Build import result with envelope-based statistics
+ */
+const buildImportResult = (validatedData: ValidatedImportData): ImportResult => {
+  const counts = getImportCounts(validatedData);
+
+  return {
+    success: true,
+    imported: {
+      envelopes: counts.envelopes,
+      savingsEnvelopes: counts.savingsEnvelopes + counts.legacySavingsGoals,
+      supplementalEnvelopes: counts.supplementalEnvelopes + counts.legacySupplementalAccounts,
+      bills: counts.bills,
+      transactions: counts.transactions,
+      savingsGoals: counts.legacySavingsGoals, // Legacy count for backward compatibility
+      debts: counts.debts,
+      paycheckHistory: validatedData.paycheckHistory?.length || 0,
+      auditLog: counts.auditLog,
+    },
+  };
+};
 
 const performImport = async (
   validatedData: ValidatedImportData,
@@ -170,12 +268,14 @@ const performImport = async (
   await queryClient.invalidateQueries();
   await queryClient.refetchQueries();
 
+  const counts = getImportCounts(validatedData);
   logger.info("✅ Data import completed and synced to cloud", {
-    envelopes: validatedData.envelopes?.length || 0,
-    transactions: validatedData.allTransactions?.length || 0,
-    bills: validatedData.bills?.length || 0,
-    debts: validatedData.debts?.length || 0,
-    savingsGoals: validatedData.savingsGoals?.length || 0,
+    envelopes: counts.envelopes,
+    savingsEnvelopes: counts.savingsEnvelopes + counts.legacySavingsGoals,
+    supplementalEnvelopes: counts.supplementalEnvelopes + counts.legacySupplementalAccounts,
+    transactions: counts.transactions,
+    bills: counts.bills,
+    debts: counts.debts,
   });
   logger.info("TanStack Query cache invalidated and refetched after data import");
 };

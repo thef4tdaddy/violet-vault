@@ -1,14 +1,29 @@
-import logger from "../common/logger";
+import logger from "@/utils/common/logger";
 
+/**
+ * Envelope with optional envelopeType for import validation
+ */
+interface EnvelopeWithType {
+  id?: string;
+  name?: string;
+  envelopeType?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Import data structure - updated for envelope-based model
+ */
 interface ImportedData {
-  envelopes?: unknown[];
-  exportMetadata?: { budgetId?: string };
+  envelopes?: EnvelopeWithType[];
+  exportMetadata?: { budgetId?: string; modelVersion?: string };
   allTransactions?: unknown[];
   transactions?: unknown[];
   bills?: unknown[];
   savingsGoals?: unknown[];
+  supplementalAccounts?: unknown[];
   debts?: unknown[];
   auditLog?: unknown[];
+  paycheckHistory?: unknown[];
 }
 
 interface CurrentUser {
@@ -36,9 +51,38 @@ const checkBudgetIdMismatch = (
 };
 
 const unifyTransactions = (importedData: ImportedData): unknown[] => {
-  return Array.isArray(importedData.allTransactions)
-    ? importedData.allTransactions
-    : [...(importedData.transactions || []), ...(importedData.bills || [])];
+  if (Array.isArray(importedData.allTransactions)) {
+    return importedData.allTransactions;
+  }
+  const transactions = importedData.transactions || [];
+  const bills = importedData.bills || [];
+  return [...transactions, ...bills];
+};
+
+/**
+ * Count array length safely
+ */
+const safeLength = (arr: unknown[] | undefined): number => arr?.length || 0;
+
+/**
+ * Count envelopes by type for logging
+ */
+const countEnvelopesByType = (envelopes: EnvelopeWithType[]): Record<string, number> => {
+  const counts: Record<string, number> = {
+    regular: 0,
+    savings: 0,
+    supplemental: 0,
+    bill: 0,
+    variable: 0,
+    other: 0,
+  };
+
+  for (const envelope of envelopes) {
+    const type = envelope.envelopeType || "regular";
+    counts[type] = (counts[type] || 0) + 1;
+  }
+
+  return counts;
 };
 
 export const validateImportedData = (
@@ -56,12 +100,13 @@ export const validateImportedData = (
   const unifiedAllTransactions = unifyTransactions(importedData);
 
   logger.info("Data validation successful", {
-    envelopes: importedData.envelopes?.length || 0,
-    bills: importedData.bills?.length || 0,
-    savingsGoals: importedData.savingsGoals?.length || 0,
-    debts: importedData.debts?.length || 0,
-    auditLog: importedData.auditLog?.length || 0,
-    allTransactions: unifiedAllTransactions?.length || 0,
+    envelopes: safeLength(importedData.envelopes),
+    envelopesByType: countEnvelopesByType(importedData.envelopes || []),
+    bills: safeLength(importedData.bills),
+    savingsGoals: safeLength(importedData.savingsGoals),
+    supplementalAccounts: safeLength(importedData.supplementalAccounts),
+    debts: safeLength(importedData.debts),
+    allTransactions: safeLength(unifiedAllTransactions),
     hasBudgetIdMismatch,
   });
 
