@@ -100,6 +100,7 @@ interface RecordPaymentOptions {
     debtId: string;
     date: string;
     notes: string;
+    envelopeId: string;
   }) => Promise<void>;
 }
 interface LinkDebtToBillOptions {
@@ -275,8 +276,10 @@ const resolveEnvelopeForDebt = async (debt: Debt): Promise<string> => {
   let envelopeId = debt.envelopeId;
 
   // If debt is linked to a bill, get envelope from bill
-  if (!envelopeId && (debt as { billId?: string }).billId) {
-    const bill = await budgetDb.bills.get((debt as { billId: string }).billId);
+  // Note: billId may exist on debt objects at runtime even though not in strict interface
+  const debtWithPossibleBillId = debt as unknown as { billId?: string };
+  if (!envelopeId && debtWithPossibleBillId.billId) {
+    const bill = await budgetDb.bills.get(debtWithPossibleBillId.billId);
     envelopeId = bill?.envelopeId;
   }
 

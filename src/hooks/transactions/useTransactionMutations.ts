@@ -127,7 +127,13 @@ export const useTransactionMutations = () => {
       const normalizedTransaction = normalizeTransactionAmount(rawTransaction);
 
       // Validate with Zod schema (includes sign validation)
-      const validatedTransaction = validateAndNormalizeTransaction(normalizedTransaction);
+      const zodValidated = validateAndNormalizeTransaction(normalizedTransaction);
+
+      // Ensure date is a Date object (Zod allows Date | string, but db requires Date)
+      const validatedTransaction: Transaction = {
+        ...zodValidated,
+        date: zodValidated.date instanceof Date ? zodValidated.date : new Date(zodValidated.date),
+      };
 
       await optimisticHelpers.addTransaction(queryClient, validatedTransaction);
       await budgetDb.transactions.put(validatedTransaction);
@@ -235,13 +241,21 @@ export const useTransactionMutations = () => {
         throw new Error(`Invalid transaction update data: ${errorMessages}`);
       }
 
-      const updatedTransaction = {
-        ...validationResult.data,
-        updatedAt: new Date().toISOString(),
+      // Ensure date is a Date object if present (Zod allows Date | string, but db requires Date)
+      // Create the normalized updates without the date first, then add it if present
+      const { date, ...restData } = validationResult.data;
+      const normalizedUpdates: Partial<Transaction> = {
+        ...restData,
+        lastModified: Date.now(),
       };
-      await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
-      await budgetDb.transactions.update(id, updatedTransaction);
-      return { id, updates: updatedTransaction };
+
+      if (date !== undefined) {
+        normalizedUpdates.date = date instanceof Date ? date : new Date(date);
+      }
+
+      await optimisticHelpers.updateTransaction(queryClient, id, normalizedUpdates);
+      await budgetDb.transactions.update(id, normalizedUpdates);
+      return { id, updates: normalizedUpdates };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });

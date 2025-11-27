@@ -574,7 +574,7 @@ class CloudSyncService {
         debts,
         paycheckHistory,
         ...metadataFields,
-      };
+      } as DexieData;
     } catch (error) {
       logger.error("Failed to fetch data from Dexie:", error);
       throw error;

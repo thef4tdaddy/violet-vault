@@ -40,12 +40,11 @@ async function runHealthChecksInternal(results: HealthCheckResults) {
     transactions: [],
     bills: [],
     debts: [],
-    savingsGoals: [],
     paycheckHistory: [],
-    supplementalAccounts: [],
     unassignedCash: 0,
     actualBalance: 0,
     lastModified: Date.now(),
+    syncVersion: "2.0",
     ...overrides,
   });
 
