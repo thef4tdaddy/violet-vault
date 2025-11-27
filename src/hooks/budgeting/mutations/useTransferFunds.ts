@@ -68,7 +68,15 @@ export const useTransferFunds = () => {
         description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
       };
 
-      const transaction = validateAndNormalizeTransaction(rawTransaction);
+      const validatedTransaction = validateAndNormalizeTransaction(rawTransaction);
+      // Ensure date is a Date object for DB types compatibility
+      const transaction = {
+        ...validatedTransaction,
+        date:
+          validatedTransaction.date instanceof Date
+            ? validatedTransaction.date
+            : new Date(validatedTransaction.date),
+      };
       await budgetDb.transactions.put(transaction);
 
       // Apply optimistic updates to cache
