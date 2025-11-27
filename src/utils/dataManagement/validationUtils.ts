@@ -26,10 +26,19 @@ interface CurrentUser {
 }
 
 /**
+ * Validated import data type
+ * Represents the structure after validation with unified transactions
+ * Uses intersection with Record to allow the unknown[] for allTransactions
+ */
+export type ValidatedImportData = Omit<ImportedData, "allTransactions"> & {
+  allTransactions: unknown[];
+};
+
+/**
  * Validation result containing validated data and any validation issues
  */
 export interface ValidationResult {
-  validatedData: (ImportedData & { allTransactions: unknown[] }) | Record<string, unknown>;
+  validatedData: ValidatedImportData;
   hasBudgetIdMismatch: boolean;
   importBudgetId: string | undefined;
   validationWarnings: string[];
@@ -40,6 +49,33 @@ export interface ValidationResult {
     debts: ItemValidationResult<unknown>;
   };
 }
+
+/**
+ * Error message mapping for specific validation paths
+ * Provides user-friendly error messages for common validation failures
+ */
+const VALIDATION_ERROR_MESSAGES: Record<string, string> = {
+  envelopes: "Invalid backup file: missing or invalid envelopes data.",
+};
+
+/**
+ * Get user-friendly error message for validation path
+ */
+const getErrorMessageForPath = (path: string, defaultMessage: string): string => {
+  // Check for exact path match
+  if (VALIDATION_ERROR_MESSAGES[path]) {
+    return VALIDATION_ERROR_MESSAGES[path];
+  }
+
+  // Check for path prefix matches (e.g., "envelopes.0.name" matches "envelopes")
+  for (const [errorPath, errorMessage] of Object.entries(VALIDATION_ERROR_MESSAGES)) {
+    if (path.startsWith(errorPath)) {
+      return errorMessage;
+    }
+  }
+
+  return `Invalid backup file: ${path ? `${path}: ` : ""}${defaultMessage}`;
+};
 
 /**
  * Validate data structure using Zod schema
@@ -53,17 +89,11 @@ const validateDataStructure = (data: unknown): ImportedData => {
   const result = validateImportedDataStructureSafe(data);
 
   if (!result.success) {
-    // Extract the first meaningful error message
     const firstError = result.error.issues[0];
     const path = firstError.path.join(".");
     const message = firstError.message;
 
-    // Check for specific common errors
-    if (path === "envelopes" || path.startsWith("envelopes")) {
-      throw new Error("Invalid backup file: missing or invalid envelopes data.");
-    }
-
-    throw new Error(`Invalid backup file: ${path ? `${path}: ` : ""}${message}`);
+    throw new Error(getErrorMessageForPath(path, message));
   }
 
   return result.data;
@@ -199,11 +229,13 @@ export const validateImportedData = (
     });
   }
 
+  const validatedData: ValidatedImportData = {
+    ...validatedStructure,
+    allTransactions: unifiedAllTransactions,
+  };
+
   return {
-    validatedData: {
-      ...validatedStructure,
-      allTransactions: unifiedAllTransactions,
-    } as ImportedData & { allTransactions: unknown[] },
+    validatedData,
     hasBudgetIdMismatch,
     importBudgetId: validatedStructure.exportMetadata?.budgetId,
     validationWarnings,

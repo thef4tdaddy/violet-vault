@@ -71,6 +71,11 @@ export type LegacySupplementalAccount = z.infer<typeof LegacySupplementalAccount
  * Relaxed envelope schema for import validation
  * More permissive than EnvelopeSchema to allow importing legacy data
  * Uses passthrough to allow additional fields
+ *
+ * Note: lastModified is optional here (unlike strict EnvelopeSchema) because:
+ * 1. Legacy backup files may not have this field
+ * 2. The database layer will add lastModified on insertion if missing
+ * 3. This allows importing data from older app versions
  */
 export const ImportEnvelopeSchema = z
   .object({
@@ -106,6 +111,8 @@ export type ImportEnvelope = z.infer<typeof ImportEnvelopeSchema>;
 /**
  * Relaxed transaction schema for import validation
  * More permissive than TransactionSchema to allow importing various data formats
+ *
+ * Note: lastModified is optional to support legacy backup files
  */
 export const ImportTransactionSchema = z
   .object({
@@ -131,6 +138,8 @@ export type ImportTransaction = z.infer<typeof ImportTransactionSchema>;
 
 /**
  * Relaxed bill schema for import validation
+ *
+ * Note: lastModified is optional to support legacy backup files
  */
 export const ImportBillSchema = z
   .object({
@@ -154,6 +163,8 @@ export type ImportBill = z.infer<typeof ImportBillSchema>;
 
 /**
  * Relaxed debt schema for import validation
+ *
+ * Note: lastModified is optional to support legacy backup files
  */
 export const ImportDebtSchema = z
   .object({

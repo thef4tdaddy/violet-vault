@@ -172,6 +172,11 @@ const buildMismatchWarning = (
 };
 
 /**
+ * Maximum number of validation warnings to display in confirmation dialog
+ */
+const MAX_DISPLAYED_WARNINGS = 5;
+
+/**
  * Build validation warning message for confirmation dialog
  */
 const buildValidationWarning = (validationWarnings: string[]): string => {
@@ -179,9 +184,11 @@ const buildValidationWarning = (validationWarnings: string[]): string => {
     return "";
   }
 
-  return `\n\n⚠️ VALIDATION WARNINGS:\n${validationWarnings.slice(0, 5).join("\n")}${
-    validationWarnings.length > 5 ? `\n... and ${validationWarnings.length - 5} more warnings` : ""
-  }`;
+  const displayedWarnings = validationWarnings.slice(0, MAX_DISPLAYED_WARNINGS).join("\n");
+  const remainingCount = validationWarnings.length - MAX_DISPLAYED_WARNINGS;
+  const moreWarningsText = remainingCount > 0 ? `\n... and ${remainingCount} more warnings` : "";
+
+  return `\n\n⚠️ VALIDATION WARNINGS:\n${displayedWarnings}${moreWarningsText}`;
 };
 
 const buildConfirmMessage = (
