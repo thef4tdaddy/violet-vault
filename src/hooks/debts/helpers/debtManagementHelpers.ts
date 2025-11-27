@@ -19,15 +19,12 @@ interface DebtData {
   currentBalance?: number;
   interestRate?: number;
 }
-
 interface CreatedDebt {
   id: string;
 }
-
 interface Envelope {
   id: string;
 }
-
 interface Bill {
   id: string;
   debtId?: string;
@@ -35,7 +32,6 @@ interface Bill {
   amount?: number;
   dueDate?: string;
 }
-
 interface Debt {
   id: string;
   name: string;
@@ -56,7 +52,6 @@ interface Debt {
     notes: string;
   }>;
 }
-
 interface ConnectionData {
   paymentMethod?: string;
   createBill?: boolean;
@@ -96,11 +91,7 @@ interface CreateDebtOptions {
 
 interface RecordPaymentOptions {
   debt: Debt;
-  paymentData: {
-    amount: number;
-    paymentDate: string;
-    notes?: string;
-  };
+  paymentData: { amount: number; paymentDate: string; notes?: string };
   updateDebtData: (params: { id: string; updates: Debt }) => Promise<void>;
   createTransaction: (data: {
     amount: number;
@@ -111,7 +102,6 @@ interface RecordPaymentOptions {
     notes: string;
   }) => Promise<void>;
 }
-
 interface LinkDebtToBillOptions {
   debtId: string;
   billId: string;
@@ -120,13 +110,11 @@ interface LinkDebtToBillOptions {
   updateBill: (id: string, data: { debtId: string; amount: number }) => Promise<void>;
   updateDebtData: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
 }
-
 interface SyncDebtDueDatesOptions {
   debts: Debt[];
   bills: Bill[];
   updateDebtData: (params: { id: string; updates: Partial<Debt> }) => Promise<void>;
 }
-
 interface UpdateDebtOptions {
   debtId: string;
   updates: Partial<Debt>;
@@ -137,7 +125,6 @@ interface UpdateDebtOptions {
     author?: string;
   }) => Promise<void>;
 }
-
 interface DeleteDebtOptions {
   debtId: string;
   bills: Bill[];
@@ -281,6 +268,43 @@ export const createDebtOperation = async (
 };
 
 /**
+ * Resolve envelope ID for a debt, checking direct link or bill relationship
+ */
+const resolveEnvelopeForDebt = async (debt: Debt): Promise<string> => {
+  const { budgetDb } = await import("@/db/budgetDb");
+  let envelopeId = debt.envelopeId;
+
+  // If debt is linked to a bill, get envelope from bill
+  if (!envelopeId && (debt as { billId?: string }).billId) {
+    const bill = await budgetDb.bills.get((debt as { billId: string }).billId);
+    envelopeId = bill?.envelopeId;
+  }
+
+  // If still no envelope, try to find via bill relationship
+  if (!envelopeId) {
+    const bills = await budgetDb.bills.where("debtId").equals(debt.id).toArray();
+    if (bills.length > 0 && bills[0].envelopeId) {
+      envelopeId = bills[0].envelopeId;
+    }
+  }
+
+  // Envelope is REQUIRED - all transactions must route through envelopes
+  if (!envelopeId || envelopeId.trim() === "") {
+    throw new Error(
+      `Debt payment requires an envelope. Debt "${debt.name}" must be linked to an envelope (directly or through a bill).`
+    );
+  }
+
+  // Validate envelope exists
+  const envelope = await budgetDb.envelopes.get(envelopeId);
+  if (!envelope) {
+    throw new Error(`Cannot record debt payment: Envelope "${envelopeId}" does not exist.`);
+  }
+
+  return envelopeId;
+};
+
+/**
  * Record a debt payment
  */
 export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
@@ -290,45 +314,8 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
     const { amount, paymentDate, notes } = paymentData;
 
     // ARCHITECTURE: Debts are bills with finite amount/time. Paying a debt = creating a transaction.
-    // Envelopes are where all money is kept (source of truth).
-    // Behind the scenes: Supplemental accounts and savings goals are stored as envelopes
-    // (for data consistency and transaction routing), but filtered from envelope UI.
     // CRITICAL: Debt payments route through envelopes (envelopes are source of truth)
-    // Get envelope from debt (via bill if linked, or direct envelopeId)
-    const { budgetDb } = await import("@/db/budgetDb");
-    const { validateAndNormalizeTransaction } = await import("@/domain/schemas/transaction");
-    let envelopeId = debt.envelopeId;
-
-    // If debt is linked to a bill, get envelope from bill
-    if (!envelopeId && (debt as { billId?: string }).billId) {
-      const bill = await budgetDb.bills.get((debt as { billId: string }).billId);
-      envelopeId = bill?.envelopeId;
-    }
-
-    // If still no envelope, try to find via bill relationship
-    if (!envelopeId) {
-      const bills = await budgetDb.bills.where("debtId").equals(debt.id).toArray();
-      if (bills.length > 0 && bills[0].envelopeId) {
-        envelopeId = bills[0].envelopeId;
-      }
-    }
-
-    // Envelope is REQUIRED - all transactions must route through envelopes
-    // Note: Behind the scenes, this could be a regular envelope, supplemental account, or savings goal
-    // (all stored as envelopes in the database, but filtered from envelope UI)
-    if (!envelopeId || envelopeId.trim() === "") {
-      throw new Error(
-        `Debt payment requires an envelope. Debt "${debt.name}" must be linked to an envelope (directly or through a bill). Envelopes are the source of truth for all financial operations.`
-      );
-    }
-
-    // Validate envelope exists (behind the scenes, all are stored as envelopes)
-    const envelope = await budgetDb.envelopes.get(envelopeId);
-    if (!envelope) {
-      throw new Error(
-        `Cannot record debt payment: Envelope "${envelopeId}" does not exist. All debt payments must route through an existing envelope.`
-      );
-    }
+    const envelopeId = await resolveEnvelopeForDebt(debt);
 
     const interestPortion = calculateInterestPortion(debt, amount);
     const principalPortion = amount - interestPortion;
@@ -488,162 +475,27 @@ export const enrichDebtsWithRelations = (
 ) => {
   if (!debts?.length) return [];
 
-  logger.debug("🔧 Enriching debts:", {
-    rawDebtsCount: debts.length,
-    billsCount: bills.length,
-    envelopesCount: envelopes.length,
-    transactionsCount: transactions.length,
-    sampleDebt: debts[0],
-  });
+  logger.debug("🔧 Enriching debts:", { count: debts.length });
 
-  const enriched = debts.map((debt, index) => {
-    // Find related bill and envelope
+  const enriched = debts.map((debt) => {
     const relatedBill = bills.find((bill) => bill.debtId === debt.id);
     const relatedEnvelope = relatedBill
       ? envelopes.find((env) => env.id === relatedBill.envelopeId)
       : debt.envelopeId
         ? envelopes.find((env) => env.id === debt.envelopeId)
         : null;
+    const relatedTransactions = transactions.filter((t) => t.debtId === debt.id);
 
-    // Find related transactions
-    const relatedTransactions = transactions.filter(
-      (transaction) => transaction.debtId === debt.id
-    );
-
-    // Enrich the debt with calculated properties
-    const enrichedDebt = enrichDebt(
+    return enrichDebt(
       debt as unknown as DebtAccount,
       (relatedBill as unknown as import("@/db/types").Bill) || null,
       relatedEnvelope as unknown as import("@/db/types").Envelope,
       relatedTransactions as unknown as import("@/db/types").Transaction[]
     );
-
-    // Log first debt enrichment details
-    if (index === 0) {
-      logger.debug("🔧 First debt enrichment details:", {
-        originalDebt: {
-          id: debt.id,
-          name: debt.name,
-          currentBalance: debt.currentBalance,
-          minimumPayment: debt.minimumPayment,
-          interestRate: debt.interestRate,
-        },
-        enrichedDebt: {
-          id: enrichedDebt.id,
-          name: enrichedDebt.name,
-          status: enrichedDebt.status,
-          currentBalance:
-            (enrichedDebt as unknown as { currentBalance?: number }).currentBalance ??
-            enrichedDebt.balance,
-          minimumPayment: enrichedDebt.minimumPayment,
-          interestRate: enrichedDebt.interestRate,
-          payoffInfo: enrichedDebt.payoffInfo,
-          nextPaymentDate: enrichedDebt.nextPaymentDate,
-        },
-        relatedBill,
-        relatedEnvelope,
-        relatedTransactionsCount: relatedTransactions.length,
-      });
-    }
-
-    return enrichedDebt;
-  });
-
-  logger.debug("🔧 Debt enrichment complete:", {
-    enrichedCount: enriched.length,
   });
 
   return enriched;
 };
 
-/**
- * Create wrapper functions for external hook APIs
- * Extracted to reduce line count in main hook
- */
-export const createAPIWrappers = (
-  addEnvelopeAsync: ((data: unknown) => unknown) | undefined,
-  createEnvelope: (data: unknown) => unknown,
-  addBillAsync: (data: unknown) => unknown,
-  updateBillAsync: (id: string, updates: unknown) => unknown,
-  createTransaction: (data: unknown) => unknown
-) => {
-  const makeCreateEnvelopeWrapper =
-    (fn: (...args: unknown[]) => unknown) =>
-    async (data: unknown): Promise<{ id: string }> => {
-      const res = await Promise.resolve(fn(data) as unknown);
-      return res as unknown as { id: string };
-    };
-
-  const makeCreateBillWrapper =
-    (fn: (...args: unknown[]) => unknown) =>
-    async (
-      data: unknown
-    ): Promise<{
-      id: string;
-      debtId?: string;
-      envelopeId?: string;
-      amount?: number;
-      dueDate?: string;
-    }> => {
-      const res = await Promise.resolve(fn(data) as unknown);
-      const raw = res as unknown as Record<string, unknown>;
-      const rawDue = raw.dueDate as unknown;
-      const dueDate =
-        typeof rawDue === "string"
-          ? (rawDue as string)
-          : rawDue instanceof Date
-            ? (rawDue as Date).toISOString()
-            : undefined;
-      return {
-        ...raw,
-        dueDate,
-      } as { id: string; debtId?: string; envelopeId?: string; amount?: number; dueDate?: string };
-    };
-
-  const makeUpdateBillWrapper =
-    (fn: (id: string, data: unknown) => unknown) =>
-    async (id: string, data: unknown): Promise<void> => {
-      await Promise.resolve(fn(id, data));
-    };
-
-  const makeCreateTransactionWrapper =
-    (fn: (...args: unknown[]) => unknown) =>
-    async (data: unknown): Promise<void> => {
-      await Promise.resolve(fn(data));
-    };
-
-  return {
-    createEnvelopeWrapper: makeCreateEnvelopeWrapper(addEnvelopeAsync || createEnvelope),
-    createBillWrapper: makeCreateBillWrapper(addBillAsync),
-    updateBillWrapper: makeUpdateBillWrapper(updateBillAsync),
-    createTransactionWrapper: makeCreateTransactionWrapper(createTransaction),
-  };
-};
-
-/**
- * Calculate grouped debts by status
- */
-export const groupDebtsByStatus = (
-  enrichedDebts: DebtAccount[],
-  statusValues: Record<string, string>
-) => {
-  const grouped: Record<string, DebtAccount[]> = {};
-  Object.values(statusValues).forEach((status) => {
-    grouped[status] = enrichedDebts.filter((debt) => debt.status === status);
-  });
-  return grouped;
-};
-
-/**
- * Calculate grouped debts by type
- */
-export const groupDebtsByType = (
-  enrichedDebts: DebtAccount[],
-  typeValues: Record<string, string>
-) => {
-  const grouped: Record<string, DebtAccount[]> = {};
-  Object.values(typeValues).forEach((type) => {
-    grouped[type] = enrichedDebts.filter((debt) => debt.type === type);
-  });
-  return grouped;
-};
+// Re-export API wrapper functions from separate file
+export { createAPIWrappers, groupDebtsByStatus, groupDebtsByType } from "./debtApiWrappers";

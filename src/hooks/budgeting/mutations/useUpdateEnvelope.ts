@@ -3,7 +3,7 @@ import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/db/types";
-import { EnvelopePartialSchema, validateEnvelopePartialSafe } from "@/domain/schemas/envelope";
+import { validateEnvelopePartialSafe } from "@/domain/schemas/envelope";
 
 interface UpdateEnvelopeData {
   id: string;

@@ -4,7 +4,7 @@ import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient"
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 import type { Transaction, Bill } from "../../../db/types";
-import { validateBillPartialSafe } from "@/domain/schemas/bill";
+import { validateBillPartialSafe, validateBillSafe } from "@/domain/schemas/bill";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
 interface CloudSyncService {
