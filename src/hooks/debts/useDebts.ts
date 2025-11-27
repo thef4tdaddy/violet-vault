@@ -4,6 +4,7 @@ import { queryKeys } from "../../utils/common/queryClient";
 import { budgetDb } from "../../db/budgetDb";
 import BudgetHistoryTracker from "../../utils/common/budgetHistoryTracker";
 import logger from "../../utils/common/logger.ts";
+import type { z } from "zod";
 import { validateDebtSafe, validateDebtPartialSafe } from "@/domain/schemas/debt";
 
 // Query function for fetching debts
@@ -85,7 +86,9 @@ const updateDebtInDb = async ({
   // Validate updates with Zod schema
   const validationResult = validateDebtPartialSafe(updates);
   if (!validationResult.success) {
-    const errorMessages = validationResult.error.issues.map((issue) => issue.message).join(", ");
+    const errorMessages = validationResult.error.issues
+      .map((issue: z.ZodIssue) => issue.message)
+      .join(", ");
     logger.error("Debt update validation failed", {
       debtId: id,
       errors: validationResult.error.issues,

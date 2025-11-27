@@ -65,6 +65,13 @@ export const validateBillPartial = (data: unknown): BillPartial => {
 };
 
 /**
+ * Safe validation helper for partial updates - returns result with error details
+ */
+export const validateBillPartialSafe = (data: unknown) => {
+  return BillPartialSchema.safeParse(data);
+};
+
+/**
  * Zod schema for Bill Form Data validation (minimal required fields)
  * Used for validating user input in bill forms
  * Note: This validates only the minimal required fields.

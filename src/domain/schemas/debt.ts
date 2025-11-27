@@ -97,6 +97,13 @@ export const validateDebtPartial = (data: unknown): DebtPartial => {
 };
 
 /**
+ * Safe validation helper for partial updates - returns result with error details
+ */
+export const validateDebtPartialSafe = (data: unknown) => {
+  return DebtPartialSchema.safeParse(data);
+};
+
+/**
  * Debt form validation schema
  * Used for validating form input before creating/updating debts
  * Supports both string and number inputs for numeric fields

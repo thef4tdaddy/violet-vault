@@ -3,7 +3,8 @@ import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/db/types";
-import { EnvelopePartialSchema, validateEnvelopePartialSafe } from "@/domain/schemas/envelope";
+import type { z } from "zod";
+import { validateEnvelopePartialSafe } from "@/domain/schemas/envelope";
 
 interface UpdateEnvelopeData {
   id: string;
@@ -49,7 +50,7 @@ export const useUpdateEnvelope = () => {
       const validationResult = validateEnvelopePartialSafe(safeUpdates);
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues
-          .map((issue) => issue.message)
+          .map((issue: z.ZodIssue) => issue.message)
           .join(", ");
         logger.error("Envelope update validation failed", {
           envelopeId: id,

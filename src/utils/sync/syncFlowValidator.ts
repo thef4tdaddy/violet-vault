@@ -31,12 +31,11 @@ export const validateAllSyncFlows = async (): Promise<ValidationResult[]> => {
     transactions: [],
     bills: [],
     debts: [],
-    savingsGoals: [],
     paycheckHistory: [],
-    supplementalAccounts: [],
     unassignedCash: 0,
     actualBalance: 0,
     lastModified: Date.now(),
+    syncVersion: "2.0",
     ...overrides,
   });
 

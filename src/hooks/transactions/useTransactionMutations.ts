@@ -4,11 +4,10 @@ import { budgetDb } from "../../db/budgetDb.ts";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
 import logger from "../../utils/common/logger.ts";
 import type { Transaction } from "../../db/types.ts";
+import type { z } from "zod";
 import {
   normalizeTransactionAmount,
   validateAndNormalizeTransaction,
-  validateTransactionSafe,
-  TransactionPartialSchema,
   validateTransactionPartialSafe,
 } from "@/domain/schemas/transaction";
 
@@ -129,7 +128,10 @@ export const useTransactionMutations = () => {
       const normalizedTransaction = normalizeTransactionAmount(rawTransaction);
 
       // Validate with Zod schema (includes sign validation)
-      const validatedTransaction = validateAndNormalizeTransaction(normalizedTransaction);
+      // Cast back to db Transaction type since we already provided Date for the date field
+      const validatedTransaction = validateAndNormalizeTransaction(
+        normalizedTransaction
+      ) as Transaction;
 
       await optimisticHelpers.addTransaction(queryClient, validatedTransaction);
       await budgetDb.transactions.put(validatedTransaction);
@@ -228,7 +230,7 @@ export const useTransactionMutations = () => {
       const validationResult = validateTransactionPartialSafe(updates);
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues
-          .map((issue) => issue.message)
+          .map((issue: z.ZodIssue) => issue.message)
           .join(", ");
         logger.error("Transaction update validation failed", {
           transactionId: id,
@@ -240,7 +242,7 @@ export const useTransactionMutations = () => {
       const updatedTransaction = {
         ...validationResult.data,
         updatedAt: new Date().toISOString(),
-      };
+      } as Partial<Transaction>;
       await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
       await budgetDb.transactions.update(id, updatedTransaction);
       return { id, updates: updatedTransaction };

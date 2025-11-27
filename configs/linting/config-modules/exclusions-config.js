@@ -393,4 +393,14 @@ export default [
       "zustand-safe-patterns/zustand-no-store-actions-in-deps": "off", // updateBiweeklyAllocations is a useCallback, not a Zustand action
     },
   },
+  {
+    // Debt management helpers - helper functions extracted from useDebtManagement
+    // Coordinates multiple operations: bill connections, payment recording, envelope linking
+    // Complexity is inherent to debt management domain and was extracted for better organization
+    files: ["src/hooks/debts/helpers/debtManagementHelpers.ts"],
+    rules: {
+      "max-lines": "off", // Helper module consolidates related debt operations
+      "max-statements": "off", // Payment recording requires many sequential steps
+    },
+  },
 ];

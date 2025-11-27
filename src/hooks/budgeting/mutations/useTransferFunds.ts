@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
+import type { Transaction } from "@/db/types";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
 interface TransferFundsData {
@@ -68,7 +69,8 @@ export const useTransferFunds = () => {
         description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
       };
 
-      const transaction = validateAndNormalizeTransaction(rawTransaction);
+      // Cast to db Transaction type since we're providing a Date for the date field
+      const transaction = validateAndNormalizeTransaction(rawTransaction) as Transaction;
       await budgetDb.transactions.put(transaction);
 
       // Apply optimistic updates to cache

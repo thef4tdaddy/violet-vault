@@ -107,6 +107,13 @@ export const validateEnvelopePartial = (data: unknown): EnvelopePartial => {
 };
 
 /**
+ * Safe validation helper for partial updates - returns result with error details
+ */
+export const validateEnvelopePartialSafe = (data: unknown) => {
+  return EnvelopePartialSchema.safeParse(data);
+};
+
+/**
  * Supplemental Account Schema
  * Extends EnvelopeSchema with supplemental-specific fields
  * Used for FSA, HSA, 529, IRA, 401K accounts, etc.

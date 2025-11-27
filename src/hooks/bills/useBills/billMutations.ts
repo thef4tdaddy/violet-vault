@@ -4,7 +4,8 @@ import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient"
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 import type { Transaction, Bill } from "../../../db/types";
-import { validateBillPartialSafe } from "@/domain/schemas/bill";
+import type { z } from "zod";
+import { validateBillSafe, validateBillPartialSafe } from "@/domain/schemas/bill";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
 interface CloudSyncService {
@@ -73,16 +74,17 @@ export const useAddBillMutation = () => {
       const validationResult = validateBillSafe(newBill);
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues
-          .map((issue) => issue.message)
+          .map((issue: z.ZodIssue) => issue.message)
           .join(", ");
         logger.error("Bill validation failed", { errors: validationResult.error.issues });
         throw new Error(`Invalid bill data: ${errorMessages}`);
       }
 
       // Persist to Dexie (optimistic update handled by React Query)
-      await budgetDb.bills.add(validationResult.data);
+      // Cast to db Bill type since we're providing a Date for dueDate
+      await budgetDb.bills.add(validationResult.data as Bill);
 
-      return validationResult.data;
+      return validationResult.data as Bill;
     },
     onMutate: async () => {
       // Cancel outgoing refetches
@@ -151,7 +153,7 @@ export const useUpdateBillMutation = () => {
       const validationResult = validateBillPartialSafe(updates);
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues
-          .map((issue) => issue.message)
+          .map((issue: z.ZodIssue) => issue.message)
           .join(", ");
         logger.error("Bill update validation failed", {
           billId,
@@ -305,7 +307,10 @@ export const useMarkBillPaidMutation = () => {
       );
 
       // Validate and normalize transaction with Zod schema
-      const paymentTransaction = validateAndNormalizeTransaction(rawPaymentTransaction);
+      // Cast back to db Transaction type since we already provided Date for the date field
+      const paymentTransaction = validateAndNormalizeTransaction(
+        rawPaymentTransaction
+      ) as Transaction;
 
       // ARCHITECTURE: Bills are just planned transactions. Paying a bill = creating a transaction.
       // Envelopes are where all money is kept. The transaction will update the envelope balance.

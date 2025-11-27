@@ -23,7 +23,6 @@ interface DebtData {
 interface CreatedDebt {
   id: string;
 }
-
 interface Envelope {
   id: string;
 }
@@ -96,11 +95,7 @@ interface CreateDebtOptions {
 
 interface RecordPaymentOptions {
   debt: Debt;
-  paymentData: {
-    amount: number;
-    paymentDate: string;
-    notes?: string;
-  };
+  paymentData: { amount: number; paymentDate: string; notes?: string };
   updateDebtData: (params: { id: string; updates: Debt }) => Promise<void>;
   createTransaction: (data: {
     amount: number;
@@ -109,6 +104,7 @@ interface RecordPaymentOptions {
     debtId: string;
     date: string;
     notes: string;
+    envelopeId: string;
   }) => Promise<void>;
 }
 
@@ -207,9 +203,7 @@ export const handleBillConnectionsForDebt = async (options: BillConnectionOption
   }
 };
 
-/**
- * Build debt with payment history
- */
+/** Build debt with payment history */
 export const buildDebtWithPayment = (
   debt: Debt,
   paymentInfo: {
@@ -229,11 +223,9 @@ export const buildDebtWithPayment = (
     lastPaymentAmount: amount,
     status: newBalance === 0 ? DEBT_STATUS.PAID_OFF : debt.status,
   };
-
   if (!updatedDebt.paymentHistory) {
     updatedDebt.paymentHistory = [];
   }
-
   updatedDebt.paymentHistory.push({
     date: paymentDate,
     amount,
@@ -242,28 +234,22 @@ export const buildDebtWithPayment = (
     balanceAfter: newBalance,
     notes: notes || "",
   });
-
   return updatedDebt;
 };
 
-/**
- * Create a new debt with optional bill and envelope integration
- */
+/** Create a new debt with optional bill and envelope integration */
 export const createDebtOperation = async (
   debtData: DebtData & { connectionData?: ConnectionData },
   options: CreateDebtOptions
 ) => {
   const { connectionData, createEnvelope, createBill, updateBill, createDebtData } = options;
-
   try {
     logger.info("Creating debt with data", {
       debtData: debtData as unknown as Record<string, unknown>,
     });
-
     const { connectionData: _, ...cleanDebtData } = debtData;
     const createdDebt = await createDebtData(cleanDebtData);
     logger.info("Debt created", { createdDebt: createdDebt as unknown as Record<string, unknown> });
-
     await handleBillConnectionsForDebt({
       connectionData: connectionData || null,
       cleanDebtData,
@@ -272,7 +258,6 @@ export const createDebtOperation = async (
       createBill,
       updateBill,
     });
-
     return createdDebt;
   } catch (error) {
     logger.error("Error creating debt:", error);
@@ -280,31 +265,20 @@ export const createDebtOperation = async (
   }
 };
 
-/**
- * Record a debt payment
- */
+/** Record a debt payment */
 export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
   const { debt, paymentData, updateDebtData, createTransaction } = options;
-
   try {
     const { amount, paymentDate, notes } = paymentData;
-
-    // ARCHITECTURE: Debts are bills with finite amount/time. Paying a debt = creating a transaction.
-    // Envelopes are where all money is kept (source of truth).
-    // Behind the scenes: Supplemental accounts and savings goals are stored as envelopes
-    // (for data consistency and transaction routing), but filtered from envelope UI.
-    // CRITICAL: Debt payments route through envelopes (envelopes are source of truth)
-    // Get envelope from debt (via bill if linked, or direct envelopeId)
+    // ARCHITECTURE: Debts route through envelopes (source of truth)
     const { budgetDb } = await import("@/db/budgetDb");
-    const { validateAndNormalizeTransaction } = await import("@/domain/schemas/transaction");
     let envelopeId = debt.envelopeId;
-
     // If debt is linked to a bill, get envelope from bill
-    if (!envelopeId && (debt as { billId?: string }).billId) {
-      const bill = await budgetDb.bills.get((debt as { billId: string }).billId);
+    const debtWithBill = debt as unknown as { billId?: string };
+    if (!envelopeId && debtWithBill.billId) {
+      const bill = await budgetDb.bills.get(debtWithBill.billId);
       envelopeId = bill?.envelopeId;
     }
-
     // If still no envelope, try to find via bill relationship
     if (!envelopeId) {
       const bills = await budgetDb.bills.where("debtId").equals(debt.id).toArray();
@@ -312,27 +286,18 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
         envelopeId = bills[0].envelopeId;
       }
     }
-
     // Envelope is REQUIRED - all transactions must route through envelopes
-    // Note: Behind the scenes, this could be a regular envelope, supplemental account, or savings goal
-    // (all stored as envelopes in the database, but filtered from envelope UI)
     if (!envelopeId || envelopeId.trim() === "") {
       throw new Error(
-        `Debt payment requires an envelope. Debt "${debt.name}" must be linked to an envelope (directly or through a bill). Envelopes are the source of truth for all financial operations.`
+        `Debt payment requires an envelope. Debt "${debt.name}" must be linked to an envelope.`
       );
     }
-
-    // Validate envelope exists (behind the scenes, all are stored as envelopes)
     const envelope = await budgetDb.envelopes.get(envelopeId);
     if (!envelope) {
-      throw new Error(
-        `Cannot record debt payment: Envelope "${envelopeId}" does not exist. All debt payments must route through an existing envelope.`
-      );
+      throw new Error(`Cannot record debt payment: Envelope "${envelopeId}" does not exist.`);
     }
-
     const interestPortion = calculateInterestPortion(debt, amount);
     const principalPortion = amount - interestPortion;
-
     const updatedDebt = buildDebtWithPayment(debt, {
       amount,
       paymentDate,
@@ -340,26 +305,18 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
       principalPortion,
       notes,
     });
-
     await updateDebtData({ id: debt.id, updates: updatedDebt });
-
-    // ARCHITECTURE: Debts are just bills with finite amount/time. Paying a debt = creating a transaction.
-    // Envelopes are where all money is kept. The transaction will update the envelope balance.
+    // Paying a debt = creating a transaction through the envelope
     await createTransaction({
-      amount: -amount, // Negative for expense
+      amount: -amount,
       description: `${debt.name} Payment`,
       category: "Debt Payment",
-      envelopeId: envelopeId, // REQUIRED - transactions must have envelope (envelopes are source of truth)
+      envelopeId,
       debtId: debt.id,
       date: paymentDate,
       notes: notes || "",
     });
-
-    logger.info("Debt payment recorded successfully", {
-      debtId: debt.id,
-      envelopeId,
-      amount,
-    });
+    logger.info("Debt payment recorded successfully", { debtId: debt.id, envelopeId, amount });
     return updatedDebt;
   } catch (error) {
     logger.error("Error recording debt payment:", error);
@@ -367,16 +324,12 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
   }
 };
 
-/**
- * Link debt to an existing bill
- */
+/** Link debt to an existing bill */
 export const linkDebtToBillOperation = async (options: LinkDebtToBillOptions) => {
   const { debtId, billId, debts, bills, updateBill, updateDebtData } = options;
-
   try {
     const debt = debts.find((d) => d.id === debtId);
     const bill = bills.find((b) => b.id === billId);
-
     if (!debt || !bill) {
       throw new Error("Debt or bill not found");
     }
