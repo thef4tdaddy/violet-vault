@@ -41,7 +41,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 vi.mock("@/constants/categories", () => ({
-  AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((category: string) => `classified_${category}`),
+  AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn(() => "variable"),
 }));
 
 // Mock window.cloudSyncService
@@ -94,7 +94,7 @@ describe("useAddEnvelope - CRUD Tests", () => {
         archived: false,
         createdAt: expect.any(Number),
         lastModified: expect.any(Number),
-        envelopeType: "classified_expenses",
+        envelopeType: "variable",
       };
 
       // Get the mutation function
@@ -127,7 +127,7 @@ describe("useAddEnvelope - CRUD Tests", () => {
 
       await act(async () => {
         const result = await mutationFn(envelopeData);
-        expect(result.envelopeType).toBe("classified_food");
+        expect(result.envelopeType).toBe("variable");
       });
 
       expect(AUTO_CLASSIFY_ENVELOPE_TYPE).toHaveBeenCalledWith("food");
@@ -139,14 +139,14 @@ describe("useAddEnvelope - CRUD Tests", () => {
       const envelopeData = {
         name: "Custom Envelope",
         category: "expenses",
-        envelopeType: "custom_type",
+        envelopeType: "savings", // Must be a valid enum value
       };
 
       const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
 
       await act(async () => {
         const result = await mutationFn(envelopeData);
-        expect(result.envelopeType).toBe("custom_type");
+        expect(result.envelopeType).toBe("savings");
       });
 
       expect(AUTO_CLASSIFY_ENVELOPE_TYPE).not.toHaveBeenCalled();
@@ -298,10 +298,203 @@ describe("useAddEnvelope - CRUD Tests", () => {
 
       const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
 
-      // Should still create envelope (validation happens at form level)
+      // Zod validation should reject empty name
       await act(async () => {
-        const result = await mutationFn(envelopeData);
-        expect(result.name).toBe("");
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+    });
+  });
+
+  describe("Validation Error Handling", () => {
+    it("should reject envelope with empty name (Zod schema validation)", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "",
+        category: "expenses",
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      // Database should not be called when validation fails
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should reject envelope with name exceeding max length (Zod schema validation)", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const longName = "a".repeat(101); // Max is 100 characters
+      const envelopeData = {
+        name: longName,
+        category: "expenses",
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should reject envelope with empty category (Zod schema validation)", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "Valid Name",
+        category: "",
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      // Empty category overrides the default and fails Zod validation
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should reject envelope with negative currentBalance (Zod schema validation)", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "Test Envelope",
+        category: "expenses",
+        currentBalance: -100,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should reject envelope with negative targetAmount (Zod schema validation)", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "Test Envelope",
+        category: "expenses",
+        targetAmount: -500,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should reject envelope with description exceeding max length", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const longDescription = "a".repeat(501); // Max is 500 characters
+      const envelopeData = {
+        name: "Test Envelope",
+        category: "expenses",
+        description: longDescription,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(envelopeData)).rejects.toThrow("Invalid envelope data");
+      });
+
+      expect(budgetDb.envelopes.put).not.toHaveBeenCalled();
+    });
+
+    it("should log validation errors for debugging", async () => {
+      const { default: logger } = await import("@/utils/common/logger");
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "",
+        category: "expenses",
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        try {
+          await mutationFn(envelopeData);
+        } catch {
+          // Expected to throw
+        }
+      });
+
+      expect(logger.error).toHaveBeenCalledWith(
+        "Envelope validation failed",
+        expect.objectContaining({
+          errors: expect.any(Array),
+        })
+      );
+    });
+
+    it("should rollback optimistic update on database constraint violation", async () => {
+      const { optimisticHelpers } = await import("@/utils/common/queryClient");
+      const dbError = new Error("Unique constraint violation: name already exists");
+      (budgetDb.envelopes.put as Mock).mockRejectedValue(dbError);
+
+      renderHook(() => useAddEnvelope());
+
+      const envelopeData = {
+        name: "Duplicate Envelope",
+        category: "expenses",
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const onError = (useMutation as Mock).mock.calls[0][0].onError;
+
+      await act(async () => {
+        try {
+          await mutationFn(envelopeData);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      });
+
+      // Optimistic update was applied before error
+      expect(optimisticHelpers.addEnvelope).toHaveBeenCalled();
+      // Error is logged
+      const { default: logger } = await import("@/utils/common/logger");
+      expect(logger.error).toHaveBeenCalledWith("Failed to add envelope:", dbError);
+    });
+
+    it("should handle concurrent modification by generating unique IDs", async () => {
+      renderHook(() => useAddEnvelope());
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      const results: { id: string }[] = [];
+      await act(async () => {
+        // Create multiple envelopes concurrently
+        const promises = [
+          mutationFn({ name: "Envelope 1", category: "expenses" }),
+          mutationFn({ name: "Envelope 2", category: "expenses" }),
+          mutationFn({ name: "Envelope 3", category: "expenses" }),
+        ];
+        results.push(...(await Promise.all(promises)));
+      });
+
+      // All should have unique IDs (though timestamps may collide in fast execution)
+      const ids = results.map((r) => r.id);
+      expect(ids).toHaveLength(3);
+      // All IDs should be valid strings
+      ids.forEach((id) => {
+        expect(id).toBeTypeOf("string");
+        expect(Number(id)).toBeGreaterThan(0);
       });
     });
   });

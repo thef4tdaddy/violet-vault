@@ -484,4 +484,193 @@ describe("Bill Mutation Hooks", () => {
       expect(data).toEqual(existingBills);
     });
   });
+
+  describe("Validation Error Handling", () => {
+    it("should throw error when adding bill with missing required fields", async () => {
+      // Arrange
+      const { result } = renderHook(() => useAddBillMutation(), { wrapper });
+
+      const invalidBillData = {
+        name: "", // Empty name should trigger validation
+        provider: "Test Provider",
+        amount: 100,
+      };
+
+      // Act & Assert - Hook should throw validation error for empty name
+      await act(async () => {
+        await expect(result.current.mutateAsync(invalidBillData)).rejects.toThrow(
+          "Invalid bill data"
+        );
+      });
+    });
+
+    it("should throw error when updating non-existent bill", async () => {
+      // Arrange
+      mockDb._mockData.bills = [];
+      mockDb.bills.get.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
+
+      // Act & Assert
+      await act(async () => {
+        await expect(
+          result.current.mutateAsync({ billId: "nonexistent", updates: { name: "Test" } })
+        ).rejects.toThrow("not found");
+      });
+    });
+
+    it("should handle envelope relationship validation when marking paid", async () => {
+      // Arrange
+      const unpaidBill = mockDataGenerators.bill({ id: "bill_1", isPaid: false });
+      mockDb._mockData.bills = [unpaidBill];
+
+      // Mock envelope as not existing
+      mockDb.envelopes = {
+        ...mockDb.envelopes,
+        get: vi.fn().mockResolvedValue(undefined),
+        update: vi.fn(),
+      };
+
+      const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
+
+      const paymentData = {
+        billId: "bill_1",
+        paidAmount: 100,
+        envelopeId: "non-existent-envelope",
+      };
+
+      // Act & Assert - Should throw error when envelope doesn't exist
+      await act(async () => {
+        await expect(result.current.mutateAsync(paymentData)).rejects.toThrow("does not exist");
+      });
+    });
+
+    it("should handle payment processing errors", async () => {
+      // Arrange - Need to provide a valid envelope for the payment to proceed to transaction creation
+      const unpaidBill = mockDataGenerators.bill({
+        id: "bill_1",
+        isPaid: false,
+        envelopeId: "env-1",
+      });
+      const mockEnvelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000 });
+      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [mockEnvelope];
+      mockDb.envelopes.get = vi.fn().mockResolvedValue(mockEnvelope);
+      mockDb.transactions.put.mockRejectedValue(new Error("Transaction creation failed"));
+
+      const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
+
+      // Act & Assert
+      await act(async () => {
+        await expect(
+          result.current.mutateAsync({
+            billId: "bill_1",
+            paidAmount: 100,
+            envelopeId: "env-1",
+          })
+        ).rejects.toThrow("Transaction creation failed");
+      });
+    });
+
+    it("should handle recurring bill edge case with invalid frequency", async () => {
+      // Arrange
+      const { result } = renderHook(() => useAddBillMutation(), { wrapper });
+
+      const recurringBillData = {
+        name: "Recurring Bill",
+        provider: "Provider",
+        amount: 50,
+        isRecurring: true,
+        frequency: "", // Empty frequency for recurring bill - should fail validation
+      };
+
+      // Act & Assert - Should throw validation error
+      await act(async () => {
+        await expect(result.current.mutateAsync(recurringBillData)).rejects.toThrow(
+          "Invalid bill data"
+        );
+      });
+    });
+
+    it("should handle database error during bill deletion", async () => {
+      // Arrange
+      mockDb.bills.delete.mockRejectedValue(new Error("Database delete failed"));
+
+      const { result } = renderHook(() => useDeleteBillMutation(), { wrapper });
+
+      // Act & Assert
+      await act(async () => {
+        await expect(result.current.mutateAsync("bill_1")).rejects.toThrow(
+          "Database delete failed"
+        );
+      });
+    });
+
+    it("should handle negative payment amount gracefully", async () => {
+      // Arrange - Need to provide a valid envelope for payment
+      const unpaidBill = mockDataGenerators.bill({
+        id: "bill_1",
+        isPaid: false,
+        envelopeId: "env-1",
+      });
+      const mockEnvelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000 });
+      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [mockEnvelope];
+      mockDb.envelopes.get = vi.fn().mockResolvedValue(mockEnvelope);
+
+      const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
+
+      const paymentData = {
+        billId: "bill_1",
+        paidAmount: -100, // Negative amount
+        envelopeId: "env-1",
+      };
+
+      // Act - Should convert to positive or handle appropriately
+      await act(async () => {
+        await result.current.mutateAsync(paymentData);
+      });
+
+      // Assert - Transaction should have negative amount (expense)
+      const transaction = mockDb.transactions.put.mock.calls[0][0];
+      expect(transaction.amount).toBe(-100); // Negative for expense (absolute value of input)
+    });
+
+    it("should validate bill not found on mark as paid", async () => {
+      // Arrange
+      mockDb._mockData.bills = [];
+      mockDb.bills.get.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
+
+      // Act & Assert
+      await act(async () => {
+        await expect(
+          result.current.mutateAsync({
+            billId: "nonexistent",
+            paidAmount: 100,
+          })
+        ).rejects.toThrow("not found");
+      });
+    });
+
+    it("should handle concurrent bill updates gracefully", async () => {
+      // Arrange
+      const bill = mockDataGenerators.bill({ id: "bill_1" });
+      mockDb._mockData.bills = [bill];
+
+      const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
+
+      // Act - Simulate concurrent updates
+      await act(async () => {
+        await Promise.all([
+          result.current.mutateAsync({ billId: "bill_1", updates: { name: "Update 1" } }),
+          result.current.mutateAsync({ billId: "bill_1", updates: { amount: 200 } }),
+        ]);
+      });
+
+      // Assert - Both updates should have been called
+      expect(mockDb.bills.update).toHaveBeenCalledTimes(2);
+    });
+  });
 });
