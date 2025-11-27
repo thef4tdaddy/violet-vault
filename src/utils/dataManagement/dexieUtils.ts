@@ -93,6 +93,10 @@ interface LegacySupplementalAccount {
 
 /**
  * Convert a legacy savings goal to an envelope with envelopeType: "savings"
+ * 
+ * Note: Validation failures are logged but data is still imported to prevent data loss.
+ * This is intentional for import functionality - we prioritize preserving user data
+ * over strict validation, allowing the app to handle any inconsistencies at runtime.
  */
 const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
   const now = Date.now();
@@ -114,10 +118,10 @@ const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
     monthlyContribution: goal.monthlyContribution,
   };
 
-  // Validate with SavingsEnvelopeSchema
+  // Validate with SavingsEnvelopeSchema - warnings only, data is still imported
   const result = SavingsEnvelopeSchema.safeParse(envelope);
   if (!result.success) {
-    logger.warn("Savings goal envelope validation failed, using raw data", {
+    logger.warn("Savings goal envelope validation failed, using raw data to prevent data loss", {
       id: envelope.id,
       errors: result.error.issues,
     });
@@ -128,6 +132,10 @@ const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
 
 /**
  * Convert a legacy supplemental account to an envelope with envelopeType: "supplemental"
+ * 
+ * Note: Validation failures are logged but data is still imported to prevent data loss.
+ * This is intentional for import functionality - we prioritize preserving user data
+ * over strict validation, allowing the app to handle any inconsistencies at runtime.
  */
 const convertSupplementalAccountToEnvelope = (account: LegacySupplementalAccount): Envelope => {
   const now = Date.now();
@@ -147,13 +155,16 @@ const convertSupplementalAccountToEnvelope = (account: LegacySupplementalAccount
     accountType: account.accountType,
   };
 
-  // Validate with SupplementalAccountSchema
+  // Validate with SupplementalAccountSchema - warnings only, data is still imported
   const result = SupplementalAccountSchema.safeParse(envelope);
   if (!result.success) {
-    logger.warn("Supplemental account envelope validation failed, using raw data", {
-      id: envelope.id,
-      errors: result.error.issues,
-    });
+    logger.warn(
+      "Supplemental account envelope validation failed, using raw data to prevent data loss",
+      {
+        id: envelope.id,
+        errors: result.error.issues,
+      }
+    );
   }
 
   return envelope;
@@ -162,12 +173,16 @@ const convertSupplementalAccountToEnvelope = (account: LegacySupplementalAccount
 /**
  * Validate imported envelopes with EnvelopeSchema
  * Returns validated envelopes, logging warnings for invalid ones
+ * 
+ * Note: Validation failures are logged but data is still imported to prevent data loss.
+ * This is intentional for import functionality - we prioritize preserving user data
+ * over strict validation, allowing the app to handle any inconsistencies at runtime.
  */
 const validateEnvelopes = (envelopes: unknown[]): Envelope[] => {
   return envelopes.map((envelope) => {
     const result = EnvelopeSchema.safeParse(envelope);
     if (!result.success) {
-      logger.warn("Envelope validation failed, using raw data", {
+      logger.warn("Envelope validation failed, using raw data to prevent data loss", {
         id: (envelope as Record<string, unknown>)?.id,
         errors: result.error.issues,
       });
