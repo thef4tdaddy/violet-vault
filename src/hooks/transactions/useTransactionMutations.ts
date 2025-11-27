@@ -244,14 +244,17 @@ export const useTransactionMutations = () => {
       // Ensure date is a Date object if present (Zod allows Date | string, but db requires Date)
       // Create the normalized updates without the date first, then add it if present
       const { date, ...restData } = validationResult.data;
-      const normalizedUpdates: Partial<Transaction> = { ...restData };
+      const normalizedUpdates: Partial<Transaction> = {
+        ...restData,
+        lastModified: Date.now(),
+      };
 
       if (date !== undefined) {
         normalizedUpdates.date = date instanceof Date ? date : new Date(date);
       }
 
       await optimisticHelpers.updateTransaction(queryClient, id, normalizedUpdates);
-      await budgetDb.transactions.update(id, { ...normalizedUpdates, lastModified: Date.now() });
+      await budgetDb.transactions.update(id, normalizedUpdates);
       return { id, updates: normalizedUpdates };
     },
     onSuccess: (data) => {

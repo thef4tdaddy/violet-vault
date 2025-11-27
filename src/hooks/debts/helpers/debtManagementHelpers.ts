@@ -276,10 +276,10 @@ const resolveEnvelopeForDebt = async (debt: Debt): Promise<string> => {
   let envelopeId = debt.envelopeId;
 
   // If debt is linked to a bill, get envelope from bill
-  // Note: billId may exist on debt objects even though not in strict interface
-  const debtWithBillId = debt as unknown as { billId?: string };
-  if (!envelopeId && debtWithBillId.billId) {
-    const bill = await budgetDb.bills.get(debtWithBillId.billId);
+  // Note: billId may exist on debt objects at runtime even though not in strict interface
+  const debtWithPossibleBillId = debt as unknown as { billId?: string };
+  if (!envelopeId && debtWithPossibleBillId.billId) {
+    const bill = await budgetDb.bills.get(debtWithPossibleBillId.billId);
     envelopeId = bill?.envelopeId;
   }
 
