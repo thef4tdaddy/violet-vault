@@ -19,6 +19,12 @@ interface UseTransactionQueryOptions {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  /**
+   * Hide internal transfer transactions (Issue #1340)
+   * When true, filters out transactions with isInternalTransfer: true
+   * These are typically paycheck allocation transfers
+   */
+  hideInternalTransfers?: boolean;
 }
 
 export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) => {
@@ -31,6 +37,7 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
     limit = 100,
     sortBy = "date",
     sortOrder = "desc",
+    hideInternalTransfers = false, // Issue #1340: Option to hide internal transfers
   } = options;
 
   // No longer accessing Zustand store for transaction data
@@ -68,6 +75,11 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
           const transactionDate = new Date(t.date);
           return transactionDate >= start && transactionDate <= end;
         });
+      }
+
+      // Issue #1340: Filter out internal transfer transactions when requested
+      if (hideInternalTransfers) {
+        transactions = transactions.filter((t) => !t.isInternalTransfer);
       }
 
       // Apply additional filters
@@ -108,6 +120,7 @@ export const useTransactionQuery = (options: UseTransactionQueryOptions = {}) =>
       limit,
       sortBy,
       sortOrder,
+      hideInternalTransfers, // Issue #1340: Include in query key for caching
     }),
     queryFn: queryFunction,
     staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
