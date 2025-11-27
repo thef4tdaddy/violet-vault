@@ -1,18 +1,26 @@
 /**
  * Automatic Backup Service - Safety net before cloud operations
  * GitHub Issue #576 Phase 3: Automatic local backup before cloud ops
+ * Updated for Issue #1337: Backup/Restore uses envelope-based model (v2.0)
+ * - Savings goals are stored as envelopes with envelopeType: "savings"
+ * - Supplemental accounts are stored as envelopes with envelopeType: "supplemental"
+ * - No separate savingsGoals array in backup data
  */
 
 import logger from "../common/logger";
 import { budgetDb } from "../../db/budgetDb";
-import type { Envelope, Transaction, Bill, Debt, SavingsGoal, PaycheckHistory } from "@/db/types";
+import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
+import type { Envelope, Transaction, Bill, Debt, PaycheckHistory } from "@/db/types";
 
+/**
+ * Backup data structure for v2.0 data model
+ * All savings goals and supplemental accounts are stored as envelopes with envelopeType
+ */
 interface BackupData {
   envelopes: Envelope[];
   transactions: Transaction[];
   bills: Bill[];
   debts: Debt[];
-  savingsGoals: SavingsGoal[];
   paycheckHistory: PaycheckHistory[];
   metadata: unknown;
   timestamp: number;
@@ -78,7 +86,7 @@ class AutoBackupService {
           totalRecords: this.countRecords(backupData),
           sizeEstimate: JSON.stringify(backupData).length,
           duration,
-          version: "1.0",
+          version: "2.0",
         },
       };
 
@@ -106,26 +114,24 @@ class AutoBackupService {
   }
 
   /**
-   * Collect all data for backup
+   * Collect all data for backup (v2.0 data model)
+   * All savings goals and supplemental accounts are stored as envelopes with envelopeType
    */
   async collectAllData(): Promise<BackupData> {
-    const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
-      await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.debts.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-        budgetDb.budget.get("metadata"),
-      ]);
+    const [envelopes, transactions, bills, debts, paycheckHistory, metadata] = await Promise.all([
+      budgetDb.envelopes.toArray(),
+      budgetDb.transactions.toArray(),
+      budgetDb.bills.toArray(),
+      budgetDb.debts.toArray(),
+      budgetDb.paycheckHistory.toArray(),
+      budgetDb.budget.get("metadata"),
+    ]);
 
     return {
       envelopes: envelopes || [],
       transactions: transactions || [],
       bills: bills || [],
       debts: debts || [],
-      savingsGoals: savingsGoals || [],
       paycheckHistory: paycheckHistory || [],
       metadata: metadata || {},
       timestamp: Date.now(),
@@ -159,7 +165,9 @@ class AutoBackupService {
   }
 
   /**
-   * Restore data from backup
+   * Restore data from backup (v2.0 data model)
+   * All savings goals and supplemental accounts are restored as envelopes with envelopeType
+   * Validates all restored envelopes with Zod schemas
    */
   async restoreFromBackup(backupId: string): Promise<boolean> {
     try {
@@ -172,6 +180,22 @@ class AutoBackupService {
 
       const data = (backup as unknown as Backup).data;
 
+      // Validate envelopes with Zod schemas before restore
+      const validatedEnvelopes: Envelope[] = [];
+      if (data?.envelopes?.length) {
+        for (const envelope of data.envelopes) {
+          const result = validateEnvelopeSafe(envelope);
+          if (result.success) {
+            validatedEnvelopes.push(envelope);
+          } else {
+            logger.warn("⚠️ Skipping invalid envelope during restore", {
+              envelopeId: envelope.id,
+              errors: result.error?.issues,
+            });
+          }
+        }
+      }
+
       // Restore data in transaction for consistency
       await budgetDb.transaction(
         "rw",
@@ -180,7 +204,6 @@ class AutoBackupService {
           budgetDb.transactions,
           budgetDb.bills,
           budgetDb.debts,
-          budgetDb.savingsGoals,
           budgetDb.paycheckHistory,
           budgetDb.budget,
         ],
@@ -190,15 +213,13 @@ class AutoBackupService {
           await budgetDb.transactions.clear();
           await budgetDb.bills.clear();
           await budgetDb.debts.clear();
-          await budgetDb.savingsGoals.clear();
           await budgetDb.paycheckHistory.clear();
 
-          // Restore data
-          if (data?.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
+          // Restore validated envelopes (includes savings goals and supplemental accounts)
+          if (validatedEnvelopes.length) await budgetDb.envelopes.bulkAdd(validatedEnvelopes);
           if (data?.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
           if (data?.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
           if (data?.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
-          if (data?.savingsGoals?.length) await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
           if (data?.paycheckHistory?.length)
             await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
 
@@ -216,6 +237,8 @@ class AutoBackupService {
       logger.production("✅ Successfully restored from backup", {
         backupId,
         timestamp: new Date(backup.timestamp).toISOString(),
+        envelopesRestored: validatedEnvelopes.length,
+        envelopesSkipped: (data?.envelopes?.length || 0) - validatedEnvelopes.length,
       });
 
       return true;
@@ -280,7 +303,7 @@ class AutoBackupService {
   }
 
   /**
-   * Helper: Count total records
+   * Helper: Count total records (v2.0 data model)
    */
   countRecords(data: BackupData): number {
     return (
@@ -288,7 +311,6 @@ class AutoBackupService {
       (data.transactions?.length || 0) +
       (data.bills?.length || 0) +
       (data.debts?.length || 0) +
-      (data.savingsGoals?.length || 0) +
       (data.paycheckHistory?.length || 0)
     );
   }

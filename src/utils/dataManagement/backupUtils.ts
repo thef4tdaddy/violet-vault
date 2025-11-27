@@ -1,34 +1,28 @@
 import { budgetDb, getBudgetMetadata } from "../../db/budgetDb.ts";
 import logger from "../common/logger";
 
+/**
+ * Create a backup of current data (v2.0 data model)
+ * All savings goals and supplemental accounts are stored as envelopes with envelopeType
+ */
 export const backupCurrentData = async () => {
   try {
     logger.info("Creating backup of current data");
-    const [
-      envelopes,
-      bills,
-      transactions,
-      savingsGoals,
-      debts,
-      paycheckHistory,
-      auditLog,
-      metadata,
-    ] = await Promise.all([
-      budgetDb.envelopes.toArray(),
-      budgetDb.bills.toArray(),
-      budgetDb.transactions.toArray(),
-      budgetDb.savingsGoals.toArray(),
-      budgetDb.debts.toArray(),
-      budgetDb.paycheckHistory.toArray(),
-      budgetDb.auditLog.toArray(),
-      getBudgetMetadata(),
-    ]);
+    const [envelopes, bills, transactions, debts, paycheckHistory, auditLog, metadata] =
+      await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.debts.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        budgetDb.auditLog.toArray(),
+        getBudgetMetadata(),
+      ]);
 
     const currentData = {
       envelopes,
       bills,
       transactions,
-      savingsGoals,
       debts,
       paycheckHistory,
       auditLog,
