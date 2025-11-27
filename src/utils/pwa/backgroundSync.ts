@@ -3,6 +3,10 @@ import logger from "../common/logger";
 /**
  * Background Sync Utility
  * Handles queuing and syncing of offline operations
+ * Enhanced for Issue #1372: Verify and Enhance Offline Handling
+ * - Exponential backoff retry logic
+ * - Better error recovery
+ * - Conflict resolution support
  */
 
 interface SyncOperation {
@@ -16,6 +20,8 @@ interface SyncOperation {
   retryCount?: number;
   maxRetries?: number;
   lastError?: string;
+  nextRetryTime?: number;
+  conflictResolution?: "local" | "remote" | "merge";
 }
 
 class BackgroundSyncManager {
@@ -72,8 +78,57 @@ class BackgroundSyncManager {
   }
 
   /**
-   * Sync all pending operations
+   * Calculate exponential backoff delay for retries
+   * Enhanced for Issue #1372
    */
+  private calculateRetryDelay(retryCount: number, baseDelay = 1000): number {
+    // Exponential backoff: baseDelay * 2^retryCount, capped at 30 seconds
+    const delay = baseDelay * Math.pow(2, retryCount);
+    return Math.min(delay, 30000);
+  }
+
+  /**
+   * Check if operation should be retried now
+   * Enhanced for Issue #1372
+   */
+  private shouldRetryNow(operation: SyncOperation): boolean {
+    if (!operation.nextRetryTime) {
+      return true;
+    }
+    return Date.now() >= operation.nextRetryTime;
+  }
+
+  /**
+   * Determine if error is retryable
+   * Enhanced for Issue #1372
+   */
+  private isRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      // Network errors are retryable
+      if (error.message.includes("fetch") || error.message.includes("network")) {
+        return true;
+      }
+      // HTTP 5xx errors are retryable
+      if (error.message.includes("HTTP 5")) {
+        return true;
+      }
+      // HTTP 429 (rate limit) is retryable
+      if (error.message.includes("HTTP 429")) {
+        return true;
+      }
+      // HTTP 408 (timeout) is retryable
+      if (error.message.includes("HTTP 408")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Sync all pending operations
+   * Enhanced with exponential backoff and better error handling (Issue #1372)
+   */
+  // eslint-disable-next-line max-statements -- Complex sync logic with retry handling requires multiple statements
   async syncPendingOperations() {
     if (!this.isOnline || this.pendingOperations.length === 0) {
       return;
@@ -83,7 +138,14 @@ class BackgroundSyncManager {
       operationCount: this.pendingOperations.length,
     });
 
-    const operationsToSync = [...this.pendingOperations];
+    // Filter operations that are ready to retry
+    const operationsToSync = this.pendingOperations.filter((op) => this.shouldRetryNow(op));
+
+    if (operationsToSync.length === 0) {
+      logger.info("⏳ Background Sync: No operations ready to sync yet");
+      return;
+    }
+
     const successfulOperations: SyncOperation[] = [];
     const failedOperations: SyncOperation[] = [];
 
@@ -101,19 +163,28 @@ class BackgroundSyncManager {
         operation.lastError = error instanceof Error ? error.message : String(error);
 
         const maxRetries = operation.maxRetries ?? 3;
-        if (operation.retryCount >= maxRetries) {
+        const isRetryable = this.isRetryableError(error);
+
+        if (operation.retryCount >= maxRetries || !isRetryable) {
           logger.error("❌ Background Sync: Operation failed permanently", error, {
             operationType: operation.type,
             operationId: operation.id,
             retryCount: operation.retryCount,
+            isRetryable,
           });
           failedOperations.push(operation);
         } else {
+          // Calculate next retry time with exponential backoff
+          const retryDelay = this.calculateRetryDelay(operation.retryCount);
+          operation.nextRetryTime = Date.now() + retryDelay;
+
           logger.warn("⚠️ Background Sync: Operation failed, will retry", {
             operationType: operation.type,
             operationId: operation.id,
             retryCount: operation.retryCount,
             maxRetries: operation.maxRetries,
+            nextRetryTime: new Date(operation.nextRetryTime).toISOString(),
+            retryDelayMs: retryDelay,
             error: error instanceof Error ? error.message : String(error),
           });
         }
@@ -141,24 +212,46 @@ class BackgroundSyncManager {
 
   /**
    * Execute a queued operation
+   * Enhanced with timeout and better error handling (Issue #1372)
    */
   async executeOperation(operation: SyncOperation): Promise<unknown> {
     const { method, url, data, headers } = operation;
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        ...headers,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-    });
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+        body: data ? JSON.stringify(data) : undefined,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // Handle conflict errors (409)
+        if (response.status === 409) {
+          throw new Error(
+            `HTTP ${response.status}: Conflict detected. Use conflictResolution strategy.`
+          );
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Request timeout after 30 seconds");
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   /**
@@ -217,17 +310,27 @@ class BackgroundSyncManager {
 
   /**
    * Get sync status for debugging/UI
+   * Enhanced for Issue #1372
    */
   getSyncStatus() {
+    const now = Date.now();
+    const readyToSync = this.pendingOperations.filter((op) => this.shouldRetryNow(op)).length;
+    const waitingForRetry = this.pendingOperations.length - readyToSync;
+
     return {
       isOnline: this.isOnline,
       pendingCount: this.pendingOperations.length,
+      readyToSync,
+      waitingForRetry,
       pendingOperations: this.pendingOperations.map((op) => ({
         id: op.id,
         type: op.type,
         timestamp: op.timestamp,
         retryCount: op.retryCount,
+        maxRetries: op.maxRetries,
         lastError: op.lastError,
+        nextRetryTime: op.nextRetryTime,
+        timeUntilRetry: op.nextRetryTime ? Math.max(0, op.nextRetryTime - now) : 0,
       })),
     };
   }

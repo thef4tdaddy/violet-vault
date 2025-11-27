@@ -243,6 +243,7 @@ class ServiceWorkerDiagnostics {
 
   /**
    * Get service worker status
+   * Enhanced for Issue #1372: Better error recovery reporting
    */
   async getServiceWorkerStatus() {
     if (!("serviceWorker" in navigator)) {
@@ -284,6 +285,18 @@ class ServiceWorkerDiagnostics {
         status.installingState = registration.installing.state;
       }
 
+      // Enhanced error recovery info (Issue #1372)
+      if (registration.active) {
+        registration.active.addEventListener("error", (event) => {
+          logger.error("Service worker error detected", {
+            error: event.error?.message,
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+          });
+        });
+      }
+
       return status;
     } catch (error) {
       logger.error("❌ Failed to get service worker status", error);
@@ -292,6 +305,38 @@ class ServiceWorkerDiagnostics {
         supported: true,
         error: errorMessage,
       };
+    }
+  }
+
+  /**
+   * Attempt to recover from service worker errors
+   * Enhanced for Issue #1372
+   */
+  async recoverFromServiceWorkerError(): Promise<boolean> {
+    try {
+      if (!("serviceWorker" in navigator)) {
+        return false;
+      }
+
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        return false;
+      }
+
+      // Try to unregister and re-register
+      await registration.unregister();
+      logger.info("🔄 Service worker unregistered for recovery");
+
+      // Wait a moment before attempting re-registration
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Re-registration will be handled by Vite PWA plugin
+      // This is just for error recovery logging
+      logger.info("✅ Service worker recovery initiated");
+      return true;
+    } catch (error) {
+      logger.error("❌ Failed to recover from service worker error", error);
+      return false;
     }
   }
 
