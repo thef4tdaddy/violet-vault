@@ -27,3 +27,6 @@ export {
   isValidProps,
   validateComponentPropsStrict,
 } from "./propValidator";
+
+// Envelope validation
+export { isValidEnvelopeType } from "./envelopeValidation";

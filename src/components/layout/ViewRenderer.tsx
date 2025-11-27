@@ -21,6 +21,8 @@ import { ErrorBoundary } from "@highlight-run/react";
 import { useLayoutData } from "@/hooks/layout";
 import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
+import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { ENVELOPE_TYPES } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
 import type { Transaction as DbTransaction, Envelope as DbEnvelope } from "@/db/types";
@@ -186,8 +188,20 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   // Get paycheck operations
   const { handleDeletePaycheck } = usePaycheckOperations();
 
-  // Get savings goals operations
+  // Get savings goals operations (for mutations)
   const savingsGoalsHook = useSavingsGoals();
+
+  // Get savings envelopes (v2.0: savings goals are now envelopes)
+  const savingsEnvelopesQuery = useEnvelopesQuery({
+    envelopeTypes: [ENVELOPE_TYPES.SAVINGS],
+    excludeEnvelopeTypes: [], // Don't exclude anything when explicitly filtering by type
+  });
+
+  // Get supplemental account envelopes (v2.0: supplemental accounts are now envelopes)
+  const supplementalEnvelopesQuery = useEnvelopesQuery({
+    envelopeTypes: [ENVELOPE_TYPES.SUPPLEMENTAL],
+    excludeEnvelopeTypes: [], // Don't exclude anything when explicitly filtering by type
+  });
 
   // Extract budget operations
   const budgetOps = extractBudgetOperations(budget);
@@ -246,7 +260,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     savings: (
       <SavingsGoals
-        savingsGoals={savingsGoalsHook.savingsGoals as unknown as Array<Record<string, unknown>>}
+        savingsGoals={savingsEnvelopesQuery.envelopes as unknown as Array<Record<string, unknown>>}
         unassignedCash={unassignedCash}
         onAddGoal={savingsGoalsHook.helpers.addGoal}
         onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
@@ -261,7 +275,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
     ),
     supplemental: (
       <SupplementalAccounts
-        supplementalAccounts={budgetOps.supplementalAccounts as Array<Record<string, unknown>>}
+        supplementalAccounts={
+          supplementalEnvelopesQuery.envelopes as Array<Record<string, unknown>>
+        }
         onAddAccount={
           budgetOps.addSupplementalAccount as unknown as (account: {
             id: string | number;

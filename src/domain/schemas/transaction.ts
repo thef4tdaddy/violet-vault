@@ -97,6 +97,13 @@ export const validateTransactionPartial = (data: unknown): TransactionPartial =>
 };
 
 /**
+ * Safe validation helper for partial updates - returns result with error details
+ */
+export const validateTransactionPartialSafe = (data: unknown) => {
+  return TransactionPartialSchema.safeParse(data);
+};
+
+/**
  * Normalize transaction amount based on type
  * Ensures expenses are negative and income is positive
  * Use this before saving transactions to enforce the sign convention

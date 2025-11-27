@@ -4,6 +4,7 @@ import { useMemo, useCallback, useEffect } from "react";
 import { queryKeys } from "@/utils/common/queryClient";
 import { budgetDb, VioletVaultDB } from "@/db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
+import { isValidEnvelopeType } from "@/utils/validation/envelopeValidation";
 import logger from "@/utils/common/logger";
 import type { Envelope as DbEnvelope } from "@/db/types";
 
@@ -47,16 +48,6 @@ const DEFAULT_EXCLUDED_TYPES = [
   ENVELOPE_TYPES.SUPPLEMENTAL,
 ];
 
-// Valid envelope types from ENVELOPE_TYPES constant
-const VALID_ENVELOPE_TYPES = Object.values(ENVELOPE_TYPES);
-
-/**
- * Validate if an envelope type is a known valid type
- */
-const isValidEnvelopeType = (envelopeType: string | undefined): boolean => {
-  return !!envelopeType && VALID_ENVELOPE_TYPES.includes(envelopeType as (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES]);
-};
-
 /**
  * Transform database envelopes to application envelopes with computed properties
  */
@@ -80,6 +71,9 @@ const transformEnvelopes = (dbEnvelopes: DbEnvelope[]): Envelope[] => {
  * Apply envelope type filtering.
  * Note: When `envelopeTypes` is provided, it takes precedence over `excludeEnvelopeTypes`.
  * This allows for explicit inclusion filtering to override default exclusions.
+ *
+ * Handles undefined envelopeType by excluding envelopes without a valid type from include filters,
+ * and including them in exclude filters (they pass through unless explicitly excluded).
  */
 const filterByEnvelopeType = (
   envelopes: Envelope[],
@@ -88,10 +82,15 @@ const filterByEnvelopeType = (
 ): Envelope[] => {
   // Include filter takes precedence over exclude filter
   if (envelopeTypes && envelopeTypes.length > 0) {
-    return envelopes.filter((env) => envelopeTypes.includes(env.envelopeType));
+    // Only include envelopes that have a valid envelopeType matching the filter
+    return envelopes.filter((env) => env.envelopeType && envelopeTypes.includes(env.envelopeType));
   }
   if (excludeEnvelopeTypes && excludeEnvelopeTypes.length > 0) {
-    return envelopes.filter((env) => !excludeEnvelopeTypes.includes(env.envelopeType));
+    // Exclude envelopes that have a valid envelopeType in the exclusion list
+    // Envelopes with undefined envelopeType are included (pass through)
+    return envelopes.filter(
+      (env) => !env.envelopeType || !excludeEnvelopeTypes.includes(env.envelopeType)
+    );
   }
   return envelopes;
 };
@@ -122,8 +121,27 @@ const sortEnvelopes = (
 /**
  * Hook for envelope data fetching, filtering, and caching
  * Handles all TanStack Query logic for envelopes
+ *
+ * @example
+ * // Default: excludes savings, sinking_fund, and supplemental envelopes
+ * const { envelopes } = useEnvelopesQuery();
+ *
+ * @example
+ * // Get only savings envelopes (for savings goals page)
+ * const { envelopes } = useEnvelopesQuery({ envelopeTypes: ["savings"] });
+ *
+ * @example
+ * // Get only supplemental accounts
+ * const { envelopes } = useEnvelopesQuery({ envelopeTypes: ["supplemental"] });
+ *
+ * @example
+ * // Include all types (admin view)
+ * const { envelopes } = useEnvelopesQuery({ excludeEnvelopeTypes: [] });
+ *
+ * @example
+ * // Custom exclusion (e.g., exclude only bills)
+ * const { envelopes } = useEnvelopesQuery({ excludeEnvelopeTypes: ["bill"] });
  */
-
 export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
   const queryClient = useQueryClient();
   const {
