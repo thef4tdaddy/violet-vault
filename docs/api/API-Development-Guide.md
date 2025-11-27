@@ -185,35 +185,141 @@ const validated = FirebaseDocumentSchema.parse(result);
 
 **Base URL:** Local Dexie IndexedDB
 
+#### v2.0 Simplified Data Model
+
+VioletVault uses a simplified **two-entity system** with **one metadata record**:
+
+1. **Envelopes** - All money containers (source of truth for balances)
+2. **Transactions** - All financial operations (income, expenses, transfers)
+3. **Budget Metadata** - High-level balance tracking (unassigned cash, actual balance)
+
+**Key Principles:**
+
+- **Envelopes are the source of truth** - All money lives in envelopes
+- **Everything is an envelope** - Savings goals and supplemental accounts are stored as envelopes with special `envelopeType` values
+- **Transactions are the only way money moves** - All financial operations create transactions
+
+#### Envelope Types
+
+| Type           | Description                                             | UI Location                |
+| -------------- | ------------------------------------------------------- | -------------------------- |
+| `bill`         | Fixed recurring amounts (rent, utilities)               | Envelope UI                |
+| `variable`     | Regular but flexible spending (groceries, gas)          | Envelope UI                |
+| `savings`      | Savings goals (can have `targetDate` for sinking funds) | Savings Goals page         |
+| `supplemental` | Special accounts (FSA, HSA, 529, IRA, 401K)             | Supplemental Accounts page |
+
 #### Endpoints (Conceptual)
 
-| Method | Path                | Description        |
-| ------ | ------------------- | ------------------ |
-| GET    | `/api/envelopes`    | List all envelopes |
-| POST   | `/api/envelopes`    | Create envelope    |
-| GET    | `/api/transactions` | List transactions  |
-| POST   | `/api/transactions` | Create transaction |
-| GET    | `/api/bills`        | List bills         |
-| POST   | `/api/bills`        | Create bill        |
+| Method | Path                | Description                       |
+| ------ | ------------------- | --------------------------------- |
+| GET    | `/api/envelopes`    | List envelopes (filtered by type) |
+| POST   | `/api/envelopes`    | Create envelope (any type)        |
+| GET    | `/api/transactions` | List transactions                 |
+| POST   | `/api/transactions` | Create transaction                |
+| GET    | `/api/bills`        | List bills (payment schedules)    |
+| POST   | `/api/bills`        | Create bill                       |
 
-#### Example: Create Envelope
+#### Example: Create Regular Envelope
 
 ```typescript
 import { EnvelopeSchema } from "@/domain/schemas/envelope";
-import { db } from "@/db";
+import { budgetDb } from "@/db/budgetDb";
 
 const newEnvelope = {
+  id: "env_groceries",
   name: "Groceries",
-  balance: 500.0,
-  budgetedAmount: 500.0,
+  category: "Food",
+  archived: false,
   lastModified: Date.now(),
+  currentBalance: 500.0,
+  envelopeType: "variable", // bill | variable | savings | supplemental
 };
 
 // Validate with Zod
 const validated = EnvelopeSchema.parse(newEnvelope);
 
 // Save to Dexie
-await db.envelopes.add(validated);
+await budgetDb.envelopes.put(validated);
+```
+
+#### Example: Create Savings Goal as Envelope
+
+```typescript
+import { SavingsEnvelopeSchema } from "@/domain/schemas/envelope";
+import { budgetDb } from "@/db/budgetDb";
+
+const savingsGoal = {
+  id: "savings_emergency",
+  name: "Emergency Fund",
+  category: "Savings",
+  archived: false,
+  lastModified: Date.now(),
+  envelopeType: "savings",
+  targetAmount: 10000,
+  currentBalance: 2500,
+  priority: "high",
+  isPaused: false,
+  isCompleted: false,
+  targetDate: "2025-12-31", // Optional: makes it a "sinking fund"
+};
+
+// Validate with Zod
+const validated = SavingsEnvelopeSchema.parse(savingsGoal);
+
+// Save to Dexie
+await budgetDb.envelopes.put(validated);
+```
+
+#### Example: Create Supplemental Account as Envelope
+
+```typescript
+import { SupplementalAccountSchema } from "@/domain/schemas/envelope";
+import { budgetDb } from "@/db/budgetDb";
+
+const hsaAccount = {
+  id: "supp_hsa",
+  name: "Health Savings Account",
+  category: "Healthcare",
+  archived: false,
+  lastModified: Date.now(),
+  envelopeType: "supplemental",
+  currentBalance: 3000,
+  annualContribution: 3850,
+  accountType: "HSA",
+  isActive: true,
+  expirationDate: null, // HSA doesn't expire
+};
+
+// Validate with Zod
+const validated = SupplementalAccountSchema.parse(hsaAccount);
+
+// Save to Dexie
+await budgetDb.envelopes.put(validated);
+```
+
+#### Filtering Envelopes by Type
+
+```typescript
+// Get regular envelopes for main envelope UI
+const regularEnvelopes = await budgetDb.envelopes
+  .filter(
+    (env) => !env.archived && (!env.envelopeType || ["bill", "variable"].includes(env.envelopeType))
+  )
+  .toArray();
+
+// Get savings goals
+const savingsGoals = await budgetDb.envelopes
+  .where("envelopeType")
+  .equals("savings")
+  .filter((env) => !env.archived)
+  .toArray();
+
+// Get supplemental accounts
+const supplementalAccounts = await budgetDb.envelopes
+  .where("envelopeType")
+  .equals("supplemental")
+  .filter((env) => !env.archived)
+  .toArray();
 ```
 
 ---
