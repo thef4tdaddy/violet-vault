@@ -6,14 +6,15 @@ import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import { constructExportObject } from "./useExportDataHelpers";
 
 const gatherDataForExport = async (): Promise<
-  [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown]
+  [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown]
 > => {
   logger.info("Gathering data for export");
+  // v2.0: Savings goals are now stored as envelopes with envelopeType: "savings"
+  // No need to fetch from separate savingsGoals table
   return Promise.all([
     budgetDb.envelopes.toArray(),
     budgetDb.bills.toArray(),
     budgetDb.transactions.toArray(),
-    budgetDb.savingsGoals.toArray(),
     budgetDb.debts.toArray(),
     budgetDb.paycheckHistory.toArray(),
     budgetDb.auditLog.toArray(),
@@ -41,7 +42,7 @@ const triggerDownload = (exportableData: unknown): number => {
 };
 
 const logExportSuccess = (
-  data: [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown],
+  data: [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown],
   pureTransactions: unknown[],
   fileSize: number
 ): {
@@ -51,7 +52,7 @@ const logExportSuccess = (
   transactions: number;
   fileSizeKB: number;
 } => {
-  const [envelopes, bills, , , debts, , ,] = data;
+  const [envelopes, bills, , debts, , ,] = data;
 
   logger.info("Export completed successfully", {
     envelopes: envelopes.length,

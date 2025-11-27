@@ -135,20 +135,12 @@ export const constructExportObject = (
   data: unknown[],
   currentUser: { userName?: string; budgetId?: string; userColor?: string } | null
 ) => {
-  const [
-    envelopes,
-    bills,
-    transactions,
-    _legacySavingsGoals, // Ignored - we use envelope-filtered savings
-    debts,
-    paycheckHistory,
-    auditLog,
-    metadata,
-  ] = data as [
+  // v2.0: Savings goals are now stored as envelopes with envelopeType: "savings"
+  // No separate savingsGoals table - all data comes from envelopes
+  const [envelopes, bills, transactions, debts, paycheckHistory, auditLog, metadata] = data as [
     EnvelopeWithType[],
     unknown[],
     Array<{ type?: string }>,
-    unknown[],
     unknown[],
     unknown[],
     unknown[],

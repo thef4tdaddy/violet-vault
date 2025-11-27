@@ -84,9 +84,13 @@ export interface DexieData {
   paycheckHistory: PaycheckHistory[];
   unassignedCash: number;
   actualBalance: number;
+  isActualBalanceManual?: boolean;
+  biweeklyAllocation?: number;
   lastModified: number;
   // v2.0 metadata
   syncVersion: string;
+  // Additional metadata fields (passthrough for extensibility)
+  [key: string]: unknown;
 }
 
 // Define interface for sync result
@@ -543,16 +547,33 @@ class CloudSyncService {
         paycheckHistory: paycheckHistory.length,
       });
 
+      // Extract all metadata fields (not just unassignedCash and actualBalance)
+      const metadataFields: Record<string, unknown> = {
+        unassignedCash: extractNumericValue(metadata, "unassignedCash"),
+        actualBalance: extractNumericValue(metadata, "actualBalance"),
+        isActualBalanceManual: metadata?.isActualBalanceManual ?? false,
+        biweeklyAllocation:
+          typeof metadata?.biweeklyAllocation === "number" ? metadata.biweeklyAllocation : 0,
+        lastModified: Date.now(),
+        syncVersion: "2.0",
+      };
+
+      // Include any other metadata fields (passthrough for extensibility)
+      if (metadata) {
+        Object.keys(metadata).forEach((key) => {
+          if (!["id", "lastModified", "version"].includes(key) && !(key in metadataFields)) {
+            metadataFields[key] = metadata[key];
+          }
+        });
+      }
+
       return {
         envelopes,
         transactions,
         bills,
         debts,
         paycheckHistory,
-        unassignedCash: extractNumericValue(metadata, "unassignedCash"),
-        actualBalance: extractNumericValue(metadata, "actualBalance"),
-        lastModified: Date.now(),
-        syncVersion: "2.0",
+        ...metadataFields,
       };
     } catch (error) {
       logger.error("Failed to fetch data from Dexie:", error);
@@ -622,16 +643,39 @@ class CloudSyncService {
             await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
           }
 
-          // Save metadata
+          // Save metadata - include ALL metadata fields, not just unassignedCash and actualBalance
           // v2.0: supplementalAccounts no longer stored separately - now in envelopes
-          await budgetDb.budget.put({
+          const metadataToSave: BudgetRecord = {
             id: "metadata",
             unassignedCash: data.unassignedCash || 0,
             actualBalance: data.actualBalance || 0,
+            isActualBalanceManual: data.isActualBalanceManual ?? false,
+            biweeklyAllocation:
+              typeof data.biweeklyAllocation === "number" ? data.biweeklyAllocation : 0,
             lastUpdated: new Date().toISOString(),
             lastModified: Date.now(),
             syncVersion: data.syncVersion || "2.0",
-          } as BudgetRecord);
+          };
+
+          // Include any other metadata fields from synced data (passthrough for extensibility)
+          Object.keys(data).forEach((key) => {
+            if (
+              ![
+                "envelopes",
+                "transactions",
+                "bills",
+                "debts",
+                "paycheckHistory",
+                "lastModified",
+                "syncVersion",
+              ].includes(key) &&
+              !(key in metadataToSave)
+            ) {
+              metadataToSave[key] = data[key];
+            }
+          });
+
+          await budgetDb.budget.put(metadataToSave);
         }
       );
 
