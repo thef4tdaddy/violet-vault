@@ -167,15 +167,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
       };
     }
 
-    const stats = statsValidation.data;
-    return {
-      maxChunkSize: stats.maxChunkSize,
-      maxArrayChunkSize: stats.maxArrayChunkSize,
-      isInitialized: stats.isInitialized,
-      lastSyncTimestamp: stats.lastSyncTimestamp,
-      totalChunks: stats.totalChunks,
-      failedChunks: stats.failedChunks,
-    };
+    return statsValidation.data;
   }
 
   // Type-safe chunk ID generation
