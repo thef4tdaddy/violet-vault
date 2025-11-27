@@ -25,13 +25,105 @@ interface EnvelopesQueryOptions {
   includeArchived?: boolean;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  /**
+   * Filter to only include specific envelope types.
+   * When set, only envelopes matching these types will be returned.
+   * Example: ["savings"] to get only savings goals
+   */
+  envelopeTypes?: string[];
+  /**
+   * Filter to exclude specific envelope types.
+   * By default, excludes savings, sinking_fund, and supplemental envelopes.
+   * Set to empty array [] to include all envelope types.
+   */
+  excludeEnvelopeTypes?: string[];
   __db?: VioletVaultDB;
 }
+
+// Default envelope types to exclude (savings, sinking_fund, supplemental live in their own pages)
+const DEFAULT_EXCLUDED_TYPES = [
+  ENVELOPE_TYPES.SAVINGS,
+  ENVELOPE_TYPES.SINKING_FUND,
+  ENVELOPE_TYPES.SUPPLEMENTAL,
+];
+
+// Valid envelope types from ENVELOPE_TYPES constant
+const VALID_ENVELOPE_TYPES = Object.values(ENVELOPE_TYPES);
+
+/**
+ * Validate if an envelope type is a known valid type
+ */
+const isValidEnvelopeType = (envelopeType: string | undefined): boolean => {
+  return !!envelopeType && VALID_ENVELOPE_TYPES.includes(envelopeType as (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES]);
+};
+
+/**
+ * Transform database envelopes to application envelopes with computed properties
+ */
+const transformEnvelopes = (dbEnvelopes: DbEnvelope[]): Envelope[] => {
+  return dbEnvelopes.map((dbEnvelope) => ({
+    ...dbEnvelope,
+    color: undefined,
+    // Use database envelopeType if it's valid, otherwise auto-classify
+    envelopeType: isValidEnvelopeType(dbEnvelope.envelopeType)
+      ? dbEnvelope.envelopeType!
+      : AUTO_CLASSIFY_ENVELOPE_TYPE(dbEnvelope.category || "expenses"),
+    status: "active",
+    utilizationRate: 0,
+    available: dbEnvelope.currentBalance || 0,
+    monthlyBudget: dbEnvelope.targetAmount,
+    monthlyAmount: dbEnvelope.targetAmount,
+  }));
+};
+
+/**
+ * Apply envelope type filtering.
+ * Note: When `envelopeTypes` is provided, it takes precedence over `excludeEnvelopeTypes`.
+ * This allows for explicit inclusion filtering to override default exclusions.
+ */
+const filterByEnvelopeType = (
+  envelopes: Envelope[],
+  envelopeTypes?: string[],
+  excludeEnvelopeTypes?: string[]
+): Envelope[] => {
+  // Include filter takes precedence over exclude filter
+  if (envelopeTypes && envelopeTypes.length > 0) {
+    return envelopes.filter((env) => envelopeTypes.includes(env.envelopeType));
+  }
+  if (excludeEnvelopeTypes && excludeEnvelopeTypes.length > 0) {
+    return envelopes.filter((env) => !excludeEnvelopeTypes.includes(env.envelopeType));
+  }
+  return envelopes;
+};
+
+/**
+ * Sort envelopes by specified field and order
+ */
+const sortEnvelopes = (
+  envelopes: Envelope[],
+  sortBy: string,
+  sortOrder: "asc" | "desc"
+): Envelope[] => {
+  return [...envelopes].sort((a, b) => {
+    const aValue: unknown = a[sortBy as keyof typeof a];
+    const bValue: unknown = b[sortBy as keyof typeof b];
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    }
+
+    const aStr = String(aValue || "").toLowerCase();
+    const bStr = String(bValue || "").toLowerCase();
+
+    return sortOrder === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+  });
+};
 
 /**
  * Hook for envelope data fetching, filtering, and caching
  * Handles all TanStack Query logic for envelopes
  */
+
 export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
   const queryClient = useQueryClient();
   const {
@@ -39,6 +131,8 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
     includeArchived = false,
     sortBy = "name",
     sortOrder = "asc",
+    envelopeTypes,
+    excludeEnvelopeTypes = DEFAULT_EXCLUDED_TYPES,
     __db,
   } = options || {};
   const dbInstance = __db ?? budgetDb;
@@ -48,30 +142,14 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
     logger.debug("TanStack Query: Fetching envelopes from Dexie");
 
     try {
-      let dbEnvelopes: DbEnvelope[] = [];
+      // Fetch from Dexie (single source of truth for local data)
+      const dbEnvelopes: DbEnvelope[] = category
+        ? await dbInstance.getEnvelopesByCategory(category)
+        : await dbInstance.envelopes.toArray();
 
-      // Always fetch from Dexie (single source of truth for local data)
-      if (category) {
-        dbEnvelopes = await dbInstance.getEnvelopesByCategory(category);
-      } else {
-        dbEnvelopes = await dbInstance.envelopes.toArray();
-      }
-
-      // Transform database envelopes to application envelopes with computed properties
-      let envelopes: Envelope[] = dbEnvelopes.map((dbEnvelope) => ({
-        ...dbEnvelope,
-        color: undefined, // Will be computed elsewhere
-        envelopeType: AUTO_CLASSIFY_ENVELOPE_TYPE(dbEnvelope.category || "expenses"),
-        status: "active", // Default status, computed elsewhere
-        utilizationRate: 0, // Computed elsewhere
-        available: dbEnvelope.currentBalance || 0, // Default to current balance
-        monthlyBudget: dbEnvelope.targetAmount, // Use target as monthly budget
-        monthlyAmount: dbEnvelope.targetAmount, // Use target as monthly amount
-      }));
-
-      logger.debug("TanStack Query: Loaded from Dexie", {
-        count: envelopes.length,
-      });
+      // Transform and log
+      let envelopes = transformEnvelopes(dbEnvelopes);
+      logger.debug("TanStack Query: Loaded from Dexie", { count: envelopes.length });
 
       // Debug: Check for corrupted envelopes (missing critical fields)
       const corruptedEnvelopes = dbEnvelopes.filter((env) => !env.name || !env.category);
@@ -87,59 +165,34 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
         });
       }
 
-      // Ensure all envelopes have envelopeType set for consistency
-      envelopes = envelopes.map((envelope) => ({
-        ...envelope,
-        envelopeType:
-          envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
-      }));
-
-      // Apply filters
-      let filteredEnvelopes = envelopes;
-
+      // Apply category filter
       if (category) {
-        filteredEnvelopes = envelopes.filter((env) => env.category === category);
+        envelopes = envelopes.filter((env) => env.category === category);
       }
 
+      // Apply archived filter
       if (!includeArchived) {
-        filteredEnvelopes = filteredEnvelopes.filter((env) => !env.archived);
+        envelopes = envelopes.filter((env) => !env.archived);
       }
 
-      // Savings goals and sinking funds live in their own modules
-      filteredEnvelopes = filteredEnvelopes.filter(
-        (env) =>
-          env.envelopeType !== ENVELOPE_TYPES.SAVINGS &&
-          env.envelopeType !== ENVELOPE_TYPES.SINKING_FUND
-      );
+      // Apply envelope type filtering
+      envelopes = filterByEnvelopeType(envelopes, envelopeTypes, excludeEnvelopeTypes);
 
-      // Apply sorting
-      filteredEnvelopes.sort((a, b) => {
-        let aValue: unknown = a[sortBy as keyof typeof a];
-        let bValue: unknown = b[sortBy as keyof typeof b];
-
-        // Handle numeric values
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        // Handle string values
-        const aStr = String(aValue || "").toLowerCase();
-        const bStr = String(bValue || "").toLowerCase();
-
-        if (sortOrder === "asc") {
-          return aStr.localeCompare(bStr);
-        } else {
-          return bStr.localeCompare(aStr);
-        }
-      });
-
-      return filteredEnvelopes;
+      // Apply sorting and return
+      return sortEnvelopes(envelopes, sortBy, sortOrder);
     } catch (error) {
       logger.error("TanStack Query: Dexie fetch failed", error);
-      // Return empty array when Dexie fails (no fallback to Zustand)
       return [];
     }
-  }, [category, includeArchived, sortBy, sortOrder, dbInstance]);
+  }, [
+    category,
+    includeArchived,
+    sortBy,
+    sortOrder,
+    envelopeTypes,
+    excludeEnvelopeTypes,
+    dbInstance,
+  ]);
 
   // Memoized query options for performance
   const queryOptions = useMemo<UseQueryOptions<Envelope[], unknown>>(
@@ -149,6 +202,8 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
         includeArchived,
         sortBy,
         sortOrder,
+        envelopeTypes,
+        excludeEnvelopeTypes,
       }),
       queryFn: queryFunction,
       staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
@@ -159,7 +214,15 @@ export const useEnvelopesQuery = (options?: EnvelopesQueryOptions) => {
       initialData: undefined, // Remove initialData to prevent persister errors
       enabled: true,
     }),
-    [category, includeArchived, sortBy, sortOrder, queryFunction]
+    [
+      category,
+      includeArchived,
+      sortBy,
+      sortOrder,
+      envelopeTypes,
+      excludeEnvelopeTypes,
+      queryFunction,
+    ]
   );
 
   // Main envelopes query

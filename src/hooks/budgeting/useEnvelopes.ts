@@ -3,10 +3,30 @@ import { useEnvelopeOperations } from "./useEnvelopeOperations";
 import { useEnvelopeCalculations } from "./useEnvelopeCalculations";
 
 /**
+ * Options for useEnvelopes hook
+ */
+interface UseEnvelopesOptions {
+  category?: string;
+  includeArchived?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  /**
+   * Filter to only include specific envelope types.
+   * Example: ["savings"] to get only savings goals
+   */
+  envelopeTypes?: string[];
+  /**
+   * Filter to exclude specific envelope types.
+   * By default, excludes savings, sinking_fund, and supplemental envelopes.
+   */
+  excludeEnvelopeTypes?: string[];
+}
+
+/**
  * Specialized hook for envelope management
  * Orchestrates envelope operations using focused sub-hooks
  */
-const useEnvelopes = (options = {}) => {
+const useEnvelopes = (options: UseEnvelopesOptions = {}) => {
   // Extract data fetching logic
   const queryResult = useEnvelopesQuery(options);
 
