@@ -356,6 +356,19 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     currentUser: { uid: "test-user" },
   };
 
+  // Type alias for DexieData to simplify type assertions
+  type DexieData = Awaited<ReturnType<typeof cloudSyncService.fetchDexieData>>;
+
+  // Empty cloud data for null cloud data test case
+  const emptyCloudData = {
+    envelopes: undefined,
+    transactions: undefined,
+    bills: undefined,
+    paycheckHistory: undefined,
+    debts: undefined,
+    lastModified: undefined,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     if (cloudSyncService.isRunning) {
@@ -381,7 +394,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
         unassignedCash: 0,
         actualBalance: 0,
-      };
+      } as DexieData;
 
       const cloudData = {
         envelopes: [{ id: "env-1", name: "Old Name" }],
@@ -393,13 +406,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      // Access the private method through prototype
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData, cloudData);
 
       expect(result.direction).toBe("toFirestore");
     });
@@ -427,12 +434,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       expect(result.direction).toBe("fromFirestore");
     });
@@ -462,12 +464,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       expect(result.direction).toBe("bidirectional");
     });
@@ -508,12 +505,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       // Shared budget user should prefer cloud when cloud has more data
       expect(result.direction).toBe("fromFirestore");
@@ -544,12 +536,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       expect(result.direction).toBe("toFirestore");
     });
@@ -577,12 +564,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       expect(result.direction).toBe("fromFirestore");
     });
@@ -612,12 +594,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       expect(result.direction).toBe("toFirestore");
     });
@@ -656,12 +633,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       // Shared budget user should prefer download even with empty data
       expect(result.direction).toBe("fromFirestore");
@@ -690,12 +662,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "2.0",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       // Should upload when cloud has no timestamp
       expect(result.direction).toBe("toFirestore");
@@ -714,14 +681,13 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         actualBalance: 0,
       };
 
+      // Use emptyCloudData to represent null/undefined cloud data scenario
       const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        null as unknown as { lastModified?: number }
+        localData as DexieData,
+        emptyCloudData
       );
 
-      // Should upload when cloud data is null
+      // Should upload when cloud data is null/empty
       expect(result.direction).toBe("toFirestore");
     });
 
@@ -751,12 +717,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
         syncVersion: "1.x",
       };
 
-      const result = cloudSyncService.determineSyncDirection(
-        localData as ReturnType<typeof cloudSyncService.fetchDexieData> extends Promise<infer T>
-          ? T
-          : never,
-        cloudData
-      );
+      const result = cloudSyncService.determineSyncDirection(localData as DexieData, cloudData);
 
       // Should recognize legacy savingsGoals as cloud data and download
       expect(result.direction).toBe("fromFirestore");
@@ -1128,7 +1089,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
 
     it("should return false when no config", () => {
       cloudSyncService.stop();
-      // @ts-expect-error - accessing private property for testing
+      // Reset config to null to test behavior when service hasn't been configured
       cloudSyncService.config = null;
 
       expect(cloudSyncService.isSharedBudgetUser()).toBe(false);
