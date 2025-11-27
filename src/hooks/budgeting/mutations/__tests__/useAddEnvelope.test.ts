@@ -40,6 +40,11 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
+// Mock AUTO_CLASSIFY_ENVELOPE_TYPE to return a valid envelope type.
+// Returns 'variable' instead of dynamic classification because:
+// 1. These tests focus on validation error handling, not classification logic
+// 2. Classification logic is tested separately in the AUTO_CLASSIFY_ENVELOPE_TYPE tests
+// 3. The mock value must be a valid EnvelopeType to pass Zod validation
 vi.mock("@/constants/categories", () => ({
   AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn(() => "variable"),
 }));
