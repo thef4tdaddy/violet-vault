@@ -4,6 +4,7 @@
  * Updated for Issue #1340: Creates proper transaction records for paycheck processing
  */
 
+import { v4 as uuidv4 } from "uuid";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
 import {
   calculatePaycheckBalances,
@@ -241,7 +242,8 @@ export const processPaycheck = async (
   envelopesQuery: BalanceCollection,
   savingsGoalsQuery: BalanceCollection
 ) => {
-  const paycheckId = `paycheck_${Date.now()}`;
+  // Use uuidv4() for guaranteed uniqueness to prevent collisions
+  const paycheckId = `paycheck_${uuidv4()}`;
 
   logger.info("Starting paycheck processing", {
     paycheckId,

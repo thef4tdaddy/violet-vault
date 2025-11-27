@@ -4,6 +4,7 @@
  * Issue #1340: Ensure Proper Transaction Creation for Paycheck Processing
  */
 
+import { v4 as uuidv4 } from "uuid";
 import { budgetDb } from "@/db/budgetDb";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 import logger from "@/utils/common/logger";
@@ -58,8 +59,9 @@ export const createPaycheckTransactions = async (
   const transactionDate = paycheckData.date ? new Date(paycheckData.date) : new Date();
 
   // 1. Create income transaction to "unassigned"
+  // Use uuidv4() for guaranteed uniqueness
   const incomeTransactionData = {
-    id: `income_${paycheckData.paycheckId}_${timestamp}`,
+    id: `income_${paycheckData.paycheckId}_${uuidv4()}`,
     date: transactionDate,
     amount: paycheckData.amount, // Positive for income
     envelopeId: "unassigned",
@@ -91,7 +93,9 @@ export const createPaycheckTransactions = async (
   for (const allocation of allocations) {
     if (allocation.amount <= 0) continue;
 
-    const transferId = `transfer_${paycheckData.paycheckId}_${allocation.envelopeId}_${timestamp}`;
+    // Use uuidv4() for guaranteed uniqueness to prevent collisions
+    // when multiple allocations go to the same envelope
+    const transferId = `transfer_${paycheckData.paycheckId}_${allocation.envelopeId}_${uuidv4()}`;
 
     // Create transfer transaction (negative from unassigned perspective)
     const transferTransactionData = {
