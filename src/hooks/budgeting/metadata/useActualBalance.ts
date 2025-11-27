@@ -5,7 +5,7 @@ import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "../../..
 import type { BudgetRecord } from "../../../db/types";
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
-import { validateBalance } from "../../../utils/validation";
+import { validateBalanceValue } from "@/domain/schemas/budget-record";
 
 // Helper to initialize default metadata
 const initializeDefaultMetadata = async (): Promise<BudgetRecord> => {
@@ -116,7 +116,13 @@ export const useActualBalance = () => {
     async (newBalance: number, options: { isManual?: boolean; author?: string } = {}) => {
       const { isManual = true, author = "Unknown User" } = options;
 
-      if (!validateBalance(newBalance)) {
+      // Validate balance using Zod schema
+      const validationResult = validateBalanceValue(newBalance);
+      if (!validationResult.success) {
+        logger.warn("Invalid actual balance:", {
+          balance: newBalance,
+          errors: validationResult.error.issues,
+        });
         return false;
       }
 

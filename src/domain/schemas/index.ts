@@ -151,9 +151,13 @@ export {
 export {
   BudgetRecordSchema,
   BudgetRecordPartialSchema,
+  BalanceValueSchema,
+  OptionalBalanceValueSchema,
   validateBudgetRecord,
   validateBudgetRecordSafe,
   validateBudgetRecordPartial,
+  validateBalanceValue,
+  validateBalanceValueStrict,
   type BudgetRecord,
   type BudgetRecordPartial,
 } from "./budget-record";

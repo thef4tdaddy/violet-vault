@@ -3,6 +3,7 @@ import { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
+import { validateBalanceValue } from "@/domain/schemas/budget-record";
 
 export const useActualBalanceOperations = () => {
   const { metadata, actualBalance } = useBudgetMetadataQuery();
@@ -12,19 +13,12 @@ export const useActualBalanceOperations = () => {
     async (balance: number, options: { isManual?: boolean; author?: string } = {}) => {
       const { isManual = true, author = "Unknown User" } = options;
 
-      if (typeof balance !== "number" || isNaN(balance)) {
-        logger.warn("Invalid actual balance:", { balance });
-        return false;
-      }
-
-      // Business logic: reasonable balance limits
-      const MAX_BALANCE = 1000000; // $1M limit
-      const MIN_BALANCE = -100000; // -$100k limit (for overdrafts)
-
-      if (balance > MAX_BALANCE || balance < MIN_BALANCE) {
-        logger.warn("Balance outside reasonable limits:", {
-          value: balance,
-          limits: { max: MAX_BALANCE, min: MIN_BALANCE },
+      // Validate balance using Zod schema
+      const validationResult = validateBalanceValue(balance);
+      if (!validationResult.success) {
+        logger.warn("Invalid actual balance:", {
+          balance,
+          errors: validationResult.error.issues,
         });
         return false;
       }
