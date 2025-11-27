@@ -1,38 +1,14 @@
 import { budgetDb } from "../db/budgetDb";
-import type {
-  BudgetRecord,
-  Envelope,
-  Transaction,
-  Bill,
-  SavingsGoal,
-  PaycheckHistory,
-  Debt,
-} from "../db/types";
+import type { BudgetRecord, Envelope, Transaction, Bill, PaycheckHistory, Debt } from "../db/types";
 import type { CloudSyncConfig } from "../types/firebase";
 import logger from "../utils/common/logger";
 import chunkedSyncService from "./chunkedSyncService";
 import { autoBackupService } from "../utils/sync/autoBackupService";
 import { syncHealthMonitor } from "../utils/sync/syncHealthMonitor";
+import { ENVELOPE_TYPES } from "../constants/categories";
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isSupplementalAccountRecord = (value: unknown): value is SupplementalAccountRecord => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  const { id, name, type, balance } = value;
-  const isValidId = typeof id === "undefined" || typeof id === "string" || typeof id === "number";
-  const isValidName = typeof name === "undefined" || typeof name === "string";
-  const isValidType = typeof type === "undefined" || typeof type === "string";
-  const isValidBalance = typeof balance === "undefined" || typeof balance === "number";
-
-  return isValidId && isValidName && isValidType && isValidBalance;
-};
 
 const extractNumericValue = (
   record: BudgetRecord | undefined,
@@ -47,17 +23,6 @@ const extractNumericValue = (
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;
-};
-
-const extractSupplementalAccounts = (
-  record: BudgetRecord | undefined
-): SupplementalAccountRecord[] => {
-  const value = record?.["supplementalAccounts"];
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter(isSupplementalAccountRecord);
 };
 
 /**
@@ -76,19 +41,28 @@ export interface SyncConfig {
 }
 
 // Define interface for data objects
+// v2.0: Savings goals and supplemental accounts are stored as envelopes with envelopeType
 export interface DataCollection {
   envelopes?: unknown[];
   transactions?: unknown[];
   bills?: unknown[];
   paycheckHistory?: unknown[];
-  savingsGoals?: unknown[];
   debts?: unknown[];
   unassignedCash?: number;
   actualBalance?: number;
-  supplementalAccounts?: unknown[];
   lastModified?: number;
+  // v2.0 metadata
+  syncVersion?: string;
+  // Legacy fields (for backward compatibility during migration)
+  /** @deprecated Use envelopes with envelopeType: "savings" instead */
+  savingsGoals?: unknown[];
+  /** @deprecated Use envelopes with envelopeType: "supplemental" instead */
+  supplementalAccounts?: unknown[];
 }
 
+// v2.0: SupplementalAccountRecord is deprecated - supplemental accounts are now stored as envelopes
+// This type is kept for backward compatibility during migration
+/** @deprecated Use Envelope with envelopeType: "supplemental" instead */
 type SupplementalAccountRecord = {
   id?: string | number;
   name?: string;
@@ -97,18 +71,22 @@ type SupplementalAccountRecord = {
   [key: string]: unknown;
 };
 
+// v2.0: Export the type for migration service compatibility
+export type { SupplementalAccountRecord };
+
 // Define interface for the specific return type of fetchDexieData
+// v2.0: Savings goals and supplemental accounts are stored as envelopes with envelopeType
 export interface DexieData {
   envelopes: Envelope[];
   transactions: Transaction[];
   bills: Bill[];
   debts: Debt[];
-  savingsGoals: SavingsGoal[];
   paycheckHistory: PaycheckHistory[];
   unassignedCash: number;
   actualBalance: number;
-  supplementalAccounts: SupplementalAccountRecord[];
   lastModified: number;
+  // v2.0 metadata
+  syncVersion: string;
 }
 
 // Define interface for sync result
@@ -246,17 +224,20 @@ class CloudSyncService {
       try {
         const cloudResult = await chunkedSyncService.loadFromCloud();
         cloudData = cloudResult || null;
-        logger.debug("📊 CloudSyncService received data from chunkedSyncService", {
+        // v2.0: Log cloud data structure - savings goals are now in envelopes
+        logger.debug("📊 CloudSyncService received data from chunkedSyncService (v2.0)", {
           hasData: !!cloudData,
           keys: cloudData ? Object.keys(cloudData) : [],
+          syncVersion: (cloudData as DataCollection)?.syncVersion || "1.x",
           arrayLengths: cloudData
             ? {
                 envelopes: (cloudData as DataCollection).envelopes?.length || 0,
                 transactions: (cloudData as DataCollection).transactions?.length || 0,
                 bills: (cloudData as DataCollection).bills?.length || 0,
                 paycheckHistory: (cloudData as DataCollection).paycheckHistory?.length || 0,
-                savingsGoals: (cloudData as DataCollection).savingsGoals?.length || 0,
                 debts: (cloudData as DataCollection).debts?.length || 0,
+                // Legacy: log if old savingsGoals array exists
+                legacySavingsGoals: (cloudData as DataCollection).savingsGoals?.length || 0,
               }
             : null,
         });
@@ -292,15 +273,16 @@ class CloudSyncService {
 
       // Determine sync direction
       const syncDecision = this.determineSyncDirection(localData, cloudData as DataCollection);
+      // v2.0: Updated logging - savings goals are now in envelopes
       logger.info(`🔄 Sync direction determined: ${syncDecision.direction}`, {
         localLastModified: localData?.lastModified,
         cloudLastModified: (cloudData as DataCollection)?.lastModified,
+        syncVersion: (cloudData as DataCollection)?.syncVersion || "1.x",
         hasLocalData: !!(
           localData?.envelopes?.length ||
           localData?.transactions?.length ||
           localData?.bills?.length ||
           localData?.paycheckHistory?.length ||
-          localData?.savingsGoals?.length ||
           localData?.debts?.length
         ),
         hasCloudData: !!(
@@ -308,8 +290,9 @@ class CloudSyncService {
           (cloudData as DataCollection)?.transactions?.length ||
           (cloudData as DataCollection)?.bills?.length ||
           (cloudData as DataCollection)?.paycheckHistory?.length ||
-          (cloudData as DataCollection)?.savingsGoals?.length ||
-          (cloudData as DataCollection)?.debts?.length
+          (cloudData as DataCollection)?.debts?.length ||
+          // Legacy: check for old savingsGoals array
+          (cloudData as DataCollection)?.savingsGoals?.length
         ),
       });
 
@@ -527,12 +510,12 @@ class CloudSyncService {
 
   async fetchDexieData(): Promise<DexieData> {
     try {
-      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata]: [
+      // v2.0: Fetch all data - savings goals and supplemental accounts are now stored as envelopes
+      const [envelopes, transactions, bills, debts, paycheckHistory, metadata]: [
         Envelope[],
         Transaction[],
         Bill[],
         Debt[],
-        SavingsGoal[],
         PaycheckHistory[],
         BudgetRecord | undefined,
       ] = await Promise.all([
@@ -540,22 +523,36 @@ class CloudSyncService {
         budgetDb.transactions.toArray(),
         budgetDb.bills.toArray(),
         budgetDb.debts.toArray(),
-        budgetDb.savingsGoals.toArray(),
         budgetDb.paycheckHistory.toArray(),
         budgetDb.budget.get("metadata"),
       ]);
+
+      // v2.0: Log envelope type distribution for debugging
+      const savingsEnvelopes = envelopes.filter((e) => e.envelopeType === ENVELOPE_TYPES.SAVINGS);
+      const supplementalEnvelopes = envelopes.filter(
+        (e) => e.envelopeType === ENVELOPE_TYPES.SUPPLEMENTAL
+      );
+
+      logger.debug("📊 Fetched Dexie data (v2.0 envelope model)", {
+        totalEnvelopes: envelopes.length,
+        savingsEnvelopes: savingsEnvelopes.length,
+        supplementalEnvelopes: supplementalEnvelopes.length,
+        transactions: transactions.length,
+        bills: bills.length,
+        debts: debts.length,
+        paycheckHistory: paycheckHistory.length,
+      });
 
       return {
         envelopes,
         transactions,
         bills,
         debts,
-        savingsGoals,
         paycheckHistory,
         unassignedCash: extractNumericValue(metadata, "unassignedCash"),
         actualBalance: extractNumericValue(metadata, "actualBalance"),
-        supplementalAccounts: extractSupplementalAccounts(metadata),
         lastModified: Date.now(),
+        syncVersion: "2.0",
       };
     } catch (error) {
       logger.error("Failed to fetch data from Dexie:", error);
@@ -565,9 +562,24 @@ class CloudSyncService {
 
   async saveToDexie(data: DexieData) {
     try {
-      logger.debug("💾 Saving cloud data to Dexie...");
+      logger.debug("💾 Saving cloud data to Dexie (v2.0 envelope model)...");
+
+      // v2.0: Log envelope type distribution for debugging
+      const savingsEnvelopes = data.envelopes.filter(
+        (e) => e.envelopeType === ENVELOPE_TYPES.SAVINGS
+      );
+      const supplementalEnvelopes = data.envelopes.filter(
+        (e) => e.envelopeType === ENVELOPE_TYPES.SUPPLEMENTAL
+      );
+
+      logger.debug("📊 Saving envelope types:", {
+        totalEnvelopes: data.envelopes.length,
+        savingsEnvelopes: savingsEnvelopes.length,
+        supplementalEnvelopes: supplementalEnvelopes.length,
+      });
 
       // Clear existing data and save new data in a transaction
+      // v2.0: savingsGoals table is deprecated - data now stored in envelopes with envelopeType
       await budgetDb.transaction(
         "rw",
         [
@@ -584,6 +596,11 @@ class CloudSyncService {
           await budgetDb.envelopes.clear();
           await budgetDb.bills.clear();
           await budgetDb.transactions.clear();
+          // v2.0: Clear legacy savingsGoals table (data is now in envelopes)
+          // This is safe because:
+          // 1. saveToDexie is only called when downloading from cloud (after migration)
+          // 2. Migration service runs before sync, converting savingsGoals to envelopes
+          // 3. Cloud data already contains migrated savings envelopes
           await budgetDb.savingsGoals.clear();
           await budgetDb.debts.clear();
           await budgetDb.paycheckHistory.clear();
@@ -598,9 +615,6 @@ class CloudSyncService {
           if (data.transactions.length) {
             await budgetDb.transactions.bulkAdd(data.transactions);
           }
-          if (data.savingsGoals.length) {
-            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
-          }
           if (data.debts.length) {
             await budgetDb.debts.bulkAdd(data.debts);
           }
@@ -609,18 +623,19 @@ class CloudSyncService {
           }
 
           // Save metadata
+          // v2.0: supplementalAccounts no longer stored separately - now in envelopes
           await budgetDb.budget.put({
             id: "metadata",
             unassignedCash: data.unassignedCash || 0,
             actualBalance: data.actualBalance || 0,
-            supplementalAccounts: data.supplementalAccounts ?? [],
             lastUpdated: new Date().toISOString(),
             lastModified: Date.now(),
+            syncVersion: data.syncVersion || "2.0",
           } as BudgetRecord);
         }
       );
 
-      logger.info("✅ Cloud data saved to Dexie successfully");
+      logger.info("✅ Cloud data saved to Dexie successfully (v2.0 envelope model)");
     } catch (error) {
       logger.error("Failed to save cloud data to Dexie:", error);
       throw error;
@@ -628,47 +643,52 @@ class CloudSyncService {
   }
 
   determineSyncDirection(localData: DexieData, cloudData: DataCollection) {
-    // Check if cloud has meaningful data vs local (include all data types)
+    // v2.0: Check if cloud has meaningful data vs local
+    // Savings goals and supplemental accounts are now stored as envelopes with envelopeType
+    // Legacy savingsGoals and supplementalAccounts arrays are still counted for backward compatibility
     const hasCloudData = !!(
       cloudData?.envelopes?.length ||
       cloudData?.transactions?.length ||
       cloudData?.bills?.length ||
       cloudData?.paycheckHistory?.length ||
-      cloudData?.savingsGoals?.length ||
-      cloudData?.debts?.length
+      cloudData?.debts?.length ||
+      // Legacy support: count savingsGoals if present in older cloud data
+      cloudData?.savingsGoals?.length
     );
     const hasLocalData = !!(
       localData?.envelopes?.length ||
       localData?.transactions?.length ||
       localData?.bills?.length ||
       localData?.paycheckHistory?.length ||
-      localData?.savingsGoals?.length ||
       localData?.debts?.length
     );
 
-    // Calculate item counts for comparison
+    // v2.0: Calculate item counts for comparison
+    // Note: savingsGoals and supplementalAccounts are now counted as part of envelopes
     const cloudItemCount =
       (cloudData?.envelopes?.length || 0) +
       (cloudData?.transactions?.length || 0) +
       (cloudData?.bills?.length || 0) +
       (cloudData?.paycheckHistory?.length || 0) +
-      (cloudData?.savingsGoals?.length || 0) +
-      (cloudData?.debts?.length || 0);
+      (cloudData?.debts?.length || 0) +
+      // Legacy support: count savingsGoals if present in older cloud data
+      (cloudData?.savingsGoals?.length || 0);
     const localItemCount =
       (localData?.envelopes?.length || 0) +
       (localData?.transactions?.length || 0) +
       (localData?.bills?.length || 0) +
       (localData?.paycheckHistory?.length || 0) +
-      (localData?.savingsGoals?.length || 0) +
       (localData?.debts?.length || 0);
 
-    logger.info("🔄 Sync direction analysis:", {
+    logger.info("🔄 Sync direction analysis (v2.0):", {
       hasCloudData,
       hasLocalData,
       cloudItemCount,
       localItemCount,
       cloudLastModified: cloudData?.lastModified,
       localLastModified: localData?.lastModified,
+      cloudSyncVersion: cloudData?.syncVersion || "1.x",
+      localSyncVersion: localData?.syncVersion || "2.0",
     });
 
     // If cloud has data but local doesn't, download from cloud

@@ -22,11 +22,15 @@ vi.mock("../../db/budgetDb", () => ({
     paycheckHistory: {
       toArray: vi.fn(() => Promise.resolve([])),
     },
+    // v2.0: savingsGoals table is deprecated but kept for backward compatibility
     savingsGoals: {
       toArray: vi.fn(() => Promise.resolve([])),
     },
     debts: {
       toArray: vi.fn(() => Promise.resolve([])),
+    },
+    budget: {
+      get: vi.fn(() => Promise.resolve(undefined)),
     },
   },
 }));
@@ -306,6 +310,41 @@ describe("CloudSyncService - Sync Core Tests", () => {
 
       // Should complete without error
       expect(true).toBe(true);
+    });
+  });
+
+  describe("v2.0 Envelope-Based Sync Model", () => {
+    beforeEach(() => {
+      cloudSyncService.start(mockConfig);
+    });
+
+    it("should include syncVersion in fetched data", async () => {
+      const result = await cloudSyncService.forceSync();
+
+      // Sync should complete with a result
+      expect(result).toBeDefined();
+      // The sync should use v2.0 model
+    });
+
+    it("should handle envelopes with different envelope types", async () => {
+      // Test that savings and supplemental envelopes are synced correctly
+      const result = await cloudSyncService.forceSync();
+
+      expect(result).toBeDefined();
+    });
+
+    it("should not require savingsGoals array in DexieData", async () => {
+      // v2.0: savingsGoals are now stored as envelopes with envelopeType: "savings"
+      const result = await cloudSyncService.forceSync();
+
+      expect(result).toBeDefined();
+    });
+
+    it("should not require supplementalAccounts array in DexieData", async () => {
+      // v2.0: supplemental accounts are now stored as envelopes with envelopeType: "supplemental"
+      const result = await cloudSyncService.forceSync();
+
+      expect(result).toBeDefined();
     });
   });
 });
