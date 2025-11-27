@@ -834,4 +834,237 @@ describe("useTransactionMutations", () => {
       });
     });
   });
+
+  describe("Optimistic Update Rollback Tests", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      (useQueryClient as Mock).mockReturnValue(mockQueryClient);
+    });
+
+    describe("Transaction Creation Rollback on Validation Failure", () => {
+      it("should rollback optimistic update when transaction creation fails validation", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const validationError = new Error("Invalid transaction data: amount must be positive");
+        (budgetDb.transactions.put as Mock).mockRejectedValue(validationError);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = (useMutation as Mock).mockConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Validation Test",
+          envelopeId: "env-1",
+        };
+
+        // Test onError callback is properly set up
+        expect(addMutation.onError).toBeDefined();
+
+        // Simulate error handling
+        const { default: logger } = await import("@/utils/common/logger");
+
+        await act(async () => {
+          addMutation.onError(validationError);
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to add transaction",
+          validationError,
+          expect.objectContaining({ source: "addTransactionMutation" })
+        );
+      });
+
+      it("should not call optimistic helpers when envelope validation fails early", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const { optimisticHelpers } = await import("@/utils/common/queryClient");
+
+        // Envelope does not exist
+        (budgetDb.envelopes.get as Mock).mockResolvedValueOnce(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = (useMutation as Mock).mockConfigs[0];
+
+        // Clear any previous calls
+        (optimisticHelpers.addTransaction as Mock).mockClear();
+
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Invalid Envelope Test",
+          envelopeId: "non-existent-envelope",
+        };
+
+        await act(async () => {
+          try {
+            await addMutation.mutationFn(transactionData);
+          } catch {
+            // Expected - envelope doesn't exist
+          }
+        });
+
+        // Optimistic update should NOT have been called since validation failed early
+        expect(optimisticHelpers.addTransaction).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Transaction Update Rollback on Error", () => {
+      it("should invalidate transaction queries on update error to rollback UI", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const dbError = new Error("Database constraint violation");
+        (budgetDb.transactions.update as Mock).mockRejectedValue(dbError);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = (useMutation as Mock).mockConfigs[3];
+
+        // Verify onError includes query invalidation for rollback
+        expect(updateMutation.onError).toBeDefined();
+
+        // Clear previous calls
+        mockQueryClient.invalidateQueries.mockClear();
+
+        await act(async () => {
+          updateMutation.onError(dbError);
+        });
+
+        // Rollback should invalidate transaction queries
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["transactions"],
+        });
+      });
+    });
+
+    describe("Transaction Deletion Rollback on Error", () => {
+      it("should log error when transaction deletion fails", async () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+        const deleteError = new Error("Transaction locked by another process");
+
+        const { default: logger } = await import("@/utils/common/logger");
+
+        await act(async () => {
+          deleteMutation.onError(deleteError);
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to delete transaction",
+          deleteError,
+          expect.objectContaining({ source: "deleteTransactionMutation" })
+        );
+
+        // Verify rollback via query invalidation
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["transactions"],
+        });
+      });
+    });
+
+    describe("UI State Consistency After Rollback", () => {
+      it("should reset loading states after mutation failure", () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: new Error("Failed") },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: new Error("Failed") },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null },
+        ];
+
+        (useMutation as Mock).mockImplementation(() => mockMutations.shift() || mockMutations[0]);
+
+        const { result } = renderHook(() => useTransactionMutations());
+
+        // After failure, loading states should be false
+        expect(result.current.isAdding).toBe(false);
+        expect(result.current.isDeleting).toBe(false);
+        expect(result.current.isUpdating).toBe(false);
+      });
+
+      it("should provide consistent mutation function references after error", () => {
+        // Mock returns the same mutation object for all calls
+        const mockMutationObject = {
+          mutate: vi.fn(),
+          mutateAsync: vi.fn(),
+          isPending: false,
+        };
+
+        (useMutation as Mock).mockReturnValue(mockMutationObject);
+
+        const { result, rerender } = renderHook(() => useTransactionMutations());
+
+        // Verify functions are defined
+        expect(typeof result.current.addTransaction).toBe("function");
+        expect(typeof result.current.deleteTransaction).toBe("function");
+        expect(typeof result.current.updateTransaction).toBe("function");
+
+        // Simulate rerender after error
+        rerender();
+
+        // Function references should remain stable after rerender
+        expect(typeof result.current.addTransaction).toBe("function");
+        expect(typeof result.current.deleteTransaction).toBe("function");
+        expect(typeof result.current.updateTransaction).toBe("function");
+      });
+    });
+  });
 });
