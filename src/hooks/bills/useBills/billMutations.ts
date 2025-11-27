@@ -79,10 +79,19 @@ export const useAddBillMutation = () => {
         throw new Error(`Invalid bill data: ${errorMessages}`);
       }
 
-      // Persist to Dexie (optimistic update handled by React Query)
-      await budgetDb.bills.add(validationResult.data);
+      // Ensure dueDate is a Date object (Zod allows Date | string, but db requires Date)
+      const validatedBill: Bill = {
+        ...validationResult.data,
+        dueDate:
+          validationResult.data.dueDate instanceof Date
+            ? validationResult.data.dueDate
+            : new Date(validationResult.data.dueDate),
+      };
 
-      return validationResult.data;
+      // Persist to Dexie (optimistic update handled by React Query)
+      await budgetDb.bills.add(validatedBill);
+
+      return validatedBill;
     },
     onMutate: async () => {
       // Cancel outgoing refetches
@@ -305,7 +314,13 @@ export const useMarkBillPaidMutation = () => {
       );
 
       // Validate and normalize transaction with Zod schema
-      const paymentTransaction = validateAndNormalizeTransaction(rawPaymentTransaction);
+      const zodValidated = validateAndNormalizeTransaction(rawPaymentTransaction);
+
+      // Ensure date is a Date object (Zod allows Date | string, but db requires Date)
+      const paymentTransaction: Transaction = {
+        ...zodValidated,
+        date: zodValidated.date instanceof Date ? zodValidated.date : new Date(zodValidated.date),
+      };
 
       // ARCHITECTURE: Bills are just planned transactions. Paying a bill = creating a transaction.
       // Envelopes are where all money is kept. The transaction will update the envelope balance.
