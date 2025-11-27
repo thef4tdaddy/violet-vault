@@ -15,6 +15,12 @@ import type {
 import { isString, isObject } from "../types/common";
 import { syncOperationWrapper } from "./types/firebaseServiceTypes";
 import logger from "../utils/common/logger";
+import {
+  validateCloudSyncUserSafe,
+  validateLoadedDataSafe,
+  validateChunkedSyncStatsSafe,
+  formatSyncValidationErrors,
+} from "@/domain/schemas/sync";
 
 /**
  * Type-safe wrapper for Chunked Sync Service
@@ -67,9 +73,14 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
           throw new Error("Data cannot be undefined");
         }
 
-        // Validate user information
-        if (!this.isValidUser(currentUser)) {
-          throw new Error("Invalid user information provided");
+        // Validate user information using Zod schema
+        const userValidation = validateCloudSyncUserSafe(currentUser);
+        if (!userValidation.success) {
+          const { message, details } = formatSyncValidationErrors(
+            userValidation.error,
+            "Cloud sync user"
+          );
+          throw new Error(`Invalid user information: ${message}. Details: ${details.join(", ")}`);
         }
 
         // Validate data size (rough check)
@@ -110,9 +121,16 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
           return null as T;
         }
 
-        // Validate loaded data structure
-        if (!this.isValidLoadedData(result)) {
-          throw new Error("Loaded chunked data has invalid structure");
+        // Validate loaded data structure using Zod schema
+        const loadedDataValidation = validateLoadedDataSafe(result);
+        if (!loadedDataValidation.success) {
+          const { message, details } = formatSyncValidationErrors(
+            loadedDataValidation.error,
+            "Loaded chunked data"
+          );
+          throw new Error(
+            `Loaded chunked data has invalid structure: ${message}. Details: ${details.join(", ")}`
+          );
         }
 
         // Additional validation for chunked data integrity
@@ -137,9 +155,11 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
   getStats(): ChunkedSyncStats {
     const rawStats = chunkedSyncService.getStats() as unknown;
 
-    // Validate stats structure and provide defaults
-    if (!this.isValidStats(rawStats)) {
-      logger.warn("Chunked sync service returned invalid stats structure");
+    // Validate stats structure using Zod schema and provide defaults
+    const statsValidation = validateChunkedSyncStatsSafe(rawStats);
+    if (!statsValidation.success) {
+      const { message } = formatSyncValidationErrors(statsValidation.error, "Chunked sync stats");
+      logger.warn(`Chunked sync service returned invalid stats structure: ${message}`);
       return {
         maxChunkSize: 900 * 1024, // 900KB default
         maxArrayChunkSize: 5000,
@@ -147,15 +167,7 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
       };
     }
 
-    const stats = rawStats as unknown as Record<string, unknown>;
-    return {
-      maxChunkSize: Number(stats.maxChunkSize) || 900 * 1024,
-      maxArrayChunkSize: Number(stats.maxArrayChunkSize) || 5000,
-      isInitialized: Boolean(stats.isInitialized),
-      lastSyncTimestamp: stats.lastSyncTimestamp as number | undefined,
-      totalChunks: stats.totalChunks as number | undefined,
-      failedChunks: stats.failedChunks as number | undefined,
-    };
+    return statsValidation.data;
   }
 
   // Type-safe chunk ID generation
@@ -202,69 +214,6 @@ class TypedChunkedSyncServiceImpl implements TypedChunkedSyncService {
   }
 
   // Private validation helpers
-  private isValidUser(user: unknown): user is CloudSyncConfig["currentUser"] {
-    const userObj = user as Record<string, unknown>;
-    return (
-      typeof user === "object" &&
-      user !== null &&
-      "uid" in userObj &&
-      "userName" in userObj &&
-      typeof userObj.uid === "string" &&
-      typeof userObj.userName === "string" &&
-      userObj.uid.length > 0 &&
-      userObj.userName.length > 0
-    );
-  }
-
-  private isValidLoadedData(data: unknown): boolean {
-    // Allow null (no data found)
-    if (data === null) {
-      return true;
-    }
-
-    // Must be an object, array, string, number, or boolean
-    const validType =
-      typeof data === "object" ||
-      typeof data === "string" ||
-      typeof data === "number" ||
-      typeof data === "boolean";
-
-    if (!validType) {
-      return false;
-    }
-
-    // Additional validation for object structures
-    if (isObject(data)) {
-      // Check for common budget data structure
-      const obj = data as Record<string, unknown>;
-
-      // If it has transactions, validate they're in array format
-      if ("transactions" in obj && obj.transactions !== null && !Array.isArray(obj.transactions)) {
-        return false;
-      }
-
-      // If it has envelopes, validate they're in array format
-      if ("envelopes" in obj && obj.envelopes !== null && !Array.isArray(obj.envelopes)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  private isValidStats(stats: unknown): stats is ChunkedSyncStats {
-    const statsObj = stats as Record<string, unknown>;
-    return (
-      typeof stats === "object" &&
-      stats !== null &&
-      "maxChunkSize" in statsObj &&
-      "maxArrayChunkSize" in statsObj &&
-      "isInitialized" in statsObj &&
-      typeof statsObj.maxChunkSize === "number" &&
-      typeof statsObj.maxArrayChunkSize === "number" &&
-      typeof statsObj.isInitialized === "boolean"
-    );
-  }
 
   private estimateDataSize(data: unknown): number {
     try {

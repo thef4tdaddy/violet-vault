@@ -370,3 +370,20 @@ export {
   type BillItemProps,
   type AnalyticsDashboardProps,
 } from "./component-props";
+
+// Sync Schemas & Types (Issue #1341)
+export {
+  CloudSyncUserSchema,
+  ChunkedSyncStatsSchema,
+  LoadedDataSchema,
+  validateCloudSyncUser,
+  validateCloudSyncUserSafe,
+  validateChunkedSyncStats,
+  validateChunkedSyncStatsSafe,
+  validateLoadedData,
+  validateLoadedDataSafe,
+  formatSyncValidationErrors,
+  type CloudSyncUser,
+  type ChunkedSyncStatsValidated,
+  type LoadedData,
+} from "./sync";
