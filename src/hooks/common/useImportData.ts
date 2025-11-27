@@ -4,7 +4,10 @@ import { useConfirm } from "@/hooks/common/useConfirm";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import { readFileContent } from "@/utils/dataManagement/fileUtils";
-import { validateImportedData } from "@/utils/dataManagement/validationUtils";
+import {
+  validateImportedData,
+  type ValidationResult,
+} from "@/utils/dataManagement/validationUtils";
 import { backupCurrentData } from "@/utils/dataManagement/backupUtils";
 import { clearAllDexieData, importDataToDexie } from "@/utils/dataManagement/dexieUtils";
 import { clearFirebaseData, forcePushToCloud } from "@/utils/dataManagement/firebaseUtils";
@@ -168,42 +171,92 @@ const buildMismatchWarning = (
   return `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${backupId}...\nCurrent budgetId: ${currentId}...\n\nImport will re-encrypt data with your current session context.`;
 };
 
+/**
+ * Maximum number of validation warnings to display in confirmation dialog
+ */
+const MAX_DISPLAYED_WARNINGS = 5;
+
+/**
+ * Build validation warning message for confirmation dialog
+ */
+const buildValidationWarning = (validationWarnings: string[]): string => {
+  if (validationWarnings.length === 0) {
+    return "";
+  }
+
+  const displayedWarnings = validationWarnings.slice(0, MAX_DISPLAYED_WARNINGS).join("\n");
+  const remainingCount = validationWarnings.length - MAX_DISPLAYED_WARNINGS;
+  const moreWarningsText = remainingCount > 0 ? `\n... and ${remainingCount} more warnings` : "";
+
+  return `\n\n⚠️ VALIDATION WARNINGS:\n${displayedWarnings}${moreWarningsText}`;
+};
+
 const buildConfirmMessage = (
   validatedData: ValidatedImportData,
   hasBudgetIdMismatch: boolean,
   importBudgetId: string | undefined,
-  currentUser: UserData | null
+  currentUser: UserData | null,
+  validationWarnings: string[] = []
 ): string => {
   const counts = getImportCounts(validatedData);
-  const baseMessage = buildBaseMessage(counts);
+  let message = buildBaseMessage(counts);
 
   if (hasBudgetIdMismatch) {
-    return baseMessage + buildMismatchWarning(importBudgetId, currentUser);
+    message += buildMismatchWarning(importBudgetId, currentUser);
   }
 
-  return baseMessage;
+  if (validationWarnings.length > 0) {
+    message += buildValidationWarning(validationWarnings);
+  }
+
+  return message;
 };
 
-const handleConfirmation = async (
+/**
+ * Confirmation options for import dialog
+ */
+interface ConfirmationOptions {
   confirm: (config: {
     title?: string;
     message?: string;
     confirmLabel?: string;
     cancelLabel?: string;
     destructive?: boolean;
-  }) => Promise<boolean>,
-  validatedData: ValidatedImportData,
-  hasBudgetIdMismatch: boolean,
-  importBudgetId: string | undefined,
-  currentUser: UserData | null
-): Promise<boolean> => {
+  }) => Promise<boolean>;
+  validatedData: ValidatedImportData;
+  hasBudgetIdMismatch: boolean;
+  importBudgetId: string | undefined;
+  currentUser: UserData | null;
+  validationWarnings?: string[];
+}
+
+const handleConfirmation = async (options: ConfirmationOptions): Promise<boolean> => {
+  const {
+    confirm,
+    validatedData,
+    hasBudgetIdMismatch,
+    importBudgetId,
+    currentUser,
+    validationWarnings = [],
+  } = options;
+
   const message = buildConfirmMessage(
     validatedData,
     hasBudgetIdMismatch,
     importBudgetId,
-    currentUser
+    currentUser,
+    validationWarnings
   );
-  const title = hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data";
+
+  const hasWarnings = validationWarnings.length > 0;
+  let title = "Import Data";
+  if (hasBudgetIdMismatch && hasWarnings) {
+    title = "Import Data (Warnings Detected)";
+  } else if (hasBudgetIdMismatch) {
+    title = "Import Data (Encryption Context Change)";
+  } else if (hasWarnings) {
+    title = "Import Data (Validation Warnings)";
+  }
 
   return confirm({
     title,
@@ -280,9 +333,45 @@ const performImport = async (
   logger.info("TanStack Query cache invalidated and refetched after data import");
 };
 
+/**
+ * Process the validated import data
+ * Extracted to reduce statement count in main import function
+ */
+const processImportData = async (
+  validationResult: ValidationResult,
+  showSuccessToast: (message: string, title?: string) => number,
+  showWarningToast: (message: string, title?: string) => number,
+  authConfig: AuthConfig
+): Promise<ImportResult> => {
+  const { validatedData, validationWarnings } = validationResult;
+
+  await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
+
+  // Show warning toast if there were validation issues
+  if (validationWarnings.length > 0) {
+    showWarningToast(
+      `Import completed with ${validationWarnings.length} validation warning(s). Some items may have been imported with default values.`,
+      "Import Warnings"
+    );
+  }
+
+  return buildImportResult(validatedData as ValidatedImportData);
+};
+
+/**
+ * Log validation warnings if present
+ */
+const logValidationWarnings = (validationWarnings: string[]): void => {
+  if (validationWarnings.length > 0) {
+    logger.warn("Import data has validation warnings", {
+      warningCount: validationWarnings.length,
+    });
+  }
+};
+
 export const useImportData = () => {
   const { user: currentUser, budgetId, encryptionKey } = useAuthManager();
-  const { showSuccessToast, showErrorToast } = useToastHelpers();
+  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
   const confirm = useConfirm();
 
   const importData = useCallback(
@@ -290,59 +379,59 @@ export const useImportData = () => {
       const inputElement = event.target as HTMLInputElement;
       const file = inputElement.files ? inputElement.files[0] : null;
       if (!file) {
-        if (inputElement) {
-          inputElement.value = "";
-        }
+        if (inputElement) inputElement.value = "";
         return;
       }
 
       try {
         logger.info("Starting import process");
-
         const fileContent = await readFileContent(file);
         const importedData = JSON.parse(String(fileContent));
+        const validationResult: ValidationResult = validateImportedData(importedData, currentUser);
+        const { validatedData, hasBudgetIdMismatch, importBudgetId, validationWarnings } =
+          validationResult;
 
-        const { validatedData, hasBudgetIdMismatch, importBudgetId } = validateImportedData(
-          importedData,
-          currentUser
-        );
+        logValidationWarnings(validationWarnings);
 
-        const confirmed = await handleConfirmation(
+        const confirmed = await handleConfirmation({
           confirm,
-          validatedData as ValidatedImportData,
+          validatedData: validatedData as ValidatedImportData,
           hasBudgetIdMismatch,
           importBudgetId,
-          currentUser
-        );
+          currentUser,
+          validationWarnings,
+        });
 
         if (!confirmed) {
           logger.info("Import cancelled by user");
           return;
         }
 
-        // Build auth config to pass to force push
-        // This ensures the sync service has access to auth data after being stopped
-        const authConfig: AuthConfig = {
-          budgetId,
-          encryptionKey,
-          currentUser,
-        };
-
-        await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
-
-        return buildImportResult(validatedData as ValidatedImportData);
+        const authConfig: AuthConfig = { budgetId, encryptionKey, currentUser };
+        return await processImportData(
+          validationResult,
+          showSuccessToast,
+          showWarningToast,
+          authConfig
+        );
       } catch (error: unknown) {
         logger.error("Import failed", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
         showErrorToast(`Import failed: ${errorMessage}`, "Import Failed");
         throw error;
       } finally {
-        if (inputElement) {
-          inputElement.value = "";
-        }
+        if (inputElement) inputElement.value = "";
       }
     },
-    [currentUser, budgetId, encryptionKey, confirm, showErrorToast, showSuccessToast]
+    [
+      currentUser,
+      budgetId,
+      encryptionKey,
+      confirm,
+      showErrorToast,
+      showSuccessToast,
+      showWarningToast,
+    ]
   );
 
   return { importData };
