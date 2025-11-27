@@ -1,14 +1,15 @@
 import { Suspense, useCallback, lazy, createElement, ReactNode } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import Dashboard from "../pages/MainDashboard";
-import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
-import EnvelopeGrid from "../budgeting/EnvelopeGrid";
-import SavingsGoals from "../savings/SavingsGoals";
-import SupplementalAccounts from "../accounts/SupplementalAccounts";
-import PaycheckProcessor from "../budgeting/PaycheckProcessor";
-import BillManager from "../bills/BillManager";
-import TransactionLedger from "../transactions/TransactionLedger";
+// Lazy load large components for code-splitting
+const Dashboard = lazy(() => import("../pages/MainDashboard"));
+const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
+const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
+const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
+const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
+const BillManager = lazy(() => import("../bills/BillManager"));
+const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
 const AnalyticsDashboard = lazy(() => import("../analytics/AnalyticsDashboard"));
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
@@ -17,7 +18,7 @@ import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
 const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
-import { ErrorBoundary } from "@highlight-run/react";
+import { ErrorBoundary } from "../ui/ErrorBoundary";
 import { useLayoutData } from "@/hooks/layout";
 import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
@@ -247,7 +248,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   }, []);
 
   const views: Record<string, ReactNode> = {
-    dashboard: <Dashboard setActiveView={setActiveView} />,
+    dashboard: (
+      <ErrorBoundary context="MainDashboard">
+        <Suspense fallback={<LoadingSpinner />}>
+          <Dashboard setActiveView={setActiveView} />
+        </Suspense>
+      </ErrorBoundary>
+    ),
     envelopes: (
       <EnvelopeView
         envelopes={envelopes as EnvelopeWithComputed[]}
@@ -259,143 +266,177 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
       />
     ),
     savings: (
-      <SavingsGoals
-        savingsGoals={savingsEnvelopesQuery.envelopes as unknown as Array<Record<string, unknown>>}
-        unassignedCash={unassignedCash}
-        onAddGoal={savingsGoalsHook.helpers.addGoal}
-        onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
-        onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-        onDistributeToGoals={(amount: number, goals: unknown[]) => {
-          const distribution = { amount, goals };
-          savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
-            logger.error("Failed to distribute funds:", err);
-          });
-        }}
-      />
+      <ErrorBoundary context="SavingsGoals">
+        <Suspense fallback={<LoadingSpinner />}>
+          <SavingsGoals
+            savingsGoals={
+              savingsEnvelopesQuery.envelopes as unknown as Array<Record<string, unknown>>
+            }
+            unassignedCash={unassignedCash}
+            onAddGoal={savingsGoalsHook.helpers.addGoal}
+            onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
+            onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
+            onDistributeToGoals={(amount: number, goals: unknown[]) => {
+              const distribution = { amount, goals };
+              savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
+                logger.error("Failed to distribute funds:", err);
+              });
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     ),
     supplemental: (
-      <SupplementalAccounts
-        supplementalAccounts={
-          supplementalEnvelopesQuery.envelopes as Array<Record<string, unknown>>
-        }
-        onAddAccount={
-          budgetOps.addSupplementalAccount as unknown as (account: {
-            id: string | number;
-            name: string;
-            type: string;
-            currentBalance: number;
-            annualContribution: number;
-            expirationDate: string | null;
-            description: string | null;
-            color: string;
-            isActive: boolean;
-            createdBy: string;
-            createdAt: string;
-            lastUpdated: string;
-            transactions: unknown[];
-          }) => void
-        }
-        onUpdateAccount={
-          budgetOps.updateSupplementalAccount as unknown as (account: {
-            id: string | number;
-            name: string;
-            type: string;
-            currentBalance: number;
-            annualContribution: number;
-            expirationDate: string | null;
-            description: string | null;
-            color: string;
-            isActive: boolean;
-            createdBy: string;
-            createdAt: string;
-            lastUpdated: string;
-            transactions: unknown[];
-          }) => void
-        }
-        onDeleteAccount={
-          budgetOps.deleteSupplementalAccount as unknown as (accountId: string) => void
-        }
-        onTransferToEnvelope={
-          budgetOps.transferFromSupplementalAccount as unknown as (transfer: {
-            accountId: string;
-            envelopeId: string;
-            amount: number;
-            description: string;
-          }) => void
-        }
-        envelopes={envelopes}
-        currentUser={user}
-      />
+      <ErrorBoundary context="SupplementalAccounts">
+        <Suspense fallback={<LoadingSpinner />}>
+          <SupplementalAccounts
+            supplementalAccounts={
+              supplementalEnvelopesQuery.envelopes as Array<Record<string, unknown>>
+            }
+            onAddAccount={
+              budgetOps.addSupplementalAccount as unknown as (account: {
+                id: string | number;
+                name: string;
+                type: string;
+                currentBalance: number;
+                annualContribution: number;
+                expirationDate: string | null;
+                description: string | null;
+                color: string;
+                isActive: boolean;
+                createdBy: string;
+                createdAt: string;
+                lastUpdated: string;
+                transactions: unknown[];
+              }) => void
+            }
+            onUpdateAccount={
+              budgetOps.updateSupplementalAccount as unknown as (account: {
+                id: string | number;
+                name: string;
+                type: string;
+                currentBalance: number;
+                annualContribution: number;
+                expirationDate: string | null;
+                description: string | null;
+                color: string;
+                isActive: boolean;
+                createdBy: string;
+                createdAt: string;
+                lastUpdated: string;
+                transactions: unknown[];
+              }) => void
+            }
+            onDeleteAccount={
+              budgetOps.deleteSupplementalAccount as unknown as (accountId: string) => void
+            }
+            onTransferToEnvelope={
+              budgetOps.transferFromSupplementalAccount as unknown as (transfer: {
+                accountId: string;
+                envelopeId: string;
+                amount: number;
+                description: string;
+              }) => void
+            }
+            envelopes={envelopes}
+            currentUser={user}
+          />
+        </Suspense>
+      </ErrorBoundary>
     ),
     paycheck: (
-      <PaycheckProcessor
-        envelopes={envelopes}
-        paycheckHistory={
-          tanStackPaycheckHistory as unknown as Array<{
-            id: string | number;
-            payerName?: string;
-            amount?: number;
-          }>
-        }
-        onProcessPaycheck={tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>}
-        onDeletePaycheck={async (paycheck: { id: string | number }) => {
-          await handleDeletePaycheck(
-            paycheck.id,
-            tanStackPaycheckHistory as unknown as Array<{
-              id: string | number;
-              amount: number;
-              mode?: string;
-              envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
-              allocations?: unknown[];
-            }>
-          );
-        }}
-        currentUser={currentUser as unknown as { userName: string }}
-      />
+      <ErrorBoundary context="PaycheckProcessor">
+        <Suspense fallback={<LoadingSpinner />}>
+          <PaycheckProcessor
+            envelopes={envelopes}
+            paycheckHistory={
+              tanStackPaycheckHistory as unknown as Array<{
+                id: string | number;
+                payerName?: string;
+                amount?: number;
+              }>
+            }
+            onProcessPaycheck={
+              tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>
+            }
+            onDeletePaycheck={async (paycheck: { id: string | number }) => {
+              await handleDeletePaycheck(
+                paycheck.id,
+                tanStackPaycheckHistory as unknown as Array<{
+                  id: string | number;
+                  amount: number;
+                  mode?: string;
+                  envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
+                  allocations?: unknown[];
+                }>
+              );
+            }}
+            currentUser={currentUser as unknown as { userName: string }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     ),
     bills: (
-      <BillManager
-        transactions={
-          safeTransactions as unknown as Array<{
-            id: string;
-            date: Date | string;
-            amount: number;
-            [key: string]: unknown;
-          }>
-        }
-        envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
-        onUpdateBill={
-          handleUpdateBill as unknown as (
-            bill: import("@/types/bills").Bill
-          ) => void | Promise<void>
-        }
-        onCreateRecurringBill={() => {}}
-        onSearchNewBills={async () => {}}
-        onError={handleBillManagerError}
-      />
+      <ErrorBoundary context="BillManager">
+        <Suspense fallback={<LoadingSpinner />}>
+          <BillManager
+            transactions={
+              safeTransactions as unknown as Array<{
+                id: string;
+                date: Date | string;
+                amount: number;
+                [key: string]: unknown;
+              }>
+            }
+            envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
+            onUpdateBill={
+              handleUpdateBill as unknown as (
+                bill: import("@/types/bills").Bill
+              ) => void | Promise<void>
+            }
+            onCreateRecurringBill={() => {}}
+            onSearchNewBills={async () => {}}
+            onError={handleBillManagerError}
+          />
+        </Suspense>
+      </ErrorBoundary>
     ),
-    transactions: <TransactionLedger currentUser={user} />,
+    transactions: (
+      <ErrorBoundary context="TransactionLedger">
+        <Suspense fallback={<LoadingSpinner />}>
+          <TransactionLedger currentUser={user} />
+        </Suspense>
+      </ErrorBoundary>
+    ),
     analytics: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <AnalyticsDashboard />
-      </Suspense>
+      <ErrorBoundary context="AnalyticsDashboard">
+        <Suspense fallback={<LoadingSpinner />}>
+          <AnalyticsDashboard />
+        </Suspense>
+      </ErrorBoundary>
     ),
     debts: isDebtFeatureEnabled("ENABLE_DEBT_DASHBOARD") ? (
-      <Suspense fallback={<LoadingSpinner />}>
-        <DebtDashboard />
-      </Suspense>
+      <ErrorBoundary context="DebtDashboard">
+        <Suspense fallback={<LoadingSpinner />}>
+          <DebtDashboard />
+        </Suspense>
+      </ErrorBoundary>
     ) : (
       <DebtDisabledView />
     ),
     automation: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <AutoFundingView />
-      </Suspense>
+      <ErrorBoundary context="AutoFundingView">
+        <Suspense fallback={<LoadingSpinner />}>
+          <AutoFundingView />
+        </Suspense>
+      </ErrorBoundary>
     ),
     activity: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <ActivityFeed />
-      </Suspense>
+      <ErrorBoundary context="ActivityFeed">
+        <Suspense fallback={<LoadingSpinner />}>
+          <ActivityFeed />
+        </Suspense>
+      </ErrorBoundary>
     ),
   };
 

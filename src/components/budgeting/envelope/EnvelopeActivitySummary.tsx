@@ -1,3 +1,4 @@
+import React from "react";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
@@ -19,8 +20,9 @@ interface EnvelopeForSummary {
  *
  * Part of EnvelopeItem refactoring for ESLint compliance
  * Related to Epic #158 - Mobile UI/UX Enhancements
+ * Memoized to prevent unnecessary re-renders
  */
-const EnvelopeActivitySummary = ({ envelope }: { envelope: EnvelopeForSummary }) => {
+const EnvelopeActivitySummary = React.memo(({ envelope }: { envelope: EnvelopeForSummary }) => {
   if (envelope.envelopeType === ENVELOPE_TYPES.VARIABLE) {
     return (
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 py-4">
@@ -66,6 +68,8 @@ const EnvelopeActivitySummary = ({ envelope }: { envelope: EnvelopeForSummary })
       </div>
     </div>
   );
-};
+});
+
+EnvelopeActivitySummary.displayName = "EnvelopeActivitySummary";
 
 export default EnvelopeActivitySummary;

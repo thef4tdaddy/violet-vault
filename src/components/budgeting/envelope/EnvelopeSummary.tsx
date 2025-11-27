@@ -1,3 +1,4 @@
+import React from "react";
 import EnvelopeSummaryCards from "../EnvelopeSummaryCards";
 
 interface EnvelopeTotals {
@@ -13,12 +14,14 @@ interface EnvelopeTotals {
   [key: string]: unknown;
 }
 
-const EnvelopeSummary = ({ totals }: { totals: EnvelopeTotals }) => {
+const EnvelopeSummary = React.memo(({ totals }: { totals: EnvelopeTotals }) => {
   return (
     <div className="mb-6">
       <EnvelopeSummaryCards totals={totals} />
     </div>
   );
-};
+});
+
+EnvelopeSummary.displayName = "EnvelopeSummary";
 
 export default EnvelopeSummary;

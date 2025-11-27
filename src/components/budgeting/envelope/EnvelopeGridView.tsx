@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
+import type { Virtualizer } from "@tanstack/react-virtual";
 import { EnvelopeGridHeader } from "./EnvelopeGridHeader";
 import EnvelopeSummary from "./EnvelopeSummary";
 import EnvelopeItem from "./EnvelopeItem";
 import UnassignedCashEnvelope from "./UnassignedCashEnvelope";
 import EmptyStateHints from "../../onboarding/EmptyStateHints";
+import { useEnvelopeGridVirtualization } from "@/hooks/budgeting/useEnvelopeGridVirtualization";
 
 // Empty state component
 const EmptyStateView = ({
@@ -33,6 +35,126 @@ const EmptyStateView = ({
     </div>
   );
 };
+
+// Virtualized grid component
+const VirtualizedEnvelopeGrid = ({
+  parentRef,
+  rowVirtualizer,
+  envelopeRows,
+  unassignedCash,
+  handleViewHistory,
+  viewMode,
+  handleEnvelopeSelect,
+  handleEnvelopeEdit,
+  handleQuickFund,
+  selectedEnvelopeId,
+  bills,
+}: {
+  parentRef: React.RefObject<HTMLDivElement | null>;
+  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
+  envelopeRows: Array<Array<{ id: string; [key: string]: unknown }>>;
+  unassignedCash: number;
+  handleViewHistory: (env: unknown) => void;
+  viewMode: string;
+  handleEnvelopeSelect: (id: string) => void;
+  handleEnvelopeEdit: (env: unknown) => void;
+  handleQuickFund: (id: string, amount: number) => void;
+  selectedEnvelopeId: string | null;
+  bills: unknown[];
+}) => (
+  <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
+    <div
+      style={{
+        height: `${rowVirtualizer.getTotalSize()}px`,
+        position: "relative",
+      }}
+    >
+      {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+        const rowEnvelopes = envelopeRows[virtualRow.index] || [];
+        return (
+          <div
+            key={virtualRow.index}
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          >
+            {virtualRow.index === 0 && (
+              <UnassignedCashEnvelope
+                unassignedCash={unassignedCash}
+                onViewHistory={handleViewHistory}
+                viewMode={viewMode}
+              />
+            )}
+            {rowEnvelopes.map((envelope) => (
+              <EnvelopeItem
+                key={envelope.id}
+                envelope={envelope as never}
+                onSelect={handleEnvelopeSelect}
+                onEdit={handleEnvelopeEdit}
+                onViewHistory={handleViewHistory}
+                onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
+                isSelected={selectedEnvelopeId === envelope.id}
+                bills={bills as never}
+                unassignedCash={unassignedCash}
+                viewMode={viewMode}
+              />
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Non-virtualized grid component
+const StandardEnvelopeGrid = ({
+  sortedEnvelopes,
+  unassignedCash,
+  handleViewHistory,
+  viewMode,
+  handleEnvelopeSelect,
+  handleEnvelopeEdit,
+  handleQuickFund,
+  selectedEnvelopeId,
+  bills,
+}: {
+  sortedEnvelopes: Array<{ id: string; [key: string]: unknown }>;
+  unassignedCash: number;
+  handleViewHistory: (env: unknown) => void;
+  viewMode: string;
+  handleEnvelopeSelect: (id: string) => void;
+  handleEnvelopeEdit: (env: unknown) => void;
+  handleQuickFund: (id: string, amount: number) => void;
+  selectedEnvelopeId: string | null;
+  bills: unknown[];
+}) => (
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <UnassignedCashEnvelope
+      unassignedCash={unassignedCash}
+      onViewHistory={handleViewHistory}
+      viewMode={viewMode}
+    />
+    {sortedEnvelopes.map((envelope) => (
+      <EnvelopeItem
+        key={envelope.id}
+        envelope={envelope as never}
+        onSelect={handleEnvelopeSelect}
+        onEdit={handleEnvelopeEdit}
+        onViewHistory={handleViewHistory}
+        onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
+        isSelected={selectedEnvelopeId === envelope.id}
+        bills={bills as never}
+        unassignedCash={unassignedCash}
+        viewMode={viewMode}
+      />
+    ))}
+  </div>
+);
 
 // Main grid view component
 function EnvelopeGridView({
@@ -81,6 +203,23 @@ function EnvelopeGridView({
   bills: unknown[];
   children: React.ReactNode;
 }) {
+  // Virtualization setup - only virtualize if >50 envelopes
+  const { parentRef, rowVirtualizer, shouldVirtualize, getColumnsCount } =
+    useEnvelopeGridVirtualization(sortedEnvelopes, 50);
+
+  // Calculate columns count for grid layout
+  const columnsCount = getColumnsCount();
+
+  // Split envelopes into rows for virtualization
+  const envelopeRows = useMemo(() => {
+    if (!shouldVirtualize) return [];
+    const rows: Array<Array<{ id: string; [key: string]: unknown }>> = [];
+    for (let i = 0; i < sortedEnvelopes.length; i += columnsCount) {
+      rows.push(sortedEnvelopes.slice(i, i + columnsCount));
+    }
+    return rows;
+  }, [sortedEnvelopes, shouldVirtualize, columnsCount]);
+
   return (
     <div className={`space-y-6 ${className} relative`}>
       {/* Action Buttons Row */}
@@ -102,28 +241,34 @@ function EnvelopeGridView({
       {/* Summary Cards */}
       <EnvelopeSummary totals={totals} />
 
-      {/* Envelope Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <UnassignedCashEnvelope
+      {/* Envelope Grid - Virtualized when >50 items */}
+      {shouldVirtualize ? (
+        <VirtualizedEnvelopeGrid
+          parentRef={parentRef}
+          rowVirtualizer={rowVirtualizer}
+          envelopeRows={envelopeRows}
           unassignedCash={unassignedCash}
-          onViewHistory={handleViewHistory}
+          handleViewHistory={handleViewHistory}
           viewMode={viewMode}
+          handleEnvelopeSelect={handleEnvelopeSelect}
+          handleEnvelopeEdit={handleEnvelopeEdit}
+          handleQuickFund={handleQuickFund}
+          selectedEnvelopeId={selectedEnvelopeId}
+          bills={bills}
         />
-        {sortedEnvelopes.map((envelope) => (
-          <EnvelopeItem
-            key={envelope.id}
-            envelope={envelope as never}
-            onSelect={handleEnvelopeSelect}
-            onEdit={handleEnvelopeEdit}
-            onViewHistory={handleViewHistory}
-            onQuickFund={(envelopeId: string) => handleQuickFund(envelopeId, 0)}
-            isSelected={selectedEnvelopeId === envelope.id}
-            bills={bills as never}
-            unassignedCash={unassignedCash}
-            viewMode={viewMode}
-          />
-        ))}
-      </div>
+      ) : (
+        <StandardEnvelopeGrid
+          sortedEnvelopes={sortedEnvelopes}
+          unassignedCash={unassignedCash}
+          handleViewHistory={handleViewHistory}
+          viewMode={viewMode}
+          handleEnvelopeSelect={handleEnvelopeSelect}
+          handleEnvelopeEdit={handleEnvelopeEdit}
+          handleQuickFund={handleQuickFund}
+          selectedEnvelopeId={selectedEnvelopeId}
+          bills={bills}
+        />
+      )}
 
       {sortedEnvelopes.length === 0 && (
         <EmptyStateView

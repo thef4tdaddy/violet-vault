@@ -427,27 +427,65 @@ export default defineConfig(() => {
       // Manual chunk splitting for optimal bundle sizes (Issue 617: Code Splitting)
       rollupOptions: {
         output: {
-          manualChunks: {
+          manualChunks: (id) => {
             // Vendor chunk for React ecosystem
-            "react-vendor": ["react", "react-dom", "react-router-dom"],
+            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
+              return "react-vendor";
+            }
             // Firebase chunk (lazy loaded)
-            "firebase-vendor": [
-              "firebase/app",
-              "firebase/firestore",
-              "firebase/auth",
-            ],
+            if (id.includes("node_modules/firebase")) {
+              return "firebase-vendor";
+            }
             // Data libraries chunk
-            "data-vendor": ["@tanstack/react-query", "dexie", "zustand"],
+            if (id.includes("node_modules/@tanstack/react-query") || id.includes("node_modules/dexie") || id.includes("node_modules/zustand")) {
+              return "data-vendor";
+            }
+            // Validation chunk - Zod is used everywhere but can be shared
+            if (id.includes("node_modules/zod")) {
+              return "validation-vendor";
+            }
+            // Charts chunk - Recharts only used in analytics (lazy loaded)
+            if (id.includes("node_modules/recharts")) {
+              return "charts-vendor";
+            }
+            // OCR chunk - Tesseract only used in receipts feature
+            if (id.includes("node_modules/tesseract.js")) {
+              return "ocr-vendor";
+            }
+            // Screenshot/Canvas chunk - html2canvas used in bug reports and exports
+            if (id.includes("node_modules/html2canvas")) {
+              return "canvas-vendor";
+            }
+            // Monitoring chunk - Highlight.run (already lazy loaded)
+            if (id.includes("node_modules/@highlight-run") || id.includes("node_modules/highlight.run")) {
+              return "monitoring-vendor";
+            }
             // UI/Utils chunk
-            "ui-vendor": [
-              "lucide-react",
-              "tailwindcss",
-              "@tanstack/react-virtual",
-            ],
-            // Crypto/Security chunk - simple static config
-            "crypto-vendor": ["bip39", "@msgpack/msgpack", "pako"],
+            if (id.includes("node_modules/lucide-react") || id.includes("node_modules/tailwindcss") || id.includes("node_modules/@tanstack/react-virtual")) {
+              return "ui-vendor";
+            }
+            // Crypto/Security chunk
+            if (id.includes("node_modules/bip39") || id.includes("node_modules/@msgpack") || id.includes("node_modules/pako")) {
+              return "crypto-vendor";
+            }
             // PDF/QR chunk (lazy loaded)
-            "export-vendor": ["jspdf", "qrcode", "qrcode.react"],
+            if (id.includes("node_modules/jspdf") || id.includes("node_modules/qrcode")) {
+              return "export-vendor";
+            }
+            // React utilities chunk
+            if (id.includes("node_modules/react-swipeable") || id.includes("node_modules/react-is") || id.includes("node_modules/uuid")) {
+              return "react-utils-vendor";
+            }
+            // Split by feature area for large app code
+            if (id.includes("/src/components/analytics") || id.includes("/src/hooks/analytics")) {
+              return "analytics-feature";
+            }
+            if (id.includes("/src/components/receipts") || id.includes("/src/hooks/receipts") || id.includes("/src/utils/receipts")) {
+              return "receipts-feature";
+            }
+            if (id.includes("/src/services/bugReport") || id.includes("/src/components/feedback")) {
+              return "bug-report-feature";
+            }
           },
         },
         // Enhanced tree-shaking (less aggressive to avoid temporal dead zone errors)
