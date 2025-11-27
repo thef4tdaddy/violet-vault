@@ -44,6 +44,7 @@ interface Debt {
   interestRate?: number;
   status?: string;
   envelopeId?: string;
+  billId?: string;
   lastPaymentDate?: string;
   lastPaymentAmount?: number;
   paymentHistory?: Array<{
@@ -274,9 +275,8 @@ export const recordPaymentOperation = async (options: RecordPaymentOptions) => {
     const { budgetDb } = await import("@/db/budgetDb");
     let envelopeId = debt.envelopeId;
     // If debt is linked to a bill, get envelope from bill
-    const debtWithBill = debt as unknown as { billId?: string };
-    if (!envelopeId && debtWithBill.billId) {
-      const bill = await budgetDb.bills.get(debtWithBill.billId);
+    if (!envelopeId && debt.billId) {
+      const bill = await budgetDb.bills.get(debt.billId);
       envelopeId = bill?.envelopeId;
     }
     // If still no envelope, try to find via bill relationship
