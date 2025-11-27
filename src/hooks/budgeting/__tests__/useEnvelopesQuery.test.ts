@@ -231,6 +231,210 @@ describe("useEnvelopesQuery", () => {
 
       expect(result.current.envelopes.length).toBe(3);
     });
+
+    it("should exclude supplemental envelopes by default", async () => {
+      // Arrange
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({
+          id: "env_supplemental",
+          name: "HSA Account",
+          category: "Health & Medical",
+          envelopeType: "supplemental",
+          archived: false,
+        })
+      );
+
+      // Act
+      const { result } = renderHook(() => useEnvelopesQuery({ __db: mockDb }), { wrapper });
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.some((env) => env.envelopeType === "supplemental")).toBe(false);
+      expect(envelopes.some((env) => env.name === "HSA Account")).toBe(false);
+    });
+
+    it("should filter only specific envelope types when envelopeTypes is set", async () => {
+      // Arrange
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({
+          id: "env_variable",
+          name: "Groceries",
+          category: "Food & Dining",
+          envelopeType: "variable",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_savings",
+          name: "Vacation Fund",
+          category: "Savings",
+          envelopeType: "savings",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_supplemental",
+          name: "HSA",
+          category: "Health & Medical",
+          envelopeType: "supplemental",
+          archived: false,
+        })
+      );
+
+      // Act - filter only savings envelopes
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ envelopeTypes: ["savings"], __db: mockDb }),
+        { wrapper }
+      );
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.length).toBe(1);
+      expect(envelopes[0].envelopeType).toBe("savings");
+      expect(envelopes[0].name).toBe("Vacation Fund");
+    });
+
+    it("should filter multiple envelope types when envelopeTypes has multiple values", async () => {
+      // Arrange
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({
+          id: "env_variable",
+          name: "Groceries",
+          category: "Food & Dining",
+          envelopeType: "variable",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_savings",
+          name: "Vacation Fund",
+          category: "Savings",
+          envelopeType: "savings",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_supplemental",
+          name: "HSA",
+          category: "Health & Medical",
+          envelopeType: "supplemental",
+          archived: false,
+        })
+      );
+
+      // Act - filter both savings and supplemental envelopes
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ envelopeTypes: ["savings", "supplemental"], __db: mockDb }),
+        { wrapper }
+      );
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.length).toBe(2);
+      expect(envelopes.some((env) => env.envelopeType === "savings")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "supplemental")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "variable")).toBe(false);
+    });
+
+    it("should allow excluding specific envelope types with excludeEnvelopeTypes", async () => {
+      // Arrange
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({
+          id: "env_variable",
+          name: "Groceries",
+          category: "Food & Dining",
+          envelopeType: "variable",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_bill",
+          name: "Rent",
+          category: "Housing",
+          envelopeType: "bill",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_savings",
+          name: "Vacation Fund",
+          category: "Savings",
+          envelopeType: "savings",
+          archived: false,
+        })
+      );
+
+      // Act - exclude only savings, keep variable and bill
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ excludeEnvelopeTypes: ["savings"], __db: mockDb }),
+        { wrapper }
+      );
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.length).toBe(2);
+      expect(envelopes.some((env) => env.envelopeType === "variable")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "bill")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "savings")).toBe(false);
+    });
+
+    it("should include all envelope types when excludeEnvelopeTypes is empty array", async () => {
+      // Arrange
+      mockDb._mockData.envelopes.length = 0;
+      mockDb._mockData.envelopes.push(
+        mockDataGenerators.envelope({
+          id: "env_variable",
+          name: "Groceries",
+          category: "Food & Dining",
+          envelopeType: "variable",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_savings",
+          name: "Vacation Fund",
+          category: "Savings",
+          envelopeType: "savings",
+          archived: false,
+        }),
+        mockDataGenerators.envelope({
+          id: "env_supplemental",
+          name: "HSA",
+          category: "Health & Medical",
+          envelopeType: "supplemental",
+          archived: false,
+        })
+      );
+
+      // Act - include all types
+      const { result } = renderHook(
+        () => useEnvelopesQuery({ excludeEnvelopeTypes: [], __db: mockDb }),
+        { wrapper }
+      );
+
+      // Assert
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      const envelopes = result.current.envelopes;
+      expect(envelopes.length).toBe(3);
+      expect(envelopes.some((env) => env.envelopeType === "variable")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "savings")).toBe(true);
+      expect(envelopes.some((env) => env.envelopeType === "supplemental")).toBe(true);
+    });
   });
 
   describe("Sorting", () => {
