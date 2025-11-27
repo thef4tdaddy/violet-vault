@@ -1,4 +1,15 @@
 import logger from "@/utils/common/logger";
+import {
+  ImportedDataSchema,
+  validateImportedDataStructureSafe,
+  validateEnvelopes,
+  validateTransactions,
+  validateBills,
+  validateDebts,
+  formatValidationErrors,
+  type ImportedData,
+  type ItemValidationResult,
+} from "@/domain/schemas/import-export";
 
 /**
  * Envelope with optional envelopeType for import validation
@@ -10,35 +21,82 @@ interface EnvelopeWithType {
   [key: string]: unknown;
 }
 
-/**
- * Import data structure - updated for envelope-based model
- */
-interface ImportedData {
-  envelopes?: EnvelopeWithType[];
-  exportMetadata?: { budgetId?: string; modelVersion?: string };
-  allTransactions?: unknown[];
-  transactions?: unknown[];
-  bills?: unknown[];
-  savingsGoals?: unknown[];
-  supplementalAccounts?: unknown[];
-  debts?: unknown[];
-  auditLog?: unknown[];
-  paycheckHistory?: unknown[];
-}
-
 interface CurrentUser {
   budgetId?: string;
 }
 
-const validateDataStructure = (data: unknown): void => {
+/**
+ * Validated import data type
+ * Represents the structure after validation with unified transactions
+ * Uses intersection with Record to allow the unknown[] for allTransactions
+ */
+export type ValidatedImportData = Omit<ImportedData, "allTransactions"> & {
+  allTransactions: unknown[];
+};
+
+/**
+ * Validation result containing validated data and any validation issues
+ */
+export interface ValidationResult {
+  validatedData: ValidatedImportData;
+  hasBudgetIdMismatch: boolean;
+  importBudgetId: string | undefined;
+  validationWarnings: string[];
+  itemValidation: {
+    envelopes: ItemValidationResult<unknown>;
+    transactions: ItemValidationResult<unknown>;
+    bills: ItemValidationResult<unknown>;
+    debts: ItemValidationResult<unknown>;
+  };
+}
+
+/**
+ * Error message mapping for specific validation paths
+ * Provides user-friendly error messages for common validation failures
+ */
+const VALIDATION_ERROR_MESSAGES: Record<string, string> = {
+  envelopes: "Invalid backup file: missing or invalid envelopes data.",
+};
+
+/**
+ * Get user-friendly error message for validation path
+ */
+const getErrorMessageForPath = (path: string, defaultMessage: string): string => {
+  // Check for exact path match
+  if (VALIDATION_ERROR_MESSAGES[path]) {
+    return VALIDATION_ERROR_MESSAGES[path];
+  }
+
+  // Check for path prefix matches (e.g., "envelopes.0.name" matches "envelopes")
+  for (const [errorPath, errorMessage] of Object.entries(VALIDATION_ERROR_MESSAGES)) {
+    if (path.startsWith(errorPath)) {
+      return errorMessage;
+    }
+  }
+
+  return `Invalid backup file: ${path ? `${path}: ` : ""}${defaultMessage}`;
+};
+
+/**
+ * Validate data structure using Zod schema
+ * @throws Error if the structure is invalid
+ */
+const validateDataStructure = (data: unknown): ImportedData => {
   if (!data || typeof data !== "object") {
     throw new Error("Invalid backup file: not a valid JSON object.");
   }
 
-  const typedData = data as ImportedData;
-  if (!typedData.envelopes || !Array.isArray(typedData.envelopes)) {
-    throw new Error("Invalid backup file: missing or invalid envelopes data.");
+  const result = validateImportedDataStructureSafe(data);
+
+  if (!result.success) {
+    const firstError = result.error.issues[0];
+    const path = firstError.path.join(".");
+    const message = firstError.message;
+
+    throw new Error(getErrorMessageForPath(path, message));
   }
+
+  return result.data;
 };
 
 const checkBudgetIdMismatch = (
@@ -85,37 +143,106 @@ const countEnvelopesByType = (envelopes: EnvelopeWithType[]): Record<string, num
   return counts;
 };
 
-export const validateImportedData = (
-  importedData: ImportedData,
-  currentUser: CurrentUser | null | undefined
+/**
+ * Validate individual items and collect warnings
+ * Returns validation results for each item type
+ */
+const validateIndividualItems = (
+  importedData: ImportedData
 ): {
-  validatedData: ImportedData & { allTransactions: unknown[] };
-  hasBudgetIdMismatch: boolean;
-  importBudgetId: string | undefined;
+  envelopes: ItemValidationResult<unknown>;
+  transactions: ItemValidationResult<unknown>;
+  bills: ItemValidationResult<unknown>;
+  debts: ItemValidationResult<unknown>;
 } => {
-  logger.info("Validating imported data");
-  validateDataStructure(importedData);
-
-  const hasBudgetIdMismatch = checkBudgetIdMismatch(importedData, currentUser);
-  const unifiedAllTransactions = unifyTransactions(importedData);
-
-  logger.info("Data validation successful", {
-    envelopes: safeLength(importedData.envelopes),
-    envelopesByType: countEnvelopesByType(importedData.envelopes || []),
-    bills: safeLength(importedData.bills),
-    savingsGoals: safeLength(importedData.savingsGoals),
-    supplementalAccounts: safeLength(importedData.supplementalAccounts),
-    debts: safeLength(importedData.debts),
-    allTransactions: safeLength(unifiedAllTransactions),
-    hasBudgetIdMismatch,
-  });
+  const envelopeResult = validateEnvelopes(importedData.envelopes || []);
+  const transactionResult = validateTransactions(
+    importedData.allTransactions || importedData.transactions || []
+  );
+  const billResult = validateBills(importedData.bills || []);
+  const debtResult = validateDebts(importedData.debts || []);
 
   return {
-    validatedData: {
-      ...importedData,
-      allTransactions: unifiedAllTransactions,
-    },
-    hasBudgetIdMismatch,
-    importBudgetId: importedData.exportMetadata?.budgetId,
+    envelopes: envelopeResult,
+    transactions: transactionResult,
+    bills: billResult,
+    debts: debtResult,
   };
 };
+
+/**
+ * Validate imported data with comprehensive Zod schema validation
+ * - Validates overall structure with ImportedDataSchema
+ * - Validates individual items (envelopes, transactions, bills, debts)
+ * - Provides detailed validation warnings for invalid items
+ */
+export const validateImportedData = (
+  importedData: unknown,
+  currentUser: CurrentUser | null | undefined
+): ValidationResult => {
+  logger.info("Validating imported data");
+
+  // Step 1: Validate structure with Zod schema
+  const validatedStructure = validateDataStructure(importedData);
+
+  // Step 2: Check budget ID mismatch
+  const hasBudgetIdMismatch = checkBudgetIdMismatch(validatedStructure, currentUser);
+
+  // Step 3: Unify transactions
+  const unifiedAllTransactions = unifyTransactions(validatedStructure);
+
+  // Step 4: Validate individual items
+  const dataForItemValidation = {
+    ...validatedStructure,
+    allTransactions: unifiedAllTransactions,
+  };
+  const itemValidation = validateIndividualItems(dataForItemValidation as ImportedData);
+
+  // Step 5: Generate validation warnings for invalid items
+  const validationWarnings = formatValidationErrors(
+    itemValidation.envelopes.invalid,
+    itemValidation.transactions.invalid,
+    itemValidation.bills.invalid,
+    itemValidation.debts.invalid
+  );
+
+  // Log validation results
+  const envelopes = (validatedStructure.envelopes || []) as EnvelopeWithType[];
+  logger.info("Data validation successful", {
+    envelopes: safeLength(validatedStructure.envelopes),
+    envelopesByType: countEnvelopesByType(envelopes),
+    bills: safeLength(validatedStructure.bills),
+    savingsGoals: safeLength(validatedStructure.savingsGoals),
+    supplementalAccounts: safeLength(validatedStructure.supplementalAccounts),
+    debts: safeLength(validatedStructure.debts),
+    allTransactions: safeLength(unifiedAllTransactions),
+    hasBudgetIdMismatch,
+    validationWarnings: validationWarnings.length,
+  });
+
+  if (validationWarnings.length > 0) {
+    logger.warn("Some items have validation warnings", {
+      invalidEnvelopes: itemValidation.envelopes.invalid.length,
+      invalidTransactions: itemValidation.transactions.invalid.length,
+      invalidBills: itemValidation.bills.invalid.length,
+      invalidDebts: itemValidation.debts.invalid.length,
+    });
+  }
+
+  const validatedData: ValidatedImportData = {
+    ...validatedStructure,
+    allTransactions: unifiedAllTransactions,
+  };
+
+  return {
+    validatedData,
+    hasBudgetIdMismatch,
+    importBudgetId: validatedStructure.exportMetadata?.budgetId,
+    validationWarnings,
+    itemValidation,
+  };
+};
+
+// Re-export types and functions for use in other modules
+export type { ImportedData, ItemValidationResult };
+export { ImportedDataSchema, formatValidationErrors };

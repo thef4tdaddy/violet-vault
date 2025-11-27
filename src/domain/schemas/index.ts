@@ -321,6 +321,32 @@ export {
   type ValidationResult,
 } from "./api-responses";
 
+// Import/Export Schemas & Types
+export {
+  ExportMetadataSchema,
+  LegacySupplementalAccountSchema,
+  ImportEnvelopeSchema,
+  ImportTransactionSchema,
+  ImportBillSchema,
+  ImportDebtSchema,
+  ImportedDataSchema,
+  validateImportedDataStructure,
+  validateImportedDataStructureSafe,
+  validateEnvelopes,
+  validateTransactions,
+  validateBills,
+  validateDebts,
+  formatValidationErrors,
+  type ExportMetadata,
+  type LegacySupplementalAccount,
+  type ImportEnvelope,
+  type ImportTransaction,
+  type ImportBill,
+  type ImportDebt,
+  type ImportedData,
+  type ItemValidationResult,
+} from "./import-export";
+
 // Component Props Schemas & Types (Phase 3)
 export {
   EnvelopeGridPropsSchema,

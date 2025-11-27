@@ -16,6 +16,7 @@ import pwaManager, { type PWAManagerUiStore } from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
 import { initializeStoreRegistry } from "./utils/stores/storeRegistry";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 // Lazy load monitoring to reduce main bundle size
 const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
@@ -67,38 +68,42 @@ const App = () => {
   }, []); // Empty deps - only initialize once
 
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <div className="font-sans">
-            <MainLayout
-              firebaseSync={
-                cloudSyncService as unknown as {
-                  start: (config: unknown) => void;
-                  forceSync: () => Promise<unknown>;
-                  isRunning: boolean;
-                }
-              }
-            />
-            <ConfirmProvider />
-            <PromptProvider />
+    <ErrorBoundary context="App" showReload={true}>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <div className="font-sans">
+              <ErrorBoundary context="MainLayout">
+                <MainLayout
+                  firebaseSync={
+                    cloudSyncService as unknown as {
+                      start: (config: unknown) => void;
+                      forceSync: () => Promise<unknown>;
+                      isRunning: boolean;
+                    }
+                  }
+                />
+              </ErrorBoundary>
+              <ConfirmProvider />
+              <PromptProvider />
 
-            {/* PWA Modals */}
-            <UpdateAvailableModal />
-            <InstallPromptModal />
-            <PatchNotesModal />
+              {/* PWA Modals */}
+              <UpdateAvailableModal />
+              <InstallPromptModal />
+              <PatchNotesModal />
 
-            {/* PWA Status Indicators - Removed per user request for cleaner UI */}
-            {/* <OfflineStatusIndicator /> */}
+              {/* PWA Status Indicators - Removed per user request for cleaner UI */}
+              {/* <OfflineStatusIndicator /> */}
 
-            {/* Load monitoring system after main app renders */}
-            <Suspense fallback={null}>
-              <HighlightLoader />
-            </Suspense>
-          </div>
-        </AuthProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+              {/* Load monitoring system after main app renders */}
+              <Suspense fallback={null}>
+                <HighlightLoader />
+              </Suspense>
+            </div>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 };
 
