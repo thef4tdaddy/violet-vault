@@ -78,8 +78,8 @@ export const useTransactionImport = (
 
     setImportStep(3);
 
-    // Process transactions
-    const processedTransactions = await processTransactions(
+    // Process transactions with validation
+    const processResult = await processTransactions(
       importData as unknown[] | { data?: unknown[] },
       fieldMapping as {
         amount: string;
@@ -90,14 +90,37 @@ export const useTransactionImport = (
       }
     );
 
-    // Import transactions first
-    onBulkImport(processedTransactions);
+    // Show validation warnings if any rows were invalid
+    if (processResult.invalid.length > 0) {
+      const errorCount = processResult.invalid.length;
+      const errorSummary = processResult.invalid
+        .slice(0, 3)
+        .map((invalid) => {
+          const descriptionField = fieldMapping.description || "description";
+          const rowDesc =
+            (invalid.row as Record<string, unknown>)?.[descriptionField] ||
+            `Row ${invalid.index + 1}`;
+          return `  • ${rowDesc}: ${invalid.errors.slice(0, 2).join("; ")}`;
+        })
+        .join("\n");
+      const moreText =
+        processResult.invalid.length > 3
+          ? `\n  ... and ${processResult.invalid.length - 3} more`
+          : "";
+
+      globalToast.showWarning(
+        `${errorCount} row(s) skipped due to validation errors:\n${errorSummary}${moreText}`,
+        "Import Warnings",
+        8000
+      );
+    }
+
+    // Import only valid transactions
+    onBulkImport(processResult.valid);
 
     // Process auto-funding for income transactions
     const autoFundingPromises: unknown[] = [];
-    const incomeTransactions = (processedTransactions as Array<{ amount: number }>).filter(
-      (t) => t.amount > 0
-    );
+    const incomeTransactions = processResult.valid.filter((t) => t.amount > 0);
 
     if (incomeTransactions.length > 0) {
       logger.info("Processing auto-funding for imported income transactions", {
@@ -112,7 +135,7 @@ export const useTransactionImport = (
 
     // Enhanced success message including auto-funding results
     const message = generateSuccessMessage(
-      processedTransactions as Array<{ amount: number }>,
+      processResult,
       importData as { clearExisting?: boolean },
       autoFundingPromises as Array<{
         result: { execution: { totalFunded: number; rulesExecuted: number } };
