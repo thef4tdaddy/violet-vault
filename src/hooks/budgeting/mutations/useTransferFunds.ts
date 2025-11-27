@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
+import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
 interface TransferFundsData {
   fromEnvelopeId: string;
@@ -55,7 +56,8 @@ export const useTransferFunds = () => {
       });
 
       // Create transfer transaction in Dexie
-      const transaction = {
+      // Validate and normalize with Zod schema
+      const rawTransaction = {
         id: `transfer_${Date.now()}`,
         amount,
         envelopeId: fromEnvelopeId,
@@ -66,6 +68,7 @@ export const useTransferFunds = () => {
         description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
       };
 
+      const transaction = validateAndNormalizeTransaction(rawTransaction);
       await budgetDb.transactions.put(transaction);
 
       // Apply optimistic updates to cache

@@ -4,6 +4,8 @@ import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient"
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 import type { Transaction, Bill } from "../../../db/types";
+import { validateBillPartialSafe } from "@/domain/schemas/bill";
+import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
 interface CloudSyncService {
   triggerSyncForCriticalChange(change: string): void;
@@ -42,56 +44,6 @@ const createPaymentTransaction = (
   };
 };
 
-interface PaymentUpdateParams {
-  queryClient: ReturnType<typeof useQueryClient>;
-  envelopeId: string;
-  paidAmount: number;
-  paymentDate: string;
-  billId: string;
-  transactionId: string;
-}
-
-// Helper to update envelope balance after payment
-const updateEnvelopeForPayment = async ({
-  queryClient,
-  envelopeId,
-  paidAmount,
-  paymentDate,
-  billId,
-  transactionId,
-}: PaymentUpdateParams) => {
-  const envelope = await budgetDb.envelopes.get(envelopeId);
-  if (!envelope) return;
-
-  const newBalance = (envelope.currentBalance || 0) - paidAmount;
-  const envelopeUpdate = {
-    currentBalance: newBalance,
-    updatedAt: new Date().toISOString(),
-    lastTransaction: {
-      type: "bill_payment",
-      amount: -paidAmount,
-      date: paymentDate,
-      billId: billId,
-      transactionId: transactionId,
-    },
-    name: envelope.name || `Envelope ${envelopeId}`,
-    category: envelope.category || "Other",
-  };
-
-  await budgetDb.envelopes.update(envelopeId, envelopeUpdate);
-  await optimisticHelpers.updateEnvelope(queryClient, envelopeId, {
-    currentBalance: newBalance,
-  });
-
-  logger.debug("💰 Updated envelope balance for bill payment", {
-    envelopeId,
-    envelopeName: envelope.name,
-    oldBalance: envelope.currentBalance || 0,
-    newBalance,
-    paidAmount,
-  });
-};
-
 /**
  * Add bill mutation hook
  */
@@ -117,10 +69,20 @@ export const useAddBillMutation = () => {
         createdAt: Date.now(),
       };
 
-      // Persist to Dexie (optimistic update handled by React Query)
-      await budgetDb.bills.add(newBill);
+      // Validate with Zod schema before saving
+      const validationResult = validateBillSafe(newBill);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues
+          .map((issue) => issue.message)
+          .join(", ");
+        logger.error("Bill validation failed", { errors: validationResult.error.issues });
+        throw new Error(`Invalid bill data: ${errorMessages}`);
+      }
 
-      return newBill;
+      // Persist to Dexie (optimistic update handled by React Query)
+      await budgetDb.bills.add(validationResult.data);
+
+      return validationResult.data;
     },
     onMutate: async () => {
       // Cancel outgoing refetches
@@ -185,17 +147,31 @@ export const useUpdateBillMutation = () => {
         throw new Error(`Bill with ID ${billId} not found`);
       }
 
-      const updatedBill = {
+      // Validate updates with Zod schema
+      const validationResult = validateBillPartialSafe(updates);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues
+          .map((issue) => issue.message)
+          .join(", ");
+        logger.error("Bill update validation failed", {
+          billId,
+          errors: validationResult.error.issues,
+        });
+        throw new Error(`Invalid bill update data: ${errorMessages}`);
+      }
+
+      // Merge validated updates with existing bill
+      const validatedBill = {
         ...existingBill,
-        ...updates,
-        id: billId, // Ensure ID stays the same
+        ...validationResult.data,
+        id: billId,
         lastModified: Date.now(),
       };
 
       // Update in Dexie (optimistic update handled by React Query)
-      await budgetDb.bills.update(billId, updatedBill);
+      await budgetDb.bills.update(billId, validatedBill);
 
-      return updatedBill;
+      return validatedBill;
     },
     onSuccess: (bill, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
@@ -279,6 +255,28 @@ export const useMarkBillPaidMutation = () => {
         throw new Error(`Bill with ID ${billId} not found`);
       }
 
+      // ARCHITECTURE: Bills are just planned transactions. Paying a bill = creating a transaction.
+      // Envelopes are where all money is kept (source of truth).
+      // Behind the scenes: Supplemental accounts and savings goals are stored as envelopes
+      // (for data consistency and transaction routing), but filtered from envelope UI.
+      // CRITICAL: Bills route through envelopes - envelope is required for payment
+      const effectiveEnvelopeId = envelopeId || bill.envelopeId;
+      if (!effectiveEnvelopeId || effectiveEnvelopeId.trim() === "") {
+        throw new Error(
+          "Bill payment requires an envelope. Envelopes are the source of truth for all financial operations."
+        );
+      }
+
+      // Validate envelope exists (envelopes are source of truth)
+      // Note: Behind the scenes, this could be a regular envelope, supplemental account, or savings goal
+      // (all stored as envelopes in the database, but filtered from envelope UI)
+      const envelope = await budgetDb.envelopes.get(effectiveEnvelopeId);
+      if (!envelope) {
+        throw new Error(
+          `Cannot pay bill: Envelope "${effectiveEnvelopeId}" does not exist. All bill payments must route through an existing envelope.`
+        );
+      }
+
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
       // Apply to Dexie directly (optimistic update handled by React Query)
@@ -297,29 +295,26 @@ export const useMarkBillPaidMutation = () => {
       });
 
       // Create transaction record for the bill payment
-      const paymentTransaction = createPaymentTransaction(
+      // Transaction MUST have envelope (envelopes are source of truth)
+      const rawPaymentTransaction = createPaymentTransaction(
         bill,
         billId,
         paidAmount,
         paymentDate,
-        envelopeId
+        effectiveEnvelopeId // Use validated envelope ID
       );
 
+      // Validate and normalize transaction with Zod schema
+      const paymentTransaction = validateAndNormalizeTransaction(rawPaymentTransaction);
+
+      // ARCHITECTURE: Bills are just planned transactions. Paying a bill = creating a transaction.
+      // Envelopes are where all money is kept. The transaction will update the envelope balance.
       // Add transaction to Dexie
       await budgetDb.transactions.put(paymentTransaction);
       await optimisticHelpers.addTransaction(queryClient, paymentTransaction);
 
-      // If bill is linked to envelope, update envelope balance
-      if (envelopeId && paidAmount) {
-        await updateEnvelopeForPayment({
-          queryClient,
-          envelopeId,
-          paidAmount,
-          paymentDate,
-          billId,
-          transactionId: paymentTransaction.id,
-        });
-      }
+      // Note: Envelope balance update is now handled by useTransactionBalanceUpdater when transaction is added.
+      // No need for direct envelope update here.
 
       return { billId, paymentTransaction };
     },

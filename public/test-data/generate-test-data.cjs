@@ -600,11 +600,12 @@ const generateTransactions = () => {
     });
 
     // Income - 2x per month (biweekly paychecks)
+    // ARCHITECTURE: Income always goes to "unassigned" first (envelopes are source of truth)
     transactions.push({
       id: `txn-${String(txnCounter++).padStart(3, "0")}`,
       date: getDateString(startDay + 3),
       amount: 2500.0,
-      envelopeId: "env-008-emergency",
+      envelopeId: "unassigned", // Income goes to unassigned cash
       category: "Income",
       type: "income",
       lastModified: getTimestamp(startDay + 3),
@@ -617,7 +618,7 @@ const generateTransactions = () => {
       id: `txn-${String(txnCounter++).padStart(3, "0")}`,
       date: getDateString(startDay + 17),
       amount: 2500.0,
-      envelopeId: "env-008-emergency",
+      envelopeId: "unassigned", // Income goes to unassigned cash
       category: "Income",
       type: "income",
       lastModified: getTimestamp(startDay + 17),
@@ -668,7 +669,7 @@ const createRecurringBillCandidates = () => {
         id: `txn-recurring-${providerIndex + 1}-${i + 1}`,
         date: getDateString(daysAgo),
         amount: -Math.abs(provider.amount),
-        envelopeId: "",
+        envelopeId: "unassigned", // CRITICAL: All transactions must have envelopeId
         category: "",
         type: "expense",
         lastModified: getTimestamp(daysAgo),
@@ -717,7 +718,7 @@ const createUncategorizedTransactionClusters = () => {
         id: `txn-uncat-${clusterIndex + 1}-${idx + 1}`,
         date: getDateString(daysAgo),
         amount: -Math.abs(amount),
-        envelopeId: "",
+        envelopeId: "unassigned", // CRITICAL: All transactions must have envelopeId
         category: "",
         type: "expense",
         lastModified: getTimestamp(daysAgo),
@@ -1022,21 +1023,35 @@ const updateBaseEnvelopes = () => {
   });
 };
 
-// Update savings goals to have current amounts and recent dates
-const updateBaseSavingsGoals = () => {
+// Convert savings goals to envelopes with envelopeType: "savings"
+// ARCHITECTURE: Savings goals are envelopes behind the scenes, filtered from envelope UI
+const convertSavingsGoalsToEnvelopes = () => {
   return baseData.savingsGoals.map((goal) => {
     const currentAmount = goal.currentAmount || 0;
     const targetAmount = goal.targetAmount || 1000;
+    const targetDate =
+      goal.targetDate ||
+      new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
+    // Convert savings goal to envelope
     return {
-      ...goal,
-      currentAmount,
-      targetAmount,
+      id: goal.id || `env-savings-${Date.now()}`,
+      name: goal.name || "Savings Goal",
+      category: goal.category || "Savings",
+      archived: goal.isCompleted || false,
       lastModified: getTimestamp(0),
       createdAt: getTimestamp(180),
-      targetDate:
-        goal.targetDate ||
-        new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      currentBalance: currentAmount, // Savings goal currentAmount → envelope currentBalance
+      targetAmount: targetAmount,
+      envelopeType: "savings", // CRITICAL: Mark as savings envelope type
+      description: goal.description || "",
+      // Savings goal metadata
+      targetDate: targetDate, // For sinking funds (time-bound savings)
+      priority: goal.priority || "medium",
+      isPaused: goal.isPaused || false,
+      isCompleted: goal.isCompleted || false,
+      monthlyContribution: goal.monthlyContribution || 0,
+      color: goal.color || ENVELOPE_COLORS[Math.floor(Math.random() * ENVELOPE_COLORS.length)],
     };
   });
 };
@@ -1094,7 +1109,9 @@ const updatedBasePaycheckHistory = updateBasePaycheckHistory();
 const recurringBillTransactions = createRecurringBillCandidates();
 const uncategorizedClusterTransactions = createUncategorizedTransactionClusters();
 
-const updateSupplementalAccounts = () => {
+// Convert supplemental accounts to envelopes with envelopeType: "supplemental"
+// ARCHITECTURE: Supplemental accounts are envelopes behind the scenes, filtered from envelope UI
+const convertSupplementalAccountsToEnvelopes = () => {
   const templates = [
     [
       { daysAgo: 5, amount: -85.5, merchant: "Walgreens Pharmacy" },
@@ -1120,26 +1137,42 @@ const updateSupplementalAccounts = () => {
   ];
 
   return baseData.supplementalAccounts.map((account, index) => {
-    const sample = templates[index % templates.length];
-    const transactions = sample.map((entry, idx) => ({
-      id: `${account.id}-txn-${idx + 1}`,
-      date: getDateString(entry.daysAgo),
-      amount: parseFloat(entry.amount.toFixed(2)),
-      merchant: entry.merchant,
-      description: entry.merchant,
-      type: entry.amount >= 0 ? "contribution" : "spending",
-      lastModified: getTimestamp(entry.daysAgo),
-      createdAt: getTimestamp(entry.daysAgo),
-    }));
-
+    // Convert supplemental account to envelope
     return {
-      ...account,
-      transactions,
+      id: account.id || `env-supplemental-${Date.now()}-${index}`,
+      name: account.name || "Supplemental Account",
+      category: account.type || "Supplemental",
+      archived: !account.isActive,
+      lastModified: getTimestamp(0),
+      createdAt: getTimestamp(180),
+      currentBalance: account.currentBalance || account.balance || 0,
+      envelopeType: "supplemental", // CRITICAL: Mark as supplemental envelope type
+      description: account.description || "",
+      color: account.color || ENVELOPE_COLORS[Math.floor(Math.random() * ENVELOPE_COLORS.length)],
+      // Supplemental account metadata
+      annualContribution: account.annualContribution || 0,
+      expirationDate: account.expirationDate || null,
+      isActive: account.isActive !== undefined ? account.isActive : true,
+      type: account.type || "FSA", // FSA, HSA, etc.
+      createdBy: account.createdBy || "System",
+      createdAt: account.createdAt || new Date().toISOString(),
+      lastUpdated: account.lastUpdated || new Date().toISOString(),
     };
   });
 };
 
-const allEnvelopes = [...updatedBaseEnvelopes, ...serviceEnvelopes, ...debtEnvelopes];
+// Convert savings goals and supplemental accounts to envelopes
+const savingsGoalEnvelopes = convertSavingsGoalsToEnvelopes();
+const supplementalAccountEnvelopes = convertSupplementalAccountsToEnvelopes();
+
+// Combine all envelopes (regular + service + debt + savings + supplemental)
+const allEnvelopes = [
+  ...updatedBaseEnvelopes,
+  ...serviceEnvelopes,
+  ...debtEnvelopes,
+  ...savingsGoalEnvelopes,
+  ...supplementalAccountEnvelopes,
+];
 const allBills = [...updatedBaseBills, ...debtBills];
 const allTransactions = [
   ...updatedBaseTransactions,
@@ -1147,7 +1180,6 @@ const allTransactions = [
   ...recurringBillTransactions,
   ...uncategorizedClusterTransactions,
 ];
-const updatedSupplementalAccounts = updateSupplementalAccounts();
 
 const buildAllTransactions = () => {
   const billPayments = allBills
@@ -1268,13 +1300,14 @@ const enhancedEnvelopes = enhanceEnvelopesForAnalytics(allEnvelopes);
 // Construct final export object
 const builtAllTransactions = buildAllTransactions();
 
+// ARCHITECTURE: Simplified data model - savings goals and supplemental accounts are now envelopes
 const enhancedData = {
-  envelopes: enhancedEnvelopes,
+  envelopes: enhancedEnvelopes, // Includes regular, savings, and supplemental envelopes
   bills: allBills,
   transactions: allTransactions,
   allTransactions: builtAllTransactions,
-  savingsGoals: updatedBaseSavingsGoals,
-  supplementalAccounts: updatedSupplementalAccounts,
+  // NOTE: savingsGoals and supplementalAccounts removed - they're now in envelopes array
+  // with envelopeType: "savings" and envelopeType: "supplemental" respectively
   debts: enhancedDebts,
   paycheckHistory: updatedBasePaycheckHistory,
   auditLog: baseData.auditLog,
@@ -1285,10 +1318,21 @@ const enhancedData = {
   exportMetadata: {
     ...baseData.exportMetadata,
     exportDate: new Date().toISOString(),
-    note: "Enhanced test data with 100+ transactions and full entity connections",
+    note: "Enhanced test data with 100+ transactions and full entity connections. Uses simplified data model: savings goals and supplemental accounts are envelopes with envelopeType.",
+    dataModelVersion: "2.0", // Simplified model
   },
   _dataGuide: {
     ...baseData._dataGuide,
+    architecture: {
+      note: "Simplified Data Model (v2.0)",
+      principles: [
+        "Envelopes are the source of truth for all money",
+        "Savings goals are envelopes with envelopeType: 'savings'",
+        "Supplemental accounts are envelopes with envelopeType: 'supplemental'",
+        "All transactions must have envelopeId (income uses 'unassigned')",
+        "Bills and debts are planning metadata, not money holders",
+      ],
+    },
     fixtures: {
       recurringBillCandidates: {
         description: "Synthetic recurring merchants used to populate Discover Bills modal",
@@ -1311,11 +1355,13 @@ const enhancedData = {
     connections: {
       "Debt → Envelope": "debts have envelopeId field",
       "Debt → Bill": "bills have debtId field pointing to debt",
-      "Bill → Envelope": "bills have envelopeId field",
+      "Bill → Envelope": "bills have envelopeId field (envelopes are source of truth)",
       "Envelope → Bill": "envelopes have billId field",
       "Envelope → Debt": "envelopes have debtId field",
-      "Transaction → Envelope": "transactions have envelopeId field",
+      "Transaction → Envelope": "transactions have envelopeId field (REQUIRED)",
       "Transaction → Bill": "bill payment transactions have billId field",
+      "Savings Goal → Envelope": "savings goals are envelopes with envelopeType: 'savings'",
+      "Supplemental Account → Envelope": "supplemental accounts are envelopes with envelopeType: 'supplemental'",
     },
     stats: {
       envelopes: enhancedEnvelopes.length,
@@ -1323,9 +1369,9 @@ const enhancedData = {
       transactions: allTransactions.length,
       allTransactions: builtAllTransactions.length,
       debts: enhancedDebts.length,
-      savingsGoals: baseData.savingsGoals.length,
-      supplementalAccounts: updatedSupplementalAccounts.length,
-      paycheckHistory: baseData.paycheckHistory.length,
+      savingsGoalsAsEnvelopes: savingsGoalEnvelopes.length,
+      supplementalAccountsAsEnvelopes: supplementalAccountEnvelopes.length,
+      paycheckHistory: updatedBasePaycheckHistory.length,
     },
   },
 };
@@ -1336,7 +1382,11 @@ fs.writeFileSync(outputPath, JSON.stringify(enhancedData, null, 2));
 
 console.log("✅ Enhanced test data generated!");
 console.log(`📊 Stats:`);
-console.log(`   - Envelopes: ${enhancedEnvelopes.length} (added 4 debt payment envelopes)`);
+console.log(`   - Envelopes: ${enhancedEnvelopes.length} (includes regular, savings, supplemental, and debt payment envelopes)`);
+console.log(`     • Regular envelopes: ${updatedBaseEnvelopes.length + serviceEnvelopes.length}`);
+console.log(`     • Savings goals (as envelopes): ${savingsGoalEnvelopes.length}`);
+console.log(`     • Supplemental accounts (as envelopes): ${supplementalAccountEnvelopes.length}`);
+console.log(`     • Debt payment envelopes: ${debtEnvelopes.length}`);
 console.log(`   - Bills: ${allBills.length} (added 4 debt payment bills)`);
 console.log(
   `   - Transactions: ${allTransactions.length} (generated ${newTransactions.length} base + ${recurringBillTransactions.length} discovery + ${uncategorizedClusterTransactions.length} suggestion samples)`
@@ -1344,6 +1394,11 @@ console.log(
 console.log(`   - All Transactions: ${builtAllTransactions.length}`);
 console.log(`   - Debts: ${enhancedDebts.length} (updated with envelope connections)`);
 console.log(`\n📁 Saved to: ${outputPath}`);
+console.log(`\n🏗️  Architecture: Simplified Data Model (v2.0)`);
+console.log(`   • Savings goals are envelopes with envelopeType: "savings"`);
+console.log(`   • Supplemental accounts are envelopes with envelopeType: "supplemental"`);
+console.log(`   • All transactions have envelopeId (income uses "unassigned")`);
+console.log(`   • Bills and debts are planning metadata, not money holders`);
 const endDate = new Date();
 const startDate = new Date();
 startDate.setDate(startDate.getDate() - 180);

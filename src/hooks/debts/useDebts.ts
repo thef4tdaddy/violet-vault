@@ -4,6 +4,7 @@ import { queryKeys } from "../../utils/common/queryClient";
 import { budgetDb } from "../../db/budgetDb";
 import BudgetHistoryTracker from "../../utils/common/budgetHistoryTracker";
 import logger from "../../utils/common/logger.ts";
+import { validateDebtSafe, validateDebtPartialSafe } from "@/domain/schemas/debt";
 
 // Query function for fetching debts
 const fetchDebtsWithMigration = async () => {
@@ -43,18 +44,26 @@ const addDebtToDb = async (debtData: {
     ? { status: "active", ...debtData }
     : { id: crypto.randomUUID(), status: "active", ...debtData };
 
-  await budgetDb.debts.put(debt as never);
+  // Validate with Zod schema before saving
+  const validationResult = validateDebtSafe(debt);
+  if (!validationResult.success) {
+    const errorMessages = validationResult.error.issues.map((issue) => issue.message).join(", ");
+    logger.error("Debt validation failed", { errors: validationResult.error.issues });
+    throw new Error(`Invalid debt data: ${errorMessages}`);
+  }
+
+  await budgetDb.debts.put(validationResult.data as never);
 
   await BudgetHistoryTracker.trackDebtChange({
-    debtId: debt.id as string,
+    debtId: validationResult.data.id,
     changeType: "add",
     previousData: null as never,
-    newData: debt as never,
+    newData: validationResult.data as never,
     author: debtData.author || "Unknown User",
   });
 
   // Fetch the complete debt from DB to return proper type
-  const savedDebt = await budgetDb.debts.get(debt.id as string);
+  const savedDebt = await budgetDb.debts.get(validationResult.data.id);
   if (!savedDebt) {
     throw new Error("Failed to retrieve saved debt");
   }
@@ -73,8 +82,19 @@ const updateDebtInDb = async ({
 }) => {
   const previousData = await budgetDb.debts.get(id);
 
+  // Validate updates with Zod schema
+  const validationResult = validateDebtPartialSafe(updates);
+  if (!validationResult.success) {
+    const errorMessages = validationResult.error.issues.map((issue) => issue.message).join(", ");
+    logger.error("Debt update validation failed", {
+      debtId: id,
+      errors: validationResult.error.issues,
+    });
+    throw new Error(`Invalid debt update data: ${errorMessages}`);
+  }
+
   await budgetDb.debts.update(id, {
-    ...updates,
+    ...validationResult.data,
     lastModified: Date.now(),
   });
 
@@ -88,7 +108,7 @@ const updateDebtInDb = async ({
     author,
   });
 
-  return { id, ...updates };
+  return { id, ...validationResult.data };
 };
 
 // Mutation function for deleting a debt

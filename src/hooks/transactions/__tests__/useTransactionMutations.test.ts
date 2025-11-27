@@ -13,12 +13,51 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   };
 });
 
-vi.mock("../../../services/budgetDatabaseService", () => ({
-  default: {
+vi.mock("@/db/budgetDb", () => ({
+  budgetDb: {
+    transactions: {
+      put: vi.fn(),
+      get: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    envelopes: {
+      get: vi.fn(), // Required for envelope validation
+    },
+  },
+}));
+
+vi.mock("@/hooks/transactions/useTransactionBalanceUpdater", () => ({
+  useTransactionBalanceUpdater: () => ({
+    updateBalancesForTransaction: vi.fn(),
+  }),
+}));
+
+vi.mock("@/utils/common/queryClient", () => ({
+  queryKeys: {
+    transactions: ["transactions"],
+    envelopes: ["envelopes"],
+    dashboard: ["dashboard"],
+    analytics: ["analytics"],
+  },
+  optimisticHelpers: {
     addTransaction: vi.fn(),
     updateTransaction: vi.fn(),
-    deleteTransaction: vi.fn(),
+    removeTransaction: vi.fn(),
   },
+}));
+
+vi.mock("@/domain/schemas/transaction", () => ({
+  normalizeTransactionAmount: vi.fn((txn) => {
+    // Normalize: expense=negative, income=positive
+    if (txn.type === "expense" && txn.amount > 0) {
+      return { ...txn, amount: -Math.abs(txn.amount) };
+    }
+    if (txn.type === "income" && txn.amount < 0) {
+      return { ...txn, amount: Math.abs(txn.amount) };
+    }
+    return txn;
+  }),
 }));
 
 vi.mock("../../../stores/ui/toastStore", () => ({
@@ -44,9 +83,21 @@ describe("useTransactionMutations", () => {
     setQueryData: vi.fn(),
   };
 
-  beforeEach(() => {
+  const mockEnvelope = {
+    id: "env-1",
+    name: "Test Envelope",
+    currentBalance: 0,
+    category: "expenses",
+  };
+
+  beforeEach(async () => {
     vi.clearAllMocks();
     (useQueryClient as Mock).mockReturnValue(mockQueryClient);
+    // Mock envelope existence check (envelopes are source of truth - where all money is kept)
+    // Behind the scenes: Supplemental accounts and savings goals are stored as envelopes
+    // (for data consistency and transaction routing), but filtered from envelope UI
+    const { budgetDb } = await import("@/db/budgetDb");
+    (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
   });
 
   describe("addTransaction mutation", () => {
@@ -131,9 +182,10 @@ describe("useTransactionMutations", () => {
   describe("updateTransaction mutation", () => {
     it("should configure update transaction mutation correctly", () => {
       const mockMutations = [
-        { mutate: vi.fn(), isPending: false, error: null }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
       (useMutation as Mock).mockImplementation(() => mockMutations.shift());
@@ -147,13 +199,17 @@ describe("useTransactionMutations", () => {
     it("should handle successful transaction update", () => {
       let updateOnSuccess;
       const mockMutations = [
-        { mutate: vi.fn(), isPending: false, error: null }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
       (useMutation as Mock).mockImplementation(({ onSuccess }) => {
-        if (!updateOnSuccess) updateOnSuccess = onSuccess;
+        // Store the update mutation's onSuccess (4th call)
+        if ((useMutation as Mock).mock.calls.length === 4) {
+          updateOnSuccess = onSuccess;
+        }
         return mockMutations.shift();
       });
 
@@ -165,7 +221,7 @@ describe("useTransactionMutations", () => {
         amount: 200,
       };
       act(() => {
-        updateOnSuccess(updatedTransaction);
+        if (updateOnSuccess) updateOnSuccess(updatedTransaction);
       });
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
@@ -177,9 +233,10 @@ describe("useTransactionMutations", () => {
   describe("deleteTransaction mutation", () => {
     it("should configure delete transaction mutation correctly", () => {
       const mockMutations = [
-        { mutate: vi.fn(), isPending: false, error: null }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
       (useMutation as Mock).mockImplementation(() => mockMutations.shift());
@@ -251,6 +308,530 @@ describe("useTransactionMutations", () => {
       expect(result.current.addTransaction).toBeDefined();
       expect(result.current.updateTransaction).toBeDefined();
       expect(result.current.deleteTransaction).toBeDefined();
+    });
+  });
+
+  describe("CRUD Operations - Comprehensive Validation", () => {
+    let mutationConfigs: Array<{ mutationFn: unknown; onSuccess: unknown; onError: unknown }> = [];
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      mutationConfigs = [];
+      (useQueryClient as Mock).mockReturnValue(mockQueryClient);
+    });
+
+    describe("Add Transaction - Validation & Safety (Envelopes are Source of Truth)", () => {
+      it("should require envelope for transaction creation", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Test Transaction",
+          // Missing envelopeId - should fail
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("Transaction must have an envelope");
+        });
+      });
+
+      it("should validate envelope exists before creating transaction", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.envelopes.get as Mock).mockResolvedValueOnce(undefined); // Envelope doesn't exist
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Test Transaction",
+          envelopeId: "non-existent",
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("does not exist");
+        });
+      });
+      it("should create transaction with proper amount normalization (expense=negative)", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
+
+        // Mock all 4 mutations (add, reconcile, delete, update)
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          // Store the config for later access
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        // Get the add mutation config (first call)
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 100, // Positive amount
+          description: "Test Expense",
+          category: "food",
+          envelopeId: "env-1", // REQUIRED - envelopes are source of truth
+        };
+
+        await act(async () => {
+          const result = await addMutation.mutationFn(transactionData);
+          // Expense should be normalized to negative
+          expect(result.amount).toBeLessThan(0);
+        });
+      });
+
+      it("should create transaction with proper amount normalization (income=positive)", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "income",
+          amount: -100, // Negative amount (should be corrected)
+          description: "Test Income",
+          category: "salary",
+          envelopeId: "env-1", // REQUIRED - envelopes are source of truth
+        };
+
+        await act(async () => {
+          const result = await addMutation.mutationFn(transactionData);
+          // Income should be normalized to positive
+          expect(result.amount).toBeGreaterThan(0);
+        });
+      });
+
+      it("should warn and auto-correct sign mismatches", async () => {
+        const { default: logger } = await import("@/utils/common/logger");
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 100, // Positive for expense (mismatch)
+          description: "Mismatch Test",
+          envelopeId: "env-1", // REQUIRED - envelopes are source of truth
+        };
+
+        await act(async () => {
+          await addMutation.mutationFn(transactionData);
+        });
+
+        expect(logger.warn).toHaveBeenCalledWith(
+          expect.stringContaining("sign mismatch"),
+          expect.any(Object)
+        );
+      });
+
+      it("should apply optimistic update before database write", async () => {
+        const { optimisticHelpers } = await import("@/utils/common/queryClient");
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Optimistic Test",
+          envelopeId: "env-1", // REQUIRED - envelopes are source of truth
+        };
+
+        await act(async () => {
+          await addMutation.mutationFn(transactionData);
+        });
+
+        expect(optimisticHelpers.addTransaction).toHaveBeenCalled();
+      });
+
+      it("should invalidate all related queries on success", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Query Test",
+          envelopeId: "env-1", // REQUIRED - envelopes are source of truth
+        };
+
+        await act(async () => {
+          const result = await addMutation.mutationFn(transactionData);
+          await addMutation.onSuccess(result);
+        });
+
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["transactions"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["envelopes"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["dashboard"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["analytics"],
+        });
+      });
+    });
+
+    describe("Update Transaction - Validation & Safety", () => {
+      it("should update transaction with validated data", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.update as Mock).mockResolvedValue(1);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = mutationConfigs[3]; // Fourth mutation (update)
+        const updateData = {
+          id: "txn-1",
+          updates: {
+            description: "Updated Description",
+            amount: -75,
+          },
+        };
+
+        await act(async () => {
+          const result = await updateMutation.mutationFn(updateData);
+          expect(result.id).toBe("txn-1");
+          expect(result.updates.description).toBe("Updated Description");
+        });
+
+        expect(budgetDb.transactions.update).toHaveBeenCalledWith(
+          "txn-1",
+          expect.objectContaining({
+            description: "Updated Description",
+            amount: -75,
+            updatedAt: expect.any(String),
+          })
+        );
+      });
+
+      it("should apply optimistic update before database write", async () => {
+        const { optimisticHelpers } = await import("@/utils/common/queryClient");
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.update as Mock).mockResolvedValue(1);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = (useMutation as Mock).mockConfigs[3];
+        const updateData = {
+          id: "txn-1",
+          updates: { description: "Optimistic Update" },
+        };
+
+        await act(async () => {
+          await updateMutation.mutationFn(updateData);
+        });
+
+        expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(
+          mockQueryClient,
+          "txn-1",
+          expect.objectContaining({
+            description: "Optimistic Update",
+          })
+        );
+      });
+
+      it("should invalidate queries and rollback on error", async () => {
+        const { default: logger } = await import("@/utils/common/logger");
+        const { budgetDb } = await import("@/db/budgetDb");
+        const dbError = new Error("Update failed");
+        (budgetDb.transactions.update as Mock).mockRejectedValue(dbError);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = (useMutation as Mock).mockConfigs[3];
+        const updateData = {
+          id: "txn-1",
+          updates: { description: "Error Test" },
+        };
+
+        await act(async () => {
+          try {
+            await updateMutation.mutationFn(updateData);
+          } catch (error) {
+            await updateMutation.onError(error as Error);
+          }
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to update transaction",
+          dbError,
+          expect.any(Object)
+        );
+        // Should invalidate to rollback optimistic update
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["transactions"],
+        });
+      });
+    });
+
+    describe("Delete Transaction - Validation & Safety", () => {
+      it("should delete transaction and update balances", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const mockTransaction = {
+          id: "txn-1",
+          amount: -50,
+          envelopeId: "env-1",
+        };
+        (budgetDb.transactions.get as Mock).mockResolvedValue(mockTransaction);
+        (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const deleteMutation = mutationConfigs[2]; // Third mutation (delete)
+
+        await act(async () => {
+          const result = await deleteMutation.mutationFn("txn-1");
+          expect(result).toBe("txn-1");
+        });
+
+        expect(budgetDb.transactions.get).toHaveBeenCalledWith("txn-1");
+        expect(budgetDb.transactions.delete).toHaveBeenCalledWith("txn-1");
+      });
+
+      it("should handle deletion of non-existent transaction gracefully", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        (budgetDb.transactions.get as Mock).mockResolvedValue(undefined);
+        (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+
+        await act(async () => {
+          const result = await deleteMutation.mutationFn("non-existent");
+          expect(result).toBe("non-existent");
+        });
+
+        // Should still attempt deletion (idempotent)
+        expect(budgetDb.transactions.delete).toHaveBeenCalledWith("non-existent");
+      });
+
+      it("should invalidate all related queries on successful deletion", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const mockTransaction = { id: "txn-1", amount: -50 };
+        (budgetDb.transactions.get as Mock).mockResolvedValue(mockTransaction);
+        (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          if (!(useMutation as Mock).mockConfigs) {
+            (useMutation as Mock).mockConfigs = [];
+          }
+          (useMutation as Mock).mockConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+
+        await act(async () => {
+          const result = await deleteMutation.mutationFn("txn-1");
+          await deleteMutation.onSuccess(result);
+        });
+
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["transactions"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["envelopes"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["dashboard"],
+        });
+        expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
+          queryKey: ["analytics"],
+        });
+      });
     });
   });
 });

@@ -3,6 +3,7 @@ import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
 import logger from "@/utils/common/logger";
+import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
 
 interface AddEnvelopeData {
   name: string;
@@ -48,13 +49,23 @@ export const useAddEnvelope = () => {
           AUTO_CLASSIFY_ENVELOPE_TYPE(envelopeData.category || "expenses"),
       };
 
+      // Validate with Zod schema before saving
+      const validationResult = validateEnvelopeSafe(newEnvelope);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues
+          .map((issue) => issue.message)
+          .join(", ");
+        logger.error("Envelope validation failed", { errors: validationResult.error.issues });
+        throw new Error(`Invalid envelope data: ${errorMessages}`);
+      }
+
       // Optimistic update
-      await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
+      await optimisticHelpers.addEnvelope(queryClient, validationResult.data);
 
       // Use put() instead of add() to handle duplicates gracefully
-      await budgetDb.envelopes.put(newEnvelope);
+      await budgetDb.envelopes.put(validationResult.data);
 
-      return newEnvelope;
+      return validationResult.data;
     },
     onSuccess: (envelope) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });

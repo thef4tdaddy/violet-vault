@@ -4,7 +4,13 @@ import { budgetDb } from "../../db/budgetDb.ts";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
 import logger from "../../utils/common/logger.ts";
 import type { Transaction } from "../../db/types.ts";
-import { normalizeTransactionAmount } from "@/domain/schemas/transaction";
+import {
+  normalizeTransactionAmount,
+  validateAndNormalizeTransaction,
+  validateTransactionSafe,
+  TransactionPartialSchema,
+  validateTransactionPartialSafe,
+} from "@/domain/schemas/transaction";
 
 export interface TransactionInput {
   date?: string;
@@ -63,14 +69,34 @@ export const useTransactionMutations = () => {
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
     mutationFn: async (transactionData: TransactionInput): Promise<Transaction> => {
+      // ARCHITECTURE: Envelopes are where all money is kept (source of truth).
+      // Behind the scenes: Supplemental accounts and savings goals are stored as envelopes
+      // (for data consistency and transaction routing), but filtered from envelope UI.
+      // Bills are just planned transactions. Debts are bills with finite amount/time.
+      // Paying bills/debts = creating a transaction to an envelope.
+      // CRITICAL: Transactions MUST have an envelope (envelopes are source of truth)
+      if (!transactionData.envelopeId || transactionData.envelopeId.trim() === "") {
+        throw new Error("Transaction must have an envelope. Envelope ID is required.");
+      }
+
+      // Validate envelope exists before creating transaction
+      // Note: Behind the scenes, this could be a regular envelope, supplemental account, or savings goal
+      // (all stored as envelopes in the database, but filtered from envelope UI)
+      const envelope = await budgetDb.envelopes.get(transactionData.envelopeId);
+      if (!envelope) {
+        throw new Error(
+          `Cannot create transaction: Envelope "${transactionData.envelopeId}" does not exist. Transactions must be linked to an existing envelope.`
+        );
+      }
+
       const rawTransaction: Transaction = {
         id: Date.now().toString(),
         date: new Date(transactionData.date || new Date().toISOString().split("T")[0]),
         type: transactionData.type || "expense",
-        category: transactionData.category || "other",
+        category: transactionData.category || envelope.category || "other",
         createdAt: Date.now(),
         amount: transactionData.amount || 0,
-        envelopeId: transactionData.envelopeId || "",
+        envelopeId: transactionData.envelopeId, // Required - validated above
         lastModified: Date.now(),
         description: transactionData.description,
         merchant: transactionData.merchant,
@@ -100,12 +126,15 @@ export const useTransactionMutations = () => {
       }
 
       // Normalize amount sign based on type (expense=negative, income=positive)
-      const newTransaction = normalizeTransactionAmount(rawTransaction);
+      const normalizedTransaction = normalizeTransactionAmount(rawTransaction);
 
-      await optimisticHelpers.addTransaction(queryClient, newTransaction);
-      await budgetDb.transactions.put(newTransaction);
-      await updateBalancesForTransaction(newTransaction);
-      return newTransaction;
+      // Validate with Zod schema (includes sign validation)
+      const validatedTransaction = validateAndNormalizeTransaction(normalizedTransaction);
+
+      await optimisticHelpers.addTransaction(queryClient, validatedTransaction);
+      await budgetDb.transactions.put(validatedTransaction);
+      await updateBalancesForTransaction(validatedTransaction);
+      return validatedTransaction;
     },
     onSuccess: (transaction) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
@@ -195,7 +224,23 @@ export const useTransactionMutations = () => {
       id,
       updates,
     }: TransactionUpdateInput): Promise<TransactionUpdateInput> => {
-      const updatedTransaction = { ...updates, updatedAt: new Date().toISOString() };
+      // Validate updates with Zod schema
+      const validationResult = validateTransactionPartialSafe(updates);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues
+          .map((issue) => issue.message)
+          .join(", ");
+        logger.error("Transaction update validation failed", {
+          transactionId: id,
+          errors: validationResult.error.issues,
+        });
+        throw new Error(`Invalid transaction update data: ${errorMessages}`);
+      }
+
+      const updatedTransaction = {
+        ...validationResult.data,
+        updatedAt: new Date().toISOString(),
+      };
       await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
       await budgetDb.transactions.update(id, updatedTransaction);
       return { id, updates: updatedTransaction };

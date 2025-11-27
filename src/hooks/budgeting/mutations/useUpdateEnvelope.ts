@@ -3,6 +3,7 @@ import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/db/types";
+import { EnvelopePartialSchema, validateEnvelopePartialSafe } from "@/domain/schemas/envelope";
 
 interface UpdateEnvelopeData {
   id: string;
@@ -44,9 +45,22 @@ export const useUpdateEnvelope = () => {
         category: safeCategory,
       };
 
+      // Validate updates with Zod schema
+      const validationResult = validateEnvelopePartialSafe(safeUpdates);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues
+          .map((issue) => issue.message)
+          .join(", ");
+        logger.error("Envelope update validation failed", {
+          envelopeId: id,
+          errors: validationResult.error.issues,
+        });
+        throw new Error(`Invalid envelope update data: ${errorMessages}`);
+      }
+
       // Create properly typed update object for Dexie
       const dbUpdates: Partial<Envelope> = {
-        ...safeUpdates,
+        ...validationResult.data,
         lastModified: Date.now(),
       };
 
@@ -60,7 +74,7 @@ export const useUpdateEnvelope = () => {
       });
 
       // Apply optimistic update with validated data
-      await optimisticHelpers.updateEnvelope(queryClient, id, safeUpdates);
+      await optimisticHelpers.updateEnvelope(queryClient, id, validationResult.data);
 
       // Apply to Dexie directly with safe updates
       await budgetDb.envelopes.update(id, dbUpdates);
