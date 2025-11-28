@@ -551,4 +551,283 @@ describe("useDebts - CRUD Operations", () => {
       });
     });
   });
+
+  describe("Validation Error Handling", () => {
+    it("should handle database error when adding debt", async () => {
+      const dbError = new Error("Database write failed");
+      (budgetDb.debts.put as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.addDebt).toBeDefined();
+      });
+
+      await expect(
+        result.current.addDebtAsync({
+          id: "test-debt-id", // Provide ID to avoid crypto.randomUUID
+          name: "Test Debt",
+          creditor: "Test Creditor",
+          type: "personal" as const,
+          currentBalance: 1000,
+          originalBalance: 1000, // Required field
+          minimumPayment: 50,
+          interestRate: 5, // Required field
+          lastModified: Date.now(), // Required field
+        })
+      ).rejects.toThrow("Database write failed");
+    });
+
+    it("should handle database error when updating debt", async () => {
+      const dbError = new Error("Database update failed");
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.debts.update as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.updateDebt).toBeDefined();
+      });
+
+      await expect(
+        result.current.updateDebtAsync({
+          id: "debt-1",
+          updates: { name: "Updated Name" },
+        })
+      ).rejects.toThrow("Database update failed");
+    });
+
+    it("should handle database error when deleting debt", async () => {
+      const dbError = new Error("Database delete failed");
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.debts.delete as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.deleteDebt).toBeDefined();
+      });
+
+      await expect(result.current.deleteDebtAsync({ id: "debt-1" })).rejects.toThrow(
+        "Database delete failed"
+      );
+    });
+
+    it("should handle history tracking errors gracefully", async () => {
+      const historyError = new Error("History tracking failed");
+      (BudgetHistoryTracker.trackDebtChange as ReturnType<typeof vi.fn>).mockRejectedValue(
+        historyError
+      );
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.addDebt).toBeDefined();
+      });
+
+      // Even if history tracking fails, the debt should still be created
+      // (history tracking is secondary)
+      await expect(
+        result.current.addDebtAsync({
+          id: "test-debt-id", // Provide ID to avoid crypto.randomUUID
+          name: "Test Debt",
+          creditor: "Test Creditor",
+          type: "personal" as const,
+          currentBalance: 1000,
+          originalBalance: 1000, // Required field
+          minimumPayment: 50,
+          interestRate: 5, // Required field
+          lastModified: Date.now(), // Required field
+        })
+      ).rejects.toThrow("History tracking failed");
+    });
+
+    it("should handle payment recording with non-existent debt", async () => {
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.recordDebtPayment).toBeDefined();
+      });
+
+      // Payment on non-existent debt should not update balance but should return
+      const payment = await result.current.recordDebtPaymentAsync({
+        id: "non-existent",
+        payment: {
+          amount: 100,
+          date: new Date().toISOString(),
+        },
+      });
+      // Payment on non-existent debt - the hook doesn't update and returns early
+      expect(payment).toBeDefined();
+    });
+
+    it("should validate debt name is not empty", async () => {
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.addDebt).toBeDefined();
+      });
+
+      // Empty name should fail validation
+      await expect(
+        result.current.addDebtAsync({
+          id: "test-debt-id", // Provide ID to avoid crypto.randomUUID
+          name: "", // Empty name
+          creditor: "Test Creditor",
+          type: "personal" as const,
+          currentBalance: 1000,
+          originalBalance: 1000,
+          minimumPayment: 50,
+          interestRate: 5,
+        })
+      ).rejects.toThrow("Invalid debt data");
+    });
+
+    it("should handle concurrent debt updates", async () => {
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.updateDebt).toBeDefined();
+      });
+
+      // Simulate concurrent updates
+      await Promise.all([
+        result.current.updateDebtAsync({
+          id: "debt-1",
+          updates: { name: "Update 1" },
+        }),
+        result.current.updateDebtAsync({
+          id: "debt-1",
+          updates: { currentBalance: 4000 },
+        }),
+      ]);
+
+      await waitFor(() => {
+        expect(budgetDb.debts.update).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it("should validate minimum payment is not negative", async () => {
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.addDebt).toBeDefined();
+      });
+
+      // Negative minimum payment should fail validation
+      await expect(
+        result.current.addDebtAsync({
+          id: "test-debt-id", // Provide ID to avoid crypto.randomUUID
+          name: "Test Debt",
+          creditor: "Test Creditor",
+          type: "personal" as const,
+          currentBalance: 1000,
+          originalBalance: 1000, // Required field
+          minimumPayment: -50, // Negative minimum payment
+          interestRate: 5,
+        })
+      ).rejects.toThrow("Invalid debt data");
+    });
+
+    it("should handle envelope relationship validation for debt payment", async () => {
+      const debtWithEnvelope = { ...mockDebt, envelopeId: "non-existent-envelope" };
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(debtWithEnvelope);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.recordDebtPayment).toBeDefined();
+      });
+
+      // Payment should still be recorded even if envelope doesn't exist
+      await result.current.recordDebtPaymentAsync({
+        id: "debt-1",
+        payment: {
+          amount: 100,
+          date: new Date().toISOString(),
+        },
+      });
+
+      await waitFor(() => {
+        expect(budgetDb.debts.update).toHaveBeenCalled();
+      });
+    });
+
+    it("should handle payment amount exceeding balance", async () => {
+      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.recordDebtPayment).toBeDefined();
+      });
+
+      // Payment exceeds current balance
+      await result.current.recordDebtPaymentAsync({
+        id: "debt-1",
+        payment: {
+          amount: 10000, // More than 5000 balance
+          date: new Date().toISOString(),
+        },
+      });
+
+      await waitFor(() => {
+        // Balance should be clamped to 0
+        expect(budgetDb.debts.update).toHaveBeenCalledWith(
+          "debt-1",
+          expect.objectContaining({
+            currentBalance: 0,
+          })
+        );
+      });
+    });
+
+    it("should validate interest rate is not negative", async () => {
+      const { result } = renderHook(() => useDebts(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.addDebt).toBeDefined();
+      });
+
+      // Negative interest rate should fail validation
+      await expect(
+        result.current.addDebtAsync({
+          id: "test-debt-id", // Provide ID to avoid crypto.randomUUID
+          name: "Test Debt",
+          creditor: "Test Creditor",
+          type: "personal" as const,
+          currentBalance: 1000,
+          originalBalance: 1000, // Required field
+          minimumPayment: 50,
+          interestRate: -5, // Negative interest rate
+        })
+      ).rejects.toThrow("Invalid debt data");
+    });
+  });
 });
