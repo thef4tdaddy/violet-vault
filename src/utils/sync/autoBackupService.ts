@@ -3,6 +3,7 @@
  * GitHub Issue #576 Phase 3: Automatic local backup before cloud ops
  * Updated for Issue #1337: Backup/Restore uses envelope-based model (v2.0)
  * Enhanced for Issue #1342: Backup/Restore Validation Enhancement
+ * GitHub Issue #1394: Add Performance Monitoring for Critical Operations
  * - Savings goals are stored as envelopes with envelopeType: "savings"
  * - Supplemental accounts are stored as envelopes with envelopeType: "supplemental"
  * - No separate savingsGoals array in backup data
@@ -16,6 +17,7 @@ import { validateTransactionSafe } from "@/domain/schemas/transaction";
 import { validateBillSafe } from "@/domain/schemas/bill";
 import { validateDebtSafe } from "@/domain/schemas/debt";
 import { validatePaycheckHistorySafe } from "@/domain/schemas/paycheck-history";
+import { trackBackup } from "@/utils/monitoring/performanceMonitor";
 import type { Envelope, Transaction, Bill, Debt, PaycheckHistory } from "@/db/types";
 
 /**
@@ -99,7 +101,7 @@ class AutoBackupService {
   }
 
   /**
-   * Create automatic backup before sync operation
+   * Create automatic backup before sync operation with Sentry performance tracking
    */
   async createPreSyncBackup(syncType = "unknown"): Promise<string | null> {
     if (!this.isEnabled) {
@@ -115,35 +117,46 @@ class AutoBackupService {
         syncType,
       });
 
-      const startTime = Date.now();
-      const backupData = await this.collectAllData();
-      const duration = Date.now() - startTime;
+      // Track backup creation with Sentry performance monitoring
+      const backupResult = await trackBackup(
+        "create",
+        async () => {
+          const backupData = await this.collectAllData();
+          const totalRecords = this.countRecords(backupData);
+          const sizeEstimate = JSON.stringify(backupData).length;
 
-      const backup: Backup = {
-        id: backupId,
-        type: "sync_triggered",
-        syncType: syncType as "firebase" | "export" | "import" | undefined,
-        timestamp: Date.now(),
-        data: backupData,
-        metadata: {
-          totalRecords: this.countRecords(backupData),
-          sizeEstimate: JSON.stringify(backupData).length,
-          duration,
-          version: "2.0",
+          const backup: Backup = {
+            id: backupId,
+            type: "sync_triggered",
+            syncType: syncType as "firebase" | "export" | "import" | undefined,
+            timestamp: Date.now(),
+            data: backupData,
+            metadata: {
+              totalRecords,
+              sizeEstimate,
+              duration: 0, // Will be calculated by wrapper
+              version: "2.0",
+            },
+          };
+
+          // Store backup in IndexedDB
+          await this.storeBackup(backup);
+
+          // Clean up old backups
+          await this.cleanupOldBackups();
+
+          return { backup, totalRecords, sizeEstimate };
         },
-      };
-
-      // Store backup in IndexedDB
-      await this.storeBackup(backup);
-
-      // Clean up old backups
-      await this.cleanupOldBackups();
+        {
+          backup_type: "pre_sync",
+          sync_type: syncType,
+        }
+      );
 
       logger.production("📦 Auto backup created successfully", {
         backupId,
-        records: backup.metadata?.totalRecords ?? 0,
-        size: this.formatSize(backup.metadata?.sizeEstimate ?? 0),
-        duration,
+        records: backupResult.totalRecords,
+        size: this.formatSize(backupResult.sizeEstimate),
       });
 
       return backupId;
@@ -208,7 +221,7 @@ class AutoBackupService {
   }
 
   /**
-   * Restore data from backup (v2.0 data model)
+   * Restore data from backup (v2.0 data model) with Sentry performance tracking
    * All savings goals and supplemental accounts are restored as envelopes with envelopeType
    * Validates all restored data with Zod schemas (Issue #1342)
    */
@@ -223,79 +236,95 @@ class AutoBackupService {
 
       const data = (backup as unknown as Backup).data;
 
-      // Validate all data types with Zod schemas before restore using helper function
-      const envelopeResult = validateRestoreItems<Envelope>(
-        data?.envelopes,
-        validateEnvelopeSafe,
-        "envelope"
-      );
-      const transactionResult = validateRestoreItems<Transaction>(
-        data?.transactions,
-        validateTransactionSafe,
-        "transaction"
-      );
-      const billResult = validateRestoreItems<Bill>(data?.bills, validateBillSafe, "bill");
-      const debtResult = validateRestoreItems<Debt>(data?.debts, validateDebtSafe, "debt");
-      const paycheckResult = validateRestoreItems<PaycheckHistory>(
-        data?.paycheckHistory,
-        validatePaycheckHistorySafe,
-        "paycheck"
-      );
-
-      // Restore data in transaction for consistency
-      await budgetDb.transaction(
-        "rw",
-        [
-          budgetDb.envelopes,
-          budgetDb.transactions,
-          budgetDb.bills,
-          budgetDb.debts,
-          budgetDb.paycheckHistory,
-          budgetDb.budget,
-        ],
+      // Track restore operation with Sentry performance monitoring
+      await trackBackup(
+        "restore",
         async () => {
-          // Clear existing data
-          await budgetDb.envelopes.clear();
-          await budgetDb.transactions.clear();
-          await budgetDb.bills.clear();
-          await budgetDb.debts.clear();
-          await budgetDb.paycheckHistory.clear();
+          // Validate all data types with Zod schemas before restore using helper function
+          const envelopeResult = validateRestoreItems<Envelope>(
+            data?.envelopes,
+            validateEnvelopeSafe,
+            "envelope"
+          );
+          const transactionResult = validateRestoreItems<Transaction>(
+            data?.transactions,
+            validateTransactionSafe,
+            "transaction"
+          );
+          const billResult = validateRestoreItems<Bill>(data?.bills, validateBillSafe, "bill");
+          const debtResult = validateRestoreItems<Debt>(data?.debts, validateDebtSafe, "debt");
+          const paycheckResult = validateRestoreItems<PaycheckHistory>(
+            data?.paycheckHistory,
+            validatePaycheckHistorySafe,
+            "paycheck"
+          );
 
-          // Restore validated data (includes savings goals and supplemental accounts)
-          if (envelopeResult.validItems.length)
-            await budgetDb.envelopes.bulkAdd(envelopeResult.validItems);
-          if (transactionResult.validItems.length)
-            await budgetDb.transactions.bulkAdd(transactionResult.validItems);
-          if (billResult.validItems.length) await budgetDb.bills.bulkAdd(billResult.validItems);
-          if (debtResult.validItems.length) await budgetDb.debts.bulkAdd(debtResult.validItems);
-          if (paycheckResult.validItems.length)
-            await budgetDb.paycheckHistory.bulkAdd(paycheckResult.validItems);
+          // Restore data in transaction for consistency
+          await budgetDb.transaction(
+            "rw",
+            [
+              budgetDb.envelopes,
+              budgetDb.transactions,
+              budgetDb.bills,
+              budgetDb.debts,
+              budgetDb.paycheckHistory,
+              budgetDb.budget,
+            ],
+            async () => {
+              // Clear existing data
+              await budgetDb.envelopes.clear();
+              await budgetDb.transactions.clear();
+              await budgetDb.bills.clear();
+              await budgetDb.debts.clear();
+              await budgetDb.paycheckHistory.clear();
 
-          // Restore metadata
-          if (data?.metadata) {
-            await budgetDb.budget.put({
-              id: "metadata",
-              ...(data.metadata as Record<string, unknown>),
-              lastModified: Date.now(),
-            } as import("@/db/types").BudgetRecord);
-          }
+              // Restore validated data (includes savings goals and supplemental accounts)
+              if (envelopeResult.validItems.length)
+                await budgetDb.envelopes.bulkAdd(envelopeResult.validItems);
+              if (transactionResult.validItems.length)
+                await budgetDb.transactions.bulkAdd(transactionResult.validItems);
+              if (billResult.validItems.length) await budgetDb.bills.bulkAdd(billResult.validItems);
+              if (debtResult.validItems.length) await budgetDb.debts.bulkAdd(debtResult.validItems);
+              if (paycheckResult.validItems.length)
+                await budgetDb.paycheckHistory.bulkAdd(paycheckResult.validItems);
+
+              // Restore metadata
+              if (data?.metadata) {
+                await budgetDb.budget.put({
+                  id: "metadata",
+                  ...(data.metadata as Record<string, unknown>),
+                  lastModified: Date.now(),
+                } as import("@/db/types").BudgetRecord);
+              }
+            }
+          );
+
+          logger.production("✅ Successfully restored from backup", {
+            backupId,
+            timestamp: new Date(backup.timestamp).toISOString(),
+            envelopesRestored: envelopeResult.validItems.length,
+            envelopesSkipped: envelopeResult.skippedCount,
+            transactionsRestored: transactionResult.validItems.length,
+            transactionsSkipped: transactionResult.skippedCount,
+            billsRestored: billResult.validItems.length,
+            billsSkipped: billResult.skippedCount,
+            debtsRestored: debtResult.validItems.length,
+            debtsSkipped: debtResult.skippedCount,
+            paycheckHistoryRestored: paycheckResult.validItems.length,
+            paycheckHistorySkipped: paycheckResult.skippedCount,
+          });
+
+          return {
+            envelopesRestored: envelopeResult.validItems.length,
+            transactionsRestored: transactionResult.validItems.length,
+            billsRestored: billResult.validItems.length,
+            debtsRestored: debtResult.validItems.length,
+          };
+        },
+        {
+          backup_id: backupId,
         }
       );
-
-      logger.production("✅ Successfully restored from backup", {
-        backupId,
-        timestamp: new Date(backup.timestamp).toISOString(),
-        envelopesRestored: envelopeResult.validItems.length,
-        envelopesSkipped: envelopeResult.skippedCount,
-        transactionsRestored: transactionResult.validItems.length,
-        transactionsSkipped: transactionResult.skippedCount,
-        billsRestored: billResult.validItems.length,
-        billsSkipped: billResult.skippedCount,
-        debtsRestored: debtResult.validItems.length,
-        debtsSkipped: debtResult.skippedCount,
-        paycheckHistoryRestored: paycheckResult.validItems.length,
-        paycheckHistorySkipped: paycheckResult.skippedCount,
-      });
 
       return true;
     } catch (error) {

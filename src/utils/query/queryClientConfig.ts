@@ -1,5 +1,6 @@
 // Query Client Configuration - TanStack Query setup with Dexie integration
 import { QueryClient, MutationCache, QueryCache, type Query } from "@tanstack/react-query";
+import * as Sentry from "@sentry/react";
 // Import H safely to avoid circular dependency issues
 import logger from "../common/logger";
 
@@ -53,7 +54,7 @@ export const createQueryClient = () => {
       },
     },
 
-    // Query cache with global error handling
+    // Query cache with global error handling and performance tracking
     queryCache: new QueryCache({
       onError: (error: Error, query: Query<unknown, unknown, unknown, readonly unknown[]>) => {
         logger.error("Query error", error, {
@@ -62,7 +63,43 @@ export const createQueryClient = () => {
         });
         // Error logging is handled by logger, no need for direct H usage
       },
-      onSuccess: (_data: unknown, query: Query<unknown, unknown, unknown, readonly unknown[]>) => {
+      onSuccess: (data: unknown, query: Query<unknown, unknown, unknown, readonly unknown[]>) => {
+        // Track query performance with Sentry spans
+        // Use dataUpdateCount as an indicator of fresh data (count increases on each fetch)
+        const queryState = query.state;
+
+        // Only track queries that have been fetched (not from cache)
+        // We use the query hash and a simple check to avoid tracking cached results
+        if (queryState.dataUpdateCount > 0) {
+          const queryKeyString = Array.isArray(query.queryKey)
+            ? query.queryKey.join(":")
+            : String(query.queryKey);
+
+          // Estimate fetch time based on fetchStatus changes
+          // Since we can't directly measure, we track that the query completed
+          // The actual timing will be captured by Sentry's automatic tracing
+          Sentry.startSpan(
+            {
+              op: "db.query",
+              name: `Query: ${queryKeyString}`,
+            },
+            (span) => {
+              span.setAttribute("query_key", queryKeyString);
+              span.setAttribute("data_update_count", queryState.dataUpdateCount);
+              span.setAttribute(
+                "result_type",
+                Array.isArray(data) ? "array" : typeof data === "object" ? "object" : typeof data
+              );
+
+              if (Array.isArray(data)) {
+                span.setAttribute("result_count", data.length);
+              }
+
+              span.setStatus({ code: 1 }); // OK status
+            }
+          );
+        }
+
         // Optional: Track successful queries in development
         if (import.meta.env.DEV) {
           logger.debug("Query success", {
