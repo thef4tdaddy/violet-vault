@@ -41,11 +41,11 @@ jobs:
     runs-on: ubuntu-latest
     # Create releases for:
     # - main branch (always)
-    # - develop branch (every 20 commits or manual trigger)
+    # - develop branch (every 10 commits since last release, or manual trigger)
     # - version tags (always)
     if: |
       (github.ref == 'refs/heads/main') ||
-      (github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || github.run_number % 20 == 0)) ||
+      (github.ref == 'refs/heads/develop') ||
       startsWith(github.ref, 'refs/tags/v')
 
     steps:
@@ -63,8 +63,45 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Check if release should be created for develop
+        id: should_release
+        if: github.ref == 'refs/heads/develop' && github.event_name != 'workflow_dispatch'
+        run: |
+          # For develop: only create release if enough commits since last release
+          # Get the last Sentry release for develop (check last 50 commits for release markers)
+          COMMITS_SINCE_LAST_RELEASE=0
+          LAST_RELEASE_COMMIT=""
+
+          # Try to find last release commit by checking commit messages or tags
+          # Look for commits that mention "Sentry release" or check last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -n "$LAST_TAG" ]; then
+            # Count commits since last tag
+            COMMITS_SINCE_LAST_RELEASE=$(git rev-list --count ${LAST_TAG}..HEAD 2>/dev/null || echo "0")
+          else
+            # No tags, count all commits (first release)
+            COMMITS_SINCE_LAST_RELEASE=$(git rev-list --count HEAD 2>/dev/null || echo "0")
+          fi
+
+          # Create release if 10+ commits since last release (or first release)
+          RELEASE_THRESHOLD=10
+          if [ "$COMMITS_SINCE_LAST_RELEASE" -ge "$RELEASE_THRESHOLD" ] || [ "$COMMITS_SINCE_LAST_RELEASE" -eq 0 ]; then
+            echo "should_create=true" >> $GITHUB_OUTPUT
+            echo "✅ Creating release: $COMMITS_SINCE_LAST_RELEASE commits since last release"
+          else
+            echo "should_create=false" >> $GITHUB_OUTPUT
+            echo "⏭️  Skipping release: only $COMMITS_SINCE_LAST_RELEASE commits since last release (need $RELEASE_THRESHOLD)"
+          fi
+
+          echo "commits_since_last=${COMMITS_SINCE_LAST_RELEASE}" >> $GITHUB_OUTPUT
+
       - name: Get version info
         id: version
+        if: |
+          github.ref == 'refs/heads/main' ||
+          (github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || steps.should_release.outputs.should_create == 'true')) ||
+          startsWith(github.ref, 'refs/tags/v')
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}"
@@ -112,6 +149,10 @@ jobs:
           version: latest
 
       - name: Create Sentry Release
+        if: |
+          github.ref == 'refs/heads/main' ||
+          (github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || steps.should_release.outputs.should_create == 'true')) ||
+          startsWith(github.ref, 'refs/tags/v')
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ env.SENTRY_ORG }}
@@ -148,6 +189,10 @@ jobs:
           echo "📍 Environment: ${ENVIRONMENT}"
 
       - name: Output Release Info
+        if: |
+          github.ref == 'refs/heads/main' ||
+          (github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || steps.should_release.outputs.should_create == 'true')) ||
+          startsWith(github.ref, 'refs/tags/v')
         run: |
           echo "## 🚀 Sentry Release Created" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
