@@ -454,6 +454,8 @@ export default defineConfig(() => {
       // Manual chunk splitting for optimal bundle sizes (Issue 617: Code Splitting)
       rollupOptions: {
         output: {
+          // Ensure ES module format for proper CommonJS interop
+          format: 'es',
           manualChunks: (id) => {
             // Vendor chunk for React ecosystem
             if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
