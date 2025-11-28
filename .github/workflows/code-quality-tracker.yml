@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
@@ -78,22 +78,28 @@ jobs:
           echo "total=$TS_ERRORS" >> $GITHUB_OUTPUT
           echo "📊 TypeScript Results: ${TS_ERRORS} compilation errors"
 
-      - name: Update Issue #748 (ESLint Tracking)
+      - name: Run TypeScript strict mode check and capture errors
+        id: typecheck_strict
+        run: |
+          npx tsc --noEmit --strict --allowJs false 2>&1 | tee typecheck-strict-output.txt || true
+
+          # Count TypeScript strict mode errors
+          TS_STRICT_ERRORS=$(grep -c "error TS" typecheck-strict-output.txt 2>/dev/null || echo 0)
+
+          echo "total=$TS_STRICT_ERRORS" >> $GITHUB_OUTPUT
+          echo "📊 TypeScript Strict Mode Results: ${TS_STRICT_ERRORS} errors"
+
+      - name: Update Issue #748 (Combined Code Quality Tracking)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const eslintTotal = ${{ steps.eslint.outputs.total }};
             const eslintWarnings = ${{ steps.eslint.outputs.warnings }};
             const eslintErrors = ${{ steps.eslint.outputs.errors }};
+            const tsTotal = ${{ steps.typecheck.outputs.total }};
+            const tsStrictTotal = ${{ steps.typecheck_strict.outputs.total }};
             const currentDate = new Date().toISOString().split('T')[0];
-
-            // Update issue body with latest metrics
-            const bodyUpdate = '| **Total Violations** | **' + eslintTotal + '** | ' + (eslintTotal === 0 ? '✅' : '⚠️') + ' |\n' +
-              '| **Errors** | ' + eslintErrors + ' | ' + (eslintErrors === 0 ? '✅' : '❌') + ' |\n' +
-              '| **Warnings** | ' + eslintWarnings + ' | ' + (eslintWarnings === 0 ? '✅' : '⚠️') + ' |\n' +
-              '| **Last Updated** | ' + currentDate + ' | - |';
-
             try {
               const issue = await github.rest.issues.get({
                 owner: context.repo.owner,
@@ -101,11 +107,28 @@ jobs:
                 issue_number: 748
               });
 
-              // Update the body with new metrics in the status table
+              // Update the status table with all metrics
+              const statusTable = '| **ESLint Total Violations** | **' + eslintTotal + '** | ' + (eslintTotal === 0 ? '✅' : '⚠️') + ' |\n' +
+                '| **ESLint Errors** | ' + eslintErrors + ' | ' + (eslintErrors === 0 ? '✅' : '❌') + ' |\n' +
+                '| **ESLint Warnings** | ' + eslintWarnings + ' | ' + (eslintWarnings === 0 ? '✅' : '⚠️') + ' |\n' +
+                '| **TypeScript Errors (Non-Strict)** | **' + tsTotal + '** | ' + (tsTotal === 0 ? '✅' : '❌') + ' |\n' +
+                '| **TypeScript Errors (Strict Mode)** | ' + tsStrictTotal + ' | ' + (tsStrictTotal === 0 ? '✅' : '⏳') + ' |\n' +
+                '| **Last Updated** | ' + currentDate + ' | - |';
+
+              // Update the status table in the body
               let newBody = issue.data.body.replace(
-                /\| \*\*Total Violations\*\* \| \*\*\d+\*\* \| .* \|\n\| \*\*Errors\*\* \| \d+ \| .* \|\n\| \*\*Warnings\*\* \| \d+ \| .* \|\n\| \*\*Last Updated\*\* \| [^|]+ \| - \|/,
-                bodyUpdate
+                /\| \*\*ESLint Total Violations\*\* \| \*\*\d+\*\* \| .* \|\n\| \*\*ESLint Errors\*\* \| \d+ \| .* \|\n\| \*\*ESLint Warnings\*\* \| \d+ \| .* \|\n\| \*\*TypeScript Errors \(Non-Strict\)\*\* \| \*\*\d+\*\* \| .* \|\n\| \*\*TypeScript Errors \(Strict Mode\)\*\* \| \d+ \| .* \|\n\| \*\*Last Updated\*\* \| [^|]+ \| - \|/,
+                statusTable
               );
+
+              // Fallback: if the regex doesn't match, try to find and replace just the table section
+              if (newBody === issue.data.body) {
+                // Try matching the old format and update it
+                newBody = issue.data.body.replace(
+                  /\| \*\*Total Violations\*\* \| \*\*\d+\*\* \| .* \|\n\| \*\*Errors\*\* \| \d+ \| .* \|\n\| \*\*Warnings\*\* \| \d+ \| .* \|\n\| \*\*Last Updated\*\* \| [^|]+ \| - \|/,
+                  statusTable
+                );
+              }
 
               await github.rest.issues.update({
                 owner: context.repo.owner,
@@ -114,17 +137,28 @@ jobs:
                 body: newBody
               });
 
-              console.log('✅ Successfully updated Issue #748 (ESLint Tracking)');
+              console.log('✅ Successfully updated Issue #748 (Combined Code Quality Tracking)');
 
-              // Only post comment if there are violations
-              if (eslintTotal > 0) {
-                const commentBody = '## ⚠️ ESLint Issues Detected - ' + currentDate + '\n\n' +
-                  '**Status**: Issues found\n\n' +
-                  '- **Total Issues**: ' + eslintTotal + '\n' +
-                  '  - Warnings: ' + eslintWarnings + '\n' +
-                  '  - Errors: ' + eslintErrors + '\n\n' +
-                  '❌ Code quality issues detected - review and fix before release\n\n' +
-                  '_Checked: ' + currentDate + '_';
+              // Post comment if there are any issues
+              if (eslintTotal > 0 || tsTotal > 0 || tsStrictTotal > 0) {
+                const hasIssues = eslintTotal > 0 || tsTotal > 0;
+                const statusEmoji = hasIssues ? '⚠️' : '📋';
+                const statusText = hasIssues ? 'Code quality issues detected' : 'Strict mode tracking';
+                
+                const commentBody = `## ${statusEmoji} Code Quality Status - ${currentDate}\n\n` +
+                  `**Status**: ${statusText}\n\n` +
+                  `### ESLint\n` +
+                  `- **Total Issues**: ${eslintTotal}\n` +
+                  `  - Errors: ${eslintErrors}\n` +
+                  `  - Warnings: ${eslintWarnings}\n\n` +
+                  `### TypeScript\n` +
+                  `| Mode | Errors | Status |\n` +
+                  `|------|--------|--------|\n` +
+                  `| **Non-Strict** | ${tsTotal} | ${tsTotal === 0 ? '✅ Ready for production' : '❌ Blocks release'} |\n` +
+                  `| **Strict Mode** | ${tsStrictTotal} | ${tsStrictTotal === 0 ? '✅ Issue #713 complete' : '⏳ Issue #713 in progress'} |\n\n` +
+                  (hasIssues ? `❌ Code quality issues detected - review and fix before release\n\n` : '') +
+                  (tsStrictTotal > 0 ? `📋 ${tsStrictTotal} strict mode errors tracked in #713\n\n` : '') +
+                  `_Checked: ${currentDate}_`;
 
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
@@ -132,46 +166,15 @@ jobs:
                   issue_number: 748,
                   body: commentBody
                 });
-                console.log('✅ Posted issue comment for violations');
+                console.log('✅ Posted issue comment for code quality status');
               }
             } catch (error) {
               console.log('❌ Failed to update issue #748:', error.message);
             }
 
-      - name: Update Issue #806 (TypeScript Tracking)
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const tsTotal = ${{ steps.typecheck.outputs.total }};
-            const currentDate = new Date().toISOString().split('T')[0];
-
-            // Only post comment if there are errors
-            if (tsTotal > 0) {
-              const commentBody = '## 🔴 TypeScript Errors Detected - ' + currentDate + '\n\n' +
-                '**Status**: Compilation errors found\n\n' +
-                '- **Total Errors**: ' + tsTotal + '\n\n' +
-                '❌ ' + tsTotal + ' compilation errors - blocks v2.0 release\n\n' +
-                '_Checked: ' + currentDate + '_';
-
-              try {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: 806,
-                  body: commentBody
-                });
-                console.log('✅ Posted issue comment for TypeScript errors');
-              } catch (error) {
-                console.log('❌ Failed to post comment on issue #806:', error.message);
-              }
-            } else {
-              console.log('✅ TypeScript check passed - no comment posted');
-            }
-
       - name: Create or update summary comment on PR
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const eslintTotal = ${{ steps.eslint.outputs.total }};
