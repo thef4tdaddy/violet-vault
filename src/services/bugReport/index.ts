@@ -266,8 +266,8 @@ export class BugReportService {
           providers
         );
 
-        // TODO: Implement separate screenshot upload if provider supports it
-        // For now, just note that screenshot was too large
+        // Note: Separate screenshot upload is not yet implemented for large files
+        // When providers with blob storage support are added, screenshots can be uploaded separately
         result.screenshotStatus = {
           captured: true,
           size: screenshotInfo.sizeKB,

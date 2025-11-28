@@ -1,6 +1,5 @@
 import { useMemo, useCallback } from "react";
 import { useAnalyticsData } from "./useAnalyticsData";
-// import { useChartConfig } from "./useChartConfig"; // TODO: File does not exist
 import {
   _calculateFinancialMetrics,
   calculateTrends,
@@ -35,7 +34,7 @@ export const useAnalyticsIntegration = ({
     timeFilter,
   });
 
-  // Get chart configuration - TODO: useChartConfig hook doesn't exist
+  // Chart configuration placeholder - will be expanded in future enhancement
   const chartConfig = useMemo(() => ({}), []);
 
   // Enhanced metrics with additional calculations

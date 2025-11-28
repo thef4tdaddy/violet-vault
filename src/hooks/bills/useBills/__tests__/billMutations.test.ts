@@ -434,7 +434,7 @@ describe("Bill Mutation Hooks", () => {
   describe("Optimistic Updates", () => {
     it.skip("should apply optimistic update before database update", async () => {
       // NOTE: Skipped - Current implementation doesn't use optimistic helpers
-      // TODO: Add optimistic updates for better UX (tracked in future issue)
+      // Future enhancement: Add optimistic updates for better UX
 
       // Arrange
       const { result } = renderHook(() => useAddBillMutation(), { wrapper });

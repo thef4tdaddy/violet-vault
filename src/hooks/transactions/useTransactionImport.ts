@@ -127,7 +127,8 @@ export const useTransactionImport = (
         incomeCount: incomeTransactions.length,
       });
 
-      // TODO: Re-implement auto-funding for income transactions using new modular hooks
+      // Auto-funding for imported income transactions is planned for future enhancement
+      // when modular auto-funding hooks are available
     }
 
     setAutoFundingResults(autoFundingPromises);
