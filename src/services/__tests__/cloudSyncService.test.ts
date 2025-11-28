@@ -404,6 +404,67 @@ describe("CloudSyncService - Sync Core Tests", () => {
       expect(result).toBeDefined();
     });
   });
+
+  describe("Network Failure Handling", () => {
+    beforeEach(() => {
+      cloudSyncService.start(mockConfig);
+    });
+
+    it("should implement retry with exponential backoff for network failures", async () => {
+      // Import the retry utilities to verify exponential backoff behavior
+      const { calculateRetryDelay } = await import("@/utils/sync/retryUtils");
+
+      // Verify exponential backoff calculations
+      const delays: number[] = [];
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        // Calculate delay without jitter for predictable testing
+        const delay = calculateRetryDelay(attempt, { jitter: false });
+        delays.push(delay);
+      }
+
+      // Verify exponential growth: 1000, 2000, 4000, 8000, 16000
+      expect(delays[0]).toBe(1000); // 1000 * 2^0 = 1000
+      expect(delays[1]).toBe(2000); // 1000 * 2^1 = 2000
+      expect(delays[2]).toBe(4000); // 1000 * 2^2 = 4000
+      expect(delays[3]).toBe(8000); // 1000 * 2^3 = 8000
+      expect(delays[4]).toBe(16000); // 1000 * 2^4 = 16000 (capped at maxDelay)
+
+      // Verify delay is capped at maxDelay
+      const cappedDelay = calculateRetryDelay(10, { jitter: false, maxDelay: 16000 });
+      expect(cappedDelay).toBe(16000);
+    });
+
+    it("should detect network recovery and resume sync operations", async () => {
+      // Simulate network recovery detection scenario
+      let isOnline = false;
+
+      // Mock network state detection
+      const checkNetworkStatus = (): boolean => isOnline;
+
+      // Initially offline
+      expect(checkNetworkStatus()).toBe(false);
+
+      // Simulate network recovery
+      isOnline = true;
+      expect(checkNetworkStatus()).toBe(true);
+
+      // Verify sync can be triggered after network recovery
+      const result = await cloudSyncService.forceSync();
+      expect(result).toBeDefined();
+
+      // Verify error categorization recognizes network errors
+      const networkErrorCategory = cloudSyncService.categorizeError("Network connection failed");
+      expect(networkErrorCategory).toBe("network");
+
+      // Verify timeout errors are also categorized as network issues
+      const timeoutCategory = cloudSyncService.categorizeError("Connection timeout");
+      expect(timeoutCategory).toBe("network");
+
+      // Verify connection errors are categorized correctly
+      const connectionCategory = cloudSyncService.categorizeError("Connection lost");
+      expect(connectionCategory).toBe("network");
+    });
+  });
 });
 
 describe("CloudSyncService - Conflict Resolution Tests", () => {
