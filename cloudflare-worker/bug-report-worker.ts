@@ -132,8 +132,10 @@ interface SystemInfo {
  * Custom Data from frontend
  */
 interface CustomData {
-  highlightSession?: {
-    sessionUrl?: string;
+  sentrySession?: {
+    eventUrl?: string | null;
+    eventId?: string | null;
+    available?: boolean;
   };
   [key: string]: unknown;
 }
@@ -147,7 +149,7 @@ interface BugReport {
   steps?: string;
   expected?: string;
   actual?: string;
-  severity?: 'low' | 'medium' | 'high' | 'critical';
+  severity?: "low" | "medium" | "high" | "critical";
   screenshot?: string;
   sessionUrl?: string;
   env?: ReportEnv;
@@ -339,10 +341,10 @@ interface NotificationData {
 // ============================================================================
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Max-Age': '86400',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Max-Age": "86400",
 };
 
 // ============================================================================
@@ -411,11 +413,11 @@ export default {
         const bugReport = payload.data || payload;
 
         // Debug log to understand the structure
-        console.log('Payload structure:', {
+        console.log("Payload structure:", {
           hasData: !!payload.data,
           hasTitle: !!bugReport.title,
           hasDescription: !!bugReport.description,
-          payloadType: 'type' in payload ? (payload as { type?: string }).type : undefined,
+          payloadType: "type" in payload ? (payload as { type?: string }).type : undefined,
           payloadKeys: Object.keys(payload),
           bugReportKeys: Object.keys(bugReport || {}),
         });
@@ -447,16 +449,16 @@ export default {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (error) {
-        console.error('Bug report processing failed:', error);
+        console.error("Bug report processing failed:", error);
 
         return new Response(
           JSON.stringify({
-            error: 'Internal server error',
-            message: error instanceof Error ? error.message : 'Unknown error',
+            error: "Internal server error",
+            message: error instanceof Error ? error.message : "Unknown error",
           }),
           {
             status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
       }
@@ -470,13 +472,17 @@ export default {
   },
 
   // Handle scheduled events (cron triggers)
-  async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext): Promise<void> {
-    console.log('Running scheduled cleanup...');
+  async scheduled(
+    _controller: ScheduledController,
+    env: Env,
+    _ctx: ExecutionContext
+  ): Promise<void> {
+    console.log("Running scheduled cleanup...");
     try {
       const result = await cleanupOldScreenshots(env);
-      console.log('Cleanup result:', result);
+      console.log("Cleanup result:", result);
     } catch (error) {
-      console.error('Scheduled cleanup failed:', error);
+      console.error("Scheduled cleanup failed:", error);
     }
   },
 };
@@ -519,7 +525,7 @@ async function processBugReport(bugReport: BugReport, env: Env): Promise<BugRepo
     hasContextInfo: !!_contextInfo,
     contextInfoKeys: _contextInfo ? Object.keys(_contextInfo as Record<string, unknown>) : null,
     hasSessionUrl: !!sessionUrl,
-    sessionUrl: sessionUrl || 'null',
+    sessionUrl: sessionUrl || "null",
   });
 
   // Store screenshot if provided
@@ -584,13 +590,13 @@ async function processBugReport(bugReport: BugReport, env: Env): Promise<BugRepo
  */
 async function storeScreenshot(screenshotDataUrl: string, env: Env): Promise<string | null> {
   if (!env.R2_BUCKET) {
-    console.warn('R2_BUCKET not configured, skipping screenshot storage');
+    console.warn("R2_BUCKET not configured, skipping screenshot storage");
     return null;
   }
 
   try {
     // Extract base64 data from data URL
-    const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, '');
+    const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, "");
     const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
     // 🛡️ COST PROTECTION: Check file size (max 5MB to stay well under free tier)
@@ -666,7 +672,7 @@ async function storeScreenshot(screenshotDataUrl: string, env: Env): Promise<str
  */
 async function cleanupOldScreenshots(env: Env): Promise<CleanupResult> {
   if (!env.R2_BUCKET) {
-    return { error: 'R2_BUCKET not configured' };
+    return { error: "R2_BUCKET not configured" };
   }
 
   try {
@@ -705,8 +711,8 @@ async function cleanupOldScreenshots(env: Env): Promise<CleanupResult> {
       message: `Cleaned up ${deletedCount} screenshots, freed ${Math.round(totalSize / (1024 * 1024))}MB`,
     };
   } catch (error) {
-    console.error('Cleanup failed:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error' };
+    console.error("Cleanup failed:", error);
+    return { error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
 
@@ -715,7 +721,7 @@ async function cleanupOldScreenshots(env: Env): Promise<CleanupResult> {
  */
 async function getUsageStats(env: Env): Promise<UsageStats> {
   if (!env.R2_BUCKET) {
-    return { error: 'R2_BUCKET not configured' };
+    return { error: "R2_BUCKET not configured" };
   }
 
   try {
@@ -742,7 +748,7 @@ async function getUsageStats(env: Env): Promise<UsageStats> {
       freeStorageLimit: 10 * 1024, // 10GB in MB
     };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Unknown error' };
+    return { error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
 
@@ -752,8 +758,8 @@ async function getUsageStats(env: Env): Promise<UsageStats> {
 async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
     return {
-      error: 'GitHub configuration not found',
-      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' },
+      error: "GitHub configuration not found",
+      fallback: { nextVersion: "1.9.0", currentVersion: "1.8.0" },
     };
   }
 
@@ -782,8 +788,8 @@ async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
       {
         headers: {
           Authorization: `token ${env.GITHUB_TOKEN}`,
-          'User-Agent': 'VioletVault-BugReporter/1.0',
-          Accept: 'application/vnd.github.v3+json',
+          "User-Agent": "VioletVault-BugReporter/1.0",
+          Accept: "application/vnd.github.v3+json",
         },
       }
     );
@@ -796,7 +802,7 @@ async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
 
     // Find release-please PR (contains "chore(main): release" in title)
     const releasePR = prs.find(
-      (pr) => pr.title.includes('chore(main): release') && pr.head.ref.includes('release-please')
+      (pr) => pr.title.includes("chore(main): release") && pr.head.ref.includes("release-please")
     );
 
     // Extract version from release PR title: "chore(main): release violet-vault 1.8.0"
@@ -808,7 +814,7 @@ async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
 
     // Get current/latest version from releases
     const latestRelease = releases.find((release) => !release.prerelease);
-    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, '') : '1.8.0';
+    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, "") : "1.8.0";
 
     // If no release PR found, increment the current version
     if (!nextVersion) {
@@ -836,10 +842,10 @@ async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
         : null,
     };
   } catch (error) {
-    console.error('Failed to fetch release-please info:', error);
+    console.error("Failed to fetch release-please info:", error);
     return {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' },
+      error: error instanceof Error ? error.message : "Unknown error",
+      fallback: { nextVersion: "1.9.0", currentVersion: "1.8.0" },
     };
   }
 }
@@ -850,10 +856,10 @@ async function getReleasePleaseInfo(env: Env): Promise<ReleasePleaseResponse> {
 async function getMilestones(env: Env): Promise<MilestonesResponse> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
     return {
-      error: 'GitHub configuration not found',
+      error: "GitHub configuration not found",
       fallback: {
-        version: '1.8.0',
-        title: 'v1.8.0 - Cash Management (Fallback)',
+        version: "1.8.0",
+        title: "v1.8.0 - Cash Management (Fallback)",
       },
     };
   }
@@ -880,8 +886,8 @@ async function getMilestones(env: Env): Promise<MilestonesResponse> {
       return {
         milestones: [],
         current: {
-          version: '1.8.0',
-          title: 'v1.8.0 - Cash Management (Fallback)',
+          version: "1.8.0",
+          title: "v1.8.0 - Cash Management (Fallback)",
         },
       };
     }
@@ -898,8 +904,8 @@ async function getMilestones(env: Env): Promise<MilestonesResponse> {
       .filter((m): m is GitHubMilestone & { version: string } => Boolean(m.version)) // Only keep milestones with valid versions
       .sort((a, b) => {
         // Sort by version number (lowest first)
-        const aVersion = a.version.split('.').map(Number);
-        const bVersion = b.version.split('.').map(Number);
+        const aVersion = a.version.split(".").map(Number);
+        const bVersion = b.version.split(".").map(Number);
 
         for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
           const aPart = aVersion[i] || 0;
@@ -924,8 +930,8 @@ async function getMilestones(env: Env): Promise<MilestonesResponse> {
     } else {
       // No due dates available, use highest version number (most recent)
       currentMilestone = processedMilestones.sort((a, b) => {
-        const aVersion = a.version.split('.').map(Number);
-        const bVersion = b.version.split('.').map(Number);
+        const aVersion = a.version.split(".").map(Number);
+        const bVersion = b.version.split(".").map(Number);
         for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
           const aPart = aVersion[i] || 0;
           const bPart = bVersion[i] || 0;
@@ -974,12 +980,12 @@ async function getMilestones(env: Env): Promise<MilestonesResponse> {
       },
     };
   } catch (error) {
-    console.error('Failed to fetch milestones:', error);
+    console.error("Failed to fetch milestones:", error);
     return {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       fallback: {
-        version: '1.8.0',
-        title: 'v1.8.0 - Cash Management (Fallback)',
+        version: "1.8.0",
+        title: "v1.8.0 - Cash Management (Fallback)",
       },
     };
   }
@@ -993,9 +999,9 @@ async function generateSmartLabels(
   description: string,
   reportEnv: ReportEnv | undefined,
   env: Env,
-  severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
+  severity: "low" | "medium" | "high" | "critical" = "medium"
 ): Promise<string[]> {
-  const labels: string[] = ['bug', 'user-reported'];
+  const labels: string[] = ["bug", "user-reported"];
 
   // Fetch existing GitHub labels to avoid duplication
   let existingLabels: string[] = [];
@@ -1003,7 +1009,7 @@ async function generateSmartLabels(
     const labelsResponse = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/labels`, {
       headers: {
         Authorization: `token ${env.GITHUB_TOKEN}`,
-        'User-Agent': 'VioletVault-BugReporter/1.0',
+        "User-Agent": "VioletVault-BugReporter/1.0",
         Accept: "application/vnd.github.v3+json",
       },
     });
@@ -1014,7 +1020,7 @@ async function generateSmartLabels(
       console.log(`Found ${existingLabels.length} existing labels`);
     }
   } catch (error) {
-    console.error('Failed to fetch existing labels:', error);
+    console.error("Failed to fetch existing labels:", error);
   }
 
   // Helper function to add label only if it exists
@@ -1226,42 +1232,42 @@ async function generateSmartLabels(
   // Enhanced context analysis using comprehensive browser info
   if (reportEnv?.browserInfo) {
     // Memory-related issues
-    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === 'object') {
+    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === "object") {
       const usedMemory = reportEnv.browserInfo.memory.usedJSHeapSize || 0;
       if (usedMemory > 100) {
         // More than 100MB JS heap usage
-        addLabelIfExists('performance');
-        addLabelIfExists('memory');
+        addLabelIfExists("performance");
+        addLabelIfExists("memory");
       }
     }
 
     // Touch/mobile device indicators
     if (reportEnv.browserInfo.maxTouchPoints && reportEnv.browserInfo.maxTouchPoints > 0) {
-      addLabelIfExists('mobile');
-      addLabelIfExists('touch');
+      addLabelIfExists("mobile");
+      addLabelIfExists("touch");
     }
 
     // Offline/connectivity issues
     if (reportEnv.browserInfo.onLine === false) {
-      addLabelIfExists('connectivity');
-      addLabelIfExists('offline');
+      addLabelIfExists("connectivity");
+      addLabelIfExists("offline");
     }
   }
 
   // Storage-related issues
   if (reportEnv?.storageInfo) {
-    const localStorageKB = parseInt(reportEnv.storageInfo.localStorage || '0') || 0;
-    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage || '0') || 0;
+    const localStorageKB = parseInt(reportEnv.storageInfo.localStorage || "0") || 0;
+    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage || "0") || 0;
 
     if (localStorageKB > 1024 || sessionStorageKB > 512) {
       // Large storage usage
-      addLabelIfExists('storage');
-      addLabelIfExists('performance');
+      addLabelIfExists("storage");
+      addLabelIfExists("performance");
     }
 
     if (reportEnv.storageInfo.error) {
-      addLabelIfExists('storage');
-      addLabelIfExists('permissions');
+      addLabelIfExists("storage");
+      addLabelIfExists("permissions");
     }
   }
 
@@ -1273,76 +1279,76 @@ async function generateSmartLabels(
       const docHeight = reportEnv.domInfo.documentDimensions.height;
 
       if (docHeight > 10000 || docWidth > 3000) {
-        addLabelIfExists('performance');
-        addLabelIfExists('ui');
+        addLabelIfExists("performance");
+        addLabelIfExists("ui");
       }
     }
 
     // Focus-related issues
     if (reportEnv.domInfo.focusedElement) {
       const focusedType = reportEnv.domInfo.focusedElement.type;
-      if (focusedType === 'text' || focusedType === 'email' || focusedType === 'password') {
-        addLabelIfExists('forms');
-        addLabelIfExists('input');
+      if (focusedType === "text" || focusedType === "email" || focusedType === "password") {
+        addLabelIfExists("forms");
+        addLabelIfExists("input");
       }
     }
   }
 
   // Performance timing analysis
   if (reportEnv?.performanceInfo && Array.isArray(reportEnv.performanceInfo)) {
-    const perfData = reportEnv.performanceInfo.join(' ').toLowerCase();
-    if (perfData.includes('slow') || perfData.includes('timeout')) {
-      addLabelIfExists('performance');
-      addLabelIfExists('loading');
+    const perfData = reportEnv.performanceInfo.join(" ").toLowerCase();
+    if (perfData.includes("slow") || perfData.includes("timeout")) {
+      addLabelIfExists("performance");
+      addLabelIfExists("loading");
     }
   }
 
   // Active modals and UI state context
   if (pageContext?.visibleModals && pageContext.visibleModals.length > 0) {
-    addLabelIfExists('modal');
-    addLabelIfExists('ui');
+    addLabelIfExists("modal");
+    addLabelIfExists("ui");
 
     // Check for specific modal types
-    const modalText = pageContext.visibleModals.join(' ').toLowerCase();
-    if (modalText.includes('edit') || modalText.includes('add')) {
-      addLabelIfExists('forms');
+    const modalText = pageContext.visibleModals.join(" ").toLowerCase();
+    if (modalText.includes("edit") || modalText.includes("add")) {
+      addLabelIfExists("forms");
     }
-    if (modalText.includes('debt')) {
-      addLabelIfExists('debt');
+    if (modalText.includes("debt")) {
+      addLabelIfExists("debt");
     }
-    if (modalText.includes('envelope') || modalText.includes('budget')) {
-      addLabelIfExists('envelope');
+    if (modalText.includes("envelope") || modalText.includes("budget")) {
+      addLabelIfExists("envelope");
     }
   }
 
   // Button context for interaction issues
   if (pageContext?.activeButtons && pageContext.activeButtons.length > 0) {
-    const buttonText = pageContext.activeButtons.join(' ').toLowerCase();
-    if (buttonText.includes('save') || buttonText.includes('submit')) {
-      addLabelIfExists('forms');
-      addLabelIfExists('save');
+    const buttonText = pageContext.activeButtons.join(" ").toLowerCase();
+    if (buttonText.includes("save") || buttonText.includes("submit")) {
+      addLabelIfExists("forms");
+      addLabelIfExists("save");
     }
-    if (buttonText.includes('delete') || buttonText.includes('remove')) {
-      addLabelIfExists('delete');
+    if (buttonText.includes("delete") || buttonText.includes("remove")) {
+      addLabelIfExists("delete");
     }
-    if (buttonText.includes('sync') || buttonText.includes('backup')) {
-      addLabelIfExists('sync');
+    if (buttonText.includes("sync") || buttonText.includes("backup")) {
+      addLabelIfExists("sync");
     }
   }
 
   // Enhanced accessibility and device context
-  if (reportEnv?.colorScheme === 'dark') {
-    addLabelIfExists('dark-mode');
+  if (reportEnv?.colorScheme === "dark") {
+    addLabelIfExists("dark-mode");
   }
 
   if (reportEnv?.reducedMotion === true) {
-    addLabelIfExists('accessibility');
-    addLabelIfExists('motion');
+    addLabelIfExists("accessibility");
+    addLabelIfExists("motion");
   }
 
   if (reportEnv?.standaloneMode === true) {
-    addLabelIfExists('pwa');
-    addLabelIfExists('standalone');
+    addLabelIfExists("pwa");
+    addLabelIfExists("standalone");
   }
 
   // Network/connection type analysis
@@ -1385,17 +1391,17 @@ async function generateSmartLabels(
       url.includes("preview") ||
       url.includes("git-") ||
       url.includes("vercel.app") ||
-      url.includes('netlify.app')
+      url.includes("netlify.app")
     ) {
       // Environment detection only - not sanitizing URLs
-      labels.push('dev-environment');
+      labels.push("dev-environment");
     } else if (
-      url.includes('violevault.com') ||
-      url.includes('production') ||
-      !url.includes('localhost')
+      url.includes("violevault.com") ||
+      url.includes("production") ||
+      !url.includes("localhost")
     ) {
       // Environment detection only - not sanitizing URLs
-      labels.push('live-environment');
+      labels.push("live-environment");
     }
   }
 
@@ -1429,7 +1435,7 @@ async function createGitHubIssue(
     steps?: string;
     expected?: string;
     actual?: string;
-    severity?: 'low' | 'medium' | 'high' | 'critical';
+    severity?: "low" | "medium" | "high" | "critical";
     screenshotUrl: string | null;
     sessionUrl?: string;
     env?: ReportEnv;
@@ -1525,12 +1531,12 @@ async function createGitHubIssue(
       const line = lines[0];
       let parts: string[] = [];
 
-      if (line.includes('- ')) {
-        parts = line.split('- ').filter((p) => p.trim().length > 0);
-      } else if (line.includes('* ')) {
-        parts = line.split('* ').filter((p) => p.trim().length > 0);
-      } else if (line.includes('• ')) {
-        parts = line.split('• ').filter((p) => p.trim().length > 0);
+      if (line.includes("- ")) {
+        parts = line.split("- ").filter((p) => p.trim().length > 0);
+      } else if (line.includes("* ")) {
+        parts = line.split("* ").filter((p) => p.trim().length > 0);
+      } else if (line.includes("• ")) {
+        parts = line.split("• ").filter((p) => p.trim().length > 0);
       }
 
       if (parts.length > 1) {
@@ -1539,7 +1545,7 @@ async function createGitHubIssue(
 
         processedDescription =
           `${firstPart}\n\n### Tasks/Steps:\n` +
-          remainingParts.map((part) => `- [ ] ${part.trim()}`).join('\n');
+          remainingParts.map((part) => `- [ ] ${part.trim()}`).join("\n");
       }
     }
   }
@@ -1565,14 +1571,14 @@ async function createGitHubIssue(
     issueBody += `## Actual Behavior\n\n${actual}\n\n`;
   }
 
-  if (severity && severity !== 'medium') {
+  if (severity && severity !== "medium") {
     const severityEmoji: Record<string, string> = {
-      low: '🔵',
-      medium: '🟡',
-      high: '🟠',
-      critical: '🔴',
+      low: "🔵",
+      medium: "🟡",
+      high: "🟠",
+      critical: "🔴",
     };
-    issueBody += `## Severity\n\n${severityEmoji[severity] || '🟡'} **${severity.toUpperCase()}**\n\n`;
+    issueBody += `## Severity\n\n${severityEmoji[severity] || "🟡"} **${severity.toUpperCase()}**\n\n`;
   }
 
   // Add enhanced user location prominently at the top (Issue #347)
@@ -1751,10 +1757,10 @@ async function createGitHubIssue(
   if (sessionUrl) {
     issueBody += `## Session Replay\n[View session replay](${sessionUrl})\n\n`;
   } else if (
-    customData?.highlightSession?.sessionUrl &&
-    customData.highlightSession.sessionUrl !== "Session replay unavailable"
+    customData?.sentrySession?.eventUrl &&
+    customData.sentrySession.eventUrl !== "Sentry event link unavailable"
   ) {
-    issueBody += `## Session Replay\n[View Highlight.io session](${customData.highlightSession.sessionUrl})\n\n`;
+    issueBody += `## Session Replay\n[View Sentry event](${customData.sentrySession.eventUrl})\n\n`;
   }
 
   // Add screenshot
@@ -1822,8 +1828,8 @@ async function createGitHubIssue(
   const issueData: GitHubIssueData = {
     title:
       title && title.trim()
-        ? title.substring(0, 80) + (title.length > 80 ? '...' : '')
-        : `Bug Report: ${description.substring(0, 60)}${description.length > 60 ? '...' : ''}`,
+        ? title.substring(0, 80) + (title.length > 80 ? "..." : "")
+        : `Bug Report: ${description.substring(0, 60)}${description.length > 60 ? "..." : ""}`,
     body: finalIssueBody,
     labels: smartLabels,
   };
@@ -1854,10 +1860,10 @@ async function createGitHubIssue(
         console.log(`Milestone not found: ${milestoneInfo.current?.title}`);
       }
     } else {
-      console.log('Failed to fetch milestones for assignment');
+      console.log("Failed to fetch milestones for assignment");
     }
   } else {
-    console.log('No milestone info available for bug report assignment');
+    console.log("No milestone info available for bug report assignment");
   }
 
   // Create the GitHub issue
@@ -1933,12 +1939,12 @@ async function sendNotification(data: NotificationData, env: Env): Promise<void>
       text: `🐛 New bug report received`,
       attachments: [
         {
-          color: '#ff6b6b',
+          color: "#ff6b6b",
           fields: [
             {
-              title: 'Description',
+              title: "Description",
               value:
-                data.description.substring(0, 200) + (data.description.length > 200 ? '...' : ''),
+                data.description.substring(0, 200) + (data.description.length > 200 ? "..." : ""),
               short: false,
             },
             {

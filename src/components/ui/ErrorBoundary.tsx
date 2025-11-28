@@ -1,6 +1,7 @@
 import React, { Component, type ReactNode } from "react";
 import logger from "@/utils/common/logger";
 import { getIcon } from "@/utils";
+import { captureError } from "@/utils/common/sentry";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -18,7 +19,7 @@ interface ErrorBoundaryState {
 
 /**
  * Simple React ErrorBoundary that doesn't depend on external libraries
- * Used as a fallback when Highlight.run ErrorBoundary is not available
+ * Used as a fallback when Sentry ErrorBoundary is not available
  */
 class SimpleErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -37,18 +38,11 @@ class SimpleErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
       context,
     });
 
-    // Try to report to Highlight.io if available
-    // Use dynamic import to avoid bundling Highlight if not needed
-    import("@/utils/common/highlight")
-      .then(({ captureError }) => {
-        captureError(error, {
-          context,
-          componentStack: errorInfo.componentStack,
-        });
-      })
-      .catch(() => {
-        // Highlight not available, already logged above
-      });
+    // Report to Sentry
+    captureError(error, {
+      context,
+      componentStack: errorInfo.componentStack,
+    });
 
     this.setState({ errorInfo });
   }
@@ -108,17 +102,21 @@ class SimpleErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 /**
- * Lazy-loaded Highlight ErrorBoundary wrapper
- * Falls back to SimpleErrorBoundary if Highlight is not available
+ * Lazy-loaded Sentry ErrorBoundary wrapper
+ * Falls back to SimpleErrorBoundary if Sentry is not available
  */
-const LazyHighlightErrorBoundary = React.lazy(async () => {
+const LazySentryErrorBoundary = React.lazy(async () => {
   try {
-    const { ErrorBoundary } = await import("@highlight-run/react");
+    const { ErrorBoundary } = await import("@sentry/react");
     return {
-      default: ErrorBoundary as React.ComponentType<{ children: ReactNode }>,
+      default: ErrorBoundary as React.ComponentType<{
+        children: ReactNode;
+        fallback?: ReactNode;
+        showDialog?: boolean;
+      }>,
     };
   } catch {
-    // Fallback to simple error boundary if Highlight fails to load
+    // Fallback to simple error boundary if Sentry fails to load
     return {
       default: SimpleErrorBoundary,
     };
@@ -126,7 +124,7 @@ const LazyHighlightErrorBoundary = React.lazy(async () => {
 });
 
 /**
- * Smart ErrorBoundary that uses Highlight when available, falls back to simple boundary
+ * Smart ErrorBoundary that uses Sentry when available, falls back to simple boundary
  */
 export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   children,
@@ -135,11 +133,11 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   onReset,
   showReload,
 }) => {
-  // Check if Highlight is enabled via environment variable
-  const isHighlightEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
+  // Check if Sentry is enabled via environment variable
+  const isSentryEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
 
-  if (isHighlightEnabled) {
-    // Use lazy-loaded Highlight ErrorBoundary
+  if (isSentryEnabled) {
+    // Use lazy-loaded Sentry ErrorBoundary
     return (
       <React.Suspense
         fallback={
@@ -153,12 +151,23 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
           </SimpleErrorBoundary>
         }
       >
-        <LazyHighlightErrorBoundary>{children}</LazyHighlightErrorBoundary>
+        <LazySentryErrorBoundary
+          fallback={
+            fallback || (
+              <SimpleErrorBoundary context={context} onReset={onReset} showReload={showReload}>
+                {children}
+              </SimpleErrorBoundary>
+            )
+          }
+          showDialog={false}
+        >
+          {children}
+        </LazySentryErrorBoundary>
       </React.Suspense>
     );
   }
 
-  // Use simple error boundary if Highlight is disabled
+  // Use simple error boundary if Sentry is disabled
   return (
     <SimpleErrorBoundary
       fallback={fallback}

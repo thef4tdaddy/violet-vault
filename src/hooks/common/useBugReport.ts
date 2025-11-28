@@ -47,8 +47,8 @@ const useBugReport = (options: BugReportOptions = {}) => {
    */
   const openModal = async () => {
     try {
-      // Initialize Highlight.io session
-      await submission.initializeHighlightSession();
+      // Initialize Sentry session
+      await submission.initializeSentrySession();
 
       // Auto-capture screenshot if enabled
       if (options.autoCapture && form.includeScreenshot) {

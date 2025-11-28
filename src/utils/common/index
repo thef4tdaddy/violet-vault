@@ -9,7 +9,7 @@ export { default as firebaseConfig } from './firebaseConfig.js';
 export { default as fixAutoAllocateUndefined } from './fixAutoAllocateUndefined.js';
 export { default as fixMetadata } from './fixMetadata.js';
 export { default as frequencyCalculations } from './frequencyCalculations.js';
-export { default as highlight } from './highlight.js';
+export { default as sentry } from './sentry.js';
 export { default as lazyImport } from './lazyImport.js';
 export { default as logger } from './logger.js';
 export { default as ocrProcessor } from './ocrProcessor.js';

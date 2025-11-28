@@ -3,8 +3,8 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import ViewRenderer from "../ViewRenderer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Mock ErrorBoundary
-vi.mock("@highlight-run/react", () => ({
+// Mock ErrorBoundary (Sentry ErrorBoundary is used, but we'll mock it as a simple wrapper)
+vi.mock("@/components/ui/ErrorBoundary", () => ({
   ErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 

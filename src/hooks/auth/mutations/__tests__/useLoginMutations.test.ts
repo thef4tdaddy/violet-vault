@@ -67,7 +67,7 @@ vi.mock("../../../../services/storage/localStorageService", () => ({
   },
 }));
 
-vi.mock("../../../../utils/common/highlight", () => ({
+vi.mock("../../../../utils/common/sentry", () => ({
   identifyUser: vi.fn(),
 }));
 

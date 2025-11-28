@@ -1,8 +1,6 @@
-// Dynamic import to avoid circular dependency with highlight.js
-let H: {
-  track?: (event: string, data?: Record<string, unknown>) => void;
-  consumeError?: (error: Error, message?: string, payload?: Record<string, string>) => void;
-} | null = null;
+// Dynamic import to avoid circular dependency with sentry.js
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let SentryInstance: any | null = null;
 
 // Helper function to get import.meta.env safely
 function getImportMetaEnv() {
@@ -35,23 +33,23 @@ class Logger {
     this.logBuffer = [];
   }
 
-  // Initialize H when needed
-  initH() {
-    if (!H) {
+  // Initialize Sentry when needed
+  initSentry() {
+    if (!SentryInstance) {
       try {
         // Use dynamic import to avoid circular dependency
-        import("../common/highlight.js")
+        import("../common/sentry.js")
           .then((module) => {
-            H = module.H;
+            SentryInstance = module.Sentry;
           })
           .catch(() => {
-            H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+            SentryInstance = { captureException: () => {}, captureMessage: () => {} }; // Fallback mock
           });
       } catch {
-        H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+        SentryInstance = { captureException: () => {}, captureMessage: () => {} }; // Fallback mock
       }
     }
-    return H || { track: () => {}, consumeError: () => {} };
+    return SentryInstance || { captureException: () => {}, captureMessage: () => {} };
   }
 
   getIsDevSite() {
@@ -154,18 +152,17 @@ class Logger {
 
     this.recordLogEntry("DEBUG", message, data);
 
-    // Highlight.io tracking for all debug logs
+    // Sentry tracking for all debug logs
     try {
-      const h = this.initH();
-      if (h && h.track) {
-        h.track("debug", {
-          message: `DEBUG: ${message}`,
-          category: "debug",
-          ...data,
+      const sentry = this.initSentry();
+      if (sentry && sentry.captureMessage) {
+        sentry.captureMessage(`DEBUG: ${message}`, "debug", {
+          tags: { category: "debug" },
+          extra: data,
         });
       }
     } catch {
-      // Silently fail if highlight.io isn't available
+      // Silently fail if Sentry isn't available
     }
   }
 
@@ -192,16 +189,15 @@ class Logger {
     }
 
     try {
-      const h = this.initH();
-      if (h && h.track) {
-        h.track("info", {
-          message: `INFO: ${message}`,
-          category: "app",
-          ...data,
+      const sentry = this.initSentry();
+      if (sentry && sentry.captureMessage) {
+        sentry.captureMessage(`INFO: ${message}`, "info", {
+          tags: { category: "app" },
+          extra: data,
         });
       }
     } catch (error) {
-      console.error("Highlight.io logging failed:", error);
+      console.error("Sentry logging failed:", error);
     }
 
     this.recordLogEntry("INFO", message, data);
@@ -213,12 +209,11 @@ class Logger {
 
     this.recordLogEntry("WARN", message, data);
 
-    const h = this.initH();
-    if (h && h.track) {
-      h.track("warning", {
-        message: `WARN: ${message}`,
-        category: "app",
-        ...data,
+    const sentry = this.initSentry();
+    if (sentry && sentry.captureMessage) {
+      sentry.captureMessage(`WARN: ${message}`, "warning", {
+        tags: { category: "app" },
+        extra: data,
       });
     }
   }
@@ -229,17 +224,17 @@ class Logger {
 
     this.recordLogEntry("ERROR", message, data, error);
 
-    const h = this.initH();
-    if (h && h.consumeError) {
+    const sentry = this.initSentry();
+    if (sentry && sentry.captureException) {
       if (error instanceof Error) {
-        h.consumeError(error, "Error occurred", {
-          metadata: JSON.stringify({ message, ...data }),
-          tags: JSON.stringify({ component: "app" }),
+        sentry.captureException(error, {
+          tags: { component: "app" },
+          extra: { message, ...data },
         });
       } else {
-        h.consumeError(new Error(message), "Error occurred", {
-          metadata: JSON.stringify(data),
-          tags: JSON.stringify({ component: "app" }),
+        sentry.captureException(new Error(message), {
+          tags: { component: "app" },
+          extra: data,
         });
       }
     }
@@ -270,16 +265,15 @@ class Logger {
     this.recordLogEntry("PRODUCTION", message, data);
 
     try {
-      const h = this.initH();
-      if (h && h.track) {
-        h.track("production", {
-          message: `PRODUCTION: ${message}`,
-          category: "production",
-          ...data,
+      const sentry = this.initSentry();
+      if (sentry && sentry.captureMessage) {
+        sentry.captureMessage(`PRODUCTION: ${message}`, "info", {
+          tags: { category: "production" },
+          extra: data,
         });
       }
     } catch (error) {
-      console.error("Highlight.io production logging failed:", error);
+      console.error("Sentry production logging failed:", error);
     }
   }
 
@@ -290,28 +284,27 @@ class Logger {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
     }
 
-    // Also send to Highlight.io
+    // Also send to Sentry
     try {
-      const h = this.initH();
-      if (h && h.track) {
-        h.track("budget-sync", {
-          message: `BUDGET-SYNC: ${message}`,
-          category: "budget-sync",
-          ...data,
+      const sentry = this.initSentry();
+      if (sentry && sentry.captureMessage) {
+        sentry.captureMessage(`BUDGET-SYNC: ${message}`, "info", {
+          tags: { category: "budget-sync" },
+          extra: data,
         });
 
         // For critical budget sync issues, also send as error to ensure visibility
         if (message.includes("budgetId value") || message.includes("sync issue")) {
-          if (h.consumeError) {
-            h.consumeError(new Error(`Budget Sync: ${message}`), "Budget sync error", {
-              metadata: JSON.stringify(data),
-              tags: JSON.stringify({ category: "budget-sync", critical: "true" }),
+          if (sentry.captureException) {
+            sentry.captureException(new Error(`Budget Sync: ${message}`), {
+              tags: { category: "budget-sync", critical: "true" },
+              extra: data,
             });
           }
         }
       }
     } catch (error) {
-      console.error("Failed to log to Highlight.io:", error);
+      console.error("Failed to log to Sentry:", error);
     }
 
     this.recordLogEntry("BUDGET-SYNC", message, data);
@@ -354,17 +347,16 @@ class Logger {
     });
   }
 
-  // Test Highlight.io connectivity
-  testHighlight(): void {
-    console.log("🧪 Testing Highlight.io connectivity...");
+  // Test Sentry connectivity
+  testSentry(): void {
+    console.log("🧪 Testing Sentry connectivity...");
 
-    // Send a test event
-    const h = this.initH();
-    if (h && h.track) {
-      h.track("test-event", {
-        message: "Test event from logger",
-        category: "test",
-        timestamp: new Date().toISOString(),
+    // Send a test message
+    const sentry = this.initSentry();
+    if (sentry && sentry.captureMessage) {
+      sentry.captureMessage("Test event from logger", "info", {
+        tags: { category: "test", source: "logger" },
+        extra: { timestamp: new Date().toISOString() },
       });
     }
 
@@ -372,15 +364,15 @@ class Logger {
     try {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
-      if (h && h.consumeError) {
-        h.consumeError(error as Error, "Test error from logger", {
-          metadata: JSON.stringify({ test: true, source: "logger" }),
-          tags: JSON.stringify({ category: "test" }),
+      if (sentry && sentry.captureException) {
+        sentry.captureException(error as Error, {
+          tags: { category: "test", source: "logger" },
+          extra: { test: true },
         });
       }
     }
 
-    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
+    console.log("✅ Sentry test messages sent - check your Sentry dashboard");
   }
 }
 
@@ -413,7 +405,7 @@ function safeStringify(value: Record<string, unknown>) {
 // Make logger available globally for testing
 if (typeof window !== "undefined") {
   (window as unknown as Record<string, unknown>).logger = logger;
-  (window as unknown as Record<string, unknown>).testHighlight = () => logger.testHighlight();
+  (window as unknown as Record<string, unknown>).testSentry = () => logger.testSentry();
 }
 
 export default logger;

@@ -9,7 +9,7 @@
 
 import { encryptionUtils } from "../utils/security/encryption";
 import logger from "../utils/common/logger";
-import { identifyUser } from "../utils/common/highlight";
+import { identifyUser } from "../utils/common/sentry";
 
 interface UserData {
   userName: string;

@@ -19,7 +19,7 @@ import { initializeStoreRegistry } from "./utils/stores/storeRegistry";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 // Lazy load monitoring to reduce main bundle size
-const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
+const SentryLoader = React.lazy(() => import("./components/monitoring/SentryLoader"));
 
 const App = () => {
   const uiStoreApiRef = useRef<PWAManagerUiStore | null>(null);
@@ -97,7 +97,7 @@ const App = () => {
 
               {/* Load monitoring system after main app renders */}
               <Suspense fallback={null}>
-                <HighlightLoader />
+                <SentryLoader />
               </Suspense>
             </div>
           </AuthProvider>

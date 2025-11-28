@@ -456,8 +456,8 @@ export default defineConfig(() => {
             if (id.includes("node_modules/html2canvas")) {
               return "canvas-vendor";
             }
-            // Monitoring chunk - Highlight.run (already lazy loaded)
-            if (id.includes("node_modules/@highlight-run") || id.includes("node_modules/highlight.run")) {
+            // Monitoring chunk - Sentry (already lazy loaded)
+            if (id.includes("node_modules/@sentry")) {
               return "monitoring-vendor";
             }
             // UI/Utils chunk
@@ -503,7 +503,7 @@ export default defineConfig(() => {
         ? {} // No terser options in development (minify is false anyway)
         : {
             compress: {
-              drop_console: false, // Keep console for Highlight.io
+              drop_console: false, // Keep console for Sentry
               drop_debugger: true,
               pure_funcs: ["console.debug"], // Remove debug statements
               // Ultra-conservative settings to prevent temporal dead zone errors

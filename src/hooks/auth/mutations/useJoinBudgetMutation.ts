@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../contexts/AuthContext";
 import { encryptionUtils } from "../../../utils/security/encryption";
 import logger from "../../../utils/common/logger";
-import { identifyUser } from "../../../utils/common/highlight";
+import { identifyUser } from "../../../utils/common/sentry";
 import localStorageService from "../../../services/storage/localStorageService";
 import type { UserData } from "../../../types/auth";
 import type { SessionData } from "../../../contexts/authConstants";

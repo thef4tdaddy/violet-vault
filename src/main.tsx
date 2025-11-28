@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-// Highlight.run now loaded lazily via HighlightLoader component
+// Sentry now loaded lazily via SentryLoader component
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/common/queryClient";
 import { SystemInfoService } from "./services/bugReport/systemInfoService.ts";
@@ -98,7 +98,7 @@ import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefine
 
 // Debug tools are now initialized in the initializeApp function to avoid module scope store operations
 
-// Highlight.run initialization moved to lazy loader in App.jsx
+// Sentry initialization moved to lazy loader in App.tsx
 
 // Initialize crypto compatibility layer
 initializeCrypto();

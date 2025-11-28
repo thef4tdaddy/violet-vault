@@ -2,7 +2,7 @@ import { useState } from "react";
 import BugReportService from "../../../services/bugReport/index.ts";
 import logger from "../../../utils/common/logger.ts";
 import { validateBugReportSubmission } from "../../../utils/validation";
-import { useBugReportHighlight } from "./useBugReportHighlight";
+import { useBugReportSentry } from "./useBugReportSentry";
 
 /// <reference types="../../../vite-env.d.ts" />
 
@@ -35,17 +35,17 @@ interface BugReportSubmissionActions {
     description: string,
     severity?: "low" | "medium" | "high" | "critical"
   ) => Promise<unknown>;
-  initializeHighlightSession: () => Promise<void>;
-  getHighlightSessionData: () => Promise<{
-    sessionUrl: string;
-    sessionId: string | null;
+  initializeSentrySession: () => Promise<void>;
+  getSentrySessionData: () => Promise<{
+    eventUrl: string | null;
+    eventId: string | null;
     available: boolean;
   }>;
 }
 
 /**
  * Hook for managing bug report submission (V2)
- * Includes Highlight.io integration and comprehensive error handling
+ * Includes Sentry integration and comprehensive error handling
  * Extracted from useBugReportV2.ts to reduce complexity
  */
 export const useBugReportSubmissionV2 = (
@@ -63,8 +63,8 @@ export const useBugReportSubmissionV2 = (
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
 
-  // Use Highlight.io hook
-  const highlight = useBugReportHighlight();
+  // Use Sentry hook
+  const sentry = useBugReportSentry();
 
   /**
    * Validate submission requirements using utils/validation
@@ -95,7 +95,7 @@ export const useBugReportSubmissionV2 = (
       webhook?: { url: string };
     },
     customData: {
-      highlightSession: await getHighlightSessionData(),
+      sentrySession: await getSentrySessionData(),
     },
   });
 
@@ -210,17 +210,17 @@ export const useBugReportSubmissionV2 = (
   };
 
   /**
-   * Initialize Highlight.io session management
+   * Initialize Sentry session management
    */
-  const initializeHighlightSession = async (): Promise<void> => {
-    return highlight.initializeHighlightSession();
+  const initializeSentrySession = async (): Promise<void> => {
+    return sentry.initializeSentrySession();
   };
 
   /**
-   * Get Highlight.io session data
+   * Get Sentry session data
    */
-  const getHighlightSessionData = async () => {
-    return highlight.getHighlightSessionData();
+  const getSentrySessionData = async () => {
+    return sentry.getSentrySessionData();
   };
 
   const state: BugReportSubmissionState = {
@@ -232,8 +232,8 @@ export const useBugReportSubmissionV2 = (
   const actions: BugReportSubmissionActions = {
     submitReport,
     quickReport,
-    initializeHighlightSession,
-    getHighlightSessionData,
+    initializeSentrySession,
+    getSentrySessionData,
   };
 
   return {
