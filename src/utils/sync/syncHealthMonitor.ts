@@ -1,9 +1,12 @@
 /**
  * Sync Health Monitor - Track sync reliability and performance
  * GitHub Issue #576 Phase 3: Advanced Monitoring
+ * GitHub Issue #1394: Add Performance Monitoring for Critical Operations
  */
 
+import * as Sentry from "@sentry/react";
 import logger from "../common/logger";
+import { PERFORMANCE_THRESHOLDS, SPAN_STATUS } from "@/utils/monitoring/performanceMonitor";
 
 interface SyncMetrics {
   totalAttempts: number;
@@ -134,7 +137,7 @@ class SyncHealthMonitor {
   }
 
   /**
-   * Record successful sync completion
+   * Record successful sync completion with Sentry performance tracking
    */
   recordSyncSuccess(syncId: string, metadata: unknown = {}): void {
     if (!this.currentSync || this.currentSync.id !== syncId) {
@@ -143,6 +146,7 @@ class SyncHealthMonitor {
 
     const endTime = Date.now();
     const duration = endTime - this.currentSync.startTime;
+    const isSlow = duration > PERFORMANCE_THRESHOLDS.SLOW_SYNC;
 
     const completedSync: CompletedSync = {
       ...this.currentSync,
@@ -155,17 +159,57 @@ class SyncHealthMonitor {
     this.addToRecentSyncs(completedSync);
     this.updateMetrics(completedSync);
 
+    // Track sync performance with Sentry span
+    Sentry.startSpan(
+      {
+        op: "sync.cloud",
+        name: `Cloud Sync: ${this.currentSync.type}`,
+      },
+      (span) => {
+        span.setAttribute("sync_id", syncId);
+        span.setAttribute("sync_type", this.currentSync?.type || "unknown");
+        span.setAttribute("duration_ms", duration);
+        span.setAttribute("is_slow", isSlow);
+        span.setAttribute("success", true);
+
+        // Add metadata attributes if available
+        if (metadata && typeof metadata === "object") {
+          const metaRecord = metadata as Record<string, unknown>;
+          if (metaRecord.direction) {
+            span.setAttribute("direction", String(metaRecord.direction));
+          }
+        }
+
+        if (isSlow) {
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_sync" });
+          Sentry.captureMessage(`Slow sync detected: ${this.currentSync?.type}`, {
+            level: "warning",
+            tags: { operation_type: "sync.cloud", is_slow: "true" },
+            extra: {
+              syncId,
+              syncType: this.currentSync?.type,
+              duration: Math.round(duration),
+              threshold: PERFORMANCE_THRESHOLDS.SLOW_SYNC,
+            },
+          });
+        } else {
+          span.setStatus({ code: SPAN_STATUS.OK });
+        }
+      }
+    );
+
     logger.production("📊 Sync health: Successful completion", {
       syncId,
       duration,
       successRate: this.getSuccessRate(),
+      isSlow,
     });
 
     this.currentSync = null;
   }
 
   /**
-   * Record sync failure
+   * Record sync failure with Sentry error tracking
    */
   recordSyncFailure(syncId: string, error: Error, metadata: unknown = {}): void {
     if (!this.currentSync || this.currentSync.id !== syncId) {
@@ -193,6 +237,38 @@ class SyncHealthMonitor {
 
     this.addToRecentSyncs(failedSync);
     this.updateMetrics(failedSync);
+
+    // Track sync failure with Sentry span
+    Sentry.startSpan(
+      {
+        op: "sync.cloud",
+        name: `Cloud Sync Failed: ${this.currentSync.type}`,
+      },
+      (span) => {
+        span.setAttribute("sync_id", syncId);
+        span.setAttribute("sync_type", this.currentSync?.type || "unknown");
+        span.setAttribute("duration_ms", duration);
+        span.setAttribute("success", false);
+        span.setAttribute("error_message", error.message);
+        span.setAttribute("consecutive_failures", this.metrics.consecutiveFailures);
+        span.setStatus({ code: SPAN_STATUS.ERROR, message: error.message });
+      }
+    );
+
+    // Also capture the error for tracking
+    Sentry.captureException(error, {
+      tags: {
+        operation_type: "sync.cloud",
+        sync_type: this.currentSync.type,
+      },
+      extra: {
+        syncId,
+        duration,
+        consecutiveFailures: this.metrics.consecutiveFailures,
+        errorRate: this.getErrorRate(),
+        metadata,
+      },
+    });
 
     logger.error("📊 Sync health: Failed completion", {
       syncId,

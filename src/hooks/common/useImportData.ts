@@ -12,6 +12,7 @@ import { backupCurrentData } from "@/utils/dataManagement/backupUtils";
 import { clearAllDexieData, importDataToDexie } from "@/utils/dataManagement/dexieUtils";
 import { clearFirebaseData, forcePushToCloud } from "@/utils/dataManagement/firebaseUtils";
 import { queryClient } from "@/utils/common/queryClient";
+import { trackImport } from "@/utils/monitoring/performanceMonitor";
 import type { UserData } from "@/types/auth";
 import type { Envelope, Transaction } from "@/types/finance";
 import type { Bill } from "@/types/bills";
@@ -334,7 +335,7 @@ const performImport = async (
 };
 
 /**
- * Process the validated import data
+ * Process the validated import data with Sentry performance tracking
  * Extracted to reduce statement count in main import function
  */
 const processImportData = async (
@@ -344,8 +345,29 @@ const processImportData = async (
   authConfig: AuthConfig
 ): Promise<ImportResult> => {
   const { validatedData, validationWarnings } = validationResult;
+  const counts = getImportCounts(validatedData as ValidatedImportData);
 
-  await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
+  // Track import performance with Sentry
+  await trackImport(
+    async () => {
+      await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
+    },
+    {
+      itemsImported:
+        counts.envelopes +
+        counts.savingsEnvelopes +
+        counts.supplementalEnvelopes +
+        counts.bills +
+        counts.debts +
+        counts.transactions +
+        counts.auditLog,
+      envelopes: counts.envelopes,
+      transactions: counts.transactions,
+      bills: counts.bills,
+      debts: counts.debts,
+      validationWarnings: validationWarnings.length,
+    }
+  );
 
   // Show warning toast if there were validation issues
   if (validationWarnings.length > 0) {

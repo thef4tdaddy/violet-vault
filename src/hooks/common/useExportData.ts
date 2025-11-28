@@ -4,6 +4,7 @@ import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import { constructExportObject } from "./useExportDataHelpers";
+import { trackExport } from "@/utils/monitoring/performanceMonitor";
 
 const gatherDataForExport = async (): Promise<
   [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown]
@@ -99,11 +100,23 @@ export const useExportData = () => {
         return;
       }
 
-      const exportableData = constructExportObject(data, currentUser);
-      const fileSize = triggerDownload(exportableData);
-      const pureTransactions = exportableData.transactions;
+      // Track export performance with Sentry
+      const exportResult = await trackExport(
+        async () => {
+          const exportableData = constructExportObject(data, currentUser);
+          const fileSize = triggerDownload(exportableData);
+          const pureTransactions = exportableData.transactions;
+          return { exportableData, fileSize, pureTransactions };
+        },
+        {
+          envelopes: (data[0] as unknown[]).length,
+          transactions: (data[2] as unknown[]).length,
+          bills: (data[1] as unknown[]).length,
+          debts: (data[3] as unknown[]).length,
+        }
+      );
 
-      const counts = logExportSuccess(data, pureTransactions, fileSize);
+      const counts = logExportSuccess(data, exportResult.pureTransactions, exportResult.fileSize);
       const exportSummary = buildExportSummary(counts);
 
       // Log successful data export
