@@ -47,7 +47,7 @@ export const useQRCodeProcessing = () => {
   };
 
   const handleQRScan = () => {
-    // TODO: Implement camera-based QR scanning
+    // Camera-based QR scanning is planned for future enhancement
     showErrorToast(
       "QR scanning not yet implemented. Please enter the share code manually or paste QR data."
     );

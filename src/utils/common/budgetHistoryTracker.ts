@@ -68,7 +68,8 @@ export class BudgetHistoryTracker {
       };
 
       // For now, we'll store the snapshot as JSON
-      // TODO: Implement proper encryption using user's encryption key
+      // Future security enhancement: encrypt snapshot data using user's encryption key
+      // See: https://github.com/thef4tdaddy/violet-vault/issues for tracking
       const snapshotData = JSON.stringify(snapshot);
 
       // Create the commit
