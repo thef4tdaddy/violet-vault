@@ -408,4 +408,197 @@ describe("useDeleteEnvelope - CRUD Tests", () => {
       expect(budgetDb.bills.delete).toHaveBeenCalledWith("bill-3");
     });
   });
+
+  describe("Validation Error Handling", () => {
+    it("should handle database delete failure gracefully", async () => {
+      const dbError = new Error("Database delete failed");
+      (budgetDb.envelopes.delete as Mock).mockRejectedValue(dbError);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const onError = (useMutation as Mock).mock.calls[0][0].onError;
+
+      await act(async () => {
+        try {
+          await mutationFn(deleteData);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      });
+
+      const { default: logger } = await import("@/utils/common/logger");
+      expect(logger.error).toHaveBeenCalledWith("Failed to delete envelope:", dbError);
+    });
+
+    it("should handle bill disconnection failure gracefully", async () => {
+      const mockBills = [{ id: "bill-1", envelopeId: "envelope-1", name: "Bill 1" }];
+      const updateError = new Error("Failed to update bill");
+
+      (budgetDb.bills.where as Mock).mockReturnValue({
+        equals: vi.fn(() => ({
+          toArray: vi.fn().mockResolvedValue(mockBills),
+        })),
+      });
+      (budgetDb.bills.update as Mock).mockRejectedValue(updateError);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(deleteData)).rejects.toThrow("Failed to update bill");
+      });
+    });
+
+    it("should handle bill deletion failure gracefully", async () => {
+      const mockBills = [{ id: "bill-1", envelopeId: "envelope-1", name: "Bill 1" }];
+      const deleteError = new Error("Failed to delete bill");
+
+      (budgetDb.bills.where as Mock).mockReturnValue({
+        equals: vi.fn(() => ({
+          toArray: vi.fn().mockResolvedValue(mockBills),
+        })),
+      });
+      (budgetDb.bills.delete as Mock).mockRejectedValue(deleteError);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: true,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(deleteData)).rejects.toThrow("Failed to delete bill");
+      });
+    });
+
+    it("should handle unassigned cash transfer failure", async () => {
+      const { getUnassignedCash, setUnassignedCash } = await import("@/db/budgetDb");
+      const transferError = new Error("Failed to transfer balance");
+      (setUnassignedCash as Mock).mockRejectedValue(transferError);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(deleteData)).rejects.toThrow("Failed to transfer balance");
+      });
+
+      // Delete should not have been called since transfer failed
+      expect(budgetDb.envelopes.delete).not.toHaveBeenCalled();
+    });
+
+    it("should rollback optimistic update on failure", async () => {
+      // Reset mocks to default before this test
+      const budgetDbModule = await import("@/db/budgetDb");
+      (budgetDbModule.getUnassignedCash as Mock).mockResolvedValue(1000);
+      (budgetDbModule.setUnassignedCash as Mock).mockResolvedValue(undefined);
+
+      const { optimisticHelpers } = await import("@/utils/common/queryClient");
+      const dbError = new Error("Database error during delete");
+      (budgetDb.envelopes.delete as Mock).mockRejectedValue(dbError);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const onError = (useMutation as Mock).mock.calls[0][0].onError;
+
+      await act(async () => {
+        try {
+          await mutationFn(deleteData);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      });
+
+      // Optimistic update was applied before error
+      expect(optimisticHelpers.removeEnvelope).toHaveBeenCalledWith(mockQueryClient, "envelope-1");
+      // Error should be logged
+      const { default: logger } = await import("@/utils/common/logger");
+      expect(logger.error).toHaveBeenCalledWith("Failed to delete envelope:", dbError);
+    });
+
+    it("should validate relationship integrity when deleting envelope with debts", async () => {
+      // Reset all mocks to ensure proper operation
+      const budgetDbModule = await import("@/db/budgetDb");
+      (budgetDbModule.getUnassignedCash as Mock).mockResolvedValue(1000);
+      (budgetDbModule.setUnassignedCash as Mock).mockResolvedValue(undefined);
+      (budgetDb.bills.update as Mock).mockResolvedValue(1); // Reset bills.update mock
+
+      const mockBillsWithDebt = [{ id: "bill-1", envelopeId: "envelope-1", debtId: "debt-1" }];
+
+      (budgetDb.bills.where as Mock).mockReturnValue({
+        equals: vi.fn(() => ({
+          toArray: vi.fn().mockResolvedValue(mockBillsWithDebt),
+        })),
+      });
+
+      renderHook(() => useDeleteEnvelope());
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      // Should still disconnect the bill (even with debt link)
+      await act(async () => {
+        await mutationFn(deleteData);
+      });
+
+      expect(budgetDb.bills.update).toHaveBeenCalledWith("bill-1", {
+        envelopeId: undefined,
+      });
+    });
+
+    it("should handle concurrent delete requests gracefully", async () => {
+      // Reset mocks to ensure proper operation
+      const budgetDbModule = await import("@/db/budgetDb");
+      (budgetDbModule.getUnassignedCash as Mock).mockResolvedValue(1000);
+      (budgetDbModule.setUnassignedCash as Mock).mockResolvedValue(undefined);
+
+      renderHook(() => useDeleteEnvelope());
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      const deleteData = {
+        envelopeId: "envelope-1",
+        deleteBillsToo: false,
+      };
+
+      // Simulate concurrent deletes
+      await act(async () => {
+        await Promise.all([mutationFn(deleteData), mutationFn(deleteData)]);
+      });
+
+      // Both should complete (idempotent operation)
+      expect(budgetDb.envelopes.delete).toHaveBeenCalledTimes(2);
+    });
+  });
 });

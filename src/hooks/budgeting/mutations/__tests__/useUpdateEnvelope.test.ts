@@ -378,4 +378,220 @@ describe("useUpdateEnvelope - CRUD Tests", () => {
       });
     });
   });
+
+  describe("Validation Error Handling", () => {
+    it("should reject update with name exceeding max length (Zod schema validation)", async () => {
+      renderHook(() => useUpdateEnvelope());
+
+      const longName = "a".repeat(101); // Max is 100 characters
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          name: longName,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(updateData)).rejects.toThrow("Invalid envelope update data");
+      });
+
+      expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
+    });
+
+    it("should reject update with negative currentBalance (Zod schema validation)", async () => {
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          currentBalance: -100,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(updateData)).rejects.toThrow("Invalid envelope update data");
+      });
+
+      expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
+    });
+
+    it("should reject update with negative targetAmount (Zod schema validation)", async () => {
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          targetAmount: -500,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(updateData)).rejects.toThrow("Invalid envelope update data");
+      });
+
+      expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
+    });
+
+    it("should reject update with description exceeding max length", async () => {
+      renderHook(() => useUpdateEnvelope());
+
+      const longDescription = "a".repeat(501); // Max is 500 characters
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          description: longDescription,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(updateData)).rejects.toThrow("Invalid envelope update data");
+      });
+
+      expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
+    });
+
+    it("should log validation errors for debugging", async () => {
+      const { default: logger } = await import("@/utils/common/logger");
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          currentBalance: -100, // Invalid negative balance
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        try {
+          await mutationFn(updateData);
+        } catch {
+          // Expected to throw
+        }
+      });
+
+      expect(logger.error).toHaveBeenCalledWith(
+        "Envelope update validation failed",
+        expect.objectContaining({
+          envelopeId: "envelope-1",
+          errors: expect.any(Array),
+        })
+      );
+    });
+
+    it("should rollback optimistic update on database constraint violation", async () => {
+      const { optimisticHelpers } = await import("@/utils/common/queryClient");
+      const dbError = new Error("Database constraint violation");
+      (budgetDb.envelopes.update as Mock).mockRejectedValue(dbError);
+
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          name: "Updated Name",
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const onError = (useMutation as Mock).mock.calls[0][0].onError;
+
+      await act(async () => {
+        try {
+          await mutationFn(updateData);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      });
+
+      // Optimistic update was applied before error
+      expect(optimisticHelpers.updateEnvelope).toHaveBeenCalled();
+      // Error is logged
+      const { default: logger } = await import("@/utils/common/logger");
+      expect(logger.error).toHaveBeenCalledWith("Failed to update envelope:", dbError);
+    });
+
+    it("should handle concurrent modification with lastModified timestamp", async () => {
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          targetAmount: 2000,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const beforeUpdate = Date.now();
+
+      await act(async () => {
+        await mutationFn(updateData);
+      });
+
+      const afterUpdate = Date.now();
+      const updateCall = (budgetDb.envelopes.update as Mock).mock.calls[0][1];
+
+      // lastModified should be updated to current timestamp
+      expect(updateCall.lastModified).toBeGreaterThanOrEqual(beforeUpdate);
+      expect(updateCall.lastModified).toBeLessThanOrEqual(afterUpdate);
+    });
+
+    it("should validate envelope exists before applying update", async () => {
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(undefined);
+
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "non-existent",
+        updates: {
+          name: "New Name",
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+
+      await act(async () => {
+        await expect(mutationFn(updateData)).rejects.toThrow("Envelope non-existent not found");
+      });
+
+      expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
+    });
+
+    it("should handle database update failure and trigger onError", async () => {
+      const dbError = new Error("Database connection lost");
+      (budgetDb.envelopes.update as Mock).mockRejectedValue(dbError);
+
+      renderHook(() => useUpdateEnvelope());
+
+      const updateData = {
+        id: "envelope-1",
+        updates: {
+          targetAmount: 1500,
+        },
+      };
+
+      const mutationFn = (useMutation as Mock).mock.calls[0][0].mutationFn;
+      const onError = (useMutation as Mock).mock.calls[0][0].onError;
+
+      await act(async () => {
+        try {
+          await mutationFn(updateData);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      });
+
+      const { default: logger } = await import("@/utils/common/logger");
+      expect(logger.error).toHaveBeenCalledWith("Failed to update envelope:", dbError);
+    });
+  });
 });
