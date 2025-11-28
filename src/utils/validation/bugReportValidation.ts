@@ -29,9 +29,15 @@ export const validateBugReportForm = (
     return { isValid: true, errors: [] };
   }
 
+  // Safety check: ensure issues is an array before map
+  if (!result.error || !result.error.issues) {
+    return { isValid: false, errors: ["Validation error: Invalid error structure"] };
+  }
+
+  const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
   return {
     isValid: false,
-    errors: result.error.issues.map((err) => err.message),
+    errors: issues.map((err) => err?.message || "Validation error"),
   };
 };
 
@@ -61,8 +67,14 @@ export const validateBugReportSubmission = (
     return { isValid: true };
   }
 
+  // Safety check: ensure issues is an array before accessing
+  if (!result.error || !result.error.issues) {
+    return { isValid: false, error: "Validation failed: Invalid error structure" };
+  }
+
+  const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
   return {
     isValid: false,
-    error: result.error.issues[0]?.message || "Validation failed",
+    error: issues[0]?.message || "Validation failed",
   };
 };

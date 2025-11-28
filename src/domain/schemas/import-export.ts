@@ -276,10 +276,15 @@ export const validateEnvelopes = (envelopes: unknown[]): ItemValidationResult<un
     if (result.success) {
       valid.push(result.data);
     } else {
+      // Safety check: ensure issues is an array before map
+      const issues = result.error?.issues || [];
+      const safeIssues = Array.isArray(issues) ? issues : [];
       invalid.push({
         index,
         data: envelope,
-        errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+        errors: safeIssues.map(
+          (i) => `${i?.path?.join(".") || "unknown"}: ${i?.message || "Validation error"}`
+        ),
       });
     }
   });
@@ -300,10 +305,15 @@ export const validateTransactions = (transactions: unknown[]): ItemValidationRes
     if (result.success) {
       valid.push(result.data);
     } else {
+      // Safety check: ensure issues is an array before map
+      const issues = result.error?.issues || [];
+      const safeIssues = Array.isArray(issues) ? issues : [];
       invalid.push({
         index,
         data: transaction,
-        errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+        errors: safeIssues.map(
+          (i) => `${i?.path?.join(".") || "unknown"}: ${i?.message || "Validation error"}`
+        ),
       });
     }
   });
@@ -324,10 +334,15 @@ export const validateBills = (bills: unknown[]): ItemValidationResult<unknown> =
     if (result.success) {
       valid.push(result.data);
     } else {
+      // Safety check: ensure issues is an array before map
+      const issues = result.error?.issues || [];
+      const safeIssues = Array.isArray(issues) ? issues : [];
       invalid.push({
         index,
         data: bill,
-        errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+        errors: safeIssues.map(
+          (i) => `${i?.path?.join(".") || "unknown"}: ${i?.message || "Validation error"}`
+        ),
       });
     }
   });
@@ -348,10 +363,15 @@ export const validateDebts = (debts: unknown[]): ItemValidationResult<unknown> =
     if (result.success) {
       valid.push(result.data);
     } else {
+      // Safety check: ensure issues is an array before map
+      const issues = result.error?.issues || [];
+      const safeIssues = Array.isArray(issues) ? issues : [];
       invalid.push({
         index,
         data: debt,
-        errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+        errors: safeIssues.map(
+          (i) => `${i?.path?.join(".") || "unknown"}: ${i?.message || "Validation error"}`
+        ),
       });
     }
   });

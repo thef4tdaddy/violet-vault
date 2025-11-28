@@ -19,11 +19,15 @@ export const useBillValidation = (envelopes: Envelope[] = []) => {
       const zodResult = validateBillSafe(bill);
 
       if (!zodResult.success) {
-        const errors = (
-          zodResult.error as never as { errors: Array<{ path: string[]; message: string }> }
-        ).errors.map((err) => {
-          const path = err.path.join(".");
-          return `${path}: ${err.message}`;
+        // Safety check: Zod uses 'issues', not 'errors'
+        // Ensure issues is an array before map
+        if (!zodResult.error || !zodResult.error.issues) {
+          return { isValid: false, errors: ["Validation error: Invalid error structure"] };
+        }
+        const issues = Array.isArray(zodResult.error.issues) ? zodResult.error.issues : [];
+        const errors = issues.map((err) => {
+          const path = err?.path?.join(".") || "unknown";
+          return `${path}: ${err?.message || "Validation error"}`;
         });
         return { isValid: false, errors };
       }

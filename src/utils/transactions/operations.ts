@@ -44,13 +44,18 @@ export const validateTransactionData = (transactionData: unknown): ValidationRes
     // Use Zod schema for validation
     const result = validateTransactionSafe(transactionData);
 
-    if (!result.success) {
+    if (!result.success && result.error) {
       // Convert Zod errors to user-friendly messages
-      const errors = result.error.issues.map((err) => {
-        const path = err.path.join(".");
-        return `${path}: ${err.message}`;
-      });
-      return { isValid: false, errors };
+      // Safety check: ensure issues is an array before map
+      const issues = result.error.issues || [];
+      if (Array.isArray(issues)) {
+        const errors = issues.map((err) => {
+          const path = err?.path?.join(".") || "unknown";
+          return `${path}: ${err?.message || "Validation error"}`;
+        });
+        return { isValid: false, errors };
+      }
+      return { isValid: false, errors: ["Validation error: Invalid error structure"] };
     }
 
     return { isValid: true, errors: [] };

@@ -98,7 +98,13 @@ export const validateSavingsGoalForm = (formData: unknown): string[] => {
   }
 
   // Extract error messages from Zod validation errors
-  return result.error?.issues.map((err) => err.message) || [];
+  // Safety check: ensure issues is an array before map
+  if (!result.error || !result.error.issues) {
+    return ["Validation error: Invalid error structure"];
+  }
+
+  const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
+  return issues.map((err) => err?.message || "Validation error");
 };
 
 /**
@@ -111,7 +117,13 @@ export const processSavingsGoalFormData = (
   // Parse and validate with Zod schema
   const result = validateSavingsGoalFormSafe(formData);
   if (!result.success) {
-    throw new Error(`Validation failed: ${result.error.issues.map((e) => e.message).join(", ")}`);
+    // Safety check: ensure issues is an array before map
+    if (!result.error || !result.error.issues) {
+      throw new Error("Validation failed: Invalid error structure");
+    }
+    const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
+    const errorMessages = issues.map((e) => e?.message || "Validation error").join(", ");
+    throw new Error(`Validation failed: ${errorMessages}`);
   }
 
   const validatedData = result.data;

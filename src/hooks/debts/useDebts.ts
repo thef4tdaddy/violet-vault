@@ -47,8 +47,15 @@ const addDebtToDb = async (debtData: {
   // Validate with Zod schema before saving
   const validationResult = validateDebtSafe(debt);
   if (!validationResult.success) {
-    const errorMessages = validationResult.error.issues.map((issue) => issue.message).join(", ");
-    logger.error("Debt validation failed", { errors: validationResult.error.issues });
+    // Safety check: ensure issues is an array before map
+    if (!validationResult.error || !validationResult.error.issues) {
+      throw new Error("Invalid debt data: Validation error structure is invalid");
+    }
+    const issues = Array.isArray(validationResult.error.issues)
+      ? validationResult.error.issues
+      : [];
+    const errorMessages = issues.map((issue) => issue?.message || "Validation error").join(", ");
+    logger.error("Debt validation failed", { errors: issues });
     throw new Error(`Invalid debt data: ${errorMessages}`);
   }
 
@@ -85,10 +92,17 @@ const updateDebtInDb = async ({
   // Validate updates with Zod schema
   const validationResult = validateDebtPartialSafe(updates);
   if (!validationResult.success) {
-    const errorMessages = validationResult.error.issues.map((issue) => issue.message).join(", ");
+    // Safety check: ensure issues is an array before map
+    if (!validationResult.error || !validationResult.error.issues) {
+      throw new Error("Invalid debt update data: Validation error structure is invalid");
+    }
+    const issues = Array.isArray(validationResult.error.issues)
+      ? validationResult.error.issues
+      : [];
+    const errorMessages = issues.map((issue) => issue?.message || "Validation error").join(", ");
     logger.error("Debt update validation failed", {
       debtId: id,
-      errors: validationResult.error.issues,
+      errors: issues,
     });
     throw new Error(`Invalid debt update data: ${errorMessages}`);
   }

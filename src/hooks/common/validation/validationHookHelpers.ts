@@ -28,14 +28,17 @@ export function parseWithSchema<T>(schema: z.ZodSchema<T>, data: unknown): Valid
   const errors: ValidationErrors<T> = {};
 
   // Zod uses `issues` property for validation errors
-  const issues = result.error.issues || [];
+  // Safety check: ensure issues is actually an array before forEach
+  const issues = result.error?.issues || [];
 
-  issues.forEach((error) => {
-    const field = error.path[0];
-    if (field !== undefined) {
-      errors[field as keyof T] = error.message;
-    }
-  });
+  if (Array.isArray(issues)) {
+    issues.forEach((error) => {
+      const field = error?.path?.[0];
+      if (field !== undefined && error?.message) {
+        errors[field as keyof T] = error.message;
+      }
+    });
+  }
 
   return {
     success: false,
@@ -97,10 +100,14 @@ export function parseField<T>(
     const testData = { ...fullData, [fieldName]: value };
     const result = schema.safeParse(testData);
 
-    if (!result.success) {
+    if (!result.success && result.error) {
       // Find error for this specific field using issues property
-      const fieldError = result.error.issues.find((err) => err.path[0] === fieldName);
-      return fieldError?.message;
+      // Safety check: ensure issues is an array before find
+      const issues = result.error.issues || [];
+      if (Array.isArray(issues)) {
+        const fieldError = issues.find((err) => err?.path?.[0] === fieldName);
+        return fieldError?.message;
+      }
     }
 
     return undefined;

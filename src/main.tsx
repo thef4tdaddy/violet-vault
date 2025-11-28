@@ -172,8 +172,9 @@ const initializeSentryEarly = () => {
     // Silently fail - monitoring shouldn't break the app
     // Use logger if available, otherwise fail silently
     try {
-      logger.warn("Failed to initialize Sentry early", error, {
+      logger.warn("Failed to initialize Sentry early", {
         errorMessage: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.stack : String(error),
       });
     } catch {
       // Logger not available yet, fail silently

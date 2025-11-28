@@ -384,9 +384,16 @@ export default defineConfig(() => {
         'react/jsx-runtime',
         'react/jsx-dev-runtime',
       ],
+      exclude: [
+        'react-is', // Exclude react-is to prevent multiple React copies
+      ],
       esbuildOptions: {
         // Ensure React 19 compatibility
         jsx: 'automatic',
+        // Ensure React is available during optimization
+        define: {
+          'process.env.NODE_ENV': '"development"',
+        },
       },
     },
     // Avoid multiple copies of React which can cause

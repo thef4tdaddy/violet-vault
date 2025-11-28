@@ -125,14 +125,18 @@ export const createDefaultEnvelopeForm = (): EnvelopeFormData => ({
  */
 const convertZodErrors = (zodResult: ZodResult): Record<string, string> => {
   const errors: Record<string, string> = {};
-  if (!zodResult.success) {
-    const issues = zodResult.error?.issues ?? zodResult.error?.errors ?? [];
-    issues.forEach((err) => {
-      const fieldName = err.path[0];
-      if (fieldName !== undefined) {
-        errors[String(fieldName)] = err.message;
-      }
-    });
+  if (!zodResult.success && zodResult.error) {
+    // Zod uses 'issues' property, ensure we always have an array
+    const issues = zodResult.error.issues ?? zodResult.error.errors ?? [];
+    // Safety check: ensure issues is actually an array before forEach
+    if (Array.isArray(issues)) {
+      issues.forEach((err) => {
+        const fieldName = err?.path?.[0];
+        if (fieldName !== undefined && err?.message) {
+          errors[String(fieldName)] = err.message;
+        }
+      });
+    }
   }
   return errors;
 };

@@ -16,5 +16,11 @@ export const validateBillFormData = (formData: BillFormData): string[] => {
     return [];
   }
 
-  return result.error.issues.map((err) => err.message);
+  // Safety check: ensure issues is an array before map
+  if (!result.error || !result.error.issues) {
+    return ["Validation error: Invalid error structure"];
+  }
+
+  const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
+  return issues.map((err) => err?.message || "Validation error");
 };

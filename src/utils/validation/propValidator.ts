@@ -37,18 +37,22 @@ export const validateComponentProps = <T extends z.ZodType>(
   const result = schema.safeParse(props);
 
   if (!result.success) {
+    // Safety check: ensure issues is an array before accessing
+    const issues = result.error?.issues || [];
+    const safeIssues = Array.isArray(issues) ? issues : [];
+
     logger.warn(`⚠️ Invalid props for ${componentName}:`, {
       component: componentName,
-      errors: result.error.issues,
+      errors: safeIssues,
       props,
     });
 
     // Format the errors in a more readable way
-    const formattedErrors = result.error.issues.map((issue) => ({
-      path: issue.path.join("."),
-      message: issue.message,
+    const formattedErrors = safeIssues.map((issue) => ({
+      path: issue?.path?.join(".") || "unknown",
+      message: issue?.message || "Validation error",
       received:
-        issue.code === "invalid_type" ? (issue as { received?: string }).received : undefined,
+        issue?.code === "invalid_type" ? (issue as { received?: string }).received : undefined,
     }));
 
     logger.warn(`📋 Validation errors for ${componentName}:`, { errors: formattedErrors });

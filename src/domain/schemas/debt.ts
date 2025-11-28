@@ -307,11 +307,17 @@ export const validateDebtFormDataSafe = (
 
   if (!result.success) {
     // Convert Zod errors to field-specific error messages
+    // Safety check: ensure issues is an array before forEach
     const errors: Record<string, string> = {};
-    result.error.issues.forEach((err) => {
-      const path = err.path.length > 0 ? err.path.join(".") : "form";
-      errors[path] = err.message;
-    });
+    if (result.error && result.error.issues) {
+      const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
+      issues.forEach((err) => {
+        const path = err?.path && err.path.length > 0 ? err.path.join(".") : "form";
+        if (err?.message) {
+          errors[path] = err.message;
+        }
+      });
+    }
 
     return {
       success: false,
