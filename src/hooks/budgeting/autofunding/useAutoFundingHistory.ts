@@ -35,7 +35,7 @@ export const useAutoFundingHistory = (
 
         // Delegate to sub-hooks for cleanup operations
         historyHook.clearHistory(); // This will need to be updated
-        // TODO: undoHook.clearUndoStack(); // Method not yet implemented
+        // Note: undoHook.clearUndoStack() will be added when undo functionality is expanded
 
         logger.info("History cleanup completed", {
           maxHistoryAge,

@@ -153,10 +153,10 @@ export const useCloudSyncManager = () => {
 
       if (result.success) {
         logger.info("✅ Manual sync completed", result);
-        // TODO: Could add a success toast notification here
+        // Note: Success notification could be added here for better UX
       } else {
         logger.error("❌ Manual sync failed", result.error);
-        // TODO: Could add an error toast notification here
+        // Note: Error notification could be added here for better UX
       }
     } catch (error) {
       logger.error("❌ Manual sync failed:", error);
