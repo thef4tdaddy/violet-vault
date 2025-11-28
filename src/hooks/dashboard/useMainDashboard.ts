@@ -267,7 +267,7 @@ export const usePaydayManager = (
       "Navigate to envelope management for funding planning!",
       "Funding Planning"
     );
-    // TODO: Integrate with envelope planning interface
+    // Future enhancement: Direct navigation to envelope planning interface
   }, []);
 
   return {

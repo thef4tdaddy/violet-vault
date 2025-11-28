@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import useUiStore, { type UiStore } from "../../stores/ui/uiStore";
-// import { budgetDb } from "../../db/budgetDb"; // TODO: Use for local sync operations
 import logger from "../../utils/common/logger";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 

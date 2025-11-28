@@ -50,9 +50,12 @@ export interface DebtAccount {
 
   // Calculated fields (added by enrichment)
   payoffInfo?: PayoffProjection;
-  relatedBill?: unknown; // TODO: Type when bills are converted
-  relatedEnvelope?: unknown; // TODO: Type when envelopes are converted
-  relatedTransactions?: unknown[]; // TODO: Type when transactions are converted
+  /** Related bill entity - uses unknown to support both db/types.Bill and types/bills.Bill */
+  relatedBill?: unknown;
+  /** Related envelope entity - uses unknown to support both db/types.Envelope and types/bills.Envelope */
+  relatedEnvelope?: unknown;
+  /** Related transactions - uses unknown to support both db/types.Transaction and types/finance.Transaction */
+  relatedTransactions?: unknown[];
 
   // Metadata
   createdAt?: string | Date;

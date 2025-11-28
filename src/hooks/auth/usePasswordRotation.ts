@@ -64,12 +64,12 @@ const usePasswordRotation = (): UsePasswordRotationReturn => {
     }
 
     try {
-      // We need the current password for the change password mutation
-      // For password rotation, we don't have the old password, so we'll need to use a different approach
-      // TODO: This needs the current password - password rotation might need a different flow
+      // Password rotation requires the current password for security
+      // This feature requires user to re-authenticate or provide current password
+      // before updating to a new password
       showErrorToast("Password rotation requires the current password", "Not Implemented");
 
-      // For now, let's disable the rotation functionality until we implement a proper flow
+      // Password rotation functionality is limited until a re-authentication flow is implemented
       logger.warn("Password rotation attempted but requires current password implementation");
     } catch (error) {
       logger.error("Failed to change password:", error);
