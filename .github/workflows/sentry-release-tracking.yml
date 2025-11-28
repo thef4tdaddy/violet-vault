@@ -1,0 +1,159 @@
+name: Sentry Release Tracking
+
+on:
+  # Create releases for main branch (production) and develop branch
+  push:
+    branches: [main, develop]
+    tags:
+      - "v*" # Release tags
+
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to create release for"
+        required: true
+        default: "develop"
+        type: choice
+        options:
+          - develop
+          - main
+      version:
+        description: "Version/commit SHA to use (leave empty for auto)"
+        required: false
+        type: string
+
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SENTRY_ORG: f4tdaddy
+  SENTRY_PROJECT: violet-vault
+  NODE_VERSION: "22"
+
+jobs:
+  create-sentry-release:
+    runs-on: ubuntu-latest
+    # Create releases for:
+    # - main branch (always)
+    # - develop branch (every 20 commits or manual trigger)
+    # - version tags (always)
+    if: |
+      (github.ref == 'refs/heads/main') ||
+      (github.ref == 'refs/heads/develop' && (github.event_name == 'workflow_dispatch' || github.run_number % 20 == 0)) ||
+      startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Get version info
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Extract version from tag (e.g., v2.0.0 -> violetvault@2.0.0)
+            TAG_VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')
+            PACKAGE_NAME=$(node -p "require('./package.json').name")
+            VERSION="${PACKAGE_NAME}@${TAG_VERSION}"
+          else
+            # Use package.json version + branch + short SHA
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            PACKAGE_NAME=$(node -p "require('./package.json').name")
+            SHORT_SHA=$(git rev-parse --short HEAD)
+            BRANCH_NAME="${{ github.ref_name }}"
+            
+            if [ "$BRANCH_NAME" == "main" ]; then
+              # Production: clean version (e.g., "violetvault@2.0.0")
+              VERSION="${PACKAGE_NAME}@${PACKAGE_VERSION}"
+            else
+              # For develop: create pre-release version (e.g., "violetvault@2.0.1-dev.1")
+              # Count commits since last tag to create dev version number
+              LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+              if [ -n "$LAST_TAG" ]; then
+                # Get commit count since last tag
+                COMMIT_COUNT=$(git rev-list --count ${LAST_TAG}..HEAD 2>/dev/null || echo "0")
+                # Get next patch version (e.g., 2.0.0 -> 2.0.1)
+                MAJOR_MINOR=$(echo "$PACKAGE_VERSION" | cut -d. -f1,2)
+                PATCH=$(echo "$PACKAGE_VERSION" | cut -d. -f3)
+                NEXT_PATCH=$((PATCH + 1))
+                PRE_RELEASE_VERSION="${MAJOR_MINOR}.${NEXT_PATCH}-dev.${COMMIT_COUNT}"
+              else
+                # No tags found, use current version with dev suffix
+                PRE_RELEASE_VERSION="${PACKAGE_VERSION}-dev.1"
+              fi
+              VERSION="${PACKAGE_NAME}@${PRE_RELEASE_VERSION}"
+            fi
+          fi
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Release version: ${VERSION}"
+
+      - name: Setup Sentry CLI
+        uses: getsentry/action-setup@v2
+        with:
+          version: latest
+
+      - name: Create Sentry Release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT }}
+        run: |
+          echo "🚀 Creating Sentry release: ${{ steps.version.outputs.version }}"
+
+          # Create release
+          sentry-cli releases new "${{ steps.version.outputs.version }}" \
+            --org="${{ env.SENTRY_ORG }}" \
+            --project="${{ env.SENTRY_PROJECT }}"
+
+          # Associate commits with release
+          sentry-cli releases set-commits "${{ steps.version.outputs.version }}" \
+            --org="${{ env.SENTRY_ORG }}" \
+            --project="${{ env.SENTRY_PROJECT }}" \
+            --auto
+
+          # Finalize release (mark as deployed)
+          BRANCH_NAME="${{ github.ref_name }}"
+          if [ "$BRANCH_NAME" == "main" ]; then
+            ENVIRONMENT="production"
+          elif [ "$BRANCH_NAME" == "develop" ]; then
+            ENVIRONMENT="staging"
+          else
+            ENVIRONMENT="development"
+          fi
+
+          sentry-cli releases finalize "${{ steps.version.outputs.version }}" \
+            --org="${{ env.SENTRY_ORG }}" \
+            --project="${{ env.SENTRY_PROJECT }}"
+
+          echo "✅ Sentry release created: ${{ steps.version.outputs.version }}"
+          echo "📍 Environment: ${ENVIRONMENT}"
+
+      - name: Output Release Info
+        run: |
+          echo "## 🚀 Sentry Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: \`${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: \`${{ github.ref_name == 'main' && 'production' || 'staging' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View in Sentry: https://${{ env.SENTRY_ORG }}.sentry.io/releases/${{ steps.version.outputs.version }}/" >> $GITHUB_STEP_SUMMARY
