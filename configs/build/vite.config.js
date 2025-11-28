@@ -395,11 +395,13 @@ export default defineConfig(() => {
           'process.env.NODE_ENV': '"development"',
         },
       },
+      // Force re-optimization when dependencies change
+      force: false,
     },
     // Avoid multiple copies of React which can cause
     // "Invalid hook call" errors during development
     resolve: {
-      dedupe: ["react", "react-dom"],
+      dedupe: ["react", "react-dom", "react-is"],
       alias: {
         buffer: "buffer",
         "@": "/src",
