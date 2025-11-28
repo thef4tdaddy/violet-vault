@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import commonjs from "@rollup/plugin-commonjs";
 import { execSync } from "child_process";
 
 // Get git commit information at build time
@@ -76,6 +77,13 @@ export default defineConfig(() => {
         jsxRuntime: 'automatic',
       }),
       tailwindcss(),
+      // Handle CommonJS modules that use 'module' exports
+      // Note: Vite handles CommonJS automatically, but some packages need explicit transformation
+      commonjs({
+        include: [/node_modules/],
+        transformMixedEsModules: true,
+        requireReturnsDefault: 'auto',
+      }),
       VitePWA({
         registerType: "prompt", // Changed from autoUpdate to prompt for manual control
         devOptions: {
@@ -422,6 +430,8 @@ export default defineConfig(() => {
     define: {
       "process.env": {},
       global: "globalThis",
+      // Define module for CommonJS compatibility (prevents 'module is not defined' errors)
+      "typeof module": '"object"',
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
