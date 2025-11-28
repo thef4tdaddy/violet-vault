@@ -74,7 +74,7 @@ interface BackupData {
 interface BackupMetadata {
   totalRecords: number;
   sizeEstimate: number;
-  duration: number;
+  duration?: number; // Optional - tracked by performance monitor
   version: string;
 }
 
@@ -134,7 +134,6 @@ class AutoBackupService {
             metadata: {
               totalRecords,
               sizeEstimate,
-              duration: 0, // Will be calculated by wrapper
               version: "2.0",
             },
           };

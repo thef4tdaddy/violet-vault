@@ -10,6 +10,15 @@ import * as Sentry from "@sentry/react";
 import logger from "@/utils/common/logger";
 
 /**
+ * Span status codes (gRPC-compatible)
+ * @see https://docs.sentry.io/platforms/javascript/guides/react/enriching-events/tags/
+ */
+export const SPAN_STATUS = {
+  OK: 1, // Operation completed successfully
+  ERROR: 2, // Operation failed or was slow
+} as const;
+
+/**
  * Performance thresholds in milliseconds
  */
 export const PERFORMANCE_THRESHOLDS = {
@@ -87,17 +96,20 @@ export async function trackPerformance<T>(
 
         // Log slow operations as warnings
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_operation" }); // GRPC code 2 = UNKNOWN, using for slow
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_operation" });
           logSlowOperation(op, name, duration, threshold);
         } else {
-          span.setStatus({ code: 1 }); // GRPC code 1 = OK
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
 
         return { result, duration, isSlow };
       } catch (error) {
         const duration = performance.now() - start;
         span.setAttribute("duration_ms", duration);
-        span.setStatus({ code: 2, message: error instanceof Error ? error.message : "error" });
+        span.setStatus({
+          code: SPAN_STATUS.ERROR,
+          message: error instanceof Error ? error.message : "error",
+        });
 
         throw error;
       }
@@ -167,10 +179,10 @@ export async function trackImport<T>(
         });
 
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_import" });
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_import" });
           logSlowOperation("import.data", "Import Transactions", duration);
         } else {
-          span.setStatus({ code: 1 });
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
 
         logger.performance("Import operation completed", duration, {
@@ -182,7 +194,10 @@ export async function trackImport<T>(
       } catch (error) {
         const duration = performance.now() - start;
         span.setAttribute("duration_ms", duration);
-        span.setStatus({ code: 2, message: error instanceof Error ? error.message : "error" });
+        span.setStatus({
+          code: SPAN_STATUS.ERROR,
+          message: error instanceof Error ? error.message : "error",
+        });
 
         throw error;
       }
@@ -226,10 +241,10 @@ export async function trackExport<T>(
         });
 
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_export" });
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_export" });
           logSlowOperation("export.data", "Export Transactions", duration);
         } else {
-          span.setStatus({ code: 1 });
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
 
         logger.performance("Export operation completed", duration, {
@@ -241,7 +256,10 @@ export async function trackExport<T>(
       } catch (error) {
         const duration = performance.now() - start;
         span.setAttribute("duration_ms", duration);
-        span.setStatus({ code: 2, message: error instanceof Error ? error.message : "error" });
+        span.setStatus({
+          code: SPAN_STATUS.ERROR,
+          message: error instanceof Error ? error.message : "error",
+        });
 
         throw error;
       }
@@ -288,17 +306,20 @@ export async function trackSync<T>(
         });
 
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_sync" });
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_sync" });
           logSlowOperation("sync.cloud", `Cloud Sync: ${syncType}`, duration);
         } else {
-          span.setStatus({ code: 1 });
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
 
         return result;
       } catch (error) {
         const duration = performance.now() - start;
         span.setAttribute("duration_ms", duration);
-        span.setStatus({ code: 2, message: error instanceof Error ? error.message : "error" });
+        span.setStatus({
+          code: SPAN_STATUS.ERROR,
+          message: error instanceof Error ? error.message : "error",
+        });
 
         throw error;
       }
@@ -346,10 +367,10 @@ export async function trackBackup<T>(
         });
 
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_backup" });
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_backup" });
           logSlowOperation(op, `Backup: ${backupType}`, duration);
         } else {
-          span.setStatus({ code: 1 });
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
 
         logger.performance(`Backup ${backupType} completed`, duration, {
@@ -361,7 +382,10 @@ export async function trackBackup<T>(
       } catch (error) {
         const duration = performance.now() - start;
         span.setAttribute("duration_ms", duration);
-        span.setStatus({ code: 2, message: error instanceof Error ? error.message : "error" });
+        span.setStatus({
+          code: SPAN_STATUS.ERROR,
+          message: error instanceof Error ? error.message : "error",
+        });
 
         throw error;
       }

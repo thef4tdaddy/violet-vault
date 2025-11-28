@@ -3,6 +3,7 @@ import { QueryClient, MutationCache, QueryCache, type Query } from "@tanstack/re
 import * as Sentry from "@sentry/react";
 // Import H safely to avoid circular dependency issues
 import logger from "../common/logger";
+import { SPAN_STATUS } from "@/utils/monitoring/performanceMonitor";
 
 interface ErrorWithStatus {
   status?: number;
@@ -95,7 +96,7 @@ export const createQueryClient = () => {
                 span.setAttribute("result_count", data.length);
               }
 
-              span.setStatus({ code: 1 }); // OK status
+              span.setStatus({ code: SPAN_STATUS.OK });
             }
           );
         }

@@ -6,7 +6,7 @@
 
 import * as Sentry from "@sentry/react";
 import logger from "../common/logger";
-import { PERFORMANCE_THRESHOLDS } from "@/utils/monitoring/performanceMonitor";
+import { PERFORMANCE_THRESHOLDS, SPAN_STATUS } from "@/utils/monitoring/performanceMonitor";
 
 interface SyncMetrics {
   totalAttempts: number;
@@ -181,7 +181,7 @@ class SyncHealthMonitor {
         }
 
         if (isSlow) {
-          span.setStatus({ code: 2, message: "slow_sync" });
+          span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_sync" });
           Sentry.captureMessage(`Slow sync detected: ${this.currentSync?.type}`, {
             level: "warning",
             tags: { operation_type: "sync.cloud", is_slow: "true" },
@@ -193,7 +193,7 @@ class SyncHealthMonitor {
             },
           });
         } else {
-          span.setStatus({ code: 1 });
+          span.setStatus({ code: SPAN_STATUS.OK });
         }
       }
     );
@@ -251,7 +251,7 @@ class SyncHealthMonitor {
         span.setAttribute("success", false);
         span.setAttribute("error_message", error.message);
         span.setAttribute("consecutive_failures", this.metrics.consecutiveFailures);
-        span.setStatus({ code: 2, message: error.message });
+        span.setStatus({ code: SPAN_STATUS.ERROR, message: error.message });
       }
     );
 
