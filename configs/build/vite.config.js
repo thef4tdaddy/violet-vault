@@ -71,7 +71,10 @@ export default defineConfig(() => {
 
   return {
     plugins: [
-      react(),
+      react({
+        // Configure @vitejs/plugin-react for React 19
+        jsxRuntime: 'automatic',
+      }),
       tailwindcss(),
       VitePWA({
         registerType: "prompt", // Changed from autoUpdate to prompt for manual control
@@ -372,6 +375,20 @@ export default defineConfig(() => {
         },
       }),
     ],
+    // Optimize dependencies for React 19 compatibility
+    optimizeDeps: {
+      include: [
+        'recharts',
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+      ],
+      esbuildOptions: {
+        // Ensure React 19 compatibility
+        jsx: 'automatic',
+      },
+    },
     // Avoid multiple copies of React which can cause
     // "Invalid hook call" errors during development
     resolve: {
@@ -423,7 +440,8 @@ export default defineConfig(() => {
       // Production mode: Terser minification for all production builds (Issue 618)
       minify: isDevelopmentMode ? false : "terser",
       // Enable sourcemaps for development and debug builds
-      sourcemap: enableDebugBuild || isDevelopmentMode,
+      // Use 'inline' for development to avoid 404 errors, 'hidden' for production
+      sourcemap: enableDebugBuild || isDevelopmentMode ? 'inline' : false,
       // Manual chunk splitting for optimal bundle sizes (Issue 617: Code Splitting)
       rollupOptions: {
         output: {
