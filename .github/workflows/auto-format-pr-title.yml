@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, reopened, ready_for_review]
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: write
   contents: read
@@ -18,23 +23,23 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const currentTitle = pr.title;
-            
+
             // Check if title already follows conventional commit format
             const conventionalPattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+?\))?!?:\s.+/;
-            
+
             if (conventionalPattern.test(currentTitle)) {
               console.log('✅ PR title already follows conventional commit format');
               return;
             }
-            
+
             // Try to intelligently convert the title
             let newTitle = currentTitle;
             let type = 'feat'; // Default type
             let scope = '';
-            
+
             // Detect type from keywords in title
             const titleLower = currentTitle.toLowerCase();
-            
+
             if (titleLower.match(/\b(fix|bug|error|broken|resolve|patch)\b/)) {
               type = 'fix';
             } else if (titleLower.match(/\b(test|testing|spec)\b/)) {
@@ -54,7 +59,7 @@ jobs:
             } else if (titleLower.match(/\b(build|dep|dependency)\b/)) {
               type = 'build';
             }
-            
+
             // Detect scope from keywords
             if (titleLower.match(/\b(auth|login|password)\b/)) scope = 'auth';
             else if (titleLower.match(/\b(bill|invoice)\b/)) scope = 'bills';
@@ -66,21 +71,21 @@ jobs:
             else if (titleLower.match(/\b(typescript|type)\b/)) scope = 'typescript';
             else if (titleLower.match(/\b(lint|eslint)\b/)) scope = 'lint';
             else if (titleLower.match(/\b(test)\b/)) scope = 'test';
-            
+
             // Clean up the description part
             let description = currentTitle
               .replace(/^\[?WIP\]?\s*/i, '') // Remove [WIP]
               .replace(/^(fix|bug|feature|refactor|chore|docs|test|perf|style|ci|build):\s*/i, '') // Remove existing type if present
               .replace(/^(fix|add|update|improve|remove|create|implement)\s+/i, (match) => match.toLowerCase()) // Lowercase first verb
               .trim();
-            
+
             // Ensure description starts with lowercase (imperative mood)
             description = description.charAt(0).toLowerCase() + description.slice(1);
-            
+
             // Build new title
             const scopePart = scope ? `(${scope})` : '';
             newTitle = `${type}${scopePart}: ${description}`;
-            
+
             // Only update if title changed
             if (newTitle !== currentTitle) {
               await github.rest.pulls.update({
@@ -101,4 +106,3 @@ jobs:
               
               console.log(`✅ Renamed PR (${eventType}) from: "${currentTitle}" to: "${newTitle}"`);
             }
-

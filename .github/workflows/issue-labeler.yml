@@ -4,6 +4,11 @@ on:
   issues:
     types: [opened, edited, reopened]
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 permissions:
   issues: write
   contents: read

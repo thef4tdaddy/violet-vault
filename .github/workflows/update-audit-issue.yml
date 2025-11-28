@@ -5,6 +5,11 @@ on:
     - cron: "0 8 * * *" # Runs daily at 8 AM UTC
   workflow_dispatch: # Allows manual triggering
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   issues: write
   contents: read
@@ -17,12 +22,13 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --legacy-peer-deps
 
       - name: Generate audit report
         run: npm run audit:full

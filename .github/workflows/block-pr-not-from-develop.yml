@@ -5,6 +5,11 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened]
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: write

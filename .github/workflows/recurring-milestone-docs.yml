@@ -11,6 +11,11 @@ on:
         required: true
         type: string
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.milestone.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   issues: write
   contents: read
