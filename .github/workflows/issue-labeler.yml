@@ -21,6 +21,7 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const titleAndBody = `${issue.title} ${issue.body || ''}`.toLowerCase();
+            const body = (issue.body || '').toLowerCase();
 
             // Get existing labels
             const { data: repoLabels } = await github.rest.issues.listLabelsForRepo({
@@ -29,17 +30,53 @@ jobs:
               per_page: 100
             });
             const existingLabelNames = repoLabels.map(label => label.name);
+            const existingLabelsLower = existingLabelNames.map(name => name.toLowerCase());
 
-            // Define label keywords
+            // Extract explicit labels from body (e.g., "label: bug", "labels: bug, enhancement", "bug:", etc.)
+            const explicitLabels = [];
+            const labelPatterns = [
+              /(?:^|\n|^|\s)(?:label|labels|tag|tags)[\s:]+([^\n,]+(?:,\s*[^\n,]+)*)/gi,
+              /(?:^|\n|^|\s)([a-z\s]+):[\s]*(?:bug|enhancement|feature|documentation|test|performance|security)/gi,
+              /\[([^\]]+)\]/g, // Markdown-style [label]
+              /#([a-z0-9-]+)/g, // Hashtag-style #label
+            ];
+
+            for (const pattern of labelPatterns) {
+              const matches = body.matchAll(pattern);
+              for (const match of matches) {
+                const labelText = match[1] || match[0];
+                // Split by comma and clean up
+                const labels = labelText.split(',').map(l => l.trim().toLowerCase().replace(/[#\[\]:]/g, ''));
+                explicitLabels.push(...labels);
+              }
+            }
+
+            // Check for explicit label mentions in body (e.g., "this is a bug" -> bug label)
+            const explicitMentions = [];
+            for (const labelName of existingLabelNames) {
+              const labelLower = labelName.toLowerCase();
+              // Look for explicit mentions like "this is a bug" or "bug:" or "label: bug"
+              const mentionPatterns = [
+                new RegExp(`(?:^|\\s|label[\\s:]+|tag[\\s:]+)${labelLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\s|$|,|:)`, 'i'),
+                new RegExp(`\\[${labelLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]`, 'i'),
+                new RegExp(`#${labelLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i'),
+              ];
+              
+              if (mentionPatterns.some(pattern => pattern.test(body))) {
+                explicitMentions.push(labelName);
+              }
+            }
+
+            // Define label keywords with improved context
             const labelKeywords = {
-              'bug': ['bug', 'error', 'broken', 'crash', 'issue', 'problem', 'failing', 'fail', 'exception'],
-              'enhancement': ['enhancement', 'feature request', 'feature', 'improve', 'improvement', 'add support'],
-              'documentation': ['docs', 'documentation', 'readme', 'guide', 'tutorial'],
-              'testing': ['test', 'tests', 'testing', 'coverage', 'qa'],
-              'performance': ['performance', 'slow', 'optimize', 'speed', 'lag', 'memory'],
-              'security': ['security', 'vulnerability', 'cve', 'exploit'],
-              'accessibility': ['a11y', 'accessibility', 'wcag', 'keyboard', 'screen reader'],
-              'question': ['question', 'how do i', 'how to', 'help', '?']
+              'bug': ['bug', 'error', 'broken', 'crash', 'issue', 'problem', 'failing', 'fail', 'exception', 'doesn\'t work', 'not working', 'broken', 'defect'],
+              'enhancement': ['enhancement', 'feature request', 'feature', 'improve', 'improvement', 'add support', 'would be nice', 'could add', 'suggest'],
+              'documentation': ['docs', 'documentation', 'readme', 'guide', 'tutorial', 'how to', 'instructions'],
+              'testing': ['test', 'tests', 'testing', 'coverage', 'qa', 'test case', 'unit test'],
+              'performance': ['performance', 'slow', 'optimize', 'speed', 'lag', 'memory', 'bottleneck', 'takes too long'],
+              'security': ['security', 'vulnerability', 'cve', 'exploit', 'secure', 'encryption', 'privacy'],
+              'accessibility': ['a11y', 'accessibility', 'wcag', 'keyboard', 'screen reader', 'aria'],
+              'question': ['question', 'how do i', 'how to', 'help', '?', 'wondering', 'confused about']
               // Removed 'good first issue' - too broad, apply manually
             };
 
@@ -69,37 +106,85 @@ jobs:
             const toLabel = [];
             const missing = [];
 
-            // Check type labels
+            // First, add explicitly mentioned labels from body
+            for (const explicitLabel of [...explicitLabels, ...explicitMentions]) {
+              // Try exact match first
+              const exactMatch = existingLabelNames.find(name => name.toLowerCase() === explicitLabel);
+              if (exactMatch && !toLabel.includes(exactMatch)) {
+                toLabel.push(exactMatch);
+                continue;
+              }
+              
+              // Try partial match (e.g., "bug" matches "bug" label)
+              const partialMatch = existingLabelNames.find(name => 
+                name.toLowerCase().includes(explicitLabel) || explicitLabel.includes(name.toLowerCase())
+              );
+              if (partialMatch && !toLabel.includes(partialMatch)) {
+                toLabel.push(partialMatch);
+              }
+            }
+
+            // Check type labels with improved context matching
             for (const [label, keywords] of Object.entries(labelKeywords)) {
-              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
+              // Skip if already explicitly mentioned
+              if (toLabel.includes(label)) continue;
+              
+              // Check for keyword matches with better context
+              const hasKeyword = keywords.some(keyword => {
+                // Look for whole word matches or phrase matches
+                const wordBoundary = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+                return wordBoundary.test(titleAndBody);
+              });
+              
+              if (hasKeyword && existingLabelNames.includes(label)) {
                 toLabel.push(label);
-              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+              } else if (hasKeyword) {
                 missing.push(label);
               }
             }
 
-            // Check component labels
+            // Check component labels with improved context
             for (const [label, keywords] of Object.entries(componentKeywords)) {
-              if (keywords.some(keyword => titleAndBody.includes(keyword)) && existingLabelNames.includes(label)) {
+              // Skip if already explicitly mentioned
+              if (toLabel.includes(label)) continue;
+              
+              const hasKeyword = keywords.some(keyword => {
+                const wordBoundary = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+                return wordBoundary.test(titleAndBody);
+              });
+              
+              if (hasKeyword && existingLabelNames.includes(label)) {
                 toLabel.push(label);
-              } else if (keywords.some(keyword => titleAndBody.includes(keyword))) {
+              } else if (hasKeyword) {
                 missing.push(label);
               }
             }
 
             // Check priority - ONLY ONE priority label allowed
+            // Skip if priority already explicitly mentioned
             let foundPriority = false;
-            for (const [label, keywords] of Object.entries(priorityKeywords)) {
-              if (keywords.some(keyword => titleAndBody.includes(keyword))) {
-                if (!foundPriority) {
-                  if (existingLabelNames.includes(label)) {
-                    toLabel.push(label);
-                  } else {
-                    missing.push(label);
+            const existingPriorityLabels = toLabel.filter(l => 
+              ['🔴 Critical', '🟠 High', '🟡 Medium', '⚪ Low'].includes(l)
+            );
+
+            if (existingPriorityLabels.length > 0) {
+              foundPriority = true; // Priority already set explicitly
+            } else {
+              for (const [label, keywords] of Object.entries(priorityKeywords)) {
+                if (keywords.some(keyword => {
+                  const wordBoundary = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+                  return wordBoundary.test(titleAndBody);
+                })) {
+                  if (!foundPriority) {
+                    if (existingLabelNames.includes(label)) {
+                      toLabel.push(label);
+                    } else {
+                      missing.push(label);
+                    }
+                    foundPriority = true;
                   }
-                  foundPriority = true;
+                  break; // Stop after checking first matching priority
                 }
-                break; // Stop after checking first matching priority
               }
             }
 
