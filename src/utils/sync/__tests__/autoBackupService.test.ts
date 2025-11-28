@@ -299,4 +299,178 @@ describe("AutoBackupService (v2.0 data model)", () => {
       expect(autoBackupService.formatSize(1048576)).toBe("1 MB");
     });
   });
+
+  describe("Error Handling", () => {
+    beforeEach(() => {
+      // Reset all mocks before each error handling test
+      vi.clearAllMocks();
+      vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue(mockEnvelopes);
+      vi.mocked(budgetDb.transactions.toArray).mockResolvedValue(mockTransactions);
+      vi.mocked(budgetDb.bills.toArray).mockResolvedValue([]);
+      vi.mocked(budgetDb.debts.toArray).mockResolvedValue([]);
+      vi.mocked(budgetDb.paycheckHistory.toArray).mockResolvedValue([]);
+      vi.mocked(budgetDb.budget.get).mockResolvedValue(mockMetadata);
+      vi.mocked(budgetDb.autoBackups.orderBy).mockReturnValue({
+        reverse: () => ({
+          toArray: () => Promise.resolve([]),
+        }),
+      } as ReturnType<typeof budgetDb.autoBackups.orderBy>);
+    });
+
+    it("should handle backup creation failures", async () => {
+      vi.mocked(budgetDb.autoBackups.put).mockRejectedValue(new Error("Backup creation failed"));
+
+      // createPreSyncBackup returns null on error, doesn't throw
+      const result = await autoBackupService.createPreSyncBackup("firebase");
+      expect(result).toBeNull();
+    });
+
+    it("should handle restore with missing backup ID", async () => {
+      vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(undefined);
+
+      await expect(autoBackupService.restoreFromBackup("non-existent-backup")).rejects.toThrow(
+        "Backup not found: non-existent-backup"
+      );
+      expect(budgetDb.envelopes.clear).not.toHaveBeenCalled();
+    });
+
+    it("should handle restore with corrupted backup data", async () => {
+      const corruptedBackup = {
+        id: "backup-123",
+        type: "sync_triggered" as const,
+        timestamp: Date.now(),
+        data: null as unknown,
+        metadata: {
+          totalRecords: 0,
+          sizeEstimate: 0,
+          duration: 0,
+          version: "2.0",
+        },
+      };
+      vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(corruptedBackup);
+
+      // Mock transaction to execute callback
+      vi.mocked(budgetDb.transaction).mockImplementation(
+        async (_mode, _tables, callback: () => Promise<void>) => {
+          await callback();
+        }
+      );
+
+      // Corrupted data (null) will cause validation to skip all items, but restore will still succeed
+      // with empty arrays. The method returns true even if no data is restored.
+      const result = await autoBackupService.restoreFromBackup("backup-123");
+      expect(result).toBe(true);
+    });
+
+    it("should handle database transaction failures during restore", async () => {
+      const mockBackupData = {
+        id: "backup-123",
+        type: "sync_triggered" as const,
+        timestamp: Date.now(),
+        data: {
+          envelopes: mockEnvelopes,
+          transactions: mockTransactions,
+          bills: [],
+          debts: [],
+          paycheckHistory: [],
+          metadata: mockMetadata,
+          timestamp: Date.now(),
+        },
+        metadata: {
+          totalRecords: 4,
+          sizeEstimate: 1000,
+          duration: 50,
+          version: "2.0",
+        },
+      };
+      vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(mockBackupData);
+      vi.mocked(budgetDb.transaction).mockRejectedValue(new Error("Transaction failed"));
+
+      await expect(autoBackupService.restoreFromBackup("backup-123")).rejects.toThrow(
+        "Transaction failed"
+      );
+    });
+
+    it("should handle partial restore failures (some data types fail)", async () => {
+      const mockBackupData = {
+        id: "backup-123",
+        type: "sync_triggered" as const,
+        timestamp: Date.now(),
+        data: {
+          envelopes: mockEnvelopes,
+          transactions: mockTransactions,
+          bills: [],
+          debts: [],
+          paycheckHistory: [],
+          metadata: mockMetadata,
+          timestamp: Date.now(),
+        },
+        metadata: {
+          totalRecords: 4,
+          sizeEstimate: 1000,
+          duration: 50,
+          version: "2.0",
+        },
+      };
+      vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(mockBackupData);
+      vi.mocked(budgetDb.envelopes.bulkAdd).mockRejectedValue(new Error("Bulk add failed"));
+
+      // Mock transaction to execute callback and propagate error
+      vi.mocked(budgetDb.transaction).mockImplementation(
+        async (_mode, _tables, callback: () => Promise<void>) => {
+          await callback();
+        }
+      );
+
+      await expect(autoBackupService.restoreFromBackup("backup-123")).rejects.toThrow(
+        "Bulk add failed"
+      );
+    });
+
+    it("should handle data collection failures", async () => {
+      vi.mocked(budgetDb.envelopes.toArray).mockRejectedValue(
+        new Error("Failed to fetch envelopes")
+      );
+
+      await expect(autoBackupService.collectAllData()).rejects.toThrow("Failed to fetch envelopes");
+    });
+
+    it("should handle invalid backup metadata", async () => {
+      // Reset bulkAdd mocks to ensure they don't reject from previous test
+      vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue(undefined);
+      vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue(undefined);
+      vi.mocked(budgetDb.bills.bulkAdd).mockResolvedValue(undefined);
+      vi.mocked(budgetDb.debts.bulkAdd).mockResolvedValue(undefined);
+      vi.mocked(budgetDb.paycheckHistory.bulkAdd).mockResolvedValue(undefined);
+
+      const invalidBackup = {
+        id: "backup-123",
+        type: "sync_triggered" as const,
+        timestamp: Date.now(),
+        data: {
+          envelopes: mockEnvelopes,
+          transactions: mockTransactions,
+          bills: [],
+          debts: [],
+          paycheckHistory: [],
+          metadata: mockMetadata,
+          timestamp: Date.now(),
+        },
+        metadata: null as unknown,
+      };
+      vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(invalidBackup);
+
+      // Mock transaction to execute callback
+      vi.mocked(budgetDb.transaction).mockImplementation(
+        async (_mode, _tables, callback: () => Promise<void>) => {
+          await callback();
+        }
+      );
+
+      const result = await autoBackupService.restoreFromBackup("backup-123");
+
+      // Should still attempt restore even with invalid metadata (metadata is optional)
+      expect(result).toBe(true);
+    });
+  });
 });

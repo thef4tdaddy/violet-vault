@@ -243,6 +243,63 @@ describe("CloudSyncService - Sync Core Tests", () => {
       expect(result).toBeDefined();
     });
 
+    it("should handle network failures during sync", async () => {
+      const chunkedSyncService = await import("../chunkedSyncService");
+      vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValue(
+        new Error("Network request failed")
+      );
+
+      const result = await cloudSyncService.forceSync();
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBeDefined();
+    });
+
+    it("should handle timeout errors", async () => {
+      const chunkedSyncService = await import("../chunkedSyncService");
+      vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValue(
+        new Error("Request timeout")
+      );
+
+      const result = await cloudSyncService.forceSync();
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle partial sync failures", async () => {
+      const chunkedSyncService = await import("../chunkedSyncService");
+      vi.mocked(chunkedSyncService.default.saveToCloud).mockRejectedValue(
+        new Error("Partial sync failure")
+      );
+
+      const result = await cloudSyncService.forceSync();
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle encryption key errors", async () => {
+      const invalidConfig = {
+        budgetId: "test-budget",
+        encryptionKey: null as unknown as CryptoKey,
+        currentUser: { uid: "test-user" },
+      };
+
+      cloudSyncService.start(invalidConfig);
+      const result = await cloudSyncService.forceSync();
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toContain("Missing encryption context");
+    });
+
+    it("should handle database errors during sync", async () => {
+      const { budgetDb } = await import("../../db/budgetDb");
+      vi.mocked(budgetDb.envelopes.toArray).mockRejectedValue(new Error("Database error"));
+
+      const result = await cloudSyncService.forceSync();
+
+      expect(result.success).toBe(false);
+    });
+
     it("should log decryption failures", async () => {
       await cloudSyncService.forceSync();
 
