@@ -114,6 +114,20 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
+// Shared types and helpers for mutation testing
+interface MutationConfig {
+  mutationFn: (data: unknown) => Promise<unknown>;
+  onSuccess: (data: unknown) => void;
+  onError: (error: Error) => void;
+}
+
+// Helper to create mock mutation objects with required methods
+const createMockMutation = () => ({
+  mutate: vi.fn(),
+  mutateAsync: vi.fn(),
+  isPending: false,
+});
+
 describe("useTransactionMutations", () => {
   const mockQueryClient = {
     invalidateQueries: vi.fn(),
@@ -285,23 +299,29 @@ describe("useTransactionMutations", () => {
     });
 
     it("should handle successful transaction deletion", () => {
-      let deleteOnSuccess;
+      let deleteOnSuccess: ((id: string) => void) | undefined;
+      // Hook creates 4 mutations: add, reconcile, delete, update
       const mockMutations = [
-        { mutate: vi.fn(), isPending: false, error: null }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
+      let callCount = 0;
       (useMutation as Mock).mockImplementation(({ onSuccess }) => {
-        if (deleteOnSuccess) return mockMutations.shift();
-        deleteOnSuccess = onSuccess;
-        return mockMutations.shift();
+        callCount++;
+        // Third call is delete mutation
+        if (callCount === 3) {
+          deleteOnSuccess = onSuccess;
+        }
+        return mockMutations.shift() || mockMutations[0];
       });
 
       renderHook(() => useTransactionMutations());
 
       act(() => {
-        deleteOnSuccess("deleted-transaction-id");
+        if (deleteOnSuccess) deleteOnSuccess("deleted-transaction-id");
       });
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
@@ -312,32 +332,36 @@ describe("useTransactionMutations", () => {
 
   describe("loading states", () => {
     it("should track loading states correctly", () => {
+      // Hook creates 4 mutations: add, reconcile, delete, update
       const mockMutations = [
-        { mutate: vi.fn(), isPending: true, error: null }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: true, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: true, error: null }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: true, error: null }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
-      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift() || mockMutations[0]);
 
       const { result } = renderHook(() => useTransactionMutations());
 
       expect(result.current.isAdding).toBe(true);
-      expect(result.current.isUpdating).toBe(false);
       expect(result.current.isDeleting).toBe(true);
+      expect(result.current.isUpdating).toBe(false);
     });
   });
 
   describe("error handling", () => {
     it("should handle errors internally through onError callbacks", () => {
       const mockError = new Error("Transaction error");
+      // Hook creates 4 mutations: add, reconcile, delete, update
       const mockMutations = [
-        { mutate: vi.fn(), isPending: false, error: mockError }, // add
-        { mutate: vi.fn(), isPending: false, error: null }, // update
-        { mutate: vi.fn(), isPending: false, error: mockError }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: mockError }, // add
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // reconcile
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: mockError }, // delete
+        { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }, // update
       ];
 
-      (useMutation as Mock).mockImplementation(() => mockMutations.shift());
+      (useMutation as Mock).mockImplementation(() => mockMutations.shift() || mockMutations[0]);
 
       const { result } = renderHook(() => useTransactionMutations());
 
@@ -349,31 +373,36 @@ describe("useTransactionMutations", () => {
   });
 
   describe("CRUD Operations - Comprehensive Validation", () => {
-    let mutationConfigs: Array<{ mutationFn: unknown; onSuccess: unknown; onError: unknown }> = [];
+    // Use shared MutationConfig type from top level
+    let mutationConfigs: MutationConfig[] = [];
 
-    beforeEach(() => {
+    // Helper to setup mutation mocks and capture configs
+    const setupMutationMocks = () => {
+      mutationConfigs = [];
+      const mockMutations = [
+        createMockMutation(), // add
+        createMockMutation(), // reconcile
+        createMockMutation(), // delete
+        createMockMutation(), // update
+      ];
+      (useMutation as Mock).mockImplementation((config: MutationConfig) => {
+        mutationConfigs.push(config);
+        return mockMutations.shift() || mockMutations[0];
+      });
+    };
+
+    beforeEach(async () => {
       vi.clearAllMocks();
       mutationConfigs = [];
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
+      // Reset envelope mock to return valid envelope by default
+      const { budgetDb } = await import("@/db/budgetDb");
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
     });
 
     describe("Add Transaction - Validation & Safety (Envelopes are Source of Truth)", () => {
       it("should require envelope for transaction creation", async () => {
-        const { budgetDb } = await import("@/db/budgetDb");
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -385,9 +414,9 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("Transaction must have an envelope");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow(
+            "Transaction must have an envelope"
+          );
         });
       });
 
@@ -395,20 +424,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.envelopes.get as Mock).mockResolvedValueOnce(undefined); // Envelope doesn't exist
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -420,34 +436,16 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("does not exist");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow("does not exist");
         });
       });
       it("should create transaction with proper amount normalization (expense=negative)", async () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
 
-        // Mock all 4 mutations (add, reconcile, delete, update)
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          // Store the config for later access
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        // Get the add mutation config (first call)
         const addMutation = mutationConfigs[0];
         const transactionData = {
           type: "expense",
@@ -458,7 +456,7 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          const result = await addMutation.mutationFn(transactionData);
+          const result = (await addMutation.mutationFn(transactionData)) as { amount: number };
           // Expense should be normalized to negative
           expect(result.amount).toBeLessThan(0);
         });
@@ -468,20 +466,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -494,7 +479,7 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          const result = await addMutation.mutationFn(transactionData);
+          const result = (await addMutation.mutationFn(transactionData)) as { amount: number };
           // Income should be normalized to positive
           expect(result.amount).toBeGreaterThan(0);
         });
@@ -505,20 +490,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -544,20 +516,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -579,20 +538,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.put as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -605,7 +551,7 @@ describe("useTransactionMutations", () => {
 
         await act(async () => {
           const result = await addMutation.mutationFn(transactionData);
-          await addMutation.onSuccess(result);
+          addMutation.onSuccess(result);
         });
 
         expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
@@ -628,20 +574,7 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.update as Mock).mockResolvedValue(1);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const updateMutation = mutationConfigs[3]; // Fourth mutation (update)
@@ -654,7 +587,10 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          const result = await updateMutation.mutationFn(updateData);
+          const result = (await updateMutation.mutationFn(updateData)) as {
+            id: string;
+            updates: { description: string };
+          };
           expect(result.id).toBe("txn-1");
           expect(result.updates.description).toBe("Updated Description");
         });
@@ -664,7 +600,7 @@ describe("useTransactionMutations", () => {
           expect.objectContaining({
             description: "Updated Description",
             amount: -75,
-            updatedAt: expect.any(String),
+            lastModified: expect.any(Number),
           })
         );
       });
@@ -674,23 +610,10 @@ describe("useTransactionMutations", () => {
         const { budgetDb } = await import("@/db/budgetDb");
         (budgetDb.transactions.update as Mock).mockResolvedValue(1);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const updateMutation = (useMutation as Mock).mockConfigs[3];
+        const updateMutation = mutationConfigs[3];
         const updateData = {
           id: "txn-1",
           updates: { description: "Optimistic Update" },
@@ -715,23 +638,10 @@ describe("useTransactionMutations", () => {
         const dbError = new Error("Update failed");
         (budgetDb.transactions.update as Mock).mockRejectedValue(dbError);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const updateMutation = (useMutation as Mock).mockConfigs[3];
+        const updateMutation = mutationConfigs[3];
         const updateData = {
           id: "txn-1",
           updates: { description: "Error Test" },
@@ -741,7 +651,7 @@ describe("useTransactionMutations", () => {
           try {
             await updateMutation.mutationFn(updateData);
           } catch (error) {
-            await updateMutation.onError(error as Error);
+            updateMutation.onError(error as Error);
           }
         });
 
@@ -768,20 +678,7 @@ describe("useTransactionMutations", () => {
         (budgetDb.transactions.get as Mock).mockResolvedValue(mockTransaction);
         (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const deleteMutation = mutationConfigs[2]; // Third mutation (delete)
@@ -800,23 +697,10 @@ describe("useTransactionMutations", () => {
         (budgetDb.transactions.get as Mock).mockResolvedValue(undefined);
         (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+        const deleteMutation = mutationConfigs[2];
 
         await act(async () => {
           const result = await deleteMutation.mutationFn("non-existent");
@@ -833,27 +717,14 @@ describe("useTransactionMutations", () => {
         (budgetDb.transactions.get as Mock).mockResolvedValue(mockTransaction);
         (budgetDb.transactions.delete as Mock).mockResolvedValue(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+        const deleteMutation = mutationConfigs[2];
 
         await act(async () => {
           const result = await deleteMutation.mutationFn("txn-1");
-          await deleteMutation.onSuccess(result);
+          deleteMutation.onSuccess(result);
         });
 
         expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
@@ -873,18 +744,7 @@ describe("useTransactionMutations", () => {
 
     describe("Validation Error Handling", () => {
       it("should reject transaction without envelopeId (Zod schema validation)", async () => {
-        const { budgetDb } = await import("@/db/budgetDb");
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -896,24 +756,14 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("Transaction must have an envelope");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow(
+            "Transaction must have an envelope"
+          );
         });
       });
 
       it("should reject transaction with empty envelopeId", async () => {
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -925,24 +775,14 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("Transaction must have an envelope");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow(
+            "Transaction must have an envelope"
+          );
         });
       });
 
       it("should reject transaction with whitespace-only envelopeId", async () => {
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -954,25 +794,14 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("Transaction must have an envelope");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow(
+            "Transaction must have an envelope"
+          );
         });
       });
 
       it("should reject update with invalid data (Zod validation)", async () => {
-        const { budgetDb } = await import("@/db/budgetDb");
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const updateMutation = mutationConfigs[3]; // Fourth mutation (update)
@@ -984,25 +813,15 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
-          ).rejects.toThrow("Invalid transaction update data");
+          await expect(updateMutation.mutationFn(updateData)).rejects.toThrow(
+            "Invalid transaction update data"
+          );
         });
       });
 
       it("should log validation errors for debugging", async () => {
         const { default: logger } = await import("@/utils/common/logger");
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const updateMutation = mutationConfigs[3];
@@ -1015,7 +834,7 @@ describe("useTransactionMutations", () => {
 
         await act(async () => {
           try {
-            await (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData);
+            await updateMutation.mutationFn(updateData);
           } catch {
             // Expected to throw
           }
@@ -1035,17 +854,7 @@ describe("useTransactionMutations", () => {
         const balanceError = new Error("Balance calculation overflow");
         (budgetDb.transactions.put as Mock).mockRejectedValue(balanceError);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -1057,9 +866,9 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
-          ).rejects.toThrow("Balance calculation overflow");
+          await expect(addMutation.mutationFn(transactionData)).rejects.toThrow(
+            "Balance calculation overflow"
+          );
         });
       });
 
@@ -1069,17 +878,7 @@ describe("useTransactionMutations", () => {
         const dbError = new Error("Database write failed");
         (budgetDb.transactions.put as Mock).mockRejectedValue(dbError);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const addMutation = mutationConfigs[0];
@@ -1092,9 +891,9 @@ describe("useTransactionMutations", () => {
 
         await act(async () => {
           try {
-            await (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData);
+            await addMutation.mutationFn(transactionData);
           } catch (error) {
-            await (addMutation.onError as (error: Error) => Promise<void>)(error as Error);
+            addMutation.onError(error as Error);
           }
         });
 
@@ -1110,17 +909,7 @@ describe("useTransactionMutations", () => {
       });
 
       it("should validate merchant field max length", async () => {
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const updateMutation = mutationConfigs[3];
@@ -1132,24 +921,14 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
-          ).rejects.toThrow("Invalid transaction update data");
+          await expect(updateMutation.mutationFn(updateData)).rejects.toThrow(
+            "Invalid transaction update data"
+          );
         });
       });
 
       it("should validate receiptUrl is a valid URL", async () => {
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-        (useMutation as Mock).mockImplementation((config) => {
-          mutationConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
         const updateMutation = mutationConfigs[3];
@@ -1161,18 +940,40 @@ describe("useTransactionMutations", () => {
         };
 
         await act(async () => {
-          await expect(
-            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
-          ).rejects.toThrow("Invalid transaction update data");
+          await expect(updateMutation.mutationFn(updateData)).rejects.toThrow(
+            "Invalid transaction update data"
+          );
         });
       });
     });
   });
 
   describe("Optimistic Update Rollback Tests", () => {
-    beforeEach(() => {
+    // Use shared MutationConfig type from top level
+    let mutationConfigs: MutationConfig[] = [];
+
+    // Helper to setup mutation mocks and capture configs
+    const setupMutationMocks = () => {
+      mutationConfigs = [];
+      const mockMutations = [
+        createMockMutation(), // add
+        createMockMutation(), // reconcile
+        createMockMutation(), // delete
+        createMockMutation(), // update
+      ];
+      (useMutation as Mock).mockImplementation((config: MutationConfig) => {
+        mutationConfigs.push(config);
+        return mockMutations.shift() || mockMutations[0];
+      });
+    };
+
+    beforeEach(async () => {
       vi.clearAllMocks();
+      mutationConfigs = [];
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
+      // Reset envelope mock to return valid envelope by default
+      const { budgetDb } = await import("@/db/budgetDb");
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
     });
 
     describe("Transaction Creation Rollback on Validation Failure", () => {
@@ -1181,30 +982,10 @@ describe("useTransactionMutations", () => {
         const validationError = new Error("Invalid transaction data: amount must be positive");
         (budgetDb.transactions.put as Mock).mockRejectedValue(validationError);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const addMutation = (useMutation as Mock).mockConfigs[0];
-        const transactionData = {
-          type: "expense",
-          amount: 50,
-          description: "Validation Test",
-          envelopeId: "env-1",
-        };
+        const addMutation = mutationConfigs[0];
 
         // Test onError callback is properly set up
         expect(addMutation.onError).toBeDefined();
@@ -1230,24 +1011,10 @@ describe("useTransactionMutations", () => {
         // Envelope does not exist
         (budgetDb.envelopes.get as Mock).mockResolvedValueOnce(undefined);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const addMutation = (useMutation as Mock).mockConfigs[0];
+        const addMutation = mutationConfigs[0];
 
         // Clear any previous calls
         (optimisticHelpers.addTransaction as Mock).mockClear();
@@ -1278,24 +1045,10 @@ describe("useTransactionMutations", () => {
         const dbError = new Error("Database constraint violation");
         (budgetDb.transactions.update as Mock).mockRejectedValue(dbError);
 
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const updateMutation = (useMutation as Mock).mockConfigs[3];
+        const updateMutation = mutationConfigs[3];
 
         // Verify onError includes query invalidation for rollback
         expect(updateMutation.onError).toBeDefined();
@@ -1316,24 +1069,10 @@ describe("useTransactionMutations", () => {
 
     describe("Transaction Deletion Rollback on Error", () => {
       it("should log error when transaction deletion fails", async () => {
-        const mockMutations = [
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
-        ];
-
-        (useMutation as Mock).mockImplementation((config) => {
-          if (!(useMutation as Mock).mockConfigs) {
-            (useMutation as Mock).mockConfigs = [];
-          }
-          (useMutation as Mock).mockConfigs.push(config);
-          return mockMutations.shift() || mockMutations[0];
-        });
-
+        setupMutationMocks();
         renderHook(() => useTransactionMutations());
 
-        const deleteMutation = (useMutation as Mock).mockConfigs[2];
+        const deleteMutation = mutationConfigs[2];
         const deleteError = new Error("Transaction locked by another process");
 
         const { default: logger } = await import("@/utils/common/logger");
@@ -1357,6 +1096,7 @@ describe("useTransactionMutations", () => {
 
     describe("UI State Consistency After Rollback", () => {
       it("should reset loading states after mutation failure", () => {
+        // Hook creates 4 mutations: add, reconcile, delete, update
         const mockMutations = [
           { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: new Error("Failed") },
           { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null },
