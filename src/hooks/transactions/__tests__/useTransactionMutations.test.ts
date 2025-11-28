@@ -58,6 +58,43 @@ vi.mock("@/domain/schemas/transaction", () => ({
     }
     return txn;
   }),
+  validateAndNormalizeTransaction: vi.fn((txn) => {
+    // Normalize amount sign based on type
+    const normalized = txn.type === "expense" ? { ...txn, amount: -Math.abs(txn.amount) } : txn;
+    return normalized;
+  }),
+  validateTransactionPartialSafe: vi.fn((data) => {
+    // Simulate validation for description length
+    if (data.description && data.description.length > 500) {
+      return {
+        success: false,
+        error: {
+          issues: [
+            { message: "Description must be 500 characters or less", path: ["description"] },
+          ],
+        },
+      };
+    }
+    // Simulate validation for merchant length
+    if (data.merchant && data.merchant.length > 200) {
+      return {
+        success: false,
+        error: {
+          issues: [{ message: "Merchant must be 200 characters or less", path: ["merchant"] }],
+        },
+      };
+    }
+    // Simulate validation for receiptUrl
+    if (data.receiptUrl && !data.receiptUrl.startsWith("http")) {
+      return {
+        success: false,
+        error: {
+          issues: [{ message: "Receipt URL must be a valid URL", path: ["receiptUrl"] }],
+        },
+      };
+    }
+    return { success: true, data };
+  }),
 }));
 
 vi.mock("../../../stores/ui/toastStore", () => ({
@@ -830,6 +867,303 @@ describe("useTransactionMutations", () => {
         });
         expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
           queryKey: ["analytics"],
+        });
+      });
+    });
+
+    describe("Validation Error Handling", () => {
+      it("should reject transaction without envelopeId (Zod schema validation)", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Missing Envelope",
+          // Missing envelopeId
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("Transaction must have an envelope");
+        });
+      });
+
+      it("should reject transaction with empty envelopeId", async () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Empty Envelope ID",
+          envelopeId: "",
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("Transaction must have an envelope");
+        });
+      });
+
+      it("should reject transaction with whitespace-only envelopeId", async () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Whitespace Envelope ID",
+          envelopeId: "   ",
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("Transaction must have an envelope");
+        });
+      });
+
+      it("should reject update with invalid data (Zod validation)", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = mutationConfigs[3]; // Fourth mutation (update)
+        const updateData = {
+          id: "txn-1",
+          updates: {
+            description: "a".repeat(501), // Exceeds 500 char limit
+          },
+        };
+
+        await act(async () => {
+          await expect(
+            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
+          ).rejects.toThrow("Invalid transaction update data");
+        });
+      });
+
+      it("should log validation errors for debugging", async () => {
+        const { default: logger } = await import("@/utils/common/logger");
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = mutationConfigs[3];
+        const updateData = {
+          id: "txn-1",
+          updates: {
+            description: "a".repeat(501), // Invalid
+          },
+        };
+
+        await act(async () => {
+          try {
+            await (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData);
+          } catch {
+            // Expected to throw
+          }
+        });
+
+        expect(logger.error).toHaveBeenCalledWith(
+          "Transaction update validation failed",
+          expect.objectContaining({
+            transactionId: "txn-1",
+            errors: expect.any(Array),
+          })
+        );
+      });
+
+      it("should handle balance calculation errors gracefully", async () => {
+        const { budgetDb } = await import("@/db/budgetDb");
+        const balanceError = new Error("Balance calculation overflow");
+        (budgetDb.transactions.put as Mock).mockRejectedValue(balanceError);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: Number.MAX_SAFE_INTEGER,
+          description: "Large Amount Test",
+          envelopeId: "env-1",
+        };
+
+        await act(async () => {
+          await expect(
+            (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData)
+          ).rejects.toThrow("Balance calculation overflow");
+        });
+      });
+
+      it("should rollback optimistic update on add transaction failure", async () => {
+        const { optimisticHelpers } = await import("@/utils/common/queryClient");
+        const { budgetDb } = await import("@/db/budgetDb");
+        const dbError = new Error("Database write failed");
+        (budgetDb.transactions.put as Mock).mockRejectedValue(dbError);
+
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const addMutation = mutationConfigs[0];
+        const transactionData = {
+          type: "expense",
+          amount: 50,
+          description: "Rollback Test",
+          envelopeId: "env-1",
+        };
+
+        await act(async () => {
+          try {
+            await (addMutation.mutationFn as (data: unknown) => Promise<unknown>)(transactionData);
+          } catch (error) {
+            await (addMutation.onError as (error: Error) => Promise<void>)(error as Error);
+          }
+        });
+
+        // Optimistic update was called before failure
+        expect(optimisticHelpers.addTransaction).toHaveBeenCalled();
+        // Error is logged
+        const { default: logger } = await import("@/utils/common/logger");
+        expect(logger.error).toHaveBeenCalledWith(
+          "Failed to add transaction",
+          dbError,
+          expect.any(Object)
+        );
+      });
+
+      it("should validate merchant field max length", async () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = mutationConfigs[3];
+        const updateData = {
+          id: "txn-1",
+          updates: {
+            merchant: "a".repeat(201), // Exceeds 200 char limit
+          },
+        };
+
+        await act(async () => {
+          await expect(
+            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
+          ).rejects.toThrow("Invalid transaction update data");
+        });
+      });
+
+      it("should validate receiptUrl is a valid URL", async () => {
+        const mockMutations = [
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+          { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false },
+        ];
+        (useMutation as Mock).mockImplementation((config) => {
+          mutationConfigs.push(config);
+          return mockMutations.shift() || mockMutations[0];
+        });
+
+        renderHook(() => useTransactionMutations());
+
+        const updateMutation = mutationConfigs[3];
+        const updateData = {
+          id: "txn-1",
+          updates: {
+            receiptUrl: "not-a-valid-url",
+          },
+        };
+
+        await act(async () => {
+          await expect(
+            (updateMutation.mutationFn as (data: unknown) => Promise<unknown>)(updateData)
+          ).rejects.toThrow("Invalid transaction update data");
         });
       });
     });
