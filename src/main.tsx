@@ -98,7 +98,91 @@ import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefine
 
 // Debug tools are now initialized in the initializeApp function to avoid module scope store operations
 
-// Sentry initialization moved to lazy loader in App.tsx
+// Initialize Sentry early to capture module initialization errors
+// This must happen before any other imports that might throw errors
+const initializeSentryEarly = () => {
+  try {
+    // Check if Sentry should be enabled
+    const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
+    const dsn = import.meta.env.VITE_SENTRY_DSN || "";
+
+    if (isErrorReportingEnabled && dsn) {
+      // Queue for errors that happen before Sentry is ready
+      const errorQueue: Array<{ error: Error; context?: Record<string, unknown> }> = [];
+
+      // Flush queued errors to Sentry once it's ready
+      const flushErrorQueue = () => {
+        if (errorQueue.length === 0) return;
+        import("./utils/common/sentry.js")
+          .then(({ captureError }) => {
+            errorQueue.forEach(({ error, context }) => {
+              captureError(error, context);
+            });
+            errorQueue.length = 0;
+          })
+          .catch(() => {
+            // Sentry not ready yet, errors remain queued
+          });
+      };
+
+      // Set up global error handlers IMMEDIATELY (before Sentry init)
+      // This ensures we capture errors during module loading
+      const errorHandler = (event: ErrorEvent) => {
+        if (event.error) {
+          const errorContext = {
+            type: "uncaught",
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+          };
+          errorQueue.push({ error: event.error, context: errorContext });
+          // Try to flush immediately if Sentry is ready
+          flushErrorQueue();
+        }
+      };
+
+      const rejectionHandler = (event: PromiseRejectionEvent) => {
+        const error =
+          event.reason instanceof Error ? event.reason : new Error(String(event.reason));
+        const errorContext = {
+          type: "unhandledRejection",
+          reason: String(event.reason),
+        };
+        errorQueue.push({ error, context: errorContext });
+        // Try to flush immediately if Sentry is ready
+        flushErrorQueue();
+      };
+
+      // Register handlers BEFORE importing Sentry
+      window.addEventListener("error", errorHandler);
+      window.addEventListener("unhandledrejection", rejectionHandler);
+
+      // Now initialize Sentry and flush any queued errors
+      import("./utils/common/sentry.js")
+        .then(({ initSentry }) => {
+          initSentry();
+          // Flush any errors that occurred during module loading
+          flushErrorQueue();
+        })
+        .catch(() => {
+          // Silently fail - monitoring shouldn't break the app
+        });
+    }
+  } catch (error) {
+    // Silently fail - monitoring shouldn't break the app
+    // Use logger if available, otherwise fail silently
+    try {
+      logger.warn("Failed to initialize Sentry early", error, {
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
+    } catch {
+      // Logger not available yet, fail silently
+    }
+  }
+};
+
+// Initialize Sentry as early as possible
+initializeSentryEarly();
 
 // Initialize crypto compatibility layer
 initializeCrypto();

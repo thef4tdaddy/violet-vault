@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import logger from "../common/logger.ts";
+import { APP_VERSION, APP_NAME } from "../common/version.ts";
 
 interface SentryConfig {
   dsn: string;
@@ -89,9 +90,39 @@ export const initSentry = () => {
   }
 
   try {
+    // Build release name based on environment
+    // Matches workflow format: violetvault@2.0.0 (production) or violetvault@2.0.1-dev.1 (develop)
+    // The workflow creates releases, so we use the same format for consistency
+    const getReleaseName = (): string => {
+      const baseRelease = `${APP_NAME}@${APP_VERSION}`;
+
+      // In production, use clean version (matches workflow)
+      if (config.environment === "production") {
+        return baseRelease;
+      }
+
+      // For staging/develop, try to match workflow pre-release format
+      // Workflow creates: violetvault@2.0.1-dev.1 (where number is commit count)
+      // If we have a pre-release version from env, use it; otherwise fallback to SHA
+      const preReleaseVersion = import.meta.env.VITE_SENTRY_RELEASE;
+      if (preReleaseVersion) {
+        return preReleaseVersion;
+      }
+
+      // Fallback: include commit SHA if available
+      const commitSha = import.meta.env.VITE_COMMIT_SHA || import.meta.env.VERCEL_GIT_COMMIT_SHA;
+      if (commitSha) {
+        const shortSha = commitSha.substring(0, 7);
+        return `${baseRelease}-${config.environment}-${shortSha}`;
+      }
+
+      return `${baseRelease}-${config.environment}`;
+    };
+
     Sentry.init({
       dsn: config.dsn,
       environment: config.environment,
+      release: getReleaseName(),
       integrations: [
         Sentry.browserTracingIntegration(),
         Sentry.replayIntegration({

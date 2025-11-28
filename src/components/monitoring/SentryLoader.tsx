@@ -3,30 +3,35 @@ import logger from "../../utils/common/logger";
 
 /**
  * Lazy loader component for Sentry monitoring
- * This component dynamically imports and initializes Sentry only when needed,
- * reducing the main bundle size
+ * Note: Sentry is now initialized early in main.tsx to capture module initialization errors.
+ * This component ensures Sentry is fully initialized after React renders.
  */
 const SentryLoader = () => {
   useEffect(() => {
-    const initializeSentry = async () => {
+    const ensureSentryInitialized = async () => {
       try {
-        // Dynamic import of the sentry utility
-        const { initSentry } = await import("../../utils/common/sentry.js");
+        // Check if Sentry is already initialized (from main.tsx)
+        const { getErrorReportingStatus } = await import("../../utils/common/sentry.js");
+        const status = getErrorReportingStatus();
 
-        // Initialize Sentry
-        initSentry();
-
-        logger.debug("Sentry loaded and initialized via lazy loader");
+        if (status.enabled) {
+          logger.debug("Sentry already initialized early, ensuring full setup");
+        } else {
+          // Fallback: initialize if not already done
+          const { initSentry } = await import("../../utils/common/sentry.js");
+          initSentry();
+          logger.debug("Sentry initialized via lazy loader fallback");
+        }
       } catch (error) {
         // Graceful fallback - monitoring is not critical for app functionality
-        logger.warn("Failed to load Sentry monitoring", {
+        logger.warn("Failed to ensure Sentry is initialized", {
           error: error instanceof Error ? error.message : String(error),
         });
       }
     };
 
-    // Initialize after a short delay to not block initial render
-    const timer = setTimeout(initializeSentry, 100);
+    // Small delay to ensure React has rendered
+    const timer = setTimeout(ensureSentryInitialized, 50);
 
     return () => clearTimeout(timer);
   }, []);
