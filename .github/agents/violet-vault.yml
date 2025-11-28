@@ -14,6 +14,8 @@ rules:
       - "Check existing issues and link commits to them"
       - "Use commit message format: 'type: description' (e.g., 'fix: resolve lint errors')"
       - "Do NOT commit files with secrets (.env, credentials.json, etc)"
+      - "CRITICAL: GitHub workflow files (.github/workflows/*.yml) must be committed separately and cherry-picked to main to actually run"
+      - "Workflow changes: commit on develop, then cherry-pick to main (workflows only run from main branch)"
 
   # Architecture: ChastityOS v4.0.0
   - name: "Data Flow Architecture"
@@ -87,6 +89,8 @@ rules:
       - "Max 100 imports per file (split large files)"
       - "Max 200 lines per component (extract logic to hooks/utils)"
       - "Max 300 lines per service (split into focused services)"
+      - "Track ESLint and TypeScript errors in issue #748 (combined code quality tracking)"
+      - "TypeScript strict mode errors tracked separately in issue #748"
 
   # Naming Conventions
   - name: "Naming Conventions"
@@ -121,6 +125,9 @@ rules:
       - "Test files should have zero 'any' types"
       - "Aim for >80% code coverage on critical paths"
       - "Run tests: `npm run test` or `npm run test:run` for CI"
+      - "Focus on error handling and edge cases, not just happy paths"
+      - "Test critical operations: import/export, backup/restore, cloud sync, CRUD mutations"
+      - "Reference COVERAGE_GAP_ANALYSIS.md for test coverage priorities"
 
   # React Patterns
   - name: "React Component Patterns"
@@ -169,6 +176,8 @@ rules:
       - "Validate data before processing in services"
       - "Handle Firebase auth errors specifically"
       - "Network errors should trigger offline fallback"
+      - "Use Sentry for error tracking: `captureError(error, context)` from '@/utils/common/sentry'"
+      - "Error boundaries should use Sentry ErrorBoundary for production error tracking"
 
   # Documentation
   - name: "Documentation"
@@ -190,6 +199,8 @@ rules:
       - "Debounce search inputs and rapid API calls"
       - "Profile bundle size regularly"
       - "Cache computed values in TanStack Query"
+      - "Use Sentry for performance monitoring: custom spans/transactions for critical operations"
+      - "Track performance metrics for queries, data operations, sync, and backup/restore"
 
   # Security
   - name: "Security Best Practices"
@@ -202,6 +213,7 @@ rules:
       - "Follow OWASP security guidelines"
       - "Regular security audits of dependencies"
       - "Use Content Security Policy headers"
+      - "Sentry session replay masks all text and blocks all media for privacy"
 
 common_patterns:
   - name: "TanStack Query Hook Pattern"
@@ -299,6 +311,7 @@ development_workflow:
   - "Rebase onto develop before merge to keep history clean"
   - "Delete branch after merge"
   - "For urgent fixes: cherry-pick to main, then backport"
+  - "For workflow files: commit separately on develop, cherry-pick to main (workflows must be on main to run)"
 
 commit_message_format: |
   type: brief description
@@ -307,9 +320,7 @@ commit_message_format: |
 
   Fixes #issue-number (if applicable)
 
-  🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-  Co-Authored-By: Claude <noreply@anthropic.com>
+  Note: Co-Authored-By line is optional and should only be added when explicitly requested
 
 command_patterns:
   - "Fix TypeScript errors: npm run typecheck"
