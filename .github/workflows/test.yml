@@ -7,6 +7,11 @@ on:
     branches: [main, develop, nightly]
   workflow_dispatch:
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: "22"
 

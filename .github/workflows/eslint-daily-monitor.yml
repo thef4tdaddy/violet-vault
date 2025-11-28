@@ -8,6 +8,11 @@ on:
     - cron: "0 9 * * *"
   workflow_dispatch:
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   issues: write

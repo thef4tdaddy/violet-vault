@@ -7,6 +7,11 @@ on:
     branches: [main, develop]
     types: [opened, synchronize, reopened]
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: "0 2 * * *" # Daily at 2 AM UTC
 
+# Prevent duplicate runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   npm-audit:
     name: Check Dependencies for Vulnerabilities
@@ -21,9 +26,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"
           cache: "npm"
 
       - name: Install dependencies
@@ -45,21 +50,48 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const audit = JSON.parse(fs.readFileSync('npm-audit-report.json', 'utf8'));
 
-            let comment = '## npm Audit Report\n\n';
-            comment += `**Vulnerabilities Found:** ${audit.metadata.vulnerabilities.total}\n`;
-            comment += `- Critical: ${audit.metadata.vulnerabilities.critical || 0}\n`;
-            comment += `- High: ${audit.metadata.vulnerabilities.high || 0}\n`;
-            comment += `- Moderate: ${audit.metadata.vulnerabilities.moderate || 0}\n`;
-            comment += `- Low: ${audit.metadata.vulnerabilities.low || 0}\n`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+            try {
+              const audit = JSON.parse(fs.readFileSync('npm-audit-report.json', 'utf8'));
+              
+              // Find existing comment
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              
+              const botComment = comments.find(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes('npm Audit Report')
+              );
+              
+              let comment = '## npm Audit Report\n\n';
+              comment += `**Vulnerabilities Found:** ${audit.metadata.vulnerabilities.total}\n`;
+              comment += `- Critical: ${audit.metadata.vulnerabilities.critical || 0}\n`;
+              comment += `- High: ${audit.metadata.vulnerabilities.high || 0}\n`;
+              comment += `- Moderate: ${audit.metadata.vulnerabilities.moderate || 0}\n`;
+              comment += `- Low: ${audit.metadata.vulnerabilities.low || 0}\n`;
+              comment += `\n<sub>🤖 Updated: ${new Date().toISOString()}</sub>`;
+              
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: comment
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              }
+            } catch (error) {
+              console.log('⚠️ Could not read or parse audit report:', error.message);
+            }
 
       - name: Fail if critical vulnerabilities found
         if: steps.audit.outcome == 'failure'
