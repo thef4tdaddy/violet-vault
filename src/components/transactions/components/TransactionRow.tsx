@@ -96,50 +96,53 @@ const TransactionRow = React.memo(
           </div>
         </div>
 
-        <div style={columnStyles.amount} className="px-4 py-4 text-right text-sm font-medium">
+        <div
+          style={columnStyles.amount}
+          className="px-4 py-4 text-right text-sm font-medium whitespace-nowrap"
+        >
           <span className={`${amountClassName} font-semibold`}>{formattedAmount}</span>
         </div>
 
         <div style={columnStyles.actions} className="px-4 py-4 text-right">
-          <div className="flex items-center justify-end gap-2 flex-wrap">
+          <div className="flex items-center justify-end gap-2 flex-nowrap">
             {onSplit && (
               <Button
                 onClick={() => onSplit(transaction)}
-                className="flex items-center gap-2 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
                 title="Split transaction"
                 aria-label="Split transaction"
               >
                 {React.createElement(getIcon("SplitSquareHorizontal"), {
-                  className: "h-4 w-4",
+                  className: "h-4 w-4 flex-shrink-0",
                 })}
                 <span className="hidden xl:inline font-semibold">Split</span>
               </Button>
             )}
             <Button
               onClick={() => onHistoryClick(transaction)}
-              className="flex items-center gap-2 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
               title="View history"
               aria-label="View history"
             >
-              {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4" })}
+              {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4 flex-shrink-0" })}
               <span className="hidden xl:inline font-semibold">History</span>
             </Button>
             <Button
               onClick={() => onEdit(transaction)}
-              className="flex items-center gap-2 px-2 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
               title="Edit transaction"
               aria-label="Edit transaction"
             >
-              {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4" })}
+              {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4 flex-shrink-0" })}
               <span className="hidden xl:inline font-semibold">Edit</span>
             </Button>
             <Button
               onClick={() => onDeleteClick(transaction)}
-              className="flex items-center gap-2 px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
               title="Delete transaction"
               aria-label="Delete transaction"
             >
-              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
+              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 flex-shrink-0" })}
               <span className="hidden xl:inline font-semibold">Delete</span>
             </Button>
           </div>

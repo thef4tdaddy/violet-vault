@@ -9,8 +9,8 @@ export const COLUMN_WIDTHS = {
   description: "16rem",
   category: "10rem",
   envelope: "14rem",
-  amount: "10rem",
-  actions: "12rem",
+  amount: "12rem", // Increased from 10rem to prevent overlap
+  actions: "20rem", // Increased from 12rem to accommodate all buttons with text
 } as const;
 
 const createColumnStyle = (width: string) => ({
