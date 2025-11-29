@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
-import commonjs from "@rollup/plugin-commonjs";
+import path from "path";
 import { execSync } from "child_process";
 
 // Get git commit information at build time
@@ -77,13 +77,6 @@ export default defineConfig(() => {
         jsxRuntime: 'automatic',
       }),
       tailwindcss(),
-      // Handle CommonJS modules that use 'module' exports
-      // Note: Vite handles CommonJS automatically, but some packages need explicit transformation
-      commonjs({
-        include: [/node_modules/],
-        transformMixedEsModules: true,
-        requireReturnsDefault: 'auto',
-      }),
       VitePWA({
         registerType: "prompt", // Changed from autoUpdate to prompt for manual control
         devOptions: {
@@ -383,48 +376,9 @@ export default defineConfig(() => {
         },
       }),
     ],
-    // Optimize dependencies for React 19 compatibility
-    optimizeDeps: {
-      include: [
-        'recharts',
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        'react/jsx-dev-runtime',
-      ],
-      exclude: [
-        'react-is', // Exclude react-is to prevent multiple React copies
-      ],
-      esbuildOptions: {
-        // Ensure React 19 compatibility
-        jsx: 'automatic',
-        // Ensure React is available during optimization
-        define: {
-          'process.env.NODE_ENV': '"development"',
-        },
-      },
-      // Force re-optimization when dependencies change
-      force: false,
-    },
-    // Avoid multiple copies of React which can cause
-    // "Invalid hook call" errors during development
     resolve: {
-      dedupe: ["react", "react-dom", "react-is"],
       alias: {
-        buffer: "buffer",
-        "@": "/src",
-        "@/components": "/src/components",
-        "@/hooks": "/src/hooks",
-        "@/utils": "/src/utils",
-        "@/stores": "/src/stores",
-        "@/types": "/src/types",
-      },
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-    },
-    // Increase memory limits and optimize for build performance
-    server: {
-      hmr: {
-        overlay: false, // Disable error overlay for better performance
+        "@": path.resolve(process.cwd(), "src"),
       },
     },
     define: {

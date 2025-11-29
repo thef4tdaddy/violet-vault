@@ -36,6 +36,14 @@ dev-dist
 CLAUDE.local.md
 .env.development
 
+# Service Worker files (generated at build time)
+sw.js
+sw.js.map
+**/sw.js
+**/sw.js.map
+registerSW.js
+**/registerSW.js
+
 # Build and lint artifacts
 tsc-output.txt
 eslint-output.txt
