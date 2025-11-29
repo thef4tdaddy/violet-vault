@@ -104,18 +104,29 @@ Look for:
 
 ### 7. Check Network Requests
 
-Open browser DevTools → Network tab → Filter by "sentry.io":
+**See detailed guide:** [Sentry Network Debugging](./SENTRY_NETWORK_DEBUGGING.md)
+
+**Quick Check:**
+
+1. Open browser DevTools → Network tab
+2. Filter by `sentry.io`
+3. Refresh the page
+4. Look for POST requests to `https://<org>.ingest.sentry.io/api/<project-id>/envelope/`
 
 **Expected:**
 
 - POST requests to `https://<org>.ingest.sentry.io/api/<project-id>/envelope/`
 - Status: `200 OK`
+- At least 1 request on page load (initialization)
+- Additional requests when errors occur
 
 **If you see:**
 
 - `403 Forbidden` → DSN is wrong or domain not allowed
 - `400 Bad Request` → Invalid payload format
 - No requests → Sentry not initializing
+
+**Where to test:** Any page in the app (Dashboard is easiest). See [Sentry Network Debugging](./SENTRY_NETWORK_DEBUGGING.md) for detailed instructions.
 
 ### 8. Verify Release Tracking
 
