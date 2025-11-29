@@ -99,7 +99,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Impact**: Improved visual design consistency
 - **#221** - AuthContext Rename for Consistency (**COMPLETED**)
   - **Status**: Merged and deployed
-  - **Description**: Renamed AuthContext.jsx to authStore.jsx for architectural consistency
+  - **Description**: Auth state moved from Zustand to React Context in v2.0
   - **Impact**: Consistent file naming across the codebase
 
 **📊 System Improvements:**

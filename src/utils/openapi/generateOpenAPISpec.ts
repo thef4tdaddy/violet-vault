@@ -7,9 +7,11 @@
  * has type incompatibilities with strict TypeScript (Zod schema 'nullable' property
  * is a function but OpenAPI expects boolean). Since this is optional documentation
  * tooling, suppressing type checking is acceptable.
+ *
+ * ESLint disable for @typescript-eslint/ban-ts-comment is configured in
+ * configs/linting/config-modules/exclusions-config.js with approval and explanation.
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
@@ -24,7 +26,14 @@ import {
   FirebaseManifestSchema,
   BugReportSubmissionResultSchema,
 } from "@/domain/schemas/api-responses";
-import { EnvelopeSchema, TransactionSchema, BillSchema } from "@/domain/schemas";
+import {
+  EnvelopeSchema,
+  TransactionSchema,
+  BillSchema,
+  DebtSchema,
+  SavingsGoalSchema,
+  PaycheckHistorySchema,
+} from "@/domain/schemas";
 
 // Create OpenAPI registry
 const registry = new OpenAPIRegistry();
@@ -56,6 +65,9 @@ registry.registerComponent("schemas", "BugReportSubmissionResult", BugReportSubm
 registry.registerComponent("schemas", "Envelope", EnvelopeSchema);
 registry.registerComponent("schemas", "Transaction", TransactionSchema);
 registry.registerComponent("schemas", "Bill", BillSchema);
+registry.registerComponent("schemas", "Debt", DebtSchema);
+registry.registerComponent("schemas", "SavingsGoal", SavingsGoalSchema);
+registry.registerComponent("schemas", "PaycheckHistory", PaycheckHistorySchema);
 
 /**
  * Register Bug Report API Paths
@@ -465,6 +477,211 @@ registry.registerPath({
 });
 
 /**
+ * Register Debt API Paths
+ */
+const DebtListResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.array(DebtSchema),
+});
+const DebtCreateResponseSchema = z.object({
+  success: z.literal(true),
+  data: DebtSchema,
+});
+registry.registerComponent("schemas", "DebtListResponse", DebtListResponseSchema);
+registry.registerComponent("schemas", "DebtCreateResponse", DebtCreateResponseSchema);
+
+registry.registerPath({
+  method: "get",
+  path: "/api/debts",
+  tags: ["Debts"],
+  summary: "List all debts",
+  description: "Retrieve all tracked debts (local database operation)",
+  responses: {
+    200: {
+      description: "Debts retrieved successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/DebtListResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/debts",
+  tags: ["Debts"],
+  summary: "Create a debt",
+  description: "Create a new debt entry (local database operation)",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/Debt",
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Debt created successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/DebtCreateResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+/**
+ * Register Savings Goal API Paths
+ */
+const SavingsGoalListResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.array(SavingsGoalSchema),
+});
+const SavingsGoalCreateResponseSchema = z.object({
+  success: z.literal(true),
+  data: SavingsGoalSchema,
+});
+registry.registerComponent("schemas", "SavingsGoalListResponse", SavingsGoalListResponseSchema);
+registry.registerComponent("schemas", "SavingsGoalCreateResponse", SavingsGoalCreateResponseSchema);
+
+registry.registerPath({
+  method: "get",
+  path: "/api/savings-goals",
+  tags: ["Savings Goals"],
+  summary: "List all savings goals",
+  description:
+    "Retrieve all savings goals (local database operation). Note: In v2.0, savings goals are stored as envelopes with envelopeType: 'savings'",
+  responses: {
+    200: {
+      description: "Savings goals retrieved successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/SavingsGoalListResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/savings-goals",
+  tags: ["Savings Goals"],
+  summary: "Create a savings goal",
+  description:
+    "Create a new savings goal (local database operation). Note: In v2.0, savings goals are stored as envelopes with envelopeType: 'savings'",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/SavingsGoal",
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Savings goal created successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/SavingsGoalCreateResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+/**
+ * Register Paycheck History API Paths
+ */
+const PaycheckHistoryListResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.array(PaycheckHistorySchema),
+});
+const PaycheckHistoryCreateResponseSchema = z.object({
+  success: z.literal(true),
+  data: PaycheckHistorySchema,
+});
+registry.registerComponent(
+  "schemas",
+  "PaycheckHistoryListResponse",
+  PaycheckHistoryListResponseSchema
+);
+registry.registerComponent(
+  "schemas",
+  "PaycheckHistoryCreateResponse",
+  PaycheckHistoryCreateResponseSchema
+);
+
+registry.registerPath({
+  method: "get",
+  path: "/api/paycheck-history",
+  tags: ["Paycheck History"],
+  summary: "List paycheck history",
+  description: "Retrieve paycheck history records (local database operation)",
+  responses: {
+    200: {
+      description: "Paycheck history retrieved successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/PaycheckHistoryListResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/paycheck-history",
+  tags: ["Paycheck History"],
+  summary: "Create paycheck history entry",
+  description: "Create a new paycheck history record (local database operation)",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/PaycheckHistory",
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Paycheck history entry created successfully",
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/PaycheckHistoryCreateResponse",
+          },
+        },
+      },
+    },
+  },
+});
+
+/**
  * Generate OpenAPI specification
  */
 export const generateOpenAPISpec = () => {
@@ -516,6 +733,19 @@ export const generateOpenAPISpec = () => {
       {
         name: "Bills",
         description: "Bill management (local database operations)",
+      },
+      {
+        name: "Debts",
+        description: "Debt tracking and management (local database operations)",
+      },
+      {
+        name: "Savings Goals",
+        description:
+          "Savings goal management (local database operations). Note: In v2.0, savings goals are stored as envelopes with envelopeType: 'savings'",
+      },
+      {
+        name: "Paycheck History",
+        description: "Paycheck history tracking (local database operations)",
       },
     ],
     externalDocs: {

@@ -270,10 +270,12 @@ const validated = SavingsEnvelopeSchema.parse(savingsGoal);
 await budgetDb.envelopes.put(validated);
 ```
 
-#### Example: Create Supplemental Account as Envelope
+#### Example: Create Supplemental Account as Envelope (v2.0)
+
+**Note:** In v2.0, supplemental accounts are stored as envelopes with `envelopeType: "supplemental"`.
 
 ```typescript
-import { SupplementalAccountSchema } from "@/domain/schemas/envelope";
+import { EnvelopeSchema } from "@/domain/schemas/envelope";
 import { budgetDb } from "@/db/budgetDb";
 
 const hsaAccount = {
@@ -290,14 +292,44 @@ const hsaAccount = {
   expirationDate: null, // HSA doesn't expire
 };
 
-// Validate with Zod
-const validated = SupplementalAccountSchema.parse(hsaAccount);
+// Validate with Zod (EnvelopeSchema handles all envelope types)
+const validated = EnvelopeSchema.parse(hsaAccount);
 
 // Save to Dexie
 await budgetDb.envelopes.put(validated);
 ```
 
-#### Filtering Envelopes by Type
+#### Example: Create Savings Goal as Envelope (v2.0)
+
+**Note:** In v2.0, savings goals are stored as envelopes with `envelopeType: "savings"`.
+
+```typescript
+import { EnvelopeSchema } from "@/domain/schemas/envelope";
+import { budgetDb } from "@/db/budgetDb";
+
+const vacationGoal = {
+  id: "savings_vacation",
+  name: "Vacation Fund",
+  category: "Savings",
+  archived: false,
+  lastModified: Date.now(),
+  envelopeType: "savings",
+  currentBalance: 500,
+  targetAmount: 5000,
+  targetDate: new Date("2025-12-31").getTime(),
+  monthlyContribution: 200,
+};
+
+// Validate with Zod
+const validated = EnvelopeSchema.parse(vacationGoal);
+
+// Save to Dexie
+await budgetDb.envelopes.put(validated);
+```
+
+#### Filtering Envelopes by Type (v2.0)
+
+**Note:** In v2.0, all envelope types (regular, savings, supplemental) are stored in the same `envelopes` table.
 
 ```typescript
 // Get regular envelopes for main envelope UI
@@ -314,7 +346,7 @@ const savingsGoals = await budgetDb.envelopes
   .filter((env) => !env.archived)
   .toArray();
 
-// Get supplemental accounts
+// Get supplemental accounts (v2.0: stored as envelopes with envelopeType: "supplemental")
 const supplementalAccounts = await budgetDb.envelopes
   .where("envelopeType")
   .equals("supplemental")
@@ -340,15 +372,92 @@ const spec = getOpenAPISpecObject();
 
 ### Generating TypeScript Clients
 
-Use tools like `openapi-typescript` to generate type-safe clients:
+VioletVault's OpenAPI spec is compatible with standard TypeScript client generators. Here are several options:
+
+#### Option 1: openapi-typescript (Type Definitions Only)
+
+Generates TypeScript type definitions from the OpenAPI spec:
 
 ```bash
 # Install generator
 npm install --save-dev openapi-typescript
 
-# Generate TypeScript types
-npx openapi-typescript violetVault-openapi.json -o src/types/api-types.ts
+# Generate types from local spec
+npx openapi-typescript public/openapi.json -o src/types/api-types.ts
+
+# Or from production URL
+npx openapi-typescript https://your-domain.com/openapi.json -o src/types/api-types.ts
 ```
+
+**Usage:**
+
+```typescript
+import type { paths } from "@/types/api-types";
+
+// Use generated types
+type BugReport = paths["/report-issue"]["post"]["requestBody"]["content"]["application/json"];
+type BugReportResponse =
+  paths["/report-issue"]["post"]["responses"]["200"]["content"]["application/json"];
+```
+
+#### Option 2: openapi-typescript-codegen (Full Client)
+
+Generates a complete TypeScript client with request/response handling:
+
+```bash
+# Install generator
+npm install --save-dev openapi-typescript-codegen
+
+# Generate full client
+npx openapi-typescript-codegen --input public/openapi.json --output src/api/client
+```
+
+**Usage:**
+
+```typescript
+import { BugReportsService } from "@/api/client";
+
+const result = await BugReportsService.reportIssue({
+  title: "Bug title",
+  description: "Bug description",
+  // ... other fields
+});
+```
+
+#### Option 3: openapi-fetch (Runtime Type-Safe Fetch)
+
+Lightweight runtime client with TypeScript types:
+
+```bash
+npm install openapi-fetch
+```
+
+**Usage:**
+
+```typescript
+import createClient from "openapi-fetch";
+import type { paths } from "@/types/api-types";
+
+const client = createClient<paths>({
+  baseUrl: "https://bug-report-worker.thef4tdaddy.workers.dev",
+});
+
+const { data, error } = await client.POST("/report-issue", {
+  body: {
+    title: "Bug title",
+    description: "Bug description",
+    // TypeScript will validate all fields
+  },
+});
+```
+
+#### Recommended Approach
+
+For VioletVault, we recommend **openapi-typescript** for type definitions combined with your existing service layer:
+
+1. Generate types: `npx openapi-typescript public/openapi.json -o src/types/api-types.ts`
+2. Use types in services: Import and use the generated types in your service layer
+3. Maintain service abstraction: Keep business logic in services, use types for validation
 
 ### Using with API Testing Tools
 

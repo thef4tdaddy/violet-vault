@@ -358,8 +358,9 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ Reac
    - Add bearer token examples
 
 2. **More Endpoints**
-   - Document Savings Goals API
-   - Document Debt Management API
+   - ✅ Document Savings Goals API (Complete)
+   - ✅ Document Debt Management API (Complete)
+   - ✅ Document Paycheck History API (Complete)
    - Document Analytics API
    - Document Automation API
 
@@ -387,15 +388,16 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ Reac
 
 ## Acceptance Criteria
 
-| Criteria                         | Status      | Notes                                                     |
-| -------------------------------- | ----------- | --------------------------------------------------------- |
-| OpenAPI spec generated           | ✅ Complete | Full OpenAPI 3.0 spec with 11 endpoints                   |
-| Swagger UI deployed              | ✅ Complete | Available at `/api-docs` route                            |
-| All endpoints documented         | ✅ Complete | Bug Reports, Cloud Sync, Budget Data, Transactions, Bills |
-| Request/response schemas defined | ✅ Complete | All schemas from Zod domain layer                         |
-| TypeScript clients supported     | ✅ Complete | Compatible with openapi-typescript                        |
-| Documentation complete           | ✅ Complete | 14KB comprehensive developer guide                        |
-| Examples provided                | ✅ Complete | Examples for all major entities                           |
+| Criteria                         | Status      | Notes                                                                                             |
+| -------------------------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| OpenAPI spec generated           | ✅ Complete | Full OpenAPI 3.0 spec with 17 endpoints                                                           |
+| Swagger UI deployed              | ✅ Complete | Available at `/api-docs` route                                                                    |
+| All endpoints documented         | ✅ Complete | Bug Reports, Cloud Sync, Budget Data, Transactions, Bills, Debts, Savings Goals, Paycheck History |
+| Request/response schemas defined | ✅ Complete | All schemas from Zod domain layer                                                                 |
+| TypeScript clients supported     | ✅ Complete | Compatible with openapi-typescript                                                                |
+| Documentation complete           | ✅ Complete | 14KB comprehensive developer guide                                                                |
+| Examples provided                | ✅ Complete | Examples for all major entities                                                                   |
+| Missing APIs added               | ✅ Complete | Debt, Savings Goal, and Paycheck History APIs added                                               |
 
 ---
 

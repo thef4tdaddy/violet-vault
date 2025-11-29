@@ -25,7 +25,9 @@ alwaysApply: true
 :::rule{priority="high"}
 - Data flow: Firebase ↔ Dexie ↔ TanStack Query ↔ React Components
 - Server/Firebase state lives in TanStack Query; UI state belongs in Zustand only
-- React Context is reserved for auth or global app state (not UI toggles)
+- React Context for auth state (user, session, auth status) - NOT Zustand
+- Auth operations use TanStack Query mutations/queries
+- Zustand is ONLY for UI state (modals, forms, temporary interactions)
 - Components must never call Firebase or make HTTP requests directly
 - All external data is validated via Zod schemas located in `/src/domain/schemas/`
 :::
@@ -49,7 +51,7 @@ alwaysApply: true
 - Replace `console.log` with the shared `logger` utility
 - No business logic or data fetching inside components
 - Do not mix server state into Zustand or UI state into Context
-- Avoid `eslint-disable` comments unless explicitly justified
+- **NO inline `eslint-disable` comments** - ALL eslint disables must be in `configs/linting/config-modules/exclusions-config.js` with approval and explanation
 :::
 
 # Code Quality Standards

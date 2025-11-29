@@ -407,12 +407,12 @@ _Custom React hooks for business logic_
 
 _Zustand state management stores_
 
-| Store                | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `authStore.jsx`      | Authentication state management (renamed for JSX) |
-| `budgetStore.js`     | Main budget data state management (Zustand store) |
-| `onboardingStore.js` | Onboarding progress state                         |
-| `toastStore.js`      | Toast notification state                          |
+| Store                | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `AuthContext.tsx`    | Authentication state management (React Context, v2.0+) |
+| `budgetStore.js`     | Main budget data state management (Zustand store)      |
+| `onboardingStore.js` | Onboarding progress state                              |
+| `toastStore.js`      | Toast notification state                               |
 
 ## 🔧 Services Directory (`/services/`) -
 
@@ -557,7 +557,7 @@ _Testing utilities and test files_
 - ✅ Enhanced payday prediction with proactive funding suggestions (#28)
 - ✅ Comprehensive state management cleanup (#211) - Zustand consolidation
 - ✅ Logo styling fixes for glassmorphic design (#222)
-- ✅ AuthContext renamed to authStore.jsx for consistency (#221)
+- ✅ AuthContext moved from Zustand to React Context in v2.0
 - ✅ Password rotation security system fully connected to Zustand (#88)
 - ✅ Debt tracking Phase 1 foundation (#115)
 
