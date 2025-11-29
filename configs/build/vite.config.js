@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import viteCompression from "vite-plugin-compression";
 import path from "path";
 import { execSync } from "child_process";
 
@@ -375,6 +376,22 @@ export default defineConfig(() => {
           ],
         },
       }),
+      // Gzip compression for production builds
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240, // Compress files larger than 10kb
+        algorithm: "gzip",
+        ext: ".gz",
+      }),
+      // Brotli compression for production builds (better compression ratio)
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240,
+        algorithm: "brotliCompress",
+        ext: ".br",
+      }),
     ],
     resolve: {
       alias: {
@@ -384,8 +401,6 @@ export default defineConfig(() => {
     define: {
       "process.env": {},
       global: "globalThis",
-      // Define module for CommonJS compatibility (prevents 'module is not defined' errors)
-      "typeof module": '"object"',
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
@@ -425,9 +440,21 @@ export default defineConfig(() => {
             if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
               return "react-vendor";
             }
-            // Firebase chunk (lazy loaded)
+            // Firebase chunks (split for better caching)
+            if (id.includes("node_modules/firebase/auth")) {
+              return "firebase-auth";
+            }
+            if (id.includes("node_modules/firebase/firestore")) {
+              return "firebase-firestore";
+            }
+            if (id.includes("node_modules/firebase/storage")) {
+              return "firebase-storage";
+            }
+            if (id.includes("node_modules/firebase/analytics")) {
+              return "firebase-analytics";
+            }
             if (id.includes("node_modules/firebase")) {
-              return "firebase-vendor";
+              return "firebase-core";
             }
             // Data libraries chunk
             if (id.includes("node_modules/@tanstack/react-query") || id.includes("node_modules/dexie") || id.includes("node_modules/zustand")) {
@@ -438,7 +465,7 @@ export default defineConfig(() => {
               return "validation-vendor";
             }
             // Charts chunk - Recharts only used in analytics (lazy loaded)
-            if (id.includes("node_modules/recharts")) {
+            if (id.includes("node_modules/recharts") || id.includes("node_modules/victory-vendor") || id.includes("node_modules/d3")) {
               return "charts-vendor";
             }
             // OCR chunk - Tesseract only used in receipts feature
@@ -454,7 +481,7 @@ export default defineConfig(() => {
               return "monitoring-vendor";
             }
             // UI/Utils chunk
-            if (id.includes("node_modules/lucide-react") || id.includes("node_modules/tailwindcss") || id.includes("node_modules/@tanstack/react-virtual")) {
+            if (id.includes("node_modules/lucide-react") || id.includes("node_modules/tailwindcss") || id.includes("node_modules/@tanstack/react-virtual") || id.includes("node_modules/@radix-ui")) {
               return "ui-vendor";
             }
             // Crypto/Security chunk
