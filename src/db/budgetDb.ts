@@ -571,7 +571,8 @@ export const budgetDb = new VioletVaultDB();
 if (
   typeof window !== "undefined" &&
   (import.meta.env.MODE === "development" ||
-    window.location.hostname.includes("f4tdaddy.com") ||
+    window.location.hostname.includes("staging.violetvault.app") ||
+    window.location.hostname.includes("violetvault.app") ||
     window.location.hostname.includes("vercel.app"))
 ) {
   (window as { budgetDb?: VioletVaultDB }).budgetDb = budgetDb;

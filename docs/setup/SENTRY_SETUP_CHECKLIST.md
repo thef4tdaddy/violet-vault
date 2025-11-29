@@ -129,11 +129,23 @@ Open browser console and check for:
 
 ## Troubleshooting
 
+### Sentry not receiving data from Vercel
+
+**See detailed troubleshooting guide:** [Sentry Vercel Troubleshooting](./SENTRY_VERCEL_TROUBLESHOOTING.md)
+
+**Quick checks:**
+
+- Verify environment variables in Vercel (DSN, enabled flag, environment)
+- Check browser console for initialization messages
+- Verify domain is allowed in Sentry project settings
+- Test error reporting manually in browser console
+
 ### Sentry not initializing
 
-- Check `VITE_ERROR_REPORTING_ENABLED` is set to `"true"`
+- Check `VITE_ERROR_REPORTING_ENABLED` is set to `"true"` (string, not boolean)
 - Check `VITE_SENTRY_DSN` is set correctly
 - Check browser console for initialization errors
+- Verify environment variables are set for the correct Vercel environment
 
 ### Releases not being created
 
