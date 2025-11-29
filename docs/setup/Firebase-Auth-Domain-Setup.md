@@ -2,7 +2,7 @@
 
 ## Issue: Auth Not Working on Subdomains
 
-If Firebase Authentication is not working on subdomains like `dev.f4tdaddy.com`, you need to configure authorized domains in the Firebase Console.
+If Firebase Authentication is not working on subdomains like `staging.violetvault.app`, you need to configure authorized domains in the Firebase Console.
 
 ## Quick Fix
 
@@ -13,8 +13,8 @@ If Firebase Authentication is not working on subdomains like `dev.f4tdaddy.com`,
 3. Navigate to **Authentication** → **Settings** → **Authorized domains**
 4. Add these domains:
    - `localhost` (for local development)
-   - `f4tdaddy.com` (your main domain)
-   - `dev.f4tdaddy.com` (your dev subdomain)
+   - `violetvault.app` (your main domain)
+   - `staging.violetvault.app` (your staging subdomain)
    - `*.vercel.app` (for Vercel deployments)
    - Any other subdomains you use
 
@@ -29,7 +29,7 @@ If Firebase Authentication is not working on subdomains like `dev.f4tdaddy.com`,
 
 For wildcard subdomain support:
 
-- `*.f4tdaddy.com` (supports all subdomains)
+- `*.violetvault.app` (supports all subdomains)
 - `*.vercel.app` (supports all Vercel preview deployments)
 
 ## Common Errors and Solutions
@@ -75,7 +75,7 @@ The app automatically handles auth domain issues with graceful fallback:
 ## Environment-Specific Domains
 
 - **Development:** `localhost:5173`
-- **Staging/Preview:** `dev.f4tdaddy.com`, `*.vercel.app`
-- **Production:** `f4tdaddy.com`
+- **Staging/Preview:** `staging.violetvault.app`, `*.vercel.app`
+- **Production:** `violetvault.app` (or your production domain)
 
 Make sure all environments are added to Firebase authorized domains.
