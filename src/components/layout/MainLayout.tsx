@@ -176,7 +176,12 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
     return (
       <AuthGateway
-        onSetupComplete={(payload) => Promise.resolve(handleSetup(payload))}
+        onSetupComplete={(payload) => {
+          if (typeof payload === "string") {
+            return Promise.resolve(handleSetup(payload));
+          }
+          return Promise.resolve(handleSetup(payload.password, payload));
+        }}
         onLocalOnlyReady={(_user) => {}}
       />
     );

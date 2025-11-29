@@ -197,8 +197,8 @@ const initializeApp = () => {
   if (
     typeof window !== "undefined" &&
     (import.meta.env.MODE === "development" ||
-      window.location.hostname.includes("f4tdaddy.com") ||
-      window.location.hostname.includes("vercel.app"))
+      window.location.hostname.endsWith("f4tdaddy.com") ||
+      window.location.hostname.endsWith(".vercel.app"))
   ) {
     // Move window assignments to initialization to avoid module scope store operations
     const initDebugTools = async () => {

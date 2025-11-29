@@ -6,7 +6,7 @@
 interface LayoutHandlers {
   isLocalOnlyMode: boolean;
   handleLogout: () => void;
-  handleSetup: (payload: unknown) => Promise<void> | void;
+  handleSetup: (payload: unknown, userData?: unknown) => Promise<void> | void;
   handleChangePassword: (oldPassword: string, newPassword: string) => Promise<void>;
   securityManager: unknown;
 }
@@ -29,7 +29,8 @@ export const useMainLayoutHandlers = (auth: unknown): LayoutHandlers => {
     typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
   ) as () => void;
   const handleSetupFn = (typeof _handleSetup === "function" ? _handleSetup : async () => {}) as (
-    payload: unknown
+    payload: unknown,
+    userData?: unknown
   ) => Promise<void> | void;
   const handleChangePasswordFn = (
     typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
