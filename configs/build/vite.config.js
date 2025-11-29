@@ -436,8 +436,8 @@ export default defineConfig(() => {
           // Ensure ES module format for proper CommonJS interop
           format: 'es',
           manualChunks: (id) => {
-            // Vendor chunk for React ecosystem
-            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) {
+            // Vendor chunk for React ecosystem (including charts to avoid isolation issues)
+            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router") || id.includes("node_modules/recharts") || id.includes("node_modules/victory-vendor") || id.includes("node_modules/d3")) {
               return "react-vendor";
             }
             // Firebase chunks (split for better caching)
@@ -463,10 +463,6 @@ export default defineConfig(() => {
             // Validation chunk - Zod is used everywhere but can be shared
             if (id.includes("node_modules/zod")) {
               return "validation-vendor";
-            }
-            // Charts chunk - Recharts only used in analytics (lazy loaded)
-            if (id.includes("node_modules/recharts") || id.includes("node_modules/victory-vendor") || id.includes("node_modules/d3")) {
-              return "charts-vendor";
             }
             // OCR chunk - Tesseract only used in receipts feature
             if (id.includes("node_modules/tesseract.js")) {
