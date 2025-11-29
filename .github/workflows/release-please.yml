@@ -14,10 +14,11 @@ on:
   schedule:
     - cron: "0 * * * *" # Every hour at minute 0
 
-  # Also run on push to main for immediate patch releases
+  # Also run on push to main and develop for immediate patch releases
   push:
     branches:
       - main
+      - develop
 
 # Prevent duplicate runs
 concurrency:
@@ -30,9 +31,157 @@ permissions:
   issues: write
 
 jobs:
-  # Always create release-please PR - this creates the PR but doesn't release
+  # Handle develop branch pre-releases separately (commit-count-based)
+  develop-prerelease:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'develop'
+    outputs:
+      release_created: ${{ steps.prerelease.outputs.release_created }}
+      tag_name: ${{ steps.prerelease.outputs.tag_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Calculate pre-release version
+        id: prerelease
+        run: |
+          # Get current package version
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          MAJOR_MINOR=$(echo "$PACKAGE_VERSION" | cut -d. -f1,2)
+          PATCH=$(echo "$PACKAGE_VERSION" | cut -d. -f3)
+          
+          # Get last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -n "$LAST_TAG" ]; then
+            # Count commits since last tag
+            COMMIT_COUNT=$(git rev-list --count ${LAST_TAG}..HEAD 2>/dev/null || echo "0")
+            # Get next patch version
+            NEXT_PATCH=$((PATCH + 1))
+            PRE_RELEASE_VERSION="${MAJOR_MINOR}.${NEXT_PATCH}-prerelease.${COMMIT_COUNT}"
+          else
+            # No tags, use current version
+            COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo "1")
+            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.${COMMIT_COUNT}"
+          fi
+          
+          # Check if this version already exists
+          if git rev-parse "v${PRE_RELEASE_VERSION}" >/dev/null 2>&1; then
+            echo "release_created=false" >> $GITHUB_OUTPUT
+            echo "⏭️  Pre-release v${PRE_RELEASE_VERSION} already exists"
+            exit 0
+          fi
+          
+          # Check if we should create a release (every 10 commits or manual trigger)
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "$COMMIT_COUNT" -ge 10 ] || [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "release_created=true" >> $GITHUB_OUTPUT
+            echo "tag_name=v${PRE_RELEASE_VERSION}" >> $GITHUB_OUTPUT
+            echo "version=${PRE_RELEASE_VERSION}" >> $GITHUB_OUTPUT
+            echo "commit_count=${COMMIT_COUNT}" >> $GITHUB_OUTPUT
+            echo "✅ Will create pre-release: v${PRE_RELEASE_VERSION}"
+          else
+            echo "release_created=false" >> $GITHUB_OUTPUT
+            echo "⏭️  Skipping: only ${COMMIT_COUNT} commits since last release (need 10+)"
+          fi
+
+      - name: Create pre-release branch and update files
+        if: steps.prerelease.outputs.release_created == 'true'
+        run: |
+          VERSION="${{ steps.prerelease.outputs.version }}"
+          TAG_NAME="${{ steps.prerelease.outputs.tag_name }}"
+          RELEASE_BRANCH="release-please--branches--develop--components--violet-vault"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create or checkout release branch
+          if git show-ref --verify --quiet refs/heads/${RELEASE_BRANCH}; then
+            git checkout ${RELEASE_BRANCH}
+            git pull origin ${RELEASE_BRANCH} || true
+          else
+            git checkout -b ${RELEASE_BRANCH}
+          fi
+          
+          # Update package.json version
+          npm version ${VERSION} --no-git-tag-version
+          
+          # Create/update CHANGELOG.md entry
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# Changelog" > CHANGELOG.md
+          fi
+          
+          # Add changelog entry
+          TODAY=$(date +%Y-%m-%d)
+          COMMIT_COUNT="${{ steps.prerelease.outputs.commit_count }}"
+          CHANGELOG_ENTRY="## [${VERSION}] - ${TODAY}\n\n### Pre-release\n\n- Pre-release for develop branch (commit count: ${COMMIT_COUNT})\n"
+          
+          # Prepend to CHANGELOG.md
+          echo -e "${CHANGELOG_ENTRY}\n$(cat CHANGELOG.md)" > CHANGELOG.md
+          
+          # Commit changes
+          git add package.json CHANGELOG.md
+          git commit -m "chore: release ${VERSION}" || echo "No changes to commit"
+          
+          # Push branch
+          git push origin ${RELEASE_BRANCH} || echo "Branch already up to date"
+
+      - name: Create pre-release PR
+        if: steps.prerelease.outputs.release_created == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const version = '${{ steps.prerelease.outputs.version }}';
+            const releaseBranch = 'release-please--branches--develop--components--violet-vault';
+            const baseBranch = 'develop';
+            
+            // Check if PR already exists
+            const { data: existingPRs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${releaseBranch}`,
+              base: baseBranch,
+              state: 'open'
+            });
+            
+            if (existingPRs.length > 0) {
+              console.log(`✅ Pre-release PR already exists: #${existingPRs[0].number}`);
+              return;
+            }
+            
+            // Create release PR
+            const prTitle = `chore: release ${version}`;
+            const prBody = `## Release ${version}\n\nPre-release for develop branch.\n\nThis PR was created automatically by release-please.\n\n**Version format**: \`#.#.#-prerelease.#\` (based on commit count since last release)`;
+            
+            try {
+              const { data: pr } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: prTitle,
+                body: prBody,
+                head: releaseBranch,
+                base: baseBranch,
+                draft: false
+              });
+              
+              console.log(`✅ Created pre-release PR: #${pr.number}`);
+            } catch (error) {
+              console.log(`⚠️ Could not create PR: ${error.message}`);
+            }
+
+  # Regular release-please for main branch
   release-please:
     runs-on: ubuntu-latest
+    if: github.ref_name == 'main'
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -41,8 +190,9 @@ jobs:
         uses: googleapis/release-please-action@v4
         id: release
         with:
-          config-file: configs/release-please-config.json
+          config-file: configs/package/release-please-config.json
           manifest-file: .release-please-manifest.json
+          target-branch: main
 
       - name: Release Summary
         if: steps.release.outputs.release_created
@@ -52,9 +202,11 @@ jobs:
 
   # Check release type after release-please runs
   check-auto-release:
-    needs: release-please
+    needs: [release-please, develop-prerelease]
     runs-on: ubuntu-latest
-    if: needs.release-please.outputs.release_created
+    if: |
+      (needs.release-please.outputs.release_created == 'true') ||
+      (needs.develop-prerelease.outputs.release_created == 'true')
     outputs:
       should-auto-deploy: ${{ steps.check.outputs.should-auto-deploy }}
     steps:
@@ -65,8 +217,8 @@ jobs:
       - name: Check if auto-deploy should run
         id: check
         run: |
-          # Get the just-created tag
-          TAG_NAME="${{ needs.release-please.outputs.tag_name }}"
+          # Get the just-created tag (from either main or develop)
+          TAG_NAME="${{ needs.release-please.outputs.tag_name || needs.develop-prerelease.outputs.tag_name }}"
           echo "Checking tag: $TAG_NAME"
 
           # Get previous tag for comparison
@@ -103,9 +255,11 @@ jobs:
 
   # Build and deploy when a release is created (conditionally)
   build-and-deploy:
-    needs: [release-please, check-auto-release]
+    needs: [release-please, develop-prerelease, check-auto-release]
     runs-on: ubuntu-latest
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: |
+      (needs.release-please.outputs.release_created == 'true') ||
+      (needs.develop-prerelease.outputs.release_created == 'true')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -131,7 +285,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ needs.release-please.outputs.tag_name }}
+          name: dist-${{ needs.release-please.outputs.tag_name || needs.develop-prerelease.outputs.tag_name }}
           path: dist/
 
       - name: Deployment Status

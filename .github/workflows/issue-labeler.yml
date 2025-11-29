@@ -12,6 +12,7 @@ concurrency:
 permissions:
   issues: write
   contents: read
+  pull-requests: read
 
 jobs:
   auto-label-by-keywords:
@@ -253,4 +254,101 @@ jobs:
                 repo: context.repo.repo,
                 body: `📋 **Please provide more details**\n\nYour issue description is quite brief. To help us better understand and fix the problem, please include:\n\n- **Environment**: OS, browser, app version\n- **Steps to reproduce**: Exact steps to trigger the issue\n- **Expected behavior**: What should happen\n- **Actual behavior**: What actually happens\n- **Screenshots/logs**: If applicable\n\nThank you! 🙏`
               });
+            }
+
+  assign-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign issue to lowest numbered open milestone
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // Only assign milestone to newly opened issues
+            if (context.payload.action !== 'opened') {
+              console.log('Issue not newly opened, skipping milestone assignment');
+              return;
+            }
+
+            const issue = context.payload.issue;
+
+            // Skip if issue already has a milestone
+            if (issue.milestone) {
+              console.log(`Issue #${issue.number} already has milestone: ${issue.milestone.title}`);
+              return;
+            }
+
+            try {
+              // Get all open milestones
+              const { data: milestones } = await github.rest.issues.listMilestones({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100
+              });
+
+              if (milestones.length === 0) {
+                console.log('No open milestones found, skipping assignment');
+                return;
+              }
+
+              // Parse version number from milestone title (e.g., "v2.0", "v2.2.1", "v3.0")
+              const parseVersion = (title) => {
+                const match = title.match(/^v?(\d+)\.(\d+)(?:\.(\d+))?/i);
+                if (!match) return null;
+                return {
+                  major: parseInt(match[1], 10),
+                  minor: parseInt(match[2], 10),
+                  patch: parseInt(match[3] || '0', 10),
+                  original: title
+                };
+              };
+
+              // Filter milestones with valid version numbers and sort by version
+              const milestonesWithVersions = milestones
+                .map(m => ({
+                  milestone: m,
+                  version: parseVersion(m.title)
+                }))
+                .filter(m => m.version !== null)
+                .sort((a, b) => {
+                  const vA = a.version;
+                  const vB = b.version;
+                  
+                  // Compare major version
+                  if (vA.major !== vB.major) {
+                    return vA.major - vB.major;
+                  }
+                  // Compare minor version
+                  if (vA.minor !== vB.minor) {
+                    return vA.minor - vB.minor;
+                  }
+                  // Compare patch version
+                  return vA.patch - vB.patch;
+                });
+
+              if (milestonesWithVersions.length === 0) {
+                console.log('No milestones with valid version numbers found, skipping assignment');
+                return;
+              }
+
+              // Get the lowest version milestone
+              const lowestMilestone = milestonesWithVersions[0].milestone;
+
+              if (!lowestMilestone) {
+                console.log('Could not find lowest version milestone');
+                return;
+              }
+
+              // Assign issue to the lowest numbered milestone
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                milestone: lowestMilestone.number
+              });
+
+              console.log(`Assigned issue #${issue.number} to milestone: ${lowestMilestone.title} (#${lowestMilestone.number})`);
+            } catch (error) {
+              console.log('Could not assign milestone:', error.message);
+              // Don't fail the workflow if milestone assignment fails
             }
