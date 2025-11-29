@@ -32,6 +32,7 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (server state ca
 ```
 
 **Critical pattern rules:**
+
 - All external data flows through Firebase first
 - Local data persists in Dexie IndexedDB
 - TanStack Query manages server state caching
@@ -39,11 +40,13 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (server state ca
 
 ### State Management
 
-- **TanStack Query** (`@tanstack/react-query`): ALL server state, Firebase data, API calls, caching
-- **Zustand** (`@zustand`): UI STATE ONLY (modals, forms, user preferences, loading states)
-- **React Context**: Auth state and app-level state only
+- **TanStack Query** (`@tanstack/react-query`): ALL server state, Firebase data, API calls, caching, auth operations
+- **React Context**: Auth state (user, session, auth status) - NOT Zustand
+- **Zustand** (`@zustand`): UI STATE ONLY (modals, forms, user preferences, loading states, temporary interactions)
+- **Auth Operations**: TanStack Query mutations/queries (login, logout, session management)
 - CRITICAL: Never put server/Firebase data in Zustand - use TanStack Query
 - CRITICAL: Never use Context for UI state - use Zustand
+- CRITICAL: Auth state is in React Context, not Zustand (v2.0+)
 - Pattern: `useQuery` for reads, `useMutation` for writes
 
 ## Directory Structure & Rules
@@ -215,11 +218,11 @@ Standard pattern for data fetching:
 // In /src/hooks/api/useUsers.ts
 export const useUsers = () => {
   return useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: async () => {
       const data = await userService.getUsers();
       return UsersSchema.parse(data);
-    }
+    },
   });
 };
 
@@ -233,7 +236,7 @@ UI state management with Zustand:
 
 ```typescript
 // In /src/stores/ui/modalStore.ts
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface ModalState {
   isOpen: boolean;
@@ -254,8 +257,8 @@ Business logic in service layer:
 
 ```typescript
 // In /src/services/userService.ts
-import { UserSchema } from '@/domain/schemas/user';
-import logger from '@/utils/common/logger';
+import { UserSchema } from "@/domain/schemas/user";
+import logger from "@/utils/common/logger";
 
 export const userService = {
   async getUsers() {
@@ -263,10 +266,10 @@ export const userService = {
       const data = await db.users.toArray();
       return UserSchema.array().parse(data);
     } catch (error) {
-      logger.error('Failed to fetch users', error);
-      throw new Error('Failed to fetch users');
+      logger.error("Failed to fetch users", error);
+      throw new Error("Failed to fetch users");
     }
-  }
+  },
 };
 ```
 
@@ -278,6 +281,7 @@ Proper component structure:
 import React, { useCallback } from 'react';
 import { useUsers } from '@/hooks/api/useUsers';
 import { useModalStore } from '@/stores/ui/modalStore';
+import { useAuth } from '@/contexts/AuthContext'; // Auth from Context, not Zustand
 
 interface UserListProps {
   onSelect: (userId: string) => void;
@@ -286,11 +290,13 @@ interface UserListProps {
 export const UserList: React.FC<UserListProps> = ({ onSelect }) => {
   const { data: users, isLoading } = useUsers();
   const { isOpen } = useModalStore();
+  const { user, isAuthenticated } = useAuth(); // Auth state from Context
 
   const handleUserClick = useCallback((userId: string) => {
     onSelect(userId);
   }, [onSelect]);
 
+  if (!isAuthenticated) return <div>Please log in</div>;
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -344,13 +350,35 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 - 🚫 NO 'any' types - EVER - use proper types or Zod schemas
 - 🚫 NO relative imports - ALWAYS use '@' path aliases
+- 🚫 NO inline `eslint-disable` comments - ALL disables must be in `configs/linting/config-modules/exclusions-config.js` with approval and explanation
 - No `console.log()` - use logger utility
 - No business logic in components
 - No direct Firebase calls in components
 - No API calls from components
 - No server data in Zustand stores
 - No UI state in Context (use Zustand)
-- No `eslint-disable` comments without justification
 - No unused imports or variables
 - No hardcoded values (use constants)
 - No mixing concerns (keep separation of concerns)
+
+## ESLint Disable Policy
+
+**CRITICAL**: All ESLint rule disables must be:
+
+1. Added to `configs/linting/config-modules/exclusions-config.js`
+2. Include a clear explanation of WHY the disable is needed
+3. Marked with "APPROVED:" comment if user-approved
+4. NEVER use inline `eslint-disable` comments in source files
+
+**Example format in exclusions-config.js:**
+
+```javascript
+{
+  // Clear explanation of why this exclusion is needed
+  // APPROVED: Brief approval note if user-approved
+  files: ["path/to/file.ts"],
+  rules: {
+    "rule-name": "off", // Specific reason for this disable
+  },
+}
+```

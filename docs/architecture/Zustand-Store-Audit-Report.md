@@ -15,7 +15,7 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 2. **`src/stores/ui/toastStore.js`** - Toast notifications (recently fixed)
 3. **`src/stores/ui/fabStore.js`** - Floating Action Button state
 4. **`src/stores/ui/onboardingStore.js`** - Onboarding progress (simplified)
-5. **`src/stores/auth/authStore.jsx`** - Authentication state
+5. **`src/stores/auth/authStore.jsx`** - Authentication state (⚠️ **DEPRECATED in v2.0** - Auth moved to React Context)
 
 ### Non-Store Files (False Positives):
 
@@ -38,7 +38,7 @@ Comprehensive audit of all existing Zustand stores in VioletVault codebase to id
 
 **Impact**: Each violation can trigger React error #185
 
-### 2. **authStore.jsx** - 4 VIOLATIONS
+### 2. **authStore.jsx** - 4 VIOLATIONS (⚠️ **DEPRECATED in v2.0** - Auth moved to React Context)
 
 **Risk Level**: 🔴 HIGH (Critical authentication flows)
 

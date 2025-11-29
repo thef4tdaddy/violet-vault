@@ -47,7 +47,7 @@ This roadmap outlines the planned development phases for VioletVault, our secure
   - **Exceeded original requirements** with comprehensive payday management features
 - [x] **Password Rotation System** ([#88](https://github.com/thef4tdaddy/violet-vault/issues/88)) - ✅ **COMPLETED & CLOSED**
   - Complete password rotation with secure re-encryption and 90-day rotation reminders
-  - Fully integrated with consolidated Zustand auth store
+  - Fully integrated with React Context auth (v2.0+)
 - [x] **Bill-to-Envelope Integration** ([#216](https://github.com/thef4tdaddy/violet-vault/issues/216)) - ✅ **COMPLETED**
   - Complete integration between bills and envelope budgeting system
 - [x] **Logo Styling Consistency** ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) - ✅ **COMPLETED**

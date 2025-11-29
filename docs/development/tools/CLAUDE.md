@@ -34,14 +34,17 @@
 
 ## Data Structure
 
-- Firebase (if enabled) -> Dexie -> TanStack
-- Zustand only is for ui state, and auth settings
+- Firebase (if enabled) -> Dexie -> TanStack Query
+- React Context for auth state (user, session, auth status)
+- Zustand only for UI state (modals, forms, temporary interactions)
 
 ## Zustand Store Standards
 
 ### **Store Types & Use Cases**
 
-- **Core State**: Authentication, global UI settings (authStore, uiStore)
+- **Auth State**: React Context (user, session, auth status) - NOT Zustand
+- **Auth Operations**: TanStack Query mutations/queries
+- **UI State**: Zustand stores for modals, forms, temporary interactions (uiStore)
 - **Feature State**: Scoped functionality (fabStore when enabled)
 - **Ephemeral State**: Temporary UI (toasts, modals) - minimal scope
 

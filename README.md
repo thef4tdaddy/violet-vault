@@ -184,6 +184,7 @@ For a complete overview of all documentation in the repository, see the **[Docum
 - **[📋 Roadmap](docs/ROADMAP.md)** - See what's coming next and help shape VioletVault's future
 - **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
 - **[📝 Changelog](docs/CHANGELOG.md)** - Complete version history and changes
+- **[🔄 v2.0 Migration Guide](docs/migration/v2.0-migration-guide.md)** - Guide for migrating to v2.0
 
 ### Technical Documentation
 
