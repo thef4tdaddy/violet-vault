@@ -177,16 +177,43 @@ The payload is in Sentry's envelope format (binary/text). You can inspect it in:
    - Check Sentry project settings → Allowed Domains
    - Add `staging.violetvault.app` if missing
 
-### 403 Forbidden
+### CORS Error - "Fetch API cannot load ... due to access control checks"
 
-**Cause:** Domain not allowed in Sentry settings
+**Symptom:**
+
+- Console error: `Fetch API cannot load https://<org>.ingest.us.sentry.io/api/<project-id>/envelope/ due to access control checks`
+- Network tab shows: Request blocked or CORS error
+- Console shows: `Content blocker prevented frame displaying ... from loading a resource from ...`
+
+**Cause:** Your domain is not in Sentry's allowed domains list, OR a content blocker is interfering.
 
 **Fix:**
 
-1. Go to [Sentry Project Settings](https://sentry.io/settings/f4tdaddy/projects/violet-vault/security/)
-2. Security & Privacy → Allowed Domains
-3. Add: `staging.violetvault.app`
-4. Add: `*.violetvault.app` (for all subdomains)
+1. **Add Domain to Sentry:**
+   - Go to [Sentry Project Settings → Security & Privacy](https://sentry.io/settings/f4tdaddy/projects/violet-vault/security/)
+   - Scroll to **Allowed Domains**
+   - Add: `staging.violetvault.app` (exact match)
+   - Add: `*.violetvault.app` (wildcard for all subdomains)
+   - Add: `*.vercel.app` (for Vercel preview deployments)
+   - Add: `violetvault.app` (production domain)
+   - Click **Save**
+   - Wait 1-2 minutes for changes to propagate
+
+2. **Check for Content Blockers:**
+   - Disable browser extensions (ad blockers, privacy tools)
+   - Try incognito/private mode
+   - Check if requests appear in Network tab (they might be blocked by extension, not Sentry)
+
+3. **Verify Fix:**
+   - Refresh the app
+   - Check Network tab for `200 OK` responses to Sentry
+   - Console should no longer show CORS errors
+
+### 403 Forbidden
+
+**Cause:** Domain not allowed in Sentry settings (same as CORS error above)
+
+**Fix:** See "CORS Error" section above - add your domain to Sentry's allowed domains list.
 
 ### 400 Bad Request
 

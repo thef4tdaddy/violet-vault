@@ -122,7 +122,8 @@ Look for:
 
 **If you see:**
 
-- `403 Forbidden` → DSN is wrong or domain not allowed
+- `CORS error` or `Fetch API cannot load ... due to access control checks` → **Domain not allowed** (see Issue 3 below)
+- `403 Forbidden` → DSN is wrong or domain not allowed (see Issue 3 below)
 - `400 Bad Request` → Invalid payload format
 - No requests → Sentry not initializing
 
@@ -150,14 +151,35 @@ Check if releases are being created:
 
 **Fix:** Verify DSN format matches: `https://<key>@<org>.ingest.sentry.io/<project-id>`
 
-### Issue 3: Domain Not Allowed
+### Issue 3: CORS Error - "Fetch API cannot load ... due to access control checks"
 
-**Symptom:** Network requests return `403 Forbidden`
+**Symptom:**
 
-**Fix:** Add your Vercel domain to Sentry's allowed domains:
+- Console shows: `Fetch API cannot load https://<org>.ingest.us.sentry.io/api/<project-id>/envelope/ due to access control checks`
+- Network tab shows: `CORS error` or `403 Forbidden`
+- Console shows: `Content blocker prevented frame displaying ... from loading a resource from ...`
 
-1. Sentry → Project Settings → Security & Privacy
-2. Add `*.vercel.app` and your custom domain
+**Root Cause:** Your domain (`staging.violetvault.app`) is not in Sentry's allowed domains list.
+
+**Fix:** Add your domain to Sentry's allowed domains:
+
+1. Go to [Sentry Project Settings → Security & Privacy](https://sentry.io/settings/f4tdaddy/projects/violet-vault/security/)
+2. Scroll to **Allowed Domains** section
+3. Click **Add Domain**
+4. Add these domains:
+   - `staging.violetvault.app` (exact match for staging)
+   - `*.violetvault.app` (wildcard for all subdomains)
+   - `*.vercel.app` (for Vercel preview deployments)
+   - `violetvault.app` (production domain)
+5. Click **Save**
+
+**Important:** After adding domains, wait 1-2 minutes for changes to propagate, then refresh your app.
+
+**Alternative:** If you see "Content blocker prevented", you may also have a browser extension (ad blocker, privacy tool) blocking Sentry. Try:
+
+- Disable browser extensions temporarily
+- Use incognito/private mode
+- Check if requests appear in Network tab (they might be blocked by extension, not Sentry)
 
 ### Issue 4: Environment Variable Type Mismatch
 
