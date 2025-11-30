@@ -92,12 +92,32 @@ interface LegacySupplementalAccount {
 }
 
 /**
+ * Normalize date field to Unix timestamp (number)
+ * Handles number (Unix timestamp), string (ISO date), or Date object
+ * Used for flexible import of legacy backup files
+ */
+const normalizeDate = (date: unknown): number => {
+  if (typeof date === "number") {
+    return date;
+  }
+  if (typeof date === "string") {
+    const parsed = Date.parse(date);
+    return isNaN(parsed) ? Date.now() : parsed;
+  }
+  if (date instanceof Date) {
+    return date.getTime();
+  }
+  return Date.now();
+};
+
+/**
  * Convert a legacy savings goal to an envelope with envelopeType: "savings"
  *
  * Note: Validation failures are logged but data is still imported to prevent data loss.
  * This is intentional for import functionality - we prioritize preserving user data
  * over strict validation, allowing the app to handle any inconsistencies at runtime.
  */
+
 const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
   const now = Date.now();
   const envelope: Envelope = {
@@ -105,8 +125,8 @@ const convertSavingsGoalToEnvelope = (goal: LegacySavingsGoal): Envelope => {
     name: goal.name,
     category: goal.category || "Savings",
     archived: false,
-    lastModified: goal.lastModified || now,
-    createdAt: goal.createdAt || now,
+    lastModified: goal.lastModified ? normalizeDate(goal.lastModified) : now,
+    createdAt: goal.createdAt ? normalizeDate(goal.createdAt) : now,
     currentBalance: goal.currentAmount || 0,
     targetAmount: goal.targetAmount || 0,
     description: goal.description,
@@ -144,8 +164,8 @@ const convertSupplementalAccountToEnvelope = (account: LegacySupplementalAccount
     name: account.name,
     category: account.category || "Supplemental",
     archived: false,
-    lastModified: account.lastModified || now,
-    createdAt: account.createdAt || now,
+    lastModified: account.lastModified ? normalizeDate(account.lastModified) : now,
+    createdAt: account.createdAt ? normalizeDate(account.createdAt) : now,
     currentBalance: account.currentBalance || 0,
     description: account.description,
     envelopeType: "supplemental",

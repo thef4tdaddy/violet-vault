@@ -49,6 +49,16 @@ export type ExportMetadata = z.infer<typeof ExportMetadataSchema>;
  * Legacy supplemental account schema for backward compatibility
  * Used when importing files from older versions
  */
+/**
+ * Zod schema for date fields that can be Unix timestamp (number) or date string
+ * Used for flexible import validation of legacy data
+ */
+const flexibleDateSchema = z.union([
+  z.number().int().positive(), // Unix timestamp in milliseconds
+  z.string(), // ISO date string or other date format
+  z.date(), // Date object
+]);
+
 export const LegacySupplementalAccountSchema = z
   .object({
     id: z.string().min(1),
@@ -59,8 +69,8 @@ export const LegacySupplementalAccountSchema = z
     expirationDate: z.union([z.date(), z.string(), z.null()]).optional(),
     isActive: z.boolean().optional(),
     accountType: z.string().optional(),
-    lastModified: z.number().int().positive().optional(),
-    createdAt: z.number().int().positive().optional(),
+    lastModified: flexibleDateSchema.optional(),
+    createdAt: flexibleDateSchema.optional(),
     description: z.string().optional(),
   })
   .passthrough();
