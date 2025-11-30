@@ -444,6 +444,9 @@ class ChunkedSyncService implements IChunkedSyncService {
         const { removeUndefinedValues } = await import("../utils/dataManagement/firebaseUtils");
         const mainDocument = removeUndefinedValues(mainDocumentRaw);
 
+        // Store for use in chunk loop below
+        const cleanUndefined = removeUndefinedValues;
+
         // Save main document with resilience and timeout
         logger.info("🚀 [CHUNKED SYNC] About to save main document to Firebase");
         await Promise.race([
@@ -512,7 +515,7 @@ class ChunkedSyncService implements IChunkedSyncService {
             };
 
             // Remove undefined values before sending to Firebase
-            const chunkDocument = removeUndefinedValues(chunkDocumentRaw);
+            const chunkDocument = cleanUndefined(chunkDocumentRaw);
             batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
           }
 
