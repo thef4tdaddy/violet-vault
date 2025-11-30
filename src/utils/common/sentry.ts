@@ -13,6 +13,17 @@ interface SentryConfig {
 }
 
 /**
+ * Detect if we're on staging domain (even if MODE is production)
+ */
+const isStagingDomain = (): boolean => {
+  if (typeof window === "undefined") return false;
+  return (
+    window.location.hostname === "staging.violetvault.app" ||
+    window.location.hostname.includes("staging.violetvault.app")
+  );
+};
+
+/**
  * Get environment-aware configuration for Sentry
  * Implements proper environment separation to avoid quota mixing
  */
@@ -21,7 +32,11 @@ const getSentryConfig = (): SentryConfig => {
   const env = import.meta.env.MODE;
   const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
   const dsn = import.meta.env.VITE_SENTRY_DSN || "";
-  const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || env;
+
+  // Override environment detection for staging domain
+  const isStaging = isStagingDomain();
+  const effectiveEnv = isStaging ? "staging" : env;
+  const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || effectiveEnv;
 
   const config = {
     dsn,
@@ -33,6 +48,17 @@ const getSentryConfig = (): SentryConfig => {
   };
 
   // Environment-specific overrides
+  // Check staging domain first, then MODE
+  if (isStaging) {
+    return {
+      ...config,
+      enabled: config.enabled && config.dsn !== "",
+      replaysSessionSampleRate: config.replaysSessionSampleRate || 1.0, // Full sampling for testing
+      tracesSampleRate: config.tracesSampleRate || 1.0, // Full trace sampling for testing
+      debug: true,
+    };
+  }
+
   switch (env) {
     case "production":
       return {
@@ -66,12 +92,17 @@ const getSentryConfig = (): SentryConfig => {
 export const initSentry = () => {
   const config = getSentryConfig();
 
-  // Log configuration in development/staging
-  if (config.debug) {
+  // Always log configuration in staging/development for debugging
+  const shouldLog = config.debug || isStagingDomain();
+  if (shouldLog) {
     logger.debug("Initializing Sentry", {
       mode: import.meta.env.MODE,
+      hostname: typeof window !== "undefined" ? window.location.hostname : "unknown",
+      isStagingDomain: isStagingDomain(),
       environment: config.environment,
       enabled: config.enabled,
+      hasDSN: !!config.dsn,
+      errorReportingEnabled: import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true",
       tracesSampleRate: config.tracesSampleRate,
       replaysSessionSampleRate: config.replaysSessionSampleRate,
       replaysOnErrorSampleRate: config.replaysOnErrorSampleRate,
@@ -80,10 +111,17 @@ export const initSentry = () => {
 
   // Skip initialization if error reporting is disabled or no DSN
   if (!config.enabled) {
-    if (config.debug) {
-      logger.debug("Sentry initialization skipped", {
-        reason: "Error reporting disabled or no DSN provided",
+    if (shouldLog) {
+      logger.warn("Sentry initialization skipped", {
+        reason: !import.meta.env.VITE_ERROR_REPORTING_ENABLED
+          ? "VITE_ERROR_REPORTING_ENABLED is not 'true'"
+          : !config.dsn
+            ? "VITE_SENTRY_DSN is missing or empty"
+            : "Unknown reason",
         environment: config.environment,
+        hostname: typeof window !== "undefined" ? window.location.hostname : "unknown",
+        errorReportingEnabled: import.meta.env.VITE_ERROR_REPORTING_ENABLED,
+        hasDSN: !!config.dsn,
       });
     }
     return;
@@ -172,11 +210,13 @@ export const initSentry = () => {
       },
     });
 
-    if (config.debug) {
-      logger.debug("Sentry initialized successfully", {
+    if (shouldLog) {
+      logger.info("✅ Sentry initialized successfully", {
         environment: config.environment,
+        hostname: typeof window !== "undefined" ? window.location.hostname : "unknown",
         tracesSampleRate: config.tracesSampleRate,
         replaysSessionSampleRate: config.replaysSessionSampleRate,
+        dsnPrefix: config.dsn.substring(0, 30) + "...",
       });
     }
   } catch (error) {
