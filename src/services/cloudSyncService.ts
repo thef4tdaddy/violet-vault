@@ -271,6 +271,21 @@ class CloudSyncService {
             "Could not load cloud data, assuming no cloud data exists",
             error as Record<string, unknown>
           );
+          // Capture non-decryption errors to Sentry (they might be real issues)
+          if (error instanceof Error) {
+            import("../utils/common/sentry.js")
+              .then(({ captureError }) => {
+                captureError(error, {
+                  operation: "forceSync.loadFromCloud",
+                  budgetId: this.config?.budgetId?.substring(0, 8),
+                  service: "CloudSyncService",
+                  errorType: "nonDecryption",
+                });
+              })
+              .catch(() => {
+                // Sentry not available, already logged
+              });
+          }
           cloudData = null;
         }
       }

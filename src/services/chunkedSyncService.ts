@@ -549,6 +549,20 @@ class ChunkedSyncService implements IChunkedSyncService {
         return true;
       } catch (error) {
         logger.error("❌ Chunked save failed", error);
+        // Explicitly capture to Sentry with sync context
+        if (error instanceof Error) {
+          import("../utils/common/sentry.js")
+            .then(({ captureError }) => {
+              captureError(error, {
+                operation: "saveToCloud",
+                budgetId: this.budgetId?.substring(0, 8),
+                service: "ChunkedSyncService",
+              });
+            })
+            .catch(() => {
+              // Sentry not available, already logged via logger.error
+            });
+        }
         throw error;
       }
     }, "saveToCloud");
@@ -783,6 +797,20 @@ class ChunkedSyncService implements IChunkedSyncService {
         return reconstructedData;
       } catch (error) {
         logger.error("❌ Chunked load failed", error);
+        // Explicitly capture to Sentry with sync context
+        if (error instanceof Error) {
+          import("../utils/common/sentry.js")
+            .then(({ captureError }) => {
+              captureError(error, {
+                operation: "loadFromCloud",
+                budgetId: this.budgetId?.substring(0, 8),
+                service: "ChunkedSyncService",
+              });
+            })
+            .catch(() => {
+              // Sentry not available, already logged via logger.error
+            });
+        }
         throw error;
       }
     }, "loadFromCloud");
@@ -825,6 +853,20 @@ class ChunkedSyncService implements IChunkedSyncService {
       logger.info("✅ Cloud data reset completed");
     } catch (error) {
       logger.error("❌ Failed to reset cloud data", error);
+      // Explicitly capture to Sentry with sync context
+      if (error instanceof Error) {
+        import("../utils/common/sentry.js")
+          .then(({ captureError }) => {
+            captureError(error, {
+              operation: "resetCloudData",
+              budgetId: this.budgetId?.substring(0, 8),
+              service: "ChunkedSyncService",
+            });
+          })
+          .catch(() => {
+            // Sentry not available, already logged via logger.error
+          });
+      }
       throw error;
     }
   }

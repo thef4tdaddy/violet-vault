@@ -103,8 +103,12 @@ import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefine
 const initializeSentryEarly = () => {
   try {
     // Check if Sentry should be enabled
-    const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
-    const dsn = import.meta.env.VITE_SENTRY_DSN || "";
+    // Trim whitespace/newlines from environment variables (Vercel can add them)
+    const errorReportingEnabledRaw = String(
+      import.meta.env.VITE_ERROR_REPORTING_ENABLED || ""
+    ).trim();
+    const isErrorReportingEnabled = errorReportingEnabledRaw === "true";
+    const dsn = String(import.meta.env.VITE_SENTRY_DSN || "").trim();
 
     if (isErrorReportingEnabled && dsn) {
       // Queue for errors that happen before Sentry is ready
@@ -114,7 +118,13 @@ const initializeSentryEarly = () => {
       const flushErrorQueue = () => {
         if (errorQueue.length === 0) return;
         import("./utils/common/sentry.js")
-          .then(({ captureError }) => {
+          .then(({ captureError, initSentry }) => {
+            // Ensure Sentry is initialized before capturing
+            try {
+              initSentry();
+            } catch {
+              // Already initialized or failed, continue anyway
+            }
             errorQueue.forEach(({ error, context }) => {
               captureError(error, context);
             });
@@ -163,9 +173,39 @@ const initializeSentryEarly = () => {
           initSentry();
           // Flush any errors that occurred during module loading
           flushErrorQueue();
+
+          // Periodic flush to catch any errors that occurred before Sentry was ready
+          // Retry every 2 seconds for up to 10 seconds
+          let retryCount = 0;
+          const maxRetries = 5;
+          const retryInterval = setInterval(() => {
+            if (errorQueue.length > 0) {
+              flushErrorQueue();
+              retryCount++;
+              if (retryCount >= maxRetries) {
+                clearInterval(retryInterval);
+              }
+            } else {
+              clearInterval(retryInterval);
+            }
+          }, 2000);
         })
         .catch(() => {
           // Silently fail - monitoring shouldn't break the app
+          // But still try to flush errors periodically
+          let retryCount = 0;
+          const maxRetries = 10;
+          const retryInterval = setInterval(() => {
+            if (errorQueue.length > 0) {
+              flushErrorQueue();
+              retryCount++;
+              if (retryCount >= maxRetries || errorQueue.length === 0) {
+                clearInterval(retryInterval);
+              }
+            } else {
+              clearInterval(retryInterval);
+            }
+          }, 2000);
         });
     }
   } catch (error) {
