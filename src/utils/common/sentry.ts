@@ -30,13 +30,20 @@ const isStagingDomain = (): boolean => {
 // eslint-disable-next-line complexity -- justified: environment-specific config requires multiple conditionals
 const getSentryConfig = (): SentryConfig => {
   const env = import.meta.env.MODE;
-  const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
-  const dsn = import.meta.env.VITE_SENTRY_DSN || "";
+  // Trim whitespace/newlines from environment variables (Vercel can add them)
+  const errorReportingEnabledRaw = String(
+    import.meta.env.VITE_ERROR_REPORTING_ENABLED || ""
+  ).trim();
+  const isErrorReportingEnabled = errorReportingEnabledRaw === "true";
+  const dsn = String(import.meta.env.VITE_SENTRY_DSN || "").trim();
 
   // Override environment detection for staging domain
   const isStaging = isStagingDomain();
   const effectiveEnv = isStaging ? "staging" : env;
-  const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || effectiveEnv;
+  const sentryEnvironmentRaw = import.meta.env.VITE_SENTRY_ENVIRONMENT || "";
+  const sentryEnvironment = sentryEnvironmentRaw
+    ? String(sentryEnvironmentRaw).trim()
+    : effectiveEnv;
 
   const config = {
     dsn,
@@ -112,16 +119,23 @@ export const initSentry = () => {
   // Skip initialization if error reporting is disabled or no DSN
   if (!config.enabled) {
     if (shouldLog) {
+      const errorReportingEnabledRaw = String(
+        import.meta.env.VITE_ERROR_REPORTING_ENABLED || ""
+      ).trim();
       logger.warn("Sentry initialization skipped", {
-        reason: !import.meta.env.VITE_ERROR_REPORTING_ENABLED
-          ? "VITE_ERROR_REPORTING_ENABLED is not 'true'"
-          : !config.dsn
-            ? "VITE_SENTRY_DSN is missing or empty"
-            : "Unknown reason",
+        reason: !errorReportingEnabledRaw
+          ? "VITE_ERROR_REPORTING_ENABLED is missing"
+          : errorReportingEnabledRaw !== "true"
+            ? `VITE_ERROR_REPORTING_ENABLED is '${errorReportingEnabledRaw}' (expected 'true')`
+            : !config.dsn
+              ? "VITE_SENTRY_DSN is missing or empty"
+              : "Unknown reason",
         environment: config.environment,
         hostname: typeof window !== "undefined" ? window.location.hostname : "unknown",
-        errorReportingEnabled: import.meta.env.VITE_ERROR_REPORTING_ENABLED,
+        errorReportingEnabled: errorReportingEnabledRaw,
+        errorReportingEnabledRaw: import.meta.env.VITE_ERROR_REPORTING_ENABLED,
         hasDSN: !!config.dsn,
+        dsnLength: config.dsn.length,
       });
     }
     return;
