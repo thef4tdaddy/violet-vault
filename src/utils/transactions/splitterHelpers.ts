@@ -12,6 +12,8 @@ export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: 2, // Always show 2 decimal places (e.g., $123.40 not $123.4)
+    maximumFractionDigits: 2,
   }).format(Math.abs(amount));
 };
 

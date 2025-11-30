@@ -1361,7 +1361,8 @@ const enhancedData = {
       "Transaction → Envelope": "transactions have envelopeId field (REQUIRED)",
       "Transaction → Bill": "bill payment transactions have billId field",
       "Savings Goal → Envelope": "savings goals are envelopes with envelopeType: 'savings'",
-      "Supplemental Account → Envelope": "supplemental accounts are envelopes with envelopeType: 'supplemental'",
+      "Supplemental Account → Envelope":
+        "supplemental accounts are envelopes with envelopeType: 'supplemental'",
     },
     stats: {
       envelopes: enhancedEnvelopes.length,
@@ -1382,7 +1383,9 @@ fs.writeFileSync(outputPath, JSON.stringify(enhancedData, null, 2));
 
 console.log("✅ Enhanced test data generated!");
 console.log(`📊 Stats:`);
-console.log(`   - Envelopes: ${enhancedEnvelopes.length} (includes regular, savings, supplemental, and debt payment envelopes)`);
+console.log(
+  `   - Envelopes: ${enhancedEnvelopes.length} (includes regular, savings, supplemental, and debt payment envelopes)`
+);
 console.log(`     • Regular envelopes: ${updatedBaseEnvelopes.length + serviceEnvelopes.length}`);
 console.log(`     • Savings goals (as envelopes): ${savingsGoalEnvelopes.length}`);
 console.log(`     • Supplemental accounts (as envelopes): ${supplementalAccountEnvelopes.length}`);
@@ -1610,7 +1613,9 @@ fs.writeFileSync(
 const recentOfxPath = path.join(__dirname, "violet-vault-transactions-recent.ofx");
 fs.writeFileSync(recentOfxPath, buildOfxContent(recentTransactions), "utf8");
 
-console.log(`   - OFX Sample: ${ofxSampleTransactions.length} transactions saved to ${ofxOutputPath}`);
+console.log(
+  `   - OFX Sample: ${ofxSampleTransactions.length} transactions saved to ${ofxOutputPath}`
+);
 console.log(
   `   - Recent Transactions: ${recentTransactions.length} saved to ${recentJsonPath} and ${recentOfxPath}`
 );

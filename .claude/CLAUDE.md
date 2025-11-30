@@ -32,6 +32,7 @@ Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (server state ca
 ```
 
 **Critical pattern rules:**
+
 - All external data flows through Firebase first
 - Local data persists in Dexie IndexedDB
 - TanStack Query manages server state caching
@@ -215,11 +216,11 @@ Standard pattern for data fetching:
 // In /src/hooks/api/useUsers.ts
 export const useUsers = () => {
   return useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: async () => {
       const data = await userService.getUsers();
       return UsersSchema.parse(data);
-    }
+    },
   });
 };
 
@@ -233,7 +234,7 @@ UI state management with Zustand:
 
 ```typescript
 // In /src/stores/ui/modalStore.ts
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface ModalState {
   isOpen: boolean;
@@ -254,8 +255,8 @@ Business logic in service layer:
 
 ```typescript
 // In /src/services/userService.ts
-import { UserSchema } from '@/domain/schemas/user';
-import logger from '@/utils/common/logger';
+import { UserSchema } from "@/domain/schemas/user";
+import logger from "@/utils/common/logger";
 
 export const userService = {
   async getUsers() {
@@ -263,10 +264,10 @@ export const userService = {
       const data = await db.users.toArray();
       return UserSchema.array().parse(data);
     } catch (error) {
-      logger.error('Failed to fetch users', error);
-      throw new Error('Failed to fetch users');
+      logger.error("Failed to fetch users", error);
+      throw new Error("Failed to fetch users");
     }
-  }
+  },
 };
 ```
 

@@ -178,9 +178,10 @@ export const ModalContent = ({
           onTypeChange={(type) => onUpdateField("envelopeType", type)}
           excludeTypes={
             formData.envelopeType === ENVELOPE_TYPES.SAVINGS ||
-            formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND
+            formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND ||
+            formData.envelopeType === ENVELOPE_TYPES.SUPPLEMENTAL
               ? []
-              : [ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND]
+              : [ENVELOPE_TYPES.SAVINGS, ENVELOPE_TYPES.SINKING_FUND, ENVELOPE_TYPES.SUPPLEMENTAL]
           }
           disabled={!canEdit}
         />

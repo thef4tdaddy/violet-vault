@@ -7,7 +7,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 425.50,
+      "currentBalance": 425.5,
       "targetAmount": 600,
       "description": "Weekly grocery shopping and household supplies"
     },
@@ -29,7 +29,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 1500.00,
+      "currentBalance": 1500.0,
       "targetAmount": 1500,
       "description": "Monthly rent payment"
     },
@@ -40,7 +40,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 220.00,
+      "currentBalance": 220.0,
       "targetAmount": 250,
       "description": "Electric, water, gas, and internet"
     },
@@ -62,7 +62,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 150.00,
+      "currentBalance": 150.0,
       "targetAmount": 200,
       "description": "Co-pays, prescriptions, medical expenses"
     },
@@ -73,7 +73,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 95.50,
+      "currentBalance": 95.5,
       "targetAmount": 150,
       "description": "Pet food, vet visits, and supplies"
     },
@@ -84,7 +84,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 2500.00,
+      "currentBalance": 2500.0,
       "targetAmount": 10000,
       "description": "3-6 months of expenses for emergencies"
     },
@@ -95,7 +95,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 75.00,
+      "currentBalance": 75.0,
       "targetAmount": 100,
       "description": "Haircuts, toiletries, personal items"
     },
@@ -106,7 +106,7 @@
       "archived": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "currentBalance": 50.00,
+      "currentBalance": 50.0,
       "targetAmount": 150,
       "description": "Birthday gifts, charitable donations"
     }
@@ -116,7 +116,7 @@
       "id": "bill-001-rent",
       "name": "Monthly Rent",
       "dueDate": "2025-02-01",
-      "amount": 1500.00,
+      "amount": 1500.0,
       "category": "Housing",
       "isPaid": false,
       "isRecurring": true,
@@ -131,7 +131,7 @@
       "id": "bill-002-electric",
       "name": "Electric Bill",
       "dueDate": "2025-01-15",
-      "amount": 85.50,
+      "amount": 85.5,
       "category": "Bills & Utilities",
       "isPaid": true,
       "isRecurring": true,
@@ -161,7 +161,7 @@
       "id": "bill-004-car-insurance",
       "name": "Car Insurance",
       "dueDate": "2025-01-25",
-      "amount": 125.00,
+      "amount": 125.0,
       "category": "Insurance",
       "isPaid": false,
       "isRecurring": true,
@@ -176,7 +176,7 @@
       "id": "bill-005-phone",
       "name": "Cell Phone",
       "dueDate": "2025-01-10",
-      "amount": 55.00,
+      "amount": 55.0,
       "category": "Bills & Utilities",
       "isPaid": true,
       "isRecurring": true,
@@ -219,7 +219,7 @@
     {
       "id": "txn-002",
       "date": "2025-01-04",
-      "amount": 45.00,
+      "amount": 45.0,
       "envelopeId": "env-002-gas",
       "category": "Transportation",
       "type": "expense",
@@ -231,7 +231,7 @@
     {
       "id": "txn-003",
       "date": "2025-01-05",
-      "amount": 12.50,
+      "amount": 12.5,
       "envelopeId": "env-005-entertainment",
       "category": "Entertainment",
       "type": "expense",
@@ -255,7 +255,7 @@
     {
       "id": "txn-005",
       "date": "2025-01-07",
-      "amount": 125.00,
+      "amount": 125.0,
       "envelopeId": "env-001-groceries",
       "category": "Food & Dining",
       "type": "expense",
@@ -267,7 +267,7 @@
     {
       "id": "txn-006",
       "date": "2025-01-08",
-      "amount": 25.00,
+      "amount": 25.0,
       "envelopeId": "env-009-personal-care",
       "category": "Personal Care",
       "type": "expense",
@@ -291,7 +291,7 @@
     {
       "id": "txn-008",
       "date": "2025-01-10",
-      "amount": 42.30,
+      "amount": 42.3,
       "envelopeId": "env-002-gas",
       "category": "Transportation",
       "type": "expense",
@@ -303,7 +303,7 @@
     {
       "id": "txn-009",
       "date": "2025-01-11",
-      "amount": 50.00,
+      "amount": 50.0,
       "envelopeId": "env-010-gifts",
       "category": "Gifts & Donations",
       "type": "expense",
@@ -327,7 +327,7 @@
     {
       "id": "txn-011",
       "date": "2025-01-13",
-      "amount": 500.00,
+      "amount": 500.0,
       "envelopeId": "env-008-emergency",
       "category": "Emergency",
       "type": "income",
@@ -364,7 +364,7 @@
     {
       "id": "txn-002",
       "date": "2025-01-04",
-      "amount": 45.00,
+      "amount": 45.0,
       "envelopeId": "env-002-gas",
       "category": "Transportation",
       "type": "expense",
@@ -376,7 +376,7 @@
     {
       "id": "txn-003",
       "date": "2025-01-05",
-      "amount": 12.50,
+      "amount": 12.5,
       "envelopeId": "env-005-entertainment",
       "category": "Entertainment",
       "type": "expense",
@@ -400,7 +400,7 @@
     {
       "id": "txn-005",
       "date": "2025-01-07",
-      "amount": 125.00,
+      "amount": 125.0,
       "envelopeId": "env-001-groceries",
       "category": "Food & Dining",
       "type": "expense",
@@ -412,7 +412,7 @@
     {
       "id": "txn-006",
       "date": "2025-01-08",
-      "amount": 25.00,
+      "amount": 25.0,
       "envelopeId": "env-009-personal-care",
       "category": "Personal Care",
       "type": "expense",
@@ -436,7 +436,7 @@
     {
       "id": "txn-008",
       "date": "2025-01-10",
-      "amount": 42.30,
+      "amount": 42.3,
       "envelopeId": "env-002-gas",
       "category": "Transportation",
       "type": "expense",
@@ -448,7 +448,7 @@
     {
       "id": "txn-009",
       "date": "2025-01-11",
-      "amount": 50.00,
+      "amount": 50.0,
       "envelopeId": "env-010-gifts",
       "category": "Gifts & Donations",
       "type": "expense",
@@ -472,7 +472,7 @@
     {
       "id": "txn-011",
       "date": "2025-01-13",
-      "amount": 500.00,
+      "amount": 500.0,
       "envelopeId": "env-008-emergency",
       "category": "Emergency",
       "type": "income",
@@ -495,7 +495,7 @@
     {
       "id": "bill-002-electric-payment",
       "date": "2025-01-15",
-      "amount": 85.50,
+      "amount": 85.5,
       "envelopeId": "env-004-utilities",
       "category": "Bills & Utilities",
       "type": "bill",
@@ -507,7 +507,7 @@
     {
       "id": "bill-005-phone-payment",
       "date": "2025-01-10",
-      "amount": 55.00,
+      "amount": 55.0,
       "envelopeId": "env-004-utilities",
       "category": "Bills & Utilities",
       "type": "bill",
@@ -523,75 +523,75 @@
       "name": "Summer Vacation",
       "category": "Travel",
       "priority": "high",
-      "targetAmount": 3000.00,
-      "currentAmount": 850.00,
+      "targetAmount": 3000.0,
+      "currentAmount": 850.0,
       "targetDate": "2025-07-01",
       "isPaused": false,
       "isCompleted": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "description": "Two-week beach vacation in July",
-      "monthlyContribution": 250.00
+      "monthlyContribution": 250.0
     },
     {
       "id": "sg-002-laptop",
       "name": "New Laptop",
       "category": "Shopping",
       "priority": "medium",
-      "targetAmount": 1500.00,
-      "currentAmount": 600.00,
+      "targetAmount": 1500.0,
+      "currentAmount": 600.0,
       "targetDate": "2025-06-01",
       "isPaused": false,
       "isCompleted": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "description": "Replace aging laptop for work",
-      "monthlyContribution": 150.00
+      "monthlyContribution": 150.0
     },
     {
       "id": "sg-003-car-down-payment",
       "name": "Car Down Payment",
       "category": "Transportation",
       "priority": "high",
-      "targetAmount": 5000.00,
-      "currentAmount": 2100.00,
+      "targetAmount": 5000.0,
+      "currentAmount": 2100.0,
       "targetDate": "2025-12-31",
       "isPaused": false,
       "isCompleted": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "description": "Down payment for reliable used car",
-      "monthlyContribution": 300.00
+      "monthlyContribution": 300.0
     },
     {
       "id": "sg-004-home-repairs",
       "name": "Home Repair Fund",
       "category": "Housing",
       "priority": "medium",
-      "targetAmount": 2000.00,
-      "currentAmount": 450.00,
+      "targetAmount": 2000.0,
+      "currentAmount": 450.0,
       "targetDate": "2025-08-01",
       "isPaused": false,
       "isCompleted": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "description": "For appliance repairs and maintenance",
-      "monthlyContribution": 100.00
+      "monthlyContribution": 100.0
     },
     {
       "id": "sg-005-holiday-gifts",
       "name": "Holiday Shopping",
       "category": "Gifts & Donations",
       "priority": "low",
-      "targetAmount": 800.00,
-      "currentAmount": 200.00,
+      "targetAmount": 800.0,
+      "currentAmount": 200.0,
       "targetDate": "2025-12-01",
       "isPaused": false,
       "isCompleted": false,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "description": "Christmas and holiday gifts",
-      "monthlyContribution": 50.00
+      "monthlyContribution": 50.0
     }
   ],
   "supplementalAccounts": [
@@ -600,7 +600,7 @@
       "name": "Health Savings Account",
       "type": "hsa",
       "currentBalance": 3250.75,
-      "annualContribution": 3850.00,
+      "annualContribution": 3850.0,
       "expirationDate": null,
       "description": "Tax-advantaged healthcare savings",
       "color": "#10b981",
@@ -614,8 +614,8 @@
       "id": "sa-002-fsa",
       "name": "Flexible Spending Account",
       "type": "fsa",
-      "currentBalance": 875.00,
-      "annualContribution": 2850.00,
+      "currentBalance": 875.0,
+      "annualContribution": 2850.0,
       "expirationDate": "2025-12-31",
       "description": "Use-it-or-lose-it medical expenses",
       "color": "#3b82f6",
@@ -629,8 +629,8 @@
       "id": "sa-003-commuter",
       "name": "Commuter Benefits",
       "type": "commuter",
-      "currentBalance": 150.00,
-      "annualContribution": 1500.00,
+      "currentBalance": 150.0,
+      "annualContribution": 1500.0,
       "expirationDate": "2025-12-31",
       "description": "Pre-tax commuter and parking",
       "color": "#f59e0b",
@@ -648,13 +648,13 @@
       "creditor": "Chase Bank",
       "type": "credit_card",
       "status": "active",
-      "currentBalance": 2850.00,
-      "minimumPayment": 85.00,
+      "currentBalance": 2850.0,
+      "minimumPayment": 85.0,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "interestRate": 18.99,
       "dueDate": "2025-01-28",
-      "originalBalance": 3500.00
+      "originalBalance": 3500.0
     },
     {
       "id": "debt-002-student-loan",
@@ -662,13 +662,13 @@
       "creditor": "Department of Education",
       "type": "student",
       "status": "active",
-      "currentBalance": 12500.00,
-      "minimumPayment": 150.00,
+      "currentBalance": 12500.0,
+      "minimumPayment": 150.0,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "interestRate": 4.53,
       "dueDate": "2025-01-15",
-      "originalBalance": 15000.00
+      "originalBalance": 15000.0
     },
     {
       "id": "debt-003-car-loan",
@@ -676,13 +676,13 @@
       "creditor": "Ally Financial",
       "type": "auto",
       "status": "active",
-      "currentBalance": 8750.00,
-      "minimumPayment": 285.00,
+      "currentBalance": 8750.0,
+      "minimumPayment": 285.0,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
       "interestRate": 5.25,
       "dueDate": "2025-01-20",
-      "originalBalance": 18000.00
+      "originalBalance": 18000.0
     },
     {
       "id": "debt-004-personal-loan",
@@ -690,102 +690,102 @@
       "creditor": "LendingClub",
       "type": "personal",
       "status": "active",
-      "currentBalance": 3200.00,
-      "minimumPayment": 125.00,
+      "currentBalance": 3200.0,
+      "minimumPayment": 125.0,
       "lastModified": 1735995461000,
       "createdAt": 1704067200000,
-      "interestRate": 12.50,
+      "interestRate": 12.5,
       "dueDate": "2025-01-25",
-      "originalBalance": 5000.00
+      "originalBalance": 5000.0
     }
   ],
   "paycheckHistory": [
     {
       "id": "paycheck-001",
       "date": "2025-01-03",
-      "amount": 2500.00,
+      "amount": 2500.0,
       "source": "Acme Corporation",
       "allocations": {
-        "env-003-rent": 750.00,
-        "env-004-utilities": 125.00,
-        "env-001-groceries": 300.00,
-        "env-002-gas": 150.00,
-        "env-008-emergency": 250.00,
-        "env-005-entertainment": 100.00,
-        "env-006-healthcare": 100.00,
-        "env-007-pet-care": 75.00,
-        "env-009-personal-care": 50.00,
-        "env-010-gifts": 75.00
+        "env-003-rent": 750.0,
+        "env-004-utilities": 125.0,
+        "env-001-groceries": 300.0,
+        "env-002-gas": 150.0,
+        "env-008-emergency": 250.0,
+        "env-005-entertainment": 100.0,
+        "env-006-healthcare": 100.0,
+        "env-007-pet-care": 75.0,
+        "env-009-personal-care": 50.0,
+        "env-010-gifts": 75.0
       },
       "lastModified": 1735995461000,
       "createdAt": 1735995461000,
       "deductions": {
-        "Federal Tax": 375.00,
-        "State Tax": 125.00,
-        "Social Security": 155.00,
+        "Federal Tax": 375.0,
+        "State Tax": 125.0,
+        "Social Security": 155.0,
         "Medicare": 36.25,
-        "401k": 250.00,
+        "401k": 250.0,
         "Health Insurance": 158.75
       },
-      "netAmount": 2500.00
+      "netAmount": 2500.0
     },
     {
       "id": "paycheck-002",
       "date": "2024-12-20",
-      "amount": 2500.00,
+      "amount": 2500.0,
       "source": "Acme Corporation",
       "allocations": {
-        "env-003-rent": 750.00,
-        "env-004-utilities": 125.00,
-        "env-001-groceries": 300.00,
-        "env-002-gas": 150.00,
-        "env-008-emergency": 250.00,
-        "env-005-entertainment": 100.00,
-        "env-006-healthcare": 100.00,
-        "env-007-pet-care": 75.00,
-        "env-009-personal-care": 50.00,
-        "env-010-gifts": 75.00
+        "env-003-rent": 750.0,
+        "env-004-utilities": 125.0,
+        "env-001-groceries": 300.0,
+        "env-002-gas": 150.0,
+        "env-008-emergency": 250.0,
+        "env-005-entertainment": 100.0,
+        "env-006-healthcare": 100.0,
+        "env-007-pet-care": 75.0,
+        "env-009-personal-care": 50.0,
+        "env-010-gifts": 75.0
       },
       "lastModified": 1734681600000,
       "createdAt": 1734681600000,
       "deductions": {
-        "Federal Tax": 375.00,
-        "State Tax": 125.00,
-        "Social Security": 155.00,
+        "Federal Tax": 375.0,
+        "State Tax": 125.0,
+        "Social Security": 155.0,
         "Medicare": 36.25,
-        "401k": 250.00,
+        "401k": 250.0,
         "Health Insurance": 158.75
       },
-      "netAmount": 2500.00
+      "netAmount": 2500.0
     },
     {
       "id": "paycheck-003",
       "date": "2024-12-06",
-      "amount": 2500.00,
+      "amount": 2500.0,
       "source": "Acme Corporation",
       "allocations": {
-        "env-003-rent": 750.00,
-        "env-004-utilities": 125.00,
-        "env-001-groceries": 300.00,
-        "env-002-gas": 150.00,
-        "env-008-emergency": 250.00,
-        "env-005-entertainment": 100.00,
-        "env-006-healthcare": 100.00,
-        "env-007-pet-care": 75.00,
-        "env-009-personal-care": 50.00,
-        "env-010-gifts": 75.00
+        "env-003-rent": 750.0,
+        "env-004-utilities": 125.0,
+        "env-001-groceries": 300.0,
+        "env-002-gas": 150.0,
+        "env-008-emergency": 250.0,
+        "env-005-entertainment": 100.0,
+        "env-006-healthcare": 100.0,
+        "env-007-pet-care": 75.0,
+        "env-009-personal-care": 50.0,
+        "env-010-gifts": 75.0
       },
       "lastModified": 1733472000000,
       "createdAt": 1733472000000,
       "deductions": {
-        "Federal Tax": 375.00,
-        "State Tax": 125.00,
-        "Social Security": 155.00,
+        "Federal Tax": 375.0,
+        "State Tax": 125.0,
+        "Social Security": 155.0,
         "Medicare": 36.25,
-        "401k": 250.00,
+        "401k": 250.0,
         "Health Insurance": 158.75
       },
-      "netAmount": 2500.00
+      "netAmount": 2500.0
     }
   ],
   "auditLog": [
@@ -834,7 +834,7 @@
       "userId": "test-user-001",
       "changes": {
         "name": "Monthly Rent",
-        "amount": 1500.00,
+        "amount": 1500.0,
         "dueDate": "2025-02-01",
         "isRecurring": true
       },
@@ -870,7 +870,7 @@
       "changes": {
         "currentBalance": {
           "from": 512.92,
-          "to": 425.50
+          "to": 425.5
         }
       },
       "metadata": {
@@ -887,8 +887,8 @@
       "userId": "test-user-001",
       "changes": {
         "name": "Chase Freedom Credit Card",
-        "currentBalance": 2850.00,
-        "minimumPayment": 85.00
+        "currentBalance": 2850.0,
+        "minimumPayment": 85.0
       },
       "metadata": {
         "source": "ui",
@@ -904,7 +904,7 @@
       "userId": "test-user-001",
       "changes": {
         "name": "Summer Vacation",
-        "targetAmount": 3000.00,
+        "targetAmount": 3000.0,
         "targetDate": "2025-07-01"
       },
       "metadata": {
@@ -927,13 +927,13 @@
       },
       "metadata": {
         "source": "ui",
-        "paymentAmount": 85.50
+        "paymentAmount": 85.5
       }
     }
   ],
   "unassignedCash": 450.25,
-  "biweeklyAllocation": 1200.00,
-  "actualBalance": 5822.00,
+  "biweeklyAllocation": 1200.0,
+  "actualBalance": 5822.0,
   "isActualBalanceManual": false,
   "exportMetadata": {
     "exportedBy": "Test User",
@@ -964,10 +964,7 @@
     },
     "deprecatedArrays": {
       "note": "These may exist from old exports but are not actively used in v1.8+",
-      "examples": [
-        "updatedEnvelopes",
-        "oldTransactions"
-      ]
+      "examples": ["updatedEnvelopes", "oldTransactions"]
     },
     "importInstructions": "Edit 'envelopes', 'bills', or 'transactions' arrays, then re-import. The app will rebuild 'allTransactions' automatically."
   }

@@ -407,24 +407,15 @@ function logSlowOperation(
   duration: number,
   threshold: number = PERFORMANCE_THRESHOLDS.SLOW_OPERATION
 ): void {
-  Sentry.captureMessage(`Slow operation detected: ${name}`, {
-    level: "warning",
-    tags: {
-      operation_type: op,
-      is_slow: "true",
-    },
-    extra: {
-      operationName: name,
-      duration: Math.round(duration),
-      threshold,
-      exceededBy: Math.round(duration - threshold),
-    },
-  });
-
+  // Don't send slow operation warnings to Sentry - they're performance issues, not errors
+  // Only send actual errors to Sentry
+  // Log locally for debugging
   logger.warn(`Slow operation detected: ${name}`, {
     operation: op,
+    operationName: name,
     duration: Math.round(duration),
     threshold,
+    exceededBy: Math.round(duration - threshold),
   });
 }
 

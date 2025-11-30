@@ -9,6 +9,7 @@ This script automatically creates a comprehensive testing epic with all sub-issu
 **1 Master Epic + 21 Sub-Issues covering:**
 
 ### Core Features (6)
+
 - Authentication & User Management
 - Dashboard & Overview
 - Budgeting & Envelopes
@@ -17,23 +18,27 @@ This script automatically creates a comprehensive testing epic with all sub-issu
 - Debts & Loans
 
 ### Analytics & Insights (3)
+
 - Analytics & Reporting
 - Charts & Visualizations
 - Trends & History
 
 ### Advanced Features (4)
+
 - Savings Goals
 - Auto-Funding & Automation
 - Receipt Scanning & OCR
 - Data Sync & Cloud Storage
 
 ### Platform Features (4)
+
 - Sharing & Collaboration
 - Mobile Responsiveness
 - PWA & Offline Mode
 - Security & Data Protection
 
 ### System & DevOps (4)
+
 - Performance & Load Testing
 - Error Handling & Recovery
 - Accessibility (a11y)
@@ -49,6 +54,7 @@ This script automatically creates a comprehensive testing epic with all sub-issu
 ## Output
 
 The script will:
+
 1. Create a master epic issue with full overview
 2. Create 21 linked sub-issues with test checklists
 3. Apply appropriate labels to all issues
@@ -83,7 +89,7 @@ Sub-Issues Created (21 total):
 ## Each Sub-Issue Includes
 
 - **Test Scope**: List of areas to test
-- **Test Checklist**: 
+- **Test Checklist**:
   - Unit Tests
   - Integration Tests
   - E2E Tests
@@ -130,4 +136,3 @@ You can run this script multiple times to create new testing cycles. Each run wi
 - All issues are created with consistent formatting
 - Parent-child relationships are documented in issue bodies
 - Issues can be bulk-closed or updated using GitHub CLI filters
-

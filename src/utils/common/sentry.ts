@@ -27,7 +27,7 @@ const isStagingDomain = (): boolean => {
  * Get environment-aware configuration for Sentry
  * Implements proper environment separation to avoid quota mixing
  */
-// eslint-disable-next-line complexity -- justified: environment-specific config requires multiple conditionals
+
 const getSentryConfig = (): SentryConfig => {
   const env = import.meta.env.MODE;
   // Trim whitespace/newlines from environment variables (Vercel can add them)
@@ -94,6 +94,69 @@ const getSentryConfig = (): SentryConfig => {
     default:
       return { ...config, enabled: false };
   }
+};
+
+/**
+ * Filter Sentry events to reduce noise
+ * - Filters out INFO/DEBUG level messages
+ * - Filters out CORS errors from cross-origin iframes
+ * - Removes sensitive data from requests
+ */
+const filterSentryEvent = (
+  event: Sentry.ErrorEvent,
+  _hint: Sentry.EventHint
+): Sentry.ErrorEvent | null => {
+  // Filter out non-error messages (INFO, DEBUG level)
+  if (event.level === "info" || event.level === "debug") {
+    return null; // Don't send INFO/DEBUG messages to Sentry
+  }
+
+  // Filter out CORS errors from cross-origin iframes (Firebase, etc.)
+  if (event.message) {
+    const message = event.message.toLowerCase();
+    if (
+      message.includes("blocked a frame") ||
+      message.includes("access control checks") ||
+      message.includes("protocols, domains, and ports must match") ||
+      message.includes("cross-origin") ||
+      (message.includes("firebase") && message.includes("cors"))
+    ) {
+      return null; // Don't send CORS iframe errors to Sentry
+    }
+  }
+
+  // Filter out CORS errors from exception messages
+  if (event.exception) {
+    const exceptionMessage = event.exception.values?.[0]?.value?.toLowerCase() || "";
+    if (
+      exceptionMessage.includes("blocked a frame") ||
+      exceptionMessage.includes("access control checks") ||
+      exceptionMessage.includes("protocols, domains, and ports must match") ||
+      exceptionMessage.includes("cross-origin")
+    ) {
+      return null; // Don't send CORS iframe errors to Sentry
+    }
+  }
+
+  // Remove sensitive data from requests
+  if (event.request) {
+    // Remove cookies and headers that might contain sensitive data
+    if (event.request.cookies) {
+      delete event.request.cookies;
+    }
+    if (event.request.headers) {
+      // Keep only safe headers
+      const safeHeaders = ["user-agent", "accept", "accept-language"];
+      const filteredHeaders: Record<string, string> = {};
+      for (const [key, value] of Object.entries(event.request.headers)) {
+        if (safeHeaders.includes(key.toLowerCase())) {
+          filteredHeaders[key] = value as string;
+        }
+      }
+      event.request.headers = filteredHeaders;
+    }
+  }
+  return event;
 };
 
 export const initSentry = () => {
@@ -180,6 +243,13 @@ export const initSentry = () => {
         Sentry.replayIntegration({
           maskAllText: true, // Privacy: mask all text in session replay
           blockAllMedia: true, // Privacy: block all media in session replay
+          // blocklist: [
+          //   // Block Firebase iframes to prevent CORS errors
+          //   /firebaseapp\.com/i,
+          //   /firebase/i,
+          //   // Block other cross-origin iframes that might cause CORS issues
+          //   /googleapis\.com/i,
+          // ],
         }),
       ],
       tracePropagationTargets: [
@@ -192,27 +262,7 @@ export const initSentry = () => {
       tracesSampleRate: config.tracesSampleRate,
       replaysSessionSampleRate: config.replaysSessionSampleRate,
       replaysOnErrorSampleRate: config.replaysOnErrorSampleRate,
-      beforeSend(event, _hint) {
-        // Remove sensitive data from requests
-        if (event.request) {
-          // Remove cookies and headers that might contain sensitive data
-          if (event.request.cookies) {
-            delete event.request.cookies;
-          }
-          if (event.request.headers) {
-            // Keep only safe headers
-            const safeHeaders = ["user-agent", "accept", "accept-language"];
-            const filteredHeaders: Record<string, string> = {};
-            for (const [key, value] of Object.entries(event.request.headers)) {
-              if (safeHeaders.includes(key.toLowerCase())) {
-                filteredHeaders[key] = value as string;
-              }
-            }
-            event.request.headers = filteredHeaders;
-          }
-        }
-        return event;
-      },
+      beforeSend: filterSentryEvent,
       beforeSendTransaction(event) {
         // Remove sensitive data from transactions
         if (event.request) {

@@ -7,8 +7,9 @@ import { getIcon } from "../../utils";
 interface SavingsGoal {
   id: string;
   name: string;
-  currentAmount: number;
-  targetAmount: number;
+  currentAmount?: number; // Optional for v2.0 envelope compatibility
+  currentBalance?: number; // v2.0 envelope field (used if currentAmount is missing)
+  targetAmount?: number; // Optional for safety
   targetDate?: string | Date;
   color?: string;
   priority: string;
@@ -62,7 +63,11 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
     return { text: `${diffMonths} months left`, status: "normal" };
   };
 
-  const progressPercentage = getProgressPercentage(goal.currentAmount, goal.targetAmount);
+  // Handle v2.0 envelope compatibility: use currentBalance if currentAmount is missing
+  const currentAmount = goal.currentAmount ?? goal.currentBalance ?? 0;
+  const targetAmount = goal.targetAmount ?? 0;
+
+  const progressPercentage = getProgressPercentage(currentAmount, targetAmount);
   const timeRemaining = getTimeRemaining(goal.targetDate);
   const priority = priorities.find((p) => p.value === goal.priority);
 
@@ -135,11 +140,11 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <span className="text-gray-600">Current:</span>
-            <div className="font-bold text-green-600">${goal.currentAmount.toFixed(2)}</div>
+            <div className="font-bold text-green-600">${currentAmount.toFixed(2)}</div>
           </div>
           <div>
             <span className="text-gray-600">Target:</span>
-            <div className="font-bold">${goal.targetAmount.toFixed(2)}</div>
+            <div className="font-bold">${targetAmount.toFixed(2)}</div>
           </div>
         </div>
 
@@ -156,9 +161,7 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
             </div>
           )}
           <div className="text-gray-600">
-            <span className="font-medium">
-              ${(goal.targetAmount - goal.currentAmount).toFixed(2)}
-            </span>{" "}
+            <span className="font-medium">${(targetAmount - currentAmount).toFixed(2)}</span>{" "}
             remaining
           </div>
         </div>

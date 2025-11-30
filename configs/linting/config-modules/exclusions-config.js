@@ -397,6 +397,16 @@ export default [
     },
   },
   {
+    // Sentry error filtering - multiple filtering conditions needed for noise reduction
+    // APPROVED: Complexity exclusion for event filtering logic
+    // The filterSentryEvent function needs to check multiple conditions (level, message, exception, request)
+    // to properly filter out non-error messages, CORS errors, and sensitive data
+    files: ["src/utils/common/sentry.ts"],
+    rules: {
+      complexity: "off", // Multiple filtering conditions needed for noise reduction
+    },
+  },
+  {
     // EnvelopeSystem.tsx - updateBiweeklyAllocations is a useCallback hook, not a Zustand action
     // The zustand-safe-patterns rule incorrectly flags it because it's used in a useEffect dependency array
     // This is a legitimate React hook pattern where a useCallback depends on bills and envelopes,

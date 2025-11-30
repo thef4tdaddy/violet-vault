@@ -153,13 +153,15 @@ class Logger {
 
     this.recordLogEntry("DEBUG", message, data);
 
-    // Sentry tracking for all debug logs
+    // Add as breadcrumb to Sentry for context (doesn't create issues)
     try {
       const sentry = this.initSentry();
-      if (sentry && sentry.captureMessage) {
-        sentry.captureMessage(`DEBUG: ${message}`, "debug", {
-          tags: { category: "debug" },
-          extra: data,
+      if (sentry && sentry.addBreadcrumb) {
+        sentry.addBreadcrumb({
+          message: `DEBUG: ${message}`,
+          level: "debug",
+          category: "app",
+          data,
         });
       }
     } catch {
@@ -189,19 +191,22 @@ class Logger {
       consoleLog(`ℹ️ ${message}`, data);
     }
 
+    this.recordLogEntry("INFO", message, data);
+
+    // Add as breadcrumb to Sentry for context (doesn't create issues)
     try {
       const sentry = this.initSentry();
-      if (sentry && sentry.captureMessage) {
-        sentry.captureMessage(`INFO: ${message}`, "info", {
-          tags: { category: "app" },
-          extra: data,
+      if (sentry && sentry.addBreadcrumb) {
+        sentry.addBreadcrumb({
+          message: `INFO: ${message}`,
+          level: "info",
+          category: "app",
+          data,
         });
       }
-    } catch (error) {
-      console.error("Sentry logging failed:", error);
+    } catch {
+      // Silently fail if Sentry isn't available
     }
-
-    this.recordLogEntry("INFO", message, data);
   }
 
   // Warning-level logging
@@ -210,12 +215,27 @@ class Logger {
 
     this.recordLogEntry("WARN", message, data);
 
+    // Only send warnings to Sentry if they're actual issues that need attention
+    // Most warnings are just informational and don't need to be tracked
+    // Only capture warnings that indicate potential problems
     const sentry = this.initSentry();
     if (sentry && sentry.captureMessage) {
-      sentry.captureMessage(`WARN: ${message}`, "warning", {
-        tags: { category: "app" },
-        extra: data,
-      });
+      // Filter out common non-critical warnings
+      const lowerMessage = message.toLowerCase();
+      const isCriticalWarning =
+        lowerMessage.includes("error") ||
+        lowerMessage.includes("failed") ||
+        lowerMessage.includes("critical") ||
+        lowerMessage.includes("security") ||
+        lowerMessage.includes("unauthorized") ||
+        lowerMessage.includes("permission denied");
+
+      if (isCriticalWarning) {
+        sentry.captureMessage(`WARN: ${message}`, "warning", {
+          tags: { category: "app", critical: "true" },
+          extra: data,
+        });
+      }
     }
   }
 
@@ -242,7 +262,7 @@ class Logger {
   }
 
   // Production-level logging for important user-visible events
-  // Always shows in console AND sends to Highlight.io regardless of environment
+  // Always shows in console regardless of environment
   //
   // USE FOR:
   // - User login/logout events
@@ -265,16 +285,19 @@ class Logger {
 
     this.recordLogEntry("PRODUCTION", message, data);
 
+    // Add as breadcrumb to Sentry for context (doesn't create issues)
     try {
       const sentry = this.initSentry();
-      if (sentry && sentry.captureMessage) {
-        sentry.captureMessage(`PRODUCTION: ${message}`, "info", {
-          tags: { category: "production" },
-          extra: data,
+      if (sentry && sentry.addBreadcrumb) {
+        sentry.addBreadcrumb({
+          message: `PRODUCTION: ${message}`,
+          level: "info",
+          category: "production",
+          data,
         });
       }
-    } catch (error) {
-      console.error("Sentry production logging failed:", error);
+    } catch {
+      // Silently fail if Sentry isn't available
     }
   }
 
@@ -285,30 +308,39 @@ class Logger {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
     }
 
-    // Also send to Sentry
+    this.recordLogEntry("BUDGET-SYNC", message, data);
+
+    // Add as breadcrumb to Sentry for context (doesn't create issues)
     try {
       const sentry = this.initSentry();
-      if (sentry && sentry.captureMessage) {
-        sentry.captureMessage(`BUDGET-SYNC: ${message}`, "info", {
-          tags: { category: "budget-sync" },
-          extra: data,
+      if (sentry && sentry.addBreadcrumb) {
+        sentry.addBreadcrumb({
+          message: `BUDGET-SYNC: ${message}`,
+          level: "info",
+          category: "budget-sync",
+          data,
         });
+      }
 
-        // For critical budget sync issues, also send as error to ensure visibility
-        if (message.includes("budgetId value") || message.includes("sync issue")) {
-          if (sentry.captureException) {
-            sentry.captureException(new Error(`Budget Sync: ${message}`), {
-              tags: { category: "budget-sync", critical: "true" },
-              extra: data,
-            });
-          }
+      // Only send critical budget sync errors to Sentry as exceptions
+      if (sentry && sentry.captureException) {
+        const lowerMessage = message.toLowerCase();
+        if (
+          lowerMessage.includes("error") ||
+          lowerMessage.includes("failed") ||
+          lowerMessage.includes("budgetId value") ||
+          lowerMessage.includes("sync issue") ||
+          lowerMessage.includes("critical")
+        ) {
+          sentry.captureException(new Error(`Budget Sync: ${message}`), {
+            tags: { category: "budget-sync", critical: "true" },
+            extra: data,
+          });
         }
       }
     } catch (error) {
       console.error("Failed to log to Sentry:", error);
     }
-
-    this.recordLogEntry("BUDGET-SYNC", message, data);
   }
 
   auth(message: string, data: Record<string, unknown> = {}) {

@@ -13,6 +13,7 @@ A basic test budget file containing minimal realistic data for quick testing.
 A comprehensive test budget file with 236+ transactions over 6 months and full entity connections for thorough testing.
 
 **Enhanced Data Included:**
+
 - **14 Envelopes**: 10 regular + 4 debt payment envelopes with full connections
 - **10 Bills**: 6 regular + 4 debt payment bills (all connected to envelopes)
 - **236+ Transactions**: 6 months of realistic transactions (Aug 2024 - Jan 2025)
@@ -23,11 +24,13 @@ A comprehensive test budget file with 236+ transactions over 6 months and full e
 - **8 Audit Log Entries**: Sample change history
 
 **Basic Data (original file):**
+
 - **10 Envelopes**, **6 Bills**, **12 Transactions**
 - **5 Savings Goals**, **3 Supplemental Accounts**, **4 Debts**
 - **3 Paycheck History Entries**, **8 Audit Log Entries**
 
 **Budget Summary:**
+
 - Total envelope balances: $5,322.00
 - Total savings goals progress: $4,200.00 / $12,300.00
 - Total debts: $27,300.00
@@ -39,18 +42,21 @@ A comprehensive test budget file with 236+ transactions over 6 months and full e
 The enhanced test data includes proper relationships between all entities:
 
 **Debt → Envelope → Bill → Transaction Chain:**
+
 - `debt-001-credit-card` → `env-debt-001-cc` → `bill-debt-001-cc` → Monthly payment transactions
 - `debt-002-student-loan` → `env-debt-002-student` → `bill-debt-002-student` → Monthly payment transactions
 - `debt-003-car-loan` → `env-debt-003-auto` → `bill-debt-003-auto` → Monthly payment transactions
 - `debt-004-personal-loan` → `env-debt-004-personal` → `bill-debt-004-personal` → Monthly payment transactions
 
 **Connection Fields:**
+
 - **Debt**: `envelopeId` points to payment envelope
 - **Bill**: `envelopeId` points to funding envelope, `debtId` points to associated debt
 - **Envelope**: `billId` points to connected bill, `debtId` points to connected debt
 - **Transaction**: `envelopeId` points to envelope, bill payments also have `billId`
 
 This allows testing:
+
 - Debt payment tracking across all pages
 - Bill-to-envelope fund allocation
 - Transaction filtering by debt/bill/envelope
@@ -105,6 +111,7 @@ The JSON file follows the Violet Vault export format:
 ## Data Details
 
 ### Envelopes
+
 - **Groceries** ($425.50/$600) - Food & Dining
 - **Gas & Fuel** ($180.25/$300) - Transportation
 - **Rent** ($1,500/$1,500) - Housing
@@ -117,12 +124,15 @@ The JSON file follows the Violet Vault export format:
 - **Gifts & Donations** ($50/$150) - Gifts & Donations
 
 ### Bills
+
 All bills are monthly recurring with realistic amounts and due dates.
 
 ### Transactions
+
 12 transactions spanning various categories with realistic merchants (Kroger, Shell, AMC Theaters, PetSmart, etc.).
 
 ### Savings Goals
+
 - **Summer Vacation** ($850/$3,000) - High priority, July 2025
 - **New Laptop** ($600/$1,500) - Medium priority, June 2025
 - **Car Down Payment** ($2,100/$5,000) - High priority, December 2025
@@ -130,6 +140,7 @@ All bills are monthly recurring with realistic amounts and due dates.
 - **Holiday Shopping** ($200/$800) - Low priority, December 2025
 
 ### Debts
+
 - **Credit Card** ($2,850 @ 18.99% APR) - Min payment $85
 - **Student Loan** ($12,500 @ 4.53% APR) - Min payment $150
 - **Auto Loan** ($8,750 @ 5.25% APR) - Min payment $285
@@ -166,6 +177,7 @@ Use this test data to verify:
 ## Modification
 
 You can modify this file to test edge cases:
+
 - Edit amounts to test calculations
 - Add/remove entries to test list rendering
 - Change dates to test date handling

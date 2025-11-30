@@ -182,15 +182,14 @@ class SyncHealthMonitor {
 
         if (isSlow) {
           span.setStatus({ code: SPAN_STATUS.ERROR, message: "slow_sync" });
-          Sentry.captureMessage(`Slow sync detected: ${this.currentSync?.type}`, {
-            level: "warning",
-            tags: { operation_type: "sync.cloud", is_slow: "true" },
-            extra: {
-              syncId,
-              syncType: this.currentSync?.type,
-              duration: Math.round(duration),
-              threshold: PERFORMANCE_THRESHOLDS.SLOW_SYNC,
-            },
+          // Don't send slow sync warnings to Sentry - they're performance issues, not errors
+          // Only send actual errors to Sentry
+          // Log locally for debugging
+          logger.warn(`Slow sync detected: ${this.currentSync?.type}`, {
+            syncId,
+            syncType: this.currentSync?.type,
+            duration: Math.round(duration),
+            threshold: PERFORMANCE_THRESHOLDS.SLOW_SYNC,
           });
         } else {
           span.setStatus({ code: SPAN_STATUS.OK });
