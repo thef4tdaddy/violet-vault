@@ -15,8 +15,15 @@ Complete architectural guide for Zustand store development in VioletVault. This 
 
 - ✅ **Persistent UI Settings**: Theme, preferences, user settings
 - ✅ **Global UI State**: Modal visibility, loading states
-- ✅ **Authentication State**: User info, tokens, session data
-- ✅ **App-Level Configuration**: Feature flags, sync settings
+- ✅ **Temporary Form State**: Form inputs, draft data
+- ✅ **App-Level UI Configuration**: Feature flags, UI preferences
+
+#### **What Belongs in React Context**
+
+- ✅ **Authentication State**: User info, tokens, session data (AuthContext)
+- ✅ **Auth Operations**: Login, logout, session management (via TanStack Query)
+
+**Note**: Auth state moved from Zustand to React Context in v2.0. See [Auth Architecture](#auth-architecture) section.
 
 #### **What DOESN'T Belong in Zustand**
 
@@ -333,15 +340,44 @@ const updateUser = (userData) => {
 };
 ```
 
+## 🔐 Auth Architecture (v2.0+)
+
+### **React Context for Auth State**
+
+As of v2.0, authentication state is managed via React Context, not Zustand:
+
+- **AuthContext**: Provides user, session, and auth status
+- **TanStack Query**: Handles auth operations (login, logout, session management)
+- **Zustand**: Only for UI state (modals, forms, temporary interactions)
+
+**Migration Note**: If you have code using `authStore` from Zustand, update to use `AuthContext` instead.
+
+### **Example: Using AuthContext**
+
+```typescript
+import { useAuth } from '@/contexts/AuthContext';
+
+const MyComponent = () => {
+  const { user, isAuthenticated, login, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={login} />;
+  }
+
+  return <div>Welcome, {user?.email}</div>;
+};
+```
+
 ## 🔗 Integration with VioletVault Architecture
 
 ### **Data Flow Hierarchy**
 
 1. **Firebase** (optional cloud storage)
 2. **Dexie** (local IndexedDB storage)
-3. **TanStack Query** (computed state, server data)
-4. **Zustand** (UI state, auth state only)
-5. **React State** (component-local state)
+3. **TanStack Query** (computed state, server data, auth operations)
+4. **React Context** (auth state)
+5. **Zustand** (UI state, auth state only)
+6. **React State** (component-local state)
 
 ### **Store Coordination**
 

@@ -134,6 +134,8 @@ export const initSentry = () => {
         "localhost",
         /^https:\/\/.*\.vercel\.app$/,
         /^https:\/\/.*\.budget-app.*\.vercel\.app$/,
+        /^https:\/\/staging\.violetvault\.app$/,
+        /^https:\/\/.*\.violetvault\.app$/,
       ],
       tracesSampleRate: config.tracesSampleRate,
       replaysSessionSampleRate: config.replaysSessionSampleRate,

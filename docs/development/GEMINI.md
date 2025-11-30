@@ -26,5 +26,6 @@
 
 ## Data Structure
 
-- Firebase (if enabled) -> Dexie -> TanStack
-- Zustand only is for ui state, and auth settings
+- Firebase (if enabled) -> Dexie -> TanStack Query
+- React Context for auth state (user, session, auth status)
+- Zustand only for UI state (modals, forms, temporary interactions)

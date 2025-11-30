@@ -67,7 +67,7 @@ These rules apply to all `.js` and `.jsx` files in the project.
 
 **React Context (Issue #491):**
 
-- `createContext`, `useContext` from `react`: **Error**. Use TanStack Query + Dexie for data, Zustand stores for UI/auth state
+- `createContext`, `useContext` from `react`: **Error** for data fetching. Use TanStack Query + Dexie for data, Zustand stores for UI state only. **Note**: Auth state uses React Context (v2.0+), not Zustand.
 
 **Icon System (Issue #575):**
 
@@ -78,7 +78,8 @@ These rules apply to all `.js` and `.jsx` files in the project.
 - **Warning** for files over 300 lines.
 - **Error** for files over 400 lines (needs refactoring soon).
 - **Error** for files over 500 lines (critical, must be refactored).
-  - _Exclusions_: `**/budgetDb.js`, `**/budgetHistoryService.js`, `**/chunkedSyncService.js`, `**/budgetHistoryTracker.js`, `**/authStore.jsx`, `**/SyncHealthIndicator.jsx`, `**/ActivityFeed.jsx`. These core infrastructure and diagnostic files are exempt from the 500 LOC limit and `no-restricted-imports` for service imports.
+  - _Exclusions_: `**/budgetDb.js`, `**/budgetHistoryService.js`, `**/chunkedSyncService.js`, `**/budgetHistoryTracker.js`, `**/SyncHealthIndicator.jsx`, `**/ActivityFeed.jsx`. These core infrastructure and diagnostic files are exempt from the 500 LOC limit and `no-restricted-imports` for service imports.
+  - **Note**: `authStore.jsx` was removed in v2.0 - auth state is now in React Context (`AuthContext`).
 
 #### Complexity Rules
 
@@ -127,7 +128,7 @@ These rules apply specifically to files within the `src/components` directory an
 - `**/SyncHealthIndicator.jsx` - System monitoring
 - `**/ActivityFeed.jsx` - Activity display
 - `**/budgetDb.js` - Database layer (all complexity rules disabled)
-- `**/authStore.jsx` - Authentication store (all complexity rules disabled)
+- `**/AuthContext.tsx` - Authentication context (all complexity rules disabled) - **Note**: Auth moved from Zustand to React Context in v2.0
 - `**/chunkedSyncService.js` - Sync operations (all complexity rules disabled)
 - `**/cloudSyncService.js` - Cloud sync (all complexity rules disabled)
 

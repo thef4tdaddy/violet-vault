@@ -1,5 +1,101 @@
 # Changelog
 
+## [2.0.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.10.0...violet-vault-v2.0.0) (2025-11-29)
+
+### 🎉 Major Release: TypeScript Conversion & Data Model Simplification
+
+This is a major release with significant architectural improvements, type safety enhancements, and data model simplification.
+
+### ⚠️ BREAKING CHANGES
+
+#### TypeScript Conversion
+- **All code converted to TypeScript** - JavaScript files migrated to `.ts`/`.tsx`
+- **Stricter type checking** - TypeScript strict mode enabled
+- **Import paths standardized** - All imports must use `@` alias (e.g., `@/utils/foo`)
+- **No `any` types** - All types must be properly defined
+
+#### Data Model Simplification
+- **Savings Goals → Envelopes** - Savings goals are now envelopes with `envelopeType: "savings"`
+- **Supplemental Accounts → Envelopes** - Supplemental accounts are now envelopes with `envelopeType: "supplemental"`
+- **Simplified relationships** - Two-entity system: Envelopes and Transactions
+- **Single source of truth** - All money lives in envelopes
+
+#### Auth Architecture
+- **React Context for auth** - Auth state moved from Zustand to React Context
+- **TanStack Query for auth operations** - Auth mutations/queries use TanStack Query
+- **Zustand for UI only** - Zustand now only used for UI state (modals, forms)
+
+#### Validation Changes
+- **Zod schema validation** - All data validated with Zod schemas
+- **Stricter validation** - Invalid data will be rejected
+- **Runtime type checking** - Type safety at runtime
+
+### ✨ Features
+
+#### Type Safety & Developer Experience
+- Full TypeScript coverage across entire codebase
+- Comprehensive Zod schema validation for all data
+- Better IDE autocomplete and error detection
+- Improved code organization and architecture patterns
+
+#### Data Validation
+- All forms validate with Zod schemas
+- Better error messages and validation feedback
+- Consistent validation patterns across the app
+- Type-safe data operations
+
+#### Performance & Monitoring
+- Sentry integration for error tracking
+- Performance monitoring for critical operations
+- Release tracking for better debugging
+- Pre-release versioning for develop branch
+
+#### Testing & Quality
+- Comprehensive CRUD validation tests
+- Enhanced test coverage for transactions, bills, and debts
+- Improved test utilities and factories
+- Better error handling and edge case coverage
+
+### 🔧 Improvements
+
+- Enhanced error handling with global error boundaries
+- Improved build optimizations (Gzip/Brotli compression, code splitting)
+- Better code splitting for Firebase, charts, and UI libraries
+- Optimized bundle size and load performance
+- Improved transaction table UI (fixed button overlap issues)
+
+### 📚 Documentation
+
+- Created comprehensive v2.0 migration guide
+- Updated architecture documentation
+- Enhanced developer onboarding guides
+- Improved API documentation
+
+### 🐛 Bug Fixes
+
+- Fixed validation errors in envelope and transaction forms
+- Resolved `TypeError: Cannot read properties of undefined` in validation helpers
+- Fixed transaction table button overlap on desktop
+- Improved error handling for Zod validation failures
+- Fixed React 19 compatibility issues with recharts
+
+### 🔄 Migration
+
+**Automatic migration**: Your data will be automatically migrated on first load. No manual steps required.
+
+**For detailed migration instructions**, see [v2.0 Migration Guide](./migration/v2.0-migration-guide.md).
+
+### 📦 Dependencies
+
+- Updated to React 19
+- Updated to TypeScript 5.9
+- Updated to Vite 7
+- Updated to TanStack Query 5
+- Updated to Tailwind CSS 4
+- Updated to Zustand 5
+
+---
+
 ## [1.9.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.8.0...violet-vault-v1.9.0) (2025-08-27)
 
 ### ⚠ BREAKING CHANGES

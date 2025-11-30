@@ -54,24 +54,32 @@ jobs:
       - name: Calculate pre-release version
         id: prerelease
         run: |
-          # Get current package version
+          # Get current package version (base version, e.g., 2.0.0)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          MAJOR_MINOR=$(echo "$PACKAGE_VERSION" | cut -d. -f1,2)
-          PATCH=$(echo "$PACKAGE_VERSION" | cut -d. -f3)
           
-          # Get last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          # Find the last prerelease tag for this base version
+          # Pattern: v2.0.0-prerelease.1, v2.0.0-prerelease.2, etc.
+          LAST_PRERELEASE_TAG=$(git tag --sort=-version:refname | grep -E "^v${PACKAGE_VERSION}-prerelease\.[0-9]+$" | head -1 || echo "")
           
-          if [ -n "$LAST_TAG" ]; then
-            # Count commits since last tag
-            COMMIT_COUNT=$(git rev-list --count ${LAST_TAG}..HEAD 2>/dev/null || echo "0")
-            # Get next patch version
-            NEXT_PATCH=$((PATCH + 1))
-            PRE_RELEASE_VERSION="${MAJOR_MINOR}.${NEXT_PATCH}-prerelease.${COMMIT_COUNT}"
+          if [ -n "$LAST_PRERELEASE_TAG" ]; then
+            # Extract prerelease number from last tag (e.g., "v2.0.0-prerelease.5" -> "5")
+            LAST_PRERELEASE_NUM=$(echo "$LAST_PRERELEASE_TAG" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-prerelease\.([0-9]+)$/\1/')
+            NEXT_PRERELEASE_NUM=$((LAST_PRERELEASE_NUM + 1))
+            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.${NEXT_PRERELEASE_NUM}"
+            
+            # Count commits since last prerelease tag
+            COMMIT_COUNT=$(git rev-list --count ${LAST_PRERELEASE_TAG}..HEAD 2>/dev/null || echo "0")
           else
-            # No tags, use current version
-            COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo "1")
-            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.${COMMIT_COUNT}"
+            # No prerelease tags exist yet, start at 1
+            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.1"
+            
+            # Count commits since last tag (any tag) or from beginning
+            LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -n "$LAST_TAG" ]; then
+              COMMIT_COUNT=$(git rev-list --count ${LAST_TAG}..HEAD 2>/dev/null || echo "0")
+            else
+              COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo "1")
+            fi
           fi
           
           # Check if this version already exists

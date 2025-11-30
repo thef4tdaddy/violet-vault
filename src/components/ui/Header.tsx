@@ -44,7 +44,7 @@ const Header = memo(
                 // Environment-specific border colors for better differentiation
                 import.meta.env.MODE === "development"
                   ? "border-orange-500" // Local development
-                  : window.location.hostname.includes("dev.f4tdaddy.com") ||
+                  : window.location.hostname.includes("staging.violetvault.app") ||
                       (window.location.hostname.includes("vercel.app") &&
                         !window.location.hostname.includes("violet-vault-production"))
                     ? "border-red-500" // Preview/staging environments

@@ -197,7 +197,8 @@ const initializeApp = () => {
   if (
     typeof window !== "undefined" &&
     (import.meta.env.MODE === "development" ||
-      window.location.hostname.endsWith("f4tdaddy.com") ||
+      window.location.hostname.includes("staging.violetvault.app") ||
+      window.location.hostname.includes("violetvault.app") ||
       window.location.hostname.endsWith(".vercel.app"))
   ) {
     // Move window assignments to initialization to avoid module scope store operations

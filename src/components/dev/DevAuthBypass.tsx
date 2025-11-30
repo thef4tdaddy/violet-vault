@@ -25,8 +25,9 @@ const DevAuthBypass = () => {
     // Only allow in development or staging environments
     const isDevMode =
       process.env.NODE_ENV === "development" ||
-      window.location.hostname.includes("dev.") ||
-      window.location.hostname.includes("staging.");
+      window.location.hostname.includes("staging.violetvault.app") ||
+      window.location.hostname.includes("staging.") ||
+      window.location.hostname.includes("dev.");
 
     if (!isDevMode) {
       logger.warn("Dev auth bypass attempted in non-dev environment");

@@ -59,6 +59,8 @@ Documentation for APIs and integration:
 | API-Response-Validation-Guide.md  | docs/api/ | API response validation patterns                      |
 | OpenAPI-Implementation-Summary.md | docs/api/ | OpenAPI implementation details                        |
 
+**Note:** Interactive Swagger UI is available at `/api-docs` when running the application.
+
 ---
 
 ## Architecture Documentation
@@ -128,6 +130,14 @@ Setup and configuration guides:
 | Bug-Report-System-Setup.md        | docs/setup/ | Bug report system configuration              |
 | Branch-Protection-Rules.md        | docs/setup/ | Branch protection and workflow rules         |
 | Sentry Rules.md                   | docs/setup/ | Sentry error tracking configuration          |
+
+## Migration Documentation
+
+Version migration guides:
+
+| File                    | Location        | Description                          |
+| ----------------------- | --------------- | ------------------------------------ |
+| v2.0-migration-guide.md | docs/migration/ | Complete guide for migrating to v2.0 |
 
 ---
 
