@@ -1,6 +1,41 @@
 import { cloudSyncService, type SyncConfig } from "../../services/cloudSyncService.ts";
 import logger from "../common/logger";
 
+/**
+ * Recursively remove undefined values from objects/arrays
+ * Firebase doesn't allow undefined values - they must be omitted or null
+ * This function removes undefined values to prevent Firebase errors
+ */
+export function removeUndefinedValues<T>(value: T): T {
+  if (value === undefined) {
+    // Return null for undefined (Firebase accepts null)
+    return null as T;
+  }
+
+  if (value === null) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => removeUndefinedValues(item))
+      .filter((item) => item !== undefined) as T;
+  }
+
+  if (typeof value === "object") {
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      if (val !== undefined) {
+        cleaned[key] = removeUndefinedValues(val);
+      }
+      // Skip undefined keys entirely
+    }
+    return cleaned as T;
+  }
+
+  return value;
+}
+
 export const clearFirebaseData = async () => {
   try {
     logger.info("Clearing Firebase data before import...");

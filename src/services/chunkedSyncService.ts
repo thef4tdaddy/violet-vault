@@ -414,7 +414,7 @@ class ChunkedSyncService implements IChunkedSyncService {
           );
         }
 
-        const mainDocument = {
+        const mainDocumentRaw = {
           ...chunkedData,
           _manifest: {
             encryptedData: {
@@ -438,6 +438,11 @@ class ChunkedSyncService implements IChunkedSyncService {
                 : [],
           },
         };
+
+        // Remove undefined values before sending to Firebase
+        // Firebase doesn't allow undefined - must be omitted or null
+        const { removeUndefinedValues } = await import("../utils/dataManagement/firebaseUtils");
+        const mainDocument = removeUndefinedValues(mainDocumentRaw);
 
         // Save main document with resilience and timeout
         logger.info("🚀 [CHUNKED SYNC] About to save main document to Firebase");
@@ -489,7 +494,7 @@ class ChunkedSyncService implements IChunkedSyncService {
               throw new Error(`IV too small: ${ivBytes.length} bytes`);
             }
 
-            const chunkDocument = {
+            const chunkDocumentRaw = {
               encryptedData: {
                 data: base64FromBytes(encryptedChunk.data),
                 iv: base64FromBytes(encryptedChunk.iv),
@@ -506,6 +511,8 @@ class ChunkedSyncService implements IChunkedSyncService {
               metadata: encryptedChunk.metadata || {},
             };
 
+            // Remove undefined values before sending to Firebase
+            const chunkDocument = removeUndefinedValues(chunkDocumentRaw);
             batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
           }
 
