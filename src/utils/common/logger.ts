@@ -58,6 +58,7 @@ class Logger {
       window.location.hostname === "localhost" ||
       window.location.hostname.startsWith("dev") ||
       /^dev\./.test(window.location.hostname) ||
+      window.location.hostname.includes("staging.violetvault.app") ||
       window.location.hostname.includes("preview") ||
       window.location.hostname.includes("127.0.0.1") ||
       window.location.hostname.includes("192.168.") ||

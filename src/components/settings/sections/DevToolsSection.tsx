@@ -9,6 +9,7 @@ const isDevelopmentMode = () => {
     typeof window !== "undefined" &&
     (import.meta.env.MODE === "development" ||
       window.location.hostname.includes("dev.") ||
+      window.location.hostname.includes("staging.violetvault.app") ||
       window.location.hostname.includes("localhost") ||
       window.location.hostname === "127.0.0.1")
   );
