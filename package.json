@@ -125,7 +125,7 @@
     "terser": "^5.43.1",
     "typescript": "^5.9.3",
     "util": "^0.12.5",
-    "vite": "^7.2.4",
+    "vite": "^7.2.6",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-pwa": "^1.1.0",
     "vitest": "^4.0.13",
