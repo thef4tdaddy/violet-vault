@@ -118,7 +118,7 @@
     "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "^27.0.1",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.3",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
     "swagger-ui-react": "^5.30.2",
