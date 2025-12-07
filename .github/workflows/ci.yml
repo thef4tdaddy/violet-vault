@@ -1,9 +1,7 @@
 name: CI
 
 on:
-  # Run hourly for automated formatting and linting
-  schedule:
-    - cron: "0 * * * *" # Every hour at minute 0
+
 
   # Keep PR checks for essential validation (without auto-formatting)
   pull_request:
@@ -32,28 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Auto-fix formatting
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: npm run format
 
-      - name: Check for formatting changes
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Code was auto-formatted. Committing changes..."
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git add .
-            git commit -m "style: auto-fix prettier formatting"
-            
-            # Push to main branch for scheduled runs
-            git push origin HEAD:main
-          else
-            echo "No formatting changes needed"
-          fi
 
       - name: Lint
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: npm run lint
 
       - name: Test with Coverage
