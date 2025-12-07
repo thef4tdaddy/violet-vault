@@ -56,22 +56,26 @@ jobs:
         run: |
           # Get current package version (base version, e.g., 2.0.0)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          
+
           # Find the last prerelease tag for this base version
           # Pattern: v2.0.0-prerelease.1, v2.0.0-prerelease.2, etc.
           LAST_PRERELEASE_TAG=$(git tag --sort=-version:refname | grep -E "^v${PACKAGE_VERSION}-prerelease\.[0-9]+$" | head -1 || echo "")
-          
+
           if [ -n "$LAST_PRERELEASE_TAG" ]; then
+            # Extract base version (remove existing prerelease suffix if present)
+            BASE_VERSION=$(echo "$PACKAGE_VERSION" | sed 's/-prerelease.*//')
+            
             # Extract prerelease number from last tag (e.g., "v2.0.0-prerelease.5" -> "5")
             LAST_PRERELEASE_NUM=$(echo "$LAST_PRERELEASE_TAG" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-prerelease\.([0-9]+)$/\1/')
             NEXT_PRERELEASE_NUM=$((LAST_PRERELEASE_NUM + 1))
-            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.${NEXT_PRERELEASE_NUM}"
+            PRE_RELEASE_VERSION="${BASE_VERSION}-prerelease.${NEXT_PRERELEASE_NUM}"
             
             # Count commits since last prerelease tag
             COMMIT_COUNT=$(git rev-list --count ${LAST_PRERELEASE_TAG}..HEAD 2>/dev/null || echo "0")
           else
             # No prerelease tags exist yet, start at 1
-            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.1"
+            BASE_VERSION=$(echo "$PACKAGE_VERSION" | sed 's/-prerelease.*//')
+            PRE_RELEASE_VERSION="${BASE_VERSION}-prerelease.1"
             
             # Count commits since last tag (any tag) or from beginning
             LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -81,14 +85,14 @@ jobs:
               COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo "1")
             fi
           fi
-          
+
           # Check if this version already exists
           if git rev-parse "v${PRE_RELEASE_VERSION}" >/dev/null 2>&1; then
             echo "release_created=false" >> $GITHUB_OUTPUT
             echo "⏭️  Pre-release v${PRE_RELEASE_VERSION} already exists"
             exit 0
           fi
-          
+
           # Check if we should create a release (every 10 commits or manual trigger)
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "$COMMIT_COUNT" -ge 10 ] || [ "$COMMIT_COUNT" -eq 0 ]; then
             echo "release_created=true" >> $GITHUB_OUTPUT
@@ -107,11 +111,11 @@ jobs:
           VERSION="${{ steps.prerelease.outputs.version }}"
           TAG_NAME="${{ steps.prerelease.outputs.tag_name }}"
           RELEASE_BRANCH="release-please--branches--develop--components--violet-vault"
-          
+
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # Create or checkout release branch
           if git show-ref --verify --quiet refs/heads/${RELEASE_BRANCH}; then
             git checkout ${RELEASE_BRANCH}
@@ -119,27 +123,27 @@ jobs:
           else
             git checkout -b ${RELEASE_BRANCH}
           fi
-          
+
           # Update package.json version
           npm version ${VERSION} --no-git-tag-version
-          
+
           # Create/update CHANGELOG.md entry
           if [ ! -f CHANGELOG.md ]; then
             echo "# Changelog" > CHANGELOG.md
           fi
-          
+
           # Add changelog entry
           TODAY=$(date +%Y-%m-%d)
           COMMIT_COUNT="${{ steps.prerelease.outputs.commit_count }}"
           CHANGELOG_ENTRY="## [${VERSION}] - ${TODAY}\n\n### Pre-release\n\n- Pre-release for develop branch (commit count: ${COMMIT_COUNT})\n"
-          
+
           # Prepend to CHANGELOG.md
           echo -e "${CHANGELOG_ENTRY}\n$(cat CHANGELOG.md)" > CHANGELOG.md
-          
+
           # Commit changes
           git add package.json CHANGELOG.md
           git commit -m "chore: release ${VERSION}" || echo "No changes to commit"
-          
+
           # Push branch
           git push origin ${RELEASE_BRANCH} || echo "Branch already up to date"
 
@@ -151,7 +155,7 @@ jobs:
             const version = '${{ steps.prerelease.outputs.version }}';
             const releaseBranch = 'release-please--branches--develop--components--violet-vault';
             const baseBranch = 'develop';
-            
+
             // Check if PR already exists
             const { data: existingPRs } = await github.rest.pulls.list({
               owner: context.repo.owner,
@@ -160,16 +164,16 @@ jobs:
               base: baseBranch,
               state: 'open'
             });
-            
+
             if (existingPRs.length > 0) {
               console.log(`✅ Pre-release PR already exists: #${existingPRs[0].number}`);
               return;
             }
-            
+
             // Create release PR
             const prTitle = `chore: release ${version}`;
             const prBody = `## Release ${version}\n\nPre-release for develop branch.\n\nThis PR was created automatically by release-please.\n\n**Version format**: \`#.#.#-prerelease.#\` (based on commit count since last release)`;
-            
+
             try {
               const { data: pr } = await github.rest.pulls.create({
                 owner: context.repo.owner,
