@@ -13,7 +13,7 @@ on:
       target_url:
         description: "Target URL to test"
         required: false
-        default: "https://dev.f4tdaddy.com"
+        default: "https://staging.violetvault.app"
         type: string
 
 # Prevent duplicate runs
@@ -109,7 +109,7 @@ jobs:
       - name: "🔐 Authenticate with dev auth bypass"
         run: |
           # For now, only targeting dev environment
-          TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
+          TARGET_URL="${{ github.event.inputs.target_url || 'https://staging.violetvault.app' }}"
           echo "🔐 Authenticating with $TARGET_URL..."
 
           # Authenticate and get cookies
@@ -157,7 +157,7 @@ jobs:
         continue-on-error: true
         run: |
           # For now, only targeting dev environment
-          TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
+          TARGET_URL="${{ github.event.inputs.target_url || 'https://staging.violetvault.app' }}"
 
           # Initialize failure tracking
           LIGHTHOUSE_FAILURES=""
@@ -178,7 +178,7 @@ jobs:
             echo "🔦 Testing $TARGET_URL$PAGE"
             TOTAL_COUNT=$((TOTAL_COUNT + 1))
 
-            if npx lighthouse "$TARGET_URL$PAGE" \
+            if npx --yes lighthouse "$TARGET_URL$PAGE" \
               --chrome-flags="--headless --no-sandbox --disable-gpu" \
               --output=html \
               --output=json \
@@ -203,7 +203,7 @@ jobs:
           echo "# 🔦 Lighthouse Performance Report" > lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
           echo "**Generated:** $(date -u)" >> lighthouse-results/SUMMARY.md
-          echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
+          echo "**Target:** ${{ github.event.inputs.target_url || 'https://staging.violetvault.app' }}" >> lighthouse-results/SUMMARY.md
           echo "**Branch:** ${{ github.ref_name }}" >> lighthouse-results/SUMMARY.md
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
@@ -598,7 +598,7 @@ jobs:
         uses: actions/github-script@v8
         env:
           FAILED_PAGES: ${{ steps.check_issues.outputs.failed_pages }}
-          TARGET_URL: ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}
+          TARGET_URL: ${{ github.event.inputs.target_url || 'https://staging.violetvault.app' }}
           BRANCH_NAME: ${{ github.ref_name }}
           LIGHTHOUSE_ISSUES: ${{ steps.check_issues.outputs.lighthouse_issues }}
           TEST_FAILURES: ${{ steps.check_issues.outputs.test_failures }}
@@ -763,7 +763,7 @@ jobs:
           echo "## 🔦 Lighthouse Monitoring Workflow Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Target:** ${{ github.event.inputs.target_url || 'https://staging.violetvault.app' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 

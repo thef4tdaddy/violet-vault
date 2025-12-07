@@ -198,7 +198,7 @@ jobs:
         uses: googleapis/release-please-action@v4
         id: release
         with:
-          config-file: configs/package/release-please-config.json
+          config-file: configs/release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: main
 
