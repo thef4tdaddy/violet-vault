@@ -5,7 +5,9 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "noEmit": true
   },
   "include": ["vite.config.js", "vitest.config.js", "configs/**/*", ".commitlintrc.cjs"]
 }
