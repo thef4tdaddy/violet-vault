@@ -62,16 +62,20 @@ jobs:
           LAST_PRERELEASE_TAG=$(git tag --sort=-version:refname | grep -E "^v${PACKAGE_VERSION}-prerelease\.[0-9]+$" | head -1 || echo "")
 
           if [ -n "$LAST_PRERELEASE_TAG" ]; then
+            # Extract base version (remove existing prerelease suffix if present)
+            BASE_VERSION=$(echo "$PACKAGE_VERSION" | sed 's/-prerelease.*//')
+            
             # Extract prerelease number from last tag (e.g., "v2.0.0-prerelease.5" -> "5")
             LAST_PRERELEASE_NUM=$(echo "$LAST_PRERELEASE_TAG" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-prerelease\.([0-9]+)$/\1/')
             NEXT_PRERELEASE_NUM=$((LAST_PRERELEASE_NUM + 1))
-            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.${NEXT_PRERELEASE_NUM}"
+            PRE_RELEASE_VERSION="${BASE_VERSION}-prerelease.${NEXT_PRERELEASE_NUM}"
             
             # Count commits since last prerelease tag
             COMMIT_COUNT=$(git rev-list --count ${LAST_PRERELEASE_TAG}..HEAD 2>/dev/null || echo "0")
           else
             # No prerelease tags exist yet, start at 1
-            PRE_RELEASE_VERSION="${PACKAGE_VERSION}-prerelease.1"
+            BASE_VERSION=$(echo "$PACKAGE_VERSION" | sed 's/-prerelease.*//')
+            PRE_RELEASE_VERSION="${BASE_VERSION}-prerelease.1"
             
             # Count commits since last tag (any tag) or from beginning
             LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
