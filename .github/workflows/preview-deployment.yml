@@ -59,7 +59,7 @@ jobs:
             return deployment.data.id;
 
       - name: Upload preview build to artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: preview-build-${{ github.event.pull_request.number }}
           path: dist/

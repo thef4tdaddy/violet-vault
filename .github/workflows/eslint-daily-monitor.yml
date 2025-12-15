@@ -281,7 +281,7 @@ jobs:
 
       - name: Upload ESLint report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: eslint-report-${{ github.ref_name }}-${{ github.run_number }}
           path: eslint_report.json

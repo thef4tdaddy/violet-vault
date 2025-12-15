@@ -258,7 +258,7 @@ jobs:
           done
 
       - name: "📤 Upload Lighthouse reports"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: lighthouse-reports-${{ github.run_number }}
           path: lighthouse-results/
