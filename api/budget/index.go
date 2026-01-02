@@ -1,4 +1,4 @@
-package handler
+package budget
 
 import (
 	"encoding/json"
@@ -126,7 +126,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	var req BudgetCalculationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		json.NewEncoder(w).Encode(BudgetCalculationResponse{Success: false, Error: "Invalid JSON: " + err.Error()})
+		_ = json.NewEncoder(w).Encode(BudgetCalculationResponse{Success: false, Error: "Invalid JSON: " + err.Error()})
 		return
 	}
 
@@ -139,7 +139,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		Totals:  totals,
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // Core Logic

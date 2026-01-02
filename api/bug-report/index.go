@@ -1,4 +1,4 @@
-package handler
+package bug_report
 
 import (
 	"bytes"
@@ -193,7 +193,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // formatIssueBody formats the bug report data into a Markdown issue body
@@ -256,7 +256,7 @@ func createGitHubIssue(title, body string, labels []string, token string) (int, 
 	if err != nil {
 		return 0, "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusCreated {
 		bodyBytes, _ := io.ReadAll(resp.Body)
@@ -276,7 +276,7 @@ func createGitHubIssue(title, body string, labels []string, token string) (int, 
 
 func sendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(BugReportResponse{
+	_ = json.NewEncoder(w).Encode(BugReportResponse{
 		Success:  false,
 		Provider: "github",
 		Error:    message,

@@ -2,8 +2,9 @@
 # full_salvo.sh - Multi-language verification script for v2.0 Polyglot Backend
 # Runs TypeScript, Go, and Python linters/type checkers
 
-
-echo "🚀 VioletVault v2.0 Full Salvo - Multi-Language Verification"
+echo ""
+echo "=============================================================="
+echo "🚀 VioletVault Full Salvo - Multi-Language Full Build Verification"
 echo "=============================================================="
 
 # Colors for output
@@ -41,6 +42,8 @@ npm run typecheck || report_status $? "TypeScript"
 echo -e "\n${YELLOW}→ Running Prettier format check...${NC}"
 npm run format:check || report_status $? "Prettier"
 
+# TODO: Add TypeScript tests
+
 # 2. Go Checks
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
@@ -72,18 +75,15 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
         echo -e "${YELLOW}⚠ golangci-lint not found, skipping${NC}"
     fi
 
-    # Run Go tests if any exist
-    if ls *_test.go 1> /dev/null 2>&1; then
-        echo -e "\n${YELLOW}→ Running go test...${NC}"
-        go test ./... -v || report_status $? "go test"
-    else
-        echo -e "${YELLOW}ℹ No Go tests found${NC}"
-    fi
+    echo -e "\n${YELLOW}→ Running go test...${NC}"
+    go test ./... -v || report_status $? "go test"
 
     cd ..
 else
     echo -e "${YELLOW}⚠ No Go code found in api/, skipping Go checks${NC}"
 fi
+
+
 
 # 3. Python Checks
 echo ""
@@ -92,22 +92,33 @@ echo -e "${BLUE}  3️⃣  Python Backend Checks${NC}"
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
 
 if [ -f "pyproject.toml" ] && [ -f "api/analytics.py" ]; then
+    # Define python executable paths
+    RUFF_CMD="ruff"
+    MYPY_CMD="mypy"
+    
+    if [ -f ".venv/bin/ruff" ]; then
+        RUFF_CMD=".venv/bin/ruff"
+    fi
+    if [ -f ".venv/bin/mypy" ]; then
+        MYPY_CMD=".venv/bin/mypy"
+    fi
+
     # Check if ruff is available
-    if command -v ruff &> /dev/null; then
+    if command -v "$RUFF_CMD" &> /dev/null || [ -f "$RUFF_CMD" ]; then
         echo -e "\n${YELLOW}→ Running ruff lint...${NC}"
-        ruff check api/ || report_status $? "ruff lint"
+        $RUFF_CMD check api/ || report_status $? "ruff lint"
 
         echo -e "\n${YELLOW}→ Running ruff format check...${NC}"
-        ruff format --check api/ || report_status $? "ruff format"
+        $RUFF_CMD format --check api/ || report_status $? "ruff format"
     else
         echo -e "${YELLOW}⚠ ruff not found, skipping ruff checks${NC}"
         echo -e "${YELLOW}  Install with: pip install ruff${NC}"
     fi
 
     # Check if mypy is available
-    if command -v mypy &> /dev/null; then
+    if command -v "$MYPY_CMD" &> /dev/null || [ -f "$MYPY_CMD" ]; then
         echo -e "\n${YELLOW}→ Running mypy type check...${NC}"
-        mypy api/ || report_status $? "mypy"
+        $MYPY_CMD api/ || report_status $? "mypy"
     else
         echo -e "${YELLOW}⚠ mypy not found, skipping type checks${NC}"
         echo -e "${YELLOW}  Install with: pip install mypy${NC}"
@@ -134,7 +145,10 @@ echo -e "${BLUE}═════════════════════�
 
 if [ $OVERALL_STATUS -eq 0 ]; then
     echo -e "\n${GREEN}✓✓✓ All checks passed! ✓✓✓${NC}"
-    echo -e "${GREEN}Ready for deployment to v2.0 Polyglot Backend${NC}\n"
+    # Touch success token for pre-commit hook
+    mkdir -p .git
+    touch .git/FULL_SALVO_SUCCESS
+    echo -e "${GREEN}Ready for deployment!!! 🚀🚀🚀${NC}\n"
 else
     echo -e "\n${RED}✗✗✗ Some checks failed ✗✗✗${NC}"
     echo -e "${RED}Please fix the errors above before committing${NC}\n"

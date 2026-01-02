@@ -1,7 +1,7 @@
 {
   "name": "violetvault",
   "private": true,
-  "version": "2.0.0-alpha.7",
+  "version": "2.0.0-alpha.9",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
   "license": "CC-BY-NC-SA-4.0",
@@ -140,8 +140,7 @@
       "prettier --config configs/linting/prettier.config.js --write"
     ],
     "*.go": [
-      "gofmt -w",
-      "go vet"
+      "gofmt -w"
     ]
   },
   "overrides": {

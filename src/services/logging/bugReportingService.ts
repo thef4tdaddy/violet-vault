@@ -217,25 +217,10 @@ export class BugReportingService {
     });
 
     try {
-      // Prepare payload for Go backend
-      const payload = {
-        title: data.title || `Bug Report - ${new Date().toLocaleDateString()}`,
-        description: data.description || "",
-        steps: data.steps || "",
-        expected: data.expected || "",
-        actual: data.actual || "",
-        severity: data.severity || "medium",
-        labels: data.labels || [],
-        systemInfo: data.systemInfo,
-        screenshot: data.customData?.screenshot || "",
-      };
-
-      // Call Go serverless function
+      const payload = this.createGoBackendPayload(data);
       const response = await fetch("/api/bug-report", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -245,7 +230,6 @@ export class BugReportingService {
       }
 
       const result = await response.json();
-
       if (!result.success) {
         throw new Error(result.error || "Bug report submission failed");
       }
@@ -269,6 +253,20 @@ export class BugReportingService {
         error: (error as Error).message || "Failed to submit bug report",
       };
     }
+  }
+
+  private static createGoBackendPayload(data: BugReportData) {
+    return {
+      title: data.title || `Bug Report - ${new Date().toLocaleDateString()}`,
+      description: data.description || "",
+      steps: data.steps || "",
+      expected: data.expected || "",
+      actual: data.actual || "",
+      severity: data.severity || "medium",
+      labels: data.labels || [],
+      systemInfo: data.systemInfo,
+      screenshot: data.customData?.screenshot || "",
+    };
   }
 
   /**
