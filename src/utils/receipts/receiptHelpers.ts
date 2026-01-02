@@ -163,10 +163,10 @@ export const hasMinimumExtractedData = (receiptData: ReceiptData | null | undefi
 export const isReceiptDataComplete = (receiptData: ReceiptData): boolean => {
   return Boolean(
     receiptData &&
-      receiptData.merchant &&
-      receiptData.total &&
-      receiptData.total > 0 &&
-      receiptData.date
+    receiptData.merchant &&
+    receiptData.total &&
+    receiptData.total > 0 &&
+    receiptData.date
   );
 };
 

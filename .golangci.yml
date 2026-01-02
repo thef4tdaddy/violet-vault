@@ -1,0 +1,40 @@
+# golangci-lint configuration for VioletVault Go Backend
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck # Check for unchecked errors
+    - gosimple # Simplify code
+    - govet # Vet examines Go source code
+    - ineffassign # Detect ineffectual assignments
+    - staticcheck # Advanced Go linter
+    - unused # Check for unused code
+    - gofmt # Check code formatting
+    - goimports # Check import formatting
+    - misspell # Check for misspelled words
+    - gocritic # Provides diagnostics that check for bugs, performance and style issues
+    - revive # Fast, configurable, extensible, flexible, and beautiful linter
+
+linters-settings:
+  errcheck:
+    check-blank: true
+  govet:
+    check-shadowing: true
+  gofmt:
+    simplify: true
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+      - name: indent-error-flow
+        severity: warning
+      - name: var-naming
+        severity: warning
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
