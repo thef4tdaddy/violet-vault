@@ -5,7 +5,7 @@ import { keyManagementService } from "../keyManagementService";
 // Note: keyManagementService is now parameter-driven and doesn't import auth store
 // Auth data is passed as parameters, so no mocking needed for auth
 
-vi.mock("../../../utils/security/encryption", () => ({
+vi.mock("@/utils/security/encryption", () => ({
   encryptionUtils: {
     deriveKey: vi.fn(() =>
       Promise.resolve({
@@ -18,7 +18,7 @@ vi.mock("../../../utils/security/encryption", () => ({
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

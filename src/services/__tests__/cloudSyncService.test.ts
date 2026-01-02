@@ -8,7 +8,7 @@ vi.mock("../chunkedSyncService", () => ({
   },
 }));
 
-vi.mock("../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     transactions: {
       toArray: vi.fn(() => Promise.resolve([])),
@@ -35,13 +35,13 @@ vi.mock("../../db/budgetDb", () => ({
   },
 }));
 
-vi.mock("../../utils/sync/autoBackupService", () => ({
+vi.mock("@/utils/sync/autoBackupService", () => ({
   autoBackupService: {
     createPreSyncBackup: vi.fn(() => Promise.resolve("backup-id-123")),
   },
 }));
 
-vi.mock("../../utils/sync/syncHealthMonitor", () => ({
+vi.mock("@/utils/sync/syncHealthMonitor", () => ({
   syncHealthMonitor: {
     recordSyncStart: vi.fn(() => "sync-id-123"),
     updateSyncProgress: vi.fn(),
@@ -52,7 +52,7 @@ vi.mock("../../utils/sync/syncHealthMonitor", () => ({
   },
 }));
 
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -292,7 +292,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
     });
 
     it("should handle database errors during sync", async () => {
-      const { budgetDb } = await import("../../db/budgetDb");
+      const { budgetDb } = await import("@/db/budgetDb");
       vi.mocked(budgetDb.envelopes.toArray).mockRejectedValue(new Error("Database error"));
 
       const result = await cloudSyncService.forceSync();
@@ -1058,7 +1058,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle sync with many envelopes", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       // Mock large dataset
       const manyEnvelopes = Array.from({ length: 100 }, (_, i) => ({
@@ -1078,7 +1078,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle sync with many transactions", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       // Mock large transaction list
       const manyTransactions = Array.from({ length: 500 }, (_, i) => ({
@@ -1098,7 +1098,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle sync with all data types populated", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       // Mock all data types
       vi.mocked(budgetDbModule.budgetDb.envelopes.toArray).mockResolvedValueOnce([
@@ -1129,7 +1129,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle missing metadata gracefully", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       vi.mocked(budgetDbModule.budgetDb.budget.get).mockResolvedValueOnce(undefined);
 
@@ -1139,7 +1139,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle corrupted metadata", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       // Mock corrupted metadata (missing expected fields)
       vi.mocked(budgetDbModule.budgetDb.budget.get).mockResolvedValueOnce({
@@ -1153,7 +1153,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle string values in numeric metadata fields", async () => {
-      const budgetDbModule = await import("../../db/budgetDb");
+      const budgetDbModule = await import("@/db/budgetDb");
 
       // Mock metadata with string values instead of numbers
       vi.mocked(budgetDbModule.budgetDb.budget.get).mockResolvedValueOnce({

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import firebaseMessagingService from "../../services/firebaseMessaging";
+import firebaseMessagingService from "@/services/sync/firebaseMessaging";
 import {
   getPermissionStatusForUI,
   requestNotificationPermission,

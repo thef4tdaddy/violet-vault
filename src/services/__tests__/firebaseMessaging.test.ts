@@ -15,7 +15,7 @@ vi.mock("firebase/messaging", () => ({
   isSupported: vi.fn(),
 }));
 
-vi.mock("../../utils/common/firebaseConfig", () => ({
+vi.mock("@/utils/common/firebaseConfig", () => ({
   firebaseConfig: {
     apiKey: "test-api-key",
     authDomain: "test-domain",
@@ -26,7 +26,7 @@ vi.mock("../../utils/common/firebaseConfig", () => ({
   },
 }));
 
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

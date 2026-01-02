@@ -31,7 +31,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-vi.mock("../../../services/cloudSyncService", () => ({
+vi.mock("../../../services/sync/cloudSyncService", () => ({
   cloudSyncService: {
     start: vi.fn(),
     stop: vi.fn(),
@@ -145,7 +145,7 @@ describe("useCloudSyncManager", () => {
   it("should handle manual sync", async () => {
     // Set up sync enabled state
     mockUseBudgetStore.cloudSyncEnabled = true;
-    const { cloudSyncService } = await import("../../../services/cloudSyncService");
+    const { cloudSyncService } = await import("../../../services/sync/cloudSyncService");
     vi.mocked(cloudSyncService.forceSync).mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useCloudSyncManager());
@@ -165,7 +165,7 @@ describe("useCloudSyncManager", () => {
       await result.current.handleManualSync();
     });
 
-    const { cloudSyncService } = await import("../../../services/cloudSyncService");
+    const { cloudSyncService } = await import("../../../services/sync/cloudSyncService");
     expect(cloudSyncService.forceSync).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,5 @@
 import logger from "../../utils/common/logger";
-import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 
 interface EditLockServiceUser {
   id?: string;

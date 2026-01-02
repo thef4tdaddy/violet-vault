@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { transactionSplitterService } from "../../services/transactions/transactionSplitterService";
+import { transactionSplitterService } from "@/services/transactions/transactionSplitterService";
 import type { Transaction, SplitAllocation, Envelope } from "@/types/finance";
 
 /**

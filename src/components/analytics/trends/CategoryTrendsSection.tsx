@@ -9,7 +9,7 @@ interface CategoryTrendsSectionProps {
 }
 
 const CategoryTrendsSection: React.FC<CategoryTrendsSectionProps> = ({ categoryTrends }) => {
-  const tooltipFormatter = (value: number) => [formatCurrency(value), "Amount"];
+  const tooltipFormatter = (value: any) => [formatCurrency(Number(value)), "Amount"];
 
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">

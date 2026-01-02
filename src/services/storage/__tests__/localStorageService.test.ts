@@ -4,7 +4,7 @@ import { localStorageService } from "../localStorageService";
 import logger from "@/utils/common/logger";
 
 // Mock logger
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

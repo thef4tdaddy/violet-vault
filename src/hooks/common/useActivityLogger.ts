@@ -1,6 +1,6 @@
 // src/hooks/useActivityLogger.js
 import { useEffect } from "react";
-import activityLogger, { ACTIVITY_TYPES, ENTITY_TYPES } from "../../services/activityLogger";
+import activityLogger, { ACTIVITY_TYPES, ENTITY_TYPES } from "@/services/logging/activityLogger";
 import { useAuthManager } from "../auth/useAuthManager";
 
 /**

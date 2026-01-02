@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import logger from "../../utils/common/logger";
-import localStorageService from "../../services/storage/localStorageService";
+import localStorageService from "@/services/storage/localStorageService";
 
 /**
  * Reset encryption hook return type

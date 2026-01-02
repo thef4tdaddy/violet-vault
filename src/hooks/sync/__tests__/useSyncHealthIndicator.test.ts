@@ -7,7 +7,7 @@ vi.mock("../../../utils/sync/masterSyncValidator", () => ({
   getQuickSyncStatus: vi.fn(),
 }));
 
-vi.mock("../../../services/cloudSyncService", () => ({
+vi.mock("../../../services/sync/cloudSyncService", () => ({
   cloudSyncService: {
     isRunning: false,
     activeSyncPromise: null,
@@ -102,7 +102,7 @@ describe("useSyncHealthIndicator", () => {
   });
 
   it("should monitor background sync activity", () => {
-    const cloudSyncService = require("../../../services/cloudSyncService").cloudSyncService;
+    const cloudSyncService = require("../../../services/sync/cloudSyncService").cloudSyncService;
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 

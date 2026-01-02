@@ -1,10 +1,10 @@
 // Budget Database Service Tests
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { budgetDb } from "@/db/budgetDb";
 
 // Mock the database
-vi.mock("../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     open: vi.fn(),
     close: vi.fn(),

@@ -111,7 +111,7 @@ export const useCloudSyncManager = () => {
     if (newValue) {
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
-        const { cloudSyncService } = await import("../../services/cloudSyncService");
+        const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
         // Get auth data from AuthContext instead of old Zustand store
         // Note: useAuth is a hook and can only be called from components, not from event handlers
         // This is a limitation - for now we'll skip auth validation in settings
@@ -126,7 +126,7 @@ export const useCloudSyncManager = () => {
     } else {
       logger.debug("💾 Cloud sync disabled - stopping background sync");
       try {
-        const { cloudSyncService } = await import("../../services/cloudSyncService");
+        const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
         cloudSyncService.stop();
       } catch (error) {
         logger.error("Failed to stop cloud sync:", error);
@@ -140,7 +140,7 @@ export const useCloudSyncManager = () => {
     setIsSyncing(true);
     try {
       logger.debug("🔄 Manual sync triggered from settings");
-      const { cloudSyncService } = await import("../../services/cloudSyncService");
+      const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
 
       if (!(cloudSyncService as { isRunning?: boolean }).isRunning) {
         logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
@@ -151,11 +151,12 @@ export const useCloudSyncManager = () => {
 
       const result = await cloudSyncService.forceSync();
 
-      if (result.success) {
-        logger.info("✅ Manual sync completed", result);
+      if (result?.success) {
+        logger.info("✅ Manual sync completed", result as unknown as Record<string, unknown>);
         // Note: Success notification could be added here for better UX
       } else {
-        logger.error("❌ Manual sync failed", result.error);
+        const errorMsg = result?.error || result?.reason || "Unknown error";
+        logger.error("❌ Manual sync failed", { error: errorMsg });
         // Note: Error notification could be added here for better UX
       }
     } catch (error) {

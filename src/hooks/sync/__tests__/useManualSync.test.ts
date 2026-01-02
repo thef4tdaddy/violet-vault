@@ -5,7 +5,7 @@ import React from "react";
 import { useManualSync } from "../useManualSync";
 
 // Mock cloudSyncService
-vi.mock("@/services/cloudSyncService", () => ({
+vi.mock("@/services/sync/cloudSyncService", () => ({
   cloudSyncService: {
     isRunning: true,
     forceSync: vi.fn(),
@@ -55,7 +55,7 @@ describe("useManualSync", () => {
     wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(QueryClientProvider, { client: queryClient }, children);
 
-    const cloudSync = await import("@/services/cloudSyncService");
+    const cloudSync = await import("@/services/sync/cloudSyncService");
     mockCloudSyncService = cloudSync.cloudSyncService as {
       isRunning: boolean;
       forceSync: ReturnType<typeof vi.fn>;

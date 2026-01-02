@@ -26,7 +26,7 @@ vi.mock("../../common/useEditLock", () => ({
   }),
 }));
 
-vi.mock("../../../services/editLockService", () => ({
+vi.mock("../../../services/sync/editLockService", () => ({
   initializeEditLocks: vi.fn(),
 }));
 

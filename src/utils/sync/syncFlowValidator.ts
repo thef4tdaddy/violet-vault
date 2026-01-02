@@ -4,7 +4,11 @@
  */
 
 import { budgetDb } from "@/db/budgetDb";
-import { cloudSyncService, type DexieData, type DataCollection } from "@/services/cloudSyncService";
+import {
+  cloudSyncService,
+  type DexieData,
+  type DataCollection,
+} from "@/services/sync/cloudSyncService";
 import logger from "@/utils/common/logger";
 import type { Envelope, Transaction, Bill, Debt } from "@/db/types";
 

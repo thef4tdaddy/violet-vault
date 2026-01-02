@@ -4,7 +4,7 @@ import "./index.css";
 // Sentry now loaded lazily via SentryLoader component
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/common/queryClient";
-import { SystemInfoService } from "./services/bugReport/systemInfoService.ts";
+import BugReportingService from "./services/logging/bugReportingService.ts";
 import logger from "./utils/common/logger.ts";
 import { initializeCrypto } from "./utils/security/cryptoCompat.ts";
 
@@ -28,7 +28,7 @@ declare global {
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {
   const loadSyncServices = () => {
-    import("./services/chunkedSyncService.js").catch((error) => {
+    import("./services/sync/chunkedSyncService.js").catch((error) => {
       logger.warn("Firebase sync services failed to load:", error);
     });
   };
@@ -231,7 +231,7 @@ initializeCrypto();
 // Initialize app after DOM is ready
 const initializeApp = () => {
   // Initialize console log and error capture for bug reports
-  SystemInfoService.initializeErrorCapture();
+  BugReportingService.initialize();
 
   // Initialize debugging tools after DOM is ready to avoid store operations in module scope
   if (
@@ -263,9 +263,8 @@ const initializeApp = () => {
 
       // Offline Data Validation
       window.offlineReadiness = async () => {
-        const { default: offlineDataValidator } = await import(
-          "./utils/pwa/offlineDataValidator.js"
-        );
+        const { default: offlineDataValidator } =
+          await import("./utils/pwa/offlineDataValidator.js");
         return await offlineDataValidator.getOfflineReadinessReport();
       };
 
@@ -322,7 +321,7 @@ const initializeApp = () => {
         );
 
         try {
-          const { cloudSyncService } = await import("./services/cloudSyncService.js");
+          const { cloudSyncService } = await import("./services/sync/cloudSyncService.js");
 
           // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
           logger.info("🔍 Checking local data before clearing cloud...");
@@ -368,7 +367,7 @@ const initializeApp = () => {
       window.clearCloudDataOnly = async () => {
         logger.info("🧹 Clearing cloud data only (no restart)...");
         try {
-          const { cloudSyncService } = await import("./services/cloudSyncService.js");
+          const { cloudSyncService } = await import("./services/sync/cloudSyncService.js");
           cloudSyncService.stop();
           logger.info("⏸️ Stopped sync service");
 
@@ -384,34 +383,28 @@ const initializeApp = () => {
 
       // Bug report testing tools
       window.testBugReportCapture = async () => {
-        const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
-        const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
-
         logger.info("🐛 Testing bug report capture...");
 
-        // Test console log capture
-        const errors = SystemInfoService.getRecentErrors();
-        logger.info("📝 Console logs captured:", { count: errors.consoleLogs?.length || 0 });
-        logger.info("❌ Errors captured:", { count: errors.recentErrors?.length || 0 });
+        // Test diagnostics
+        const diagnostics = BugReportingService.runDiagnostics();
+        logger.info("📝 Diagnostics collected:", diagnostics);
 
         // Test screenshot capture
         try {
-          const screenshot = await ScreenshotService.captureScreenshot();
-          const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
+          const screenshot = await BugReportingService.captureScreenshot();
           logger.info("📸 Screenshot capture:", {
-            status: info ? `Success (${info.sizeKB}KB)` : "Failed",
+            status: screenshot ? `Success (${(screenshot.length / 1024).toFixed(1)}KB)` : "Failed",
           });
           return {
             success: true,
-            errors,
+            diagnostics,
             screenshot: !!screenshot,
-            screenshotInfo: info,
           };
         } catch (error) {
           logger.info("📸 Screenshot capture failed:", { error: (error as Error).message });
           return {
             success: false,
-            errors,
+            diagnostics,
             screenshot: false,
             error: error instanceof Error ? error.message : String(error),
           };

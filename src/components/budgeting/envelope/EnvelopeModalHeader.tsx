@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import type { LockDocument } from "@/services/editLockService";
+import type { LockDocument } from "@/types/editLock";
 
 interface EnvelopeModalHeaderProps {
   title?: string;

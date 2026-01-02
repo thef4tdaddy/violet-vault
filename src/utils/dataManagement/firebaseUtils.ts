@@ -1,4 +1,4 @@
-import { cloudSyncService, type SyncConfig } from "../../services/cloudSyncService.ts";
+import { cloudSyncService, type SyncConfig } from "@/services/sync/cloudSyncService.ts";
 import logger from "../common/logger";
 
 /**
@@ -65,7 +65,7 @@ export const forcePushToCloud = async (authConfig: SyncConfig | null = null) => 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
-    const chunkedSyncService = await import("../../services/chunkedSyncService");
+    const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
     if (chunkedSyncService.default && chunkedSyncService.default.decryptionFailures) {
       chunkedSyncService.default.decryptionFailures.clear();
       logger.info("✅ Cleared decryption failure tracking");

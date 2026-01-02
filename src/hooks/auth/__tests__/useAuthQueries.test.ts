@@ -28,7 +28,7 @@ vi.mock("@tanstack/react-query", () => ({
 }));
 
 // Mock the auth service
-vi.mock("../../services/authService", () => ({
+vi.mock("@/services/auth/authService", () => ({
   authService: {
     login: vi.fn(),
     logout: vi.fn(),

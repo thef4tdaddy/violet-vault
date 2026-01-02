@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/common/queryClient";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
-import { cloudSyncService } from "./services/cloudSyncService";
+import { cloudSyncService } from "./services/sync/cloudSyncService";
 // import BugReportButton from "./components/feedback/BugReportButton"; // Now in MainLayout
 import ConfirmProvider from "./components/ui/ConfirmProvider";
 import PromptProvider from "./components/ui/PromptProvider";

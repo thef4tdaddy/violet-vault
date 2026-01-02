@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAuthManager } from "../auth/useAuthManager";
 import useEditLock from "../common/useEditLock";
-import { initializeEditLocks } from "../../services/editLockService";
+import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEnvelopeForm from "./useEnvelopeForm";
 
 interface Envelope {

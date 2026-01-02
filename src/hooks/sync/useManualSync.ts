@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../utils/common/queryClient";
-import { cloudSyncService } from "../../services/cloudSyncService";
+import { cloudSyncService } from "@/services/sync/cloudSyncService";
 import logger from "../../utils/common/logger";
 
 /**

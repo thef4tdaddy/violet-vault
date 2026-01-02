@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vite
 import { QueryClient } from "@tanstack/react-query";
 import { prefetchHelpers } from "../prefetchHelpers";
 import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies
@@ -16,7 +16,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/services/budgetDatabaseService", () => ({
+vi.mock("@/services/budget/budgetDatabaseService", () => ({
   budgetDatabaseService: {
     getEnvelopes: vi.fn(),
     getTransactions: vi.fn(),

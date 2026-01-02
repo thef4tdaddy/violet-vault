@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BugReportService from "../../../services/bugReport/index.ts";
+import BugReportService from "../../../services/logging/bugReportingService.ts";
 import logger from "../../../utils/common/logger.ts";
 import { validateBugReportSubmission } from "../../../utils/validation";
 import { useBugReportSentry } from "./useBugReportSentry";
@@ -102,21 +102,17 @@ export const useBugReportSubmissionV2 = (
   /**
    * Handle successful submission
    */
-  const handleSuccessfulSubmission = (result: {
-    successfulProvider?: string;
-    attempts?: number;
-  }): boolean => {
+  const handleSuccessfulSubmission = (result: { provider: string; url?: string }): boolean => {
     setSubmitResult({
       success: true,
-      submissionId: result.successfulProvider || "unknown",
-      url: undefined,
-      provider: result.successfulProvider,
+      submissionId: result.url || result.provider || "unknown",
+      url: result.url,
+      provider: result.provider,
       screenshotStatus: null,
     });
 
     logger.info("Bug report submitted successfully", {
-      provider: result.successfulProvider,
-      attempts: result.attempts,
+      provider: result.provider,
     });
 
     return true;
@@ -148,7 +144,7 @@ export const useBugReportSubmissionV2 = (
    */
   const executeSubmission = async (): Promise<{
     success: boolean;
-    result?: { successfulProvider?: string; attempts?: number };
+    result?: { provider: string; url?: string };
     error?: { error?: string };
   }> => {
     const reportOptions = await prepareReportOptions();

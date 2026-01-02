@@ -521,7 +521,7 @@ export const getQuickSyncStatus = async () => {
 
     // Check 2: Cloud sync service availability
     try {
-      const { cloudSyncService } = await import("../../services/cloudSyncService");
+      const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
       const isRunning = Boolean(cloudSyncService);
       checks.push({
         name: "Cloud Sync Service",

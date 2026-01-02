@@ -2,7 +2,7 @@
  * Activity formatting utilities
  * Extracted from ActivityFeed.jsx for better maintainability and ESLint compliance
  */
-import { ACTIVITY_TYPES } from "../../services/activityLogger";
+import { ACTIVITY_TYPES } from "@/services/logging/activityLogger";
 
 interface ActivityDetails {
   name?: string;

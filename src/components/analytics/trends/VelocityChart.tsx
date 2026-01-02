@@ -32,7 +32,11 @@ const VelocityChart = ({ spendingVelocity = [] }: VelocityChartProps) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={velocityTooltipFormatter} />
+              <Tooltip
+                formatter={(value: any, name: any) =>
+                  velocityTooltipFormatter(Number(value || 0), String(name || ""))
+                }
+              />
               <Area
                 type="monotone"
                 dataKey="percentChange"

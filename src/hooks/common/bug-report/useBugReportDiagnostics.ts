@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BugReportService from "../../../services/bugReport/index.ts";
+import BugReportService from "../../../services/logging/bugReportingService.ts";
 import logger from "../../../utils/common/logger.ts";
 
 /**

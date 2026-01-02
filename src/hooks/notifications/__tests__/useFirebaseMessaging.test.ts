@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useFirebaseMessaging } from "../useFirebaseMessaging";
 
 // Mock dependencies
-vi.mock("../../../services/firebaseMessaging", () => ({
+vi.mock("../../../services/sync/firebaseMessaging", () => ({
   default: {
     initialize: vi.fn(async () => true),
     getCurrentToken: vi.fn(() => null),
@@ -42,7 +42,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should initialize on mount", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
 
     const { result } = renderHook(() => useFirebaseMessaging());
 
@@ -112,7 +113,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should clear token", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
 
     const { result } = renderHook(() => useFirebaseMessaging());
 
@@ -126,7 +128,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should send test message when token available", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
     vi.mocked(firebaseMessagingService.getCurrentToken).mockReturnValueOnce("test-token");
 
     const { result } = renderHook(() => useFirebaseMessaging());
@@ -144,7 +147,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should handle initialization failure", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
     vi.mocked(firebaseMessagingService.initialize).mockResolvedValueOnce(false);
 
     const { result } = renderHook(() => useFirebaseMessaging());
@@ -157,7 +161,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should handle initialization error", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
     vi.mocked(firebaseMessagingService.initialize).mockRejectedValueOnce(new Error("Init failed"));
 
     const { result } = renderHook(() => useFirebaseMessaging());
@@ -264,7 +269,8 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should not initialize twice", async () => {
-    const firebaseMessagingService = (await import("../../../services/firebaseMessaging")).default;
+    const firebaseMessagingService = (await import("../../../services/sync/firebaseMessaging"))
+      .default;
     vi.mocked(firebaseMessagingService.initialize).mockClear();
 
     const { result } = renderHook(() => useFirebaseMessaging());

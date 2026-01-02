@@ -1,6 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import type { FilterParams } from "./queryKeys";
 import logger from "@/utils/common/logger";

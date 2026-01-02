@@ -11,11 +11,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { budgetDb } from "@/db/budgetDb";
 
 // Mock the database
-vi.mock("../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     open: vi.fn(),
     close: vi.fn(),
@@ -74,7 +74,7 @@ vi.mock("../../db/budgetDb", () => ({
 }));
 
 // Mock logger to avoid console output
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

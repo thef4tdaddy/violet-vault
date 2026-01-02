@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { editLockService } from "../../services/editLockService";
-import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
+import { editLockService } from "@/services/sync/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 import useToast from "./useToast";
 import logger from "../../utils/common/logger";
 import {

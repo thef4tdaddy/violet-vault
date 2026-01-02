@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type RefObject } from "react";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
-import { cloudSyncService } from "../../services/cloudSyncService";
+import { cloudSyncService } from "@/services/sync/cloudSyncService";
 import logger from "../../utils/common/logger";
 
 /**

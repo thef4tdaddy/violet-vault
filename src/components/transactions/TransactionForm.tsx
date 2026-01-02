@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
 import useEditLock from "@/hooks/common/useEditLock";
-import { initializeEditLocks } from "@/services/editLockService";
+import { useEditLockInit } from "@/hooks/common/useEditLockInit";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
@@ -62,11 +62,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   } = useAuthManager();
 
   // Initialize edit lock service when modal opens
-  useEffect(() => {
-    if (isOpen && budgetId && currentUser) {
-      initializeEditLocks(budgetId, currentUser);
-    }
-  }, [isOpen, budgetId, currentUser]);
+  // Using hook to avoid direct service import
+  useEditLockInit(isOpen ? budgetId : null, isOpen ? currentUser : null);
 
   // Edit locking for the transaction (only when editing existing transaction)
   const editLock = useEditLock("transaction", editingTransaction?.id?.toString() || "", {

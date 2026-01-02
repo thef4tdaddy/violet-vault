@@ -11,7 +11,7 @@ import { useBillForm } from "@/hooks/bills/useBillForm";
 import useEditLock from "@/hooks/common/useEditLock";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
-import { initializeEditLocks } from "@/services/editLockService";
+import { useEditLockInit } from "@/hooks/common/useEditLockInit";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
@@ -209,11 +209,8 @@ const useBillModalState = ({
     user: currentUser,
   } = useAuthManager();
 
-  useEffect(() => {
-    if (isOpen && budgetId && currentUser) {
-      initializeEditLocks(budgetId ?? "", currentUser);
-    }
-  }, [isOpen, budgetId, currentUser]);
+  // Using hook to avoid direct service import
+  useEditLockInit(isOpen ? budgetId : null, isOpen ? currentUser : null);
 
   const { isLocked, isOwnLock, canEdit, lock, breakLock } = useEditLock(
     editingBill ? "bill" : null,

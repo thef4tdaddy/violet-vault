@@ -7,7 +7,7 @@ import AccountsGrid from "./AccountsGrid";
 import AccountFormModal from "./AccountFormModal";
 import TransferModal from "./TransferModal";
 import { getIcon } from "@/utils";
-import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 
 interface Account {
   id: string | number;

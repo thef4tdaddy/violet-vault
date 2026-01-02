@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import localStorageService from "../../services/storage/localStorageService";
+import localStorageService from "@/services/storage/localStorageService";
 import logger from "../../utils/common/logger";
 
 const ACKNOWLEDGMENT_KEY = "localDataSecurityAcknowledged";

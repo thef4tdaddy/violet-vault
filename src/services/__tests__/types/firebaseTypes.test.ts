@@ -10,9 +10,9 @@ import {
   firebaseErrorHandler,
   syncOperationWrapper,
   syncDataValidator,
-} from "../../types/firebaseServiceTypes";
-import { enhancedFirebaseErrorHandler } from "../../types/errorHandling";
-import logger from "../../../utils/common/logger";
+} from "../types/firebaseServiceTypes";
+import { enhancedFirebaseErrorHandler } from "../types/errorHandling";
+import logger from "@/utils/common/logger";
 
 // Mock the original services
 vi.mock("../../firebaseSyncService", () => ({
@@ -44,7 +44,7 @@ vi.mock("../../chunkedSyncService", () => ({
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

@@ -1,8 +1,8 @@
 import { clearFirebaseData, forcePushToCloud } from "../firebaseUtils";
-import { cloudSyncService } from "../../../services/cloudSyncService";
+import { cloudSyncService } from "../../../services/sync/cloudSyncService";
 import { vi } from "vitest";
 
-vi.mock("../../../services/cloudSyncService", () => ({
+vi.mock("../../../services/sync/cloudSyncService", () => ({
   cloudSyncService: {
     clearAllData: vi.fn(),
     stop: vi.fn(),

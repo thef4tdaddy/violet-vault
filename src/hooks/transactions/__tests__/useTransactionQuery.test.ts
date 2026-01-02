@@ -12,7 +12,7 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   };
 });
 
-vi.mock("../../../services/budgetDatabaseService", () => ({
+vi.mock("../../../services/budget/budgetDatabaseService", () => ({
   default: {
     getTransactions: vi.fn(),
   },

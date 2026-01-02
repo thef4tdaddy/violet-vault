@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import type { Mock } from "vitest";
 import { optimisticHelpers } from "../optimisticHelpers";
 import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies
@@ -24,7 +24,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/services/budgetDatabaseService", () => ({
+vi.mock("@/services/budget/budgetDatabaseService", () => ({
   default: {
     saveBudgetMetadata: vi.fn(),
   },

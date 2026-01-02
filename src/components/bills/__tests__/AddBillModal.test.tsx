@@ -48,7 +48,7 @@ vi.mock("@/hooks/auth/useAuthManager", () => ({
   })),
 }));
 
-vi.mock("@/services/editLockService", () => ({
+vi.mock("@/services/sync/editLockService", () => ({
   initializeEditLocks: vi.fn(),
 }));
 

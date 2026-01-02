@@ -1,5 +1,5 @@
-import { encryptionUtils } from "../../utils/security/encryption";
-import logger from "../../utils/common/logger";
+import { encryptionUtils } from "@/utils/security/encryption";
+import logger from "@/utils/common/logger";
 
 export interface KeyFileData {
   version?: string;

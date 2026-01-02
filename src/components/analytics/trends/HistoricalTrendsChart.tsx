@@ -21,7 +21,10 @@ interface HistoricalTrendsChartProps {
 }
 
 const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({ spendingTrends = [] }) => {
-  const tooltipFormatter = (value: number, name: string) => [formatCurrency(value), name];
+  const tooltipFormatter = (value: number | undefined | string, name: string | undefined) => {
+    if (value === undefined || value === null) return ["$0.00", name || ""];
+    return [formatCurrency(Number(value)), name || ""];
+  };
 
   const hasData = spendingTrends && spendingTrends.length > 0;
 
@@ -38,7 +41,10 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({ spendingT
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={tooltipFormatter} labelFormatter={(month) => `Month: ${month}`} />
+              <Tooltip
+                formatter={tooltipFormatter}
+                labelFormatter={(month: any) => `Month: ${month}`}
+              />
               <Legend />
               <Area
                 type="monotone"

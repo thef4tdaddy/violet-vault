@@ -5,7 +5,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { useAuthManager } from "../auth/useAuthManager";
-import { initializeEditLocks } from "../../services/editLockService";
+import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
 import useBills from "../bills/useBills";

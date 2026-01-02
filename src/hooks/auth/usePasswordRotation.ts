@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useAuthManager } from "./useAuthManager";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
-import localStorageService from "../../services/storage/localStorageService";
+import localStorageService from "@/services/storage/localStorageService";
 
 /**
  * Password rotation hook return type

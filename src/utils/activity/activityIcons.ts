@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { getIcon } from "../icons";
-import { ENTITY_TYPES } from "../../services/activityLogger";
+import { ENTITY_TYPES } from "@/services/logging/activityLogger";
 
 export interface IconInfo {
   component: React.ComponentType<{ className?: string }>;

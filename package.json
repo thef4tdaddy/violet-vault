@@ -1,7 +1,7 @@
 {
   "name": "violetvault",
   "private": true,
-  "version": "2.0.1-prerelease.2618",
+  "version": "2.0.0-alpha.2",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
   "license": "CC-BY-NC-SA-4.0",
@@ -24,13 +24,13 @@
     "pwa"
   ],
   "scripts": {
-    "dev": "vite --mode development",
-    "dev:staging": "vite --mode staging",
-    "build": "vite build --mode production",
-    "build:staging": "vite build --mode staging",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
-    "preview:staging": "vite preview --mode staging",
+    "dev": "vite --config configs/build/vite.config.ts --mode development",
+    "dev:staging": "vite --config configs/build/vite.config.ts --mode staging",
+    "build": "vite build --config configs/build/vite.config.ts --mode production",
+    "build:staging": "vite build --config configs/build/vite.config.ts --mode staging",
+    "build:dev": "vite build --config configs/build/vite.config.ts --mode development",
+    "preview": "vite preview --config configs/build/vite.config.ts",
+    "preview:staging": "vite preview --config configs/build/vite.config.ts --mode staging",
     "lint": "eslint . --config configs/linting/eslint.config.js --max-warnings 1000",
     "lint:fix": "eslint . --config configs/linting/eslint.config.js --fix",
     "lint:json": "mkdir -p docs/audits && eslint . --config configs/linting/eslint.config.js --format json > docs/audits/lint-results.json || true",
@@ -43,7 +43,7 @@
     "typecheck:strict": "mkdir -p docs/audits && tsc --noEmit --strict --allowJs false > docs/audits/typecheck-strict-results.txt || true",
     "typecheck:strict:audit": "npm run typecheck:strict && bash scripts/sort-typecheck-strict-audit.sh",
     "audit:full": "npm run lint:audit && npm run typecheck:audit && npm run typecheck:strict:audit && bash scripts/generate-markdown-report.sh",
-    "typecheck:sw": "tsc --noEmit --project tsconfig.sw.json",
+    "typecheck:sw": "tsc --noEmit --project configs/typescript/tsconfig.sw.json",
     "format": "prettier --config ./configs/linting/prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:check": "prettier --config ./configs/linting/prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "prepare": "husky",
@@ -105,7 +105,6 @@
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.2",
     "@types/swagger-ui-react": "^5.18.0",
-    "@types/uuid": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
     "@vitejs/plugin-react": "^5.0.0",
@@ -118,6 +117,7 @@
     "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "^27.0.1",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.3",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
@@ -130,6 +130,15 @@
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.13",
     "workbox-window": "^7.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --config configs/linting/eslint.config.js --fix --no-warn-ignored",
+      "prettier --config configs/linting/prettier.config.js --write"
+    ],
+    "*.{json,md,yml,yaml,css,scss}": [
+      "prettier --config configs/linting/prettier.config.js --write"
+    ]
   },
   "overrides": {
     "glob": "^9.0.0"

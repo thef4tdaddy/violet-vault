@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": [
+    "../../vite.config.js",
+    "../../vitest.config.js",
+    "../../configs/**/*",
+    "../linting/commitlint.config.cjs"
+  ]
+}

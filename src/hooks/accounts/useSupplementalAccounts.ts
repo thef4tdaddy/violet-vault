@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuthManager } from "@/hooks/auth/useAuthManager";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import useEditLock from "@/hooks/common/useEditLock";
-import { initializeEditLocks } from "@/services/editLockService";
+import { initializeEditLocks } from "@/services/sync/editLockService";
 import {
   validateAccountForm,
   validateTransferForm,

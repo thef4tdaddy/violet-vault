@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { predictNextPayday, checkRecentPayday } from "../../utils/budgeting/paydayPredictor";
 import useToast from "../common/useToast";
 import logger from "../../utils/common/logger";
-import localStorageService from "../../services/storage/localStorageService";
+import localStorageService from "@/services/storage/localStorageService";
 
 interface PaycheckHistoryItem {
   date: string | Date;

@@ -302,7 +302,7 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
       }
 
       // Import and start the cloud sync service
-      const { cloudSyncService } = await import("../../services/cloudSyncService");
+      const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
 
       const normalizedUser =
         typeof authData.currentUser === "string"

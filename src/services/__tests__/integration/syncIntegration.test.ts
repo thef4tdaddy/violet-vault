@@ -1,9 +1,9 @@
 // Sync Integration Tests - Real End-to-End Testing
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
-import firebaseSyncService from "@/services/firebaseSyncService";
-import chunkedSyncService from "@/services/chunkedSyncService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
+import firebaseSyncService from "@/services/sync/firebaseSyncService";
+import chunkedSyncService from "@/services/sync/chunkedSyncService";
 import { encryptionUtils } from "@/utils/security/encryption";
 
 // Test configuration

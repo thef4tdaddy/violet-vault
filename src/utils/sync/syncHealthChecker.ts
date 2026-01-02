@@ -4,8 +4,12 @@
  */
 
 import { budgetDb } from "@/db/budgetDb";
-import { cloudSyncService, type DexieData, type DataCollection } from "@/services/cloudSyncService";
-import chunkedSyncService from "@/services/chunkedSyncService";
+import {
+  cloudSyncService,
+  type DexieData,
+  type DataCollection,
+} from "@/services/sync/cloudSyncService";
+import chunkedSyncService from "@/services/sync/chunkedSyncService";
 import { detectLocalData } from "@/utils/sync/dataDetectionHelper";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/db/types";

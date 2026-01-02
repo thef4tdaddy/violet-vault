@@ -1,9 +1,9 @@
 // Optimistic Update Helpers - TanStack Query optimistic updates with Dexie persistence
 import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
+import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
-import { cloudSyncService } from "@/services/cloudSyncService";
+import { cloudSyncService } from "@/services/sync/cloudSyncService";
 import type { SavingsGoal, Envelope, Transaction, Bill } from "@/db/types";
 import type { QueryClient } from "@tanstack/react-query";
 

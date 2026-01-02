@@ -7,7 +7,7 @@ import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 
 interface AccountForm {
   name: string;
