@@ -2,7 +2,6 @@
 # full_salvo.sh - Multi-language verification script for v2.0 Polyglot Backend
 # Runs TypeScript, Go, and Python linters/type checkers
 
-set -e
 
 echo "🚀 VioletVault v2.0 Full Salvo - Multi-Language Verification"
 echo "=============================================================="
