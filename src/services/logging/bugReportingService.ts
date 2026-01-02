@@ -208,25 +208,67 @@ export class BugReportingService {
   }
 
   /**
-   * Submit to GitHub or Polyglot Go Backend
+   * Submit to GitHub via Go Backend (v2.0 Polyglot)
    */
   private static async submitToGitHub(data: BugReportData): Promise<SubmissionResult> {
-    // TODO (v2.0 Polyglot): Replace this with gRPC or REST client for Go Backend
-    // Milestone: March 2026 - Migration to Centralized Go Bug Reporting
-    logger.info("Submitting bug report to v2.0 Polyglot Pipeline (Simulated)", {
+    logger.info("Submitting bug report to v2.0 Go Backend", {
       title: data.title,
       labels: data.labels,
     });
 
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 1000));
+    try {
+      // Prepare payload for Go backend
+      const payload = {
+        title: data.title || `Bug Report - ${new Date().toLocaleDateString()}`,
+        description: data.description || "",
+        steps: data.steps || "",
+        expected: data.expected || "",
+        actual: data.actual || "",
+        severity: data.severity || "medium",
+        labels: data.labels || [],
+        systemInfo: data.systemInfo,
+        screenshot: data.customData?.screenshot || "",
+      };
 
-    return {
-      success: true,
-      provider: "github",
-      issueNumber: Math.floor(Math.random() * 1000) + 500,
-      url: "https://github.com/f4tdaddy/violet-vault/issues/demo",
-    };
+      // Call Go serverless function
+      const response = await fetch("/api/bug-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Bug report submission failed");
+      }
+
+      logger.info("Bug report submitted successfully", {
+        issueNumber: result.issueNumber,
+        url: result.url,
+      });
+
+      return {
+        success: true,
+        provider: "github",
+        issueNumber: result.issueNumber,
+        url: result.url,
+      };
+    } catch (error) {
+      logger.error("Failed to submit bug report to Go backend", error);
+      return {
+        success: false,
+        provider: "github",
+        error: (error as Error).message || "Failed to submit bug report",
+      };
+    }
   }
 
   /**

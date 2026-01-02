@@ -60,3 +60,21 @@ docs/audits/sorted-typecheck-strict-report.txt
 
 # Test coverage
 coverage/
+
+# Go build artifacts
+api/*.test
+api/*.exe
+api/*.dll
+api/*.so
+api/*.dylib
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
