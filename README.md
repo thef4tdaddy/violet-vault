@@ -84,6 +84,7 @@
   - Go for bug report GitHub API proxy (secrets handling)
   - Python for financial intelligence (payday prediction, merchant analysis)
 - Firebase for cloud storage and real-time sync
+
 - Web Crypto API for client-side encryption
 - Local Storage for offline functionality and intelligent caching
 
@@ -241,11 +242,12 @@ VioletVault provides comprehensive API documentation with OpenAPI 3.0 specificat
 
 #### Key API Endpoints
 
+- **AutoFunding Simulation API** (`/api/autofunding`): Python-based serverless function for smart funding simulations
 - **Bug Report Worker**: Submit bug reports with screenshots
 - **Cloud Sync**: Encrypted data synchronization with Firebase
 - **Budget Data**: Local database operations for envelopes, transactions, and bills
 
-See the [API Development Guide](docs/API-Development-Guide.md) for detailed usage examples and authentication information.
+See the [API Development Guide](docs/API-Development-Guide.md) and [Python API README](api/README.md) for detailed usage examples and authentication information.
 
 ## 🗺️ Roadmap
 
