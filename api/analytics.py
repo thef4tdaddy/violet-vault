@@ -216,7 +216,7 @@ def analyze_merchant_patterns(
     return suggestions[:10]  # Limit to top 10
 
 
-class handler(BaseHTTPRequestHandler):
+class Handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler"""
 
     def _set_headers(self, status_code: int = 200) -> None:
