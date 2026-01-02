@@ -60,3 +60,18 @@ docs/audits/sorted-typecheck-strict-report.txt
 
 # Test coverage
 coverage/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+api/venv/
+api/env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
