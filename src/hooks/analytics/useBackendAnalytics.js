@@ -30,7 +30,7 @@ export const usePaydayPrediction = (transactions, options = {}) => {
     },
     enabled: !!transactions && transactions.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
     ...options,
   });
 };
@@ -63,7 +63,7 @@ export const useMerchantPatterns = (transactions, envelopes = [], monthsOfData =
     },
     enabled: !!transactions && transactions.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
     ...options,
   });
 };
@@ -104,7 +104,7 @@ export const useBackendAnalytics = (transactions, envelopes = [], monthsOfData =
     },
     enabled: !!transactions && transactions.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
     ...options,
   });
 };

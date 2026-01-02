@@ -346,7 +346,13 @@ func formatScreenshot(screenshot string) string {
 
 // createGitHubIssue creates an issue on GitHub
 func createGitHubIssue(payload GitHubIssuePayload, token string) (int, string, error) {
-	apiURL := "https://api.github.com/repos/thef4tdaddy/violet-vault/issues"
+	// Get repository from environment or use default
+	repo := os.Getenv("GITHUB_REPO")
+	if repo == "" {
+		repo = "thef4tdaddy/violet-vault"
+	}
+	
+	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/issues", repo)
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {

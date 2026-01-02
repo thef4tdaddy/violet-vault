@@ -44,6 +44,39 @@ VITE_API_BASE_URL=http://localhost:3000/api
 VITE_API_BASE_URL=/api  # Or leave unset to use default
 ```
 
+### GITHUB_REPO
+**Required**: No  
+**Type**: String  
+**Default**: `thef4tdaddy/violet-vault`  
+**Description**: GitHub repository for bug reports (owner/repo format)  
+**Where to Set**: Vercel Dashboard → Project Settings → Environment Variables
+
+**Example**:
+```
+GITHUB_REPO=myorg/myrepo
+```
+
+### ANALYTICS_MIN_AMOUNT
+**Required**: No  
+**Type**: Float  
+**Default**: `50`  
+**Description**: Minimum spending amount to trigger envelope suggestions  
+**Where to Set**: Vercel Dashboard → Project Settings → Environment Variables
+
+### ANALYTICS_MIN_TRANSACTIONS
+**Required**: No  
+**Type**: Integer  
+**Default**: `3`  
+**Description**: Minimum number of transactions required for pattern detection  
+**Where to Set**: Vercel Dashboard → Project Settings → Environment Variables
+
+### ANALYTICS_BUFFER_PERCENTAGE
+**Required**: No  
+**Type**: Float  
+**Default**: `1.1` (110%)  
+**Description**: Buffer percentage for suggested envelope amounts  
+**Where to Set**: Vercel Dashboard → Project Settings → Environment Variables
+
 ## Environment Files
 
 ### `.env.development` (for local development)

@@ -4,6 +4,7 @@ Provides financial prediction and pattern analysis endpoints
 """
 
 import json
+import os
 import re
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler
@@ -77,10 +78,10 @@ SUGGESTION_COLORS = [
     "#8b5cf6", "#14b8a6", "#f97316", "#84cc16", "#6366f1",
 ]
 
-# Default settings
-DEFAULT_MIN_AMOUNT = 50
-DEFAULT_MIN_TRANSACTIONS = 3
-DEFAULT_BUFFER_PERCENTAGE = 1.1
+# Default settings - configurable via environment variables
+DEFAULT_MIN_AMOUNT = float(os.getenv("ANALYTICS_MIN_AMOUNT", "50"))
+DEFAULT_MIN_TRANSACTIONS = int(os.getenv("ANALYTICS_MIN_TRANSACTIONS", "3"))
+DEFAULT_BUFFER_PERCENTAGE = float(os.getenv("ANALYTICS_BUFFER_PERCENTAGE", "1.1"))
 
 
 def predict_next_payday(transactions: List[Transaction]) -> PaydayPrediction:
