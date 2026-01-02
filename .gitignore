@@ -62,11 +62,14 @@ docs/audits/sorted-typecheck-strict-report.txt
 coverage/
 
 # Go build artifacts
+# Go build artifacts
 api/*.test
 api/*.exe
 api/*.dll
 api/*.so
 api/*.dylib
+api/bin/
+api/pkg/
 
 # Python cache and build artifacts
 __pycache__/
