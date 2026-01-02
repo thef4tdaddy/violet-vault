@@ -275,8 +275,8 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 	if amount >= 0 {
 		transactionType = "income"
 	} else {
-		// Ensure expenses are negative
-		amount = -amount * -1 // Keep it negative
+		// Ensure expenses are negative (already negative, keep it)
+		// amount is already negative, no change needed
 	}
 
 	// Get description
@@ -374,9 +374,9 @@ func getFieldName(mapping map[string]string, field string, alternatives []string
 		return mapped
 	}
 
-	// Try alternatives
-	for _, alt := range alternatives {
-		return alt
+	// Return the first alternative (used as fallback)
+	if len(alternatives) > 0 {
+		return alternatives[0]
 	}
 
 	return field
