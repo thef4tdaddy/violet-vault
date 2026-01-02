@@ -54,19 +54,20 @@ The backend is split between Go and Python for optimal performance and maintaina
 
 - `GITHUB_TOKEN`: Personal access token with `repo` scope
 
-### 2. Analytics Engine (`analytics.py`)
+### 2. Analytics Engine
 
-**Endpoint**: `POST /api/analytics`
+The analytics functionality is split into two separate endpoints for better performance and reduced cold-start times on Vercel:
 
-**Purpose**: Provide financial intelligence using Python for data analysis.
+#### 2a. Payday Prediction (`analytics/prediction.py`)
 
-**Operations**:
+**Endpoint**: `POST /api/analytics/prediction`
 
-#### Predict Payday
+**Purpose**: Predict next payday based on paycheck history.
+
+**Request**:
 
 ```json
 {
-  "operation": "predictPayday",
   "paychecks": [
     { "date": "2025-12-15", "amount": 2500 },
     { "date": "2025-12-01", "amount": 2500 }
@@ -79,6 +80,7 @@ The backend is split between Go and Python for optimal performance and maintaina
 ```json
 {
   "success": true,
+  "error": null,
   "prediction": {
     "nextPayday": "2025-12-29T00:00:00",
     "confidence": 85,
@@ -89,11 +91,25 @@ The backend is split between Go and Python for optimal performance and maintaina
 }
 ```
 
-#### Analyze Merchants
+**Error Response**:
 
 ```json
 {
-  "operation": "analyzeMerchants",
+  "success": false,
+  "error": "Missing required field: paychecks"
+}
+```
+
+#### 2b. Merchant Categorization (`analytics/categorization.py`)
+
+**Endpoint**: `POST /api/analytics/categorization`
+
+**Purpose**: Analyze merchant patterns and suggest envelope budgets.
+
+**Request**:
+
+```json
+{
   "transactions": [
     { "description": "Starbucks Coffee", "amount": -5.5, "envelopeId": "" },
     { "description": "Amazon.com", "amount": -45.0, "envelopeId": "" }
@@ -107,6 +123,7 @@ The backend is split between Go and Python for optimal performance and maintaina
 ```json
 {
   "success": true,
+  "error": null,
   "suggestions": [
     {
       "category": "Coffee & Drinks",
@@ -118,6 +135,20 @@ The backend is split between Go and Python for optimal performance and maintaina
   ]
 }
 ```
+
+**Error Response**:
+
+```json
+{
+  "success": false,
+  "error": "monthsOfData must be a positive integer"
+}
+```
+
+**Validation**:
+
+- `transactions`: Required, must be an array
+- `monthsOfData`: Optional, defaults to 1, must be a positive integer
 
 ## Development
 
@@ -198,17 +229,30 @@ curl -X POST http://localhost:3000/api/bug-report \
   }'
 ```
 
-#### Analytics API
+#### Payday Prediction API
 
 ```bash
-curl -X POST http://localhost:3000/api/analytics \
+curl -X POST http://localhost:3000/api/analytics/prediction \
   -H "Content-Type: application/json" \
   -d '{
-    "operation": "predictPayday",
     "paychecks": [
       {"date": "2025-12-15", "amount": 2500},
       {"date": "2025-12-01", "amount": 2500}
     ]
+  }'
+```
+
+#### Merchant Categorization API
+
+```bash
+curl -X POST http://localhost:3000/api/analytics/categorization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transactions": [
+      {"description": "Starbucks", "amount": -5.50, "envelopeId": ""},
+      {"description": "Amazon", "amount": -45.00, "envelopeId": ""}
+    ],
+    "monthsOfData": 3
   }'
 ```
 

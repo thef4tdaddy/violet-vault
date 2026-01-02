@@ -29,13 +29,6 @@ export interface MerchantSuggestion {
   monthlyAverage: number;
 }
 
-interface AnalyticsRequest {
-  operation: "predictPayday" | "analyzeMerchants";
-  transactions?: Array<Record<string, unknown>>;
-  paychecks?: PaycheckEntry[];
-  monthsOfData?: number;
-}
-
 interface AnalyticsResponse {
   success: boolean;
   error?: string;
@@ -46,7 +39,8 @@ interface AnalyticsResponse {
 // --- Implementation ---
 
 export class AnalyticsApiService {
-  private static readonly API_ENDPOINT = "/api/analytics";
+  private static readonly PREDICTION_ENDPOINT = "/api/analytics/prediction";
+  private static readonly CATEGORIZATION_ENDPOINT = "/api/analytics/categorization";
   private static readonly TIMEOUT_MS = 30000;
 
   /**
@@ -58,12 +52,9 @@ export class AnalyticsApiService {
         paycheckCount: paychecks.length,
       });
 
-      const request: AnalyticsRequest = {
-        operation: "predictPayday",
+      const response = await this.callApi(this.PREDICTION_ENDPOINT, {
         paychecks,
-      };
-
-      const response = await this.callApi(request);
+      });
 
       if (!response.success || !response.prediction) {
         logger.error("Payday prediction failed", { error: response.error });
@@ -95,13 +86,10 @@ export class AnalyticsApiService {
         monthsOfData,
       });
 
-      const request: AnalyticsRequest = {
-        operation: "analyzeMerchants",
+      const response = await this.callApi(this.CATEGORIZATION_ENDPOINT, {
         transactions,
         monthsOfData,
-      };
-
-      const response = await this.callApi(request);
+      });
 
       if (!response.success || !response.suggestions) {
         logger.error("Merchant analysis failed", { error: response.error });
@@ -122,17 +110,20 @@ export class AnalyticsApiService {
   /**
    * Call the Python analytics API
    */
-  private static async callApi(request: AnalyticsRequest): Promise<AnalyticsResponse> {
+  private static async callApi(
+    endpoint: string,
+    body: Record<string, unknown>
+  ): Promise<AnalyticsResponse> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
     try {
-      const response = await fetch(this.API_ENDPOINT, {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
 
@@ -161,16 +152,13 @@ export class AnalyticsApiService {
    */
   static async healthCheck(): Promise<boolean> {
     try {
-      const response = await fetch(this.API_ENDPOINT, {
-        method: "GET",
-      });
+      // Check both endpoints
+      const [predictionHealth, categorizationHealth] = await Promise.all([
+        fetch(this.PREDICTION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
+        fetch(this.CATEGORIZATION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
+      ]);
 
-      if (!response.ok) {
-        return false;
-      }
-
-      const data = await response.json();
-      return data.success === true;
+      return predictionHealth.success === true && categorizationHealth.success === true;
     } catch (error) {
       logger.error("Analytics API health check failed", error);
       return false;
