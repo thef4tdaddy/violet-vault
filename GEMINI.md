@@ -1,30 +1,24 @@
-- If there is a bug on main, create an issue for it, in case we are unable to fix it in the moment so there is tracking.
-- If I suggest a new feature, create a GH issue for it so it can be tracked to completion.
-- When creating issues, if its a GH issue for a bug use label "bug" , if its a new feature / enhancement use the label "enhancement" and "roadmap" on the issue
+# 🌌 Antigravity Config (GEMINI.md)
 
-- Always Commit Changes Frequently so changes can be easily reverted
+## 🎯 Primary Focus
 
-## Branch Strategy
+Architecture Simplification and v2.0 Hybrid Rewrite.
 
-- **feature/* → milestone-X.Y**: Individual features
-- **milestone-X.Y → develop**: Complete milestones only
-- **develop → main**: Production releases only
+## 📜 User Rules
 
-## Commit Rules
+- Create GH issues for bugs (label: `bug`) and features (label: `enhancement`, `roadmap`).
+- Commit changes frequently.
+- Run `prettier` before committing.
+- Data Flow: Firebase → Dexie → TanStack Query.
+- State: React Context (Auth) / Zustand (UI only).
 
-- Only fix/docs/CI/revert commits allowed directly on main
-- All features must go through milestone branch first
-- feat/style/perf must go to milestone, then develop, then main
-- Always run prettier before committing
+## 🔄 Active Task
 
-## PR Rules
+Consolidating Sync Services and preparing the Polyglot backend structure.
 
-- Features: Squash and merge to milestone branch
-- Milestones: Create merge commit to develop
-- Releases: Create merge commit to main
-- Always ensure branch is up to date before merging
+- **Milestone**: v2.0 (Target: March 1, 2026)
+- **Epic**: #1463
 
-## Data Structure
+## 🛠️ Tooling
 
-- Firebase (if enabled) -> Dexie -> TanStack
-- Zustand only is for ui state, and auth settings
+Use `full_salvo.sh` for multi-language verification.
