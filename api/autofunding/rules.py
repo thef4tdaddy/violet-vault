@@ -5,6 +5,7 @@ Pure functions for rule processing and validation
 """
 from typing import List, Optional
 from .models import AutoFundingRule, AutoFundingContext, EnvelopeData
+from .currency import round_currency, calculate_percentage_amount
 
 
 # Rule Types
@@ -50,7 +51,7 @@ def calculate_funding_amount(
     
     elif rule_type == RULE_TYPES["PERCENTAGE"]:
         base_amount = get_base_amount_for_percentage(rule, context)
-        return round((base_amount * rule.config.percentage / 100) * 100) / 100
+        return calculate_percentage_amount(base_amount, rule.config.percentage)
     
     elif rule_type == RULE_TYPES["PRIORITY_FILL"]:
         return calculate_priority_fill_amount(rule, context)

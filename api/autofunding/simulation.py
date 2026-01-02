@@ -19,6 +19,7 @@ from .rules import (
     sort_rules_by_priority,
 )
 from .conditions import should_rule_execute
+from .currency import split_amount
 
 
 def simulate_rule_execution(
@@ -209,20 +210,15 @@ def plan_rule_transfers(
     elif rule_type == RULE_TYPES["SPLIT_REMAINDER"]:
         if rule.config.targetIds and len(rule.config.targetIds) > 0:
             num_targets = len(rule.config.targetIds)
-            amount_per_envelope = int(total_amount / num_targets * 100) / 100
+            # Use currency utility for proper splitting
+            amounts = split_amount(total_amount, num_targets)
             
             for index, envelope_id in enumerate(rule.config.targetIds):
-                # Handle rounding by giving any remainder to the last envelope
-                if index == num_targets - 1:
-                    amount = total_amount - (amount_per_envelope * (num_targets - 1))
-                else:
-                    amount = amount_per_envelope
-                
                 transfers.append(
                     PlannedTransfer(
                         fromEnvelopeId="unassigned",
                         toEnvelopeId=envelope_id,
-                        amount=amount,
+                        amount=amounts[index],
                         description=f"Auto-funding (split): {rule.name}",
                         ruleId=rule.id,
                         ruleName=rule.name,

@@ -5,8 +5,16 @@ Vercel serverless function for autofunding simulation
 from http.server import BaseHTTPRequestHandler
 import json
 from typing import Dict, Any
-from .models import AutoFundingRequest, AutoFundingResult, SimulationResult
-from .simulation import simulate_rule_execution
+
+# Use absolute imports for Vercel serverless functions
+try:
+    # Try relative import first (for local development)
+    from .models import AutoFundingRequest, AutoFundingResult, SimulationResult
+    from .simulation import simulate_rule_execution
+except ImportError:
+    # Fall back to absolute import (for Vercel deployment)
+    from autofunding.models import AutoFundingRequest, AutoFundingResult, SimulationResult
+    from autofunding.simulation import simulate_rule_execution
 
 
 class handler(BaseHTTPRequestHandler):
