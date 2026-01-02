@@ -92,10 +92,13 @@ def evaluate_conditions(
                     (e for e in envelopes if e.id == condition.envelopeId),
                     None
                 )
-                if not envelope or not (envelope.currentBalance or 0.0) < condition.value:
+                # Condition fails if envelope not found or balance >= value
+                if envelope is None:
+                    return False
+                if (envelope.currentBalance or 0.0) >= condition.value:
                     return False
             else:
-                if not unassigned_cash < condition.value:
+                if unassigned_cash >= condition.value:
                     return False
         
         elif condition_type == CONDITION_TYPES["BALANCE_GREATER_THAN"]:
@@ -104,10 +107,13 @@ def evaluate_conditions(
                     (e for e in envelopes if e.id == condition.envelopeId),
                     None
                 )
-                if not envelope or not (envelope.currentBalance or 0.0) > condition.value:
+                # Condition fails if envelope not found or balance <= value
+                if envelope is None:
+                    return False
+                if (envelope.currentBalance or 0.0) <= condition.value:
                     return False
             else:
-                if not unassigned_cash > condition.value:
+                if unassigned_cash <= condition.value:
                     return False
         
         elif condition_type == CONDITION_TYPES["UNASSIGNED_ABOVE"]:
