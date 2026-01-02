@@ -45,9 +45,8 @@ export const usePaycheckOperations = () => {
         const paycheckToDelete = validatePaycheckDeletion(paycheckId, paycheckHistory);
 
         // Import required database functions
-        const { budgetDb, getBudgetMetadata, setBudgetMetadata } = await import(
-          "../../db/budgetDb"
-        );
+        const { budgetDb, getBudgetMetadata, setBudgetMetadata } =
+          await import("../../db/budgetDb");
 
         // Calculate new balances and handle envelope reversals
         const balances = await calculateReversedBalances(

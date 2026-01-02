@@ -150,8 +150,10 @@ const DesktopTransactionTable = ({
   );
 };
 
-interface MobileTransactionListProps
-  extends Pick<TransactionTableProps, "transactions" | "envelopes" | "onEdit" | "onSplit"> {
+interface MobileTransactionListProps extends Pick<
+  TransactionTableProps,
+  "transactions" | "envelopes" | "onEdit" | "onSplit"
+> {
   deletingTransaction: Transaction | null;
   handleDeleteClick: (transaction: Transaction) => void;
   handleHistoryClick: (transaction: Transaction) => void;

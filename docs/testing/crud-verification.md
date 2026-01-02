@@ -50,7 +50,7 @@ As of v2.0, VioletVault uses a simplified data model:
 | Create / Update / Delete bills  | `useBills` mutations, `billMutations.ts`, `AddBillModal` | `src/hooks/bills/useBills/__tests__/billMutations.test.ts` | ✅ Pass              | Ran `npx vitest run …billMutations.test.ts`. IndexedDB warnings only.                          |
 | Fetch + filter bills            | `useBills` queries                                       | `src/hooks/bills/useBills/__tests__/billQueries.test.ts`   | ✅ Pass              | Same run; all assertions green.                                                                |
 | Bulk update / smart suggestions | `useBulkBillUpdate`, `useBillManager` helpers            | `src/hooks/bills/__tests__/useBulkBillUpdate.test.tsx`     | ✅ Pass (not re-run) | Existing coverage validated in prior regression suite; optional to rerun if behaviour changes. |
-| Bill ↔ Envelope linkage        | `useBillOperations`, `useBillPayment`                    | Covered by mutations and payment tests                     | ✅ Pass              | Payment mutation suite asserts envelope balance deduction.                                     |
+| Bill ↔ Envelope linkage         | `useBillOperations`, `useBillPayment`                    | Covered by mutations and payment tests                     | ✅ Pass              | Payment mutation suite asserts envelope balance deduction.                                     |
 
 ## Savings Goals (v2.0: Stored as Envelopes)
 
@@ -82,33 +82,33 @@ As of v2.0, VioletVault uses a simplified data model:
 | ----------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Create / Update / Delete / Reconcile      | `useTransactionMutations`, `useTransactions`                  | `src/hooks/transactions/useTransactionsV2` suites (multiple)             | ⚠️ Partial    | Pointed `useTransactionLedger` suite currently fails: pagination expectations drifted (current `handlePagination` keeps `currentPage` at 1) and mocks reference legacy module paths. Needs test + implementation realignment. |
 | Transaction ledger filtering & pagination | `useTransactionLedger`, `useTransactionFilters`               | `src/hooks/transactions/__tests__/useTransactionLedger.test.tsx`         | ⛔ Blocked    | See above failures (pagination behaviour + outdated mocks).                                                                                                                                                                   |
-| Transaction ↔ Envelope sync              | `useTransactionMutations`, `optimisticHelpers.updateEnvelope` | Asserted within `billMutations` + transaction mutation suites            | ✅ Pass       | Verified implicitly through bill payment + mutation tests (see Bills section).                                                                                                                                                |
-| Transaction ↔ Bill linkage               | `useLedgerOperations.handlePayBill`                           | `src/hooks/transactions/helpers/useLedgerOperations.ts` tests            | ⚠️ Partial    | Helper tests exist but not run during this session; schedule follow-up execution.                                                                                                                                             |
+| Transaction ↔ Envelope sync               | `useTransactionMutations`, `optimisticHelpers.updateEnvelope` | Asserted within `billMutations` + transaction mutation suites            | ✅ Pass       | Verified implicitly through bill payment + mutation tests (see Bills section).                                                                                                                                                |
+| Transaction ↔ Bill linkage                | `useLedgerOperations.handlePayBill`                           | `src/hooks/transactions/helpers/useLedgerOperations.ts` tests            | ⚠️ Partial    | Helper tests exist but not run during this session; schedule follow-up execution.                                                                                                                                             |
 | Paycheck transactions (v2.0)              | `paycheckTransactionService`                                  | `src/services/transactions/__tests__/paycheckTransactionService.test.ts` | ✅ Pass       | Tests verify income → unassigned and internal transfer transactions.                                                                                                                                                          |
 
 ## Debts & Connections
 
-| Operation                       | Implementation Surface                                                 | Automated Coverage                                       | Latest Status | Notes                                                                                         |
-| ------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
-| Create / Edit / Delete debts    | `useDebtFormValidated`, `useDebtManagement`                            | `src/hooks/debts/__tests__/useDebtFormValidated.test.ts` | ⚠️ Pending    | Tests not re-run in this session; historically pass. Execute before sign-off.                 |
-| Debt form validation            | `debtFormValidation.ts`                                                | `src/utils/debts/__tests__/debtFormValidation.test.ts`   | ⚠️ Pending    | Same as above.                                                                                |
+| Operation                      | Implementation Surface                                                 | Automated Coverage                                       | Latest Status | Notes                                                                                         |
+| ------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| Create / Edit / Delete debts   | `useDebtFormValidated`, `useDebtManagement`                            | `src/hooks/debts/__tests__/useDebtFormValidated.test.ts` | ⚠️ Pending    | Tests not re-run in this session; historically pass. Execute before sign-off.                 |
+| Debt form validation           | `debtFormValidation.ts`                                                | `src/utils/debts/__tests__/debtFormValidation.test.ts`   | ⚠️ Pending    | Same as above.                                                                                |
 | Debt ↔ Bill / Envelope linkage | `debtManagementHelpers.createDebtOperation`, `linkDebtToBillOperation` | No dedicated automated coverage                          | ⛔ Blocked    | Requires new tests that simulate connection workflows (auto-created bill + envelope linking). |
 
 ## Cross-Domain Matrix Summary
 
-| Domain                         | CRUD Coverage                       | Connection Coverage                          | Overall Status |
-| ------------------------------ | ----------------------------------- | -------------------------------------------- | -------------- |
-| Envelopes                      | Covered (form/query suites passing) | Partial (transfer + link tests missing)      | ⚠️             |
-| Envelope Types (v2.0)          | Covered (schema + model tests)      | Covered (filtering by type)                  | ✅             |
+| Domain                         | CRUD Coverage                       | Connection Coverage                         | Overall Status |
+| ------------------------------ | ----------------------------------- | ------------------------------------------- | -------------- |
+| Envelopes                      | Covered (form/query suites passing) | Partial (transfer + link tests missing)     | ⚠️             |
+| Envelope Types (v2.0)          | Covered (schema + model tests)      | Covered (filtering by type)                 | ✅             |
 | Bills                          | Covered (passing)                   | Covered (billing ↔ envelopes, transactions) | ✅             |
-| Savings Goals (v2.0 envelopes) | Covered (schema + migration tests)  | Covered (stored as savings envelopes)        | ✅             |
-| Supplemental Accts (v2.0 env)  | Covered (schema + migration tests)  | Covered (stored as supplemental envelopes)   | ✅             |
-| Transactions                   | Partial (ledger suite failing)      | Partial (linkage verified indirectly)        | ⚠️             |
-| Paycheck Processing (v2.0)     | Covered (transaction service tests) | Covered (income + transfer transactions)     | ✅             |
-| Debts                          | Pending execution                   | Blocked (needs new tests)                    | ⚠️             |
-| Import/Export (v2.0)           | Covered (dexieUtils + backup tests) | Covered (envelope-based format)              | ✅             |
-| Sync (v2.0)                    | Covered (cloudSync service tests)   | Covered (envelope-based sync)                | ✅             |
-| Backup/Restore (v2.0)          | Covered (autoBackupService tests)   | Covered (envelope-based backup)              | ✅             |
+| Savings Goals (v2.0 envelopes) | Covered (schema + migration tests)  | Covered (stored as savings envelopes)       | ✅             |
+| Supplemental Accts (v2.0 env)  | Covered (schema + migration tests)  | Covered (stored as supplemental envelopes)  | ✅             |
+| Transactions                   | Partial (ledger suite failing)      | Partial (linkage verified indirectly)       | ⚠️             |
+| Paycheck Processing (v2.0)     | Covered (transaction service tests) | Covered (income + transfer transactions)    | ✅             |
+| Debts                          | Pending execution                   | Blocked (needs new tests)                   | ⚠️             |
+| Import/Export (v2.0)           | Covered (dexieUtils + backup tests) | Covered (envelope-based format)             | ✅             |
+| Sync (v2.0)                    | Covered (cloudSync service tests)   | Covered (envelope-based sync)               | ✅             |
+| Backup/Restore (v2.0)          | Covered (autoBackupService tests)   | Covered (envelope-based backup)             | ✅             |
 
 ## Next Steps
 

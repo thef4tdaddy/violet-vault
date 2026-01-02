@@ -12,6 +12,7 @@ from typing import Any, TypedDict
 
 class PaycheckEntry(TypedDict, total=False):
     """Paycheck entry structure"""
+
     date: str
     processedAt: str
     amount: float
@@ -19,6 +20,7 @@ class PaycheckEntry(TypedDict, total=False):
 
 class PaydayPrediction(TypedDict):
     """Payday prediction result"""
+
     nextPayday: str | None
     confidence: int
     pattern: str | None
@@ -28,6 +30,7 @@ class PaydayPrediction(TypedDict):
 
 class MerchantSuggestion(TypedDict):
     """Merchant pattern suggestion"""
+
     category: str
     amount: float
     count: int
@@ -37,6 +40,7 @@ class MerchantSuggestion(TypedDict):
 
 class AnalyticsRequest(TypedDict):
     """Analytics API request structure"""
+
     operation: str
     transactions: list[dict[str, Any]]
     paychecks: list[PaycheckEntry]
@@ -45,6 +49,7 @@ class AnalyticsRequest(TypedDict):
 
 class AnalyticsResponse(TypedDict):
     """Analytics API response structure"""
+
     success: bool
     error: str | None
     prediction: PaydayPrediction | None
@@ -173,8 +178,7 @@ def analyze_merchant_patterns(
 
     # Filter unassigned negative transactions
     unassigned_transactions = [
-        t for t in transactions
-        if t.get("amount", 0) < 0 and not t.get("envelopeId")
+        t for t in transactions if t.get("amount", 0) < 0 and not t.get("envelopeId")
     ]
 
     merchant_spending: dict[str, dict[str, Any]] = {}
@@ -185,11 +189,7 @@ def analyze_merchant_patterns(
         for category, pattern in MERCHANT_PATTERNS.items():
             if pattern.search(description):
                 if category not in merchant_spending:
-                    merchant_spending[category] = {
-                        "amount": 0,
-                        "count": 0,
-                        "transactions": []
-                    }
+                    merchant_spending[category] = {"amount": 0, "count": 0, "transactions": []}
                 merchant_spending[category]["amount"] += abs(transaction.get("amount", 0))
                 merchant_spending[category]["count"] += 1
                 merchant_spending[category]["transactions"].append(transaction)
@@ -201,13 +201,15 @@ def analyze_merchant_patterns(
             monthly_average = data["amount"] / max(months_of_data, 1)
             suggested_budget = int(monthly_average * BUFFER_PERCENTAGE)
 
-            suggestions.append({
-                "category": category,
-                "amount": round(data["amount"], 2),
-                "count": data["count"],
-                "suggestedBudget": suggested_budget,
-                "monthlyAverage": round(monthly_average, 2),
-            })
+            suggestions.append(
+                {
+                    "category": category,
+                    "amount": round(data["amount"], 2),
+                    "count": data["count"],
+                    "suggestedBudget": suggested_budget,
+                    "monthlyAverage": round(monthly_average, 2),
+                }
+            )
 
     # Sort by amount descending
     suggestions.sort(key=lambda x: x["amount"], reverse=True)
@@ -217,7 +219,7 @@ def analyze_merchant_patterns(
 class handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler"""
 
-    def _set_headers(self, status_code: int = 200):
+    def _set_headers(self, status_code: int = 200) -> None:
         """Set response headers"""
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json")
@@ -226,11 +228,11 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-    def do_OPTIONS(self):
+    def do_OPTIONS(self) -> None:
         """Handle preflight requests"""
         self._set_headers(200)
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         """Handle POST requests"""
         try:
             # Read and parse request body
@@ -251,7 +253,10 @@ class handler(BaseHTTPRequestHandler):
                 }
             elif operation == "analyzeMerchants":
                 transactions = request_data.get("transactions", [])
-                months_of_data = request_data.get("monthsOfData", 1)
+                months_of_data_nullable = request_data.get("monthsOfData", 1)
+                months_of_data = (
+                    months_of_data_nullable if months_of_data_nullable is not None else 1
+                )
                 suggestions = analyze_merchant_patterns(transactions, months_of_data)
                 response = {
                     "success": True,
@@ -292,16 +297,14 @@ class handler(BaseHTTPRequestHandler):
             }
             self.wfile.write(json.dumps(error_response).encode())
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         """Handle GET requests (health check)"""
         self._set_headers(200)
         response = {
             "success": True,
             "message": "VioletVault Analytics API v2.0",
             "endpoints": {
-                "POST /api/analytics": {
-                    "operations": ["predictPayday", "analyzeMerchants"]
-                }
-            }
+                "POST /api/analytics": {"operations": ["predictPayday", "analyzeMerchants"]}
+            },
         }
         self.wfile.write(json.dumps(response).encode())
