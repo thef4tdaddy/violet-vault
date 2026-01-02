@@ -6,6 +6,16 @@
   },
   "installCommand": "npm ci",
   "buildCommand": "npm ci && if [ \"$VERCEL_ENV\" == \"preview\" ]; then npm run build:dev; else npm run build; fi",
+  "functions": {
+    "api/bug-report.go": {
+      "runtime": "go1.x",
+      "maxDuration": 30
+    },
+    "api/analytics.py": {
+      "runtime": "python3.12",
+      "maxDuration": 30
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",

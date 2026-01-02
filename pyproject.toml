@@ -1,0 +1,64 @@
+[project]
+name = "violet-vault-api"
+version = "2.0.0"
+description = "Violet Vault Python backend services"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.ruff]
+# Ruff configuration for linting and formatting
+line-length = 100
+target-version = "py312"
+
+# Enable specific rule sets
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+# Ignore specific rules
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+# Use spaces for indentation
+indent-style = "space"
+
+[tool.ruff.lint.isort]
+# Import sorting configuration
+known-first-party = ["api"]
+
+[tool.mypy]
+# MyPy configuration for static type checking
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+# Pytest configuration
+testpaths = ["api/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
