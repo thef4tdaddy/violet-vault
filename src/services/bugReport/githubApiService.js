@@ -7,27 +7,33 @@ import logger from "../../utils/common/logger";
 
 export class GitHubAPIService {
   /**
-   * Submit bug report to GitHub Issues API
+   * Submit bug report to GitHub Issues API via backend
    * @param {Object} reportData - Bug report data
    * @returns {Promise<Object>} Submission result
    */
   static async submitToGitHub(reportData) {
     try {
-      logger.debug("Submitting bug report to GitHub", {
+      logger.debug("Submitting bug report to GitHub via backend", {
         title: reportData.title,
       });
 
-      const issueBody = this.formatGitHubIssueBody(reportData);
-      const labels = [...(reportData.labels || []), "bug", "automated-report"];
-
+      // Prepare payload for backend API
       const payload = {
         title: reportData.title,
-        body: issueBody,
-        labels: labels,
+        description: reportData.description,
+        steps: reportData.steps,
+        expected: reportData.expected,
+        actual: reportData.actual,
+        severity: reportData.severity || 'medium',
+        labels: [...(reportData.labels || []), "bug", "automated-report"],
+        systemInfo: reportData.systemInfo,
+        screenshot: reportData.screenshot,
+        sessionUrl: reportData.sessionUrl,
+        contextInfo: reportData.contextInfo,
+        logs: reportData.logs,
       };
 
-      // Note: This would typically require GitHub API credentials
-      // For now, we'll simulate the API call and return success
+      // Call backend API
       const result = await this.makeGitHubAPICall(payload);
 
       if (result.success) {
@@ -321,32 +327,41 @@ export class GitHubAPIService {
   }
 
   /**
-   * Make actual GitHub API call
+   * Make actual GitHub API call via backend
    * @param {Object} payload - Issue payload
    * @returns {Promise<Object>} API response
    */
   static async makeGitHubAPICall(payload) {
     try {
-      // This is a placeholder for actual GitHub API integration
-      // In a real implementation, you would:
-      // 1. Set up GitHub App or Personal Access Token
-      // 2. Make authenticated request to GitHub Issues API
-      // 3. Handle rate limiting and errors properly
+      // Use the backend Go API endpoint
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+      
+      logger.debug("GitHub API call via backend", payload);
 
-      logger.debug("GitHub API call payload", payload);
+      const response = await fetch(`${apiUrl}/bug-report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-      // Simulate API call with delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await response.json();
 
-      // Simulate successful response
-      const simulatedResponse = {
+      if (!response.ok) {
+        throw new Error(result.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      if (!result.success) {
+        throw new Error(result.error || 'GitHub API call failed');
+      }
+
+      logger.info("GitHub API call completed", result);
+      return {
         success: true,
-        issueNumber: Math.floor(Math.random() * 1000) + 100,
-        url: `https://github.com/your-repo/issues/${Math.floor(Math.random() * 1000) + 100}`,
+        issueNumber: result.issueNumber,
+        url: result.url,
       };
-
-      logger.info("GitHub API call completed", simulatedResponse);
-      return simulatedResponse;
     } catch (error) {
       logger.error("GitHub API call failed", error);
       return {
