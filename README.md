@@ -81,6 +81,9 @@
 **Backend & Infrastructure:**
 
 - Firebase for cloud storage and real-time sync
+- **Go 1.22+ Backend** - High-performance bug report processing
+- **Python 3.12+ Backend** - Financial analytics and ML predictions
+- Vercel Serverless Functions for polyglot backend services
 - Cloudflare Workers for bug reporting and API services
 - Cloudflare R2 for secure screenshot storage with cost protection
 - Web Crypto API for client-side encryption
@@ -156,10 +159,32 @@ src/
 ├── stores/              # Zustand state management
 ├── services/            # Business logic and API services
 ├── utils/               # Utility functions and helpers
+├── types/               # TypeScript type definitions
 └── App.jsx              # Main application entry point
+
+api/                    # Backend serverless functions
+├── bug-report.go          # Go bug report processor
+├── analytics.py           # Python analytics engine
+└── tests/                 # Backend test suites
 ```
 
 📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/Source-Code-Directory.md)
+
+## 🔌 Backend Architecture (v2.0)
+
+VioletVault uses a **polyglot serverless architecture** on Vercel for optimal performance:
+
+### Go Backend (`/api/bug-report.go`)
+- **Bug Report Processing**: High-performance GitHub Issues integration
+- **Features**: Screenshot handling, environment detection, markdown formatting
+- **Tests**: Comprehensive unit tests with 100% coverage
+
+### Python Backend (`/api/analytics.py`)
+- **Financial Intelligence**: ML-based payday prediction and pattern analysis
+- **Merchant Categorization**: Regex-based spending pattern detection
+- **Envelope Suggestions**: Smart budget recommendations
+
+📖 **Complete API documentation**: [Backend API Docs](docs/API.md)
 
 ## 🔐 Security
 
@@ -263,6 +288,7 @@ See the [LICENSE](LICENSE) file for complete details.
 | **Features**        | [Feature List](#-features)                                             | Complete feature overview  |
 | **Development**     | [Contributing Guide](CONTRIBUTING.md)                                  | Development workflow       |
 | **Architecture**    | [Project Structure](#-project-structure)                               | Codebase organization      |
+| **Backend API**     | [API Documentation](docs/API.md)                                       | Go & Python backend docs   |
 | **Roadmap**         | [GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects) | Live development board     |
 | **Planning**        | [Milestones](docs/MILESTONES.md)                                       | Weekly release planning    |
 | **Testing**         | [Testing Strategy](docs/Testing-Strategy.md)                           | QA approach                |
