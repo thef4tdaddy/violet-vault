@@ -80,9 +80,10 @@
 
 **Backend & Infrastructure:**
 
+- **Polyglot Backend (v2.0)** - Go + Python serverless functions on Vercel
+  - Go for bug report GitHub API proxy (secrets handling)
+  - Python for financial intelligence (payday prediction, merchant analysis)
 - Firebase for cloud storage and real-time sync
-- Cloudflare Workers for bug reporting and API services
-- Cloudflare R2 for secure screenshot storage with cost protection
 - Web Crypto API for client-side encryption
 - Local Storage for offline functionality and intelligent caching
 
@@ -93,6 +94,8 @@
 - Vitest for unit and integration testing
 - Husky + Commitlint for git hooks
 - Release Please for automated releases
+- **Multi-language tooling** - Go (golangci-lint), Python (ruff, mypy)
+- `full_salvo.sh` - Comprehensive multi-language verification script
 
 ## 🚦 Getting Started
 
@@ -100,6 +103,10 @@
 
 - Node.js 18+
 - npm or yarn
+- **Optional (for backend development):**
+  - Go 1.22+ (for bug report API)
+  - Python 3.12+ (for analytics API)
+  - ruff, mypy (Python tooling: `pip install ruff mypy`)
 
 ### Installation
 
@@ -131,6 +138,7 @@
 ## 📝 Available Scripts
 
 ```bash
+# Frontend Development
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
@@ -138,6 +146,16 @@ npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint issues
 npm run format       # Format code with Prettier
 npm run format:check # Check code formatting
+npm run typecheck    # Run TypeScript type checking
+
+# Backend Development (v2.0 Polyglot)
+cd api && go build ./...        # Build Go serverless functions
+cd api && go test ./...         # Test Go code
+ruff check api/                 # Lint Python code
+mypy api/                       # Type check Python code
+
+# Multi-Language Verification
+./scripts/full_salvo.sh         # Run all linters/tests (TS/Go/Python)
 ```
 
 ## 🏗️ Project Structure
@@ -145,20 +163,33 @@ npm run format:check # Check code formatting
 VioletVault is organized into a comprehensive modular architecture with **696 files** across major functional areas:
 
 ```
-src/
-├── components/           # React components (27 major categories)
-│   ├── analytics/           # Financial analytics & reporting
-│   ├── automation/          # Auto-funding and smart rules
-│   ├── budgeting/           # Envelope management system
-│   ├── bills/              # Bill tracking and management
-│   ├── auth/               # Authentication and security
-│   ├── settings/           # Configuration and preferences
-│   └── [22 more categories]
-├── hooks/               # Custom React hooks
-├── stores/              # Zustand state management
-├── services/            # Business logic and API services
-├── utils/               # Utility functions and helpers
-└── App.jsx              # Main application entry point
+violet-vault/
+├── api/                  # v2.0 Polyglot Backend (Go + Python)
+│   ├── bug-report.go        # Go: Bug report GitHub API proxy
+│   ├── analytics.py         # Python: Financial intelligence engine
+│   ├── go.mod              # Go module dependencies
+│   └── README.md           # Backend API documentation
+├── src/
+│   ├── components/           # React components (27 major categories)
+│   │   ├── analytics/           # Financial analytics & reporting
+│   │   ├── automation/          # Auto-funding and smart rules
+│   │   ├── budgeting/           # Envelope management system
+│   │   ├── bills/              # Bill tracking and management
+│   │   ├── auth/               # Authentication and security
+│   │   ├── settings/           # Configuration and preferences
+│   │   └── [22 more categories]
+│   ├── hooks/               # Custom React hooks
+│   ├── stores/              # Zustand state management
+│   ├── services/            # Business logic and API services
+│   │   ├── analytics/          # Analytics API integration (Python)
+│   │   ├── logging/            # Bug reporting service (Go)
+│   │   └── [other services]
+│   ├── utils/               # Utility functions and helpers
+│   └── App.jsx              # Main application entry point
+├── scripts/
+│   └── full_salvo.sh        # Multi-language verification script
+├── pyproject.toml          # Python tooling configuration
+└── vercel.json             # Vercel serverless deployment config
 ```
 
 📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/Source-Code-Directory.md)
