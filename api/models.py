@@ -3,7 +3,7 @@ Data Models for VioletVault Analytics Service
 Mirrors the TypeScript/Zod schemas from the frontend
 """
 
-from typing import Optional, Literal
+from typing import Optional, Literal, List, Dict
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -88,8 +88,8 @@ class AuditSnapshot(BaseModel):
     Complete snapshot of budget data for integrity audit
     Contains all envelopes, transactions, and metadata needed for analysis
     """
-    envelopes: list[Envelope] = Field(..., description="All envelopes in the budget")
-    transactions: list[Transaction] = Field(..., description="All transactions")
+    envelopes: List[Envelope] = Field(..., description="All envelopes in the budget")
+    transactions: List[Transaction] = Field(..., description="All transactions")
     metadata: BudgetMetadata = Field(..., description="Budget metadata")
 
 
@@ -102,7 +102,7 @@ class IntegrityViolation(BaseModel):
     message: str = Field(..., description="Human-readable description of the violation")
     entityId: Optional[str] = Field(None, description="ID of the entity involved (envelope or transaction)")
     entityType: Optional[Literal["envelope", "transaction", "budget"]] = Field(None, description="Type of entity")
-    details: Optional[dict] = Field(default_factory=dict, description="Additional details about the violation")
+    details: Optional[Dict] = Field(default_factory=dict, description="Additional details about the violation")
 
 
 class IntegrityAuditResult(BaseModel):
@@ -110,7 +110,7 @@ class IntegrityAuditResult(BaseModel):
     Result of an integrity audit operation
     Contains all violations found and summary statistics
     """
-    violations: list[IntegrityViolation] = Field(..., description="List of all violations found")
-    summary: dict = Field(..., description="Summary statistics (counts by severity and type)")
+    violations: List[IntegrityViolation] = Field(..., description="List of all violations found")
+    summary: Dict = Field(..., description="Summary statistics (counts by severity and type)")
     timestamp: str = Field(..., description="When the audit was performed (ISO format)")
-    snapshotSize: dict = Field(..., description="Size of the data snapshot analyzed")
+    snapshotSize: Dict = Field(..., description="Size of the data snapshot analyzed")

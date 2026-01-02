@@ -18,10 +18,9 @@ class EnvelopeIntegrityAuditor:
     """
     Performs integrity checks on envelope budget data
     Detects orphaned transactions, negative balances, and balance leakage
+    
+    This class is stateless - each audit() call is independent.
     """
-
-    def __init__(self):
-        self.violations: List[IntegrityViolation] = []
 
     def audit(self, snapshot: AuditSnapshot) -> IntegrityAuditResult:
         """
@@ -33,21 +32,21 @@ class EnvelopeIntegrityAuditor:
         Returns:
             IntegrityAuditResult with all violations found
         """
-        self.violations = []
+        violations: List[IntegrityViolation] = []
         
         # Build envelope ID set for efficient lookup
         envelope_ids = self._build_envelope_id_set(snapshot.envelopes)
         
         # Run all audit checks
-        self._check_orphaned_transactions(snapshot.transactions, envelope_ids)
-        self._check_negative_envelopes(snapshot.envelopes)
-        self._check_balance_leakage(snapshot)
+        self._check_orphaned_transactions(snapshot.transactions, envelope_ids, violations)
+        self._check_negative_envelopes(snapshot.envelopes, violations)
+        self._check_balance_leakage(snapshot, violations)
         
         # Generate summary statistics
-        summary = self._generate_summary()
+        summary = self._generate_summary(violations)
         
         return IntegrityAuditResult(
-            violations=self.violations,
+            violations=violations,
             summary=summary,
             timestamp=datetime.utcnow().isoformat(),
             snapshotSize={
@@ -75,7 +74,8 @@ class EnvelopeIntegrityAuditor:
     def _check_orphaned_transactions(
         self, 
         transactions: List[Transaction], 
-        envelope_ids: Set[str]
+        envelope_ids: Set[str],
+        violations: List[IntegrityViolation]
     ) -> None:
         """
         Check for transactions pointing to non-existent envelopes
@@ -83,11 +83,12 @@ class EnvelopeIntegrityAuditor:
         Args:
             transactions: List of all transactions
             envelope_ids: Set of valid envelope IDs
+            violations: List to append violations to
         """
         for txn in transactions:
             # Check main envelopeId
             if txn.envelopeId and txn.envelopeId not in envelope_ids:
-                self.violations.append(IntegrityViolation(
+                violations.append(IntegrityViolation(
                     severity="error",
                     type="orphaned_transaction",
                     message=f"Transaction references non-existent envelope: {txn.envelopeId}",
@@ -104,7 +105,7 @@ class EnvelopeIntegrityAuditor:
             
             # Check fromEnvelopeId for transfers
             if txn.fromEnvelopeId and txn.fromEnvelopeId not in envelope_ids:
-                self.violations.append(IntegrityViolation(
+                violations.append(IntegrityViolation(
                     severity="error",
                     type="orphaned_transaction",
                     message=f"Transfer transaction references non-existent source envelope: {txn.fromEnvelopeId}",
@@ -120,7 +121,7 @@ class EnvelopeIntegrityAuditor:
             
             # Check toEnvelopeId for transfers
             if txn.toEnvelopeId and txn.toEnvelopeId not in envelope_ids:
-                self.violations.append(IntegrityViolation(
+                violations.append(IntegrityViolation(
                     severity="error",
                     type="orphaned_transaction",
                     message=f"Transfer transaction references non-existent destination envelope: {txn.toEnvelopeId}",
@@ -134,12 +135,17 @@ class EnvelopeIntegrityAuditor:
                     }
                 ))
 
-    def _check_negative_envelopes(self, envelopes: List[Envelope]) -> None:
+    def _check_negative_envelopes(
+        self, 
+        envelopes: List[Envelope],
+        violations: List[IntegrityViolation]
+    ) -> None:
         """
         Check for envelopes with negative balances (unless explicitly allowed)
         
         Args:
             envelopes: List of all envelopes
+            violations: List to append violations to
         """
         for env in envelopes:
             # Skip if balance is not set or envelope is archived
@@ -152,7 +158,7 @@ class EnvelopeIntegrityAuditor:
                 # Some envelope types like credit cards might allow negative balances
                 severity = "warning" if env.envelopeType in ["bill", "variable"] else "error"
                 
-                self.violations.append(IntegrityViolation(
+                violations.append(IntegrityViolation(
                     severity=severity,
                     type="negative_balance",
                     message=f"Envelope has negative balance: {env.name} (${env.currentBalance:.2f})",
@@ -167,12 +173,17 @@ class EnvelopeIntegrityAuditor:
                     }
                 ))
 
-    def _check_balance_leakage(self, snapshot: AuditSnapshot) -> None:
+    def _check_balance_leakage(
+        self, 
+        snapshot: AuditSnapshot,
+        violations: List[IntegrityViolation]
+    ) -> None:
         """
         Check for balance leakage: Sum of envelope balances + unassigned != total account balance
         
         Args:
             snapshot: Complete budget snapshot
+            violations: List to append violations to
         """
         # Calculate sum of all envelope balances
         total_envelope_balance = sum(
@@ -189,7 +200,7 @@ class EnvelopeIntegrityAuditor:
         
         # If actual balance is not set, we can't check for leakage
         if actual_balance is None:
-            self.violations.append(IntegrityViolation(
+            violations.append(IntegrityViolation(
                 severity="warning",
                 type="missing_data",
                 message="Cannot check balance leakage: actualBalance not set in metadata",
@@ -210,7 +221,7 @@ class EnvelopeIntegrityAuditor:
         tolerance = 0.01  # 1 cent tolerance for floating point errors
         
         if discrepancy > tolerance:
-            self.violations.append(IntegrityViolation(
+            violations.append(IntegrityViolation(
                 severity="error",
                 type="balance_leakage",
                 message=f"Balance leakage detected: Expected ${expected_balance:.2f}, but actual is ${actual_balance:.2f} (diff: ${discrepancy:.2f})",
@@ -226,15 +237,18 @@ class EnvelopeIntegrityAuditor:
                 }
             ))
 
-    def _generate_summary(self) -> Dict:
+    def _generate_summary(self, violations: List[IntegrityViolation]) -> Dict:
         """
         Generate summary statistics for violations
         
+        Args:
+            violations: List of all violations found
+            
         Returns:
             Dictionary with counts by severity and type
         """
         summary = {
-            "total": len(self.violations),
+            "total": len(violations),
             "by_severity": {
                 "error": 0,
                 "warning": 0,
@@ -243,7 +257,7 @@ class EnvelopeIntegrityAuditor:
             "by_type": {}
         }
         
-        for violation in self.violations:
+        for violation in violations:
             # Count by severity
             summary["by_severity"][violation.severity] += 1
             

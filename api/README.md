@@ -222,7 +222,19 @@ api/
 
 ## Testing
 
-Run manual tests using curl:
+### Manual Testing
+
+Run the included test script:
+
+```bash
+# From repository root
+python api/test_audit.py
+
+# Or with the virtual environment
+api/venv/bin/python api/test_audit.py
+```
+
+Test using curl:
 
 ```bash
 # Health check
@@ -231,8 +243,14 @@ curl http://localhost:8000/health
 # Integrity audit (example)
 curl -X POST http://localhost:8000/audit/envelope-integrity \
   -H "Content-Type: application/json" \
-  -d @test_snapshot.json
+  -d @api/test_snapshot_valid.json
 ```
+
+### Future Improvements
+
+- Add pytest-based unit tests
+- Add integration tests
+- Add CI/CD pipeline for Python service
 
 ## Architecture
 

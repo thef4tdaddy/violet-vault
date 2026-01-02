@@ -16,9 +16,12 @@ app = FastAPI(
 )
 
 # Configure CORS for frontend access
+# TODO: For production, configure specific allowed origins via environment variable
+# Example: VITE_FRONTEND_URL=https://violet-vault.vercel.app
+# For now, allowing all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Configure for production
+    allow_origins=["*"],  # Production: Replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
