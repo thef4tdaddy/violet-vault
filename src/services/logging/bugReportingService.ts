@@ -28,8 +28,8 @@ export interface BugReportOptions {
 export interface BugReportData extends BugReportOptions {
   title: string;
   timestamp: string;
-  systemInfo: any;
-  contextInfo: any;
+  systemInfo: Record<string, unknown>;
+  contextInfo: Record<string, unknown>;
 }
 
 export interface SubmissionResult {
@@ -43,14 +43,16 @@ export interface SubmissionResult {
 // --- Implementation ---
 
 export class BugReportingService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static recentErrors: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static consoleLogs: any[] = [];
   private static maxLogs = 50;
 
   /**
    * Initialize error and log capture
    */
-  static initialize() {
+  public static initialize() {
     if (typeof window === "undefined") return;
 
     // Capture global errors
@@ -98,7 +100,8 @@ export class BugReportingService {
     /* eslint-enable no-console */
   }
 
-  private static addLog(level: string, args: any[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public static addLog(level: string, args: any[]) {
     this.consoleLogs.push({
       level,
       message: args
@@ -199,7 +202,7 @@ export class BugReportingService {
       });
       return canvas.toDataURL("image/jpeg", 0.6);
     } catch (error) {
-      logger.warn("Screenshot capture failed", error as any);
+      logger.warn("Screenshot capture failed", { error });
       return null;
     }
   }

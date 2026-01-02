@@ -33,7 +33,7 @@ const VelocityChart = ({ spendingVelocity = [] }: VelocityChartProps) => {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip
-                formatter={(value: any, name: any) =>
+                formatter={(value: number | undefined, name: string | undefined) =>
                   velocityTooltipFormatter(Number(value || 0), String(name || ""))
                 }
               />

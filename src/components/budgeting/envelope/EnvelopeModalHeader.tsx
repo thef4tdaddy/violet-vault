@@ -31,7 +31,7 @@ const EnvelopeModalHeader = ({
   return (
     <>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
+      <div className="bg-linear-to-r from-blue-600 to-blue-800 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center flex-1">
             <div className="bg-white/20 p-2 rounded-xl mr-3">

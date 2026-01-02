@@ -1,7 +1,7 @@
+/* global ServiceWorkerGlobalScope, NotificationOptions, WindowClient */
 /// <reference lib="webworker" />
 
 /* eslint-disable no-console */
-/// <reference lib="webworker" />
 import { initializeApp } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
@@ -29,7 +29,13 @@ if (firebaseConfig.projectId !== "demo-project") {
     const { notification, data } = payload;
 
     const notificationTitle = notification?.title || "VioletVault";
-    const notificationOptions: any = {
+
+    // Extend NotificationOptions to include standard 'actions' property missing from basic TS type
+    interface ExtendedNotificationOptions extends NotificationOptions {
+      actions?: { action: string; title: string; icon?: string }[];
+    }
+
+    const notificationOptions: ExtendedNotificationOptions = {
       body: notification?.body || "You have a new notification",
       icon: notification?.icon || "/images/icon-192x192.png",
       badge: "/images/icon-192x192.png",
@@ -46,6 +52,7 @@ if (firebaseConfig.projectId !== "demo-project") {
     if (data?.actions) {
       try {
         const actions = JSON.parse(data.actions);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         notificationOptions.actions = actions.map((action: any) => ({
           action: action.action,
           title: action.title,

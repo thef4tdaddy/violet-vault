@@ -41,6 +41,7 @@ interface TransactionFormProps {
   smartCategorySuggestion?: (description: string) => TransactionCategorySuggestion | null;
 }
 
+/* eslint-disable complexity */
 const TransactionForm: React.FC<TransactionFormProps> = ({
   isOpen,
   onClose,

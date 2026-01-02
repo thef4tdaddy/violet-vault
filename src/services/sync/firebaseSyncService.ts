@@ -363,6 +363,7 @@ class FirebaseSyncService {
             success: false,
             error: syncOperationWrapper.execute(async () => {
               throw error;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             }) as any, // Not ideal but works for now
             timestamp: Date.now(),
           });
