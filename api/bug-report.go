@@ -95,12 +95,38 @@ Screenshot was provided but omitted from issue body ({{.ScreenshotSize}} bytes).
 *Submitted via VioletVault Bug Reporter v2.0 (Go Backend)*
 `
 
+// getAllowedOrigin returns the request Origin if it is present in the
+// BUG_REPORT_ALLOWED_ORIGINS environment variable (comma-separated list).
+// If no match is found, it returns an empty string and no CORS headers
+// will be set, preventing browsers from making cross-origin requests.
+func getAllowedOrigin(r *http.Request) string {
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		return ""
+	}
+
+	allowed := os.Getenv("BUG_REPORT_ALLOWED_ORIGINS")
+	if allowed == "" {
+		return ""
+	}
+
+	for _, o := range strings.Split(allowed, ",") {
+		if strings.TrimSpace(o) == origin {
+			return origin
+		}
+	}
+
+	return ""
+}
+
 // Handler is the Vercel serverless function entry point
 func Handler(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	// Set CORS headers only for allowed origins
+	if allowedOrigin := getAllowedOrigin(r); allowedOrigin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	}
 	w.Header().Set("Content-Type", "application/json")
 
 	// Handle preflight
