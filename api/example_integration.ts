@@ -113,8 +113,16 @@ export async function performEnvelopeIntegrityAudit(): Promise<IntegrityAuditRes
       db.budgetRecords.toArray()
     ]);
     
-    // Get main budget record (or first one if multiple exist)
-    const metadata = budgetRecords.find(record => record.id === 'main') || budgetRecords[0];
+    // Get main budget record; if none exists, intentionally fall back to the first record
+    let metadata = budgetRecords.find(record => record.id === 'main');
+    
+    if (!metadata && budgetRecords.length > 0) {
+      logger.warn(
+        'integrityAudit',
+        'No budget record with id "main" found; falling back to first budget record'
+      );
+      metadata = budgetRecords[0];
+    }
     
     if (!metadata) {
       throw new Error('No budget metadata found in database');
