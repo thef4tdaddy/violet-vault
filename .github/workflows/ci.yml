@@ -1,0 +1,153 @@
+name: CI
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  full-salvo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # --- Setup ---
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+          cache-dependency-path: api/go.sum
+
+      - name: Install Dependencies
+        id: setup_deps
+        run: |
+          # Frontend
+          npm ci
+
+          # Python (if present)
+          if [ -f "requirements.txt" ]; then
+            python -m venv .venv
+            source .venv/bin/activate
+            pip install -r requirements.txt
+            pip install pytest pytest-cov ruff mypy
+          elif [ -f "pyproject.toml" ]; then
+             python -m venv .venv
+             source .venv/bin/activate
+             pip install .
+             pip install pytest pytest-cov ruff mypy
+          else
+            echo "No Python deps found, installing tooling only"
+            python -m venv .venv
+            source .venv/bin/activate
+            pip install pytest ruff mypy
+          fi
+
+          # Go (if mod exists)
+          if [ -f "api/go.mod" ]; then
+             cd api
+             go mod download
+             cd ..
+          fi
+
+      # --- Polyglot Salvo ---
+
+      # 1. TypeScript/Frontend
+      - name: Frontend Linting & Typecheck
+        id: frontend_checks
+        run: |
+          set -o pipefail
+          {
+            EXIT_CODE=0
+
+            echo "::group::Prettier"
+            npm run format:check && echo "STATUS_PRETTIER:0" || { echo "STATUS_PRETTIER:1"; EXIT_CODE=1; }
+            echo "::endgroup::"
+
+            echo "::group::ESLint"
+            npm run lint && echo "STATUS_ESLINT:0" || { echo "STATUS_ESLINT:1"; EXIT_CODE=1; }
+            echo "::endgroup::"
+
+            echo "::group::TypeScript"
+            npm run typecheck && echo "STATUS_TSC:0" || { echo "STATUS_TSC:1"; EXIT_CODE=1; }
+            echo "::endgroup::"
+
+            exit $EXIT_CODE
+          }
+
+      - name: Frontend Tests
+        id: frontend_test
+        run: |
+          npm run test:run
+
+      # 2. Go Backend
+      - name: Go Backend Checks
+        id: go_checks
+        if: hashFiles('api/**/*.go') != ''
+        run: |
+          cd api
+          set -o pipefail
+          {
+            EXIT_CODE=0
+
+            echo "::group::Go Format"
+            if [ -z "$(gofmt -l .)" ]; then
+              echo "STATUS_GOFMT:0"
+            else
+              gofmt -d .
+              echo "STATUS_GOFMT:1"
+              EXIT_CODE=1
+            fi
+            echo "::endgroup::"
+
+            echo "::group::Go Vet"
+            go vet ./... && echo "STATUS_GOVET:0" || { echo "STATUS_GOVET:1"; EXIT_CODE=1; }
+            echo "::endgroup::"
+
+            echo "::group::Go Test"
+            go test ./... -v && echo "STATUS_GOTEST:0" || { echo "STATUS_GOTEST:1"; EXIT_CODE=1; }
+            echo "::endgroup::"
+            
+            exit $EXIT_CODE
+          }
+
+      # 3. Python Backend
+      - name: Python Backend Checks
+        id: py_checks
+        if: hashFiles('api/**/*.py') != ''
+        run: |
+          source .venv/bin/activate
+
+          # For now, simplistic checks on api/ folder
+          # In future, point this to api/analytics or specific module
+
+          echo "::group::Ruff"
+          ruff check api/ || true # warning only for now
+          echo "::endgroup::"
+
+          echo "::group::Mypy"
+          mypy api/ --ignore-missing-imports || true # warning only for now
+          echo "::endgroup::"
