@@ -312,51 +312,84 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 }
 
 // autoDetectFieldMapping attempts to automatically detect field mapping from headers
+// Prioritizes exact matches over substring matches to avoid ambiguity
 func autoDetectFieldMapping(headers []string) map[string]string {
 	mapping := make(map[string]string)
 
+	// First pass: exact matches (case-insensitive)
 	for _, header := range headers {
 		headerLower := strings.ToLower(strings.TrimSpace(header))
 
-		// Date detection
-		if strings.Contains(headerLower, "date") || strings.Contains(headerLower, "time") {
+		// Exact matches for common field names
+		switch headerLower {
+		case "date", "transaction_date", "transaction date":
 			if _, exists := mapping["date"]; !exists {
 				mapping["date"] = header
 			}
-		}
-
-		// Amount detection
-		if strings.Contains(headerLower, "amount") || strings.Contains(headerLower, "value") || strings.Contains(headerLower, "price") {
+		case "amount", "value":
 			if _, exists := mapping["amount"]; !exists {
 				mapping["amount"] = header
 			}
-		}
-
-		// Description detection
-		if strings.Contains(headerLower, "description") || strings.Contains(headerLower, "memo") || strings.Contains(headerLower, "payee") || strings.Contains(headerLower, "name") {
+		case "description", "memo", "payee":
 			if _, exists := mapping["description"]; !exists {
 				mapping["description"] = header
 			}
-		}
-
-		// Category detection
-		if strings.Contains(headerLower, "category") || strings.Contains(headerLower, "type") {
+		case "category":
 			if _, exists := mapping["category"]; !exists {
 				mapping["category"] = header
 			}
-		}
-
-		// Merchant detection
-		if strings.Contains(headerLower, "merchant") || strings.Contains(headerLower, "vendor") {
+		case "merchant", "vendor":
 			if _, exists := mapping["merchant"]; !exists {
 				mapping["merchant"] = header
 			}
-		}
-
-		// Notes detection
-		if strings.Contains(headerLower, "note") {
+		case "notes", "note":
 			if _, exists := mapping["notes"]; !exists {
 				mapping["notes"] = header
+			}
+		}
+	}
+
+	// Second pass: substring matches for fields not yet mapped
+	for _, header := range headers {
+		headerLower := strings.ToLower(strings.TrimSpace(header))
+
+		// Date detection (if not already mapped)
+		if _, exists := mapping["date"]; !exists {
+			if strings.Contains(headerLower, "date") && !strings.Contains(headerLower, "update") {
+				mapping["date"] = header
+				continue
+			}
+		}
+
+		// Amount detection (if not already mapped)
+		if _, exists := mapping["amount"]; !exists {
+			if strings.Contains(headerLower, "amount") || strings.Contains(headerLower, "price") {
+				mapping["amount"] = header
+				continue
+			}
+		}
+
+		// Description detection (if not already mapped)
+		if _, exists := mapping["description"]; !exists {
+			if strings.Contains(headerLower, "description") || strings.Contains(headerLower, "payee") {
+				mapping["description"] = header
+				continue
+			}
+		}
+
+		// Merchant detection (if not already mapped)
+		if _, exists := mapping["merchant"]; !exists {
+			if strings.Contains(headerLower, "merchant") || strings.Contains(headerLower, "vendor") {
+				mapping["merchant"] = header
+				continue
+			}
+		}
+
+		// Notes detection (if not already mapped, and avoid conflict with "note" in other contexts)
+		if _, exists := mapping["notes"]; !exists {
+			if strings.Contains(headerLower, "note") && !strings.Contains(headerLower, "debit") && !strings.Contains(headerLower, "credit") {
+				mapping["notes"] = header
+				continue
 			}
 		}
 	}
