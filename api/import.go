@@ -273,8 +273,7 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 	if amount >= 0 {
 		transactionType = "income"
 	} else {
-		// Ensure expenses are negative (already negative, keep it)
-		// amount is already negative, no change needed
+		// Negative amounts represent expenses; preserve the amount sign as-is.
 	}
 
 	// Get description
