@@ -140,10 +140,12 @@ export class AnalyticsApiService {
     paychecks: PaycheckEntry[]
   ): PaydayPrediction | null {
     try {
-      // Convert PaycheckEntry to LocalPaycheckEntry format
-      // LocalPaycheckEntry has index signature [key: string]: unknown
-      // so we can safely pass the full object
-      const localPaychecks = paychecks as LocalPaycheckEntry[];
+      // Convert PaycheckEntry to LocalPaycheckEntry format, normalizing date fields
+      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((paycheck) => ({
+        ...paycheck,
+        date: paycheck.date ? new Date(paycheck.date) : undefined,
+        processedAt: paycheck.processedAt ? new Date(paycheck.processedAt) : undefined,
+      }));
 
       const localPrediction = localPredict(localPaychecks);
 
