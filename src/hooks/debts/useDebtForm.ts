@@ -48,11 +48,10 @@ export interface ConnectedEnvelope {
   [key: string]: unknown;
 }
 
-export interface DebtSubmissionData
-  extends Omit<
-    DebtFormState,
-    "currentBalance" | "interestRate" | "minimumPayment" | "originalBalance" | "creditLimit"
-  > {
+export interface DebtSubmissionData extends Omit<
+  DebtFormState,
+  "currentBalance" | "interestRate" | "minimumPayment" | "originalBalance" | "creditLimit"
+> {
   currentBalance: number;
   balance: number; // Alias for currentBalance
   interestRate: number;

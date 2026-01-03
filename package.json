@@ -1,7 +1,7 @@
 {
   "name": "violetvault",
   "private": true,
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.14",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
   "license": "CC-BY-NC-SA-4.0",
@@ -34,15 +34,15 @@
     "lint": "eslint . --config configs/linting/eslint.config.js --max-warnings 1000",
     "lint:fix": "eslint . --config configs/linting/eslint.config.js --fix",
     "lint:json": "mkdir -p docs/audits && eslint . --config configs/linting/eslint.config.js --format json > docs/audits/lint-results.json || true",
-    "lint:audit": "npm run lint:json && bash scripts/sort-lint-audit.sh",
+    "lint:audit": "npm run lint:json && bash scripts/audit/sort-lint-audit.sh",
     "tsc:check": "tsc --noEmit",
     "tsc:watch": "tsc --noEmit --watch",
     "typecheck": "tsc --noEmit",
     "typecheck:raw": "mkdir -p docs/audits && tsc --noEmit > docs/audits/typecheck-results.txt || true",
-    "typecheck:audit": "npm run typecheck:raw && bash scripts/sort-typecheck-audit.sh",
+    "typecheck:audit": "npm run typecheck:raw && bash scripts/audit/sort-typecheck-audit.sh",
     "typecheck:strict": "mkdir -p docs/audits && tsc --noEmit --strict --allowJs false > docs/audits/typecheck-strict-results.txt || true",
-    "typecheck:strict:audit": "npm run typecheck:strict && bash scripts/sort-typecheck-strict-audit.sh",
-    "audit:full": "npm run lint:audit && npm run typecheck:audit && npm run typecheck:strict:audit && bash scripts/generate-markdown-report.sh",
+    "typecheck:strict:audit": "npm run typecheck:strict && bash scripts/audit/sort-typecheck-strict-audit.sh",
+    "audit:full": "npm run lint:audit && npm run typecheck:audit && npm run typecheck:strict:audit && bash scripts/audit/generate-markdown-report.sh",
     "typecheck:sw": "tsc --noEmit --project configs/typescript/tsconfig.sw.json",
     "format": "prettier --config ./configs/linting/prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:check": "prettier --config ./configs/linting/prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
@@ -138,6 +138,9 @@
     ],
     "*.{json,md,yml,yaml,css,scss}": [
       "prettier --config configs/linting/prettier.config.js --write"
+    ],
+    "*.go": [
+      "gofmt -w"
     ]
   },
   "overrides": {

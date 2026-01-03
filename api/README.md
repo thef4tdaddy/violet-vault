@@ -1,277 +1,218 @@
-# VioletVault Analytics API
+# VioletVault v2.0 Polyglot Backend
 
-Python-based analytics service for VioletVault, providing heavy compute endpoints for budget data analysis.
+This directory contains serverless functions for the VioletVault v2.0 polyglot backend architecture.
 
-## Overview
+## Architecture
 
-This service implements the "Polyglot Backend" architecture for VioletVault, handling computationally intensive tasks that are better suited for Python than JavaScript/TypeScript.
+The backend is split between Go and Python for optimal performance and maintainability:
 
-## Features
+- **Go**: Handles bug report proxy (GitHub API) and high-performance streaming imports.
+- **Python**: Handles financial intelligence (payday prediction, merchant categorization, autofunding simulation, integrity audits).
 
-### Envelope Integrity Audit
-
-Analyzes budget data snapshots for integrity violations:
-
-- **Orphaned Transactions**: Detects transactions pointing to non-existent envelopes
-- **Negative Balances**: Identifies envelopes with negative balances (with severity based on envelope type)
-- **Balance Leakage**: Verifies that sum of envelope balances + unassigned cash equals total account balance
-
-## Setup
-
-### Prerequisites
-
-- Python 3.11 or higher
-- pip
-
-### Installation
-
-1. **Create virtual environment:**
+### Python Structure
 
 ```bash
-cd api
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+api/
+├── __init__.py              # Main API module
+├── requirements.txt         # Python dependencies
+├── autofunding/             # Autofunding module
+│   ├── index.py             # Main autofunding endpoint (Vercel handler)
+│   ├── __init__.py          # Module exports
+│   ├── models.py            # Pydantic models (data validation)
+│   ├── simulation.py        # Core simulation logic
+│   ├── rules.py             # Rule processing utilities
+│   ├── currency.py          # Currency utilities
+│   └── conditions.py        # Condition evaluation utilities
+├── analytics/               # Analytics module
+│   ├── audit.py             # Integrity audit logic
+│   ├── prediction.py
+│   └── categorization.py
+└── main.py                  # FastAPI application (Dev only)
 ```
 
-2. **Install dependencies:**
+## Serverless Functions
 
-```bash
-pip install -r requirements.txt
+### 1. Bug Report Proxy (`bug-report.go`)
+
+**Endpoint**: `POST /api/bug-report`
+
+**Purpose**: Offload GitHub Issue creation and secret handling to a secure backend.
+
+**Payload**:
+
+```json
+{
+  "title": "Bug report title",
+  "description": "Bug description",
+  "steps": "Steps to reproduce",
+  "expected": "Expected behavior",
+  "actual": "Actual behavior",
+  "severity": "low|medium|high|critical",
+  "labels": ["bug", "frontend"],
+  "systemInfo": {
+    "appVersion": "2.0.0",
+    "userAgent": "..."
+  },
+  "screenshot": "base64_encoded_image"
+}
 ```
 
-### Running the Service
+**Response**:
 
-**Development mode:**
-
-```bash
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```json
+{
+  "success": true,
+  "provider": "github",
+  "issueNumber": 123,
+  "url": "https://github.com/thef4tdaddy/violet-vault/issues/123"
+}
 ```
 
-**Production mode:**
+**Environment Variables**:
 
-```bash
-uvicorn api.main:app --host 0.0.0.0 --port 8000
+- `GITHUB_TOKEN`: Personal access token with `repo` scope
+
+### 2. Import API - Streaming Service (`import.go`)
+
+**Endpoint**: `POST /api/import`
+
+**Purpose**: High-performance Go-based serverless function for parsing and validating large CSV/JSON transaction imports. Reads input streams line-by-line to minimize memory usage.
+
+**Features**:
+
+- **Streaming Parse**: Line-by-line parsing for large files
+- **CSV & JSON Support**: Handles both formats
+- **Auto Field Detection**: Detects date, amount, description, etc.
+- **Validation**: Filters invalid rows directly in stream
+
+**Request**:
+Multipart Form Data:
+
+- `file`: CSV or JSON file
+- `fieldMapping`: Optional JSON string mapping fields
+
+**Response**:
+
+```json
+{
+  "success": true,
+  "transactions": [ ... ],
+  "invalid": [ ... ],
+  "message": "Successfully processed 150 transactions"
+}
 ```
 
-The API will be available at `http://localhost:8000`
+### 3. Analytics Engine
 
-## API Documentation
+The analytics functionality is split into separate endpoints for better performance and reduced cold-start times on Vercel:
 
-Once running, visit:
+#### 3a. Payday Prediction (`analytics/prediction.py`)
 
-- **Interactive API docs (Swagger UI)**: http://localhost:8000/docs
-- **Alternative docs (ReDoc)**: http://localhost:8000/redoc
-- **OpenAPI schema**: http://localhost:8000/openapi.json
+**Endpoint**: `POST /api/analytics/prediction`
 
-## Endpoints
+**Purpose**: Predict next payday based on paycheck history.
 
-### `POST /audit/envelope-integrity`
+**Request**:
 
-Performs integrity audit on budget data snapshot.
+```json
+{
+  "paychecks": [
+    { "date": "2025-12-15", "amount": 2500 },
+    { "date": "2025-12-01", "amount": 2500 }
+  ]
+}
+```
+
+#### 3b. Merchant Categorization (`analytics/categorization.py`)
+
+**Endpoint**: `POST /api/analytics/categorization`
+
+**Purpose**: Analyze merchant patterns and suggest envelope budgets.
+
+**Request**:
+
+```json
+{
+  "transactions": [
+    { "description": "Starbucks Coffee", "amount": -5.5 },
+    { "description": "Amazon.com", "amount": -45.0 }
+  ],
+  "monthsOfData": 3
+}
+```
+
+#### 3c. AutoFunding Simulation (`autofunding/index.py`)
+
+**Endpoint**: `POST /api/autofunding`
+
+**Purpose**: Simulates the execution of AutoFunding rules without making actual changes.
+
+**Request Payload**:
+
+```json
+{
+  "rules": [ ... ],
+  "context": {
+    "data": {
+      "unassignedCash": 1000,
+      "envelopes": [ ... ]
+    },
+    "trigger": "manual"
+  }
+}
+```
+
+#### 3d. Envelope Integrity Audit (`analytics/audit.py`)
+
+**Endpoint**: `POST /audit/envelope-integrity`
+
+**Purpose**: Analyzes budget data snapshots for integrity violations: usage of non-existent envelopes, negative balances, and balance leakages.
 
 **Request Body:**
 
 ```json
 {
-  "envelopes": [
-    {
-      "id": "env-1",
-      "name": "Groceries",
-      "category": "Food",
-      "archived": false,
-      "lastModified": 1672531200000,
-      "currentBalance": 500.00
-    }
-  ],
-  "transactions": [
-    {
-      "id": "txn-1",
-      "date": "2024-01-01",
-      "amount": -50.00,
-      "envelopeId": "env-1",
-      "category": "Food",
-      "type": "expense",
-      "lastModified": 1672531200000,
-      "description": "Grocery shopping"
-    }
-  ],
-  "metadata": {
-    "id": "budget-1",
-    "lastModified": 1672531200000,
-    "actualBalance": 1000.00,
-    "unassignedCash": 500.00
-  }
+  "envelopes": [ ... ],
+  "transactions": [ ... ],
+  "metadata": { ... }
 }
 ```
 
-**Response:**
+### Prerequisites
 
-```json
-{
-  "violations": [
-    {
-      "severity": "error",
-      "type": "balance_leakage",
-      "message": "Balance leakage detected...",
-      "entityId": "budget-1",
-      "entityType": "budget",
-      "details": {
-        "actualBalance": 1000.00,
-        "expectedBalance": 1000.00,
-        "discrepancy": 0.00
-      }
-    }
-  ],
-  "summary": {
-    "total": 1,
-    "by_severity": {
-      "error": 1,
-      "warning": 0,
-      "info": 0
-    },
-    "by_type": {
-      "balance_leakage": 1
-    }
-  },
-  "timestamp": "2024-01-01T12:00:00.000000",
-  "snapshotSize": {
-    "envelopes": 1,
-    "transactions": 1,
-    "metadata": 1
-  }
-}
-```
+- Go 1.22+
+- Python 3.12+
+- Node.js 18+
 
-### `GET /health`
-
-Health check endpoint for service monitoring.
-
-**Response:**
-
-```json
-{
-  "status": "healthy",
-  "service": "VioletVault Analytics API",
-  "version": "1.0.0",
-  "endpoints": {
-    "audit": "/audit/envelope-integrity"
-  }
-}
-```
-
-## Data Models
-
-### Envelope
-
-Represents budget allocation containers (e.g., "Groceries", "Gas"). Mirrors TypeScript schema from `src/domain/schemas/envelope.ts`.
-
-### Transaction
-
-Represents financial operations (income, expenses, transfers). Mirrors TypeScript schema from `src/domain/schemas/transaction.ts`.
-
-### BudgetMetadata
-
-High-level budget information including total balance and unassigned cash. Mirrors TypeScript schema from `src/domain/schemas/budget-record.ts`.
-
-## Integration with Frontend
-
-The frontend can call this service to perform integrity audits:
-
-```typescript
-// Example TypeScript/React integration
-const performIntegrityAudit = async () => {
-  const snapshot = {
-    envelopes: await db.envelopes.toArray(),
-    transactions: await db.transactions.toArray(),
-    metadata: await db.budgetRecords.get('main'),
-  };
-
-  const response = await fetch('http://localhost:8000/audit/envelope-integrity', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(snapshot),
-  });
-
-  const result = await response.json();
-  return result;
-};
-```
-
-## Development
-
-### Project Structure
-
-```
-api/
-├── __init__.py              # Package initialization
-├── main.py                  # FastAPI application
-├── models.py                # Pydantic data models
-├── requirements.txt         # Python dependencies
-├── analytics/
-│   ├── __init__.py
-│   └── audit.py            # Integrity audit logic
-└── README.md               # This file
-```
-
-### Adding New Analytics Endpoints
-
-1. Create logic in `api/analytics/`
-2. Define request/response models in `api/models.py`
-3. Add endpoint to `api/main.py`
-4. Update this README
-
-## Testing
-
-### Manual Testing
-
-Run the included test script:
+### Setup
 
 ```bash
-# From repository root
-python api/test_audit.py
+# Go
+cd api
+go mod download
+go test ./...
 
-# Or with the virtual environment
-api/venv/bin/python api/test_audit.py
+# Python
+python -m venv .venv
+source .venv/bin/activate
+pip install -r api/requirements.txt
+ruff check api/
+mypy -p api
 ```
 
-Test using curl:
+### Multi-Language Verification
+
+Run the full salvo script to verify all languages:
 
 ```bash
-# Health check
-curl http://localhost:8000/health
-
-# Integrity audit (example)
-curl -X POST http://localhost:8000/audit/envelope-integrity \
-  -H "Content-Type: application/json" \
-  -d @api/test_snapshot_valid.json
+./scripts/full_salvo.sh
 ```
 
-### Future Improvements
+## Deployment
 
-- Add pytest-based unit tests
-- Add integration tests
-- Add CI/CD pipeline for Python service
+### Vercel
 
-## Architecture
+The API functions are deployed as Vercel serverless functions.
 
-This service implements the "Polyglot Backend" architecture mentioned in `GEMINI.md`:
-
-- **Python**: Heavy compute tasks like data analysis, audits, and future ML features
-- **TypeScript/React**: UI and client-side logic
-- **Firebase**: Cloud storage and real-time sync
-
-## Future Enhancements
-
-- [ ] Add unit tests with pytest
-- [ ] Add ML-based spending predictions
-- [ ] Add budget optimization recommendations
-- [ ] Add transaction pattern analysis
-- [ ] Add Docker deployment configuration
-- [ ] Add production deployment documentation
-- [ ] Add authentication/authorization
-- [ ] Add rate limiting
-- [ ] Add caching for expensive operations
-
-## License
-
-Same as parent project - CC BY-NC-SA 4.0
+- `api/*.go` -> Go Runtime
+- `api/**/*.py` -> Python Runtime (configured in `vercel.json`)

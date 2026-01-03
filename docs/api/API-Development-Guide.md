@@ -153,7 +153,98 @@ const response = await fetch("https://bug-report-worker.thef4tdaddy.workers.dev/
 
 ---
 
-### 2. Cloud Sync API
+### 2. Import API (Go Streaming Service)
+
+**Base URL:** `/api/import` (Vercel Serverless Function)
+
+A high-performance Go-based streaming service for parsing and validating large CSV/JSON transaction imports. Processes files line-by-line to minimize memory usage and prevent UI thread freezing.
+
+#### Endpoint
+
+| Method | Path          | Description                            |
+| ------ | ------------- | -------------------------------------- |
+| POST   | `/api/import` | Upload and parse CSV/JSON transactions |
+
+#### Features
+
+- ✅ **Streaming Parse**: Line-by-line processing for large files
+- ✅ **CSV & JSON Support**: Both formats supported
+- ✅ **Auto Field Detection**: Automatically maps common field names
+- ✅ **Data Normalization**: Maps to VioletVault Transaction schema
+- ✅ **Validation**: Filters invalid rows (missing amounts, invalid dates, future dates)
+- ✅ **Low Memory Footprint**: Streams data instead of loading entire file into RAM
+
+#### Request Format
+
+```bash
+POST /api/import
+Content-Type: multipart/form-data
+
+file: [CSV or JSON file]
+fieldMapping: [optional JSON string]
+```
+
+#### Response Format
+
+```typescript
+interface ImportApiResponse {
+  success: boolean;
+  transactions?: Transaction[];
+  invalid?: Array<{
+    index: number;
+    row: string;
+    errors: string[];
+  }>;
+  error?: string;
+  message?: string;
+}
+```
+
+#### Example: Upload CSV File
+
+```typescript
+import { uploadToGoImportApi } from "@/api/integration-example";
+
+// Upload file to Go streaming service
+const file = document.querySelector('input[type="file"]').files[0];
+const result = await uploadToGoImportApi(file);
+
+if (result.success) {
+  console.log(`Valid transactions: ${result.transactions?.length}`);
+  console.log(`Invalid rows: ${result.invalid?.length}`);
+
+  // Process valid transactions
+  result.transactions?.forEach((transaction) => {
+    // Insert into Dexie or display for user review
+  });
+}
+```
+
+#### Example: Custom Field Mapping
+
+```typescript
+const fieldMapping = {
+  date: "Transaction Date",
+  amount: "Amount",
+  description: "Payee",
+  category: "Category",
+};
+
+const result = await uploadToGoImportApi(file, fieldMapping);
+```
+
+#### Validation Rules
+
+- ✅ Date must be valid and not more than 24 hours in the future
+- ✅ Amount must be a valid number
+- ✅ Required fields: date, amount
+- ✅ Optional fields: description, category, merchant, notes
+
+**See:** `/api/README.md` for complete documentation and test examples.
+
+---
+
+### 3. Cloud Sync API
 
 **Base URL:** Firebase Firestore (configured per environment)
 
@@ -181,7 +272,7 @@ const validated = FirebaseDocumentSchema.parse(result);
 
 ---
 
-### 3. Budget Data API (Local)
+### 4. Budget Data API (Local)
 
 **Base URL:** Local Dexie IndexedDB
 

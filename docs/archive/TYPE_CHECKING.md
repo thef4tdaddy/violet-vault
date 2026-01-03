@@ -161,7 +161,7 @@ The current setup supports gradual TypeScript adoption:
 
 - **TypeScript Config:** [`tsconfig.json`](../tsconfig.json)
 - **Workflow:** [`.github/workflows/type-errors-tracker.yml`](../.github/workflows/type-errors-tracker.yml)
-- **Parser Script:** [`scripts/parse-tsc-errors.js`](../scripts/parse-tsc-errors.js)
+
 - **Tracking Data:** [`.github/data/type-errors.json`](../.github/data/type-errors.json)
 - **Official TypeScript Docs:** [https://www.typescriptlang.org/docs/](https://www.typescriptlang.org/docs/)
 

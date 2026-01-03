@@ -181,9 +181,8 @@ export const createBulkOperationMutationConfig = (
       transactions: unknown[];
       updates?: unknown;
     }) => {
-      const { bulkOperationOnTransactions } = await import(
-        "./helpers/transactionOperationsHelpers"
-      );
+      const { bulkOperationOnTransactions } =
+        await import("./helpers/transactionOperationsHelpers");
       const normalized = normalizeCategoryRules(categoryRules || []);
       return bulkOperationOnTransactions(
         operation,

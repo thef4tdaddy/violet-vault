@@ -5,13 +5,35 @@ echo "🛡️  VioletVault Pre-commit Quality Gate"
 echo "🔍 Running lint-staged..."
 npx lint-staged || exit 1
 
-# 2. Run project-wide type check (required for TS consistency)
-echo "🔍 Running project-wide type check..."
-npm run typecheck || exit 1
+# 2. Check for recent Full Salvo run (last 10 minutes)
+# This replaces heavy typecheck/vet on every commit
+SALVO_TOKEN=".git/FULL_SALVO_SUCCESS"
+if [ -f "$SALVO_TOKEN" ]; then
+    # Get file modification time (portable way?)
+    # macOS 'stat -f %m', Linux 'stat -c %Y'
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        LAST_RUN=$(stat -f %m "$SALVO_TOKEN")
+    else
+        LAST_RUN=$(stat -c %Y "$SALVO_TOKEN" 2>/dev/null || date +%s)
+    fi
+    
+    NOW=$(date +%s)
+    DIFF=$((NOW - LAST_RUN))
+    
+    if [ $DIFF -gt 600 ]; then
+        echo "❌ Full Salvo outdated (last run: ${DIFF}s ago)."
+        echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
+        exit 1
+    else
+        echo "✅ Full Salvo verified (${DIFF}s ago)."
+    fi
+else
+    echo "❌ Full Salvo never run."
+    echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
+    exit 1
+fi
 
-# 3. Run a smoke test (build) to ensure no regressions
-echo "🏗️  Verifying build status..."
-npm run build || exit 1
+
 
 # 4. Auto-bump alpha version
 echo "🔖 Auto-bumping alpha version..."
