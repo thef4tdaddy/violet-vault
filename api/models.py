@@ -5,7 +5,6 @@ Mirrors the TypeScript/Zod schemas from the frontend
 
 from typing import Optional, Literal, List, Dict
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 class Envelope(BaseModel):
