@@ -7,7 +7,23 @@ This directory contains serverless functions for the VioletVault v2.0 polyglot b
 The backend is split between Go and Python for optimal performance and maintainability:
 
 - **Go**: Handles bug report proxy to GitHub API (secrets, authentication)
-- **Python**: Handles financial intelligence (payday prediction, merchant categorization)
+- **Python**: Handles financial intelligence (payday prediction, merchant categorization, autofunding simulation)
+
+### Python Structure
+
+```
+api/
+├── __init__.py              # Main API module
+├── requirements.txt         # Python dependencies
+├── autofunding.py          # Main autofunding endpoint (Vercel handler)
+└── autofunding/            # Autofunding module
+    ├── __init__.py         # Module exports
+    ├── models.py           # Pydantic models (data validation)
+    ├── simulation.py       # Core simulation logic
+    ├── rules.py            # Rule processing utilities
+    ├── currency.py         # Currency utilities
+    └── conditions.py       # Condition evaluation utilities
+```
 
 ## Serverless Functions
 
@@ -56,7 +72,7 @@ The backend is split between Go and Python for optimal performance and maintaina
 
 ### 2. Analytics Engine
 
-The analytics functionality is split into two separate endpoints for better performance and reduced cold-start times on Vercel:
+The analytics functionality is split into separate endpoints for better performance and reduced cold-start times on Vercel:
 
 #### 2a. Payday Prediction (`analytics/prediction.py`)
 
@@ -145,10 +161,93 @@ The analytics functionality is split into two separate endpoints for better perf
 }
 ```
 
-**Validation**:
+#### 2c. AutoFunding Simulation (`autofunding.py`)
 
-- `transactions`: Required, must be an array
-- `monthsOfData`: Optional, defaults to 1, must be a positive integer
+**Endpoint**: `POST /api/autofunding`
+
+**Purpose**: Simulates the execution of AutoFunding rules without making actual changes. This allows the frontend to preview what transfers would occur based on the current rules and context.
+
+**Request Payload**:
+
+```json
+{
+  "rules": [
+    {
+      "id": "rule1",
+      "name": "Groceries Top-up",
+      "description": "Fill groceries envelope",
+      "type": "fixed_amount",
+      "trigger": "manual",
+      "priority": 1,
+      "enabled": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "lastExecuted": null,
+      "executionCount": 0,
+      "config": {
+        "sourceType": "unassigned",
+        "sourceId": null,
+        "targetType": "envelope",
+        "targetId": "env1",
+        "targetIds": [],
+        "amount": 200,
+        "percentage": 0,
+        "conditions": [],
+        "scheduleConfig": {}
+      }
+    }
+  ],
+  "context": {
+    "data": {
+      "unassignedCash": 1000,
+      "newIncomeAmount": 2500,
+      "envelopes": [
+        {
+          "id": "env1",
+          "name": "Groceries",
+          "currentBalance": 150,
+          "monthlyAmount": 400
+        }
+      ]
+    },
+    "trigger": "manual",
+    "currentDate": "2024-01-15T12:00:00.000Z"
+  }
+}
+```
+
+**Response**:
+
+```json
+{
+  "success": true,
+  "simulation": {
+    "totalPlanned": 200,
+    "rulesExecuted": 1,
+    "plannedTransfers": [
+      {
+        "fromEnvelopeId": "unassigned",
+        "toEnvelopeId": "env1",
+        "amount": 200,
+        "description": "Auto-funding: Groceries Top-up",
+        "ruleId": "rule1",
+        "ruleName": "Groceries Top-up"
+      }
+    ],
+    "ruleResults": [
+      {
+        "ruleId": "rule1",
+        "ruleName": "Groceries Top-up",
+        "success": true,
+        "amount": 200,
+        "plannedTransfers": [...],
+        "targetEnvelopes": ["env1"]
+      }
+    ],
+    "remainingCash": 800,
+    "errors": []
+  }
+}
+```
 
 ## Development
 
@@ -170,7 +269,10 @@ go test ./...
 ### Python Setup
 
 ```bash
-# Install Python tooling
+# Install dependencies
+pip install -r api/requirements.txt
+
+# Install tooling
 pip install ruff mypy
 
 # Lint Python code
@@ -256,6 +358,25 @@ curl -X POST http://localhost:3000/api/analytics/categorization \
   }'
 ```
 
+#### AutoFunding Simulation API
+
+```bash
+curl -X POST http://localhost:3000/api/autofunding \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rules": [],
+    "context": {
+        "data": {
+            "unassignedCash": 1000,
+            "newIncomeAmount": 0,
+            "envelopes": []
+        },
+        "trigger": "manual",
+        "currentDate": "2024-03-20T12:00:00Z"
+    }
+  }'
+```
+
 ## Security
 
 - **Secrets**: Never commit `GITHUB_TOKEN` or any secrets to the repository
@@ -269,6 +390,39 @@ curl -X POST http://localhost:3000/api/analytics/categorization \
 - Use Vercel Analytics for performance monitoring
 - Frontend logs API failures with detailed context
 
+## Key Features (AutoFunding)
+
+### Stateless Design
+
+- Does not read from Firebase
+- All context provided in the request payload
+- Pure function simulation
+
+### Request Validation
+
+- Uses Pydantic for automatic request validation
+- Type-safe with full schema enforcement
+- Provides clear error messages for invalid requests
+
+### Ported Logic
+
+The following functions have been ported from TypeScript:
+
+1. **`simulate_rule_execution`**: Main simulation orchestrator
+2. **`simulate_single_rule`**: Single rule simulation
+3. **`plan_rule_transfers`**: Transfer planning
+4. **`calculate_funding_amount`**: Amount calculation
+5. **`calculate_priority_fill_amount`**: Priority fill logic
+6. **`calculate_transfer_impact`**: Impact calculation
+
+### Rule Types Supported
+
+- `fixed_amount`: Fixed dollar amount transfers
+- `percentage`: Percentage-based transfers
+- `priority_fill`: Fill envelope to monthly amount
+- `split_remainder`: Split remaining cash evenly
+- `conditional`: Conditional rule execution
+
 ## Future Enhancements
 
 - Add caching layer for analytics results
@@ -276,3 +430,7 @@ curl -X POST http://localhost:3000/api/analytics/categorization \
 - Add authentication/authorization
 - Add request logging and monitoring
 - Expand analytics capabilities (budgeting AI, spending insights)
+- Machine learning models for smart funding recommendations
+- Optimization algorithms for rule ordering
+- Advanced scheduling logic
+- Rule conflict detection
