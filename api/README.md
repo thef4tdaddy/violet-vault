@@ -7,11 +7,11 @@ This directory contains serverless functions for the VioletVault v2.0 polyglot b
 The backend is split between Go and Python for optimal performance and maintainability:
 
 - **Go**: Handles bug report proxy (GitHub API) and high-performance streaming imports.
-- **Python**: Handles financial intelligence (payday prediction, merchant categorization, autofunding simulation).
+- **Python**: Handles financial intelligence (payday prediction, merchant categorization, autofunding simulation, integrity audits).
 
 ### Python Structure
 
-```
+```bash
 api/
 ├── __init__.py              # Main API module
 ├── requirements.txt         # Python dependencies
@@ -23,7 +23,11 @@ api/
 │   ├── rules.py             # Rule processing utilities
 │   ├── currency.py          # Currency utilities
 │   └── conditions.py        # Condition evaluation utilities
-└── analytics/               # Analytics module
+├── analytics/               # Analytics module
+│   ├── audit.py             # Integrity audit logic
+│   ├── prediction.py
+│   └── categorization.py
+└── main.py                  # FastAPI application (Dev only)
 ```
 
 ## Serverless Functions
@@ -158,7 +162,21 @@ The analytics functionality is split into separate endpoints for better performa
 }
 ```
 
-## Development
+#### 3d. Envelope Integrity Audit (`analytics/audit.py`)
+
+**Endpoint**: `POST /audit/envelope-integrity`
+
+**Purpose**: Analyzes budget data snapshots for integrity violations: usage of non-existent envelopes, negative balances, and balance leakages.
+
+**Request Body:**
+
+```json
+{
+  "envelopes": [ ... ],
+  "transactions": [ ... ],
+  "metadata": { ... }
+}
+```
 
 ### Prerequisites
 
@@ -175,6 +193,8 @@ go mod download
 go test ./...
 
 # Python
+python -m venv .venv
+source .venv/bin/activate
 pip install -r api/requirements.txt
 ruff check api/
 mypy -p api

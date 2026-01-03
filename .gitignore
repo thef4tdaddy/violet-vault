@@ -62,7 +62,6 @@ docs/audits/sorted-typecheck-strict-report.txt
 coverage/
 
 # Go build artifacts
-# Go build artifacts
 api/*.test
 api/*.exe
 api/*.dll
@@ -74,6 +73,7 @@ api/pkg/
 # Python cache and build artifacts
 __pycache__/
 *.py[cod]
+*.so
 *$py.class
 *.egg-info/
 .pytest_cache/
@@ -81,7 +81,8 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
-.venv/
+api/venv/
+api/env/
 .Python
 env/
 ENV/

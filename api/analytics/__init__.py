@@ -5,6 +5,10 @@ Shared types and utilities for analytics endpoints
 
 from typing import Any, TypedDict
 
+from api.analytics.audit import EnvelopeIntegrityAuditor
+
+__all__ = ["EnvelopeIntegrityAuditor"]
+
 
 class PaycheckEntry(TypedDict, total=False):
     """Paycheck entry structure"""

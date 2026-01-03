@@ -82,7 +82,7 @@
 
 - **Polyglot Backend (v2.0)** - Go + Python serverless functions on Vercel
   - Go for bug report GitHub API proxy (secrets handling)
-  - Python for financial intelligence (payday prediction, merchant analysis)
+  - Python for financial intelligence (payday prediction, merchant analysis, integrity audits)
 - Firebase for cloud storage and real-time sync
 
 - Web Crypto API for client-side encryption
@@ -135,6 +135,39 @@
    ```
 
 5. **Open your browser** to `http://localhost:5173`
+
+### Python Analytics Service (Optional)
+
+For advanced analytics features like envelope integrity audits:
+
+1. **Navigate to the api directory**
+
+   ```bash
+   cd api
+   ```
+
+2. **Create and activate virtual environment**
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Start the analytics service**
+
+   ```bash
+   uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+5. **Access API documentation** at `http://localhost:8000/docs`
+
+See [api/README.md](api/README.md) for more details.
 
 ## 📝 Available Scripts
 
@@ -295,7 +328,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
 
-### 🎯 What This Means:
+### 🎯 What This Means
 
 **✅ You CAN:**
 
