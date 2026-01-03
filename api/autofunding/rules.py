@@ -3,7 +3,7 @@ Auto-Funding Rules Utilities
 Port of src/utils/budgeting/autofunding/rules.ts
 Pure functions for rule processing and validation
 """
-from typing import List, Optional
+from typing import List
 from .models import AutoFundingRule, AutoFundingContext, EnvelopeData
 from .currency import round_currency, calculate_percentage_amount
 
