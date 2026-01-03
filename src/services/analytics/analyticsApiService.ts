@@ -3,6 +3,9 @@
  * Interfaces with Python analytics backend for financial intelligence
  */
 import logger from "@/utils/common/logger";
+import { ApiClient } from "@/services/api/client";
+import { predictNextPayday as localPredict } from "@/utils/budgeting/paydayPredictor";
+import type { PaycheckEntry as LocalPaycheckEntry } from "@/utils/budgeting/paydayPredictor";
 
 // --- Types ---
 
@@ -29,13 +32,6 @@ export interface MerchantSuggestion {
   monthlyAverage: number;
 }
 
-interface AnalyticsResponse {
-  success: boolean;
-  error?: string;
-  prediction?: PaydayPrediction;
-  suggestions?: MerchantSuggestion[];
-}
-
 // --- Implementation ---
 
 export class AnalyticsApiService {
@@ -45,6 +41,7 @@ export class AnalyticsApiService {
 
   /**
    * Predict next payday based on paycheck history
+   * Uses V2 Polyglot Backend with fallback to local prediction when offline
    */
   static async predictNextPayday(paychecks: PaycheckEntry[]): Promise<PaydayPrediction | null> {
     try {
@@ -52,29 +49,41 @@ export class AnalyticsApiService {
         paycheckCount: paychecks.length,
       });
 
-      const response = await this.callApi(this.PREDICTION_ENDPOINT, {
-        paychecks,
-      });
+      // Check if online before making API call
+      if (!ApiClient.isOnline()) {
+        logger.warn("Offline - using local payday prediction fallback");
+        return this.localPaydayPredictionFallback(paychecks);
+      }
 
-      if (!response.success || !response.prediction) {
+      const response = await ApiClient.post<{ prediction: PaydayPrediction }>(
+        this.PREDICTION_ENDPOINT,
+        { paychecks },
+        { timeout: this.TIMEOUT_MS }
+      );
+
+      if (!response.success || !response.data?.prediction) {
         logger.error("Payday prediction failed", { error: response.error });
-        return null;
+        // Fallback to local prediction if API fails
+        logger.warn("API failed - using local payday prediction fallback");
+        return this.localPaydayPredictionFallback(paychecks);
       }
 
       logger.info("Payday prediction successful", {
-        confidence: response.prediction.confidence,
-        pattern: response.prediction.pattern,
+        confidence: response.data.prediction.confidence,
+        pattern: response.data.prediction.pattern,
       });
 
-      return response.prediction;
+      return response.data.prediction;
     } catch (error) {
       logger.error("Failed to predict payday", error);
-      return null;
+      // Fallback to local prediction on error
+      return this.localPaydayPredictionFallback(paychecks);
     }
   }
 
   /**
    * Analyze merchant patterns and get envelope suggestions
+   * Uses V2 Polyglot Backend - returns empty array when offline
    */
   static async analyzeMerchantPatterns(
     transactions: Array<Record<string, unknown>>,
@@ -86,21 +95,28 @@ export class AnalyticsApiService {
         monthsOfData,
       });
 
-      const response = await this.callApi(this.CATEGORIZATION_ENDPOINT, {
-        transactions,
-        monthsOfData,
-      });
+      // Check if online before making API call
+      if (!ApiClient.isOnline()) {
+        logger.warn("Offline - merchant analysis unavailable");
+        return [];
+      }
 
-      if (!response.success || !response.suggestions) {
+      const response = await ApiClient.post<{ suggestions: MerchantSuggestion[] }>(
+        this.CATEGORIZATION_ENDPOINT,
+        { transactions, monthsOfData },
+        { timeout: this.TIMEOUT_MS }
+      );
+
+      if (!response.success || !response.data?.suggestions) {
         logger.error("Merchant analysis failed", { error: response.error });
         return [];
       }
 
       logger.info("Merchant analysis successful", {
-        suggestionCount: response.suggestions.length,
+        suggestionCount: response.data.suggestions.length,
       });
 
-      return response.suggestions;
+      return response.data.suggestions;
     } catch (error) {
       logger.error("Failed to analyze merchants", error);
       return [];
@@ -108,42 +124,33 @@ export class AnalyticsApiService {
   }
 
   /**
-   * Call the Python analytics API
+   * Local fallback for payday prediction when API is unavailable
+   * Converts backend response format to match frontend format
    */
-  private static async callApi(
-    endpoint: string,
-    body: Record<string, unknown>
-  ): Promise<AnalyticsResponse> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
-
+  private static localPaydayPredictionFallback(
+    paychecks: PaycheckEntry[]
+  ): PaydayPrediction | null {
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
+      // Convert PaycheckEntry to LocalPaycheckEntry format
+      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((pc) => ({
+        date: pc.date,
+        processedAt: pc.processedAt,
+        amount: pc.amount,
+      }));
 
-      clearTimeout(timeoutId);
+      const localPrediction = localPredict(localPaychecks);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result: AnalyticsResponse = await response.json();
-      return result;
+      // Convert Date to ISO string for API compatibility
+      return {
+        nextPayday: localPrediction.nextPayday ? localPrediction.nextPayday.toISOString() : null,
+        confidence: localPrediction.confidence,
+        pattern: localPrediction.pattern,
+        intervalDays: localPrediction.intervalDays,
+        message: localPrediction.message,
+      };
     } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("Analytics API request timeout");
-      }
-
-      throw error;
+      logger.error("Local payday prediction fallback failed", error);
+      return null;
     }
   }
 
@@ -154,8 +161,12 @@ export class AnalyticsApiService {
     try {
       // Check both endpoints
       const [predictionHealth, categorizationHealth] = await Promise.all([
-        fetch(this.PREDICTION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
-        fetch(this.CATEGORIZATION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
+        ApiClient.get<{ success: boolean }>(this.PREDICTION_ENDPOINT, {
+          timeout: 5000,
+        }),
+        ApiClient.get<{ success: boolean }>(this.CATEGORIZATION_ENDPOINT, {
+          timeout: 5000,
+        }),
       ]);
 
       return predictionHealth.success === true && categorizationHealth.success === true;
