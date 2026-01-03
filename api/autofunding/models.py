@@ -4,16 +4,25 @@ Mirrors the TypeScript interfaces from src/utils/budgeting/autofunding/
 """
 from typing import List, Optional, Dict, Any, Literal
 from pydantic import BaseModel, Field
-from enum import Enum
-from .conditions import CONDITION_TYPES
 
 
 # Condition Types
-ConditionType = Enum(
-    "ConditionType",
-    {key.upper(): key for key in CONDITION_TYPES.keys()},
-    type=str,
-)
+CONDITION_TYPES = {
+    "BALANCE_LESS_THAN": "balance_less_than",
+    "BALANCE_GREATER_THAN": "balance_greater_than",
+    "DATE_RANGE": "date_range",
+    "TRANSACTION_AMOUNT": "transaction_amount",
+    "UNASSIGNED_ABOVE": "unassigned_above",
+}
+
+# Condition type literal
+ConditionType = Literal["balance_less_than", "balance_greater_than", "date_range", "transaction_amount", "unassigned_above"]
+
+# Rule Types - must be defined before AutoFundingRule
+RuleType = Literal["fixed_amount", "percentage", "conditional", "split_remainder", "priority_fill"]
+
+# Trigger Types - must be defined before AutoFundingRule
+TriggerType = Literal["manual", "income_detected", "monthly", "weekly", "biweekly", "payday"]
 
 
 class Condition(BaseModel):
@@ -47,8 +56,8 @@ class AutoFundingRule(BaseModel):
     id: str
     name: str
     description: str = ""
-    type: str
-    trigger: str
+    type: RuleType
+    trigger: TriggerType
     priority: int
     enabled: bool
     createdAt: str

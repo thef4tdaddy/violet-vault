@@ -5,10 +5,14 @@ Can be used to test locally or against deployed API
 """
 import json
 import sys
+from datetime import datetime, timezone
 
 
 def generate_test_payload():
     """Generate a test payload for the autofunding API"""
+    # Use current date for testing instead of hardcoded date
+    current_date = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+    
     return {
         "rules": [
             {
@@ -78,7 +82,7 @@ def generate_test_payload():
                 ]
             },
             "trigger": "manual",
-            "currentDate": "2024-01-15T12:00:00.000Z"
+            "currentDate": current_date
         }
     }
 

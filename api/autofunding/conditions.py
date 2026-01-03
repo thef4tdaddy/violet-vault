@@ -5,17 +5,7 @@ Pure functions for evaluating rule conditions and schedules
 """
 from typing import List, Optional
 from datetime import datetime
-from .models import AutoFundingRule, AutoFundingContext, Condition
-
-
-# Condition Types
-CONDITION_TYPES = {
-    "BALANCE_LESS_THAN": "balance_less_than",
-    "BALANCE_GREATER_THAN": "balance_greater_than",
-    "DATE_RANGE": "date_range",
-    "TRANSACTION_AMOUNT": "transaction_amount",
-    "UNASSIGNED_ABOVE": "unassigned_above",
-}
+from .models import AutoFundingRule, AutoFundingContext, Condition, CONDITION_TYPES
 
 
 def should_rule_execute(
@@ -81,17 +71,20 @@ def evaluate_conditions(
     
     envelopes = context.data.envelopes
     unassigned_cash = context.data.unassignedCash
-    current_date = context.currentDate or datetime.now().isoformat()
+    # Use provided currentDate or raise error if not provided for deterministic behavior
+    if not context.currentDate:
+        raise ValueError("currentDate is required in context for condition evaluation")
+    current_date = context.currentDate
+    
+    # Optimize envelope lookups with dictionary
+    envelope_map = {e.id: e for e in envelopes}
     
     for condition in conditions:
         condition_type = condition.type
         
         if condition_type == CONDITION_TYPES["BALANCE_LESS_THAN"]:
             if condition.envelopeId:
-                envelope = next(
-                    (e for e in envelopes if e.id == condition.envelopeId),
-                    None
-                )
+                envelope = envelope_map.get(condition.envelopeId)
                 # Condition fails if envelope not found or balance >= value
                 if envelope is None:
                     return False
@@ -103,10 +96,7 @@ def evaluate_conditions(
         
         elif condition_type == CONDITION_TYPES["BALANCE_GREATER_THAN"]:
             if condition.envelopeId:
-                envelope = next(
-                    (e for e in envelopes if e.id == condition.envelopeId),
-                    None
-                )
+                envelope = envelope_map.get(condition.envelopeId)
                 # Condition fails if envelope not found or balance <= value
                 if envelope is None:
                     return False

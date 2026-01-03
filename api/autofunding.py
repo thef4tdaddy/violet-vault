@@ -4,11 +4,17 @@ Vercel serverless function for autofunding simulation
 """
 from http.server import BaseHTTPRequestHandler
 import json
+import os
+import logging
 from typing import Dict, Any
+from pydantic import ValidationError
 
 # Use absolute imports for Vercel serverless functions to avoid masking ImportError
-from autofunding.models import AutoFundingRequest, AutoFundingResult, SimulationResult
+from autofunding.models import AutoFundingRequest, AutoFundingResult
 from autofunding.simulation import simulate_rule_execution
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class handler(BaseHTTPRequestHandler):
@@ -45,11 +51,17 @@ class handler(BaseHTTPRequestHandler):
         }
     """
     
+    def _get_allowed_origin(self) -> str:
+        """Get allowed origin from environment or use wildcard for development"""
+        # In production, should be set to specific domain(s)
+        allowed_origin = os.environ.get("ALLOWED_ORIGIN", "*")
+        return allowed_origin
+    
     def _set_headers(self, status_code: int = 200, content_type: str = "application/json"):
         """Set response headers"""
         self.send_response(status_code)
         self.send_header("Content-type", content_type)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", self._get_allowed_origin())
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
@@ -84,15 +96,26 @@ class handler(BaseHTTPRequestHandler):
             # Parse JSON
             try:
                 data = json.loads(body.decode("utf-8"))
-            except json.JSONDecodeError as e:
-                self._send_error_response(f"Invalid JSON: {str(e)}", 400)
+            except json.JSONDecodeError:
+                self._send_error_response("Invalid JSON format", 400)
                 return
             
             # Validate request with Pydantic
             try:
                 request = AutoFundingRequest(**data)
-            except Exception as e:
-                self._send_error_response(f"Invalid request: {str(e)}", 400)
+            except ValidationError as e:
+                # Extract user-friendly validation errors
+                error_messages = []
+                for error in e.errors():
+                    field = ".".join(str(loc) for loc in error["loc"])
+                    error_messages.append(f"{field}: {error['msg']}")
+                self._send_error_response(
+                    f"Validation error: {'; '.join(error_messages)}", 
+                    400
+                )
+                return
+            except Exception:
+                self._send_error_response("Invalid request format", 400)
                 return
             
             # Execute simulation
@@ -117,7 +140,9 @@ class handler(BaseHTTPRequestHandler):
             self._send_json_response(response.model_dump(), 200)
             
         except Exception as e:
-            self._send_error_response(f"Internal server error: {str(e)}", 500)
+            # Log the full error for debugging but send sanitized message to client
+            logger.error(f"Internal error in autofunding API: {str(e)}", exc_info=True)
+            self._send_error_response("An internal error occurred. Please try again later.", 500)
     
     def do_GET(self):
         """Handle GET request - return API info"""

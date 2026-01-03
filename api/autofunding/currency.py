@@ -6,7 +6,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 def round_currency(amount: float) -> float:
     """
-    Rounds a currency amount to 2 decimal places with proper banker's rounding
+    Rounds a currency amount to 2 decimal places using standard rounding (round half up)
     
     Args:
         amount: The amount to round
