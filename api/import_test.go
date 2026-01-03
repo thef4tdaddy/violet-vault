@@ -10,6 +10,13 @@ import (
 	"testing"
 )
 
+// checkErr acts as a helper to explicitly handle errors in tests
+func checkErr(t *testing.T, err error) {
+	if err != nil {
+		t.Logf("Error encountered: %v", err)
+	}
+}
+
 // TestHandler_OptionsRequest tests CORS preflight OPTIONS request
 func TestHandler_OptionsRequest(t *testing.T) {
 	req := httptest.NewRequest("OPTIONS", "/api/import", nil)
@@ -39,7 +46,7 @@ func TestHandler_InvalidMethod(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if response.Success {
 		t.Error("Expected success to be false for invalid method")
@@ -50,7 +57,7 @@ func TestHandler_InvalidMethod(t *testing.T) {
 func TestHandler_MissingFile(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.Close()
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -68,8 +75,8 @@ func TestHandler_UnsupportedFileType(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.txt")
-	part.Write([]byte("some text"))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte("some text")); return err }())
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -82,7 +89,7 @@ func TestHandler_UnsupportedFileType(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if !strings.Contains(response.Error, "Unsupported file type") {
 		t.Errorf("Expected unsupported file type error, got: %s", response.Error)
@@ -100,8 +107,8 @@ func TestHandler_ValidCSV(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
-	part.Write([]byte(csvContent))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(csvContent)); return err }())
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -114,7 +121,7 @@ func TestHandler_ValidCSV(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if !response.Success {
 		t.Errorf("Expected success, got error: %s", response.Error)
@@ -149,8 +156,8 @@ func TestHandler_ValidJSON(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.json")
-	part.Write([]byte(jsonContent))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(jsonContent)); return err }())
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -163,7 +170,7 @@ func TestHandler_ValidJSON(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if !response.Success {
 		t.Errorf("Expected success, got error: %s", response.Error)
@@ -184,8 +191,8 @@ func TestHandler_CSVWithInvalidRows(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
-	part.Write([]byte(csvContent))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(csvContent)); return err }())
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -198,7 +205,7 @@ func TestHandler_CSVWithInvalidRows(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if !response.Success {
 		t.Errorf("Expected success, got error: %s", response.Error)
@@ -228,9 +235,9 @@ func TestHandler_CustomFieldMapping(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
-	part.Write([]byte(csvContent))
-	writer.WriteField("fieldMapping", string(mappingJSON))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(csvContent)); return err }())
+	checkErr(t, writer.WriteField("fieldMapping", string(mappingJSON)))
+	checkErr(t, writer.Close())
 
 	req := httptest.NewRequest("POST", "/api/import", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -243,7 +250,7 @@ func TestHandler_CustomFieldMapping(t *testing.T) {
 	}
 
 	var response ImportResponse
-	json.NewDecoder(w.Body).Decode(&response)
+	checkErr(t, json.NewDecoder(w.Body).Decode(&response))
 
 	if !response.Success {
 		t.Errorf("Expected success, got error: %s", response.Error)
@@ -267,15 +274,15 @@ func TestProcessCSV(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
-	part.Write([]byte(csvContent))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(csvContent)); return err }())
+	checkErr(t, writer.Close())
 
 	// Parse the multipart to extract the file
 	reader := multipart.NewReader(body, writer.Boundary())
 	form, _ := reader.ReadForm(10 << 20)
 	file := form.File["file"][0]
 	openedFile, _ := file.Open()
-	defer openedFile.Close()
+	defer func() { checkErr(t, openedFile.Close()) }()
 
 	transactions, invalid, err := processCSV(openedFile, nil)
 
@@ -300,15 +307,15 @@ func TestProcessJSON(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.json")
-	part.Write([]byte(jsonContent))
-	writer.Close()
+	checkErr(t, func() error { _, err := part.Write([]byte(jsonContent)); return err }())
+	checkErr(t, writer.Close())
 
 	// Parse the multipart to extract the file
 	reader := multipart.NewReader(body, writer.Boundary())
 	form, _ := reader.ReadForm(10 << 20)
 	file := form.File["file"][0]
 	openedFile, _ := file.Open()
-	defer openedFile.Close()
+	defer func() { checkErr(t, openedFile.Close()) }()
 
 	transactions, invalid, err := processJSON(openedFile, nil)
 

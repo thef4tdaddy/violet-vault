@@ -83,7 +83,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		sendError(w, "Failed to get file: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			fmt.Printf("Error closing file: %v\n", closeErr)
+		}
+	}()
 
 	// Determine file type
 	fileType := ""
@@ -131,7 +135,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	if encodeErr := json.NewEncoder(w).Encode(response); encodeErr != nil {
+		fmt.Printf("Error encoding response: %v\n", encodeErr)
+	}
 }
 
 // processCSV handles CSV file parsing with streaming
@@ -272,8 +278,6 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 	transactionType := "expense"
 	if amount >= 0 {
 		transactionType = "income"
-	} else {
-		// Negative amounts represent expenses; preserve the amount sign as-is.
 	}
 
 	// Get description
@@ -476,5 +480,7 @@ func sendError(w http.ResponseWriter, message string, statusCode int) {
 		Success: false,
 		Error:   message,
 	}
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		fmt.Printf("Error encoding response: %v\n", err)
+	}
 }

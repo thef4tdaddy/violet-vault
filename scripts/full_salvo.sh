@@ -2,20 +2,25 @@
 # full_salvo.sh - Multi-language verification script for v2.0 Polyglot Backend
 # Runs TypeScript, Go, and Python linters/type checkers
 
-echo ""
-echo "=============================================================="
-echo "🚀 VioletVault Full Salvo - Multi-Language Full Build Verification"
-echo "=============================================================="
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
+
+# Header
+echo ""
+echo -e "${MAGENTA}================================================================================${NC}"
+echo -e "${MAGENTA}🚀 VioletVault Full Salvo - Multi-Language Full Build Verification${NC}"
+echo -e "${MAGENTA}================================================================================${NC}"
+echo ""
 
 # Track overall status
 OVERALL_STATUS=0
+# Track failed steps
+FAILED_STEPS=()
 
 # Helper function for status reporting
 report_status() {
@@ -23,6 +28,7 @@ report_status() {
         echo -e "${GREEN}✓ $2 passed${NC}"
     else
         echo -e "${RED}✗ $2 failed${NC}"
+        FAILED_STEPS+=("$2")
         OVERALL_STATUS=1
     fi
 }
@@ -40,7 +46,16 @@ echo -e "\n${YELLOW}→ Running TypeScript type check...${NC}"
 npm run typecheck || report_status $? "TypeScript"
 
 echo -e "\n${YELLOW}→ Running Prettier format...${NC}"
-npm run format || report_status $? "Prettier"
+# Run format quietly, only showing output on error
+if npm run format > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ Prettier passed${NC}"
+else
+    echo -e "${RED}✗ Prettier failed${NC}"
+    # Re-run to show error
+    npm run format
+    FAILED_STEPS+=("Prettier")
+    OVERALL_STATUS=1
+fi
 
 # TODO: Add TypeScript tests
 
@@ -58,6 +73,7 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
     else
         echo -e "${RED}✗ go fmt found unformatted files:${NC}"
         gofmt -l .
+        FAILED_STEPS+=("go fmt")
         OVERALL_STATUS=1
     fi
 
@@ -152,7 +168,11 @@ if [ $OVERALL_STATUS -eq 0 ]; then
     echo -e "${GREEN}Ready for deployment!!! 🚀🚀🚀${NC}\n"
 else
     echo -e "\n${RED}✗✗✗ Some checks failed ✗✗✗${NC}"
-    echo -e "${RED}Please fix the errors above before committing${NC}\n"
+    echo -e "${RED}Failed steps:${NC}"
+    for step in "${FAILED_STEPS[@]}"; do
+        echo -e "  - ${RED}$step${NC}"
+    done
+    echo -e "\n${RED}Please fix the errors above before committing${NC}\n"
 fi
 
 exit $OVERALL_STATUS
