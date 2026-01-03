@@ -11,7 +11,6 @@ from .models import (
     RuleResult,
     ErrorResult,
     SimulationResult,
-    EnvelopeData,
 )
 from .rules import (
     RULE_TYPES,
