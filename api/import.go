@@ -253,10 +253,8 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 	parsedDate, err := parseDate(dateStr)
 	if err != nil {
 		errors = append(errors, fmt.Sprintf("Invalid date format: %v", err))
-	}
-
-	// Check for future dates
-	if parsedDate.After(time.Now().Add(24 * time.Hour)) {
+	} else if !parsedDate.IsZero() && parsedDate.After(time.Now().Add(24*time.Hour)) {
+		// Check for future dates only when the parsed date is valid and non-zero
 		errors = append(errors, "Future dates are not allowed")
 	}
 
