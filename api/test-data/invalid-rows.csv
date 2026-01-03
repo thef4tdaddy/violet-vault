@@ -1,0 +1,7 @@
+Date,Description,Amount,Category
+2024-01-15,Valid Transaction,$50.00,Groceries
+2024-13-45,Invalid Date,$25.00,Dining
+2024-01-17,Missing Amount,,Transportation
+2025-12-31,Future Date,$100.00,Shopping
+2024-01-20,Valid Transaction 2,not a number,Utilities
+2024-01-21,Another Valid One,$75.50,Entertainment
