@@ -29,7 +29,7 @@ app.add_middleware(
 
 
 @app.get("/")
-def read_root():
+def get_root():
     """Health check endpoint"""
     return {
         "service": "VioletVault Analytics API",
