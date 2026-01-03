@@ -8,20 +8,10 @@
  * import type { Transaction } from '@/domain/schemas/transaction';
  */
 
-// Transaction type (use actual import in your application)
-interface Transaction {
-  id: string;
-  date: string;
-  amount: number;
-  envelopeId: string;
-  category: string;
-  type: string;
-  lastModified: number;
-  createdAt: number;
-  description?: string;
-  merchant?: string;
-  notes?: string;
-}
+// Placeholder Transaction type for this integration example ONLY.
+// In your application, import the real type instead:
+// import type { Transaction } from '@/domain/schemas/transaction';
+type Transaction = unknown;
 
 /**
  * Response from the Go import API
