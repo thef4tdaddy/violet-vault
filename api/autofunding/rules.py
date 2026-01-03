@@ -5,7 +5,7 @@ Pure functions for rule processing and validation
 """
 from typing import List
 from .models import AutoFundingRule, AutoFundingContext
-from .currency import round_currency, calculate_percentage_amount
+from .currency import calculate_percentage_amount
 
 
 # Rule Types
