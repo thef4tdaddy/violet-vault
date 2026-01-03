@@ -239,6 +239,9 @@ export class ApiClient {
   /**
    * Combine multiple abort signals into one
    * Needed for handling both timeout and manual cancellation
+   *
+   * Note: Event listeners are set with { once: true } to prevent memory leaks.
+   * They are automatically removed after firing once.
    */
   private static combineAbortSignals(signals: AbortSignal[]): AbortSignal {
     const controller = new AbortController();

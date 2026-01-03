@@ -141,18 +141,9 @@ export class AnalyticsApiService {
   ): PaydayPrediction | null {
     try {
       // Convert PaycheckEntry to LocalPaycheckEntry format
-      // Note: LocalPaycheckEntry has index signature [key: string]: unknown
-      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((pc) => {
-        const entry: LocalPaycheckEntry = {
-          date: pc.date,
-          processedAt: pc.processedAt,
-        };
-        // Preserve amount via index signature if present
-        if (pc.amount !== undefined) {
-          (entry as Record<string, unknown>).amount = pc.amount;
-        }
-        return entry;
-      });
+      // LocalPaycheckEntry has index signature [key: string]: unknown
+      // so we can safely pass the full object
+      const localPaychecks = paychecks as LocalPaycheckEntry[];
 
       const localPrediction = localPredict(localPaychecks);
 
