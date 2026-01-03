@@ -9,6 +9,22 @@ The backend is split between Go and Python for optimal performance and maintaina
 - **Go**: Handles bug report proxy to GitHub API (secrets, authentication)
 - **Python**: Handles financial intelligence (payday prediction, merchant categorization, autofunding simulation)
 
+### Python Structure
+
+```
+api/
+├── __init__.py              # Main API module
+├── requirements.txt         # Python dependencies
+├── autofunding.py          # Main autofunding endpoint (Vercel handler)
+└── autofunding/            # Autofunding module
+    ├── __init__.py         # Module exports
+    ├── models.py           # Pydantic models (data validation)
+    ├── simulation.py       # Core simulation logic
+    ├── rules.py            # Rule processing utilities
+    ├── currency.py         # Currency utilities
+    └── conditions.py       # Condition evaluation utilities
+```
+
 ## Serverless Functions
 
 ### 1. Bug Report Proxy (`bug-report.go`)
