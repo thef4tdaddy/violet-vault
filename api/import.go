@@ -243,7 +243,7 @@ func normalizeTransaction(row map[string]string, fieldMapping map[string]string,
 	descriptionField := getFieldName(fieldMapping, "description", []string{"description", "Description", "DESCRIPTION", "memo", "Memo", "payee", "Payee"})
 	categoryField := getFieldName(fieldMapping, "category", []string{"category", "Category", "CATEGORY"})
 	merchantField := getFieldName(fieldMapping, "merchant", []string{"merchant", "Merchant", "MERCHANT"})
-	notesField := getFieldName(fieldMapping, "notes", []string{"notes", "Notes", "NOTES", "memo", "Memo"})
+	notesField := getFieldName(fieldMapping, "notes", []string{"notes", "Notes", "NOTES"})
 
 	// Parse date
 	dateStr := row[dateField]
