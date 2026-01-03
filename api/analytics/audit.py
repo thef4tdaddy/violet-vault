@@ -218,7 +218,8 @@ class EnvelopeIntegrityAuditor:
         
         # Check for discrepancy (allow small floating point differences)
         discrepancy = abs(expected_balance - actual_balance)
-        tolerance = 0.01  # 1 cent tolerance for floating point errors
+        # Tolerance for floating point errors (configurable via instance attribute)
+        tolerance = getattr(self, "balance_leakage_tolerance", 0.01)
         
         if discrepancy > tolerance:
             violations.append(IntegrityViolation(
