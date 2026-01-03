@@ -170,15 +170,27 @@ export class AnalyticsApiService {
     try {
       // Check both endpoints
       const [predictionHealth, categorizationHealth] = await Promise.all([
-        ApiClient.get<{ success: boolean }>(this.PREDICTION_ENDPOINT, {
+        ApiClient.get<{ success?: boolean }>(this.PREDICTION_ENDPOINT, {
           timeout: 5000,
         }),
-        ApiClient.get<{ success: boolean }>(this.CATEGORIZATION_ENDPOINT, {
+        ApiClient.get<{ success?: boolean }>(this.CATEGORIZATION_ENDPOINT, {
           timeout: 5000,
         }),
       ]);
 
-      return predictionHealth.success === true && categorizationHealth.success === true;
+      const isHealthy = (response: { success?: boolean } | null | undefined): boolean => {
+        if (response == null) {
+          return false;
+        }
+        // If the API call succeeded but the response does not contain a `success` field,
+        // treat the endpoint as healthy. Only an explicit `success: false` is unhealthy.
+        if (typeof response.success === "undefined") {
+          return true;
+        }
+        return response.success === true;
+      };
+
+      return isHealthy(predictionHealth) && isHealthy(categorizationHealth);
     } catch (error) {
       logger.error("Analytics API health check failed", error);
       return false;
