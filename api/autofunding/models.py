@@ -4,13 +4,22 @@ Mirrors the TypeScript interfaces from src/utils/budgeting/autofunding/
 """
 from typing import List, Optional, Dict, Any, Literal
 from pydantic import BaseModel, Field
+from enum import Enum
+from .conditions import CONDITION_TYPES
 
 
 # Condition Types
+ConditionType = Enum(
+    "ConditionType",
+    {key.upper(): key for key in CONDITION_TYPES.keys()},
+    type=str,
+)
+
+
 class Condition(BaseModel):
     """Condition for conditional rules"""
     id: Optional[str] = None
-    type: str
+    type: ConditionType
     envelopeId: Optional[str] = None
     value: float
     operator: Optional[str] = None
