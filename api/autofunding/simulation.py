@@ -3,7 +3,7 @@ Auto-Funding Simulation Core Logic
 Port of src/utils/budgeting/autofunding/simulation.ts
 Pure functions for simulating rule executions and planning transfers
 """
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from .models import (
     AutoFundingRule,
     AutoFundingContext,
