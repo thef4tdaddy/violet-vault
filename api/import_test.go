@@ -176,7 +176,6 @@ func TestHandler_ValidJSON(t *testing.T) {
 
 // TestHandler_CSVWithInvalidRows tests CSV with validation errors
 func TestHandler_CSVWithInvalidRows(t *testing.T) {
-	// Note: 2025-12-31 is less than 24 hours in the future from current time in tests
 	csvContent := `Date,Description,Amount,Category
 2024-01-15,Valid Transaction,($50.00),Groceries
 2024-13-45,Invalid Date,($25.00),Dining
