@@ -51,7 +51,7 @@ export class ApiClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    // Combine signals if provided
+    // Use combined signal only if custom signal provided
     const combinedSignal = signal
       ? this.combineAbortSignals([signal, controller.signal])
       : controller.signal;

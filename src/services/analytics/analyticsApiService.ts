@@ -32,6 +32,15 @@ export interface MerchantSuggestion {
   monthlyAverage: number;
 }
 
+// API Response Types
+interface PredictionApiResponse {
+  prediction: PaydayPrediction;
+}
+
+interface CategoryApiResponse {
+  suggestions: MerchantSuggestion[];
+}
+
 // --- Implementation ---
 
 export class AnalyticsApiService {
@@ -55,7 +64,7 @@ export class AnalyticsApiService {
         return this.localPaydayPredictionFallback(paychecks);
       }
 
-      const response = await ApiClient.post<{ prediction: PaydayPrediction }>(
+      const response = await ApiClient.post<PredictionApiResponse>(
         this.PREDICTION_ENDPOINT,
         { paychecks },
         { timeout: this.TIMEOUT_MS }
@@ -101,7 +110,7 @@ export class AnalyticsApiService {
         return [];
       }
 
-      const response = await ApiClient.post<{ suggestions: MerchantSuggestion[] }>(
+      const response = await ApiClient.post<CategoryApiResponse>(
         this.CATEGORIZATION_ENDPOINT,
         { transactions, monthsOfData },
         { timeout: this.TIMEOUT_MS }
@@ -132,11 +141,18 @@ export class AnalyticsApiService {
   ): PaydayPrediction | null {
     try {
       // Convert PaycheckEntry to LocalPaycheckEntry format
-      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((pc) => ({
-        date: pc.date,
-        processedAt: pc.processedAt,
-        amount: pc.amount,
-      }));
+      // Note: LocalPaycheckEntry has index signature [key: string]: unknown
+      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((pc) => {
+        const entry: LocalPaycheckEntry = {
+          date: pc.date,
+          processedAt: pc.processedAt,
+        };
+        // Preserve amount via index signature if present
+        if (pc.amount !== undefined) {
+          (entry as Record<string, unknown>).amount = pc.amount;
+        }
+        return entry;
+      });
 
       const localPrediction = localPredict(localPaychecks);
 
