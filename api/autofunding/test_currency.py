@@ -2,16 +2,17 @@
 Unit tests for currency utilities
 Tests precise financial calculations using Decimal
 """
-import sys
+
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from autofunding.currency import round_currency, calculate_percentage_amount, split_amount
+from api.autofunding.currency import calculate_percentage_amount, round_currency, split_amount
 
 
-def test_round_currency_standard_cases():
+def test_round_currency_standard_cases() -> None:
     """Test standard rounding cases"""
     assert round_currency(10.555) == 10.56
     assert round_currency(10.554) == 10.55
@@ -21,7 +22,7 @@ def test_round_currency_standard_cases():
     print("✓ test_round_currency_standard_cases passed")
 
 
-def test_round_currency_edge_cases():
+def test_round_currency_edge_cases() -> None:
     """Test edge cases for rounding"""
     assert round_currency(0.0) == 0.0
     assert round_currency(0.005) == 0.01
@@ -31,7 +32,7 @@ def test_round_currency_edge_cases():
     print("✓ test_round_currency_edge_cases passed")
 
 
-def test_round_currency_large_numbers():
+def test_round_currency_large_numbers() -> None:
     """Test rounding with large numbers"""
     assert round_currency(1000000.555) == 1000000.56
     assert round_currency(999999.994) == 999999.99
@@ -39,7 +40,7 @@ def test_round_currency_large_numbers():
     print("✓ test_round_currency_large_numbers passed")
 
 
-def test_calculate_percentage_amount_basic():
+def test_calculate_percentage_amount_basic() -> None:
     """Test basic percentage calculations"""
     assert calculate_percentage_amount(1000, 30) == 300.0
     assert calculate_percentage_amount(1000, 33.33) == 333.30
@@ -48,7 +49,7 @@ def test_calculate_percentage_amount_basic():
     print("✓ test_calculate_percentage_amount_basic passed")
 
 
-def test_calculate_percentage_amount_precision():
+def test_calculate_percentage_amount_precision() -> None:
     """Test percentage calculations with precision requirements"""
     # Test that results are properly rounded
     assert calculate_percentage_amount(100, 33.33) == 33.33
@@ -57,7 +58,7 @@ def test_calculate_percentage_amount_precision():
     print("✓ test_calculate_percentage_amount_precision passed")
 
 
-def test_calculate_percentage_amount_edge_cases():
+def test_calculate_percentage_amount_edge_cases() -> None:
     """Test edge cases for percentage calculations"""
     assert calculate_percentage_amount(0, 50) == 0.0
     assert calculate_percentage_amount(1000, 0) == 0.0
@@ -66,7 +67,7 @@ def test_calculate_percentage_amount_edge_cases():
     print("✓ test_calculate_percentage_amount_edge_cases passed")
 
 
-def test_split_amount_equal_parts():
+def test_split_amount_equal_parts() -> None:
     """Test splitting amounts into equal parts"""
     result = split_amount(100, 3)
     assert len(result) == 3
@@ -77,7 +78,7 @@ def test_split_amount_equal_parts():
     print("✓ test_split_amount_equal_parts passed")
 
 
-def test_split_amount_two_parts():
+def test_split_amount_two_parts() -> None:
     """Test splitting into two parts"""
     result = split_amount(300, 2)
     assert len(result) == 2
@@ -87,7 +88,7 @@ def test_split_amount_two_parts():
     print("✓ test_split_amount_two_parts passed")
 
 
-def test_split_amount_uneven():
+def test_split_amount_uneven() -> None:
     """Test splitting amounts that don't divide evenly"""
     result = split_amount(101, 3)
     assert len(result) == 3
@@ -97,7 +98,7 @@ def test_split_amount_uneven():
     print("✓ test_split_amount_uneven passed")
 
 
-def test_split_amount_single_part():
+def test_split_amount_single_part() -> None:
     """Test splitting into a single part"""
     result = split_amount(123.45, 1)
     assert len(result) == 1
@@ -105,7 +106,7 @@ def test_split_amount_single_part():
     print("✓ test_split_amount_single_part passed")
 
 
-def test_split_amount_many_parts():
+def test_split_amount_many_parts() -> None:
     """Test splitting into many parts"""
     result = split_amount(1000, 7)
     assert len(result) == 7
@@ -115,16 +116,16 @@ def test_split_amount_many_parts():
     print("✓ test_split_amount_many_parts passed")
 
 
-def test_split_amount_edge_cases():
+def test_split_amount_edge_cases() -> None:
     """Test edge cases for split_amount"""
     # Zero parts
     result = split_amount(100, 0)
     assert result == []
-    
+
     # Negative parts
     result = split_amount(100, -1)
     assert result == []
-    
+
     # Zero amount
     result = split_amount(0, 3)
     assert len(result) == 3
@@ -132,7 +133,7 @@ def test_split_amount_edge_cases():
     print("✓ test_split_amount_edge_cases passed")
 
 
-def test_split_amount_precision():
+def test_split_amount_precision() -> None:
     """Test that split amounts maintain precision"""
     # Test with an amount that requires careful rounding
     result = split_amount(99.99, 3)

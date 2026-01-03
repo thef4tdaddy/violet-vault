@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from analytics import ErrorResponse, PaycheckEntry, PaydayPrediction
+from . import ErrorResponse, PaycheckEntry, PaydayPrediction
 
 
 def predict_next_payday(paychecks: list[PaycheckEntry]) -> PaydayPrediction:
@@ -167,5 +167,5 @@ class handler(BaseHTTPRequestHandler):
     def _send_error(self, status_code: int, message: str) -> None:
         """Send error response"""
         self._set_headers(status_code)
-        error_response: ErrorResponse = {"success": False, "error": message}
+        error_response: ErrorResponse = {"error": message}
         self.wfile.write(json.dumps(error_response).encode())

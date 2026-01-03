@@ -39,8 +39,8 @@ npm run lint || report_status $? "ESLint"
 echo -e "\n${YELLOW}→ Running TypeScript type check...${NC}"
 npm run typecheck || report_status $? "TypeScript"
 
-echo -e "\n${YELLOW}→ Running Prettier format check...${NC}"
-npm run format:check || report_status $? "Prettier"
+echo -e "\n${YELLOW}→ Running Prettier format...${NC}"
+npm run format || report_status $? "Prettier"
 
 # TODO: Add TypeScript tests
 
@@ -91,7 +91,7 @@ echo -e "${BLUE}═════════════════════�
 echo -e "${BLUE}  3️⃣  Python Backend Checks${NC}"
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
 
-if [ -f "pyproject.toml" ] && [ -f "api/analytics.py" ]; then
+if [ -f "pyproject.toml" ] && [ -n "$(find api -name "*.py" -print -quit)" ]; then
     # Define python executable paths
     RUFF_CMD="ruff"
     MYPY_CMD="mypy"
@@ -118,7 +118,8 @@ if [ -f "pyproject.toml" ] && [ -f "api/analytics.py" ]; then
     # Check if mypy is available
     if command -v "$MYPY_CMD" &> /dev/null || [ -f "$MYPY_CMD" ]; then
         echo -e "\n${YELLOW}→ Running mypy type check...${NC}"
-        $MYPY_CMD api/ || report_status $? "mypy"
+
+        $MYPY_CMD -p api || report_status $? "mypy"
     else
         echo -e "${YELLOW}⚠ mypy not found, skipping type checks${NC}"
         echo -e "${YELLOW}  Install with: pip install mypy${NC}"

@@ -3,7 +3,7 @@ Analytics Intelligence Engine - v2.0 Polyglot Backend
 Shared types and utilities for analytics endpoints
 """
 
-from typing import TypedDict
+from typing import Any, TypedDict
 
 
 class PaycheckEntry(TypedDict, total=False):
@@ -37,5 +37,13 @@ class MerchantSuggestion(TypedDict):
 class ErrorResponse(TypedDict):
     """Standard error response structure"""
 
-    success: bool
     error: str
+
+
+class AnalyticsRequest(TypedDict):
+    """Analytics API request structure"""
+
+    operation: str
+    transactions: list[dict[str, Any]]
+    paychecks: list[PaycheckEntry]
+    monthsOfData: int | None

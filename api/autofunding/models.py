@@ -2,9 +2,10 @@
 Pydantic models for AutoFunding API
 Mirrors the TypeScript interfaces from src/utils/budgeting/autofunding/
 """
-from typing import List, Optional, Dict, Any, Literal
-from pydantic import BaseModel, Field
 
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 # Condition Types
 CONDITION_TYPES = {
@@ -16,7 +17,13 @@ CONDITION_TYPES = {
 }
 
 # Condition type literal
-ConditionType = Literal["balance_less_than", "balance_greater_than", "date_range", "transaction_amount", "unassigned_above"]
+ConditionType = Literal[
+    "balance_less_than",
+    "balance_greater_than",
+    "date_range",
+    "transaction_amount",
+    "unassigned_above",
+]
 
 # Rule Types - must be defined before AutoFundingRule
 RuleType = Literal["fixed_amount", "percentage", "conditional", "split_remainder", "priority_fill"]
@@ -27,32 +34,35 @@ TriggerType = Literal["manual", "income_detected", "monthly", "weekly", "biweekl
 
 class Condition(BaseModel):
     """Condition for conditional rules"""
-    id: Optional[str] = None
+
+    id: str | None = None
     type: ConditionType
-    envelopeId: Optional[str] = None
+    envelopeId: str | None = None
     value: float
-    operator: Optional[str] = None
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
+    operator: str | None = None
+    startDate: str | None = None
+    endDate: str | None = None
 
 
 # Rule Configuration
 class RuleConfig(BaseModel):
     """Rule configuration matching TypeScript RuleConfig interface"""
+
     sourceType: Literal["unassigned", "envelope", "income"]
-    sourceId: Optional[str] = None
+    sourceId: str | None = None
     targetType: Literal["envelope", "multiple"]
-    targetId: Optional[str] = None
-    targetIds: List[str] = Field(default_factory=list)
+    targetId: str | None = None
+    targetIds: list[str] = Field(default_factory=list)
     amount: float = 0.0
     percentage: float = 0.0
-    conditions: List[Condition] = Field(default_factory=list)
-    scheduleConfig: Dict[str, Any] = Field(default_factory=dict)
+    conditions: list[Condition] = Field(default_factory=list)
+    scheduleConfig: dict[str, Any] = Field(default_factory=dict)
 
 
 # AutoFunding Rule
 class AutoFundingRule(BaseModel):
     """AutoFunding rule matching TypeScript AutoFundingRule interface"""
+
     id: str
     name: str
     description: str = ""
@@ -61,7 +71,7 @@ class AutoFundingRule(BaseModel):
     priority: int
     enabled: bool
     createdAt: str
-    lastExecuted: Optional[str] = None
+    lastExecuted: str | None = None
     executionCount: int = 0
     config: RuleConfig
 
@@ -69,30 +79,34 @@ class AutoFundingRule(BaseModel):
 # Envelope Data
 class EnvelopeData(BaseModel):
     """Envelope data matching TypeScript EnvelopeData interface"""
+
     id: str
-    currentBalance: Optional[float] = 0.0
-    monthlyAmount: Optional[float] = None
-    name: Optional[str] = None
+    currentBalance: float | None = 0.0
+    monthlyAmount: float | None = None
+    name: str | None = None
 
 
 # AutoFunding Context
 class AutoFundingContextData(BaseModel):
     """Context data for autofunding execution"""
+
     unassignedCash: float
-    newIncomeAmount: Optional[float] = None
-    envelopes: List[EnvelopeData]
+    newIncomeAmount: float | None = None
+    envelopes: list[EnvelopeData]
 
 
 class AutoFundingContext(BaseModel):
     """AutoFunding context matching TypeScript AutoFundingContext interface"""
+
     data: AutoFundingContextData
     trigger: str
-    currentDate: Optional[str] = None
+    currentDate: str | None = None
 
 
 # Planned Transfer
 class PlannedTransfer(BaseModel):
     """Planned transfer from simulation"""
+
     fromEnvelopeId: str
     toEnvelopeId: str
     amount: float
@@ -104,18 +118,20 @@ class PlannedTransfer(BaseModel):
 # Rule Result
 class RuleResult(BaseModel):
     """Result from simulating a single rule"""
+
     ruleId: str
     ruleName: str
     success: bool
-    error: Optional[str] = None
+    error: str | None = None
     amount: float
-    plannedTransfers: List[PlannedTransfer]
-    targetEnvelopes: Optional[List[str]] = None
+    plannedTransfers: list[PlannedTransfer]
+    targetEnvelopes: list[str] | None = None
 
 
 # Error Result
 class ErrorResult(BaseModel):
     """Error from rule execution"""
+
     ruleId: str
     ruleName: str
     error: str
@@ -124,17 +140,19 @@ class ErrorResult(BaseModel):
 # Simulation Result
 class SimulationResult(BaseModel):
     """Complete simulation result"""
+
     totalPlanned: float
     rulesExecuted: int
-    plannedTransfers: List[PlannedTransfer]
-    ruleResults: List[RuleResult]
+    plannedTransfers: list[PlannedTransfer]
+    ruleResults: list[RuleResult]
     remainingCash: float
-    errors: List[ErrorResult]
+    errors: list[ErrorResult]
 
 
 # Warning
 class Warning(BaseModel):
     """Warning about execution plan"""
+
     type: str
     message: str
     severity: str
@@ -143,13 +161,15 @@ class Warning(BaseModel):
 # AutoFunding Result (API Response)
 class AutoFundingResult(BaseModel):
     """Complete autofunding simulation result - API Response"""
+
     success: bool
-    simulation: Optional[SimulationResult] = None
-    error: Optional[str] = None
+    simulation: SimulationResult | None = None
+    error: str | None = None
 
 
 # Request Model
 class AutoFundingRequest(BaseModel):
     """Request payload for autofunding simulation endpoint"""
-    rules: List[AutoFundingRule]
+
+    rules: list[AutoFundingRule]
     context: AutoFundingContext
