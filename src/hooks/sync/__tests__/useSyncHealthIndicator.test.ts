@@ -3,28 +3,32 @@ import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock dependencies
-vi.mock("../../../utils/sync/masterSyncValidator", () => ({
+vi.mock("@/utils/sync/masterSyncValidator", () => ({
   getQuickSyncStatus: vi.fn(),
 }));
 
-vi.mock("../../../services/sync/cloudSyncService", () => ({
+vi.mock("@/services/sync/cloudSyncService", () => ({
   cloudSyncService: {
     isRunning: false,
     activeSyncPromise: null,
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
   },
 }));
 
-const { getQuickSyncStatus } = require("../../../utils/sync/masterSyncValidator");
-
 describe("useSyncHealthIndicator", () => {
-  beforeEach(() => {
+  let getQuickSyncStatus: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    // Import mocked module
+    const masterSyncValidator = await import("@/utils/sync/masterSyncValidator");
+    getQuickSyncStatus = masterSyncValidator.getQuickSyncStatus as ReturnType<typeof vi.fn>;
+
     vi.clearAllMocks();
     vi.useFakeTimers();
   });
@@ -101,8 +105,8 @@ describe("useSyncHealthIndicator", () => {
     expect(result.current.showDetails).toBe(false);
   });
 
-  it("should monitor background sync activity", () => {
-    const cloudSyncService = require("../../../services/sync/cloudSyncService").cloudSyncService;
+  it("should monitor background sync activity", async () => {
+    const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
