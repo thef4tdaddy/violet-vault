@@ -130,10 +130,11 @@ describe("Account Helpers", () => {
     });
 
     it("should generate timestamp-based IDs", () => {
-      const id = generateAccountId();
       const now = Date.now();
-      expect(id).toBeGreaterThan(now - 1000);
-      expect(id).toBeLessThanOrEqual(now);
+      const id = generateAccountId();
+      // ID should be close to now (within 1 second) since it's based on timestamp + counter
+      expect(id).toBeGreaterThanOrEqual(now);
+      expect(id).toBeLessThan(now + 1000);
     });
   });
 

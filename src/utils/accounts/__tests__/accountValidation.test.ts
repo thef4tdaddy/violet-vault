@@ -310,7 +310,7 @@ describe("Account Validation", () => {
         id: 1,
         isActive: true,
         currentBalance: 500,
-        expirationDate: "2025-12-31",
+        expirationDate: "2027-12-31", // Future date
       };
       const result = checkTransferEligibility(account);
       expect(result.isEligible).toBe(true);

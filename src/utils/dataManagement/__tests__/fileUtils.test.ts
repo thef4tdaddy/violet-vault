@@ -17,18 +17,30 @@ describe("fileUtils", () => {
       const file = new Blob(["test content"], { type: "text/plain" });
       const error = new Error("Test error");
 
-      const reader = {
-        readAsText: vi.fn(),
-        onload: vi.fn(),
-        onerror: vi.fn(),
-      };
+      // Create a mock FileReader class
+      class MockFileReader {
+        onload: ((e: ProgressEvent<FileReader>) => void) | null = null;
+        onerror: ((e: ProgressEvent<FileReader>) => void) | null = null;
+        readAsText = vi.fn(() => {
+          // Simulate error asynchronously
+          setTimeout(() => {
+            if (this.onerror) {
+              this.onerror(error as unknown as ProgressEvent<FileReader>);
+            }
+          }, 0);
+        });
+      }
 
-      vi.spyOn(window, "FileReader").mockImplementation(() => reader);
+      // Mock the global FileReader
+      const originalFileReader = global.FileReader;
+      global.FileReader = MockFileReader as unknown as typeof FileReader;
 
-      const promise = readFileContent(file);
-      reader.onerror(error);
-
-      await expect(promise).rejects.toThrow("Failed to read file.");
+      try {
+        await expect(readFileContent(file)).rejects.toThrow("Failed to read file.");
+      } finally {
+        // Restore original FileReader
+        global.FileReader = originalFileReader;
+      }
     });
   });
 });

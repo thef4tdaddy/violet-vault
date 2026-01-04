@@ -165,6 +165,14 @@ export const validateTransferForm = (
     };
   }
 
+  // Positive amount validation
+  if (transferAmount <= 0) {
+    return {
+      isValid: false,
+      message: "Amount must be greater than 0",
+    };
+  }
+
   // Balance validation
   if (!fromAccount || fromAccount.currentBalance === undefined) {
     return {
