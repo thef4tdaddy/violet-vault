@@ -1,8 +1,10 @@
 import { renderHook } from "@testing-library/react";
 import { useTransactionFilters } from "../useTransactionFilters";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import type { Mock } from "vitest";
 
 // Mock dependencies
-vi.mock("../../../utils/validation", () => ({
+vi.mock("@/utils/validation", () => ({
   isValidTransaction: vi.fn(),
   matchesSearchTerm: vi.fn(),
   matchesTypeFilter: vi.fn(),
@@ -11,16 +13,14 @@ vi.mock("../../../utils/validation", () => ({
   compareTransactions: vi.fn(),
 }));
 
-const {
-  isValidTransaction,
-  matchesSearchTerm,
-  matchesTypeFilter,
-  matchesEnvelopeFilter,
-  matchesDateFilter,
-  compareTransactions,
-} = require("../../../utils/validation");
-
 describe("useTransactionFilters", () => {
+  let isValidTransaction: Mock;
+  let matchesSearchTerm: Mock;
+  let matchesTypeFilter: Mock;
+  let matchesEnvelopeFilter: Mock;
+  let matchesDateFilter: Mock;
+  let compareTransactions: Mock;
+
   const mockTransactions = [
     {
       id: "1",
@@ -58,7 +58,16 @@ describe("useTransactionFilters", () => {
     sortOrder: "desc",
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Import mocked functions
+    const validation = await import("@/utils/validation");
+    isValidTransaction = validation.isValidTransaction as Mock;
+    matchesSearchTerm = validation.matchesSearchTerm as Mock;
+    matchesTypeFilter = validation.matchesTypeFilter as Mock;
+    matchesEnvelopeFilter = validation.matchesEnvelopeFilter as Mock;
+    matchesDateFilter = validation.matchesDateFilter as Mock;
+    compareTransactions = validation.compareTransactions as Mock;
+
     vi.clearAllMocks();
 
     // Setup default mock implementations

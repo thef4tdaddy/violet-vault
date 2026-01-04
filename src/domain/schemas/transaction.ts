@@ -13,6 +13,30 @@ export const TransactionTypeSchema = z.enum(["income", "expense", "transfer"]);
 export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
 /**
+ * Base object schema for Transaction (without refinements)
+ * Used to create partial schemas
+ */
+const TransactionBaseSchema = z.object({
+  id: z.string().min(1, "Transaction ID is required"),
+  date: z.union([z.date(), z.string()]),
+  amount: z.number(), // Can be positive (income) or negative (expense)
+  envelopeId: z.string().min(1, "Envelope ID is required"),
+  category: z.string().min(1, "Category is required"),
+  type: TransactionTypeSchema.default("expense"),
+  lastModified: z.number().int().positive("Last modified must be a positive number"),
+  createdAt: z.number().int().positive().optional(),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+  receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+  // Paycheck-related metadata for internal transfers
+  isInternalTransfer: z.boolean().optional(),
+  paycheckId: z.string().optional(),
+  // Transfer-specific fields
+  fromEnvelopeId: z.string().optional(),
+  toEnvelopeId: z.string().optional(),
+});
+
+/**
  * Zod schema for Transaction validation
  * Represents financial transactions (income, expenses, transfers)
  *
@@ -26,43 +50,23 @@ export type TransactionType = z.infer<typeof TransactionTypeSchema>;
  * - type='income' MUST have positive amount
  * - type='transfer' can be either (depending on direction)
  */
-export const TransactionSchema = z
-  .object({
-    id: z.string().min(1, "Transaction ID is required"),
-    date: z.union([z.date(), z.string()]),
-    amount: z.number(), // Can be positive (income) or negative (expense)
-    envelopeId: z.string().min(1, "Envelope ID is required"),
-    category: z.string().min(1, "Category is required"),
-    type: TransactionTypeSchema.default("expense"),
-    lastModified: z.number().int().positive("Last modified must be a positive number"),
-    createdAt: z.number().int().positive().optional(),
-    description: z.string().max(500, "Description must be 500 characters or less").optional(),
-    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
-    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
-    // Paycheck-related metadata for internal transfers
-    isInternalTransfer: z.boolean().optional(),
-    paycheckId: z.string().optional(),
-    // Transfer-specific fields
-    fromEnvelopeId: z.string().optional(),
-    toEnvelopeId: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Enforce sign convention based on transaction type
-      if (data.type === "expense" && data.amount > 0) {
-        return false; // Expenses MUST be negative
-      }
-      if (data.type === "income" && data.amount < 0) {
-        return false; // Income MUST be positive
-      }
-      return true;
-    },
-    {
-      message:
-        "Transaction amount sign must match type: expenses must be negative, income must be positive",
-      path: ["amount"],
+export const TransactionSchema = TransactionBaseSchema.refine(
+  (data) => {
+    // Enforce sign convention based on transaction type
+    if (data.type === "expense" && data.amount > 0) {
+      return false; // Expenses MUST be negative
     }
-  );
+    if (data.type === "income" && data.amount < 0) {
+      return false; // Income MUST be positive
+    }
+    return true;
+  },
+  {
+    message:
+      "Transaction amount sign must match type: expenses must be negative, income must be positive",
+    path: ["amount"],
+  }
+);
 
 /**
  * Type inference from schema
@@ -71,8 +75,9 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 
 /**
  * Partial transaction schema for updates
+ * Created from base schema (without refinements) to avoid Zod v4 compatibility issues
  */
-export const TransactionPartialSchema = TransactionSchema.partial();
+export const TransactionPartialSchema = TransactionBaseSchema.partial();
 export type TransactionPartial = z.infer<typeof TransactionPartialSchema>;
 
 /**

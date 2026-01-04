@@ -1,24 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook } from "@testing-library/react";
-import { useQuery } from "@tanstack/react-query";
+import { renderHook, waitFor } from "@testing-library/react";
 import { useTransactionQuery } from "../useTransactionQuery";
+import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
+import type { QueryClient } from "@tanstack/react-query";
 
 // Mock dependencies
-vi.mock("@tanstack/react-query", async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...(actual as Record<string, unknown>),
-    useQuery: vi.fn(),
-  };
-});
-
-vi.mock("../../../services/budget/budgetDatabaseService", () => ({
+vi.mock("@/services/budget/budgetDatabaseService", () => ({
   default: {
     getTransactions: vi.fn(),
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -29,13 +22,25 @@ vi.mock("../../../utils/common/logger", () => ({
 }));
 
 describe("useTransactionQuery", () => {
+  let queryClient: QueryClient;
+  let wrapper: ReturnType<typeof createQueryWrapper>;
+  let mockGetTransactions: ReturnType<typeof vi.fn>;
+
   const mockTransactions = [
     { id: "1", description: "Test Transaction 1", amount: 100 },
     { id: "2", description: "Test Transaction 2", amount: 200 },
   ];
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    queryClient = createTestQueryClient();
+    wrapper = createQueryWrapper(queryClient);
+
+    // Get mocked service
+    const budgetService = await import("@/services/budget/budgetDatabaseService");
+    mockGetTransactions = budgetService.default.getTransactions as ReturnType<typeof vi.fn>;
+
     vi.clearAllMocks();
+    mockGetTransactions.mockResolvedValue(mockTransactions);
   });
 
   it("should initialize with correct query configuration", () => {
