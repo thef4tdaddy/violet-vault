@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi, Mock } from "vitest";
-import budgetHistoryService from "../budgetHistoryService";
+import budgetHistoryService from "@/services/budget/budgetHistoryService";
 import { budgetDb } from "@/db/budgetDb";
 import { encryptionUtils } from "@/utils/security/encryption";
 
@@ -187,8 +187,8 @@ describe("BudgetHistoryService", () => {
       const result = await budgetHistoryService.trackUnassignedCashChange(options);
 
       expect(result.commit.message).toContain("Updated unassigned cash from");
-      expect(result.changes[0].beforeData.amount).toBe(1000);
-      expect(result.changes[0].afterData.amount).toBe(1500);
+      expect(result.changes[0].oldValue.amount).toBe(1000);
+      expect(result.changes[0].newValue.amount).toBe(1500);
     });
 
     it("should handle distribution source correctly", async () => {
@@ -228,9 +228,9 @@ describe("BudgetHistoryService", () => {
       const result = await budgetHistoryService.trackActualBalanceChange(options);
 
       expect(result.commit.message).toContain("Updated actual balance via manual entry");
-      expect(result.changes[0].beforeData.balance).toBe(5000);
-      expect(result.changes[0].afterData.balance).toBe(5500);
-      expect(result.changes[0].afterData.isManual).toBe(true);
+      expect(result.changes[0].oldValue.balance).toBe(5000);
+      expect(result.changes[0].newValue.balance).toBe(5500);
+      expect(result.changes[0].newValue.isManual).toBe(true);
     });
   });
 
@@ -253,7 +253,7 @@ describe("BudgetHistoryService", () => {
 
       expect(result.commit.message).toContain("Added new debt: Credit Card");
       expect(result.changes[0].entityId).toBe("debt1");
-      expect(result.changes[0].changeType).toBe("add");
+      expect(result.changes[0].changeType).toBe("create");
     });
 
     it("should track debt modification", async () => {
