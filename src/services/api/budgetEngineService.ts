@@ -86,7 +86,7 @@ export class BudgetEngineService {
 
       const response = await ApiClient.post<BudgetCalculationResponse>(
         this.ENDPOINT,
-        requestBody as unknown as Record<string, unknown>,
+        requestBody,
         {
           timeout: 60000, // 60 seconds for large datasets
         }
