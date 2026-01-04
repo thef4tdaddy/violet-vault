@@ -288,6 +288,7 @@ describe("useImportData", () => {
       importBudgetId: undefined,
       validationWarnings: [],
     });
+    (importDataToDexie as Mock).mockResolvedValue(undefined);
     (forcePushToCloud as Mock).mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useImportData());
