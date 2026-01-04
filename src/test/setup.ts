@@ -112,6 +112,9 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
+// Mock Element.prototype.scrollTo for components like StandardTabs
+Element.prototype.scrollTo = vi.fn();
+
 /**
  * Mock implementation of Storage interface (localStorage/sessionStorage)
  */

@@ -343,7 +343,7 @@ export const useLoginMutation = () => {
           }
           return {
             success: false,
-            error: "Invalid password or corrupted data.",
+            error: errorMessage || "Invalid password or corrupted data.",
           };
         }
       };

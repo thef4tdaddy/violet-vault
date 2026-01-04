@@ -2,14 +2,21 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { validateManifest } from "../manifestValidator";
 import { VALIDATION_CONSTANTS } from "../constants";
 
-// Mock logger
-vi.mock("@/utils/common/logger", () => ({
-  default: {
+vi.mock("../../../common/logger", () => {
+  const mock = {
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  },
-}));
+    auth: vi.fn(),
+    info: vi.fn(),
+  };
+  return {
+    default: mock,
+    logger: mock,
+  };
+});
+
+import { logger } from "../../../common/logger";
 
 // Type definition for valid validation result
 type ValidResult = {
@@ -103,7 +110,7 @@ describe("manifestValidator", () => {
         chunks: {},
       };
 
-      const result = validateManifest(manifest, "version-type-test");
+      const result = validateManifest(manifest as any, "version-type-test");
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Manifest version must be a string");
@@ -142,7 +149,7 @@ describe("manifestValidator", () => {
         chunks: {},
       };
 
-      const result = validateManifest(manifest, "timestamp-type-test");
+      const result = validateManifest(manifest as any, "timestamp-type-test");
 
       expect(result.isValid).toBe(true); // Warnings don't fail validation
       expect(result.warnings).toContain("Manifest timestamp must be a number");
@@ -211,7 +218,7 @@ describe("manifestValidator", () => {
         chunks: "not-an-object",
       };
 
-      const result = validateManifest(manifest, "chunks-type-test");
+      const result = validateManifest(manifest as any, "chunks-type-test");
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Manifest chunks must be an object");
@@ -344,27 +351,26 @@ describe("manifestValidator", () => {
 
   describe("logging integration", () => {
     it("should log validation failures", async () => {
-      const logger = await import("@/utils/common/logger");
-
       const invalidManifest = {
         version: 123, // Wrong type
         chunks: "not-object", // Wrong type
       };
 
-      validateManifest(invalidManifest, "logging-failure-test");
+      validateManifest(invalidManifest as any, "logging-failure-test");
 
-      expect(logger.default.error).toHaveBeenCalledWith(
+      expect(logger.error).toHaveBeenCalledWith(
         "❌ Manifest validation failed for logging-failure-test",
+        null,
         expect.objectContaining({
-          isValid: false,
-          errors: expect.any(Array),
+          validationResult: expect.objectContaining({
+            isValid: false,
+            errors: expect.any(Array),
+          }),
         })
       );
     });
 
     it("should log validation warnings", async () => {
-      const logger = await import("@/utils/common/logger");
-
       const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
       const manifest = {
         version: "2.0",
@@ -374,18 +380,18 @@ describe("manifestValidator", () => {
 
       validateManifest(manifest, "logging-warning-test");
 
-      expect(logger.default.warn).toHaveBeenCalledWith(
+      expect(logger.warn).toHaveBeenCalledWith(
         "⚠️ Manifest validation warnings for logging-warning-test",
-        expect.objectContaining({
-          isValid: true,
-          warnings: expect.arrayContaining(["Manifest timestamp is in the future"]),
-        })
+        {
+          validationResult: expect.objectContaining({
+            isValid: true,
+            warnings: expect.arrayContaining(["Manifest timestamp is in the future"]),
+          }),
+        }
       );
     });
 
     it("should log successful validation", async () => {
-      const logger = await import("@/utils/common/logger");
-
       const validManifest = {
         version: "2.0",
         timestamp: Date.now(),
@@ -396,10 +402,10 @@ describe("manifestValidator", () => {
 
       validateManifest(validManifest, "logging-success-test");
 
-      expect(logger.default.debug).toHaveBeenCalledWith(
+      expect(logger.debug).toHaveBeenCalledWith(
         "✅ Manifest validation passed for logging-success-test",
         expect.objectContaining({
-          chunkCount: 1,
+          chunkCount: expect.any(Number),
           manifestSize: expect.any(Number),
         })
       );

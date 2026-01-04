@@ -6,7 +6,7 @@
       "category": "Food",
       "archived": false,
       "lastModified": 1704153600000,
-      "currentBalance": 500.00,
+      "currentBalance": 500.0,
       "envelopeType": "variable"
     },
     {
@@ -15,7 +15,7 @@
       "category": "Housing",
       "archived": false,
       "lastModified": 1704153600000,
-      "currentBalance": 1200.00,
+      "currentBalance": 1200.0,
       "envelopeType": "bill"
     },
     {
@@ -24,7 +24,7 @@
       "category": "Transportation",
       "archived": false,
       "lastModified": 1704153600000,
-      "currentBalance": 150.00,
+      "currentBalance": 150.0,
       "envelopeType": "variable"
     }
   ],
@@ -32,7 +32,7 @@
     {
       "id": "txn-1",
       "date": "2024-01-01",
-      "amount": -50.00,
+      "amount": -50.0,
       "envelopeId": "env-groceries",
       "category": "Food",
       "type": "expense",
@@ -42,7 +42,7 @@
     {
       "id": "txn-2",
       "date": "2024-01-02",
-      "amount": -1200.00,
+      "amount": -1200.0,
       "envelopeId": "env-rent",
       "category": "Housing",
       "type": "expense",
@@ -52,7 +52,7 @@
     {
       "id": "txn-3",
       "date": "2024-01-03",
-      "amount": 3000.00,
+      "amount": 3000.0,
       "envelopeId": "unassigned",
       "category": "Income",
       "type": "income",
@@ -63,7 +63,7 @@
   "metadata": {
     "id": "budget-main",
     "lastModified": 1704153600000,
-    "actualBalance": 3600.00,
-    "unassignedCash": 1750.00
+    "actualBalance": 3600.0,
+    "unassignedCash": 1750.0
   }
 }

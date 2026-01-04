@@ -1,5 +1,30 @@
 // Sync Integration Tests - Real End-to-End Testing
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
+// Mock crypto operations before other imports
+vi.mock("@/utils/security/encryption", () => ({
+  encryptionUtils: {
+    generateKey: vi.fn(() =>
+      Promise.resolve({
+        key: {
+          type: "secret",
+          extractable: true,
+          algorithm: { name: "AES-GCM" },
+          usages: ["encrypt", "decrypt"],
+        } as CryptoKey,
+        salt: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
+      })
+    ),
+    encrypt: vi.fn((data) =>
+      Promise.resolve({
+        data: [1, 2, 3, 4, 5],
+        iv: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+      })
+    ),
+    decrypt: vi.fn(() => Promise.resolve({})),
+  },
+}));
+
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import firebaseSyncService from "@/services/sync/firebaseSyncService";

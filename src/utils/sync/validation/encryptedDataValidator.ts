@@ -35,13 +35,19 @@ export const validateEncryptedData = (
     return { isValid: false, errors, warnings };
   }
 
-  // Check for required properties
-  if (!encryptedData.data) {
-    errors.push("Missing encrypted data property");
-  }
+  // Check for required properties with error handling
+  try {
+    if (!encryptedData.data) {
+      errors.push("Missing encrypted data property");
+    }
 
-  if (!encryptedData.iv) {
-    errors.push("Missing initialization vector (IV) property");
+    if (!encryptedData.iv) {
+      errors.push("Missing initialization vector (IV) property");
+    }
+  } catch (accessError) {
+    const errorMsg = accessError instanceof Error ? accessError.message : String(accessError);
+    errors.push(`Data validation error: ${errorMsg}`);
+    return { isValid: false, errors, warnings };
   }
 
   if (errors.length > 0) {
