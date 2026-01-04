@@ -227,33 +227,57 @@ export class BudgetCalculationService {
   private static async checkBackendAvailability(): Promise<boolean> {
     const now = Date.now();
 
+    // Narrow `this` to allow an internal in-flight promise without changing class fields
+    const self = this as typeof BudgetCalculationService & {
+      healthCheckPromise?: Promise<boolean> | null;
+    };
+
     // Return cached result if recent
     if (this.backendAvailable !== null && now - this.lastHealthCheck < this.HEALTH_CHECK_INTERVAL) {
       return this.backendAvailable;
     }
 
-    // Perform health check
-    try {
-      this.backendAvailable = await BudgetEngineService.isAvailable();
-      this.lastHealthCheck = now;
-      logger.info("Backend availability check", { available: this.backendAvailable });
-      return this.backendAvailable;
-    } catch (error) {
-      logger.warn("Backend availability check failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.backendAvailable = false;
-      this.lastHealthCheck = now;
-      return false;
+    // If a health check is already in progress, await the same promise
+    if (self.healthCheckPromise) {
+      return self.healthCheckPromise;
     }
+
+    // Perform health check and share the in-flight promise across callers
+    self.healthCheckPromise = (async () => {
+      try {
+        const available = await BudgetEngineService.isAvailable();
+        this.backendAvailable = available;
+        this.lastHealthCheck = Date.now();
+        logger.info("Backend availability check", { available: this.backendAvailable });
+        return available;
+      } catch (error) {
+        logger.warn("Backend availability check failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        this.backendAvailable = false;
+        this.lastHealthCheck = Date.now();
+        return false;
+      } finally {
+        self.healthCheckPromise = null;
+      }
+    })();
+
+    return self.healthCheckPromise;
   }
 
   /**
    * Force refresh backend availability status
    */
   static async refreshBackendStatus(): Promise<boolean> {
+    // Clear cached status
     this.backendAvailable = null;
     this.lastHealthCheck = 0;
+
+    // Also clear any in-flight health check promise so the next call starts fresh
+    const self = this as typeof BudgetCalculationService & {
+      healthCheckPromise?: Promise<boolean> | null;
+    };
+    self.healthCheckPromise = null;
     return this.checkBackendAvailability();
   }
 
