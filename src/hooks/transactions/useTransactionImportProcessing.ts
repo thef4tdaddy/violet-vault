@@ -327,12 +327,79 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
       }
     }
 
-    // Fallback: Read file and process client-side
-    // This requires reading the file content first
+    // Fallback: Read file and process client-side using FileReader
     logger.info("Using client-side file import");
-    throw new Error(
-      "Client-side file import not yet implemented in this integration. Please use processTransactions() with pre-parsed data."
-    );
+
+    const readFileAsText = (fileToRead: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          resolve(typeof reader.result === "string" ? reader.result : "");
+        };
+
+        reader.onerror = () => {
+          reject(
+            reader.error ??
+              new Error("Unknown error while reading file on client-side")
+          );
+        };
+
+        reader.readAsText(fileToRead);
+      });
+    };
+
+   const parseContentToRows = async (): Promise<unknown[]> => {
+      const content = await readFileAsText(file);
+
+      // Try JSON first
+      try {
+        const json = JSON.parse(content);
+        if (Array.isArray(json)) {
+          return json;
+        }
+        if (json && Array.isArray((json as any).transactions)) {
+          return (json as any).transactions;
+        }
+      } catch {
+        // Not JSON, fall through to CSV parsing
+      }
+
+      // Basic CSV parsing: first line as headers, remaining as data rows
+      const lines = content
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (lines.length === 0) {
+        return [];
+      }
+
+      const [headerLine, ...dataLines] = lines;
+      const headers = headerLine.split(",").map((h) => h.trim());
+
+      const rows = dataLines.map((line) => {
+        const values = line.split(",");
+        const row: Record<string, unknown> = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] !== undefined ? values[index].trim() : "";
+        });
+        return row;
+      });
+
+      return rows;
+    };
+
+    const rawRows = await parseContentToRows();
+
+    // Delegate validation/normalization to existing processing pipeline
+    const result = await processTransactions(rawRows, fieldMapping);
+
+    // Ensure the source is marked as client-side if not already set
+    return {
+      ...result,
+      source: result.source ?? "client",
+    };
   };
 
   return {
