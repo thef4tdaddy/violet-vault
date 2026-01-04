@@ -192,7 +192,10 @@ export class BudgetCalculationService {
       envelopeId: bill.envelopeId,
       isPaid: bill.isPaid,
       amount: bill.amount,
-      dueDate: bill.dueDate instanceof Date ? bill.dueDate.toISOString() : bill.dueDate,
+      dueDate:
+        bill.dueDate instanceof Date
+          ? bill.dueDate.toISOString().split("T")[0]
+          : bill.dueDate,
       name: bill.name,
     }));
 
