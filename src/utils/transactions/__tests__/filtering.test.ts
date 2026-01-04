@@ -94,13 +94,19 @@ describe("filtering utilities", () => {
     });
 
     it("should handle invalid dates gracefully", () => {
-      // Invalid date strings result in Invalid Date objects but don't throw errors
-      // They'll fail date comparisons and be included/excluded based on logic
-      const result = filterByDateRange([{ ...mockTransactions[0], date: "invalid-date" }], {
+      // Invalid date strings create Invalid Date objects (NaN comparisons)
+      // NaN < Date and NaN > Date both return false, so invalid dates pass through filters
+      const txWithInvalidDate = { ...mockTransactions[0], date: "invalid-date" };
+      const result = filterByDateRange([txWithInvalidDate], {
         start: "2023-09-01",
       });
-      // The transaction with invalid date gets included as it doesn't fail the comparison
+
+      // Verify invalid date transaction is included (NaN comparison returns false, so it passes the filter)
       expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(txWithInvalidDate);
+
+      // Also test that it doesn't throw an error (handled by try-catch)
+      expect(() => filterByDateRange([txWithInvalidDate], { start: "2023-09-01" })).not.toThrow();
     });
 
     it("should handle empty transactions array", () => {
