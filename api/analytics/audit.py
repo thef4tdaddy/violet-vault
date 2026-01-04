@@ -3,7 +3,7 @@ Envelope Integrity Audit Logic
 Analyzes budget data for integrity violations and inconsistencies
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 from api.models import (
@@ -49,7 +49,7 @@ class EnvelopeIntegrityAuditor:
         return IntegrityAuditResult(
             violations=violations,
             summary=summary,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             snapshotSize={
                 "envelopes": len(snapshot.envelopes),
                 "transactions": len(snapshot.transactions),
