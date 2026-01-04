@@ -33,22 +33,9 @@ describe("useExportData", () => {
         exportedBy: user?.userName || "unknown",
       },
     }));
-    // Mock DOM methods
+    // Mock URL methods
     global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
     global.URL.revokeObjectURL = vi.fn();
-    const mockLink = {
-      href: "",
-      download: "",
-      click: vi.fn(),
-    };
-    document.createElement = vi.fn((tagName: string) => {
-      if (tagName === "a") {
-        return mockLink as unknown as HTMLElement;
-      }
-      return document.createElement(tagName);
-    });
-    document.body.appendChild = vi.fn();
-    document.body.removeChild = vi.fn();
   });
 
   it("should export data successfully", async () => {
