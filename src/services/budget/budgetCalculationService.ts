@@ -129,7 +129,15 @@ export class BudgetCalculationService {
         status: envData.status || "healthy",
         upcomingBills: envData.upcomingBills || [],
         overdueBills: envData.overdueBills || [],
-        transactions: (envData.transactions || []) as unknown as Transaction[],
+        transactions: Array.isArray(envData.transactions)
+          ? envData.transactions.filter(
+              (txn: any): txn is Transaction =>
+                txn &&
+                typeof txn === "object" &&
+                "createdAt" in txn &&
+                "lastModified" in txn
+            )
+          : [],
         bills: envData.bills || [],
         biweeklyNeed: envData.biweeklyNeed || 0,
       })) as unknown as ClientEnvelopeData[];
