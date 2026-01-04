@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import BillTable from "../BillTable";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock child components
 vi.mock("../BillTableHeader", () => ({
@@ -57,6 +58,7 @@ describe("BillTable", () => {
   const mockSetShowBulkUpdateModal = vi.fn();
   const mockSetShowBillDetail = vi.fn();
   const mockHandlePayBill = vi.fn();
+  let queryClient: QueryClient;
 
   const mockGetBillDisplayData = vi.fn((bill) => ({
     Icon: () => <div>Icon</div>,
@@ -94,22 +96,35 @@ describe("BillTable", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const renderWithQuery = (component: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    );
+  };
 
   describe("Rendering", () => {
     it("should render without crashing", () => {
-      render(<BillTable {...defaultProps} />);
+      renderWithQuery(<BillTable {...defaultProps} />);
       expect(screen.getByTestId("bill-table-header")).toBeInTheDocument();
     });
 
     it("should render table structure", () => {
-      render(<BillTable {...defaultProps} />);
+      renderWithQuery(<BillTable {...defaultProps} />);
       const table = screen.getByRole("table");
       expect(table).toBeInTheDocument();
     });
 
     it("should display empty state when no bills", () => {
-      render(<BillTable {...defaultProps} />);
+      renderWithQuery(<BillTable {...defaultProps} />);
       expect(screen.getByTestId("bill-table-empty-state")).toBeInTheDocument();
       expect(screen.getByText(/No bills in all mode/i)).toBeInTheDocument();
     });
@@ -134,7 +149,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(screen.getByText("Electric Bill")).toBeInTheDocument();
       expect(screen.getByText("Internet Bill")).toBeInTheDocument();
@@ -153,7 +168,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(screen.queryByTestId("bill-table-empty-state")).not.toBeInTheDocument();
     });
@@ -170,7 +185,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(screen.getByText("Pay")).toBeInTheDocument();
     });
@@ -187,7 +202,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(screen.queryByText("Pay")).not.toBeInTheDocument();
     });
@@ -214,7 +229,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       const checkboxes = screen.getAllByRole("checkbox");
       expect(checkboxes).toHaveLength(2);
@@ -232,7 +247,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       const checkbox = screen.getByRole("checkbox");
       await userEvent.click(checkbox);
@@ -246,14 +261,14 @@ describe("BillTable", () => {
         isAllSelected: false,
       };
 
-      render(<BillTable {...defaultProps} selectionState={selectionState} />);
+      renderWithQuery(<BillTable {...defaultProps} selectionState={selectionState} />);
 
       expect(screen.getByTestId("bill-table-bulk-actions")).toBeInTheDocument();
       expect(screen.getByText("Selected: 2")).toBeInTheDocument();
     });
 
     it("should not show bulk actions when no bills selected", () => {
-      render(<BillTable {...defaultProps} />);
+      renderWithQuery(<BillTable {...defaultProps} />);
 
       expect(screen.queryByTestId("bill-table-bulk-actions")).not.toBeInTheDocument();
     });
@@ -272,7 +287,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       const row = screen.getByText("Bill").closest("tr");
       await userEvent.click(row);
@@ -292,7 +307,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       const payButton = screen.getByText("Pay");
       await userEvent.click(payButton);
@@ -322,7 +337,7 @@ describe("BillTable", () => {
         },
       ];
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(mockGetBillDisplayData).toHaveBeenCalledTimes(2);
       expect(mockGetBillDisplayData).toHaveBeenCalledWith(bills[0]);
@@ -351,7 +366,7 @@ describe("BillTable", () => {
         statusText: "Due Soon",
       });
 
-      render(<BillTable {...defaultProps} filteredBills={bills} />);
+      renderWithQuery(<BillTable {...defaultProps} filteredBills={bills} />);
 
       expect(screen.getByText("$123.45")).toBeInTheDocument();
       expect(screen.getByText("Jan 15, 2024")).toBeInTheDocument();
