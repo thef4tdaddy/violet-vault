@@ -7,7 +7,7 @@ import {
   validateReceiptData,
   formatCurrency,
   isReceiptDataComplete,
-} from "../receiptHelpers.jsx";
+} from "../receiptHelpers";
 
 describe("receiptHelpers", () => {
   describe("renderConfidenceIndicator", () => {

@@ -66,8 +66,41 @@ export type PaycheckHistory = z.infer<typeof PaycheckHistorySchema>;
 
 /**
  * Partial paycheck history schema for updates
+ * Note: Created from the base object schema without refinements,
+ * since .partial() cannot be used on schemas with refinements
  */
-export const PaycheckHistoryPartialSchema = PaycheckHistorySchema.partial();
+export const PaycheckHistoryPartialSchema = z
+  .object({
+    id: z.string().min(1, "Paycheck ID is required"),
+    date: z.union([z.date(), z.string()]).optional(),
+    processedAt: z.union([z.date(), z.string()]).optional(),
+    amount: z.number().min(0, "Amount cannot be negative"),
+    source: z.string().min(1).max(100).optional(),
+    payerName: z.string().min(1).max(100).optional(),
+    allocations: z
+      .union([
+        z.array(
+          z.object({
+            envelopeId: z.string(),
+            envelopeName: z.string(),
+            amount: z.number(),
+          })
+        ),
+        z.record(z.string(), z.number().min(0)),
+      ])
+      .optional(),
+    lastModified: z.number().int().positive("Last modified must be a positive number"),
+    createdAt: z.number().int().positive().optional(),
+    deductions: z.record(z.string(), z.number().min(0)).optional(),
+    netAmount: z.number().min(0).optional(),
+    processedBy: z.string().optional(),
+    allocationMode: z.string().optional(),
+    totalAllocated: z.number().optional(),
+    remainingAmount: z.number().optional(),
+    incomeTransactionId: z.string().optional(),
+    transferTransactionIds: z.array(z.string()).optional(),
+  })
+  .partial();
 export type PaycheckHistoryPartial = z.infer<typeof PaycheckHistoryPartialSchema>;
 
 /**

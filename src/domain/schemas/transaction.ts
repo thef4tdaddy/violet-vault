@@ -71,8 +71,28 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 
 /**
  * Partial transaction schema for updates
+ * Note: Created from the base object schema without refinements,
+ * since .partial() cannot be used on schemas with refinements
  */
-export const TransactionPartialSchema = TransactionSchema.partial();
+export const TransactionPartialSchema = z
+  .object({
+    id: z.string().min(1, "Transaction ID is required"),
+    date: z.union([z.date(), z.string()]),
+    amount: z.number(),
+    envelopeId: z.string().min(1, "Envelope ID is required"),
+    category: z.string().min(1, "Category is required"),
+    type: TransactionTypeSchema.default("expense"),
+    lastModified: z.number().int().positive("Last modified must be a positive number"),
+    createdAt: z.number().int().positive().optional(),
+    description: z.string().max(500, "Description must be 500 characters or less").optional(),
+    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+    isInternalTransfer: z.boolean().optional(),
+    paycheckId: z.string().optional(),
+    fromEnvelopeId: z.string().optional(),
+    toEnvelopeId: z.string().optional(),
+  })
+  .partial();
 export type TransactionPartial = z.infer<typeof TransactionPartialSchema>;
 
 /**
