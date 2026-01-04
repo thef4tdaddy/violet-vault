@@ -36,7 +36,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Import after mocks are set up
-import firebaseMessagingService from "../firebaseMessaging";
+import firebaseMessagingService from "@/services/sync/firebaseMessaging";
 import { getToken, onMessage, isSupported } from "firebase/messaging";
 import logger from "@/utils/common/logger";
 

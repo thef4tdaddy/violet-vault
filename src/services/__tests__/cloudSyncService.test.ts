@@ -62,7 +62,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-const { cloudSyncService } = await import("../cloudSyncService");
+const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
 
 describe("CloudSyncService - Sync Core Tests", () => {
   const mockConfig = {
@@ -244,7 +244,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
     });
 
     it("should handle network failures during sync", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValue(
         new Error("Network request failed")
       );
@@ -256,7 +256,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
     });
 
     it("should handle timeout errors", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValue(
         new Error("Request timeout")
       );
@@ -267,7 +267,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
     });
 
     it("should handle partial sync failures", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.saveToCloud).mockRejectedValue(
         new Error("Partial sync failure")
       );
@@ -848,7 +848,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle decryption errors gracefully during sync", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValueOnce(
         new Error("The provided data is too small")
       );
@@ -869,7 +869,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle OperationError during cloud load", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       const operationError = new Error("Operation failed");
       operationError.name = "OperationError";
       vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValueOnce(operationError);
@@ -881,7 +881,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should handle key mismatch errors", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.loadFromCloud).mockRejectedValueOnce(
         new Error("key mismatch detected")
       );
@@ -1040,7 +1040,7 @@ describe("CloudSyncService - Conflict Resolution Tests", () => {
     });
 
     it("should reset syncing flag after error", async () => {
-      const chunkedSyncService = await import("../chunkedSyncService");
+      const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
       vi.mocked(chunkedSyncService.default.initialize).mockRejectedValueOnce(
         new Error("Init failed")
       );
