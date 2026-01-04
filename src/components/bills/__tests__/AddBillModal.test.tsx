@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import AddBillModal from "../AddBillModal";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock all hooks with default exports where needed
 vi.mock("@/hooks/bills/useBillForm", () => ({
@@ -102,6 +103,7 @@ describe("AddBillModal", () => {
   const mockOnUpdateBill = vi.fn();
   const mockOnDeleteBill = vi.fn();
   const mockOnError = vi.fn();
+  let queryClient: QueryClient;
 
   const defaultProps = {
     isOpen: true,
@@ -115,21 +117,34 @@ describe("AddBillModal", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const renderWithQuery = (component: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    );
+  };
 
   describe("Rendering", () => {
     it("should not render when isOpen is false", () => {
-      render(<AddBillModal {...defaultProps} isOpen={false} />);
+      renderWithQuery(<AddBillModal {...defaultProps} isOpen={false} />);
       expect(screen.queryByTestId("bill-modal-header")).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
     });
 
     it("should display Add Bill title for new bills", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByText("Add Bill")).toBeInTheDocument();
     });
 
@@ -141,24 +156,24 @@ describe("AddBillModal", () => {
         dueDate: "2024-01-15",
       };
 
-      render(<AddBillModal {...defaultProps} editingBill={editingBill} />);
+      renderWithQuery(<AddBillModal {...defaultProps} editingBill={editingBill} />);
       expect(screen.getByText("Edit Bill")).toBeInTheDocument();
     });
 
     it("should render form fields", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByTestId("bill-form-fields")).toBeInTheDocument();
     });
 
     it("should render modal header", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
     });
   });
 
   describe("User Interactions", () => {
     it("should call onClose when close button is clicked", async () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
 
       const closeButton = screen.getByText("Close");
       await userEvent.click(closeButton);
@@ -169,7 +184,7 @@ describe("AddBillModal", () => {
 
   describe("Form Fields", () => {
     it("should render name and amount inputs", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
 
       expect(screen.getByTestId("bill-name-input")).toBeInTheDocument();
       expect(screen.getByTestId("bill-amount-input")).toBeInTheDocument();

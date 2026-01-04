@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import SecuritySettings from "../SecuritySettingsRefactored";
+import SecuritySettings from "../SecuritySettings";
 
 // Mock the custom hook
 vi.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
