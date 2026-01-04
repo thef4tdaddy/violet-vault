@@ -176,7 +176,14 @@ export class BudgetCalculationService {
       envelopeId: tx.envelopeId,
       type: tx.type,
       amount: tx.amount,
-      date: tx.date instanceof Date ? tx.date.toISOString().split("T")[0] : tx.date,
+      date:
+        tx.date instanceof Date
+          ? new Date(
+              Date.UTC(tx.date.getFullYear(), tx.date.getMonth(), tx.date.getDate())
+            )
+              .toISOString()
+              .split("T")[0]
+          : tx.date,
       description: tx.description,
     }));
 
