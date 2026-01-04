@@ -1,14 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useLoginMutation, useLogoutMutation, useChangePasswordMutation } from "../useAuthQueries";
 
-/**
- * Test suite for useAuthQueries
- * TanStack Query hooks for auth operations
- * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
- */
-
-// Mock TanStack Query
+// Mock TanStack Query FIRST
 vi.mock("@tanstack/react-query", () => ({
   useMutation: vi.fn((_options) => ({
     mutate: vi.fn(),
@@ -25,6 +18,11 @@ vi.mock("@tanstack/react-query", () => ({
     isError: false,
     error: null,
   })),
+  useQueryClient: vi.fn(() => ({
+    clear: vi.fn(),
+    invalidateQueries: vi.fn(),
+    removeQueries: vi.fn(),
+  })),
 }));
 
 // Mock the auth service
@@ -39,7 +37,7 @@ vi.mock("@/services/auth/authService", () => ({
 }));
 
 // Mock AuthContext
-vi.mock("../../contexts/AuthContext", () => ({
+vi.mock("../../../contexts/AuthContext", () => ({
   useAuth: vi.fn(() => ({
     setAuthenticated: vi.fn(),
     clearAuth: vi.fn(),
@@ -47,6 +45,8 @@ vi.mock("../../contexts/AuthContext", () => ({
     setError: vi.fn(),
   })),
 }));
+
+import { useLoginMutation, useLogoutMutation, useChangePasswordMutation } from "../useAuthQueries";
 
 describe("useAuthQueries", () => {
   beforeEach(() => {
