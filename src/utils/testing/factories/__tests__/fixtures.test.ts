@@ -83,9 +83,14 @@ describe("Test Fixtures", () => {
       expect(types).toContain("expense");
     });
 
-    it("should have positive amounts", () => {
+    it("should have correct amount signs based on type", () => {
       sampleTransactions.forEach((transaction) => {
-        expect(transaction.amount).toBeGreaterThan(0);
+        if (transaction.type === "expense") {
+          expect(transaction.amount).toBeLessThan(0);
+        } else if (transaction.type === "income") {
+          expect(transaction.amount).toBeGreaterThan(0);
+        }
+        // transfer can be either positive or negative
       });
     });
   });
