@@ -1,9 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
-import MainDashboard from "../MainDashboard";
-import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useTransactions } from "@/hooks/common/useTransactions";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query};
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useUnassignedCash, useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
 
 // Mock all custom hooks
 vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
