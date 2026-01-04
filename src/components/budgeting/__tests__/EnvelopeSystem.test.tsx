@@ -2,6 +2,8 @@ import { renderHook } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import useEnvelopeSystem from "../EnvelopeSystem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import useBills from "@/hooks/bills/useBills";
 
 // Mock dependencies
 vi.mock("@/stores/ui/uiStore", () => ({
@@ -60,9 +62,7 @@ describe("useEnvelopeSystem", () => {
 
   const createWrapper = () => {
     return ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
   };
 
@@ -181,8 +181,7 @@ describe("useEnvelopeSystem", () => {
         { id: "2", name: "Gas", balance: 200 },
       ];
 
-      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
-      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useEnvelopes).mockReturnValue({
         envelopes: mockEnvelopes,
         addEnvelope: vi.fn(),
         updateEnvelope: vi.fn(),
@@ -201,8 +200,7 @@ describe("useEnvelopeSystem", () => {
         { id: "2", name: "Electric", amount: 100 },
       ];
 
-      const useBills = require("@/hooks/bills/useBills").default;
-      (useBills as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useBills).mockReturnValue({
         bills: mockBills,
         isLoading: false,
       });
@@ -213,8 +211,7 @@ describe("useEnvelopeSystem", () => {
     });
 
     it("should report loading state correctly", () => {
-      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
-      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useEnvelopes).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),
         updateEnvelope: vi.fn(),

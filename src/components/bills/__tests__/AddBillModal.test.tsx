@@ -60,11 +60,10 @@ vi.mock("../ui/EditLockIndicator", () => ({
 }));
 
 vi.mock("../BillModalHeader", () => ({
-  default: ({ title, onClose, onSubmit }) => (
+  default: ({ editingBill, onClose }) => (
     <div data-testid="bill-modal-header">
-      <h2>{title}</h2>
+      <h2>{editingBill ? "Edit Bill" : "Add Bill"}</h2>
       <button onClick={onClose}>Close</button>
-      <button onClick={onSubmit}>Submit</button>
     </div>
   ),
 }));
@@ -125,11 +124,7 @@ describe("AddBillModal", () => {
   });
 
   const renderWithQuery = (component: React.ReactElement) => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        {component}
-      </QueryClientProvider>
-    );
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
   describe("Rendering", () => {
