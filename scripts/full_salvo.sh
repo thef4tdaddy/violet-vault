@@ -40,7 +40,16 @@ echo -e "${BLUE}  1️⃣  TypeScript/JavaScript Checks${NC}"
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
 
 echo -e "\n${YELLOW}→ Running ESLint...${NC}"
-npm run lint || report_status $? "ESLint"
+npm run lint > .lint_output.txt 2>&1
+LINT_EXIT_CODE=$?
+cat .lint_output.txt
+if [ $LINT_EXIT_CODE -ne 0 ]; then
+    cp .lint_output.txt .lint_failure.log
+    report_status $LINT_EXIT_CODE "ESLint"
+else
+    report_status 0 "ESLint"
+fi
+rm -f .lint_output.txt
 
 echo -e "\n${YELLOW}→ Running TypeScript type check...${NC}"
 npm run typecheck || report_status $? "TypeScript"
@@ -71,14 +80,7 @@ echo -e "${BLUE}═════════════════════�
 if [ -d "api" ] && [ -f "api/go.mod" ]; then
     echo -e "\n${YELLOW}→ Running go fmt...${NC}"
     cd api
-    if ! gofmt -l . | grep -q .; then
-        echo -e "${GREEN}✓ go fmt passed${NC}"
-    else
-        echo -e "${RED}✗ go fmt found unformatted files:${NC}"
-        gofmt -l .
-        FAILED_STEPS+=("go fmt")
-        OVERALL_STATUS=1
-    fi
+    go fmt ./... || report_status $? "go fmt"
 
     echo -e "\n${YELLOW}→ Running go vet...${NC}"
     go vet ./... || report_status $? "go vet"
@@ -89,7 +91,7 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
     # Check if golangci-lint is available
     if command -v golangci-lint &> /dev/null; then
         echo -e "\n${YELLOW}→ Running golangci-lint...${NC}"
-        golangci-lint run || report_status $? "golangci-lint"
+        golangci-lint run ./... || report_status $? "golangci-lint"
     else
         echo -e "${YELLOW}⚠ golangci-lint not found, skipping${NC}"
     fi
@@ -104,7 +106,6 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
         go tool cover -func=coverage.out
         rm coverage.out
     fi
-
     cd ..
 else
     echo -e "${YELLOW}⚠ No Go code found in api/, skipping Go checks${NC}"
@@ -136,11 +137,11 @@ if [ -f "pyproject.toml" ] && [ -n "$(find api -name "*.py" -print -quit)" ]; th
 
     # Check if ruff is available
     if command -v "$RUFF_CMD" &> /dev/null || [ -f "$RUFF_CMD" ]; then
-        echo -e "\n${YELLOW}→ Running ruff lint...${NC}"
-        $RUFF_CMD check api/ || report_status $? "ruff lint"
+        echo -e "\n${YELLOW}→ Running ruff format (auto-fix)...${NC}"
+        $RUFF_CMD format api/ || report_status $? "ruff format"
 
-        echo -e "\n${YELLOW}→ Running ruff format check...${NC}"
-        $RUFF_CMD format --check api/ || report_status $? "ruff format"
+        echo -e "\n${YELLOW}→ Running ruff lint (auto-fix)...${NC}"
+        $RUFF_CMD check --fix api/ || report_status $? "ruff lint"
     else
         echo -e "${YELLOW}⚠ ruff not found, skipping ruff checks${NC}"
         echo -e "${YELLOW}  Install with: pip install ruff${NC}"
@@ -188,6 +189,13 @@ else
     for step in "${FAILED_STEPS[@]}"; do
         echo -e "  - ${RED}$step${NC}"
     done
+
+    if [ -f .lint_failure.log ]; then
+        echo -e "\n${RED}🔍 ESLint Errors Details:${NC}"
+        cat .lint_failure.log
+        rm .lint_failure.log
+    fi
+
     echo -e "\n${RED}Please fix the errors above before committing${NC}\n"
 fi
 

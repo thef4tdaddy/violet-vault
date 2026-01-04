@@ -82,16 +82,9 @@ export const TransactionPartialSchema = z
     envelopeId: z.string().min(1, "Envelope ID is required").optional(),
     category: z.string().min(1, "Category is required").optional(),
     type: TransactionTypeSchema.optional(),
-    lastModified: z
-      .number()
-      .int()
-      .positive("Last modified must be a positive number")
-      .optional(),
+    lastModified: z.number().int().positive("Last modified must be a positive number").optional(),
     createdAt: z.number().int().positive().optional(),
-    description: z
-      .string()
-      .max(500, "Description must be 500 characters or less")
-      .optional(),
+    description: z.string().max(500, "Description must be 500 characters or less").optional(),
     merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
     receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
     isInternalTransfer: z.boolean().optional(),

@@ -150,87 +150,80 @@ export class ImportService {
 
     for (const header of headers) {
       const headerLower = header.toLowerCase().trim();
-      // Normalize by removing common separators so we can match "transaction_date",
-      // "transaction date", "transactiondate", "txn_date", etc.
+      // Normalize by removing common separators
       const normalizedHeader = headerLower.replace(/[^a-z0-9]/g, "");
 
-      // Date detection
-      if (
-        headerLower === "date" ||
-        headerLower === "transaction_date" ||
-        headerLower === "transaction date" ||
-        normalizedHeader === "transactiondate" ||
-        normalizedHeader === "transdate" ||
-        normalizedHeader === "transactiondt" ||
-        normalizedHeader === "postingdate" ||
-        // common abbreviations like "txn_date", "txn date", "txndate"
-        (normalizedHeader.startsWith("txn") && normalizedHeader.includes("date")) ||
-        (normalizedHeader.startsWith("trans") && normalizedHeader.includes("date"))
-      ) {
+      if (this.isDateField(headerLower, normalizedHeader)) {
         mapping.date = header;
-      }
-      // Amount detection
-      else if (
-        headerLower === "amount" ||
-        headerLower === "value" ||
-        normalizedHeader.includes("amount") ||
-        normalizedHeader.includes("amt") ||
-        normalizedHeader.includes("value") ||
-        normalizedHeader.includes("price") ||
-        normalizedHeader.includes("total")
-      ) {
+      } else if (this.isAmountField(headerLower, normalizedHeader)) {
         mapping.amount = header;
-      }
-      // Description detection
-      else if (
-        headerLower === "description" ||
-        headerLower === "memo" ||
-        headerLower === "payee" ||
-        normalizedHeader.includes("description") ||
-        normalizedHeader.includes("desc") ||
-        normalizedHeader.includes("memo") ||
-        normalizedHeader.includes("payee") ||
-        normalizedHeader.includes("details")
-      ) {
+      } else if (this.isDescriptionField(headerLower, normalizedHeader)) {
         mapping.description = header;
-      }
-      // Category detection
-      else if (
-        headerLower === "category" ||
-        normalizedHeader === "category" ||
-        normalizedHeader.startsWith("category") ||
-        normalizedHeader === "cat" ||
-        normalizedHeader.startsWith("cat")
-      ) {
+      } else if (this.isCategoryField(headerLower, normalizedHeader)) {
         mapping.category = header;
-      }
-      // Merchant detection
-      else if (
-        headerLower === "merchant" ||
-        headerLower === "vendor" ||
-        normalizedHeader.includes("merchant") ||
-        normalizedHeader.includes("vendor") ||
-        normalizedHeader.includes("store") ||
-        normalizedHeader.includes("shop")
-      ) {
+      } else if (this.isMerchantField(headerLower, normalizedHeader)) {
         mapping.merchant = header;
-      }
-      // Notes detection
-      else if (
-        headerLower === "notes" ||
-        headerLower === "note" ||
-        normalizedHeader.includes("note") ||
-        normalizedHeader.includes("notes") ||
-        normalizedHeader.includes("comment") ||
-        normalizedHeader.includes("comments") ||
-        normalizedHeader.includes("remark") ||
-        normalizedHeader.includes("remarks")
-      ) {
+      } else if (this.isNotesField(headerLower, normalizedHeader)) {
         mapping.notes = header;
       }
     }
 
     return mapping;
+  }
+
+  private static isDateField(header: string, normalized: string): boolean {
+    return (
+      header === "date" ||
+      header === "transaction_date" ||
+      normalized === "transactiondate" ||
+      normalized === "transdate" ||
+      normalized === "postingdate" ||
+      (normalized.startsWith("txn") && normalized.includes("date"))
+    );
+  }
+
+  private static isAmountField(header: string, normalized: string): boolean {
+    return (
+      header === "amount" ||
+      header === "value" ||
+      normalized.includes("amount") ||
+      normalized.includes("amt") ||
+      normalized.includes("total")
+    );
+  }
+
+  private static isDescriptionField(header: string, normalized: string): boolean {
+    return (
+      header === "description" ||
+      header === "memo" ||
+      header === "payee" ||
+      normalized.includes("desc") ||
+      normalized.includes("details")
+    );
+  }
+
+  private static isCategoryField(header: string, normalized: string): boolean {
+    return header === "category" || normalized === "cat" || normalized.startsWith("category");
+  }
+
+  private static isMerchantField(header: string, normalized: string): boolean {
+    return (
+      header === "merchant" ||
+      header === "vendor" ||
+      normalized.includes("merchant") ||
+      normalized.includes("vendor") ||
+      normalized.includes("store")
+    );
+  }
+
+  private static isNotesField(header: string, normalized: string): boolean {
+    return (
+      header === "notes" ||
+      header === "note" ||
+      normalized.includes("note") ||
+      normalized.includes("comment") ||
+      normalized.includes("remark")
+    );
   }
 }
 

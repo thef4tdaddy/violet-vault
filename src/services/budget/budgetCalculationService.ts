@@ -139,8 +139,11 @@ export class BudgetCalculationService {
           overdueBills: envData.overdueBills || [],
           transactions: Array.isArray(envData.transactions)
             ? envData.transactions.filter(
-                (txn: any): txn is Transaction =>
-                  txn && typeof txn === "object" && "createdAt" in txn && "lastModified" in txn
+                (txn: unknown): txn is Transaction =>
+                  typeof txn === "object" &&
+                  txn !== null &&
+                  "createdAt" in txn &&
+                  "lastModified" in txn
               )
             : [],
           bills: envData.bills || [],

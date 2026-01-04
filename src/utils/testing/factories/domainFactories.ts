@@ -145,8 +145,7 @@ export const createTransaction = (overrides?: Partial<Transaction>): Transaction
  * Creates an income transaction
  */
 export const createIncomeTransaction = (overrides?: Partial<Transaction>): Transaction => {
-  const amount =
-    overrides?.amount !== undefined ? overrides.amount : generateAmount(100, 2000);
+  const amount = overrides?.amount !== undefined ? overrides.amount : generateAmount(100, 2000);
 
   return createTransaction({
     type: "income",

@@ -88,7 +88,7 @@ def generate_test_payload() -> dict:
     }
 
 
-def test_api_locally() -> bool:
+def test_api_locally() -> None:
     """Test the API using the local Python modules"""
     print("Testing API locally using Python modules...\n")
 
@@ -121,10 +121,11 @@ def test_api_locally() -> bool:
                 print(
                     f"   - ${transfer.amount:.2f} to {transfer.toEnvelopeId}: {transfer.description}"
                 )
-    else:
+    if not result["success"]:
         print(f"❌ Error: {result.get('error', 'Unknown error')}")
+        raise AssertionError(f"Simulation failed: {result.get('error')}")
 
-    return bool(result["success"])
+    return None  # Pytest expects None return on success
 
 
 def generate_curl_command() -> None:
@@ -141,15 +142,10 @@ def generate_curl_command() -> None:
 
 if __name__ == "__main__":
     try:
-        success = test_api_locally()
+        test_api_locally()  # No return value check needed, it raises assert
         generate_curl_command()
-
-        if success:
-            print("\n✅ All tests passed!")
-            sys.exit(0)
-        else:
-            print("\n❌ Tests failed!")
-            sys.exit(1)
+        print("\n✅ All tests passed!")
+        sys.exit(0)
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback

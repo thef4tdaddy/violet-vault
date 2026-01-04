@@ -54,6 +54,7 @@ export default [
       'cloudflare-worker/**',
       'js-version/**',
       'docs/examples/**',
+      'api/example_integration.ts',
     ],
   },
   {
