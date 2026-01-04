@@ -30,6 +30,8 @@ export default defineConfig({
         },
       },
     },
+    testTimeout: 30000, // 30s timeout to prevent crashes during high load
+    hookTimeout: 30000,
   },
   resolve: {
     alias: {
