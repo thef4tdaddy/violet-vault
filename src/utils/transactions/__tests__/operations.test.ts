@@ -197,7 +197,6 @@ describe("Transaction Operations Utilities", () => {
       description: "Monthly savings",
       date: "2023-01-01",
       category: "Transfer",
-      envelopeId: "env-1",
       type: "transfer" as const,
       lastModified: Date.now(),
     };
