@@ -96,8 +96,8 @@ describe("AnalyticsDashboard", () => {
     render(<AnalyticsDashboard />);
 
     expect(screen.getByText(/Comprehensive financial insights and reporting/i)).toBeInTheDocument();
-    expect(screen.getByText(/Budget Health/i)).toBeInTheDocument();
-    expect(screen.getByText(/Financial Insights/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Budget Health/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Financial Insights/i).length).toBeGreaterThan(0);
   });
 
   it("renders analytics tabs", () => {
