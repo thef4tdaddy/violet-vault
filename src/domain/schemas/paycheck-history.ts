@@ -66,8 +66,62 @@ export type PaycheckHistory = z.infer<typeof PaycheckHistorySchema>;
 
 /**
  * Partial paycheck history schema for updates
+ * Note: Cannot use .partial() on schemas with .refine() in Zod v4
+ * Created manually by making all fields optional
  */
-export const PaycheckHistoryPartialSchema = PaycheckHistorySchema.partial();
+export const PaycheckHistoryPartialSchema = z
+  .object({
+    id: z.string().min(1, "Paycheck ID is required").optional(),
+    date: z.union([z.date(), z.string()]).optional(),
+    processedAt: z.union([z.date(), z.string()]).optional(),
+    amount: z.number().min(0, "Amount cannot be negative").optional(),
+    source: z.string().min(1).max(100).optional(),
+    payerName: z.string().min(1).max(100).optional(),
+    allocations: z
+      .union([
+        z.array(
+          z.object({
+            envelopeId: z.string(),
+            envelopeName: z.string(),
+            amount: z.number(),
+          })
+        ),
+        z.record(z.string(), z.number().min(0)),
+      ])
+      .optional(),
+    lastModified: z.number().int().positive("Last modified must be a positive number").optional(),
+    createdAt: z.number().int().positive().optional(),
+    deductions: z.record(z.string(), z.number().min(0)).optional(),
+    netAmount: z.number().min(0).optional(),
+    processedBy: z.string().optional(),
+    allocationMode: z.string().optional(),
+    totalAllocated: z.number().optional(),
+    remainingAmount: z.number().optional(),
+    incomeTransactionId: z.string().optional(),
+    transferTransactionIds: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) =>
+      // If neither field is present in the patch, allow it.
+      (data.processedAt === undefined && data.date === undefined) ||
+      // Otherwise, require at least one of them to be provided.
+      Boolean(data.processedAt || data.date),
+    {
+      message: "Either processedAt or date is required when updating date fields",
+      path: ["processedAt"],
+    }
+  )
+  .refine(
+    (data) =>
+      // If neither field is present in the patch, allow it.
+      (data.payerName === undefined && data.source === undefined) ||
+      // Otherwise, require at least one of them to be provided.
+      Boolean(data.payerName || data.source),
+    {
+      message: "Either payerName or source is required when updating payer fields",
+      path: ["payerName"],
+    }
+  );
 export type PaycheckHistoryPartial = z.infer<typeof PaycheckHistoryPartialSchema>;
 
 /**

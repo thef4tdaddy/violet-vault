@@ -5,7 +5,7 @@ Mirrors the TypeScript/Zod schemas from the frontend
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Envelope(BaseModel):
@@ -13,6 +13,8 @@ class Envelope(BaseModel):
     Envelope entity representing budget categories
     Mirrors src/domain/schemas/envelope.ts
     """
+
+    model_config = ConfigDict(extra="allow")
 
     id: str = Field(..., min_length=1, description="Envelope ID")
     name: str = Field(..., min_length=1, max_length=100, description="Envelope name")
@@ -41,15 +43,14 @@ class Envelope(BaseModel):
     isActive: bool | None = None
     accountType: str | None = None
 
-    class Config:
-        extra = "allow"  # Allow additional fields like passthrough() in Zod
-
 
 class Transaction(BaseModel):
     """
     Transaction entity representing financial operations
     Mirrors src/domain/schemas/transaction.ts
     """
+
+    model_config = ConfigDict(extra="allow")
 
     id: str = Field(..., min_length=1, description="Transaction ID")
     date: str = Field(..., description="Transaction date (ISO format)")
@@ -69,9 +70,6 @@ class Transaction(BaseModel):
     fromEnvelopeId: str | None = None
     toEnvelopeId: str | None = None
 
-    class Config:
-        extra = "allow"  # Allow additional fields
-
 
 class BudgetMetadata(BaseModel):
     """
@@ -79,15 +77,14 @@ class BudgetMetadata(BaseModel):
     Mirrors src/domain/schemas/budget-record.ts
     """
 
+    model_config = ConfigDict(extra="allow")
+
     id: str = Field(..., min_length=1, description="Budget record ID")
     lastModified: int = Field(..., gt=0, description="Last modified timestamp")
     version: int | None = Field(None, gt=0, description="Version number")
     actualBalance: float | None = Field(None, description="Actual account balance")
     unassignedCash: float | None = Field(None, description="Unassigned cash balance")
     totalEnvelopeBalance: float | None = Field(None, description="Sum of all envelope balances")
-
-    class Config:
-        extra = "allow"  # Allow additional fields
 
 
 class AuditSnapshot(BaseModel):
@@ -118,7 +115,7 @@ class IntegrityViolation(BaseModel):
         None, description="Type of entity"
     )
     details: dict | None = Field(
-        default_factory=dict, description="Additional details about the violation"
+        default_factory=lambda: {}, description="Additional details about the violation"
     )
 
 
