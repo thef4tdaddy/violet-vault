@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import AuthGateway from "../AuthGateway";
 import userEvent from "@testing-library/user-event";
+import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
 
 // Mock hooks
 vi.mock("@/hooks/common/useLocalOnlyMode", () => ({
@@ -14,16 +15,22 @@ vi.mock("@/hooks/common/useLocalOnlyMode", () => ({
 
 // Mock child components
 vi.mock("../UserSetup", () => ({
-  default: ({ onSetupComplete }) => (
+  default: ({ onSetupComplete }: { onSetupComplete: (payload: any) => void }) => (
     <div data-testid="user-setup">
       <h1>User Setup</h1>
-      <button onClick={onSetupComplete}>Complete Setup</button>
+      <button onClick={() => onSetupComplete({})}>Complete Setup</button>
     </div>
   ),
 }));
 
 vi.mock("../LocalOnlySetup", () => ({
-  default: ({ onModeSelected, onSwitchToAuth }) => (
+  default: ({
+    onModeSelected,
+    onSwitchToAuth,
+  }: {
+    onModeSelected: (mode: string) => void;
+    onSwitchToAuth: () => void;
+  }) => (
     <div data-testid="local-only-setup">
       <h1>Local Only Setup</h1>
       <button onClick={() => onModeSelected("local-only")}>Use Local Only</button>
@@ -51,6 +58,14 @@ describe("AuthGateway", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset useLocalOnlyMode mock to default state
+    vi.mocked(useLocalOnlyMode).mockReturnValue({
+      isLocalOnlyMode: false,
+      localOnlyUser: null,
+      checkLocalOnlyMode: vi.fn(async () => ({ success: false })),
+      setLocalOnlyMode: vi.fn(),
+    });
+
     // Clear localStorage
     localStorage.clear();
   });
@@ -108,11 +123,11 @@ describe("AuthGateway", () => {
 
   describe("Local Only Mode", () => {
     it("should render nothing when local only mode is active", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: true,
         localOnlyUser: { id: "test-user", name: "Test" },
         checkLocalOnlyMode: vi.fn(async () => ({ success: true })),
+        setLocalOnlyMode: vi.fn(),
       });
 
       const { container } = renderGateway();
@@ -124,11 +139,11 @@ describe("AuthGateway", () => {
 
     it("should call onLocalOnlyReady when local only user exists", async () => {
       const mockUser = { id: "test-user", name: "Test" };
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: mockUser,
         checkLocalOnlyMode: vi.fn(async () => ({ success: true, user: mockUser })),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();
@@ -149,13 +164,13 @@ describe("AuthGateway", () => {
     });
 
     it("should handle error during mode check", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: null,
         checkLocalOnlyMode: vi.fn(async () => {
           throw new Error("Check failed");
         }),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();
@@ -169,11 +184,11 @@ describe("AuthGateway", () => {
 
   describe("Mode Switching", () => {
     it("should switch to local only setup", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: { id: "test", name: "Test" },
         checkLocalOnlyMode: vi.fn(async () => ({ success: true })),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();
@@ -185,11 +200,11 @@ describe("AuthGateway", () => {
 
     it("should handle local only mode selection", async () => {
       const mockUser = { id: "test-user", name: "Test" };
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: mockUser,
         checkLocalOnlyMode: vi.fn(async () => ({ success: true })),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();
@@ -207,11 +222,11 @@ describe("AuthGateway", () => {
     });
 
     it("should switch back to auth from local only", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: { id: "test", name: "Test" },
         checkLocalOnlyMode: vi.fn(async () => ({ success: true })),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();
@@ -254,13 +269,13 @@ describe("AuthGateway", () => {
 
   describe("Error Recovery", () => {
     it("should recover from checkLocalOnlyMode failure", async () => {
-      const useLocalOnlyMode = require("@/hooks/common/useLocalOnlyMode").useLocalOnlyMode as any;
-      useLocalOnlyMode.mockReturnValue({
+      vi.mocked(useLocalOnlyMode).mockReturnValue({
         isLocalOnlyMode: false,
         localOnlyUser: null,
         checkLocalOnlyMode: vi.fn(async () => {
           throw new Error("Network error");
         }),
+        setLocalOnlyMode: vi.fn(),
       });
 
       renderGateway();

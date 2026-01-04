@@ -5,13 +5,26 @@ import { useUserSetup as useUserSetupOriginal } from "../../../hooks/auth/useUse
 
 // Mock the custom hook
 vi.mock("../../../hooks/auth/useUserSetup");
+vi.mock("@/hooks/auth/useAuthManager", () => ({
+  useAuthManager: vi.fn(() => ({
+    joinBudget: vi.fn(async () => ({ success: true })),
+  })),
+}));
 
 // Type cast the mocked hook
 const useUserSetup = useUserSetupOriginal as unknown as Mock;
 
 // Mock child components
 vi.mock("../components/UserSetupHeader", () => ({
-  default: ({ step, isReturningUser, userName }) => (
+  default: ({
+    step,
+    isReturningUser,
+    userName,
+  }: {
+    step: number;
+    isReturningUser: boolean;
+    userName: string;
+  }) => (
     <div data-testid="header">
       Header: Step {step}, Returning: {isReturningUser.toString()}, User: {userName}
     </div>
@@ -19,7 +32,7 @@ vi.mock("../components/UserSetupHeader", () => ({
 }));
 
 vi.mock("../components/PasswordInput", () => ({
-  default: ({ value, onChange }) => (
+  default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input
       data-testid="password-input"
       value={value}
@@ -30,13 +43,19 @@ vi.mock("../components/PasswordInput", () => ({
 }));
 
 vi.mock("../components/UserNameInput", () => ({
-  default: ({ value, onChange }) => (
+  default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input data-testid="username-input" value={value} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
 
 vi.mock("../components/ColorPicker", () => ({
-  default: ({ selectedColor, onColorChange }) => (
+  default: ({
+    selectedColor,
+    onColorChange,
+  }: {
+    selectedColor: string;
+    onColorChange: (val: string) => void;
+  }) => (
     <div data-testid="color-picker">
       Color: {selectedColor}
       <button onClick={() => onColorChange("#test")}>Change Color</button>
@@ -45,7 +64,15 @@ vi.mock("../components/ColorPicker", () => ({
 }));
 
 vi.mock("../components/ReturningUserActions", () => ({
-  default: ({ onSubmit, onChangeProfile, onStartFresh }) => (
+  default: ({
+    onSubmit,
+    onChangeProfile,
+    onStartFresh,
+  }: {
+    onSubmit: () => void;
+    onChangeProfile: () => void;
+    onStartFresh: () => void;
+  }) => (
     <div data-testid="returning-user-actions">
       <button onClick={onSubmit}>Login</button>
       <button onClick={onChangeProfile}>Change Profile</button>
@@ -55,7 +82,17 @@ vi.mock("../components/ReturningUserActions", () => ({
 }));
 
 vi.mock("../components/StepButtons", () => ({
-  default: ({ step, onContinue, onBack, onStartTracking }) => (
+  default: ({
+    step,
+    onContinue,
+    onBack,
+    onStartTracking,
+  }: {
+    step: number;
+    onContinue: () => void;
+    onBack: () => void;
+    onStartTracking: () => void;
+  }) => (
     <div data-testid="step-buttons">
       Step {step} buttons
       {onContinue && <button onClick={onContinue}>Continue</button>}
@@ -72,8 +109,8 @@ vi.mock("../../../utils/common/logger", () => ({
 }));
 
 describe("UserSetup", () => {
-  let mockOnSetupComplete;
-  let mockHookReturn;
+  let mockOnSetupComplete: Mock;
+  let mockHookReturn: any;
 
   beforeEach(() => {
     mockOnSetupComplete = vi.fn();
@@ -161,7 +198,7 @@ describe("UserSetup", () => {
   it("should pass correct props to useUserSetup hook", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
-    expect(useUserSetup).toHaveBeenCalledWith(mockOnSetupComplete);
+    expect(useUserSetup).toHaveBeenCalledWith(expect.any(Function));
   });
 
   it("should pass correct props to header component", () => {
