@@ -69,8 +69,7 @@ export const useBugReportSubmissionV2 = (
   /**
    * Validate submission requirements using utils/validation
    */
-  // eslint-disable-next-line no-architecture-violations/no-architecture-violations
-  const validateSubmission = (): boolean => {
+  const checkSubmissionValidity = (): boolean => {
     // Validation logic is in utils/validation/bugReportValidation.ts
     const validation = validateBugReportSubmission(options.title, options.description);
     if (!validation.isValid && validation.error) {
@@ -161,7 +160,7 @@ export const useBugReportSubmissionV2 = (
    * Submit bug report using service layer
    */
   const submitReport = async (): Promise<boolean> => {
-    if (!validateSubmission()) return false;
+    if (!checkSubmissionValidity()) return false;
 
     setIsSubmitting(true);
     setSubmitError(null);

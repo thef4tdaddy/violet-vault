@@ -71,6 +71,90 @@ const result = await BugReportingService.submitBugReport({
 
 - `POST /api/bug-report` - Bug report proxy to GitHub
 - `POST /api/import` - High-performance transaction import
+- `POST /api/budget` - Budget engine calculations
+
+## New V2 Services
+
+### BudgetEngineService
+
+High-performance budget calculations using Go backend.
+
+**Features:**
+
+- Envelope balance calculations
+- Bill due date tracking
+- Utilization rate computation
+- Global budget totals
+
+**Usage:**
+
+```typescript
+import { BudgetEngineService } from "@/services/api/budgetEngineService";
+
+const response = await BudgetEngineService.calculateBudget(envelopes, transactions, bills);
+
+if (response.success) {
+  const { data, totals } = response.data;
+  // Use calculated envelope data and totals
+}
+```
+
+### BudgetCalculationService (Hybrid)
+
+Automatic backend/client fallback for budget calculations.
+
+**Usage:**
+
+```typescript
+import { BudgetCalculationService } from "@/services/budget/budgetCalculationService";
+
+// Automatic backend/client selection
+const result = await BudgetCalculationService.calculate(
+  envelopes,
+  transactions,
+  bills,
+  { preferBackend: true } // Default: true
+);
+
+console.log(`Calculated using: ${result.source}`); // "backend" or "client"
+
+// Force client-side calculation
+const clientResult = await BudgetCalculationService.calculate(envelopes, transactions, bills, {
+  forceClientSide: true,
+});
+```
+
+### ImportService
+
+High-performance CSV/JSON parsing using Go backend.
+
+**Features:**
+
+- CSV and JSON file parsing
+- Automatic field mapping detection
+- Transaction validation
+- Invalid row reporting
+
+**Usage:**
+
+```typescript
+import { ImportService } from "@/services/api/importService";
+
+// Validate file first
+const validation = ImportService.validateFile(file);
+if (!validation.valid) {
+  console.error(validation.error);
+  return;
+}
+
+// Import transactions
+const response = await ImportService.importTransactions(file, fieldMapping);
+
+if (response.success) {
+  const { transactions, invalid } = response.data;
+  // Process valid transactions
+}
+```
 
 ## Offline Behavior
 

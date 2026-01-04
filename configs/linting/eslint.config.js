@@ -25,6 +25,7 @@ export default [
       'dev-dist/**',
       'node_modules/**',
       '.git/**',
+      '.venv/**',
       'coverage/**',
       '*.min.js',
       '*.bundle.js',
@@ -53,6 +54,7 @@ export default [
       'cloudflare-worker/**',
       'js-version/**',
       'docs/examples/**',
+      'api/example_integration.ts',
     ],
   },
   {

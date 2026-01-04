@@ -56,9 +56,9 @@ export const TransactionBasicFields = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
         <div className="grid grid-cols-2 gap-3">
           {/* Expense Button - Red theme with strong visual hierarchy */}
-          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Plain button needed to avoid Button component's conflicting base styles (border-2, rounded-lg, etc.) */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() =>
               setTransactionForm({
                 ...transactionForm,
@@ -66,24 +66,26 @@ export const TransactionBasicFields = ({
               })
             }
             disabled={!!editingTransaction && !canEdit}
-            className={`p-3 rounded-lg transition-all ${
+            className={`p-3 h-auto rounded-lg transition-all ${
               transactionForm.type === "expense"
-                ? "border-2 border-black bg-red-600 text-black font-bold shadow-md" // SELECTED: Hard black outline, bright red, black text
-                : "border-2 border-red-600 bg-red-100 text-gray-600 hover:bg-red-200" // UNSELECTED: Red outline, soft red, grey text
+                ? "border-2 border-black bg-red-600 text-black font-bold shadow-md opacity-100"
+                : "border-2 border-red-600 bg-red-100 text-gray-600 hover:bg-red-200"
             } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             aria-pressed={transactionForm.type === "expense"}
             aria-label="Set transaction type to expense"
           >
-            {React.createElement(getIcon("TrendingDown"), {
-              className: "h-5 w-5 mx-auto mb-1",
-            })}
-            <span className="text-sm font-semibold">Expense</span>
-          </button>
+            <div className="flex flex-col items-center">
+              {React.createElement(getIcon("TrendingDown"), {
+                className: "h-5 w-5 mx-auto mb-1",
+              })}
+              <span className="text-sm font-semibold">Expense</span>
+            </div>
+          </Button>
 
           {/* Income Button - Green theme with strong visual hierarchy */}
-          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Plain button needed to avoid Button component's conflicting base styles (border-2, rounded-lg, etc.) */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() =>
               setTransactionForm({
                 ...transactionForm,
@@ -91,19 +93,21 @@ export const TransactionBasicFields = ({
               })
             }
             disabled={!!editingTransaction && !canEdit}
-            className={`p-3 rounded-lg transition-all ${
+            className={`p-3 h-auto rounded-lg transition-all ${
               transactionForm.type === "income"
-                ? "border-2 border-black bg-green-600 text-black font-bold shadow-md" // SELECTED: Hard black outline, green, black text
-                : "border-2 border-green-600 bg-green-100 text-gray-600 hover:bg-green-200" // UNSELECTED: Green outline, soft green, grey text
+                ? "border-2 border-black bg-green-600 text-black font-bold shadow-md opacity-100"
+                : "border-2 border-green-600 bg-green-100 text-gray-600 hover:bg-green-200"
             } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             aria-pressed={transactionForm.type === "income"}
             aria-label="Set transaction type to income"
           >
-            {React.createElement(getIcon("TrendingUp"), {
-              className: "h-5 w-5 mx-auto mb-1",
-            })}
-            <span className="text-sm font-semibold">Income</span>
-          </button>
+            <div className="flex flex-col items-center">
+              {React.createElement(getIcon("TrendingUp"), {
+                className: "h-5 w-5 mx-auto mb-1",
+              })}
+              <span className="text-sm font-semibold">Income</span>
+            </div>
+          </Button>
         </div>
         <p className="text-xs text-gray-500 mt-1">
           {transactionForm.type === "expense"
