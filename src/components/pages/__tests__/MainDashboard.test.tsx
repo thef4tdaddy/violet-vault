@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query};
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { useUnassignedCash, useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
 

@@ -1,39 +1,41 @@
 import { renderHook, act } from "@testing-library/react";
-import { vi } from "vitest";
+import { vi, beforeEach, describe, it, expect } from "vitest";
 import { useAnalyticsExport } from "../useAnalyticsExport";
 
-// Mock URL.createObjectURL and related methods
-const mockURLObj = {
-  createObjectURL: vi.fn(() => "mock-url"),
-  revokeObjectURL: vi.fn(),
-} as unknown as typeof URL;
-(global as { URL: typeof URL }).URL = mockURLObj;
-
-// Mock document.createElement and click
-const mockClick = vi.fn();
-const mockLink = {
-  href: "",
-  download: "",
-  click: mockClick,
-  style: { visibility: "" },
-};
-
-const mockDocObj = {
-  createElement: vi.fn(() => mockLink),
-  body: {
-    appendChild: vi.fn(),
-    removeChild: vi.fn(),
-  },
-} as unknown as Document;
-(global as { document: Document }).document = mockDocObj;
-
 describe("useAnalyticsExport", () => {
+  // Mock URL.createObjectURL and related methods
+  const mockCreateObjectURL = vi.fn(() => "mock-url");
+  const mockRevokeObjectURL = vi.fn();
+
+  // Mock document.createElement and click
+  const mockClick = vi.fn();
+  const mockLink = {
+    href: "",
+    download: "",
+    click: mockClick,
+    style: { visibility: "" },
+    setAttribute: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock URL methods
+    global.URL.createObjectURL = mockCreateObjectURL;
+    global.URL.revokeObjectURL = mockRevokeObjectURL;
   });
 
   it("should export analytics data correctly", () => {
     const { result } = renderHook(() => useAnalyticsExport());
+
+    // Mock DOM manipulation after hook is rendered
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        return mockLink as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName);
+    });
 
     const mockData = {
       dateRange: "3months",
@@ -49,13 +51,24 @@ describe("useAnalyticsExport", () => {
       result.current.exportAnalyticsData(mockData, mockUser);
     });
 
-    expect(global.URL.createObjectURL).toHaveBeenCalled();
+    expect(mockCreateObjectURL).toHaveBeenCalled();
     expect(mockClick).toHaveBeenCalled();
-    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("mock-url");
+    expect(mockRevokeObjectURL).toHaveBeenCalledWith("mock-url");
+
+    vi.restoreAllMocks();
   });
 
   it("should handle missing user data gracefully", () => {
     const { result } = renderHook(() => useAnalyticsExport());
+
+    // Mock DOM manipulation after hook is rendered
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        return mockLink as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName);
+    });
 
     const mockData = {
       dateRange: "1month",
@@ -69,18 +82,31 @@ describe("useAnalyticsExport", () => {
       result.current.exportAnalyticsData(mockData, null);
     });
 
-    expect(global.URL.createObjectURL).toHaveBeenCalled();
+    expect(mockCreateObjectURL).toHaveBeenCalled();
     expect(mockClick).toHaveBeenCalled();
+
+    vi.restoreAllMocks();
   });
 
   it("should handle undefined data gracefully", () => {
     const { result } = renderHook(() => useAnalyticsExport());
 
+    // Mock DOM manipulation after hook is rendered
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "a") {
+        return mockLink as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName);
+    });
+
     act(() => {
       result.current.exportAnalyticsData({}, {});
     });
 
-    expect(global.URL.createObjectURL).toHaveBeenCalled();
+    expect(mockCreateObjectURL).toHaveBeenCalled();
     expect(mockClick).toHaveBeenCalled();
+
+    vi.restoreAllMocks();
   });
 });

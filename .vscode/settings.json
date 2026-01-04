@@ -69,5 +69,8 @@
   "go.testFlags": ["-v"],
   "go.testTimeout": "30s",
   "go.lintOnSave": "package",
-  "go.toolsManagement.autoUpdate": true
+  "go.toolsManagement.autoUpdate": true,
+  "vitest.commandLine": "npm run test",
+  "vitest.enable": true,
+  "vitest.exclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
 }

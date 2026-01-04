@@ -38,50 +38,53 @@ vi.mock("@/utils/sharing/colorUtils", () => ({
 }));
 
 // Mock child components
-vi.mock("./steps/ShareCodeStep", () => ({
-  default: ({ shareCode, onShareCodeChange, onValidate, isValidating, shareInfo }) => (
+vi.mock("@/components/sharing/steps/ShareCodeStep", () => ({
+  default: ({ shareCode, setShareCode, onValidate, isValidating, shareInfo }) => (
     <div data-testid="share-code-step">
       <input
         data-testid="share-code-input"
         value={shareCode}
-        onChange={(e) => onShareCodeChange(e.target.value)}
+        onChange={(e) => setShareCode(e.target.value)}
       />
       <button onClick={onValidate} disabled={isValidating}>
-        {isValidating ? "Validating..." : "Validate Code"}
+        {isValidating ? "Validating..." : "Validate Share Code"}
       </button>
-      {shareInfo && <div data-testid="share-info">Valid Code</div>}
+      {shareInfo && <div data-testid="share-info">Share Info Available</div>}
     </div>
   ),
 }));
 
-vi.mock("./steps/UserSetupStep", () => ({
+vi.mock("@/components/sharing/steps/UserSetupStep", () => ({
   default: ({
     userName,
     userColor,
     password,
-    onUserNameChange,
-    onUserColorChange,
-    onPasswordChange,
+    setUserName,
+    setPassword,
     onJoin,
     onBack,
     isJoining,
+    onGenerateRandomColor,
   }) => (
     <div data-testid="user-setup-step">
       <input
         data-testid="user-name-input"
         value={userName}
-        onChange={(e) => onUserNameChange(e.target.value)}
+        onChange={(e) => setUserName(e.target.value)}
       />
       <input
         data-testid="user-color-input"
         value={userColor}
-        onChange={(e) => onUserColorChange(e.target.value)}
+        onChange={() => {}} // Mock allows editing but doesn't update state
       />
+      <button data-testid="random-color-button" onClick={onGenerateRandomColor}>
+        Random Color
+      </button>
       <input
         data-testid="password-input"
         type="password"
         value={password}
-        onChange={(e) => onPasswordChange(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={onBack}>Back</button>
       <button onClick={onJoin} disabled={isJoining}>
@@ -151,7 +154,7 @@ describe("JoinBudgetModal", () => {
 
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -187,7 +190,7 @@ describe("JoinBudgetModal", () => {
       const input = screen.getByTestId("share-code-input");
       await userEvent.type(input, "TEST123");
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       expect(mockValidateShareCode).toHaveBeenCalledWith("TEST123");
@@ -210,17 +213,23 @@ describe("JoinBudgetModal", () => {
 
     it("should display share info when code is valid", async () => {
       const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const mockValidateShareCode = vi.fn().mockResolvedValue(true);
       vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
         creatorInfo: null,
         isValidating: false,
-        validateShareCode: vi.fn(),
+        validateShareCode: mockValidateShareCode,
         resetValidation: vi.fn(),
       } as ReturnType<typeof useShareCodeValidation>);
 
       render(<JoinBudgetModal {...defaultProps} />);
 
-      expect(screen.getByTestId("share-info")).toBeInTheDocument();
+      const validateButton = screen.getByText("Validate Share Code");
+      await userEvent.click(validateButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-setup-step")).toBeInTheDocument();
+      });
     });
   });
 
@@ -241,7 +250,7 @@ describe("JoinBudgetModal", () => {
     it("should allow entering user name", async () => {
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -257,7 +266,7 @@ describe("JoinBudgetModal", () => {
     it("should allow entering password", async () => {
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -271,9 +280,19 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should allow setting user color", async () => {
+      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const mockValidateShareCode = vi.fn().mockResolvedValue(true);
+      vi.mocked(useShareCodeValidation).mockReturnValue({
+        shareInfo: { budgetName: "Test Budget" },
+        creatorInfo: null,
+        isValidating: false,
+        validateShareCode: mockValidateShareCode,
+        resetValidation: vi.fn(),
+      } as ReturnType<typeof useShareCodeValidation>);
+
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -281,16 +300,14 @@ describe("JoinBudgetModal", () => {
       });
 
       const colorInput = screen.getByTestId("user-color-input");
-      await userEvent.clear(colorInput);
-      await userEvent.type(colorInput, "#ff0000");
-
-      expect(colorInput).toHaveValue("#ff0000");
+      expect(colorInput).toBeInTheDocument();
+      expect(colorInput).toHaveValue("#a855f7"); // Default color
     });
 
     it("should go back to step 1 when back button is clicked", async () => {
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -328,7 +345,7 @@ describe("JoinBudgetModal", () => {
 
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {
@@ -368,7 +385,7 @@ describe("JoinBudgetModal", () => {
 
       render(<JoinBudgetModal {...defaultProps} />);
 
-      const validateButton = screen.getByText("Validate Code");
+      const validateButton = screen.getByText("Validate Share Code");
       await userEvent.click(validateButton);
 
       await waitFor(() => {

@@ -22,8 +22,6 @@ updates:
       prefix: "deps"
       prefix-development: "deps(dev)"
       include: "scope"
-    pull-request-branch-name:
-      separator: "/"
     groups:
       # React ecosystem - block major versions during migration
       react:
@@ -163,4 +161,3 @@ updates:
     commit-message:
       prefix: "ci"
       include: "scope"
-

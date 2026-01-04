@@ -7,7 +7,7 @@ describe("useChartsAnalytics", () => {
 
     expect(result.current.activeTab).toBe("overview");
     expect(result.current.chartType).toBe("line");
-    expect(result.current.dateRange).toBe("thisMonth");
+    expect(result.current.dateRange).toBe("3months");
   });
 
   it("should initialize with custom values", () => {

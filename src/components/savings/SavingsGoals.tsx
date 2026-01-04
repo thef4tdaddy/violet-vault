@@ -80,7 +80,7 @@ const SavingsGoals = ({
             })}
             Add Goal
           </Button>
-          {unassignedCash > 0 && (
+          {unassignedCash > 0 && savingsGoals.length > 0 && (
             <Button
               onClick={openDistributeModal}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black shadow-lg"
