@@ -128,34 +128,46 @@ describe("ViewRenderer", () => {
   };
 
   describe("View Rendering", () => {
-    it("should render dashboard view when activeView is dashboard", () => {
+    it("should render dashboard view when activeView is dashboard", async () => {
       renderView({ activeView: "dashboard" });
-      expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      });
     });
 
-    it("should render savings view when activeView is savings", () => {
+    it("should render savings view when activeView is savings", async () => {
       renderView({ activeView: "savings" });
-      expect(screen.getByTestId("savings-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("savings-view")).toBeInTheDocument();
+      });
     });
 
-    it("should render supplemental accounts view when activeView is supplemental", () => {
+    it("should render supplemental accounts view when activeView is supplemental", async () => {
       renderView({ activeView: "supplemental" });
-      expect(screen.getByTestId("supplemental-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("supplemental-view")).toBeInTheDocument();
+      });
     });
 
-    it("should render paycheck view when activeView is paycheck", () => {
+    it("should render paycheck view when activeView is paycheck", async () => {
       renderView({ activeView: "paycheck" });
-      expect(screen.getByTestId("paycheck-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("paycheck-view")).toBeInTheDocument();
+      });
     });
 
-    it("should render bills view when activeView is bills", () => {
+    it("should render bills view when activeView is bills", async () => {
       renderView({ activeView: "bills" });
-      expect(screen.getByTestId("bills-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("bills-view")).toBeInTheDocument();
+      });
     });
 
-    it("should render transactions view when activeView is transactions", () => {
+    it("should render transactions view when activeView is transactions", async () => {
       renderView({ activeView: "transactions" });
-      expect(screen.getByTestId("transactions-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("transactions-view")).toBeInTheDocument();
+      });
     });
 
     it("should render analytics view when activeView is analytics", async () => {
@@ -186,9 +198,11 @@ describe("ViewRenderer", () => {
       });
     });
 
-    it("should render envelope view when activeView is envelopes", () => {
+    it("should render envelope view when activeView is envelopes", async () => {
       renderView({ activeView: "envelopes" });
-      expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("envelope-grid")).toBeInTheDocument();
+      });
     });
   });
 
@@ -200,14 +214,18 @@ describe("ViewRenderer", () => {
   });
 
   describe("Default Props", () => {
-    it("should handle missing currentUser prop", () => {
+    it("should handle missing currentUser prop", async () => {
       renderView({ currentUser: undefined });
-      expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      });
     });
 
-    it("should handle missing budget prop", () => {
+    it("should handle missing budget prop", async () => {
       renderView({ budget: undefined });
-      expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
+      });
     });
   });
 });
