@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { useTransactionQuery } from "../useTransactionQuery";
 import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
 import type { QueryClient } from "@tanstack/react-query";
