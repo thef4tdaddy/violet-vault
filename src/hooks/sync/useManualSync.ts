@@ -65,7 +65,7 @@ interface UseManualSyncReturn {
 export const useManualSync = (): UseManualSyncReturn => {
   const queryClient = useQueryClient();
   const [isUploadingSyncInProgress, setIsUploadingSync] = useState(false);
-  const [isDownloadingSyncInProgress, _setIsDownloadingSync] = useState(false);
+  const [isDownloadingSyncInProgress, setIsDownloadingSync] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -87,7 +87,13 @@ export const useManualSync = (): UseManualSyncReturn => {
       if (isUploadingSyncInProgress || isDownloadingSyncInProgress) {
         return { success: false, error: "Sync already in progress" };
       }
-      setIsUploadingSync(true);
+
+      if (direction === "download") {
+        setIsDownloadingSync(true);
+      } else {
+        setIsUploadingSync(true);
+      }
+
       setSyncError(null);
       try {
         if (!cloudSyncService?.isRunning) {
@@ -113,6 +119,7 @@ export const useManualSync = (): UseManualSyncReturn => {
         return { success: false, error: (error as Error).message };
       } finally {
         setIsUploadingSync(false);
+        setIsDownloadingSync(false);
       }
     },
     [isUploadingSyncInProgress, isDownloadingSyncInProgress]

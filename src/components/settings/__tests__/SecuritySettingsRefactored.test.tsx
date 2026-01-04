@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import SecuritySettings from "../SecuritySettingsRefactored";
+import SecuritySettings from "../SecuritySettings";
 
 // Mock the custom hook
 vi.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
@@ -34,41 +34,41 @@ vi.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
 }));
 
 // Mock all section components
-vi.mock("../sections/SecurityStatusSection", () => {
-  return function SecurityStatusSection() {
+vi.mock("../sections/SecurityStatusSection", () => ({
+  default: function SecurityStatusSection() {
     return <div data-testid="security-status-section">Security Status Section</div>;
-  };
-});
+  },
+}));
 
-vi.mock("../sections/AutoLockSettingsSection", () => {
-  return function AutoLockSettingsSection() {
+vi.mock("../sections/AutoLockSettingsSection", () => ({
+  default: function AutoLockSettingsSection() {
     return <div data-testid="auto-lock-section">Auto Lock Section</div>;
-  };
-});
+  },
+}));
 
-vi.mock("../sections/ClipboardSecuritySection", () => {
-  return function ClipboardSecuritySection() {
+vi.mock("../sections/ClipboardSecuritySection", () => ({
+  default: function ClipboardSecuritySection() {
     return <div data-testid="clipboard-section">Clipboard Section</div>;
-  };
-});
+  },
+}));
 
-vi.mock("../sections/SecurityLoggingSection", () => {
-  return function SecurityLoggingSection() {
+vi.mock("../sections/SecurityLoggingSection", () => ({
+  default: function SecurityLoggingSection() {
     return <div data-testid="logging-section">Logging Section</div>;
-  };
-});
+  },
+}));
 
-vi.mock("../sections/SecurityActionsSection", () => {
-  return function SecurityActionsSection() {
+vi.mock("../sections/SecurityActionsSection", () => ({
+  default: function SecurityActionsSection() {
     return <div data-testid="actions-section">Actions Section</div>;
-  };
-});
+  },
+}));
 
-vi.mock("../modals/ClearConfirmationModal", () => {
-  return function ClearConfirmationModal() {
+vi.mock("../modals/ClearConfirmationModal", () => ({
+  default: function ClearConfirmationModal() {
     return <div data-testid="clear-modal">Clear Confirmation Modal</div>;
-  };
-});
+  },
+}));
 
 describe("SecuritySettings (Refactored)", () => {
   const defaultProps = {
