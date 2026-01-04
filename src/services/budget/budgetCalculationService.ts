@@ -189,7 +189,9 @@ export class BudgetCalculationService {
       name: bill.name,
     }));
 
-    const clientEnvelopes = envelopes as unknown as ClientEnvelope[];
+    const clientEnvelopes: ClientEnvelope[] = envelopes.map((envelope) => ({
+      ...envelope,
+    }));
 
     const envelopeData = calculateClientSide(clientEnvelopes, clientTransactions, clientBills);
     const totals = calculateTotalsClientSide(envelopeData);
