@@ -3,6 +3,9 @@
  * Interfaces with Python analytics backend for financial intelligence
  */
 import logger from "@/utils/common/logger";
+import { ApiClient } from "@/services/api/client";
+import { predictNextPayday as localPredict } from "@/utils/budgeting/paydayPredictor";
+import type { PaycheckEntry as LocalPaycheckEntry } from "@/utils/budgeting/paydayPredictor";
 
 // --- Types ---
 
@@ -29,11 +32,13 @@ export interface MerchantSuggestion {
   monthlyAverage: number;
 }
 
-interface AnalyticsResponse {
-  success: boolean;
-  error?: string;
-  prediction?: PaydayPrediction;
-  suggestions?: MerchantSuggestion[];
+// API Response Types
+interface PredictionApiResponse {
+  prediction: PaydayPrediction;
+}
+
+interface CategoryApiResponse {
+  suggestions: MerchantSuggestion[];
 }
 
 // --- Implementation ---
@@ -45,6 +50,10 @@ export class AnalyticsApiService {
 
   /**
    * Predict next payday based on paycheck history
+   * Uses V2 Polyglot Backend with fallback to local prediction when offline or API fails
+   *
+   * Note: navigator.onLine only checks browser connectivity, not API reachability.
+   * API errors (timeout, 5xx, network issues) are caught and trigger fallback.
    */
   static async predictNextPayday(paychecks: PaycheckEntry[]): Promise<PaydayPrediction | null> {
     try {
@@ -52,29 +61,45 @@ export class AnalyticsApiService {
         paycheckCount: paychecks.length,
       });
 
-      const response = await this.callApi(this.PREDICTION_ENDPOINT, {
-        paychecks,
-      });
+      // Check if online before making API call
+      // Note: navigator.onLine only detects browser connectivity, not API health
+      if (!ApiClient.isOnline()) {
+        logger.warn("Browser offline - using local payday prediction fallback");
+        return this.localPaydayPredictionFallback(paychecks);
+      }
 
-      if (!response.success || !response.prediction) {
-        logger.error("Payday prediction failed", { error: response.error });
-        return null;
+      const response = await ApiClient.post<PredictionApiResponse>(
+        this.PREDICTION_ENDPOINT,
+        { paychecks },
+        { timeout: this.TIMEOUT_MS }
+      );
+
+      if (!response.success || !response.data?.prediction) {
+        // API failed, unreachable, or returned error - fallback to local
+        logger.warn("API failed or unreachable - using local payday prediction fallback", {
+          error: response.error,
+        });
+        return this.localPaydayPredictionFallback(paychecks);
       }
 
       logger.info("Payday prediction successful", {
-        confidence: response.prediction.confidence,
-        pattern: response.prediction.pattern,
+        confidence: response.data.prediction.confidence,
+        pattern: response.data.prediction.pattern,
       });
 
-      return response.prediction;
+      return response.data.prediction;
     } catch (error) {
-      logger.error("Failed to predict payday", error);
-      return null;
+      // Network error, timeout, or API down - fallback to local
+      logger.warn("Network error or API down - using local payday prediction fallback", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return this.localPaydayPredictionFallback(paychecks);
     }
   }
 
   /**
    * Analyze merchant patterns and get envelope suggestions
+   * Uses V2 Polyglot Backend - returns empty array when offline
    */
   static async analyzeMerchantPatterns(
     transactions: Array<Record<string, unknown>>,
@@ -86,21 +111,28 @@ export class AnalyticsApiService {
         monthsOfData,
       });
 
-      const response = await this.callApi(this.CATEGORIZATION_ENDPOINT, {
-        transactions,
-        monthsOfData,
-      });
+      // Check if online before making API call
+      if (!ApiClient.isOnline()) {
+        logger.warn("Offline - merchant analysis unavailable");
+        return [];
+      }
 
-      if (!response.success || !response.suggestions) {
+      const response = await ApiClient.post<CategoryApiResponse>(
+        this.CATEGORIZATION_ENDPOINT,
+        { transactions, monthsOfData },
+        { timeout: this.TIMEOUT_MS }
+      );
+
+      if (!response.success || !response.data?.suggestions) {
         logger.error("Merchant analysis failed", { error: response.error });
         return [];
       }
 
       logger.info("Merchant analysis successful", {
-        suggestionCount: response.suggestions.length,
+        suggestionCount: response.data.suggestions.length,
       });
 
-      return response.suggestions;
+      return response.data.suggestions;
     } catch (error) {
       logger.error("Failed to analyze merchants", error);
       return [];
@@ -108,42 +140,39 @@ export class AnalyticsApiService {
   }
 
   /**
-   * Call the Python analytics API
+   * Local fallback for payday prediction when API is unavailable
+   * Converts backend response format to match frontend format
+   *
+   * Type Note: This method normalizes the type difference between local and API responses:
+   * - Local predictor returns: nextPayday: Date | null
+   * - API response expects: nextPayday: string | null (ISO format for JSON serialization)
+   * This conversion ensures consistent interface regardless of prediction source.
    */
-  private static async callApi(
-    endpoint: string,
-    body: Record<string, unknown>
-  ): Promise<AnalyticsResponse> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
-
+  private static localPaydayPredictionFallback(
+    paychecks: PaycheckEntry[]
+  ): PaydayPrediction | null {
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
+      // Convert PaycheckEntry to LocalPaycheckEntry format, normalizing date fields
+      const localPaychecks: LocalPaycheckEntry[] = paychecks.map((paycheck) => ({
+        ...paycheck,
+        date: paycheck.date ? new Date(paycheck.date) : undefined,
+        processedAt: paycheck.processedAt ? new Date(paycheck.processedAt) : undefined,
+      }));
 
-      clearTimeout(timeoutId);
+      const localPrediction = localPredict(localPaychecks);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result: AnalyticsResponse = await response.json();
-      return result;
+      // Convert Date to ISO string for API compatibility
+      // Local predictor returns Date, API expects string
+      return {
+        nextPayday: localPrediction.nextPayday ? localPrediction.nextPayday.toISOString() : null,
+        confidence: localPrediction.confidence,
+        pattern: localPrediction.pattern,
+        intervalDays: localPrediction.intervalDays,
+        message: localPrediction.message,
+      };
     } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("Analytics API request timeout");
-      }
-
-      throw error;
+      logger.error("Local payday prediction fallback failed", error);
+      return null;
     }
   }
 
@@ -154,11 +183,27 @@ export class AnalyticsApiService {
     try {
       // Check both endpoints
       const [predictionHealth, categorizationHealth] = await Promise.all([
-        fetch(this.PREDICTION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
-        fetch(this.CATEGORIZATION_ENDPOINT, { method: "GET" }).then((r) => r.json()),
+        ApiClient.get<{ success?: boolean }>(this.PREDICTION_ENDPOINT, {
+          timeout: 5000,
+        }),
+        ApiClient.get<{ success?: boolean }>(this.CATEGORIZATION_ENDPOINT, {
+          timeout: 5000,
+        }),
       ]);
 
-      return predictionHealth.success === true && categorizationHealth.success === true;
+      const isHealthy = (response: { success?: boolean } | null | undefined): boolean => {
+        if (response == null) {
+          return false;
+        }
+        // If the API call succeeded but the response does not contain a `success` field,
+        // treat the endpoint as healthy. Only an explicit `success: false` is unhealthy.
+        if (typeof response.success === "undefined") {
+          return true;
+        }
+        return response.success === true;
+      };
+
+      return isHealthy(predictionHealth) && isHealthy(categorizationHealth);
     } catch (error) {
       logger.error("Analytics API health check failed", error);
       return false;

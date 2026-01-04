@@ -5,6 +5,7 @@
  */
 import logger from "@/utils/common/logger";
 import { APP_VERSION } from "@/utils/common/version";
+import { ApiClient } from "@/services/api/client";
 
 // --- Types ---
 
@@ -218,32 +219,27 @@ export class BugReportingService {
 
     try {
       const payload = this.createGoBackendPayload(data);
-      const response = await fetch("/api/bug-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-      }
+      // Go backend response type matches BugReportResponse with optional fields (omitempty)
+      const response = await ApiClient.post<{
+        issueNumber?: number;
+        url?: string;
+      }>("/api/bug-report", payload);
 
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || "Bug report submission failed");
+      if (!response.success) {
+        throw new Error(response.error || "Bug report submission failed");
       }
 
       logger.info("Bug report submitted successfully", {
-        issueNumber: result.issueNumber,
-        url: result.url,
+        issueNumber: response.data?.issueNumber,
+        url: response.data?.url,
       });
 
       return {
         success: true,
         provider: "github",
-        issueNumber: result.issueNumber,
-        url: result.url,
+        issueNumber: response.data?.issueNumber,
+        url: response.data?.url,
       };
     } catch (error) {
       logger.error("Failed to submit bug report to Go backend", error);
