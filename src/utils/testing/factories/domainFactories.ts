@@ -127,7 +127,17 @@ export const createTransaction = (overrides?: Partial<Transaction>): Transaction
     receiptUrl: "https://example.com/receipt.jpg",
   };
 
-  return mergeDefaults(defaults, overrides);
+  const merged = mergeDefaults(defaults, overrides);
+
+  // Normalize amount sign based on transaction type after merging
+  if (merged.type === "expense") {
+    merged.amount = -Math.abs(merged.amount);
+  } else if (merged.type === "income") {
+    merged.amount = Math.abs(merged.amount);
+  }
+  // transfer keeps original sign
+
+  return merged;
 };
 
 /**
@@ -135,8 +145,11 @@ export const createTransaction = (overrides?: Partial<Transaction>): Transaction
  * Creates an income transaction
  */
 export const createIncomeTransaction = (overrides?: Partial<Transaction>): Transaction => {
+  const amount = overrides?.amount !== undefined ? overrides.amount : generateAmount(100, 2000);
+
   return createTransaction({
     type: "income",
+    amount: amount,
     category: "income",
     merchant: "Employer",
     ...overrides,

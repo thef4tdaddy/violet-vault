@@ -236,7 +236,7 @@ describe("BudgetDatabaseService", () => {
         {
           id: "1",
           date: "2024-01-01",
-          amount: 100,
+          amount: -100,
           envelopeId: "env1",
           category: "food",
           type: "expense",
@@ -245,7 +245,7 @@ describe("BudgetDatabaseService", () => {
         {
           id: "2",
           date: "2024-01-02",
-          amount: 50,
+          amount: -50,
           envelopeId: "env2",
           category: "gas",
           type: "expense",
@@ -277,7 +277,7 @@ describe("BudgetDatabaseService", () => {
         {
           id: "1",
           envelopeId: "env1",
-          amount: 100,
+          amount: -100,
           date: new Date(),
           category: "food",
           type: "expense",
@@ -298,7 +298,7 @@ describe("BudgetDatabaseService", () => {
     it("should limit results when specified", async () => {
       const mockTransactions = Array.from({ length: 200 }, (_, i) => ({
         id: `${i}`,
-        amount: 100,
+        amount: -100,
         date: new Date(),
         envelopeId: "env1",
         category: "food",
@@ -346,7 +346,7 @@ describe("BudgetDatabaseService", () => {
         {
           id: "1",
           date: new Date(),
-          amount: 100,
+          amount: -100,
           envelopeId: "env1",
           category: "food",
           type: "expense" as const,

@@ -13,8 +13,8 @@ export const TransactionTypeSchema = z.enum(["income", "expense", "transfer"]);
 export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
 /**
- * Base object schema for Transaction (without refinements)
- * Used to create partial schemas
+ * Base transaction object schema (without refinements)
+ * Used as the base for both full and partial schemas
  */
 const TransactionBaseSchema = z.object({
   id: z.string().min(1, "Transaction ID is required"),
@@ -75,9 +75,47 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 
 /**
  * Partial transaction schema for updates
- * Created from base schema (without refinements) to avoid Zod v4 compatibility issues
+ * Note: Cannot use .partial() on schemas with .refine() in Zod v4
+ * Created manually by making all fields optional
  */
-export const TransactionPartialSchema = TransactionBaseSchema.partial();
+export const TransactionPartialSchema = z
+  .object({
+    id: z.string().min(1, "Transaction ID is required").optional(),
+    date: z.union([z.date(), z.string()]).optional(),
+    amount: z.number().optional(),
+    envelopeId: z.string().min(1, "Envelope ID is required").optional(),
+    category: z.string().min(1, "Category is required").optional(),
+    type: TransactionTypeSchema.optional(),
+    lastModified: z.number().int().positive("Last modified must be a positive number").optional(),
+    createdAt: z.number().int().positive().optional(),
+    description: z.string().max(500, "Description must be 500 characters or less").optional(),
+    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
+    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+    isInternalTransfer: z.boolean().optional(),
+    paycheckId: z.string().optional(),
+    fromEnvelopeId: z.string().optional(),
+    toEnvelopeId: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // Only enforce sign convention when both type and amount are provided
+      if (data.type === undefined || data.amount === undefined) {
+        return true;
+      }
+      if (data.type === "expense" && data.amount > 0) {
+        return false; // Expenses MUST be negative
+      }
+      if (data.type === "income" && data.amount < 0) {
+        return false; // Income MUST be positive
+      }
+      return true;
+    },
+    {
+      message:
+        "Transaction amount sign must match type: expenses must be negative, income must be positive",
+      path: ["amount"],
+    }
+  );
 export type TransactionPartial = z.infer<typeof TransactionPartialSchema>;
 
 /**
