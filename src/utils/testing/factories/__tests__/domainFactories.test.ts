@@ -145,7 +145,7 @@ describe("Domain Factories", () => {
 
       expect(() => validateTransaction(transaction)).not.toThrow();
       expect(transaction.id).toBeDefined();
-      expect(transaction.amount).toBeGreaterThan(0);
+      expect(transaction.amount).toBeLessThan(0); // Expenses are negative
       expect(transaction.type).toBe("expense");
     });
 

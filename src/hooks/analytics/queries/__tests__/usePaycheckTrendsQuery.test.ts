@@ -9,27 +9,28 @@ import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils
 
 // Mock Zustand store
 vi.mock("@/stores/ui/uiStore", () => ({
+  default: vi.fn(),
   useBudgetStore: vi.fn(),
 }));
 
 describe("usePaycheckTrendsQuery", () => {
   let queryClient: ReturnType<typeof createTestQueryClient>;
   let wrapper: ReturnType<typeof createQueryWrapper>;
-  let mockUseBudgetStore: ReturnType<typeof vi.fn>;
+  let mockUseUiStore: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     queryClient = createTestQueryClient();
     wrapper = createQueryWrapper(queryClient);
 
-    // Get the mocked store
-    const { useBudgetStore } = await import("@/stores/ui/uiStore");
-    mockUseBudgetStore = useBudgetStore as ReturnType<typeof vi.fn>;
+    // Get the mocked store - it's the default export
+    const uiStoreModule = await import("@/stores/ui/uiStore");
+    mockUseUiStore = uiStoreModule.default as ReturnType<typeof vi.fn>;
   });
 
   describe("Data Fetching with No Paychecks", () => {
     it("should return empty data when no paycheck history exists", async () => {
       // Arrange
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: [],
       });
 
@@ -51,7 +52,7 @@ describe("usePaycheckTrendsQuery", () => {
 
     it("should not fetch when paycheck history is null", async () => {
       // Arrange
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: null,
       });
 
@@ -72,7 +73,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-15", amount: 1200 },
         { date: "2024-02-01", amount: 1100 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -95,7 +96,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-15", amount: 1500 },
         { date: "2024-02-01", amount: 2000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -120,7 +121,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-29", amount: 1000 },
         { date: "2024-02-12", amount: 1000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -143,7 +144,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-15", amount: 500 },
         { date: "2024-01-22", amount: 500 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -165,7 +166,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-02-01", amount: 3000 },
         { date: "2024-03-01", amount: 3000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -188,7 +189,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-02-01", amount: 1000 },
         { date: "2024-03-15", amount: 1000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -213,7 +214,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-02-01", amount: 1200 },
         { date: "2024-02-15", amount: 1300 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -239,7 +240,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-02-01", amount: 1000 },
         { date: "2024-02-15", amount: 1000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -264,7 +265,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-15", amount: 1200 },
         { date: "2024-02-01", amount: 1100 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -288,7 +289,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-01", amount: 1000 },
         { date: "2024-03-01", amount: 1300 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -310,7 +311,7 @@ describe("usePaycheckTrendsQuery", () => {
   describe("Query Configuration", () => {
     it("should use correct stale time", async () => {
       // Arrange
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: [{ date: "2024-01-01", amount: 1000 }],
       });
 
@@ -328,7 +329,7 @@ describe("usePaycheckTrendsQuery", () => {
 
     it("should be disabled when paycheck history is not available", async () => {
       // Arrange
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: undefined,
       });
 
@@ -348,7 +349,7 @@ describe("usePaycheckTrendsQuery", () => {
         { date: "2024-01-15", amount: 1000 },
         { date: "2024-01-29", amount: 1000 },
       ];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 
@@ -366,7 +367,7 @@ describe("usePaycheckTrendsQuery", () => {
     it("should handle single paycheck with no intervals", async () => {
       // Arrange
       const paychecks = [{ date: "2024-01-01", amount: 1000 }];
-      mockUseBudgetStore.mockReturnValue({
+      mockUseUiStore.mockReturnValue({
         paycheckHistory: paychecks,
       });
 

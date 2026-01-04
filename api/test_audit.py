@@ -15,7 +15,7 @@ from api.analytics import EnvelopeIntegrityAuditor
 from api.models import AuditSnapshot
 
 
-def test_audit(snapshot_file: str, expected_violations: dict) -> bool:
+def run_audit_check(snapshot_file: str, expected_violations: dict) -> bool:
     """
     Test integrity audit with given snapshot file
 
@@ -27,8 +27,23 @@ def test_audit(snapshot_file: str, expected_violations: dict) -> bool:
     print(f"Testing: {snapshot_file}")
     print(f"{'=' * 60}")
 
-    # Load snapshot
-    with open(snapshot_file) as f:
+    # Load snapshot relative to this test file
+    base_path = Path(__file__).parent
+    file_path = (
+        base_path / snapshot_file if not Path(snapshot_file).is_absolute() else Path(snapshot_file)
+    )
+
+    # Handle case where file specified is relative to api root but we are in api/
+    if not file_path.exists() and (base_path / "test_data" / Path(snapshot_file).name).exists():
+        file_path = base_path / "test_data" / Path(snapshot_file).name
+
+    # Fallback for direct execution vs pytest execution
+    if not file_path.exists():
+        # Try relative to repo root
+        repo_root = base_path.parent
+        file_path = repo_root / snapshot_file
+
+    with open(file_path) as f:
         data = json.load(f)
 
     # Parse with Pydantic
@@ -87,28 +102,31 @@ def test_audit(snapshot_file: str, expected_violations: dict) -> bool:
     return True
 
 
-def main() -> None:
-    """Run all tests"""
-    print("VioletVault Analytics API - Test Suite")
-    print("=" * 60)
+def test_valid_snapshot() -> None:
+    """Test 1: Valid snapshot (should have no critical violations)"""
+    success = run_audit_check("test_snapshot_valid.json", expected_violations={})
+    assert success, "Valid snapshot audit failed"
 
-    # Test 1: Valid snapshot (should have no critical violations)
-    test_audit("api/test_snapshot_valid.json", expected_violations={})
 
-    # Test 2: Snapshot with violations
-    test_audit(
-        "api/test_snapshot_violations.json",
+def test_violations_snapshot() -> None:
+    """Test 2: Snapshot with violations"""
+    success = run_audit_check(
+        "test_snapshot_violations.json",
         expected_violations={
             "orphaned_transaction": 1,
             "negative_balance": 1,
             "balance_leakage": 1,
         },
     )
-
-    print(f"\n{'=' * 60}")
-    print("✓ All tests completed!")
-    print(f"{'=' * 60}\n")
+    assert success, "Violations snapshot audit failed"
 
 
 if __name__ == "__main__":
-    main()
+    # For manual execution
+    try:
+        test_valid_snapshot()
+        test_violations_snapshot()
+        print("\n✓ All tests completed (Manual Run)!")
+    except AssertionError as e:
+        print(f"\n❌ Test failed: {e}")
+        sys.exit(1)

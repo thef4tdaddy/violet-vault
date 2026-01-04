@@ -29,7 +29,7 @@ describe("Component Props Schemas", () => {
           {
             id: "1",
             date: new Date(),
-            amount: 50,
+            amount: -50,
             envelopeId: "1",
             category: "Food",
             type: "expense" as const,
@@ -56,12 +56,14 @@ describe("Component Props Schemas", () => {
       expect(result.unassignedCash).toBeUndefined();
     });
 
-    it("should reject negative unassignedCash", () => {
-      const invalidProps = {
+    it("should accept negative unassignedCash (overallocated scenario)", () => {
+      const validProps = {
         unassignedCash: -100,
       };
 
-      expect(() => EnvelopeGridPropsSchema.parse(invalidProps)).toThrow();
+      const result = EnvelopeGridPropsSchema.parse(validProps);
+      expect(result).toBeDefined();
+      expect(result.unassignedCash).toBe(-100);
     });
 
     it("should reject invalid envelope data", () => {
@@ -141,6 +143,8 @@ describe("Component Props Schemas", () => {
         selectionState: {
           selectedBillIds: ["1"],
           isAllSelected: false,
+          hasSelection: true,
+          selectedCount: 1,
         },
         clearSelection: () => {},
         selectAllBills: () => {},
@@ -262,7 +266,7 @@ describe("Component Props Schemas", () => {
         transaction: {
           id: "1",
           date: "2025-01-01",
-          amount: 50,
+          amount: -50,
           envelopeId: "1",
           category: "Food",
           type: "expense" as const,

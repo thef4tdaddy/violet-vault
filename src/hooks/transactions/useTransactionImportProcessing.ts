@@ -1,26 +1,15 @@
 import { useState } from "react";
-import { globalToast as _globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
-import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
-import type { Transaction } from "@/domain/schemas/transaction";
+import { TransactionImportOrchestrator } from "@/services/transactions/transactionImportOrchestrator";
+import type { ProcessTransactionsResult } from "@/services/transactions/transactionImportOrchestrator";
 
-/**
- * Result type for transaction import processing
- */
-export interface ProcessTransactionsResult {
-  valid: Transaction[];
-  invalid: Array<{
-    index: number;
-    row: unknown;
-    errors: string[];
-  }>;
-}
+export type { ProcessTransactionsResult };
 
 /**
  * Generate success message for transaction import
  * Extracted to reduce hook function length
  */
-const generateSuccessMessage = (
+export const generateSuccessMessage = (
   result: ProcessTransactionsResult,
   importData: { clearExisting?: boolean },
   autoFundingPromises: Array<{
@@ -96,70 +85,6 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
     }
   };
 
-  /**
-   * Process a single transaction row
-   * Extracted to reduce complexity
-   */
-  const processTransactionRow = (
-    row: Record<string, unknown>,
-    index: number,
-    fieldMapping: {
-      amount: string;
-      date: string;
-      description: string;
-      category: string;
-      notes: string;
-    }
-  ): { success: true; transaction: Transaction } | { success: false; errors: string[] } => {
-    try {
-      const rawAmount = row[fieldMapping.amount];
-      const amountStr =
-        typeof rawAmount === "string" ? rawAmount.replace(/[$,]/g, "") : String(rawAmount || "0");
-      const amount = parseFloat(amountStr);
-
-      // Determine transaction type based on amount sign
-      const type = amount >= 0 ? "income" : "expense";
-
-      // Build transaction object with required fields
-      const rawTransaction = {
-        id: `import_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
-        date: String(row[fieldMapping.date] || new Date().toISOString().split("T")[0]),
-        description: String(
-          row[fieldMapping.description || "description"] || "Imported Transaction"
-        ),
-        amount, // Will be normalized by validateAndNormalizeTransaction
-        category: String(row[fieldMapping.category] || "Imported"),
-        type,
-        envelopeId: "unassigned", // Default to unassigned envelope
-        lastModified: Date.now(),
-        createdAt: Date.now(),
-        // Optional fields
-        notes: String(row[fieldMapping.notes] || ""),
-        merchant: undefined,
-        receiptUrl: undefined,
-      };
-
-      // Validate and normalize transaction using Zod schema
-      // This ensures:
-      // - Amount sign matches type (expense = negative, income = positive)
-      // - All required fields are present
-      // - Field types are correct
-      const validatedTransaction = validateAndNormalizeTransaction(rawTransaction);
-      return { success: true, transaction: validatedTransaction };
-    } catch (error) {
-      // Collect validation errors for user feedback
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const zodErrors =
-        error && typeof error === "object" && "issues" in error
-          ? (error as { issues: Array<{ path: (string | number)[]; message: string }> }).issues.map(
-              (issue) => `${issue.path.join(".")}: ${issue.message}`
-            )
-          : [errorMessage];
-
-      return { success: false, errors: zodErrors };
-    }
-  };
-
   const processTransactions = async (
     importData: { data?: unknown[] } | unknown[],
     fieldMapping: {
@@ -170,48 +95,27 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
       notes: string;
     }
   ): Promise<ProcessTransactionsResult> => {
-    const validTransactions: Transaction[] = [];
-    const invalidRows: Array<{ index: number; row: unknown; errors: string[] }> = [];
-    const dataArray = Array.isArray(importData) ? importData : (importData.data as unknown[]) || [];
+    return TransactionImportOrchestrator.processTransactions(
+      importData,
+      fieldMapping,
+      setImportProgress
+    );
+  };
 
-    for (let i = 0; i < dataArray.length; i++) {
-      const row = dataArray[i] as Record<string, unknown>;
-      setImportProgress((i / dataArray.length) * 100);
-
-      const result = processTransactionRow(row, i, fieldMapping);
-      if (result.success) {
-        validTransactions.push(result.transaction);
-      } else {
-        const descriptionField = fieldMapping.description || "description";
-        // TypeScript type narrowing: result.success is false, so result has errors property
-        const errorResult = result as { success: false; errors: string[] };
-        invalidRows.push({
-          index: i,
-          row,
-          errors: errorResult.errors,
-        });
-
-        logger.warn(`Row ${i} validation failed:`, {
-          errors: errorResult.errors,
-          row: (row[descriptionField] as string) || `Row ${i}`,
-        });
-      }
-
-      if (i % 10 === 0) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-    }
-
-    logger.info("Transaction import processing complete", {
-      total: dataArray.length,
-      valid: validTransactions.length,
-      invalid: invalidRows.length,
-    });
-
-    return {
-      valid: validTransactions,
-      invalid: invalidRows,
-    };
+  /**
+   * Process file import with automatic backend/client fallback
+   */
+  const processFileImport = async (
+    file: File,
+    fieldMapping?: Record<string, string>,
+    preferBackend = true
+  ): Promise<ProcessTransactionsResult> => {
+    return TransactionImportOrchestrator.processFileImport(
+      file,
+      fieldMapping,
+      preferBackend,
+      setImportProgress
+    );
   };
 
   return {
@@ -221,6 +125,7 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
     setAutoFundingResults,
     clearExistingData,
     processTransactions,
+    processFileImport,
     generateSuccessMessage,
   };
 };
