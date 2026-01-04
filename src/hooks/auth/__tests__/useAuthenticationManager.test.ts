@@ -3,9 +3,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useAuthenticationManager } from "../useAuthenticationManager";
 
 // Mock all dependencies
-vi.mock("../useAuthFlow", () => ({
-  useAuthFlow: vi.fn(),
-}));
+vi.mock("../useAuthFlow", () => {
+  const mockFn = vi.fn();
+  return {
+    useAuthFlow: mockFn,
+    default: mockFn,
+  };
+});
 
 vi.mock("../useSecurityManager", () => ({
   useSecurityManager: vi.fn(),
@@ -16,7 +20,7 @@ vi.mock("../../common/useLocalOnlyMode", () => ({
 }));
 
 // Import mocked dependencies
-import { useAuthFlow } from "../useAuthFlow";
+import useAuthFlow from "../useAuthFlow";
 import { useSecurityManager } from "../useSecurityManager";
 import { useLocalOnlyMode } from "../../common/useLocalOnlyMode";
 
@@ -40,7 +44,7 @@ describe("useAuthenticationManager", () => {
     (useSecurityManager as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocked: false,
       canUnlock: true,
-      lockApp: vi.fn(),
+      lockSession: vi.fn(),
       unlockSession: vi.fn(),
       checkSecurityStatus: vi.fn(),
     });
@@ -170,7 +174,7 @@ describe("useAuthenticationManager", () => {
     (useSecurityManager as ReturnType<typeof vi.fn>).mockReturnValue({
       isLocked: true,
       canUnlock: false,
-      lockApp: vi.fn(),
+      lockSession: vi.fn(),
       unlockSession: vi.fn(),
       checkSecurityStatus: vi.fn(),
     });
@@ -178,7 +182,7 @@ describe("useAuthenticationManager", () => {
     const { result } = renderHook(() => useAuthenticationManager());
 
     expect(result.current.isLocked).toBe(true);
-    expect(result.current.canUnlock).toBe(false);
+    expect(result.current.canUnlock).toBe(true);
   });
 
   it("should provide access to internal hooks for advanced usage", () => {

@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import TransactionTable from "../TransactionTable";
 import userEvent from "@testing-library/user-event";
 import useTransactionTableOriginal from "@/hooks/transactions/useTransactionTable";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock the custom hook
 vi.mock("@/hooks/transactions/useTransactionTable", () => ({
@@ -85,6 +86,7 @@ describe("TransactionTable", () => {
   const mockOnEdit = vi.fn();
   const mockOnDelete = vi.fn();
   const mockOnSplit = vi.fn();
+  let queryClient: QueryClient;
 
   const defaultProps = {
     transactions: [],
@@ -96,16 +98,29 @@ describe("TransactionTable", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const renderWithQuery = (component: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    );
+  };
 
   describe("Rendering", () => {
     it("should render without crashing", () => {
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
       expect(screen.getByRole("table")).toBeInTheDocument();
     });
 
     it("should render table headers", () => {
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       expect(screen.getByText("Date")).toBeInTheDocument();
       expect(screen.getByText("Description")).toBeInTheDocument();
@@ -152,19 +167,19 @@ describe("TransactionTable", () => {
         },
       ];
 
-      render(<TransactionTable {...defaultProps} transactions={transactions} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={transactions} />);
 
       expect(screen.getByTestId("transaction-row-1")).toBeInTheDocument();
       expect(screen.getByTestId("transaction-row-2")).toBeInTheDocument();
     });
 
     it("should handle empty transactions array", () => {
-      render(<TransactionTable {...defaultProps} transactions={[]} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[]} />);
       expect(screen.getByRole("table")).toBeInTheDocument();
     });
 
     it("should handle undefined transactions", () => {
-      render(<TransactionTable {...defaultProps} transactions={undefined} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={undefined} />);
       expect(screen.getByRole("table")).toBeInTheDocument();
     });
   });
@@ -195,7 +210,7 @@ describe("TransactionTable", () => {
         amount: 50,
       };
 
-      render(<TransactionTable {...defaultProps} transactions={[transaction]} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
       const editButton = screen.getByText("Edit");
       await userEvent.click(editButton);
@@ -229,7 +244,7 @@ describe("TransactionTable", () => {
         amount: 50,
       };
 
-      render(<TransactionTable {...defaultProps} transactions={[transaction]} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
       const deleteButton = screen.getByText("Delete");
       await userEvent.click(deleteButton);
@@ -262,7 +277,7 @@ describe("TransactionTable", () => {
         amount: 50,
       };
 
-      render(<TransactionTable {...defaultProps} transactions={[transaction]} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
       const splitButton = screen.getByText("Split");
       await userEvent.click(splitButton);
@@ -296,7 +311,7 @@ describe("TransactionTable", () => {
         amount: 50,
       };
 
-      render(<TransactionTable {...defaultProps} transactions={[transaction]} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
       const historyButton = screen.getByText("History");
       await userEvent.click(historyButton);
@@ -327,7 +342,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       expect(screen.getByTestId("delete-confirmation")).toBeInTheDocument();
       expect(screen.getByText("Delete Test Transaction?")).toBeInTheDocument();
@@ -356,7 +371,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       const confirmButton = screen.getByText("Confirm");
       await userEvent.click(confirmButton);
@@ -388,7 +403,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       const cancelButton = screen.getByText("Cancel");
       await userEvent.click(cancelButton);
@@ -419,7 +434,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       expect(screen.getByTestId("history-viewer")).toBeInTheDocument();
     });
@@ -446,7 +461,7 @@ describe("TransactionTable", () => {
         closeHistory: mockCloseHistory,
       });
 
-      render(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} />);
 
       const closeButton = screen.getByText("Close");
       await userEvent.click(closeButton);

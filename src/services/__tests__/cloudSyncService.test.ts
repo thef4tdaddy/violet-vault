@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-vi.mock("../chunkedSyncService", () => ({
+vi.mock("../sync/chunkedSyncService", () => ({
   default: {
     initialize: vi.fn(() => Promise.resolve()),
     loadFromCloud: vi.fn(() => Promise.resolve(null)),
@@ -284,6 +284,7 @@ describe("CloudSyncService - Sync Core Tests", () => {
         currentUser: { uid: "test-user" },
       };
 
+      cloudSyncService.stop();
       cloudSyncService.start(invalidConfig);
       const result = await cloudSyncService.forceSync();
 

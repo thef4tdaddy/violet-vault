@@ -108,12 +108,10 @@ export const createUpdateUser =
     setAuthState(
       (prev: AuthContextState): AuthContextState => ({
         ...prev,
-        user: prev.user
-          ? {
-              ...prev.user,
-              ...updatedUserData,
-            }
-          : null,
+        user: {
+          ...(prev.user || {}),
+          ...updatedUserData,
+        } as UserData,
       })
     );
   };

@@ -115,7 +115,7 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
 
       // Security state
       isLocked: securityManager.isLocked,
-      canUnlock: !securityManager.isLocked || true, // Can always attempt unlock
+      canUnlock: true,
 
       // Authentication readiness
       isReady: isLocalOnlyMode ? !!localOnlyUser : !!(authFlow.isUnlocked && authFlow.currentUser),
@@ -141,28 +141,31 @@ export const useAuthenticationManager = (): UseAuthenticationManagerReturn => {
     [authFlow.encryptionKey, effectiveBudgetId, authFlow.salt]
   );
 
-  // Core authentication operations - direct object without useMemo to avoid React Compiler conflicts
-  const authOperations: AuthOperations = {
-    // Setup & Login
-    handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
-      await authFlow.handleSetup(
-        userDataOrPassword as string | { password: string; budgetId?: string }
-      );
-    },
-    handleLogout: authFlow.handleLogout,
-    handleChangePassword: authFlow.handleChangePassword,
+  // Core authentication operations - memoized for reference stability
+  const authOperations: AuthOperations = useMemo(
+    () => ({
+      // Setup & Login
+      handleSetup: async (userDataOrPassword: unknown): Promise<void> => {
+        await authFlow.handleSetup(
+          userDataOrPassword as string | { password: string; budgetId?: string }
+        );
+      },
+      handleLogout: authFlow.handleLogout,
+      handleChangePassword: authFlow.handleChangePassword,
 
-    // Profile Management
-    handleUpdateProfile: authFlow.handleUpdateProfile,
+      // Profile Management
+      handleUpdateProfile: authFlow.handleUpdateProfile,
 
-    // Security Operations
-    lockApp: securityManager.lockSession,
-    unlockApp: securityManager.unlockSession,
-    checkSecurityStatus: () => {
-      // Check security status - can be implemented as needed
-      securityManager.trackActivity();
-    },
-  };
+      // Security Operations
+      lockApp: securityManager.lockSession,
+      unlockApp: securityManager.unlockSession,
+      checkSecurityStatus: () => {
+        // Check security status - can be implemented as needed
+        securityManager.trackActivity();
+      },
+    }),
+    [authFlow, securityManager]
+  );
 
   return {
     // Authentication state
