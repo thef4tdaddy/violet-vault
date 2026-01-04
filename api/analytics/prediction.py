@@ -34,7 +34,11 @@ def predict_next_payday(paychecks: list[PaycheckEntry]) -> PaydayPrediction:
     def get_paycheck_date(paycheck: PaycheckEntry) -> datetime:
         date_str = paycheck.get("processedAt") or paycheck.get("date", "")
         try:
-            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+            # Normalize to offset-naive UTC if aware
+            if dt.tzinfo is not None:
+                dt = dt.astimezone(None).replace(tzinfo=None)
+            return dt
         except (ValueError, AttributeError):
             return datetime.min
 
