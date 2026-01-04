@@ -75,7 +75,8 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 
 /**
  * Partial transaction schema for updates
- * Note: Uses base schema without refinement because Zod v4 doesn't support .partial() on refined schemas
+ * Note: Uses base schema without refinement because refinements designed for complete objects
+ * may fail on partial updates where only a subset of fields is provided.
  */
 export const TransactionPartialSchema = TransactionBaseSchema.partial();
 export type TransactionPartial = z.infer<typeof TransactionPartialSchema>;
