@@ -106,11 +106,7 @@ describe("TransactionTable", () => {
   });
 
   const renderWithQuery = (component: React.ReactElement) => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        {component}
-      </QueryClientProvider>
-    );
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
   describe("Rendering", () => {

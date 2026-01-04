@@ -1,6 +1,26 @@
+/** @vitest-environment jsdom */
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useJoinBudgetMutation } from "../useJoinBudgetMutation";
+
+// Mock crypto if not available (needed for deterministic salt derivation)
+// Mock crypto if not available (needed for deterministic salt derivation)
+if (typeof global.crypto === "undefined") {
+  (global as any).crypto = {
+    subtle: {
+      digest: vi.fn(() => Promise.resolve(new Uint8Array(32).buffer)),
+    },
+  };
+} else if (!global.crypto.subtle) {
+  (global.crypto as any).subtle = {
+    digest: vi.fn(() => Promise.resolve(new Uint8Array(32).buffer)),
+  };
+} else {
+  // Even if it exists, mock digest for consistency
+  vi.spyOn(global.crypto.subtle, "digest").mockImplementation(() =>
+    Promise.resolve(new Uint8Array(32).buffer)
+  );
+}
 
 /**
  * Test suite for useJoinBudgetMutation
@@ -31,27 +51,56 @@ vi.mock("../../../../contexts/AuthContext", () => ({
 
 vi.mock("../../../../utils/security/encryption", () => ({
   encryptionUtils: {
-    deriveKey: vi.fn(() =>
+    deriveKeyFromSalt: vi.fn(() =>
       Promise.resolve({
-        key: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-        salt: new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]),
+        type: "secret",
+        extractable: true,
+        algorithm: { name: "AES-GCM" },
+        usages: ["encrypt", "decrypt"],
+      } as any)
+    ),
+    generateKey: vi.fn(() =>
+      Promise.resolve({
+        key: {
+          type: "secret",
+          extractable: true,
+          algorithm: { name: "AES-GCM" },
+          usages: ["encrypt", "decrypt"],
+        } as any,
+        salt: new Uint8Array([25, 26, 27, 28, 29, 30, 31, 32]),
       })
     ),
     encrypt: vi.fn(() =>
       Promise.resolve({
-        data: "encrypted-shared-budget",
-        iv: "shared-iv",
+        data: [1, 2, 3, 4, 5],
+        iv: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+      })
+    ),
+    decrypt: vi.fn(() =>
+      Promise.resolve({
+        currentUser: { userName: "testuser", budgetId: "budget-123" },
+        envelopes: [],
+        transactions: [],
       })
     ),
   },
 }));
 
-vi.mock("../../../../services/storage/localStorageService", () => ({
-  default: {
+vi.mock("../../../../services/storage/localStorageService", () => {
+  const mock = {
     setUserProfile: vi.fn(),
     setBudgetData: vi.fn(),
-  },
-}));
+    getBudgetData: vi.fn(() => ({
+      salt: [9, 10, 11, 12, 13, 14, 15, 16],
+      encryptedData: [1, 2, 3],
+      iv: [4, 5, 6],
+    })),
+  };
+  return {
+    default: mock,
+    localStorageService: mock,
+  };
+});
 
 vi.mock("../../../../utils/common/sentry", () => ({
   identifyUser: vi.fn(),
@@ -61,6 +110,7 @@ vi.mock("../../../../utils/common/logger", () => ({
   default: {
     auth: vi.fn(),
     error: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -103,7 +153,7 @@ describe("useJoinBudgetMutation", () => {
     const joinResult = await result.current.mutateAsync?.(joinData);
 
     expect(joinResult.success).toBe(true);
-    expect(joinResult.user.budgetId).toBe("shared-budget-123");
+    expect(joinResult.user?.budgetId).toBe("shared-budget-123");
     expect(joinResult.sharedBudget).toBe(true);
   });
 
@@ -144,7 +194,7 @@ describe("useJoinBudgetMutation", () => {
     const joinResult = await result.current.mutateAsync?.(joinData);
 
     expect(joinResult.success).toBe(true);
-    expect(joinResult.user.userName).toBe("shareduser");
+    expect(joinResult.user?.userName).toBe("shareduser");
   });
 
   it("should handle join errors gracefully", async () => {
@@ -183,7 +233,7 @@ describe("useJoinBudgetMutation", () => {
     const joinResult = await result.current.mutateAsync?.(joinData);
 
     expect(joinResult.success).toBe(true);
-    expect(joinResult.user.userName).toBe("Shared User");
+    expect(joinResult.user?.userName).toBe("Shared User");
   });
 
   it("should call setLoading during join", async () => {

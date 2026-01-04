@@ -1,8 +1,9 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+/** @vitest-environment jsdom */
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import React, { ReactNode } from "react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { AuthProvider, useAuth } from "../AuthContext";
-import { UserData } from "@/types/auth";
+import { UserData } from "../../types/auth";
 
 /**
  * Test suite for AuthContext
@@ -10,6 +11,14 @@ import { UserData } from "@/types/auth";
  */
 
 describe("AuthContext", () => {
+  beforeEach(() => {
+    // vi.useFakeTimers(); - Moving to specific tests
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.useRealTimers();
+  });
   // Test component that uses useAuth hook
   const TestComponent = () => {
     const auth = useAuth();
@@ -184,7 +193,9 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("authenticated")).toHaveTextContent("Not Authenticated");
 
       const setAuthButton = screen.getByTestId("set-authenticated");
-      setAuthButton.click();
+      act(() => {
+        setAuthButton.click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("authenticated")).toHaveTextContent("Authenticated");
@@ -214,7 +225,9 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithUserData />);
 
-      screen.getByText("Set User").click();
+      act(() => {
+        screen.getByText("Set User").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("user-name")).toHaveTextContent("john");
@@ -226,14 +239,18 @@ describe("AuthContext", () => {
       renderWithAuthProvider(<TestComponent />);
 
       // First set authenticated
-      screen.getByTestId("set-authenticated").click();
+      act(() => {
+        screen.getByTestId("set-authenticated").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("authenticated")).toHaveTextContent("Authenticated");
       });
 
       // Then clear
-      screen.getByTestId("clear-auth").click();
+      act(() => {
+        screen.getByTestId("clear-auth").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("authenticated")).toHaveTextContent("Not Authenticated");
@@ -266,7 +283,9 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithKeys />);
 
-      screen.getByText("Set with Keys").click();
+      act(() => {
+        screen.getByText("Set with Keys").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("has-key")).toHaveTextContent("Has Key");
@@ -281,7 +300,9 @@ describe("AuthContext", () => {
 
       expect(screen.getByTestId("loading")).toHaveTextContent("Not Loading");
 
-      screen.getByTestId("set-loading").click();
+      act(() => {
+        screen.getByTestId("set-loading").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("loading")).toHaveTextContent("Loading");
@@ -306,13 +327,17 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithLoading />);
 
-      screen.getByTestId("enable-loading").click();
+      act(() => {
+        screen.getByTestId("enable-loading").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("loading-status")).toHaveTextContent("Loading");
       });
 
-      screen.getByTestId("disable-loading").click();
+      act(() => {
+        screen.getByTestId("disable-loading").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("loading-status")).toHaveTextContent("Not Loading");
@@ -326,13 +351,17 @@ describe("AuthContext", () => {
 
       expect(screen.getByTestId("error")).toHaveTextContent("No Error");
 
-      screen.getByTestId("set-error").click();
+      act(() => {
+        screen.getByTestId("set-error").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("error")).toHaveTextContent("Test Error");
       });
 
-      screen.getByTestId("clear-auth").click();
+      act(() => {
+        screen.getByTestId("clear-auth").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("error")).toHaveTextContent("No Error");
@@ -356,19 +385,25 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithErrorMessage />);
 
-      screen.getByText("Set Invalid Password Error").click();
+      act(() => {
+        screen.getByText("Set Invalid Password Error").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("error-message")).toHaveTextContent("Invalid password");
       });
 
-      screen.getByText("Set Network Error").click();
+      act(() => {
+        screen.getByText("Set Network Error").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("error-message")).toHaveTextContent("Network error");
       });
 
-      screen.getByText("Clear Error").click();
+      act(() => {
+        screen.getByText("Clear Error").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("error-message")).toHaveTextContent("No Error");
@@ -378,9 +413,12 @@ describe("AuthContext", () => {
 
   describe("Activity Tracking", () => {
     it("should track last activity timestamp", async () => {
+      vi.useFakeTimers();
+      const startTime = 1000000;
+      vi.setSystemTime(startTime);
+
       const TestComponentWithActivity = () => {
         const auth = useAuth();
-        const beforeTime = Date.now();
 
         return (
           <div>
@@ -392,35 +430,38 @@ describe("AuthContext", () => {
               Update Activity
             </button>
             <div data-testid="has-activity">
-              {auth.lastActivity && auth.lastActivity >= beforeTime
+              {auth.lastActivity && auth.lastActivity >= startTime
                 ? "Activity Tracked"
                 : "No Activity"}
             </div>
-            <div data-testid="activity-time">{auth.lastActivity ? auth.lastActivity : "None"}</div>
           </div>
         );
       };
 
       renderWithAuthProvider(<TestComponentWithActivity />);
 
-      screen.getByText("Update Activity").click();
+      // Advance time slightly
+      vi.advanceTimersByTime(100);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("has-activity")).toHaveTextContent("Activity Tracked");
+      act(() => {
+        screen.getByText("Update Activity").click();
       });
+
+      expect(screen.getByTestId("has-activity")).toHaveTextContent("Activity Tracked");
     });
 
     it("should update activity multiple times", async () => {
+      vi.useFakeTimers();
       const TestComponentWithMultipleActivities = () => {
         const auth = useAuth();
-        let firstActivityTime = 0;
+        const [firstActivityTime, setFirstActivityTime] = React.useState(0);
 
         return (
           <div>
             <button
               onClick={() => {
                 auth.updateActivity();
-                firstActivityTime = auth.lastActivity || 0;
+                setFirstActivityTime(auth.lastActivity || 0);
               }}
             >
               First Activity
@@ -443,18 +484,19 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithMultipleActivities />);
 
-      screen.getByText("First Activity").click();
-
-      await waitFor(
-        () => {
-          screen.getByText("Second Activity").click();
-        },
-        { timeout: 100 }
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId("activity-updated")).toHaveTextContent("Updated");
+      await act(async () => {
+        screen.getByText("First Activity").click();
       });
+
+      await act(async () => {
+        screen.getByText("Second Activity").click();
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(50);
+      });
+
+      expect(screen.getByTestId("activity-updated")).toHaveTextContent("Updated");
     });
   });
 
@@ -485,7 +527,17 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithLocking />);
 
-      screen.getByText("Unlock").click();
+      await act(async () => {
+        screen.getByText("Unlock").click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("unlock-status")).toHaveTextContent("Unlocked");
+      });
+
+      await act(async () => {
+        screen.getByText("Lock").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("unlock-status")).toHaveTextContent("Locked");
@@ -527,14 +579,18 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentWithUpdateUser />);
 
-      screen.getByText("Set Initial User").click();
+      act(() => {
+        screen.getByText("Set Initial User").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("user-name")).toHaveTextContent("john");
         expect(screen.getByTestId("user-color")).toHaveTextContent("#FF0000");
       });
 
-      screen.getByText("Update Color").click();
+      act(() => {
+        screen.getByText("Update Color").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("user-color")).toHaveTextContent("#00FF00");
@@ -557,7 +613,7 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("current-user")).toHaveTextContent("No Current User");
     });
 
-    it("should provide hasCurrentUser computed property", () => {
+    it("should provide hasCurrentUser computed property", async () => {
       const TestComponentWithHasCurrentUser = () => {
         const auth = useAuth();
         return (
@@ -574,9 +630,11 @@ describe("AuthContext", () => {
 
       expect(screen.getByTestId("has-current-user")).toHaveTextContent("No User");
 
-      screen.getByText("Set User").click();
+      await act(async () => {
+        screen.getByText("Set User").click();
+      });
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(screen.getByTestId("has-current-user")).toHaveTextContent("Has User");
       });
     });
@@ -619,7 +677,9 @@ describe("AuthContext", () => {
       };
 
       renderWithAuthProvider(<TestComponentRapidChanges />);
-      screen.getByText("Rapid Changes").click();
+      act(() => {
+        screen.getByText("Rapid Changes").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("auth-status")).toHaveTextContent("Not Authenticated");
@@ -642,7 +702,9 @@ describe("AuthContext", () => {
       renderWithAuthProvider(<TestComponentClearWithoutAuth />);
 
       expect(screen.getByTestId("auth-status")).toHaveTextContent("Not Authenticated");
-      screen.getByText("Clear Auth").click();
+      act(() => {
+        screen.getByText("Clear Auth").click();
+      });
       expect(screen.getByTestId("auth-status")).toHaveTextContent("Not Authenticated");
     });
 
@@ -674,7 +736,9 @@ describe("AuthContext", () => {
         </AuthProvider>
       );
 
-      screen.getByText("Set Shared User").click();
+      act(() => {
+        screen.getByText("Set Shared User").click();
+      });
 
       waitFor(() => {
         expect(screen.getByTestId("comp1")).toHaveTextContent("shared");
@@ -709,7 +773,9 @@ describe("AuthContext", () => {
 
       renderWithAuthProvider(<TestComponentMultipleActions />);
 
-      screen.getByText("Complex Action").click();
+      act(() => {
+        screen.getByText("Complex Action").click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("user")).toHaveTextContent("user");

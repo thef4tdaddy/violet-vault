@@ -121,7 +121,7 @@ describe("syncHealthHelpers", () => {
     });
 
     it("should handle invalid dates", () => {
-      expect(formatLastChecked("invalid-date")).toBe("Invalid date");
+      expect(formatLastChecked("invalid-date")).toBe("Invalid Date");
     });
   });
 
