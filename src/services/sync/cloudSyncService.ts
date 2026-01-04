@@ -146,16 +146,17 @@ class CloudSyncService {
   }
 
   stop() {
-    if (!this.isRunning) return;
-
     logger.production("Cloud sync service stopped", {
       user: this.config?.budgetId || "unknown",
     });
-    // No more periodic sync interval to clear
+
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
     this.isRunning = false;
+    this.isSyncing = false;
+    this.config = null;
+    this.syncQueue = Promise.resolve();
   }
 
   // Debounced sync to avoid rapid consecutive syncs
@@ -274,26 +275,20 @@ class CloudSyncService {
           // This prevents crashes and allows sync to continue gracefully
           cloudData = null;
         } else {
-          logger.warn(
-            "Could not load cloud data, assuming no cloud data exists",
-            error as Record<string, unknown>
-          );
-          // Capture non-decryption errors to Sentry (they might be real issues)
-          if (error instanceof Error) {
-            import("@/utils/common/sentry.js")
-              .then(({ captureError }) => {
-                captureError(error, {
-                  operation: "forceSync.loadFromCloud",
-                  budgetId: this.config?.budgetId?.substring(0, 8),
-                  service: "CloudSyncService",
-                  errorType: "nonDecryption",
-                });
-              })
-              .catch(() => {
-                // Sentry not available, already logged
-              });
-          }
-          cloudData = null;
+          logger.error("❌ Failed to load cloud data:", {
+            error: errorMessage,
+            name: errorName,
+          });
+
+          // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
+          const errorCategory = this.categorizeError(errorMessage);
+          syncHealthMonitor.recordSyncFailure(syncId, error as Error, {
+            backupId,
+            stage: "load_from_cloud",
+            errorCategory,
+          });
+
+          return { success: false, error: errorMessage, reason: errorMessage };
         }
       }
 

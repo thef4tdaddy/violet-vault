@@ -188,6 +188,10 @@ describe("useSyncHealthIndicator", () => {
     expect(global.window.forceCloudDataReset).toHaveBeenCalled();
 
     // Should refresh health status after reset
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
     await vi.waitFor(() => {
       expect(getQuickSyncStatus).toHaveBeenCalledTimes(2); // Once on mount, once after reset
     });

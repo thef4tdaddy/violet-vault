@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AuthProvider, useAuth } from "../AuthContext";
@@ -49,27 +49,6 @@ describe("AuthContext", () => {
 
   const renderWithAuthProvider = (component: ReactNode) => {
     return render(<AuthProvider>{component}</AuthProvider>);
-  };
-
-  const screen = {
-    getByTestId: (id: string) => document.querySelector(`[data-testid="${id}"]`) as HTMLElement,
-    getByText: (text: string) => {
-      const elements = Array.from(document.querySelectorAll("*"));
-      return elements.find((el) => el.textContent?.includes(text)) as HTMLElement;
-    },
-  };
-
-  const waitFor = async (callback: () => void, options = { timeout: 1000 }) => {
-    const start = Date.now();
-    while (Date.now() - start < options.timeout) {
-      try {
-        callback();
-        return;
-      } catch {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-    }
-    callback();
   };
 
   beforeEach(() => {

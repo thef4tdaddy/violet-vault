@@ -1,14 +1,8 @@
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { useAuthManager } from "../useAuthManager";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-/**
- * Test suite for useAuthManager
- * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
- */
-
-// Mock the dependencies
-vi.mock("../../contexts/AuthContext", () => ({
+// Mock the dependencies FIRST
+vi.mock("../../../contexts/AuthContext", () => ({
   useAuth: vi.fn(() => ({
     isAuthenticated: false,
     isUnlocked: false,
@@ -60,6 +54,8 @@ vi.mock("../authOperations", () => ({
   createLockSessionOperation: vi.fn((_context) => vi.fn()),
   createUpdateActivityOperation: vi.fn((_context) => vi.fn()),
 }));
+
+import { useAuthManager } from "../useAuthManager";
 
 describe("useAuthManager", () => {
   beforeEach(() => {

@@ -141,6 +141,10 @@
     ],
     "*.go": [
       "gofmt -w"
+    ],
+    "*.py": [
+      "ruff check --fix",
+      "ruff format"
     ]
   },
   "overrides": {

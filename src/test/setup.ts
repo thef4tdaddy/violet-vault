@@ -111,3 +111,47 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+/**
+ * Mock implementation of Storage interface (localStorage/sessionStorage)
+ */
+class LocalStorageMock {
+  store: Record<string, string>;
+  length: number;
+
+  constructor() {
+    this.store = {};
+    this.length = 0;
+  }
+
+  key(n: number): string | null {
+    return Object.keys(this.store)[n] || null;
+  }
+
+  getItem(key: string): string | null {
+    return this.store[key] || null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.store[key] = String(value);
+    this.length = Object.keys(this.store).length;
+  }
+
+  removeItem(key: string): void {
+    delete this.store[key];
+    this.length = Object.keys(this.store).length;
+  }
+
+  clear(): void {
+    this.store = {};
+    this.length = 0;
+  }
+}
+
+Object.defineProperty(window, "localStorage", {
+  value: new LocalStorageMock(),
+});
+
+Object.defineProperty(window, "sessionStorage", {
+  value: new LocalStorageMock(),
+});
