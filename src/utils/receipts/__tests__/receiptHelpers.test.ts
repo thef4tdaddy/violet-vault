@@ -41,7 +41,7 @@ describe("receiptHelpers", () => {
       expect(formatFileSize(1024)).toBe("1 KB");
       expect(formatFileSize(2048)).toBe("2 KB");
       expect(formatFileSize(1536)).toBe("2 KB"); // Rounds up
-      expect(formatFileSize(512)).toBe("1 KB"); // Rounds up from 0.5
+      expect(formatFileSize(512)).toBe("512 Bytes"); // Less than 1 KB stays as Bytes
     });
   });
 
