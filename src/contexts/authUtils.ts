@@ -15,7 +15,7 @@ import type { UserData } from "@/types/auth";
 type SetAuthState = React.Dispatch<React.SetStateAction<AuthContextState>>;
 
 // Helper function to initialize auth state from localStorage
-export const initializeAuthFromStorage = async (setAuthState: SetAuthState): Promise<void> => {
+export const initializeAuthFromStorage = (setAuthState: SetAuthState): void => {
   try {
     logger.auth("AuthContext: Initializing auth state from localStorage");
 

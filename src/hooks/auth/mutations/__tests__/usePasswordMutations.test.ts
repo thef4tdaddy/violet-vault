@@ -1,6 +1,16 @@
+/** @vitest-environment jsdom */
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useChangePasswordMutation } from "../usePasswordMutations";
+
+// Mock crypto if not available (needed for deterministic salt derivation)
+if (typeof global.crypto === "undefined" || !global.crypto.subtle) {
+  (global as any).crypto = {
+    subtle: {
+      digest: vi.fn(() => Promise.resolve(new Uint8Array(32).buffer)),
+    },
+  };
+}
 
 /**
  * Test suite for useChangePasswordMutation
@@ -29,15 +39,33 @@ vi.mock("../../../../contexts/AuthContext", () => ({
 
 vi.mock("../../../../utils/security/encryption", () => ({
   encryptionUtils: {
-    deriveKey: vi.fn(() =>
+    deriveKey: vi.fn((password: string) =>
       Promise.resolve({
-        key: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
+        key: {
+          type: "secret",
+          extractable: true,
+          algorithm: { name: "AES-GCM" },
+          usages: ["encrypt", "decrypt"],
+        } as any,
         salt: new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]),
       })
     ),
+    deriveKeyFromSalt: vi.fn(() =>
+      Promise.resolve({
+        type: "secret",
+        extractable: true,
+        algorithm: { name: "AES-GCM" },
+        usages: ["encrypt", "decrypt"],
+      } as any)
+    ),
     generateKey: vi.fn(() =>
       Promise.resolve({
-        key: new Uint8Array([17, 18, 19, 20, 21, 22, 23, 24]),
+        key: {
+          type: "secret",
+          extractable: true,
+          algorithm: { name: "AES-GCM" },
+          usages: ["encrypt", "decrypt"],
+        } as any,
         salt: new Uint8Array([25, 26, 27, 28, 29, 30, 31, 32]),
       })
     ),
@@ -57,12 +85,16 @@ vi.mock("../../../../utils/security/encryption", () => ({
   },
 }));
 
-vi.mock("../../../../services/storage/localStorageService", () => ({
-  default: {
+vi.mock("../../../../services/storage/localStorageService", () => {
+  const mock = {
     getBudgetData: vi.fn(),
     setBudgetData: vi.fn(),
-  },
-}));
+  };
+  return {
+    default: mock,
+    localStorageService: mock,
+  };
+});
 
 vi.mock("../../../../utils/common/logger", () => ({
   default: {
@@ -85,6 +117,13 @@ describe("useChangePasswordMutation", () => {
   });
 
   it("should change password successfully", async () => {
+    const localStorageService = await import("../../../../services/storage/localStorageService");
+    vi.mocked(localStorageService.default.getBudgetData).mockReturnValue({
+      salt: [9, 10, 11, 12, 13, 14, 15, 16],
+      encryptedData: [1, 2, 3],
+      iv: [4, 5, 6],
+    } as any);
+
     const { result } = renderHook(() => useChangePasswordMutation());
 
     const changeResult = await result.current.mutateAsync?.({

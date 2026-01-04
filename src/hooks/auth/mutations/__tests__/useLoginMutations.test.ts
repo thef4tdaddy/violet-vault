@@ -1,6 +1,26 @@
+/** @vitest-environment jsdom */
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useLoginMutation } from "../useLoginMutations";
+
+// Mock crypto if not available (needed for deterministic salt derivation)
+// Mock crypto if not available (needed for deterministic salt derivation)
+if (typeof global.crypto === "undefined") {
+  (global as any).crypto = {
+    subtle: {
+      digest: vi.fn(() => Promise.resolve(new Uint8Array(32).buffer)),
+    },
+  };
+} else if (!global.crypto.subtle) {
+  (global.crypto as any).subtle = {
+    digest: vi.fn(() => Promise.resolve(new Uint8Array(32).buffer)),
+  };
+} else {
+  // Even if it exists, mock digest for consistency
+  vi.spyOn(global.crypto.subtle, "digest").mockImplementation(() =>
+    Promise.resolve(new Uint8Array(32).buffer)
+  );
+}
 
 /**
  * Test suite for useLoginMutation
@@ -31,11 +51,13 @@ vi.mock("../../../../contexts/AuthContext", () => ({
 
 vi.mock("../../../../utils/security/encryption", () => ({
   encryptionUtils: {
-    deriveKey: vi.fn(() =>
+    deriveKeyFromSalt: vi.fn(() =>
       Promise.resolve({
-        key: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-        salt: new Uint8Array([9, 10, 11, 12, 13, 14, 15, 16]),
-      })
+        type: "secret",
+        extractable: true,
+        algorithm: { name: "AES-GCM" },
+        usages: ["encrypt", "decrypt"],
+      } as any)
     ),
     generateBudgetId: vi.fn(() => Promise.resolve("budget-id-123")),
     encrypt: vi.fn(() =>
@@ -58,14 +80,19 @@ vi.mock("../../../../utils/security/encryption", () => ({
   },
 }));
 
-vi.mock("../../../../services/storage/localStorageService", () => ({
-  default: {
+vi.mock("../../../../services/storage/localStorageService", () => {
+  const mock = {
     getBudgetData: vi.fn(),
     setBudgetData: vi.fn(),
     removeBudgetData: vi.fn(),
     setUserProfile: vi.fn(),
-  },
-}));
+    getUserProfile: vi.fn(),
+  };
+  return {
+    default: mock,
+    localStorageService: mock,
+  };
+});
 
 vi.mock("../../../../utils/common/sentry", () => ({
   identifyUser: vi.fn(),
@@ -115,8 +142,8 @@ describe("useLoginMutation", () => {
     });
 
     expect(loginResult.success).toBe(true);
-    expect(loginResult.user.userName).toBe("newuser");
-    expect(loginResult.user.budgetId).toBeDefined();
+    expect(loginResult.user?.userName).toBe("newuser");
+    expect(loginResult.user?.budgetId).toBeDefined();
   });
 
   it("should throw error if share code is missing for new user", async () => {
@@ -138,6 +165,18 @@ describe("useLoginMutation", () => {
   });
 
   it("should handle existing user login successfully", async () => {
+    const localStorageService = await import("../../../../services/storage/localStorageService");
+    vi.mocked(localStorageService.default.getBudgetData).mockReturnValue({
+      salt: [9, 10, 11, 12, 13, 14, 15, 16],
+      encryptedData: [1, 2, 3],
+      iv: [4, 5, 6],
+    } as any);
+    vi.mocked(localStorageService.default.getUserProfile).mockReturnValue({
+      userName: "testuser",
+      userColor: "#FFFFFF",
+      shareCode: "SHARE-123",
+    });
+
     const { result } = renderHook(() => useLoginMutation());
 
     const loginResult = await result.current.mutateAsync?.({
@@ -145,10 +184,13 @@ describe("useLoginMutation", () => {
     });
 
     expect(loginResult.success).toBe(true);
-    expect(loginResult.user.userName).toBe("testuser");
+    expect(loginResult.user?.userName).toBe("testuser");
   });
 
   it("should return error if password is invalid", async () => {
+    const { encryptionUtils } = await import("../../../../utils/security/encryption");
+    vi.mocked(encryptionUtils.decrypt).mockRejectedValueOnce(new Error("Decryption failed"));
+
     const { result } = renderHook(() => useLoginMutation());
 
     const loginResult = await result.current.mutateAsync?.({
