@@ -426,7 +426,7 @@ describe("filtering utilities", () => {
       expect(result.accounts).toHaveProperty("Checking");
       expect(result.accounts["Checking"]).toEqual({
         count: 3,
-        total: 2090, // abs(-85.5) + abs(2000) + abs(-4.5) = 85.5 + 2000 + 4.5 = 2090
+        total: 2090, // abs(-85.5) = 85.5, abs(2000) = 2000, abs(-4.5) = 4.5; 85.5 + 2000 + 4.5 = 2090
       });
     });
 
