@@ -243,6 +243,9 @@ const SettingsDashboard = ({
     onSync,
   });
 
+  // Don't render if not open
+  if (!isOpen) return null;
+
   return (
     <>
       <SettingsLayout

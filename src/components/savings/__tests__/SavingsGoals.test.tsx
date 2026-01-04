@@ -128,7 +128,7 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
-      expect(screen.getByText(/Distribute Cash/i)).toBeInTheDocument();
+      expect(screen.getByText(/Distribute/i)).toBeInTheDocument();
     });
 
     it("should not display distribute button when no unassigned cash", () => {
@@ -136,13 +136,13 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={0} />);
 
-      expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Distribute/i)).not.toBeInTheDocument();
     });
 
     it("should not display distribute button when no goals exist", () => {
       render(<SavingsGoals {...defaultProps} savingsGoals={[]} unassignedCash={100} />);
 
-      expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Distribute/i)).not.toBeInTheDocument();
     });
 
     it("should display summary card with goal count", () => {
@@ -202,7 +202,7 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
-      const distributeButton = screen.getByText(/Distribute Cash/i);
+      const distributeButton = screen.getByText(/Distribute/i);
       await userEvent.click(distributeButton);
 
       expect(mockOpenDistributeModal).toHaveBeenCalled();
