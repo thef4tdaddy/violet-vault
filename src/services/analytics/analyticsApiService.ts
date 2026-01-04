@@ -50,7 +50,10 @@ export class AnalyticsApiService {
 
   /**
    * Predict next payday based on paycheck history
-   * Uses V2 Polyglot Backend with fallback to local prediction when offline
+   * Uses V2 Polyglot Backend with fallback to local prediction when offline or API fails
+   *
+   * Note: navigator.onLine only checks browser connectivity, not API reachability.
+   * API errors (timeout, 5xx, network issues) are caught and trigger fallback.
    */
   static async predictNextPayday(paychecks: PaycheckEntry[]): Promise<PaydayPrediction | null> {
     try {
@@ -59,8 +62,9 @@ export class AnalyticsApiService {
       });
 
       // Check if online before making API call
+      // Note: navigator.onLine only detects browser connectivity, not API health
       if (!ApiClient.isOnline()) {
-        logger.warn("Offline - using local payday prediction fallback");
+        logger.warn("Browser offline - using local payday prediction fallback");
         return this.localPaydayPredictionFallback(paychecks);
       }
 
@@ -71,9 +75,10 @@ export class AnalyticsApiService {
       );
 
       if (!response.success || !response.data?.prediction) {
-        logger.error("Payday prediction failed", { error: response.error });
-        // Fallback to local prediction if API fails
-        logger.warn("API failed - using local payday prediction fallback");
+        // API failed, unreachable, or returned error - fallback to local
+        logger.warn("API failed or unreachable - using local payday prediction fallback", {
+          error: response.error,
+        });
         return this.localPaydayPredictionFallback(paychecks);
       }
 
@@ -84,8 +89,10 @@ export class AnalyticsApiService {
 
       return response.data.prediction;
     } catch (error) {
-      logger.error("Failed to predict payday", error);
-      // Fallback to local prediction on error
+      // Network error, timeout, or API down - fallback to local
+      logger.warn("Network error or API down - using local payday prediction fallback", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return this.localPaydayPredictionFallback(paychecks);
     }
   }
@@ -135,6 +142,11 @@ export class AnalyticsApiService {
   /**
    * Local fallback for payday prediction when API is unavailable
    * Converts backend response format to match frontend format
+   *
+   * Type Note: This method normalizes the type difference between local and API responses:
+   * - Local predictor returns: nextPayday: Date | null
+   * - API response expects: nextPayday: string | null (ISO format for JSON serialization)
+   * This conversion ensures consistent interface regardless of prediction source.
    */
   private static localPaydayPredictionFallback(
     paychecks: PaycheckEntry[]
@@ -150,6 +162,7 @@ export class AnalyticsApiService {
       const localPrediction = localPredict(localPaychecks);
 
       // Convert Date to ISO string for API compatibility
+      // Local predictor returns Date, API expects string
       return {
         nextPayday: localPrediction.nextPayday ? localPrediction.nextPayday.toISOString() : null,
         confidence: localPrediction.confidence,

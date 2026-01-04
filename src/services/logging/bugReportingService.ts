@@ -220,9 +220,10 @@ export class BugReportingService {
     try {
       const payload = this.createGoBackendPayload(data);
 
+      // Go backend response type matches BugReportResponse with optional fields (omitempty)
       const response = await ApiClient.post<{
-        issueNumber: number;
-        url: string;
+        issueNumber?: number;
+        url?: string;
       }>("/api/bug-report", payload);
 
       if (!response.success) {
