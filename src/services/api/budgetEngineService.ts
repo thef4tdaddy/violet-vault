@@ -72,6 +72,27 @@ export class BudgetEngineService {
     bills: Bill[]
   ): Promise<ApiResponse<BudgetCalculationResponse>> {
     try {
+      // Validate input arrays - return early if all are empty
+      if (envelopes.length === 0 && transactions.length === 0 && bills.length === 0) {
+        logger.warn("All input arrays are empty, skipping backend call");
+        return {
+          success: true,
+          data: {
+            success: true,
+            data: [],
+            totals: {
+              totalAllocated: 0,
+              totalSpent: 0,
+              totalBalance: 0,
+              totalUpcoming: 0,
+              totalBiweeklyNeed: 0,
+              billsDueCount: 0,
+              envelopeCount: 0,
+            },
+          },
+        };
+      }
+
       logger.info("Calculating budget via Go backend", {
         envelopeCount: envelopes.length,
         transactionCount: transactions.length,
@@ -86,7 +107,7 @@ export class BudgetEngineService {
 
       const response = await ApiClient.post<BudgetCalculationResponse>(
         this.ENDPOINT,
-        requestBody,
+        requestBody as unknown as Record<string, unknown>,
         {
           timeout: 60000, // 60 seconds for large datasets
         }

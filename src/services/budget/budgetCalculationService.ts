@@ -110,37 +110,43 @@ export class BudgetCalculationService {
       const response = await BudgetEngineService.calculateBudget(envelopes, transactions, bills);
 
       if (!response.success || !response.data) {
-        logger.error("Backend calculation failed", { error: response.error });
+        const errorMessage = response.error || "Unknown backend error";
+        logger.error("Backend calculation failed", { error: errorMessage });
+        // Return null to trigger fallback, but preserve error context in logs
         return null;
       }
 
-      // Map backend response to our format
-      const envelopeData = response.data.data.map((envData) => ({
-        ...envData,
-        // Ensure all fields match client-side format
-        id: envData.id,
-        totalSpent: envData.totalSpent || 0,
-        totalUpcoming: envData.totalUpcoming || 0,
-        totalOverdue: envData.totalOverdue || 0,
-        allocated: envData.allocated || 0,
-        available: envData.available || 0,
-        committed: envData.committed || 0,
-        utilizationRate: envData.utilizationRate || 0,
-        status: envData.status || "healthy",
-        upcomingBills: envData.upcomingBills || [],
-        overdueBills: envData.overdueBills || [],
-        transactions: Array.isArray(envData.transactions)
-          ? envData.transactions.filter(
-              (txn: any): txn is Transaction =>
-                txn &&
-                typeof txn === "object" &&
-                "createdAt" in txn &&
-                "lastModified" in txn
-            )
-          : [],
-        bills: envData.bills || [],
-        biweeklyNeed: envData.biweeklyNeed || 0,
-      })) as unknown as ClientEnvelopeData[];
+      // Map backend response to our format with explicit field validation
+      const envelopeData: ClientEnvelopeData[] = response.data.data.map((envData) => {
+        // Validate required fields exist
+        if (!envData.id) {
+          throw new Error("Backend returned envelope without ID");
+        }
+
+        return {
+          ...envData,
+          // Ensure all fields match client-side format with proper defaults
+          id: envData.id,
+          totalSpent: envData.totalSpent || 0,
+          totalUpcoming: envData.totalUpcoming || 0,
+          totalOverdue: envData.totalOverdue || 0,
+          allocated: envData.allocated || 0,
+          available: envData.available || 0,
+          committed: envData.committed || 0,
+          utilizationRate: envData.utilizationRate || 0,
+          status: envData.status || "healthy",
+          upcomingBills: envData.upcomingBills || [],
+          overdueBills: envData.overdueBills || [],
+          transactions: Array.isArray(envData.transactions)
+            ? envData.transactions.filter(
+                (txn: any): txn is Transaction =>
+                  txn && typeof txn === "object" && "createdAt" in txn && "lastModified" in txn
+              )
+            : [],
+          bills: envData.bills || [],
+          biweeklyNeed: envData.biweeklyNeed || 0,
+        } as ClientEnvelopeData;
+      });
 
       const totals = {
         totalBiweeklyNeed: response.data.totals.totalBiweeklyNeed || 0,
@@ -186,9 +192,7 @@ export class BudgetCalculationService {
       amount: tx.amount,
       date:
         tx.date instanceof Date
-          ? new Date(
-              Date.UTC(tx.date.getFullYear(), tx.date.getMonth(), tx.date.getDate())
-            )
+          ? new Date(Date.UTC(tx.date.getFullYear(), tx.date.getMonth(), tx.date.getDate()))
               .toISOString()
               .split("T")[0]
           : tx.date,
@@ -201,9 +205,7 @@ export class BudgetCalculationService {
       isPaid: bill.isPaid,
       amount: bill.amount,
       dueDate:
-        bill.dueDate instanceof Date
-          ? bill.dueDate.toISOString().split("T")[0]
-          : bill.dueDate,
+        bill.dueDate instanceof Date ? bill.dueDate.toISOString().split("T")[0] : bill.dueDate,
       name: bill.name,
     }));
 

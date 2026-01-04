@@ -339,17 +339,14 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
         };
 
         reader.onerror = () => {
-          reject(
-            reader.error ??
-              new Error("Unknown error while reading file on client-side")
-          );
+          reject(reader.error ?? new Error("Unknown error while reading file on client-side"));
         };
 
         reader.readAsText(fileToRead);
       });
     };
 
-   const parseContentToRows = async (): Promise<unknown[]> => {
+    const parseContentToRows = async (): Promise<unknown[]> => {
       const content = await readFileAsText(file);
 
       // Try JSON first
@@ -392,8 +389,23 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
 
     const rawRows = await parseContentToRows();
 
+    // Auto-detect field mapping if not provided - ensure all required fields are present
+    const mappingToUse: {
+      amount: string;
+      date: string;
+      description: string;
+      category: string;
+      notes: string;
+    } = {
+      amount: fieldMapping?.amount || "amount",
+      date: fieldMapping?.date || "date",
+      description: fieldMapping?.description || "description",
+      category: fieldMapping?.category || "category",
+      notes: fieldMapping?.notes || "notes",
+    };
+
     // Delegate validation/normalization to existing processing pipeline
-    const result = await processTransactions(rawRows, fieldMapping);
+    const result = await processTransactions(rawRows, mappingToUse);
 
     // Ensure the source is marked as client-side if not already set
     return {
