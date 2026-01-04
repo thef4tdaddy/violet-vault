@@ -150,33 +150,82 @@ export class ImportService {
 
     for (const header of headers) {
       const headerLower = header.toLowerCase().trim();
+      // Normalize by removing common separators so we can match "transaction_date",
+      // "transaction date", "transactiondate", "txn_date", etc.
+      const normalizedHeader = headerLower.replace(/[^a-z0-9]/g, "");
 
       // Date detection
       if (
         headerLower === "date" ||
         headerLower === "transaction_date" ||
-        headerLower === "transaction date"
+        headerLower === "transaction date" ||
+        normalizedHeader === "transactiondate" ||
+        normalizedHeader === "transdate" ||
+        normalizedHeader === "transactiondt" ||
+        normalizedHeader === "postingdate" ||
+        // common abbreviations like "txn_date", "txn date", "txndate"
+        (normalizedHeader.startsWith("txn") && normalizedHeader.includes("date")) ||
+        (normalizedHeader.startsWith("trans") && normalizedHeader.includes("date"))
       ) {
         mapping.date = header;
       }
       // Amount detection
-      else if (headerLower === "amount" || headerLower === "value") {
+      else if (
+        headerLower === "amount" ||
+        headerLower === "value" ||
+        normalizedHeader.includes("amount") ||
+        normalizedHeader.includes("amt") ||
+        normalizedHeader.includes("value") ||
+        normalizedHeader.includes("price") ||
+        normalizedHeader.includes("total")
+      ) {
         mapping.amount = header;
       }
       // Description detection
-      else if (headerLower === "description" || headerLower === "memo" || headerLower === "payee") {
+      else if (
+        headerLower === "description" ||
+        headerLower === "memo" ||
+        headerLower === "payee" ||
+        normalizedHeader.includes("description") ||
+        normalizedHeader.includes("desc") ||
+        normalizedHeader.includes("memo") ||
+        normalizedHeader.includes("payee") ||
+        normalizedHeader.includes("details")
+      ) {
         mapping.description = header;
       }
       // Category detection
-      else if (headerLower === "category") {
+      else if (
+        headerLower === "category" ||
+        normalizedHeader === "category" ||
+        normalizedHeader.startsWith("category") ||
+        normalizedHeader === "cat" ||
+        normalizedHeader.startsWith("cat")
+      ) {
         mapping.category = header;
       }
       // Merchant detection
-      else if (headerLower === "merchant" || headerLower === "vendor") {
+      else if (
+        headerLower === "merchant" ||
+        headerLower === "vendor" ||
+        normalizedHeader.includes("merchant") ||
+        normalizedHeader.includes("vendor") ||
+        normalizedHeader.includes("store") ||
+        normalizedHeader.includes("shop")
+      ) {
         mapping.merchant = header;
       }
       // Notes detection
-      else if (headerLower === "notes" || headerLower === "note") {
+      else if (
+        headerLower === "notes" ||
+        headerLower === "note" ||
+        normalizedHeader.includes("note") ||
+        normalizedHeader.includes("notes") ||
+        normalizedHeader.includes("comment") ||
+        normalizedHeader.includes("comments") ||
+        normalizedHeader.includes("remark") ||
+        normalizedHeader.includes("remarks")
+      ) {
         mapping.notes = header;
       }
     }
