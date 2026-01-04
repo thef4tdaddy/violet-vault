@@ -41,9 +41,11 @@ vi.mock("@/hooks/settings/useSettingsDashboard", () => ({
     ],
   })),
   useSettingsActions: vi.fn(() => ({
-    handleExport: vi.fn(),
-    handleImport: vi.fn(),
-    handleLogout: vi.fn(),
+    handleCreateTestHistory: vi.fn(),
+    handleResetConfirmAction: vi.fn((onClose, onResetEncryption) => () => {
+      onClose();
+      onResetEncryption();
+    }),
   })),
 }));
 
