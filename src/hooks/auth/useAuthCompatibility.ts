@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useAuthManager } from "./useAuthManager";
 import logger from "../../utils/common/logger";
 import { encryptionUtils } from "../../utils/security/encryption";
@@ -36,73 +37,79 @@ export const useAuthCompatibility = () => {
   const authManager = useAuthManager();
 
   // Legacy interface that matches the old authStore API
-  const legacyAuth = {
-    // State properties (matching old authStore)
-    isUnlocked: authManager.isUnlocked,
-    currentUser: authManager.user,
-    budgetId: authManager.budgetId,
-    encryptionKey: authManager.encryptionKey,
-    salt: authManager.salt,
-    lastActivity: authManager.lastActivity,
+  const legacyAuth = useMemo(
+    () => ({
+      // State properties (matching old authStore)
+      isUnlocked: authManager.isUnlocked,
+      currentUser: authManager.user,
+      budgetId: authManager.budgetId,
+      encryptionKey: authManager.encryptionKey,
+      salt: authManager.salt,
+      lastActivity: authManager.lastActivity,
 
-    // Action methods (matching old authStore)
-    login: async (password: string, userData: unknown = null) => {
-      const result = await authManager.login(password, userData as Record<string, unknown> | null);
-      return result;
-    },
+      // Action methods (matching old authStore)
+      login: async (password: string, userData: unknown = null) => {
+        const result = await authManager.login(
+          password,
+          userData as Record<string, unknown> | null
+        );
+        return result;
+      },
 
-    joinBudgetWithShareCode: async (joinData: unknown) => {
-      const result = await authManager.joinBudget(joinData as JoinData);
-      return result;
-    },
+      joinBudgetWithShareCode: async (joinData: unknown) => {
+        const result = await authManager.joinBudget(joinData as JoinData);
+        return result;
+      },
 
-    logout: () => {
-      authManager.logout();
-    },
+      logout: () => {
+        authManager.logout();
+      },
 
-    updateUser: (updatedUser: unknown) => {
-      authManager.updateUser(updatedUser as Partial<UpdatedProfile>);
-    },
+      updateUser: (updatedUser: unknown) => {
+        authManager.updateUser(updatedUser as Partial<UpdatedProfile>);
+      },
 
-    changePassword: async (oldPassword: string, newPassword: string) => {
-      const result = await authManager.changePassword(oldPassword, newPassword);
-      return result;
-    },
+      changePassword: async (oldPassword: string, newPassword: string) => {
+        const result = await authManager.changePassword(oldPassword, newPassword);
+        return result;
+      },
 
-    updateProfile: async (updatedProfile: unknown) => {
-      const result = await authManager.updateProfile(updatedProfile as UpdatedProfile);
-      return result;
-    },
+      updateProfile: async (updatedProfile: unknown) => {
+        const result = await authManager.updateProfile(updatedProfile as UpdatedProfile);
+        return result;
+      },
 
-    setLastActivity: (_timestamp: number) => {
-      authManager.updateActivity();
-    },
+      setLastActivity: (_timestamp: number) => {
+        authManager.updateActivity();
+      },
 
-    validatePassword: async (password: string) => {
-      // Compatibility method - validates password
-      try {
-        // Simple validation - attempt to derive key
-        await encryptionUtils.deriveKey(password);
-        return true;
-      } catch {
-        return false;
-      }
-    },
+      validatePassword: async (password: string) => {
+        // Compatibility method - validates password
+        try {
+          // Simple validation - attempt to derive key
+          await encryptionUtils.deriveKey(password);
+          return true;
+        } catch {
+          return false;
+        }
+      },
 
-    // Additional methods that some components might use
-    setEncryption: ({ key: _key, salt: _salt }: { key: unknown; salt: unknown }) => {
-      logger.warn("setEncryption called via compatibility layer - this should be migrated");
-      // This would need to be handled through the new auth context
-      // For now, log a warning since this should be rare
-    },
+      // Additional methods that some components might use
+      setEncryption: ({ key: _key, salt: _salt }: { key: unknown; salt: unknown }) => {
+        logger.warn("setEncryption called via compatibility layer - this should be migrated");
+        // This would need to be handled through the new auth context
+        // For now, log a warning since this should be rare
+      },
 
-    startBackgroundSyncAfterLogin: async (_isNewUser = false) => {
-      logger.info("startBackgroundSyncAfterLogin called via compatibility layer");
-      // This is now handled automatically in the login mutations
-      // So we can just return success
-      return Promise.resolve();
-    },
-  };
+      startBackgroundSyncAfterLogin: async (_isNewUser = false) => {
+        logger.info("startBackgroundSyncAfterLogin called via compatibility layer");
+        // This is now handled automatically in the login mutations
+        // So we can just return success
+        return { success: true };
+      },
+    }),
+    [authManager]
+  );
 
   // Log usage for migration tracking
   if (import.meta?.env?.MODE === "development") {

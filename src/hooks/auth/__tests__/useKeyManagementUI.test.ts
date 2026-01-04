@@ -9,11 +9,15 @@ vi.mock("../../../stores/ui/toastStore", () => ({
   },
 }));
 
+import { globalToast } from "../../../stores/ui/toastStore";
+
 vi.mock("../../../utils/common/logger", () => ({
   default: {
     error: vi.fn(),
   },
 }));
+
+import logger from "../../../utils/common/logger";
 
 describe("useKeyManagementUI", () => {
   beforeEach(() => {
@@ -104,7 +108,11 @@ describe("useKeyManagementUI", () => {
     // Set some state
     act(() => {
       result.current.updatePassword("export", "test");
-      result.current.setImportResult({ success: true });
+      result.current.setImportResult({
+        success: true,
+        importResult: {} as any,
+        loginResult: {} as any,
+      });
       result.current.setKeyFingerprint("test-fingerprint");
     });
 
@@ -157,7 +165,6 @@ describe("useKeyManagementOperations", () => {
 
     it("should reject weak passwords", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const isValid = result.current.validateExportPassword("weak");
 
@@ -170,7 +177,6 @@ describe("useKeyManagementOperations", () => {
 
     it("should reject empty passwords", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const isValid = result.current.validateExportPassword("");
 
@@ -188,7 +194,7 @@ describe("useKeyManagementOperations", () => {
 
       const isValid = result.current.validateImportRequirements(
         keyFileData,
-        null,
+        "",
         "vaultpassword",
         validation
       );
@@ -198,13 +204,12 @@ describe("useKeyManagementOperations", () => {
 
     it("should reject invalid key files", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const validation = { valid: false, error: "Invalid format" };
 
       const isValid = result.current.validateImportRequirements(
         {},
-        null,
+        "",
         "vaultpassword",
         validation
       );
@@ -212,13 +217,13 @@ describe("useKeyManagementOperations", () => {
       expect(isValid).toBe(false);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Invalid key file: Invalid format",
-        "Invalid Key File"
+        "Invalid Key File",
+        8000
       );
     });
 
     it("should require import password for protected files", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const validation = { valid: true, type: "protected" };
 
@@ -238,13 +243,12 @@ describe("useKeyManagementOperations", () => {
 
     it("should require vault password", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const validation = { valid: true, type: "unprotected" };
 
       const isValid = result.current.validateImportRequirements(
         {},
-        null,
+        "",
         "", // Empty vault password
         validation
       );
@@ -275,7 +279,6 @@ describe("useKeyManagementOperations", () => {
 
     it("should handle file read errors", async () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const mockFile = {
         text: vi.fn(() => Promise.reject(new Error("File read error"))),
@@ -292,7 +295,6 @@ describe("useKeyManagementOperations", () => {
 
     it("should handle JSON parse errors", async () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const mockFile = {
         text: vi.fn(() => Promise.resolve("invalid-json")),
@@ -306,23 +308,21 @@ describe("useKeyManagementOperations", () => {
   describe("handleImportError", () => {
     it("should handle import errors with message", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
-      const logger = require("../../../utils/common/logger");
 
       const error = new Error("Import failed");
 
       result.current.handleImportError(error);
 
-      expect(logger.default.error).toHaveBeenCalledWith("Import failed:", error);
+      expect(logger.error).toHaveBeenCalledWith("Import failed:", error);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Import failed: Import failed",
-        "Import Failed"
+        "Import Failed",
+        8000
       );
     });
 
     it("should handle import errors without message", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
 
       const error = {} as Error;
 
@@ -330,7 +330,8 @@ describe("useKeyManagementOperations", () => {
 
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Import failed: Unknown error",
-        "Import Failed"
+        "Import Failed",
+        8000
       );
     });
   });
@@ -338,14 +339,12 @@ describe("useKeyManagementOperations", () => {
   describe("handleOperationError", () => {
     it("should handle operation errors", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
-      const { globalToast } = require("../../../stores/ui/toastStore");
-      const logger = require("../../../utils/common/logger");
 
       const error = new Error("Operation failed");
 
       result.current.handleOperationError("Test operation", error);
 
-      expect(logger.default.error).toHaveBeenCalledWith("Test operation failed:", error);
+      expect(logger.error).toHaveBeenCalledWith("Test operation failed:", error);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Test operation failed: Operation failed",
         "Test operation Failed"
