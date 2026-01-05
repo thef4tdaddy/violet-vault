@@ -181,6 +181,7 @@ vi.mock("@/utils/common/logger", () => ({
     error: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
+    auth: vi.fn(),
   },
 }));
 

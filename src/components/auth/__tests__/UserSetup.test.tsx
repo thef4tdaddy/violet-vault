@@ -106,6 +106,10 @@ vi.mock("../components/StepButtons", () => ({
 vi.mock("../../../utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
+    error: vi.fn(),
+    auth: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
