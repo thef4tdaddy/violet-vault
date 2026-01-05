@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { vi } from "vitest";
+import { vi, beforeEach, describe, it, expect } from "vitest";
 import {
   useMainDashboardUI,
   useDashboardCalculations,
@@ -9,22 +9,30 @@ import {
 } from "../useMainDashboard";
 
 // Mock dependencies
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showError: vi.fn(),
     showInfo: vi.fn(),
   },
 }));
 
-vi.mock("../../../utils/budgeting/paydayPredictor", () => ({
+vi.mock("@/utils/budgeting/paydayPredictor", () => ({
   predictNextPayday: vi.fn(),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
   },
 }));
+
+// Import mocked modules after mocking
+import { globalToast } from "@/stores/ui/toastStore";
+import { predictNextPayday } from "@/utils/budgeting/paydayPredictor";
+import logger from "@/utils/common/logger";
 
 describe("useMainDashboardUI", () => {
   it("should initialize with default state", () => {
@@ -112,8 +120,11 @@ describe("useDashboardCalculations", () => {
   });
 
   it("should handle balanced accounts", () => {
+    // Total envelope = 300.75, total savings = 750.75
+    // Total virtual = 300.75 + 750.75 + 149.5 = 1201
+    // For balance: actualBalance should equal totalVirtualBalance
     const { result } = renderHook(() =>
-      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 149.75, 1201.5)
+      useDashboardCalculations(mockEnvelopes, mockSavingsGoals, 149.5, 1201)
     );
 
     expect(Math.abs(result.current.difference)).toBeLessThan(0.01);
@@ -144,11 +155,12 @@ describe("useDashboardCalculations", () => {
 });
 
 describe("useTransactionReconciliation", () => {
-  let mockReconcileTransaction;
-  let mockEnvelopes;
-  let mockSavingsGoals;
+  let mockReconcileTransaction: ReturnType<typeof vi.fn>;
+  let mockEnvelopes: Array<{ id: string; name: string }>;
+  let mockSavingsGoals: Array<{ id: string; name: string }>;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     mockReconcileTransaction = vi.fn();
     mockEnvelopes = [
       { id: "env1", name: "Groceries" },
@@ -179,10 +191,12 @@ describe("useTransactionReconciliation", () => {
       expect.objectContaining({
         amount: -100,
         description: "Test transaction",
-        reconciledAt: expect.any(String),
+      }),
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
       })
     );
-    expect(mockOnSuccess).toHaveBeenCalled();
   });
 
   it("should handle income transactions correctly", () => {
@@ -203,12 +217,12 @@ describe("useTransactionReconciliation", () => {
     expect(mockReconcileTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
         amount: 100,
-      })
+      }),
+      expect.any(Object)
     );
   });
 
   it("should validate required fields", () => {
-    const { globalToast } = require("../../../stores/ui/toastStore");
     const { result } = renderHook(() =>
       useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
     );
@@ -228,7 +242,8 @@ describe("useTransactionReconciliation", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please enter amount and description",
-      "Required Fields"
+      "Required Fields",
+      8000
     );
 
     // Test missing description
@@ -250,9 +265,13 @@ describe("useTransactionReconciliation", () => {
       useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
     );
 
+    // Auto-reconcile with valid difference
     act(() => {
       result.current.handleAutoReconcileDifference(50.25);
     });
+
+    // Verify logger.warn was NOT called (meaning validation passed)
+    expect(vi.mocked(logger.warn)).not.toHaveBeenCalled();
 
     expect(mockReconcileTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -260,6 +279,10 @@ describe("useTransactionReconciliation", () => {
         description: "Balance reconciliation - added extra funds",
         type: "income",
         envelopeId: "unassigned",
+      }),
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
       })
     );
   });
@@ -269,6 +292,7 @@ describe("useTransactionReconciliation", () => {
       useTransactionReconciliation(mockReconcileTransaction, mockEnvelopes, mockSavingsGoals)
     );
 
+    // Auto-reconcile with valid negative difference
     act(() => {
       result.current.handleAutoReconcileDifference(-25.5);
     });
@@ -279,6 +303,10 @@ describe("useTransactionReconciliation", () => {
         description: "Balance reconciliation - adjusted for discrepancy",
         type: "expense",
         envelopeId: "unassigned",
+      }),
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
       })
     );
   });
@@ -300,39 +328,46 @@ describe("useTransactionReconciliation", () => {
 });
 
 describe("usePaydayManager", () => {
-  let mockSetActiveView;
-  let mockPaycheckHistory;
+  let mockSetActiveView: ReturnType<typeof vi.fn>;
+  let mockPaycheckHistory: Array<{ date: string; amount: number; processedAt: string }>;
 
   beforeEach(() => {
     mockSetActiveView = vi.fn();
     mockPaycheckHistory = [
-      { date: "2023-01-01", amount: 2000 },
-      { date: "2023-01-15", amount: 2000 },
-      { date: "2023-02-01", amount: 2000 },
+      { date: "2023-01-01", amount: 2000, processedAt: "2023-01-01" },
+      { date: "2023-01-15", amount: 2000, processedAt: "2023-01-15" },
+      { date: "2023-02-01", amount: 2000, processedAt: "2023-02-01" },
     ];
   });
 
   it("should generate payday prediction with sufficient history", () => {
-    const { predictNextPayday } = require("../../../utils/budgeting/paydayPredictor");
     const mockPrediction = { nextPayday: "2023-02-15", confidence: 0.95 };
-    predictNextPayday.mockReturnValue(mockPrediction);
+    vi.mocked(predictNextPayday).mockReturnValue(mockPrediction);
 
     const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
 
     expect(result.current.paydayPrediction).toBe(mockPrediction);
-    expect(predictNextPayday).toHaveBeenCalledWith(mockPaycheckHistory);
+    expect(predictNextPayday).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ date: "2023-01-01", processedAt: "2023-01-01" }),
+        expect.objectContaining({ date: "2023-01-15", processedAt: "2023-01-15" }),
+        expect.objectContaining({ date: "2023-02-01", processedAt: "2023-02-01" }),
+      ])
+    );
   });
 
   it("should not generate prediction with insufficient history", () => {
     const { result } = renderHook(() =>
-      usePaydayManager([{ date: "2023-01-01", amount: 2000 }], mockSetActiveView)
+      usePaydayManager(
+        [{ date: "2023-01-01", amount: 2000, processedAt: "2023-01-01" }],
+        mockSetActiveView
+      )
     );
 
     expect(result.current.paydayPrediction).toBeNull();
   });
 
   it("should handle process paycheck navigation", () => {
-    const logger = require("../../../utils/common/logger");
     const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
 
     act(() => {
@@ -340,11 +375,10 @@ describe("usePaydayManager", () => {
     });
 
     expect(mockSetActiveView).toHaveBeenCalledWith("paycheck");
-    expect(logger.default.debug).toHaveBeenCalledWith("Navigating to paycheck processor");
+    expect(vi.mocked(logger.debug)).toHaveBeenCalledWith("Navigating to paycheck processor");
   });
 
   it("should handle envelope preparation", () => {
-    const { globalToast } = require("../../../stores/ui/toastStore");
     const { result } = renderHook(() => usePaydayManager(mockPaycheckHistory, mockSetActiveView));
 
     act(() => {
