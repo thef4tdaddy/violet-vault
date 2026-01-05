@@ -169,11 +169,22 @@ class TransactionSplitterService {
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
     if (totals.isValid || splitAllocations.length === 0) return splitAllocations;
 
-    const remainder = Math.abs(totals.allocated - originalAmount);
+    const remainder = totals.allocated - originalAmount;
+
+    // If over-allocated, scale splits proportionally to match the original amount
+    if (remainder > 0) {
+      const scaleFactor = originalAmount / totals.allocated;
+      return splitAllocations.map((split) => ({
+        ...split,
+        amount: split.amount * scaleFactor,
+      }));
+    }
+
+    // Under-allocated: add remainder split
     const remainderSplit: SplitAllocation = {
       id: `${Date.now()}`,
       description: "Balance Adjustment",
-      amount: remainder,
+      amount: Math.abs(remainder),
       category: "Balance Adjustment",
       envelopeId: "",
       isOriginalItem: false,

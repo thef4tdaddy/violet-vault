@@ -827,8 +827,8 @@ describe("Debt CRUD Validation Tests", () => {
     it("should handle null values gracefully", () => {
       const debtWithNull = { ...validDebt, interestRate: null };
       const result = DebtSchema.safeParse(debtWithNull);
-      // Should fail because interestRate expects number, not null
-      expect(result.success).toBe(false);
+      // Should succeed because interestRate is nullable and optional per "Systemic Nullability" patch
+      expect(result.success).toBe(true);
     });
 
     it("should handle undefined optional values", () => {
