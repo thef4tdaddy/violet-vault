@@ -129,7 +129,9 @@ export function useDebtFormValidated({
       const newData = buildInitialData();
       form.updateFormData(newData);
     }
-  }, [debt, isOpen, connectedBill, connectedEnvelope, buildInitialData, form]);
+    // We only want to update when input data changes, not the form object itself
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debt, isOpen, connectedBill, connectedEnvelope, buildInitialData, form.updateFormData]);
 
   return {
     // Form state from validation hook

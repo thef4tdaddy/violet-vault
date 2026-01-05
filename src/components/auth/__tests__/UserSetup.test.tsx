@@ -1,10 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test/test-utils";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import UserSetup from "../UserSetup";
 import { useUserSetup as useUserSetupOriginal } from "../../../hooks/auth/useUserSetup";
 
 // Mock the custom hook
-vi.mock("../../../hooks/auth/useUserSetup");
+vi.mock("@/hooks/auth/useUserSetup");
 vi.mock("@/hooks/auth/useAuthManager", () => ({
   useAuthManager: vi.fn(() => ({
     joinBudget: vi.fn(async () => ({ success: true })),
@@ -15,7 +15,7 @@ vi.mock("@/hooks/auth/useAuthManager", () => ({
 const useUserSetup = useUserSetupOriginal as unknown as Mock;
 
 // Mock child components
-vi.mock("../components/UserSetupHeader", () => ({
+vi.mock("@/components/auth/components/UserSetupHeader", () => ({
   default: ({
     step,
     isReturningUser,
@@ -31,7 +31,7 @@ vi.mock("../components/UserSetupHeader", () => ({
   ),
 }));
 
-vi.mock("../components/PasswordInput", () => ({
+vi.mock("@/components/auth/components/PasswordInput", () => ({
   default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input
       data-testid="password-input"
@@ -42,13 +42,13 @@ vi.mock("../components/PasswordInput", () => ({
   ),
 }));
 
-vi.mock("../components/UserNameInput", () => ({
+vi.mock("@/components/auth/components/UserNameInput", () => ({
   default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input data-testid="username-input" value={value} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
 
-vi.mock("../components/ColorPicker", () => ({
+vi.mock("@/components/auth/components/ColorPicker", () => ({
   default: ({
     selectedColor,
     onColorChange,
@@ -63,7 +63,7 @@ vi.mock("../components/ColorPicker", () => ({
   ),
 }));
 
-vi.mock("../components/ReturningUserActions", () => ({
+vi.mock("@/components/auth/components/ReturningUserActions", () => ({
   default: ({
     onSubmit,
     onChangeProfile,
@@ -81,7 +81,7 @@ vi.mock("../components/ReturningUserActions", () => ({
   ),
 }));
 
-vi.mock("../components/StepButtons", () => ({
+vi.mock("@/components/auth/components/StepButtons", () => ({
   default: ({
     step,
     onContinue,
@@ -102,9 +102,14 @@ vi.mock("../components/StepButtons", () => ({
   ),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    auth: vi.fn(),
+    budgetSync: vi.fn(),
   },
 }));
 

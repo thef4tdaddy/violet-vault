@@ -25,15 +25,19 @@ const TransactionBaseSchema = z.object({
   type: TransactionTypeSchema.default("expense"),
   lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
-  description: z.string().max(500, "Description must be 500 characters or less").optional(),
-  merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
-  receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
+  description: z
+    .string()
+    .max(500, "Description must be 500 characters or less")
+    .nullable()
+    .optional(),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").nullable().optional(),
+  receiptUrl: z.string().url("Receipt URL must be a valid URL").nullable().optional(),
   // Paycheck-related metadata for internal transfers
-  isInternalTransfer: z.boolean().optional(),
-  paycheckId: z.string().optional(),
+  isInternalTransfer: z.boolean().nullable().optional(),
+  paycheckId: z.string().nullable().optional(),
   // Transfer-specific fields
-  fromEnvelopeId: z.string().optional(),
-  toEnvelopeId: z.string().optional(),
+  fromEnvelopeId: z.string().nullable().optional(),
+  toEnvelopeId: z.string().nullable().optional(),
 });
 
 /**
@@ -88,13 +92,17 @@ export const TransactionPartialSchema = z
     type: TransactionTypeSchema.optional(),
     lastModified: z.number().int().positive("Last modified must be a positive number").optional(),
     createdAt: z.number().int().positive().optional(),
-    description: z.string().max(500, "Description must be 500 characters or less").optional(),
-    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
-    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
-    isInternalTransfer: z.boolean().optional(),
-    paycheckId: z.string().optional(),
-    fromEnvelopeId: z.string().optional(),
-    toEnvelopeId: z.string().optional(),
+    description: z
+      .string()
+      .max(500, "Description must be 500 characters or less")
+      .nullable()
+      .optional(),
+    merchant: z.string().max(200, "Merchant must be 200 characters or less").nullable().optional(),
+    receiptUrl: z.string().url("Receipt URL must be a valid URL").nullable().optional(),
+    isInternalTransfer: z.boolean().nullable().optional(),
+    paycheckId: z.string().nullable().optional(),
+    fromEnvelopeId: z.string().nullable().optional(),
+    toEnvelopeId: z.string().nullable().optional(),
   })
   .refine(
     (data) => {

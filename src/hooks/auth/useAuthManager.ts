@@ -15,6 +15,7 @@ import {
   createLockSessionOperation,
   createUpdateActivityOperation,
 } from "./authOperations";
+import { useSecurityManager } from "./useSecurityManager";
 import type {
   LoginResult,
   AuthContext,
@@ -42,6 +43,7 @@ export const useAuthManager = () => {
   const logoutMutation = useLogoutMutation();
   const changePasswordMutation = useChangePasswordMutation();
   const updateProfileMutation = useUpdateProfileMutation();
+  const securityManager = useSecurityManager();
 
   // Computed state for easier access
   const isAuthenticated = authContext.isAuthenticated && authContext.isUnlocked;
@@ -98,6 +100,9 @@ export const useAuthManager = () => {
     handleLogout: logout,
     handleChangePassword: changePassword,
     handleUpdateProfile: updateProfile,
+    _internal: {
+      securityManager,
+    },
   };
 
   return {
@@ -110,6 +115,7 @@ export const useAuthManager = () => {
     updateProfile,
     lockSession,
     updateActivity,
+    securityManager,
 
     // Computed state
     isAuthenticated,

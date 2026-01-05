@@ -3,18 +3,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import useSavingsGoalsActions from "../useSavingsGoalsActions";
 
 // Mock dependencies
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showSuccess: vi.fn(),
     showError: vi.fn(),
   },
 }));
 
-vi.mock("../../common/useConfirm", () => ({
+vi.mock("@/hooks/common/useConfirm", () => ({
   useConfirm: () => vi.fn(async () => true),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
   },
@@ -98,7 +98,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should add a new goal", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
 
     const goalData = {
@@ -114,7 +114,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should update existing goal", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
 
     const goalData = {
@@ -176,7 +176,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should delete goal with confirmation", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
 
     const goal = { id: "goal-123", name: "Test Goal" };
@@ -188,7 +188,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should handle goal submission error", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     mockCallbacks.onAddGoal.mockRejectedValueOnce(new Error("Failed to add"));
 
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
@@ -199,7 +199,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should handle goal deletion error", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     mockCallbacks.onDeleteGoal.mockRejectedValueOnce(new Error("Failed to delete"));
 
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
@@ -210,7 +210,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should distribute funds to goals", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
 
     const distribution = {
@@ -225,7 +225,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should handle distribution error", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     mockCallbacks.onDistributeToGoals.mockRejectedValueOnce(new Error("Failed"));
 
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));
@@ -260,7 +260,7 @@ describe("useSavingsGoalsActions", () => {
   });
 
   it("should handle update goal error", async () => {
-    const { globalToast } = await import("../../../stores/ui/toastStore");
+    const { globalToast } = await import("@/stores/ui/toastStore");
     mockCallbacks.onUpdateGoal.mockRejectedValueOnce(new Error("Update failed"));
 
     const { result } = renderHook(() => useSavingsGoalsActions(mockCallbacks));

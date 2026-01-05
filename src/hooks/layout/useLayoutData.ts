@@ -113,7 +113,6 @@ export const useLayoutData = () => {
   }, [budgetData.envelopes, safeTransactions, billsList]);
 
   return {
-    // Original budget data
     ...budgetData,
 
     // Safe filtered data
@@ -121,14 +120,12 @@ export const useLayoutData = () => {
 
     // Additional query results
     unassignedCash,
-    bills,
+    bills: bills as ReturnType<typeof useBills>,
 
     // Budget object with operations and state
     budget: {
-      supplementalAccounts,
-      // Note: Operations like addSupplementalAccount, updateSupplementalAccount, etc.
-      // are handled by useBudgetStore which still exists for these operations
-      // This will be refactored in a future ticket
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      supplementalAccounts: (supplementalAccounts || []) as any[], // SupplementalAccounts still needs typing in future refactor
     },
 
     // Calculated values using existing utilities
@@ -136,7 +133,7 @@ export const useLayoutData = () => {
     envelopeSummary,
 
     // Loading states
-    isLoading: budgetData.isLoading || bills.isLoading,
+    isLoading: !!(budgetData.isLoading || (bills && bills.isLoading)),
 
     // Error states
     hasError:
@@ -147,4 +144,5 @@ export const useLayoutData = () => {
   };
 };
 
+export type LayoutDataType = ReturnType<typeof useLayoutData>;
 export default useLayoutData;

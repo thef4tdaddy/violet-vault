@@ -58,12 +58,6 @@ export const useUpdateEnvelope = () => {
         throw new Error(`Invalid envelope update data: ${errorMessages}`);
       }
 
-      // Create properly typed update object for Dexie
-      const dbUpdates: Partial<Envelope> = {
-        ...validationResult.data,
-        lastModified: Date.now(),
-      };
-
       // Log envelope updates for debugging corruption issues
       logger.info("Updating envelope", {
         envelopeId: id,
@@ -73,27 +67,52 @@ export const useUpdateEnvelope = () => {
         source: "updateEnvelopeMutation",
       });
 
+      // Create properly typed update object for Dexie
+      const dbUpdates = sanitizeEnvelopeForDb(validationResult.data);
+
       // Apply optimistic update with validated data
-      await optimisticHelpers.updateEnvelope(queryClient, id, validationResult.data);
+      await optimisticHelpers.updateEnvelope(queryClient, id, dbUpdates);
 
       // Apply to Dexie directly with safe updates
       await budgetDb.envelopes.update(id, dbUpdates);
 
-      return { id, updates };
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-
       // Log successful envelope update (already logged in mutationFn, so just log confirmation)
       logger.info("✅ Envelope update completed", {
-        envelopeId: data.id,
+        envelopeId: id,
       });
 
       triggerEnvelopeSync("updated");
+
+      return { id, updates };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budget });
     },
     onError: (error) => {
       logger.error("Failed to update envelope:", error);
     },
   });
 };
+
+/**
+ * Helper to ensure Zod-validated envelope data strictly matches Dexie Envelope type.
+ * Converts explicit `null`s (allowed by Zod) to `undefined` (required by optional DB fields).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sanitizeEnvelopeForDb = (data: any): Partial<Envelope> => ({
+  ...data,
+  billId: data.billId ?? undefined,
+  debtId: data.debtId ?? undefined,
+  priority: data.priority ?? undefined,
+  isPaused: typeof data.isPaused === "boolean" ? data.isPaused : undefined,
+  targetAmount: data.targetAmount === null ? undefined : data.targetAmount,
+  envelopeType: data.envelopeType ?? undefined,
+  currentBalance: data.currentBalance ?? 0,
+  description: data.description ?? undefined,
+  autoAllocate: typeof data.autoAllocate === "boolean" ? data.autoAllocate : undefined,
+  monthlyBudget: data.monthlyBudget ?? 0,
+  biweeklyAllocation: data.biweeklyAllocation ?? 0,
+  lastModified: Date.now(),
+});

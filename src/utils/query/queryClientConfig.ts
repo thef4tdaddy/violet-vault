@@ -156,24 +156,24 @@ export const queryClientUtils = {
   /**
    * Clear all cached data
    */
-  clearAllCache: () => {
-    queryClient.clear();
+  clearAllCache: (client: QueryClient = queryClient) => {
+    client.clear();
     logger.info("All query cache cleared");
   },
 
   /**
    * Clear cache for specific entity type
    */
-  clearEntityCache: (entityType: string) => {
-    queryClient.invalidateQueries({ queryKey: [entityType] });
+  clearEntityCache: (entityType: string, client: QueryClient = queryClient) => {
+    client.removeQueries({ queryKey: [entityType] });
     logger.info(`Cache cleared for entity: ${entityType}`);
   },
 
   /**
    * Get cache statistics
    */
-  getCacheStats: () => {
-    const cache = queryClient.getQueryCache();
+  getCacheStats: (client: QueryClient = queryClient) => {
+    const cache = client.getQueryCache();
     const queries = cache.getAll();
 
     return {
@@ -191,10 +191,11 @@ export const queryClientUtils = {
   safePrefetch: async <T>(
     queryKey: unknown[],
     queryFn: () => Promise<T>,
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
+    client: QueryClient = queryClient
   ): Promise<void | null> => {
     try {
-      return await queryClient.prefetchQuery({
+      return await client.prefetchQuery({
         queryKey,
         queryFn,
         staleTime: 60 * 1000, // 1 minute default
@@ -214,9 +215,9 @@ export const queryClientUtils = {
   /**
    * Batch invalidate multiple query keys
    */
-  batchInvalidate: (queryKeys: unknown[][]) => {
+  batchInvalidate: (queryKeys: unknown[][], client: QueryClient = queryClient) => {
     queryKeys.forEach((queryKey) => {
-      queryClient.invalidateQueries({ queryKey });
+      client.invalidateQueries({ queryKey });
     });
     logger.info(`Batch invalidated ${queryKeys.length} query patterns`);
   },
@@ -224,8 +225,8 @@ export const queryClientUtils = {
   /**
    * Check if query data exists in cache
    */
-  hasQueryData: (queryKey: unknown[]) => {
-    return queryClient.getQueryData(queryKey) !== undefined;
+  hasQueryData: (queryKey: unknown[], client: QueryClient = queryClient) => {
+    return client.getQueryData(queryKey) !== undefined;
   },
 
   /**
@@ -234,10 +235,11 @@ export const queryClientUtils = {
   safeSetQueryData: (
     queryKey: unknown[],
     data: unknown,
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
+    client: QueryClient = queryClient
   ): boolean => {
     try {
-      queryClient.setQueryData(queryKey, data, options);
+      client.setQueryData(queryKey, data, options);
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

@@ -4,6 +4,7 @@ import { budgetDb } from "@/db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
+import type { Envelope } from "@/db/types";
 
 interface AddEnvelopeData {
   name: string;
@@ -59,11 +60,13 @@ export const useAddEnvelope = () => {
         throw new Error(`Invalid envelope data: ${errorMessages}`);
       }
 
-      // Optimistic update
-      await optimisticHelpers.addEnvelope(queryClient, validationResult.data);
+      // Create properly typed update object for Dexie
+      const dbUpdates = sanitizeEnvelopeForDb(validationResult.data);
 
-      // Use put() instead of add() to handle duplicates gracefully
-      await budgetDb.envelopes.put(validationResult.data);
+      // Optimistic update
+      await optimisticHelpers.addEnvelope(queryClient, dbUpdates as Envelope);
+
+      await budgetDb.envelopes.put(dbUpdates as Envelope); // Cast to Envelope as put expects a full object
 
       return validationResult.data;
     },
@@ -74,15 +77,34 @@ export const useAddEnvelope = () => {
       // Log successful envelope addition
       logger.info("✅ Envelope added", {
         name: envelope.name,
-        category: envelope.category,
-        envelopeType: envelope.envelopeType,
-        targetAmount: envelope.targetAmount,
+        id: envelope.id,
       });
 
-      triggerEnvelopeSync("added");
+      triggerEnvelopeSync("created");
     },
     onError: (error) => {
       logger.error("Failed to add envelope:", error);
     },
   });
 };
+
+/**
+ * Helper to ensure Zod-validated envelope data strictly matches Dexie Envelope type.
+ * Converts explicit `null`s (allowed by Zod) to `undefined` (required by optional DB fields).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sanitizeEnvelopeForDb = (data: any): Partial<Envelope> => ({
+  ...data,
+  billId: data.billId ?? undefined,
+  debtId: data.debtId ?? undefined,
+  priority: data.priority ?? undefined,
+  isPaused: typeof data.isPaused === "boolean" ? data.isPaused : undefined,
+  targetAmount: data.targetAmount === null ? undefined : data.targetAmount,
+  envelopeType: data.envelopeType ?? undefined,
+  currentBalance: data.currentBalance ?? 0,
+  description: data.description ?? undefined,
+  autoAllocate: typeof data.autoAllocate === "boolean" ? data.autoAllocate : undefined,
+  monthlyBudget: data.monthlyBudget ?? 0,
+  biweeklyAllocation: data.biweeklyAllocation ?? 0,
+  lastModified: Date.now(),
+});

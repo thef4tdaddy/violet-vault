@@ -72,7 +72,7 @@ describe("useDebts - CRUD Operations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-    (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
     (budgetDb.debts.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
     (budgetDb.debts.update as ReturnType<typeof vi.fn>).mockResolvedValue(1);
     (budgetDb.debts.delete as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
@@ -172,6 +172,7 @@ describe("useDebts - CRUD Operations", () => {
         currentBalance: 1000,
         minimumPayment: 50,
         interestRate: 10,
+        lastModified: Date.now(),
       };
 
       const createdDebt = {
@@ -216,6 +217,7 @@ describe("useDebts - CRUD Operations", () => {
         type: "personal" as const,
         currentBalance: 1000,
         minimumPayment: 50,
+        lastModified: Date.now(),
       };
 
       const { result } = renderHook(() => useDebts(), {
@@ -246,6 +248,7 @@ describe("useDebts - CRUD Operations", () => {
         currentBalance: 1000,
         minimumPayment: 50,
         author: "Test User",
+        lastModified: Date.now(),
       };
 
       const { result } = renderHook(() => useDebts(), {
@@ -531,6 +534,7 @@ describe("useDebts - CRUD Operations", () => {
         type: "personal" as const,
         currentBalance: 1000,
         minimumPayment: 50,
+        lastModified: Date.now(),
       };
 
       const { result } = renderHook(() => useDebts(), {

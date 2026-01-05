@@ -48,28 +48,32 @@ export const EnvelopeSchema = z
     archived: z.boolean().default(false),
     lastModified: z.number().int().positive("Last modified must be a positive number"),
     createdAt: z.number().int().positive().optional(),
-    currentBalance: z.number().min(0, "Current balance cannot be negative").optional(),
-    targetAmount: z.number().min(0, "Target amount cannot be negative").optional(),
-    description: z.string().max(500, "Description must be 500 characters or less").optional(),
+    currentBalance: z.number().min(0, "Current balance cannot be negative").nullable().optional(),
+    targetAmount: z.number().min(0, "Target amount cannot be negative").nullable().optional(),
+    description: z
+      .string()
+      .max(500, "Description must be 500 characters or less")
+      .nullable()
+      .optional(),
     // Envelope type classification
-    envelopeType: EnvelopeTypeSchema.optional(),
-    autoAllocate: z.boolean().optional(),
-    monthlyBudget: z.number().min(0).optional(),
-    biweeklyAllocation: z.number().min(0).optional(),
+    envelopeType: EnvelopeTypeSchema.nullable().optional(),
+    autoAllocate: z.boolean().nullable().optional(),
+    monthlyBudget: z.number().min(0).nullable().optional(),
+    biweeklyAllocation: z.number().min(0).nullable().optional(),
     // Connection properties
-    billId: z.string().optional(),
-    debtId: z.string().optional(),
+    billId: z.string().nullable().optional(),
+    debtId: z.string().nullable().optional(),
     // Savings goal properties (for envelopeType: "savings")
-    priority: EnvelopePrioritySchema.optional(),
-    isPaused: z.boolean().optional(),
-    isCompleted: z.boolean().optional(),
-    targetDate: z.union([z.date(), z.string()]).optional(),
-    monthlyContribution: z.number().min(0).optional(),
+    priority: EnvelopePrioritySchema.nullable().optional(),
+    isPaused: z.boolean().nullable().optional(),
+    isCompleted: z.boolean().nullable().optional(),
+    targetDate: z.union([z.date(), z.string()]).nullable().optional(),
+    monthlyContribution: z.number().min(0).nullable().optional(),
     // Supplemental account properties (for envelopeType: "supplemental")
-    annualContribution: z.number().min(0).optional(),
-    expirationDate: z.union([z.date(), z.string(), z.null()]).optional(),
-    isActive: z.boolean().optional(),
-    accountType: z.string().optional(), // FSA, HSA, etc.
+    annualContribution: z.number().min(0).nullable().optional(),
+    expirationDate: z.union([z.date(), z.string(), z.null()]).nullable().optional(),
+    isActive: z.boolean().nullable().optional(),
+    accountType: z.string().nullable().optional(), // FSA, HSA, etc.
   })
   .passthrough(); // Allow additional metadata fields
 

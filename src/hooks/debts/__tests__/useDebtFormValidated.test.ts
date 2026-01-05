@@ -142,6 +142,8 @@ describe("useDebtFormValidated", () => {
         currentBalance: "1000",
         minimumPayment: "50",
         interestRate: "15",
+        envelopeId: "env-1",
+        paymentDueDate: "2023-12-31",
       });
     });
 
@@ -158,6 +160,8 @@ describe("useDebtFormValidated", () => {
       expect.objectContaining({
         name: "Credit Card",
         creditor: "Chase",
+        envelopeId: "env-1",
+        paymentDueDate: "2023-12-31",
       })
     );
   });
@@ -221,6 +225,9 @@ describe("useDebtFormValidated", () => {
     );
 
     // Initially invalid (empty required fields)
+    act(() => {
+      result.current.validate();
+    });
     expect(result.current.canSubmit).toBe(false);
 
     // Fill in required fields
@@ -230,7 +237,12 @@ describe("useDebtFormValidated", () => {
         creditor: "Chase",
         currentBalance: "1000",
         minimumPayment: "50",
+        envelopeId: "env-1",
+        paymentDueDate: "2023-12-31",
       });
+    });
+
+    act(() => {
       result.current.validate();
     });
 

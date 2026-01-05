@@ -199,12 +199,12 @@ export class BudgetCalculationService {
               .toISOString()
               .split("T")[0]
           : tx.date,
-      description: tx.description,
+      description: tx.description ?? undefined,
     }));
 
     const clientBills: ClientBill[] = bills.map((bill) => ({
       id: bill.id,
-      envelopeId: bill.envelopeId,
+      envelopeId: bill.envelopeId ?? undefined,
       isPaid: bill.isPaid,
       amount: bill.amount,
       dueDate:
@@ -214,6 +214,11 @@ export class BudgetCalculationService {
 
     const clientEnvelopes: ClientEnvelope[] = envelopes.map((envelope) => ({
       ...envelope,
+      currentBalance: envelope.currentBalance ?? 0,
+      targetAmount: envelope.targetAmount ?? 0,
+      envelopeType: envelope.envelopeType ?? undefined,
+      biweeklyAllocation: envelope.biweeklyAllocation ?? 0,
+      monthlyBudget: envelope.monthlyBudget ?? 0,
     }));
 
     const envelopeData = calculateClientSide(clientEnvelopes, clientTransactions, clientBills);

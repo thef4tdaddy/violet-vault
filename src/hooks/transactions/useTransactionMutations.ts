@@ -43,6 +43,26 @@ const triggerTransactionSync = (changeType: string) => {
 };
 
 /**
+ * Helper to ensure Zod-validated transaction data strictly matches Dexie Transaction type.
+ * Converts explicit `null`s (allowed by Zod) to `undefined` (required by optional DB fields).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sanitizeTransactionForDb = (zodValidated: any): Transaction => ({
+  ...zodValidated,
+  date: zodValidated.date instanceof Date ? zodValidated.date : new Date(zodValidated.date),
+  description: zodValidated.description ?? undefined,
+  merchant: zodValidated.merchant ?? undefined,
+  receiptUrl: zodValidated.receiptUrl ?? undefined,
+  isInternalTransfer:
+    typeof zodValidated.isInternalTransfer === "boolean"
+      ? zodValidated.isInternalTransfer
+      : undefined,
+  paycheckId: zodValidated.paycheckId ?? undefined,
+  toEnvelopeId: zodValidated.toEnvelopeId ?? undefined,
+  fromEnvelopeId: zodValidated.fromEnvelopeId ?? undefined,
+});
+
+/**
  * Transaction Mutations Hook
  * Provides all transaction CRUD operations with TanStack Query
  *
@@ -103,25 +123,7 @@ export const useTransactionMutations = () => {
 
       // Check for sign mismatch and warn/auto-correct
       // Note: Normal UI flow won't trigger this because forms handle sign conversion
-      // This catches: imports, API calls, programmatic creation, manual DB edits
-      const isSignMismatch =
-        (rawTransaction.type === "expense" && rawTransaction.amount > 0) ||
-        (rawTransaction.type === "income" && rawTransaction.amount < 0);
-
-      if (isSignMismatch) {
-        const correctedAmount =
-          rawTransaction.type === "expense"
-            ? -Math.abs(rawTransaction.amount)
-            : Math.abs(rawTransaction.amount);
-
-        logger.warn("⚠️ Transaction amount sign mismatch - auto-correcting", {
-          type: rawTransaction.type,
-          originalAmount: rawTransaction.amount,
-          correctedAmount,
-          description: rawTransaction.description,
-          context: "Auto-normalization active - expense→negative, income→positive",
-        });
-      }
+      checkAndCorrectTransactionSign(rawTransaction);
 
       // Normalize amount sign based on type (expense=negative, income=positive)
       const normalizedTransaction = normalizeTransactionAmount(rawTransaction);
@@ -130,10 +132,7 @@ export const useTransactionMutations = () => {
       const zodValidated = validateAndNormalizeTransaction(normalizedTransaction);
 
       // Ensure date is a Date object (Zod allows Date | string, but db requires Date)
-      const validatedTransaction: Transaction = {
-        ...zodValidated,
-        date: zodValidated.date instanceof Date ? zodValidated.date : new Date(zodValidated.date),
-      };
+      const validatedTransaction = sanitizeTransactionForDb(zodValidated);
 
       await optimisticHelpers.addTransaction(queryClient, validatedTransaction);
       await budgetDb.transactions.put(validatedTransaction);
@@ -246,11 +245,30 @@ export const useTransactionMutations = () => {
       const { date, ...restData } = validationResult.data;
       const normalizedUpdates: Partial<Transaction> = {
         ...restData,
+        description: restData.description ?? undefined,
+        merchant: restData.merchant ?? undefined,
+        receiptUrl: restData.receiptUrl ?? undefined,
+        isInternalTransfer:
+          typeof restData.isInternalTransfer === "boolean"
+            ? restData.isInternalTransfer
+            : undefined,
+        paycheckId: restData.paycheckId ?? undefined,
+        toEnvelopeId: restData.toEnvelopeId ?? undefined,
+        fromEnvelopeId: restData.fromEnvelopeId ?? undefined,
         lastModified: Date.now(),
       };
 
       if (date !== undefined) {
         normalizedUpdates.date = date instanceof Date ? date : new Date(date);
+      }
+
+      // Sanitize nulls to undefined for strict types
+      if (normalizedUpdates.description === null) normalizedUpdates.description = undefined;
+      if (normalizedUpdates.envelopeId === null) normalizedUpdates.envelopeId = undefined;
+
+      // Ensure specific fields that can't be null are handled if they are in restData
+      if ("amount" in normalizedUpdates && normalizedUpdates.amount === null) {
+        delete normalizedUpdates.amount;
       }
 
       await optimisticHelpers.updateTransaction(queryClient, id, normalizedUpdates);
@@ -298,4 +316,27 @@ export const useTransactionMutations = () => {
     isDeleting: deleteTransactionMutation.isPending,
     isUpdating: updateTransactionMutation.isPending,
   };
+};
+
+/**
+ * Helper to check for transaction sign mismatches and log warnings
+ * Extracted to reduce mutation complexity
+ */
+const checkAndCorrectTransactionSign = (transaction: Transaction) => {
+  const isSignMismatch =
+    (transaction.type === "expense" && transaction.amount > 0) ||
+    (transaction.type === "income" && transaction.amount < 0);
+
+  if (isSignMismatch) {
+    const correctedAmount =
+      transaction.type === "expense" ? -Math.abs(transaction.amount) : Math.abs(transaction.amount);
+
+    logger.warn("⚠️ Transaction amount sign mismatch - auto-correcting", {
+      type: transaction.type,
+      originalAmount: transaction.amount,
+      correctedAmount,
+      description: transaction.description,
+      context: "Auto-normalization active - expense→negative, income→positive",
+    });
+  }
 };

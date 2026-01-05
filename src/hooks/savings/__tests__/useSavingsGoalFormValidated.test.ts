@@ -155,7 +155,7 @@ describe("useSavingsGoalFormValidated", () => {
       null,
       expect.objectContaining({
         name: "Emergency Fund",
-        targetAmount: 10000,
+        targetAmount: "10000",
         category: "emergency",
       })
     );

@@ -59,9 +59,14 @@ export const DebtSchema = z.object({
   minimumPayment: z.number().min(0, "Minimum payment cannot be negative"),
   lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
-  interestRate: z.number().min(0).max(100, "Interest rate must be between 0-100%").optional(),
-  dueDate: z.union([z.date(), z.string()]).optional(),
-  originalBalance: z.number().min(0).optional(),
+  interestRate: z
+    .number()
+    .min(0)
+    .max(100, "Interest rate must be between 0-100%")
+    .nullable()
+    .optional(),
+  dueDate: z.union([z.date(), z.string()]).nullable().optional(),
+  originalBalance: z.number().min(0).nullable().optional(),
 });
 
 /**

@@ -1,7 +1,7 @@
 // Prefetch Helpers Tests
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import { prefetchHelpers } from "../prefetchHelpers";
+import { prefetchHelpers, smartPrefetch } from "../prefetchHelpers";
 import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
@@ -143,10 +143,7 @@ describe("prefetchHelpers", () => {
       );
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
-        queryKey: queryKeys.transactionsByDateRange(
-          dateRange.start.toISOString(),
-          dateRange.end.toISOString()
-        ),
+        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
         queryFn: expect.any(Function),
         staleTime: 60 * 1000,
       });
@@ -197,7 +194,9 @@ describe("prefetchHelpers", () => {
 
       const options = { category: "housing", isPaid: false, daysAhead: 30 };
       (budgetDatabaseService.getBills as Mock).mockResolvedValue(mockBills);
-      (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockBills);
+      (mockQueryClient.prefetchQuery as Mock).mockImplementation(async ({ queryFn }) => {
+        return await queryFn();
+      });
 
       const result = await prefetchHelpers.prefetchBills(
         mockQueryClient as unknown as QueryClient,
@@ -232,7 +231,9 @@ describe("prefetchHelpers", () => {
 
       const options = { isCompleted: false, category: "emergency" };
       (budgetDatabaseService.getSavingsGoals as Mock).mockResolvedValue(mockGoals);
-      (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockGoals);
+      (mockQueryClient.prefetchQuery as Mock).mockImplementation(async ({ queryFn }) => {
+        return await queryFn();
+      });
 
       const result = await prefetchHelpers.prefetchSavingsGoals(
         mockQueryClient as unknown as QueryClient,
@@ -391,7 +392,7 @@ describe("prefetchHelpers", () => {
       );
       vi.spyOn(prefetchHelpers, "prefetchBills").mockResolvedValue("bills" as unknown as void);
 
-      await prefetchHelpers.smartPrefetch(mockQueryClient as unknown as QueryClient, "/");
+      await smartPrefetch(mockQueryClient as unknown as QueryClient, "/");
 
       expect(prefetchHelpers.prefetchDashboard).toHaveBeenCalledWith(mockQueryClient);
       expect(prefetchHelpers.prefetchEnvelopes).toHaveBeenCalledWith(mockQueryClient);
@@ -399,10 +400,7 @@ describe("prefetchHelpers", () => {
     });
 
     it("should handle unknown routes gracefully", async () => {
-      await prefetchHelpers.smartPrefetch(
-        mockQueryClient as unknown as QueryClient,
-        "/unknown-route"
-      );
+      await smartPrefetch(mockQueryClient as unknown as QueryClient, "/unknown-route");
 
       // Should not throw and should handle gracefully
       expect(true).toBe(true); // Test passes if no error is thrown
@@ -416,10 +414,7 @@ describe("prefetchHelpers", () => {
         "analytics" as unknown as void
       );
 
-      await prefetchHelpers.smartPrefetch(
-        mockQueryClient as unknown as QueryClient,
-        "/transactions"
-      );
+      await smartPrefetch(mockQueryClient as unknown as QueryClient, "/transactions");
 
       expect(prefetchHelpers.prefetchTransactions).toHaveBeenCalledWith(
         mockQueryClient,

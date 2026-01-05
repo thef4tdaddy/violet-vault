@@ -25,7 +25,7 @@ vi.mock("@/db/budgetDb", () => ({
 }));
 
 vi.mock("@/services/budget/budgetDatabaseService", () => ({
-  default: {
+  budgetDatabaseService: {
     saveBudgetMetadata: vi.fn(),
   },
 }));
@@ -62,8 +62,12 @@ describe("optimisticHelpers", () => {
       const updates = { name: "Updated Food", balance: 500 };
       const existingEnvelope = { id: envelopeId, name: "Food", balance: 300 };
 
-      mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
+      mockQueryClient.setQueryData.mockImplementation((key, updater) => {
         if (typeof updater === "function") {
+          // Check if it's a list update (key length 2 for ["envelopes", "list"])
+          if (Array.isArray(key) && key[1] === "list") {
+            return updater([existingEnvelope]);
+          }
           return updater(existingEnvelope);
         }
         return updater;
@@ -117,7 +121,10 @@ describe("optimisticHelpers", () => {
       ];
 
       mockQueryClient.setQueryData.mockImplementation((_key, updater) => {
-        if (_key === queryKeys.envelopesList() && typeof updater === "function") {
+        if (
+          JSON.stringify(_key) === JSON.stringify(queryKeys.envelopesList()) &&
+          typeof updater === "function"
+        ) {
           return updater(existingEnvelopes);
         }
         return updater;
@@ -127,7 +134,7 @@ describe("optimisticHelpers", () => {
 
       // Verify the updater function works correctly
       const updateFn = mockQueryClient.setQueryData.mock.calls.find(
-        (call) => call[0] === queryKeys.envelopesList()
+        (call) => JSON.stringify(call[0]) === JSON.stringify(queryKeys.envelopesList())
       )[1];
 
       const updatedList = updateFn(existingEnvelopes);

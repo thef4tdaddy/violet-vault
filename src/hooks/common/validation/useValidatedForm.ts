@@ -71,25 +71,26 @@ export function useValidatedForm<T extends Record<string, unknown>>({
    */
   const updateField = useCallback(
     (field: keyof T, value: T[keyof T]) => {
-      setData((prev) => ({ ...prev, [field]: value }));
+      setData((prev) => {
+        const nextData = { ...prev, [field]: value };
+
+        // Optional: validate on change
+        if (validateOnChange) {
+          queueMicrotask(() => {
+            const result = parseWithSchema(schema, nextData);
+            if (result.errors[field]) {
+              setErrors((prevErrors) => ({ ...prevErrors, [field]: result.errors[field] }));
+            }
+          });
+        }
+
+        return nextData;
+      });
 
       // Clear error for this field when updating
       setErrors((prev) => removeErrors(prev, [field]));
-
-      // Optional: validate on change
-      // Note: Using React.startTransition would be better for performance,
-      // but this approach is compatible with React 18 and earlier
-      if (validateOnChange) {
-        // Use queueMicrotask for better performance than setTimeout
-        queueMicrotask(() => {
-          const result = parseWithSchema(schema, { ...data, [field]: value });
-          if (result.errors[field]) {
-            setErrors((prev) => ({ ...prev, [field]: result.errors[field] }));
-          }
-        });
-      }
     },
-    [data, schema, validateOnChange]
+    [schema, validateOnChange]
   );
 
   /**
@@ -97,24 +98,25 @@ export function useValidatedForm<T extends Record<string, unknown>>({
    */
   const updateFormData = useCallback(
     (updates: Partial<T>) => {
-      setData((prev) => ({ ...prev, ...updates }));
+      setData((prev) => {
+        const nextData = { ...prev, ...updates };
+
+        // Optional: validate on change
+        if (validateOnChange) {
+          queueMicrotask(() => {
+            const result = parseWithSchema(schema, nextData);
+            setErrors((prevErrors) => ({ ...prevErrors, ...result.errors }));
+          });
+        }
+
+        return nextData;
+      });
 
       // Clear errors for updated fields
       const updatedFields = Object.keys(updates) as Array<keyof T>;
       setErrors((prev) => removeErrors(prev, updatedFields));
-
-      // Optional: validate on change
-      // Note: Using React.startTransition would be better for performance,
-      // but this approach is compatible with React 18 and earlier
-      if (validateOnChange) {
-        // Use queueMicrotask for better performance than setTimeout
-        queueMicrotask(() => {
-          const result = parseWithSchema(schema, { ...data, ...updates });
-          setErrors((prev) => ({ ...prev, ...result.errors }));
-        });
-      }
     },
-    [data, schema, validateOnChange]
+    [schema, validateOnChange]
   );
 
   /**
@@ -203,27 +205,46 @@ export function useValidatedForm<T extends Record<string, unknown>>({
     [validate, onSubmit]
   );
 
-  return {
-    // Form state
-    data,
-    errors,
-    isDirty,
-    isSubmitting,
-    isValid,
+  return useMemo(
+    () => ({
+      // Form state
+      data,
+      errors,
+      isDirty,
+      isSubmitting,
+      isValid,
 
-    // Form actions
-    updateField,
-    updateFormData,
-    setErrors,
-    clearErrors,
-    clearError,
-    validate,
-    resetForm,
-    handleSubmit,
+      // Form actions
+      updateField,
+      updateFormData,
+      setErrors,
+      clearErrors,
+      clearError,
+      validate,
+      resetForm,
+      handleSubmit,
 
-    // Utilities
-    setFieldError,
-    getFieldError,
-    hasError,
-  };
+      // Utilities
+      setFieldError,
+      getFieldError,
+      hasError,
+    }),
+    [
+      data,
+      errors,
+      isDirty,
+      isSubmitting,
+      isValid,
+      updateField,
+      updateFormData,
+      clearErrors,
+      clearError,
+      validate,
+      resetForm,
+      handleSubmit,
+      setFieldError,
+      getFieldError,
+      hasError,
+    ]
+  );
 }

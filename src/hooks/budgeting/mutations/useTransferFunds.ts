@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
+import type { Transaction } from "@/db/types";
 import logger from "@/utils/common/logger";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
@@ -56,27 +57,13 @@ export const useTransferFunds = () => {
       });
 
       // Create transfer transaction in Dexie
-      // Validate and normalize with Zod schema
-      const rawTransaction = {
-        id: `transfer_${Date.now()}`,
+      const transaction = createTransferTransaction(
+        fromEnvelopeId,
+        toEnvelopeId,
         amount,
-        envelopeId: fromEnvelopeId,
-        category: "transfer",
-        type: "transfer" as const,
-        date: new Date(),
-        lastModified: Date.now(),
-        description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
-      };
+        description
+      );
 
-      const validatedTransaction = validateAndNormalizeTransaction(rawTransaction);
-      // Ensure date is a Date object for DB types compatibility
-      const transaction = {
-        ...validatedTransaction,
-        date:
-          validatedTransaction.date instanceof Date
-            ? validatedTransaction.date
-            : new Date(validatedTransaction.date),
-      };
       await budgetDb.transactions.put(transaction);
 
       // Apply optimistic updates to cache
@@ -105,10 +92,52 @@ export const useTransferFunds = () => {
         transactionId: data.transaction.id,
       });
 
+      triggerEnvelopeSync("updated");
       triggerEnvelopeSync("transfer");
     },
     onError: (error) => {
       logger.error("Failed to transfer funds:", error);
     },
   });
+};
+
+/**
+ * Helper to construct and validate a transfer transaction object
+ */
+const createTransferTransaction = (
+  fromEnvelopeId: string,
+  toEnvelopeId: string,
+  amount: number,
+  description?: string
+): Transaction => {
+  const rawTransaction = {
+    id: `transfer_${Date.now()}`,
+    amount,
+    envelopeId: fromEnvelopeId,
+    category: "transfer",
+    type: "transfer" as const,
+    date: new Date(),
+    lastModified: Date.now(),
+    description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
+  };
+
+  const validatedTransaction = validateAndNormalizeTransaction(rawTransaction);
+
+  return {
+    ...validatedTransaction,
+    date:
+      validatedTransaction.date instanceof Date
+        ? validatedTransaction.date
+        : new Date(validatedTransaction.date),
+    description: validatedTransaction.description ?? undefined,
+    merchant: validatedTransaction.merchant ?? undefined,
+    receiptUrl: validatedTransaction.receiptUrl ?? undefined,
+    isInternalTransfer:
+      typeof validatedTransaction.isInternalTransfer === "boolean"
+        ? validatedTransaction.isInternalTransfer
+        : undefined,
+    paycheckId: validatedTransaction.paycheckId ?? undefined,
+    toEnvelopeId: validatedTransaction.toEnvelopeId ?? undefined,
+    fromEnvelopeId: validatedTransaction.fromEnvelopeId ?? undefined,
+  };
 };

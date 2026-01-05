@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import TransactionTable from "../TransactionTable";
 import userEvent from "@testing-library/user-event";
@@ -23,45 +23,58 @@ vi.mock("@/hooks/transactions/useTransactionTable", () => ({
 }));
 
 // Mock child components
-vi.mock("./components/TransactionRow", () => ({
-  default: ({ transaction, onEdit, onDelete, onSplit, onViewHistory }) => (
-    <tr data-testid={`transaction-row-${transaction.id}`}>
-      <td>{transaction.date}</td>
-      <td>{transaction.description}</td>
-      <td>{transaction.category}</td>
-      <td>${transaction.amount}</td>
-      <td>
+vi.mock("@/components/transactions/components/TransactionRow", () => ({
+  default: ({ transaction, onEdit, onDeleteClick, onSplit, onHistoryClick }: any) => (
+    <div data-testid={`transaction-row-${transaction.id}`} className="transaction-row">
+      <div>{transaction.date}</div>
+      <div>{transaction.description}</div>
+      <div>{transaction.category}</div>
+      <div>${transaction.amount}</div>
+      <div>
         <button onClick={() => onEdit(transaction)}>Edit</button>
-        <button onClick={() => onDelete(transaction)}>Delete</button>
+        <button onClick={() => onDeleteClick(transaction)}>Delete</button>
         <button onClick={() => onSplit(transaction)}>Split</button>
-        <button onClick={() => onViewHistory(transaction)}>History</button>
-      </td>
-    </tr>
+        <button onClick={() => onHistoryClick(transaction)}>History</button>
+      </div>
+    </div>
   ),
 }));
 
-vi.mock("./components/DeleteConfirmation", () => ({
-  default: ({ isOpen, onConfirm, onCancel, transaction }) =>
-    isOpen ? (
-      <div data-testid="delete-confirmation">
-        <span>Delete {transaction?.description}?</span>
-        <button onClick={onConfirm}>Confirm</button>
-        <button onClick={onCancel}>Cancel</button>
-      </div>
-    ) : null,
+vi.mock("@/components/transactions/components/DeleteConfirmation", () => ({
+  default: ({ isOpen, onConfirm, onCancel, transaction }: any) => (
+    // Note: The actual component might not use 'isOpen' prop if it's conditionally rendered by parent
+    // checking usage in Table: checks isDeleting ? <DeleteConfirmation ... /> : ...
+    // So distinct existence is enough.
+    <div data-testid="delete-confirmation">
+      <span>Delete {transaction?.description}?</span>
+      <button onClick={onConfirm}>Confirm</button>
+      <button onClick={onCancel}>Cancel</button>
+    </div>
+  ),
 }));
 
-vi.mock("../history/ObjectHistoryViewer", () => ({
-  default: ({ isOpen, onClose, objectType }) =>
-    isOpen ? (
-      <div data-testid="history-viewer">
-        <span>History for {objectType}</span>
-        <button onClick={onClose}>Close</button>
-      </div>
-    ) : null,
+vi.mock("@/components/history/ObjectHistoryViewer", () => ({
+  default: ({ onClose, objectType }: any) => (
+    <div data-testid="history-viewer">
+      <span>History for {objectType}</span>
+      <button onClick={onClose}>Close</button>
+    </div>
+  ),
 }));
 
-vi.mock("../../utils/transactions/tableHelpers", () => ({
+vi.mock("@/utils/transactions/tableHelpers", () => ({
+  MIN_TABLE_WIDTH: "80rem",
+  findEnvelopeForTransaction: vi.fn(() => ({ id: "1", name: "Test Envelope", color: "#000000" })),
+  formatTransactionAmount: vi.fn((amount) => ({
+    formatted: `$${amount}`,
+    className: "text-gray-900",
+  })),
+  formatTransactionDate: vi.fn(() => "Jan 15, 2024"),
+  getEnvelopeDisplay: vi.fn(() => ({
+    name: "Test Envelope",
+    color: "#000000",
+    className: "bg-gray-100 text-gray-800",
+  })),
   COLUMN_WIDTHS: {
     date: "8rem",
     description: "16rem",
@@ -112,7 +125,7 @@ describe("TransactionTable", () => {
   describe("Rendering", () => {
     it("should render without crashing", () => {
       renderWithQuery(<TransactionTable {...defaultProps} />);
-      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
     });
 
     it("should render table headers", () => {
@@ -171,12 +184,12 @@ describe("TransactionTable", () => {
 
     it("should handle empty transactions array", () => {
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[]} />);
-      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
     });
 
     it("should handle undefined transactions", () => {
       renderWithQuery(<TransactionTable {...defaultProps} transactions={undefined} />);
-      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
     });
   });
 
@@ -208,7 +221,8 @@ describe("TransactionTable", () => {
 
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const editButton = screen.getByText("Edit");
+      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
+      const editButton = within(row).getByText("Edit");
       await userEvent.click(editButton);
 
       expect(mockOnEdit).toHaveBeenCalledWith(transaction);
@@ -242,7 +256,8 @@ describe("TransactionTable", () => {
 
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const deleteButton = screen.getByText("Delete");
+      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
+      const deleteButton = within(row).getByText("Delete");
       await userEvent.click(deleteButton);
 
       expect(mockHandleDeleteClick).toHaveBeenCalledWith(transaction);
@@ -275,7 +290,8 @@ describe("TransactionTable", () => {
 
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const splitButton = screen.getByText("Split");
+      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
+      const splitButton = within(row).getByText("Split");
       await userEvent.click(splitButton);
 
       expect(mockOnSplit).toHaveBeenCalledWith(transaction);
@@ -309,7 +325,8 @@ describe("TransactionTable", () => {
 
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const historyButton = screen.getByText("History");
+      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
+      const historyButton = within(row).getByText("History");
       await userEvent.click(historyButton);
 
       expect(mockHandleHistoryClick).toHaveBeenCalledWith(transaction);
@@ -324,11 +341,13 @@ describe("TransactionTable", () => {
         amount: 50,
       };
 
+      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
+
       useTransactionTable.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
-          getVirtualItems: () => [],
-          getTotalSize: () => 0,
+          getVirtualItems: () => mockVirtualItems,
+          getTotalSize: () => 50,
         },
         historyTransaction: null,
         deletingTransaction: transaction,
@@ -338,7 +357,7 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      renderWithQuery(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
       expect(screen.getByTestId("delete-confirmation")).toBeInTheDocument();
       expect(screen.getByText("Delete Test Transaction?")).toBeInTheDocument();
@@ -356,8 +375,8 @@ describe("TransactionTable", () => {
       useTransactionTable.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
-          getVirtualItems: () => [],
-          getTotalSize: () => 0,
+          getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],
+          getTotalSize: () => 50,
         },
         historyTransaction: null,
         deletingTransaction: transaction,
@@ -367,9 +386,10 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      renderWithQuery(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const confirmButton = screen.getByText("Confirm");
+      const confirmation = screen.getByTestId("delete-confirmation");
+      const confirmButton = within(confirmation).getByText("Confirm");
       await userEvent.click(confirmButton);
 
       expect(mockOnDelete).toHaveBeenCalledWith("1");
@@ -388,8 +408,8 @@ describe("TransactionTable", () => {
       useTransactionTable.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
-          getVirtualItems: () => [],
-          getTotalSize: () => 0,
+          getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],
+          getTotalSize: () => 50,
         },
         historyTransaction: null,
         deletingTransaction: transaction,
@@ -399,9 +419,10 @@ describe("TransactionTable", () => {
         closeHistory: vi.fn(),
       });
 
-      renderWithQuery(<TransactionTable {...defaultProps} />);
+      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
 
-      const cancelButton = screen.getByText("Cancel");
+      const confirmation = screen.getByTestId("delete-confirmation");
+      const cancelButton = within(confirmation).getByText("Cancel");
       await userEvent.click(cancelButton);
 
       expect(mockCancelDelete).toHaveBeenCalled();

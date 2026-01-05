@@ -38,12 +38,17 @@ import AppRoutes from "./AppRoutes";
 import { viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "@/components/mobile/BottomNavigationBar";
 import { GlobalPullToRefreshProvider } from "@/components/mobile/GlobalPullToRefresh";
+import type { UserData } from "@/types/auth";
 import {
   getUserForSync,
   extractLayoutData,
   extractAuthData,
   hasSecurityAcknowledgement,
 } from "./MainLayoutHelpers";
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
 
 // ============================================================================
 // Type Definitions
@@ -59,10 +64,14 @@ interface MainLayoutProps {
   firebaseSync: FirebaseSyncService;
 }
 
+type AuthManagerType = ReturnType<typeof useAuthManager>;
+type LayoutDataType = ReturnType<typeof useLayoutData>;
+type ExtractUserType = AuthManagerType["user"];
+
 interface MainContentProps {
-  currentUser: unknown;
-  auth: unknown;
-  layoutData: unknown;
+  currentUser: ExtractUserType;
+  auth: AuthManagerType;
+  layoutData: LayoutDataType;
   _onExport: () => void;
   _onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<
     | {
@@ -88,7 +97,7 @@ interface MainContentProps {
   setSyncConflicts: (conflicts: unknown) => void;
   rotationDue: boolean;
   isLocalOnlyMode: boolean;
-  securityManager: unknown;
+  securityManager: AuthManagerType["securityManager"];
 }
 
 // ============================================================================
@@ -141,39 +150,34 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
     [removeToastById]
   );
 
-  // Log auth changes
+  // Consolidated logging for auth and sync state
+  const logKey = `${isUnlocked}-${!!currentUser}-${!!securityContext?.budgetId}-${!!securityContext?.encryptionKey}`;
   useEffect(() => {
-    logger.auth("Auth hook values", {
+    if (lastLogKeyRef.current === logKey) return;
+
+    logger.auth("Auth state change", {
       isUnlocked,
       hasCurrentUser: !!currentUser,
     });
-  }, [isUnlocked, currentUser]);
 
-  // Redirect to dashboard only if user just logged in and isn't on an app route yet
+    logger.budgetSync("Budget Sync state change", {
+      hasEncryptionKey: !!securityContext?.encryptionKey,
+      hasCurrentUser: !!currentUser,
+      hasBudgetId: !!securityContext?.budgetId,
+    });
+
+    lastLogKeyRef.current = logKey;
+  }, [logKey, isUnlocked, currentUser, securityContext?.budgetId, securityContext?.encryptionKey]);
+
+  // Redirect to dashboard on login
   useEffect(() => {
     if (isUnlocked && currentUser && !location.pathname.startsWith("/app")) {
       navigate("/app/dashboard");
     }
   }, [isUnlocked, currentUser, location.pathname, navigate]);
 
-  // Log sync state changes
-  const logKey = `${!!securityContext?.encryptionKey}-${!!currentUser}-${!!securityContext?.budgetId}`;
-  useEffect(() => {
-    if (lastLogKeyRef.current !== logKey) {
-      logger.budgetSync("BudgetProvider state changed", {
-        hasEncryptionKey: !!securityContext?.encryptionKey,
-        hasCurrentUser: !!currentUser,
-        hasBudgetId: !!securityContext?.budgetId,
-      });
-      lastLogKeyRef.current = logKey;
-    }
-  }, [logKey, securityContext?.encryptionKey, currentUser, securityContext?.budgetId]);
-
   // Handle auth gateway
-  const shouldShowGateway = (auth as unknown as Record<string, unknown>)?.shouldShowAuthGateway as
-    | (() => boolean)
-    | undefined;
-  if (shouldShowGateway?.() ?? !isAuthenticated(auth)) {
+  if (auth.shouldShowAuthGateway() || !auth.isAuthenticated) {
     return (
       <AuthGateway
         onSetupComplete={(payload) => {
@@ -182,7 +186,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
           }
           return Promise.resolve(handleSetup(payload.password, payload));
         }}
-        onLocalOnlyReady={(_user) => {}}
+        onLocalOnlyReady={() => {}}
       />
     );
   }
@@ -281,8 +285,8 @@ const MainContent = ({
   const userForSync = getUserForSync(currentUser);
   const { handleManualSync } = useFirebaseSync({
     firebaseSync,
-    encryptionKey: (securityContext as Record<string, unknown>)?.encryptionKey as CryptoKey | null,
-    budgetId: (securityContext as Record<string, unknown>)?.budgetId as string | null,
+    encryptionKey: securityContext?.encryptionKey as CryptoKey | null,
+    budgetId: securityContext?.budgetId as string | null,
     currentUser: userForSync,
   });
 
@@ -310,8 +314,8 @@ const MainContent = ({
   }, [navigate, location.search]);
 
   const updateUserProfile = useCallback(
-    (updates: unknown) => {
-      (auth as { updateUser: (updates: unknown) => void }).updateUser(updates);
+    (updates: Partial<UserData>) => {
+      auth.updateUser(updates);
     },
     [auth]
   );
@@ -365,7 +369,7 @@ const MainContent = ({
 type MainContentModals = ReturnType<typeof useMainContentModals>;
 
 interface MainContentLayoutViewProps {
-  currentUser: unknown;
+  currentUser: UserData | null;
   isLocalOnlyMode: boolean;
   isOnline: boolean;
   isSyncing: boolean;
@@ -374,23 +378,37 @@ interface MainContentLayoutViewProps {
   onHideSecurityWarning: () => void;
   onManualSync: () => void;
   onNavigateToAuth: () => void;
-  onUpdateProfile: (updates: unknown) => void;
+  onUpdateProfile: (updates: Partial<UserData>) => void;
   modals: MainContentModals;
   showCorruptionModal: boolean;
   onHideCorruptionModal: () => void;
-  budget: unknown;
+  budget: LayoutDataType["budget"];
   totalBiweeklyNeed: number;
   setActiveView: (view: string) => void;
   syncConflicts: unknown;
   onResolveConflict: () => void;
   onClearConflict: () => void;
   onExport: () => void;
-  onImport: MainContentProps["_onImport"];
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<
+    | {
+        success: boolean;
+        imported: {
+          envelopes: number;
+          bills: number;
+          transactions: number;
+          savingsGoals: number;
+          debts: number;
+          paycheckHistory: number;
+          auditLog: number;
+        };
+      }
+    | undefined
+  >;
   onLogout: () => void;
   onResetEncryption: () => void;
   resetAllData: () => void;
-  onChangePassword: MainContentProps["onChangePassword"];
-  securityManager: unknown;
+  onChangePassword: (old: string, pwd: string) => Promise<void>;
+  securityManager: ReturnType<typeof useAuthManager>["securityManager"];
 }
 
 const MainContentLayoutView = ({
@@ -499,7 +517,14 @@ const MainContentLayoutView = ({
           onChangePassword={onChangePassword as unknown as (password: string) => void}
           currentUser={currentUser as { userName?: string; userColor?: string }}
           isLocalOnlyMode={isLocalOnlyMode}
-          securityManager={securityManager as { lockApp: () => void } | null}
+          securityManager={
+            securityManager
+              ? {
+                  ...securityManager,
+                  lockApp: securityManager.lockSession,
+                }
+              : null
+          }
           onUpdateProfile={onUpdateProfile}
         />
       )}
@@ -515,13 +540,5 @@ const MainContentLayoutView = ({
     </div>
   );
 };
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-function isAuthenticated(auth: unknown): boolean {
-  return (auth as Record<string, unknown>)?.isAuthenticated === true;
-}
 
 export default MainLayout;

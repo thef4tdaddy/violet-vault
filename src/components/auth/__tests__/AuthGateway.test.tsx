@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@/test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import AuthGateway from "../AuthGateway";
 import userEvent from "@testing-library/user-event";
@@ -14,7 +14,7 @@ vi.mock("@/hooks/common/useLocalOnlyMode", () => ({
 }));
 
 // Mock child components
-vi.mock("../UserSetup", () => ({
+vi.mock("@/components/auth/UserSetup", () => ({
   default: ({ onSetupComplete }: { onSetupComplete: (payload: any) => void }) => (
     <div data-testid="user-setup">
       <h1>User Setup</h1>
@@ -23,7 +23,7 @@ vi.mock("../UserSetup", () => ({
   ),
 }));
 
-vi.mock("../LocalOnlySetup", () => ({
+vi.mock("@/components/auth/LocalOnlySetup", () => ({
   default: ({
     onModeSelected,
     onSwitchToAuth,

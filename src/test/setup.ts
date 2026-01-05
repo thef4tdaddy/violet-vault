@@ -68,6 +68,7 @@ const mockDigest = vi.fn(async (_algorithm: string, data: BufferSource) => {
 
 Object.defineProperty(global, "crypto", {
   value: {
+    randomUUID: vi.fn(() => "mock-uuid-" + Math.random().toString(36).substring(2, 9)),
     getRandomValues: mockGetRandomValues,
     subtle: {
       encrypt: vi.fn(),
@@ -122,30 +123,30 @@ class LocalStorageMock {
   store: Record<string, string>;
   length: number;
 
-  constructor() {
-    this.store = {};
-    this.length = 0;
-  }
-
-  key(n: number): string | null {
+  key = vi.fn((n: number): string | null => {
     return Object.keys(this.store)[n] || null;
-  }
+  });
 
-  getItem(key: string): string | null {
-    return this.store[key] || null;
-  }
+  getItem = vi.fn((key: string): string | null => {
+    return key in this.store ? this.store[key] : null;
+  });
 
-  setItem(key: string, value: string): void {
+  setItem = vi.fn((key: string, value: string): void => {
     this.store[key] = String(value);
     this.length = Object.keys(this.store).length;
-  }
+  });
 
-  removeItem(key: string): void {
+  removeItem = vi.fn((key: string): void => {
     delete this.store[key];
     this.length = Object.keys(this.store).length;
-  }
+  });
 
-  clear(): void {
+  clear = vi.fn((): void => {
+    this.store = {};
+    this.length = 0;
+  });
+
+  constructor() {
     this.store = {};
     this.length = 0;
   }
@@ -158,3 +159,44 @@ Object.defineProperty(window, "localStorage", {
 Object.defineProperty(window, "sessionStorage", {
   value: new LocalStorageMock(),
 });
+
+// Global Firebase Mock
+vi.mock("firebase/app", () => ({
+  initializeApp: vi.fn(() => ({})),
+  getApp: vi.fn(),
+  getApps: vi.fn(() => []),
+}));
+
+vi.mock("firebase/auth", () => ({
+  getAuth: vi.fn(() => ({
+    currentUser: null,
+    onAuthStateChanged: vi.fn((auth, callback) => {
+      callback(null);
+      return () => {};
+    }),
+    signInAnonymously: vi.fn(() => Promise.resolve({ user: { uid: "test-uid" } })),
+    signOut: vi.fn(() => Promise.resolve()),
+  })),
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    callback(null);
+    return () => {};
+  }),
+  signInAnonymously: vi.fn(() => Promise.resolve({ user: { uid: "test-uid" } })),
+}));
+
+vi.mock("firebase/firestore", () => ({
+  getFirestore: vi.fn(() => ({})),
+  doc: vi.fn(),
+  setDoc: vi.fn(() => Promise.resolve()),
+  getDoc: vi.fn(() => Promise.resolve({ exists: () => false, data: () => null })),
+  onSnapshot: vi.fn((ref, callback) => {
+    callback({ exists: () => false, data: () => null });
+    return () => {};
+  }),
+  serverTimestamp: vi.fn(() => "mock-timestamp"),
+  collection: vi.fn(),
+  addDoc: vi.fn(() => Promise.resolve({ id: "mock-id" })),
+  query: vi.fn(),
+  where: vi.fn(),
+  getDocs: vi.fn(() => Promise.resolve({ empty: true, docs: [] })),
+}));

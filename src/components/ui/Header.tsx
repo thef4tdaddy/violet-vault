@@ -4,11 +4,12 @@ import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 import SyncHealthIndicator from "../sync/SyncHealthIndicator";
+import type { UserData } from "@/types/auth";
 
 interface HeaderProps {
-  currentUser: unknown;
-  onUserChange: (user: unknown) => void;
-  onUpdateProfile: (profile: unknown) => void;
+  currentUser: UserData | null;
+  onUserChange: () => void;
+  onUpdateProfile: (profile: Partial<UserData>) => void;
   isLocalOnlyMode?: boolean;
   onShowSettings: (section?: string) => void;
   onShowDataSettings: () => void;

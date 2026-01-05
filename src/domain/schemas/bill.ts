@@ -25,7 +25,7 @@ export const BillSchema = z.object({
   isPaid: z.boolean().default(false),
   isRecurring: z.boolean().default(false),
   frequency: BillFrequencySchema,
-  envelopeId: z.string().optional(),
+  envelopeId: z.string().nullable().optional(),
   lastModified: z.number().int().positive("Last modified must be a positive number"),
   createdAt: z.number().int().positive().optional(),
   description: z.string().max(500).optional(),

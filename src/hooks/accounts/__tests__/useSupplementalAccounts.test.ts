@@ -3,18 +3,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import useSupplementalAccounts from "../useSupplementalAccounts";
 
 // Mock dependencies
-vi.mock("../../auth/useAuthManager", () => ({
+vi.mock("@/hooks/auth/useAuthManager", () => ({
   useAuthManager: () => ({
     securityContext: { budgetId: "test-budget-123" },
     user: { userName: "Test User", userColor: "#ff5733" },
   }),
 }));
 
-vi.mock("../../common/useConfirm", () => ({
+vi.mock("@/hooks/common/useConfirm", () => ({
   useConfirm: () => vi.fn(async () => true),
 }));
 
-vi.mock("../../common/useEditLock", () => ({
+vi.mock("@/hooks/common/useEditLock", () => ({
   default: () => ({
     isLocked: false,
     isOwnLock: false,
@@ -26,11 +26,11 @@ vi.mock("../../common/useEditLock", () => ({
   }),
 }));
 
-vi.mock("../../../services/sync/editLockService", () => ({
+vi.mock("@/services/sync/editLockService", () => ({
   initializeEditLocks: vi.fn(),
 }));
 
-vi.mock("../../../utils/accounts/accountValidation", () => ({
+vi.mock("@/utils/accounts/accountValidation", () => ({
   validateAccountForm: vi.fn(() => ({ isValid: true })),
   validateTransferForm: vi.fn(() => ({ isValid: true })),
   calculateAccountTotals: vi.fn(() => ({
@@ -39,11 +39,11 @@ vi.mock("../../../utils/accounts/accountValidation", () => ({
   })),
 }));
 
-vi.mock("../../../utils/accounts/accountHelpers", () => ({
+vi.mock("@/utils/accounts/accountHelpers", () => ({
   getAccountTypeInfo: vi.fn(() => ({ label: "Checking", icon: "Bank" })),
 }));
 
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showSuccess: vi.fn(),
     showError: vi.fn(),

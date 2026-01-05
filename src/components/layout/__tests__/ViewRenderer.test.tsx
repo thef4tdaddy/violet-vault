@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@/test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import ViewRenderer from "../ViewRenderer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -39,51 +39,51 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Mock all child components to simplify testing
-vi.mock("../pages/MainDashboard", () => ({
+vi.mock("@/components/pages/MainDashboard", () => ({
   default: () => <div data-testid="dashboard-view">Dashboard</div>,
 }));
 
-vi.mock("../budgeting/EnvelopeGrid", () => ({
+vi.mock("@/components/budgeting/EnvelopeGrid", () => ({
   default: () => <div data-testid="envelope-grid">Envelopes</div>,
 }));
 
-vi.mock("../budgeting/SmartEnvelopeSuggestions", () => ({
+vi.mock("@/components/budgeting/SmartEnvelopeSuggestions", () => ({
   default: () => <div>Suggestions</div>,
 }));
 
-vi.mock("../savings/SavingsGoals", () => ({
+vi.mock("@/components/savings/SavingsGoals", () => ({
   default: () => <div data-testid="savings-view">Savings</div>,
 }));
 
-vi.mock("../accounts/SupplementalAccounts", () => ({
+vi.mock("@/components/accounts/SupplementalAccounts", () => ({
   default: () => <div data-testid="supplemental-view">Supplemental Accounts</div>,
 }));
 
-vi.mock("../budgeting/PaycheckProcessor", () => ({
+vi.mock("@/components/budgeting/PaycheckProcessor", () => ({
   default: () => <div data-testid="paycheck-view">Paycheck Processor</div>,
 }));
 
-vi.mock("../bills/BillManager", () => ({
+vi.mock("@/components/bills/BillManager", () => ({
   default: () => <div data-testid="bills-view">Bills</div>,
 }));
 
-vi.mock("../transactions/TransactionLedger", () => ({
+vi.mock("@/components/transactions/TransactionLedger", () => ({
   default: () => <div data-testid="transactions-view">Transactions</div>,
 }));
 
-vi.mock("../analytics/AnalyticsDashboard", () => ({
+vi.mock("@/components/analytics/AnalyticsDashboard", () => ({
   default: () => <div data-testid="analytics-view">Analytics</div>,
 }));
 
-vi.mock("../debt/DebtDashboard", () => ({
+vi.mock("@/components/debt/DebtDashboard", () => ({
   default: () => <div data-testid="debts-view">Debts</div>,
 }));
 
-vi.mock("../automation/AutoFundingView", () => ({
+vi.mock("@/components/automation/AutoFundingView", () => ({
   default: () => <div data-testid="automation-view">Automation</div>,
 }));
 
-vi.mock("../activity/ActivityFeed", () => ({
+vi.mock("@/components/activity/ActivityFeed", () => ({
   default: () => <div data-testid="activity-view">Activity</div>,
 }));
 
@@ -120,11 +120,7 @@ describe("ViewRenderer", () => {
   });
 
   const renderView = (props: Partial<typeof defaultProps> = {}) => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        <ViewRenderer {...defaultProps} {...props} />
-      </QueryClientProvider>
-    );
+    return render(<ViewRenderer {...defaultProps} {...props} />);
   };
 
   describe("View Rendering", () => {

@@ -86,6 +86,7 @@ export const useAddBillMutation = () => {
           validationResult.data.dueDate instanceof Date
             ? validationResult.data.dueDate
             : new Date(validationResult.data.dueDate),
+        envelopeId: validationResult.data.envelopeId || undefined,
       };
 
       // Persist to Dexie (optimistic update handled by React Query)
@@ -320,6 +321,16 @@ export const useMarkBillPaidMutation = () => {
       const paymentTransaction: Transaction = {
         ...zodValidated,
         date: zodValidated.date instanceof Date ? zodValidated.date : new Date(zodValidated.date),
+        description: zodValidated.description ?? undefined,
+        merchant: zodValidated.merchant ?? undefined,
+        receiptUrl: zodValidated.receiptUrl ?? undefined,
+        isInternalTransfer:
+          typeof zodValidated.isInternalTransfer === "boolean"
+            ? zodValidated.isInternalTransfer
+            : undefined,
+        paycheckId: zodValidated.paycheckId ?? undefined,
+        fromEnvelopeId: zodValidated.fromEnvelopeId ?? undefined,
+        toEnvelopeId: zodValidated.toEnvelopeId ?? undefined,
       };
 
       // ARCHITECTURE: Bills are just planned transactions. Paying a bill = creating a transaction.

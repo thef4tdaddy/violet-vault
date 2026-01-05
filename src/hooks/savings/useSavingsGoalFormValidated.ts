@@ -96,7 +96,9 @@ export function useSavingsGoalFormValidated({
       const newData = buildInitialData();
       form.updateFormData(newData);
     }
-  }, [goal, isOpen, buildInitialData, form]);
+    // We only want to update when input data changes, not the form object itself
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goal, isOpen, buildInitialData, form.updateFormData]);
 
   return {
     // Form state from validation hook

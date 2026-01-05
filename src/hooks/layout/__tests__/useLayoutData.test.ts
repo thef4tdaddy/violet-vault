@@ -12,6 +12,17 @@ vi.mock("@/hooks/budgeting/useBudgetData", () => ({
 vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
   useUnassignedCash: vi.fn(),
   useActualBalance: vi.fn(),
+  useBudgetMetadataQuery: vi.fn(() => ({
+    metadata: null,
+    unassignedCash: 250,
+    actualBalance: 5000,
+    isActualBalanceManual: false,
+    biweeklyAllocation: 0,
+    supplementalAccounts: [],
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  })),
 }));
 
 vi.mock("@/hooks/bills/useBills", () => ({
@@ -40,11 +51,38 @@ describe("useLayoutData", () => {
   ];
 
   const mockTransactions = [
-    { id: "txn-1", amount: 50, date: "2024-01-01", envelopeId: "env-1" },
-    { id: "txn-2", amount: 100, date: "2024-01-02", envelopeId: "env-2" },
+    {
+      id: "txn-1",
+      amount: 50,
+      date: "2024-01-01",
+      envelopeId: "env-1",
+      category: "Groceries",
+      type: "income",
+      lastModified: 1000,
+    },
+    {
+      id: "txn-2",
+      amount: 100,
+      date: "2024-01-02",
+      envelopeId: "env-2",
+      category: "Rent",
+      type: "expense",
+      lastModified: 1001,
+    },
   ];
 
-  const mockBills = [{ id: "bill-1", name: "Electric", amount: 100, dueDate: "2024-01-15" }];
+  const mockBills = [
+    {
+      id: "bill-1",
+      name: "Electric",
+      amount: 100,
+      dueDate: "2024-01-15",
+      category: "Utilities",
+      isPaid: false,
+      isRecurring: true,
+      lastModified: 1002,
+    },
+  ];
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -136,18 +174,37 @@ describe("useLayoutData", () => {
 
   it("should filter out invalid transactions", () => {
     const invalidTransactions = [
-      { id: "txn-1", amount: 50, date: "2024-01-01" },
+      {
+        id: "txn-1",
+        amount: 50,
+        date: "2024-01-01",
+        envelopeId: "env-1",
+        category: "G",
+        type: "income",
+        lastModified: 1,
+      },
       null,
       undefined,
-      { id: "txn-2", amount: "invalid", date: "2024-01-02" },
-      { id: "txn-3", amount: 100, date: "2024-01-03" },
+      { id: "txn-2", amount: "invalid", date: "2024-01-02", envelopeId: "env-1" },
+      {
+        id: "txn-3",
+        amount: 100,
+        date: "2024-01-03",
+        envelopeId: "env-1",
+        category: "G",
+        type: "income",
+        lastModified: 2,
+      },
     ];
 
     mockUseBudgetData.mockReturnValue({
       envelopes: mockEnvelopes,
       transactions: invalidTransactions,
       isLoading: false,
-      error: null,
+      envelopesError: null,
+      transactionsError: null,
+      billsError: null,
+      dashboardError: null,
     });
 
     const { result } = renderHook(() => useLayoutData(), { wrapper });
@@ -240,7 +297,7 @@ describe("useLayoutData", () => {
       envelopes: mockEnvelopes,
       transactions: mockTransactions,
       isLoading: false,
-      error: new Error("Budget data error"),
+      envelopesError: new Error("Budget data error"),
     });
 
     mockUseBills.mockReturnValue({
@@ -259,7 +316,8 @@ describe("useLayoutData", () => {
       envelopes: mockEnvelopes,
       transactions: mockTransactions,
       isLoading: false,
-      error: null,
+      envelopesError: null,
+      billsError: new Error("Bills error"),
     });
 
     mockUseBills.mockReturnValue({
@@ -302,7 +360,10 @@ describe("useLayoutData", () => {
       envelopes: [{ id: "env-3", name: "New Envelope", balance: 2000, allocated: 2000 }],
       transactions: mockTransactions,
       isLoading: false,
-      error: null,
+      envelopesError: null,
+      transactionsError: null,
+      billsError: null,
+      dashboardError: null,
     });
 
     mockCalculateEnvelopeTotals.mockReturnValue({

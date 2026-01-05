@@ -1,46 +1,39 @@
+import type { useAuthManager } from "../auth/useAuthManager";
+import type { UserData } from "@/types/auth";
+
 /**
  * useMainLayoutHandlers - Extracts and type-guards auth handler functions
  * Consolidates legacy auth data extraction with proper type checking
  */
 
+type AuthManagerType = ReturnType<typeof useAuthManager>;
+
 interface LayoutHandlers {
   isLocalOnlyMode: boolean;
   handleLogout: () => void;
-  handleSetup: (payload: unknown, userData?: unknown) => Promise<void> | void;
+  handleSetup: (password: string, userData?: UserData) => Promise<void>;
   handleChangePassword: (oldPassword: string, newPassword: string) => Promise<void>;
-  securityManager: unknown;
+  securityManager: AuthManagerType["securityManager"];
 }
 
-export const useMainLayoutHandlers = (auth: unknown): LayoutHandlers => {
-  const _legacy = ((auth as Record<string, unknown>)?._legacy as Record<string, unknown>) || {};
-  const {
-    isLocalOnlyMode: rawIsLocalOnlyMode = false,
-    handleSetup: _handleSetup,
-    handleLogout: rawHandleLogout,
-    handleChangePassword,
-  } = _legacy;
+export const useMainLayoutHandlers = (auth: AuthManagerType): LayoutHandlers => {
+  const _legacy = (auth?._legacy || {}) as { isLocalOnlyMode?: boolean };
+  const securityManager = auth?.securityManager;
 
-  const _internal = (_legacy._internal as Record<string, unknown>) || {};
-  const securityManager = _internal.securityManager || {};
+  // Wrap async handlers to return Promise<void> to match component props
+  const handleSetup = async (password: string, userData?: UserData) => {
+    await auth.login(password, userData);
+  };
 
-  // Type guards for handler functions and values
-  const isLocalOnlyMode = typeof rawIsLocalOnlyMode === "boolean" ? rawIsLocalOnlyMode : false;
-  const handleLogoutFn = (
-    typeof rawHandleLogout === "function" ? rawHandleLogout : () => {}
-  ) as () => void;
-  const handleSetupFn = (typeof _handleSetup === "function" ? _handleSetup : async () => {}) as (
-    payload: unknown,
-    userData?: unknown
-  ) => Promise<void> | void;
-  const handleChangePasswordFn = (
-    typeof handleChangePassword === "function" ? handleChangePassword : async () => {}
-  ) as (old: string, newPwd: string) => Promise<void>;
+  const handleChangePassword = async (oldPassword: string, newPassword: string) => {
+    await auth.changePassword(oldPassword, newPassword);
+  };
 
   return {
-    isLocalOnlyMode,
-    handleLogout: handleLogoutFn,
-    handleSetup: handleSetupFn,
-    handleChangePassword: handleChangePasswordFn,
+    isLocalOnlyMode: !!_legacy.isLocalOnlyMode,
+    handleLogout: auth?.logout || (() => {}),
+    handleSetup,
+    handleChangePassword,
     securityManager,
   };
 };
