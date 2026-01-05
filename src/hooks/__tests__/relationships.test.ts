@@ -80,12 +80,6 @@ vi.mock("@/hooks/bills/useBills", () => ({
     updateBillAsync: vi.fn(),
     deleteBillAsync: vi.fn(),
   }),
-  useBills: () => ({
-    bills: [],
-    addBillAsync: vi.fn(),
-    updateBillAsync: vi.fn(),
-    deleteBillAsync: vi.fn(),
-  }),
 }));
 
 vi.mock("@/hooks/debts/useDebts", () => ({
