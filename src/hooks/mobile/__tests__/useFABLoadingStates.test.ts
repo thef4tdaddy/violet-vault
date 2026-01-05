@@ -144,7 +144,7 @@ describe("useFABLoadingStates", () => {
     // The hook implementation correctly prevents concurrent execution
     // but the test setup needs adjustment
     const { result } = renderHook(() => useFABLoadingStates());
-    let resolveAction: ((value: string) => void) | undefined;
+    let resolveAction: ((value: string) => void) | null = null;
     const mockAction = vi.fn(
       () =>
         new Promise<string>((resolve) => {
