@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import ShareCodeModal from "../ShareCodeModal";
 import userEvent from "@testing-library/user-event";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Mock hooks
 vi.mock("@/hooks/auth/useAuthManager", () => ({
@@ -69,14 +70,18 @@ describe("ShareCodeModal", () => {
     vi.clearAllMocks();
   });
 
+  const renderWithAuth = (component: React.ReactElement) => {
+    return render(<AuthProvider>{component}</AuthProvider>);
+  };
+
   describe("Rendering", () => {
     it("should not render when isOpen is false", () => {
-      render(<ShareCodeModal {...defaultProps} isOpen={false} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} isOpen={false} />);
       expect(screen.queryByText(/share code/i)).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
       // Modal should render, though exact content depends on implementation
       expect(mockOnClose).toBeDefined();
     });
@@ -91,7 +96,7 @@ describe("ShareCodeModal", () => {
         updateProfile: vi.fn(),
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       // The modal should exist
       await waitFor(() => {
@@ -111,7 +116,7 @@ describe("ShareCodeModal", () => {
         updateProfile: vi.fn(),
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.queryByTestId("qr-code")).toBeInTheDocument();
@@ -128,7 +133,7 @@ describe("ShareCodeModal", () => {
         updateProfile: vi.fn(),
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();
@@ -166,7 +171,7 @@ describe("ShareCodeModal", () => {
         showPaydayToast: vi.fn(),
       });
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();
@@ -204,7 +209,7 @@ describe("ShareCodeModal", () => {
         showPaydayToast: vi.fn(),
       });
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();
@@ -234,7 +239,7 @@ describe("ShareCodeModal", () => {
         showPaydayToast: vi.fn(),
       });
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(mockShowErrorToast).toHaveBeenCalled();
@@ -262,7 +267,7 @@ describe("ShareCodeModal", () => {
         showPaydayToast: vi.fn(),
       });
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       // Error handling should be in place
       await waitFor(() => {
@@ -282,7 +287,7 @@ describe("ShareCodeModal", () => {
         updateProfile: vi.fn(),
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();
@@ -307,7 +312,7 @@ describe("ShareCodeModal", () => {
         updateProfile: vi.fn(),
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();
@@ -330,7 +335,7 @@ describe("ShareCodeModal", () => {
         updateProfile: mockUpdateProfile,
       } as unknown as ReturnType<typeof useAuthManager>);
 
-      render(<ShareCodeModal {...defaultProps} />);
+      renderWithAuth(<ShareCodeModal {...defaultProps} />);
 
       await waitFor(() => {
         expect(screen.getByTestId("qr-code")).toBeInTheDocument();

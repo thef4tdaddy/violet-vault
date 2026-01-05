@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import MainLayout from "../MainLayout";
 import userEvent from "@testing-library/user-event";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Mock all dependencies
 vi.mock("react-router-dom", async () => {
@@ -196,9 +197,11 @@ describe("MainLayout", () => {
 
   const renderLayout = () => {
     return render(
-      <BrowserRouter>
-        <MainLayout firebaseSync={mockFirebaseSync} />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <MainLayout firebaseSync={mockFirebaseSync} />
+        </BrowserRouter>
+      </AuthProvider>
     );
   };
 

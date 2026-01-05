@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import UserSetup from "../UserSetup";
 import { useUserSetup as useUserSetupOriginal } from "../../../hooks/auth/useUserSetup";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Mock the custom hook
 vi.mock("../../../hooks/auth/useUserSetup");
@@ -138,8 +139,12 @@ describe("UserSetup", () => {
     useUserSetup.mockReturnValue(mockHookReturn);
   });
 
+  const renderWithAuth = (component: React.ReactElement) => {
+    return render(<AuthProvider>{component}</AuthProvider>);
+  };
+
   it("should render with correct structure", () => {
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(document.querySelector("form")).toBeInTheDocument();
@@ -149,7 +154,7 @@ describe("UserSetup", () => {
   });
 
   it("should show password input for step 1", () => {
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(screen.getByTestId("password-input")).toBeInTheDocument();
     expect(screen.getByTestId("step-buttons")).toBeInTheDocument();
@@ -162,7 +167,7 @@ describe("UserSetup", () => {
       userName: "John",
     });
 
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(screen.getByTestId("returning-user-actions")).toBeInTheDocument();
     expect(screen.queryByTestId("step-buttons")).not.toBeInTheDocument();
@@ -174,7 +179,7 @@ describe("UserSetup", () => {
       step: 2,
     });
 
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(screen.queryByTestId("password-input")).not.toBeInTheDocument();
     expect(screen.getByTestId("username-input")).toBeInTheDocument();
@@ -189,14 +194,14 @@ describe("UserSetup", () => {
       isReturningUser: true,
     });
 
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(screen.queryByTestId("username-input")).not.toBeInTheDocument();
     expect(screen.queryByTestId("color-picker")).not.toBeInTheDocument();
   });
 
   it("should pass correct props to useUserSetup hook", () => {
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     expect(useUserSetup).toHaveBeenCalledWith(expect.any(Function));
   });
@@ -211,7 +216,7 @@ describe("UserSetup", () => {
     };
     useUserSetup.mockReturnValue(mockValues);
 
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     const header = screen.getByTestId("header");
     expect(header).toHaveTextContent("Step 2");
@@ -220,7 +225,7 @@ describe("UserSetup", () => {
   });
 
   it("should apply glassmorphism styling", () => {
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     const container = document.querySelector(".glassmorphism");
     expect(container).toBeInTheDocument();
@@ -235,7 +240,7 @@ describe("UserSetup", () => {
   });
 
   it("should have background pattern", () => {
-    render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+    renderWithAuth(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
     const backgroundPattern = document.querySelector('[style*="radial-gradient"]');
     expect(backgroundPattern).toBeInTheDocument();

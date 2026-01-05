@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import AddBillModal from "../AddBillModal";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Mock all hooks with default exports where needed
 vi.mock("@/hooks/bills/useBillForm", () => ({
@@ -124,7 +125,11 @@ describe("AddBillModal", () => {
   });
 
   const renderWithQuery = (component: React.ReactElement) => {
-    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{component}</AuthProvider>
+      </QueryClientProvider>
+    );
   };
 
   describe("Rendering", () => {
