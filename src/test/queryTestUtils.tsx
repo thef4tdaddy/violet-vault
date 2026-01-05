@@ -5,6 +5,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { vi } from "vitest";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 /**
  * Creates a fresh QueryClient instance for each test
@@ -29,13 +30,21 @@ export const createTestQueryClient = () => {
 };
 
 /**
- * Wrapper component that provides QueryClient to tests
+ * Wrapper component that provides QueryClient and AuthProvider to tests
+ *
+ * This wrapper combines:
+ * - QueryClientProvider: for TanStack Query hooks
+ * - AuthProvider: for useAuth, useAuthManager, and related hooks
+ *
+ * Use this wrapper for component tests that need either or both providers.
  */
 export const createQueryWrapper = (queryClient?: QueryClient) => {
   const testQueryClient = queryClient || createTestQueryClient();
 
   return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={testQueryClient}>
+      <AuthProvider>{children}</AuthProvider>
+    </QueryClientProvider>
   );
 };
 
