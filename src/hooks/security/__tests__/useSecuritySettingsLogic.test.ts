@@ -1,5 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSecuritySettingsLogic } from "../useSecuritySettingsLogic";
+import { vi, beforeEach, it, describe, expect } from "vitest";
+import { useSecurityManager } from "../../auth/useSecurityManager";
 
 // Mock the useSecurityManager hook
 vi.mock("../../auth/useSecurityManager", () => ({
@@ -40,9 +42,29 @@ describe("useSecuritySettingsLogic", () => {
   });
 
   it("should handle setting changes", () => {
+    const mockUpdateSettings = vi.fn();
+    vi.mocked(useSecurityManager).mockReturnValueOnce({
+      isLocked: false,
+      securitySettings: {
+        autoLockEnabled: true,
+        autoLockTimeout: 30,
+        lockOnPageHide: false,
+        securityLoggingEnabled: true,
+        clipboardClearTimeout: 60,
+      },
+      securityEvents: [
+        {
+          id: 1,
+          type: "LOGIN",
+          description: "User logged in",
+          timestamp: Date.now(),
+        },
+      ],
+      updateSettings: mockUpdateSettings,
+      clearSecurityEvents: vi.fn(),
+    } as ReturnType<typeof useSecurityManager>);
+
     const { result } = renderHook(() => useSecuritySettingsLogic());
-    const mockUpdateSettings = require("../../auth/useSecurityManager").useSecurityManager()
-      .updateSettings;
 
     act(() => {
       result.current.handleSettingChange("autoLockEnabled", false);
