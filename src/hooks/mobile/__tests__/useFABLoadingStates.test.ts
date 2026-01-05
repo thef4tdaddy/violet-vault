@@ -139,10 +139,10 @@ describe("useFABLoadingStates", () => {
     expect(result.current.isActionLoading("failing-action")).toBe(false);
   });
 
+  // TODO: Fix concurrent execution test - currently causes 30s timeout
+  // The hook implementation correctly prevents concurrent execution but test needs proper async handling
+  // See issue: https://github.com/thef4tdaddy/violet-vault/issues/1536
   it.skip("should prevent concurrent executions of the same action", async () => {
-    // This test needs to be fixed - currently causing test timeouts
-    // The hook implementation correctly prevents concurrent execution
-    // but the test setup needs adjustment
     const { result } = renderHook(() => useFABLoadingStates());
     let resolveAction: ((value: string) => void) | null = null;
     const mockAction = vi.fn(
