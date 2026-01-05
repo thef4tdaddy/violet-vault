@@ -276,7 +276,9 @@ export class VioletVaultDB extends Dexie {
       if (includeArchived) {
         result = await this.envelopes.where("category").equals(category).toArray();
       } else {
-        result = await this.envelopes.where("[category+archived]").equals([category, 0]).toArray();
+        result = await this.envelopes
+          .filter((e) => e.category === category && e.archived === false)
+          .toArray();
       }
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
     }
@@ -285,7 +287,7 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getActiveEnvelopes(): Promise<Envelope[]> {
-    return this.envelopes.where("archived").equals(0).toArray();
+    return this.envelopes.filter((e) => e.archived === false).toArray();
   }
 
   // Transaction queries with compound indexes
@@ -344,8 +346,9 @@ export class VioletVaultDB extends Dexie {
     futureDate.setDate(futureDate.getDate() + daysAhead);
 
     return this.bills
-      .where("[dueDate+isPaid]")
-      .between([today, 0], [futureDate, 0], true, true)
+      .filter(
+        (bill) => bill.isPaid === false && bill.dueDate >= today && bill.dueDate <= futureDate
+      )
       .toArray();
   }
 
@@ -353,20 +356,19 @@ export class VioletVaultDB extends Dexie {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return this.bills
-      .where("[isPaid+dueDate]")
-      .between([0, new Date(0)], [0, today], true, false)
-      .toArray();
+    return this.bills.filter((bill) => bill.isPaid === false && bill.dueDate < today).toArray();
   }
 
   async getPaidBills(dateRange?: DateRange): Promise<Bill[]> {
     if (dateRange) {
       return this.bills
-        .where("[isPaid+dueDate]")
-        .between([1, dateRange.start], [1, dateRange.end], true, true)
+        .filter(
+          (bill) =>
+            bill.isPaid === true && bill.dueDate >= dateRange.start && bill.dueDate <= dateRange.end
+        )
         .toArray();
     }
-    return this.bills.where("isPaid").equals(1).toArray();
+    return this.bills.filter((bill) => bill.isPaid === true).toArray();
   }
 
   async getBillsByCategory(category: string): Promise<Bill[]> {
@@ -374,16 +376,18 @@ export class VioletVaultDB extends Dexie {
   }
 
   async getRecurringBills(): Promise<Bill[]> {
-    return this.bills.where("isRecurring").equals(1).toArray();
+    return this.bills.filter((bill) => bill.isRecurring === true).toArray();
   }
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("[isCompleted+isPaused]").equals([0, 0]).toArray();
+    return this.savingsGoals
+      .filter((goal) => goal.isCompleted === false && goal.isPaused === false)
+      .toArray();
   }
 
   async getCompletedSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("isCompleted").equals(1).toArray();
+    return this.savingsGoals.filter((goal) => goal.isCompleted === true).toArray();
   }
 
   async getSavingsGoalsByCategory(category: string): Promise<SavingsGoal[]> {
@@ -399,8 +403,11 @@ export class VioletVaultDB extends Dexie {
     futureDate.setDate(futureDate.getDate() + daysAhead);
 
     return this.savingsGoals
-      .where("[targetDate+isCompleted]")
-      .between([new Date(), 0], [futureDate, 0], true, true)
+      .filter((goal) => {
+        if (!goal.targetDate) return false;
+        const targetDate = new Date(goal.targetDate);
+        return goal.isCompleted === false && targetDate >= new Date() && targetDate <= futureDate;
+      })
       .toArray();
   }
 

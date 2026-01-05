@@ -22,15 +22,18 @@ export const optimisticHelpers = {
   ) => {
     try {
       // Update TanStack Query cache - single envelope
-      queryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old: Envelope | undefined) => ({
-        ...old,
-        ...updates,
-        lastModified: Date.now(),
-      }));
+      queryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old: Envelope | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          ...updates,
+          lastModified: Date.now(),
+        };
+      });
 
       // Update TanStack Query cache - envelope list
       queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old)) return old;
         return old.map((envelope: Envelope) =>
           envelope.id === envelopeId
             ? { ...envelope, ...updates, lastModified: Date.now() }
@@ -39,10 +42,16 @@ export const optimisticHelpers = {
       });
 
       // Update database optimistically
-      await budgetDb.envelopes.update(envelopeId, {
-        ...updates,
-        lastModified: Date.now(),
-      });
+      const existing = await budgetDb.envelopes.get(envelopeId);
+      if (existing) {
+        await budgetDb.envelopes.put({
+          ...existing,
+          ...updates,
+          lastModified: Date.now(),
+        });
+      } else {
+        logger.warn(`Envelope ${envelopeId} not found for optimistic update`);
+      }
 
       logger.debug("Optimistic envelope update completed", {
         envelopeId,
@@ -109,7 +118,7 @@ export const optimisticHelpers = {
     try {
       // Update TanStack Query cache - envelope list
       queryClient.setQueryData(queryKeys.envelopesList(), (old: Envelope[] | undefined) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old)) return old;
         return old.filter((envelope: Envelope) => envelope.id !== envelopeId);
       });
 
@@ -154,7 +163,7 @@ export const optimisticHelpers = {
       queryClient.setQueriesData(
         { queryKey: queryKeys.transactions },
         (old: Transaction[] | undefined) => {
-          if (!old) return old;
+          if (!old || !Array.isArray(old)) return old;
           return old.map((transaction: Transaction) =>
             transaction.id === transactionId
               ? { ...transaction, ...updates, lastModified: Date.now() }
@@ -233,7 +242,7 @@ export const optimisticHelpers = {
       queryClient.setQueriesData(
         { queryKey: queryKeys.transactions },
         (old: Transaction[] | undefined) => {
-          if (!old) return old;
+          if (!old || !Array.isArray(old)) return old;
           return old.filter((transaction: Transaction) => transaction.id !== transactionId);
         }
       );
@@ -277,7 +286,7 @@ export const optimisticHelpers = {
 
       // Update TanStack Query cache - bill lists
       queryClient.setQueriesData({ queryKey: queryKeys.bills }, (old: Bill[] | undefined) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old)) return old;
         return old.map((bill: Bill) =>
           bill.id === billId ? { ...bill, ...updates, lastModified: Date.now() } : bill
         );

@@ -163,7 +163,9 @@ class BudgetDatabaseService {
         }
         rawData = (envelopes as unknown as unknown[]) || [];
       } else {
-        rawData = await this.db.getActiveEnvelopes();
+        rawData = includeArchived
+          ? await this.db.envelopes.toArray()
+          : await this.db.getActiveEnvelopes();
       }
       return this._validateOutput(rawData, EnvelopeSchema.array(), "envelopes");
     } catch (error) {
@@ -217,7 +219,13 @@ class BudgetDatabaseService {
         }
         rawData = (transactions as unknown as unknown[]) || [];
       } else {
-        rawData = [];
+        // Default: Get all transactions ordered by date descending
+        const transactions = await this.db.transactions
+          .orderBy("date")
+          .reverse()
+          .limit(limit)
+          .toArray();
+        rawData = transactions;
       }
       return this._validateOutput(rawData, TransactionSchema.array(), "transactions");
     } catch (error) {
@@ -229,8 +237,12 @@ class BudgetDatabaseService {
   async saveTransactions(transactions: ZodTransaction[]): Promise<void> {
     try {
       const validated = this._validateInput(transactions, TransactionSchema.array(), "transaction");
+      const normalized = validated.map((tx) => ({
+        ...tx,
+        date: new Date(tx.date),
+      }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await this.db.bulkUpsertTransactions(validated as any);
+      await this.db.bulkUpsertTransactions(normalized as any);
       await this._invalidateTransactionCache();
       logger.debug(`Saved ${transactions.length} transactions`);
     } catch (error) {

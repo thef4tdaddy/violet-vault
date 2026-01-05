@@ -215,8 +215,8 @@ describe("Sync Integration Tests", () => {
         })) as Transaction[];
 
         expect(transactions).toHaveLength(2);
-        expect(transactions[0].description).toBe("Grocery Store");
-        expect(transactions[0].amount).toBe(-50);
+        expect(transactions[0].description).toBe("Gas Station");
+        expect(transactions[0].amount).toBe(-30);
       },
       TEST_TIMEOUT
     );
@@ -354,10 +354,11 @@ describe("Sync Integration Tests", () => {
           userName: currentUser.userName,
         });
 
-        expect(saveSuccess).toBe(true);
+        expect(saveSuccess.success).toBe(true);
 
         const loadedData = await firebaseSyncService.loadFromCloud();
-        expect(loadedData).toBeTruthy();
+        expect(loadedData.success).toBe(true);
+        expect(loadedData.data).toBeTruthy();
       },
       TEST_TIMEOUT
     );
@@ -367,8 +368,8 @@ describe("Sync Integration Tests", () => {
     it("should handle chunking logic for large datasets", () => {
       // Test chunking logic without Firebase calls
       const stats = chunkedSyncService.getStats();
-      expect(stats.maxChunkSize).toBe(800 * 1024); // 800KB
-      expect(stats.maxArrayChunkSize).toBe(1000);
+      expect(stats.maxChunkSize).toBe(900 * 1024); // 900KB
+      expect(stats.maxArrayChunkSize).toBe(5000);
       expect(stats.isInitialized).toBe(true);
     });
 
@@ -449,7 +450,7 @@ describe("Sync Integration Tests", () => {
           userId: currentUser.uid,
           userName: currentUser.userName,
         });
-        expect(cloudSaveSuccess).toBe(true);
+        expect(cloudSaveSuccess.success).toBe(true);
 
         // 3. Clear local data
         await budgetDatabaseService.clearData();

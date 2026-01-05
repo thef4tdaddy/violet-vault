@@ -208,7 +208,7 @@ export const prefetchHelpers = {
 
           // Generate dashboard data from current database state
           const [envelopes, recentTransactions, upcomingBills, metadata] = await Promise.all([
-            budgetDatabaseService.getEnvelopes({ useCache: false }),
+            budgetDatabaseService.getEnvelopes({ useCache: false, includeArchived: true }),
             budgetDatabaseService.getTransactions({
               limit: 10,
               useCache: false,

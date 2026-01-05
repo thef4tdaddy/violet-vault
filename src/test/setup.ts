@@ -184,19 +184,64 @@ vi.mock("firebase/auth", () => ({
   signInAnonymously: vi.fn(() => Promise.resolve({ user: { uid: "test-uid" } })),
 }));
 
-vi.mock("firebase/firestore", () => ({
-  getFirestore: vi.fn(() => ({})),
-  doc: vi.fn(),
-  setDoc: vi.fn(() => Promise.resolve()),
-  getDoc: vi.fn(() => Promise.resolve({ exists: () => false, data: () => null })),
-  onSnapshot: vi.fn((ref, callback) => {
-    callback({ exists: () => false, data: () => null });
-    return () => {};
-  }),
-  serverTimestamp: vi.fn(() => "mock-timestamp"),
-  collection: vi.fn(),
-  addDoc: vi.fn(() => Promise.resolve({ id: "mock-id" })),
-  query: vi.fn(),
-  where: vi.fn(),
-  getDocs: vi.fn(() => Promise.resolve({ empty: true, docs: [] })),
-}));
+vi.mock("firebase/firestore", () => {
+  const store = new Map<string, Record<string, unknown>>();
+  return {
+    getFirestore: vi.fn(() => ({})),
+    doc: vi.fn((_, ...pathSegments) => pathSegments.join("/")),
+    collection: vi.fn((_, ...pathSegments) => pathSegments.join("/")),
+    setDoc: vi.fn((ref, data) => {
+      store.set(ref, data);
+      return Promise.resolve();
+    }),
+    getDoc: vi.fn((ref) => {
+      const data = store.get(ref);
+      return Promise.resolve({
+        exists: () => !!data,
+        data: () => data || null,
+        id: ref.split("/").pop(),
+      });
+    }),
+    onSnapshot: vi.fn((ref, callback) => {
+      const data = store.get(ref);
+      callback({
+        exists: () => !!data,
+        data: () => data || null,
+        id: ref.split("/").pop(),
+      });
+      return () => {};
+    }),
+    serverTimestamp: vi.fn(() => "mock-timestamp"),
+    addDoc: vi.fn((ref, data) => {
+      const id = "mock-doc-id-" + Date.now();
+      const path = `${ref}/${id}`;
+      store.set(path, data);
+      return Promise.resolve({ id, path });
+    }),
+    query: vi.fn((col) => col),
+    where: vi.fn(),
+    getDocs: vi.fn((query) => {
+      const docs: { id: string | undefined; data: () => Record<string, unknown> | undefined }[] =
+        [];
+      const prefix = query + "/";
+      for (const [key, value] of store.entries()) {
+        if (key.startsWith(prefix) && key.split("/").length === prefix.split("/").length) {
+          docs.push({
+            id: key.split("/").pop(),
+            data: () => value,
+          });
+        }
+      }
+      return Promise.resolve({ empty: docs.length === 0, docs });
+    }),
+    writeBatch: vi.fn(() => ({
+      set: vi.fn((ref, data) => store.set(ref, data)),
+      update: vi.fn((ref, data) => {
+        const existing = store.get(ref) || {};
+        store.set(ref, { ...existing, ...data });
+      }),
+      delete: vi.fn((ref) => store.delete(ref)),
+      commit: vi.fn(() => Promise.resolve()),
+    })),
+  };
+});
