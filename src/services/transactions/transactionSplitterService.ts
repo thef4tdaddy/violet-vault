@@ -173,6 +173,10 @@ class TransactionSplitterService {
 
     // If over-allocated, scale splits proportionally to match the original amount
     if (remainder > 0) {
+      // Guard against division by zero
+      if (totals.allocated === 0) {
+        return splitAllocations;
+      }
       const scaleFactor = originalAmount / totals.allocated;
       return splitAllocations.map((split) => ({
         ...split,
