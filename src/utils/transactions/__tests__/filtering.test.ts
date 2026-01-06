@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   filterByDateRange,
   filterByEnvelope,
@@ -424,7 +425,13 @@ describe("filtering utilities", () => {
       expect(result.categories).toHaveProperty("Groceries");
       expect(result.categories["Groceries"]).toEqual({
         count: 1,
-        total: 85.5,
+        expenses: 85.5,
+        income: 0,
+      });
+      expect(result.categories["Income"]).toEqual({
+        count: 1,
+        expenses: 0,
+        income: 2000,
       });
     });
 

@@ -1,93 +1,73 @@
-// Main transaction hook that combines all focused hooks
-import { useQueryClient } from "@tanstack/react-query";
-import { useTransactionQuery } from "../transactions/useTransactionQuery.ts";
-import { useTransactionMutations } from "../transactions/useTransactionMutations.ts";
-import { useTransactionAnalytics } from "../transactions/useTransactionAnalytics.ts";
-import { useTransactionUtils } from "../transactions/useTransactionUtils.ts";
-import { queryKeys } from "../../utils/common/queryClient.ts";
+import { useTransactionQuery } from "../transactions/useTransactionQuery";
+import { useTransactionOperations } from "../transactions/useTransactionOperations";
+import { useEnvelopeOperations } from "../budgeting/useEnvelopeOperations";
 
 /**
- * Specialized hook for transaction management
- * Provides transaction operations with smart filtering, date range support, and analytics
+ * Main transaction aggregator hook.
+ * Directly orchestrates consolidated query and operations hooks.
+ * Maintains compatibility with legacy API while using new implementation.
  */
-const useTransactions = (options = {}) => {
-  const queryClient = useQueryClient();
+export const useTransactions = (options = {}) => {
+  const query = useTransactionQuery(options);
+  const operations = useTransactionOperations();
+  const envelopeOps = useEnvelopeOperations();
 
-  // Core data query
-  const { transactions, isLoading, isFetching, isError, error, refetch } =
-    useTransactionQuery(options);
+  // Combine query and operations
+  const combined = {
+    ...query,
+    ...operations,
+    transferFunds: envelopeOps.transferFundsAsync, // Use envelope ops for transfers
 
-  // Mutation operations
-  const {
-    addTransaction,
-    addTransactionAsync,
-    reconcileTransaction,
-    reconcileTransactionAsync,
-    deleteTransaction,
-    deleteTransactionAsync,
-    updateTransaction,
-    updateTransactionAsync,
-    onDelete,
-    onUpdate,
-    isAdding,
-    isReconciling,
-    isDeleting,
-    isUpdating,
-  } = useTransactionMutations();
+    // Operations - maintain original method names but point to new ops
+    // Legacy support for mutation objects
+    addTransactionMutation: {
+      mutate: operations.addTransaction,
+      mutateAsync: operations.addTransaction,
+      ...operations,
+    },
+    updateTransactionMutation: {
+      mutate: operations.updateTransaction,
+      mutateAsync: operations.updateTransaction,
+      ...operations,
+    },
+    deleteTransactionMutation: {
+      mutate: operations.deleteTransaction,
+      mutateAsync: operations.deleteTransaction,
+      ...operations,
+    },
 
-  // Analytics computation
-  const analyticsData = useTransactionAnalytics(transactions);
+    // Legacy method aliases
+    addTransactionWithRefresh: operations.addTransaction,
+    updateTransactionWithRefresh: operations.updateTransaction,
+    deleteTransactionWithRefresh: operations.deleteTransaction,
+    // Async aliases expected by some consumers
+    addTransactionAsync: operations.addTransaction,
+    updateTransactionAsync: operations.updateTransaction,
+    deleteTransactionAsync: operations.deleteTransaction,
 
-  // Utility functions
-  const utilityFunctions = useTransactionUtils(
-    transactions as unknown as import("@/types/finance").Transaction[]
-  );
+    splitTransactionWithRefresh: operations.splitTransaction,
+    transferFundsWithRefresh: envelopeOps.transferFundsAsync,
+    bulkOperationWithRefresh: operations.bulkOperation,
+
+    // Filter state (mapping from query hook)
+    hasActiveFilters: false,
+    isFilteredResult: query.transactions.length !== query.allTransactions.length,
+  };
 
   return {
-    // Data
-    transactions,
-    ...analyticsData,
-    ...utilityFunctions,
+    ...combined,
+    // V2 Compat Layer
+    v2: {
+      ...combined,
+      isUsingV2: true,
+      version: "2.1.0",
 
-    // Loading states
-    isLoading,
-    isFetching,
-    isError,
-    error,
-
-    // Mutation functions
-    addTransaction,
-    addTransactionAsync,
-    reconcileTransaction,
-    reconcileTransactionAsync,
-    deleteTransaction,
-    deleteTransactionAsync,
-    updateTransaction,
-    updateTransactionAsync,
-
-    // Convenience functions for common patterns
-    onDelete, // Common prop name used by components
-    onUpdate, // Common prop name used by components
-
-    // Mutation states
-    isAdding,
-    isReconciling,
-    isDeleting,
-    isUpdating,
-
-    // Query controls
-    refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+      // Map wrappers
+      splitTransactionWithRefresh: operations.splitTransaction,
+      transferFundsWithRefresh: envelopeOps.transferFundsAsync,
+      bulkOperationWithRefresh: operations.bulkOperation,
+    },
   };
 };
 
-// Re-export focused hooks for direct use
-export { useTransactionQuery } from "../transactions/useTransactionQuery.ts";
-export { useTransactionMutations } from "../transactions/useTransactionMutations.ts";
-export { useTransactionAnalytics } from "../transactions/useTransactionAnalytics.ts";
-export { useTransactionUtils } from "../transactions/useTransactionUtils.ts";
-export { useTransactionBalanceUpdater } from "../transactions/useTransactionBalanceUpdater.ts";
-
-// Export the main hook as both named and default
-export { useTransactions };
 export default useTransactions;

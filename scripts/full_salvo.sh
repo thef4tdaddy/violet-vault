@@ -68,8 +68,11 @@ fi
 
 # 1.5 TypeScript Tests (Vitest)
 echo -e "\n${YELLOW}→ Running Vitest with coverage...${NC}"
-echo -e "${YELLOW}ℹ Skipping Vitest (Run via VS Code Test Explorer)${NC}"
-# npm run test:coverage || report_status $? "Vitest Coverage"
+echo -e "${YELLOW}→ Running Vitest...${NC}"
+npm run test:run || report_status $? "Vitest Tests"
+
+echo -e "\n${YELLOW}→ Running Build Verification...${NC}"
+npm run build || report_status $? "Build Verification"
 
 # 2. Go Checks
 echo ""

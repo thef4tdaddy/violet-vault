@@ -20,7 +20,7 @@ import { ErrorBoundary } from "../ui/ErrorBoundary";
 import { useLayoutData } from "@/hooks/layout";
 import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
-import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
@@ -191,13 +191,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
   const savingsGoalsHook = useSavingsGoals();
 
   // Get savings envelopes (v2.0: savings goals are now envelopes)
-  const savingsEnvelopesQuery = useEnvelopesQuery({
+  const savingsEnvelopesQuery = useEnvelopes({
     envelopeTypes: [ENVELOPE_TYPES.SAVINGS],
     excludeEnvelopeTypes: [], // Don't exclude anything when explicitly filtering by type
   });
 
   // Get supplemental account envelopes (v2.0: supplemental accounts are now envelopes)
-  const supplementalEnvelopesQuery = useEnvelopesQuery({
+  const supplementalEnvelopesQuery = useEnvelopes({
     envelopeTypes: [ENVELOPE_TYPES.SUPPLEMENTAL],
     excludeEnvelopeTypes: [], // Don't exclude anything when explicitly filtering by type
   });

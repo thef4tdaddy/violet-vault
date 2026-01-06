@@ -7,19 +7,10 @@ import type { Transaction, Bill } from "../../../db/types";
 import { validateBillPartialSafe, validateBillSafe } from "@/domain/schemas/bill";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
-interface CloudSyncService {
-  triggerSyncForCriticalChange(change: string): void;
-}
-
-interface WindowWithCloudSync extends Window {
-  cloudSyncService?: CloudSyncService;
-}
-
 // Helper to trigger sync for bill changes
 const triggerBillSync = (changeType: string) => {
-  const windowWithSync = window as unknown as WindowWithCloudSync;
-  if (typeof windowWithSync !== "undefined" && windowWithSync.cloudSyncService) {
-    windowWithSync.cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
+  if (typeof window !== "undefined" && window.cloudSyncService) {
+    window.cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
   }
 };
 
