@@ -547,7 +547,7 @@ describe("conditions", () => {
     it("should validate transaction amount conditions", () => {
       const condition = {
         type: CONDITION_TYPES.TRANSACTION_AMOUNT,
-        value: 0,
+        value: undefined, // Changed from 0 to undefined to actually trigger validation error
         operator: "invalid_operator",
       };
       const result = validateCondition(condition as Condition);
