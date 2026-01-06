@@ -134,7 +134,7 @@ interface OfflineRequestQueueEntry {
 
 ### Retry Behavior
 
-- **Exponential Backoff**: Delay doubles with each retry (1s, 2s, 4s, 8s, etc.)
+- **Exponential Backoff**: Delay doubles with each retry (2s, 4s, 8s, 16s, etc.)
 - **Maximum Delay**: Capped at 30 seconds
 - **Retryable Errors**: Network errors, timeouts, HTTP 5xx, HTTP 429, HTTP 408
 - **Non-retryable Errors**: HTTP 4xx (except 408, 429), validation errors
