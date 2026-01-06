@@ -161,7 +161,9 @@ export class ImportService {
         hasMappings: !!fieldMapping,
       });
 
-      const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+      const lastDotIndex = file.name.lastIndexOf(".");
+      const fileExtension =
+        lastDotIndex === -1 ? "" : file.name.slice(lastDotIndex).toLowerCase();
 
       if (fileExtension === ".csv") {
         return this.importCSVClientSide(file, fieldMapping);
