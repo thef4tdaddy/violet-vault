@@ -1,109 +1,140 @@
-import { useEnvelopesQuery } from "./useEnvelopesQuery";
-import { useEnvelopeOperations } from "./useEnvelopeOperations";
-import { useEnvelopeCalculations } from "./useEnvelopeCalculations";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { UseQueryOptions } from "@tanstack/react-query";
+import { useMemo, useCallback, useEffect } from "react";
+import { queryKeys } from "../../utils/common/queryClient.ts";
+import { budgetDb, VioletVaultDB } from "../../db/budgetDb.ts";
+import { ENVELOPE_TYPES } from "../../constants/categories.ts";
+import logger from "../../utils/common/logger.ts";
+import {
+  processEnvelopes,
+  calculateEnvelopeStats,
+  getRepairUpdates,
+  type EnhancedEnvelope,
+} from "../../utils/budgeting/filtering.ts";
+import type { Envelope as DbEnvelope } from "../../db/types.ts";
+import { useEnvelopeOperations } from "./useEnvelopeOperations.ts";
 
-/**
- * Options for useEnvelopes hook
- */
-interface UseEnvelopesOptions {
+export interface EnvelopesQueryOptions {
   category?: string;
   includeArchived?: boolean;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-  /**
-   * Filter to only include specific envelope types.
-   * Example: ["savings"] to get only savings goals
-   */
   envelopeTypes?: string[];
-  /**
-   * Filter to exclude specific envelope types.
-   * By default, excludes savings, sinking_fund, and supplemental envelopes.
-   */
   excludeEnvelopeTypes?: string[];
+  __db?: VioletVaultDB;
 }
 
-/**
- * Specialized hook for envelope management
- * Orchestrates envelope operations using focused sub-hooks
- */
-const useEnvelopes = (options: UseEnvelopesOptions = {}) => {
-  // Extract data fetching logic
-  const queryResult = useEnvelopesQuery(options);
+const DEFAULT_EXCLUDED_TYPES = [
+  ENVELOPE_TYPES.SAVINGS,
+  ENVELOPE_TYPES.SINKING_FUND,
+  ENVELOPE_TYPES.SUPPLEMENTAL,
+];
 
-  // Extract mutation operations
-  const operationsResult = useEnvelopeOperations();
+export const useEnvelopes = (options: EnvelopesQueryOptions = {}) => {
+  const queryClient = useQueryClient();
+  const ops = useEnvelopeOperations();
 
-  // Extract calculations and utilities
-  const calculationsResult = useEnvelopeCalculations(
-    queryResult.envelopes as unknown as Array<{
-      id?: string;
-      currentBalance?: number;
-      targetAmount?: number;
-      category?: string;
-      [key: string]: unknown;
-    }>
+  const {
+    category,
+    includeArchived = false,
+    sortBy = "name",
+    sortOrder = "asc",
+    envelopeTypes,
+    excludeEnvelopeTypes = DEFAULT_EXCLUDED_TYPES,
+    __db,
+  } = options;
+  const dbInstance = __db ?? budgetDb;
+
+  const queryFunction = useCallback(async (): Promise<EnhancedEnvelope[]> => {
+    try {
+      const dbEnvelopes: DbEnvelope[] = category
+        ? await dbInstance.getEnvelopesByCategory(category)
+        : await dbInstance.envelopes.toArray();
+
+      return processEnvelopes(dbEnvelopes, {
+        category,
+        includeArchived,
+        envelopeTypes,
+        excludeEnvelopeTypes,
+        sortBy,
+        sortOrder,
+      });
+    } catch (error) {
+      logger.error("useEnvelopes: Dexie fetch failed", error);
+      return [];
+    }
+  }, [
+    category,
+    includeArchived,
+    sortBy,
+    sortOrder,
+    envelopeTypes,
+    excludeEnvelopeTypes,
+    dbInstance,
+  ]);
+
+  const queryOptions = useMemo<UseQueryOptions<EnhancedEnvelope[], unknown>>(
+    () => ({
+      queryKey: queryKeys.envelopesList({
+        category,
+        includeArchived,
+        sortBy,
+        sortOrder,
+        envelopeTypes,
+        excludeEnvelopeTypes,
+      }),
+      queryFn: queryFunction,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      placeholderData: (prev) => prev,
+    }),
+    [
+      category,
+      includeArchived,
+      sortBy,
+      sortOrder,
+      envelopeTypes,
+      excludeEnvelopeTypes,
+      queryFunction,
+    ]
   );
 
-  // Wrapper functions for envelope deletion with bill handling
-  const deleteEnvelopeWrapper = (envelopeId: string, deleteBillsToo: boolean = false) => {
-    operationsResult.deleteEnvelope({ envelopeId, deleteBillsToo });
-  };
+  const envelopesQuery = useQuery(queryOptions);
 
-  const deleteEnvelopeAsyncWrapper = (envelopeId: string, deleteBillsToo: boolean = false) => {
-    return operationsResult.deleteEnvelopeAsync({ envelopeId, deleteBillsToo });
-  };
+  useEffect(() => {
+    const handleRefresh = () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+    window.addEventListener("importCompleted", handleRefresh);
+    window.addEventListener("invalidateAllQueries", handleRefresh);
+    return () => {
+      window.removeEventListener("importCompleted", handleRefresh);
+      window.removeEventListener("invalidateAllQueries", handleRefresh);
+    };
+  }, [queryClient]);
 
-  // Repair corrupted envelopes (combines calculation + operation)
-  const repairCorruptedEnvelope = async (
-    envelopeId: string,
-    name: string,
-    category: string = "utilities"
-  ) => {
-    const updates = await calculationsResult.repairCorruptedEnvelope(envelopeId, name, category);
-    return operationsResult.updateEnvelopeAsync({ id: envelopeId, updates });
-  };
+  const stats = useMemo(
+    () => calculateEnvelopeStats(envelopesQuery.data || []),
+    [envelopesQuery.data]
+  );
+
+  const repairCorruptedEnvelope = useCallback(
+    async (id: string, name: string, category: string) => {
+      return ops.updateEnvelopeAsync(id, getRepairUpdates(name, category));
+    },
+    [ops]
+  );
 
   return {
-    // Data
-    envelopes: queryResult.envelopes,
-    totalBalance: calculationsResult.totalBalance,
-    totalTargetAmount: calculationsResult.totalTargetAmount,
-    underfundedEnvelopes: calculationsResult.underfundedEnvelopes,
-    overfundedEnvelopes: calculationsResult.overfundedEnvelopes,
-    availableCategories: calculationsResult.availableCategories,
-
-    // Loading states
-    isLoading: queryResult.isLoading,
-    isFetching: queryResult.isFetching,
-    isError: queryResult.isError,
-    error: queryResult.error,
-
-    // Mutation functions
-    addEnvelope: operationsResult.addEnvelope,
-    addEnvelopeAsync: operationsResult.addEnvelopeAsync,
-    updateEnvelope: operationsResult.updateEnvelope,
-    updateEnvelopeAsync: operationsResult.updateEnvelopeAsync,
-    deleteEnvelope: deleteEnvelopeWrapper,
-    deleteEnvelopeAsync: deleteEnvelopeAsyncWrapper,
-    transferFunds: operationsResult.transferFunds,
-    transferFundsAsync: operationsResult.transferFundsAsync,
-
-    // Mutation states
-    isAdding: operationsResult.isAdding,
-    isUpdating: operationsResult.isUpdating,
-    isDeleting: operationsResult.isDeleting,
-    isTransferring: operationsResult.isTransferring,
-
-    // Utility functions
-    getEnvelopeById: calculationsResult.getEnvelopeById,
-    getEnvelopesByCategory: calculationsResult.getEnvelopesByCategory,
+    envelopes: envelopesQuery.data || [],
+    isLoading: envelopesQuery.isLoading || ops.isProcessing,
+    isFetching: envelopesQuery.isFetching,
+    isError: envelopesQuery.isError,
+    refetch: envelopesQuery.refetch,
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+    ...ops, // helper methods
+    error: envelopesQuery.error || ops.error, // Combine errors, overriding ops.error
+    ...stats,
     repairCorruptedEnvelope,
-
-    // Query controls
-    refetch: queryResult.refetch,
-    invalidate: queryResult.invalidate,
   };
 };
 
-export { useEnvelopes };
 export default useEnvelopes;

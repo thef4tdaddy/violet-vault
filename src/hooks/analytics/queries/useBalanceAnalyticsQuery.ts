@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
-import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
 import { useBudgetMetadata } from "@/hooks/budgeting/useBudgetMetadata";
 
@@ -36,7 +36,7 @@ interface EnvelopeAnalysis {
  */
 export const useBalanceAnalyticsQuery = () => {
   // Get data from TanStack Query (Dexie as source of truth)
-  const { envelopes } = useEnvelopesQuery();
+  const { envelopes } = useEnvelopes();
   const { savingsGoals } = useSavingsGoals();
   const { unassignedCash, actualBalance } = useBudgetMetadata();
 

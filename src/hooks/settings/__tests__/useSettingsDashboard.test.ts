@@ -31,8 +31,8 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/services/sync/cloudSyncService", () => ({
-  cloudSyncService: {
+vi.mock("@/services/sync/syncOrchestrator", () => ({
+  syncOrchestrator: {
     start: vi.fn(),
     stop: vi.fn(),
     forceSync: vi.fn(),
@@ -55,7 +55,7 @@ vi.mock("@/utils/common/testBudgetHistory", () => ({
 // Import mocked modules after mocking
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { globalToast } from "@/stores/ui/toastStore";
-import { cloudSyncService } from "@/services/sync/cloudSyncService";
+import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import { createTestBudgetHistory } from "@/utils/common/testBudgetHistory";
 
 describe("useSettingsDashboardUI", () => {
@@ -158,7 +158,7 @@ describe("useCloudSyncManager", () => {
   it("should handle manual sync", async () => {
     // Set up sync enabled state
     mockUseBudgetStore.cloudSyncEnabled = true;
-    vi.mocked(cloudSyncService.forceSync).mockResolvedValue({ success: true });
+    vi.mocked(syncOrchestrator.forceSync).mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useCloudSyncManager());
 
@@ -166,7 +166,7 @@ describe("useCloudSyncManager", () => {
       await result.current.handleManualSync();
     });
 
-    expect(cloudSyncService.forceSync).toHaveBeenCalled();
+    expect(syncOrchestrator.forceSync).toHaveBeenCalled();
   });
 
   it("should not sync when cloud sync is disabled", async () => {
@@ -177,7 +177,7 @@ describe("useCloudSyncManager", () => {
       await result.current.handleManualSync();
     });
 
-    expect(cloudSyncService.forceSync).not.toHaveBeenCalled();
+    expect(syncOrchestrator.forceSync).not.toHaveBeenCalled();
   });
 });
 

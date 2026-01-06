@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   filterByDateRange,
   filterByEnvelope,
@@ -25,7 +26,7 @@ describe("filtering utilities", () => {
       id: "1",
       description: "Walmart Grocery Store",
       amount: -85.5,
-      date: "2023-09-01",
+      date: "2023-09-01T12:00:00",
       category: "Groceries",
       account: "Checking",
       envelopeId: "env1",
@@ -34,7 +35,7 @@ describe("filtering utilities", () => {
       id: "2",
       description: "Salary Deposit",
       amount: 2000.0,
-      date: "2023-09-01",
+      date: "2023-09-01T12:00:00",
       category: "Income",
       account: "Checking",
       envelopeId: "env2",
@@ -43,7 +44,7 @@ describe("filtering utilities", () => {
       id: "3",
       description: "Shell Gas Station",
       amount: -35.0,
-      date: "2023-08-15",
+      date: "2023-08-15T12:00:00",
       category: "Transportation",
       account: "Credit Card",
       envelopeId: "env3",
@@ -52,7 +53,7 @@ describe("filtering utilities", () => {
       id: "4",
       description: "Coffee Shop",
       amount: -4.5,
-      date: "2023-09-02",
+      date: "2023-09-02T12:00:00",
       category: "Dining",
       account: "Checking",
       envelopeId: "env1",
@@ -72,22 +73,22 @@ describe("filtering utilities", () => {
 
     it("should filter by start date only", () => {
       const result = filterByDateRange(mockTransactions, {
-        start: "2023-09-01",
+        start: "2023-09-01T00:00:00",
       });
       expect(result).toHaveLength(3);
       expect(result.map((t) => t.id)).toEqual(["1", "2", "4"]);
     });
 
     it("should filter by end date only", () => {
-      const result = filterByDateRange(mockTransactions, { end: "2023-09-01" });
+      const result = filterByDateRange(mockTransactions, { end: "2023-09-01T23:59:59" });
       expect(result).toHaveLength(3);
       expect(result.map((t) => t.id)).toEqual(["1", "2", "3"]);
     });
 
     it("should filter by date range", () => {
       const result = filterByDateRange(mockTransactions, {
-        start: "2023-08-20",
-        end: "2023-09-01",
+        start: "2023-08-20T00:00:00",
+        end: "2023-09-01T23:59:59",
       });
       expect(result).toHaveLength(2);
       expect(result.map((t) => t.id)).toEqual(["1", "2"]);
@@ -98,7 +99,7 @@ describe("filtering utilities", () => {
       // NaN < Date and NaN > Date both return false, so invalid dates pass through filters
       const txWithInvalidDate = { ...mockTransactions[0], date: "invalid-date" };
       const result = filterByDateRange([txWithInvalidDate], {
-        start: "2023-09-01",
+        start: "2023-09-01T00:00:00",
       });
 
       // Verify invalid date transaction is included (NaN comparison returns false, so it passes the filter)
@@ -106,7 +107,9 @@ describe("filtering utilities", () => {
       expect(result[0]).toEqual(txWithInvalidDate);
 
       // Also test that it doesn't throw an error (handled by try-catch)
-      expect(() => filterByDateRange([txWithInvalidDate], { start: "2023-09-01" })).not.toThrow();
+      expect(() =>
+        filterByDateRange([txWithInvalidDate], { start: "2023-09-01T00:00:00" })
+      ).not.toThrow();
     });
 
     it("should handle empty transactions array", () => {
@@ -315,7 +318,7 @@ describe("filtering utilities", () => {
 
     it("should handle date range filtering", () => {
       const options = {
-        dateRange: { start: "2023-09-01", end: "2023-09-02" },
+        dateRange: { start: "2023-09-01T00:00:00", end: "2023-09-02T23:59:59" },
         sortBy: "date",
       };
 
@@ -422,7 +425,13 @@ describe("filtering utilities", () => {
       expect(result.categories).toHaveProperty("Groceries");
       expect(result.categories["Groceries"]).toEqual({
         count: 1,
-        total: 85.5,
+        expenses: 85.5,
+        income: 0,
+      });
+      expect(result.categories["Income"]).toEqual({
+        count: 1,
+        expenses: 0,
+        income: 2000,
       });
     });
 
@@ -439,8 +448,8 @@ describe("filtering utilities", () => {
     it("should calculate date range", () => {
       const result = calculateTransactionStats(mockTransactions);
 
-      expect(result.dateRange.earliest).toEqual(new Date("2023-08-15"));
-      expect(result.dateRange.latest).toEqual(new Date("2023-09-02"));
+      expect(result.dateRange.earliest).toEqual(new Date("2023-08-15T12:00:00"));
+      expect(result.dateRange.latest).toEqual(new Date("2023-09-02T12:00:00"));
     });
 
     it("should handle empty transactions array", () => {

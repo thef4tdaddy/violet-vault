@@ -8,7 +8,7 @@ import type { VioletVaultDB } from "@/db/budgetDb";
 interface CloudSyncServiceType {
   isRunning: boolean;
   config?: unknown;
-  lastSyncTime: string | null;
+  lastSyncTime?: string;
   triggerSyncForCriticalChange: (changeType: string) => void;
 }
 
@@ -198,7 +198,7 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       results.cloudSync = {
         isRunning: cloudSyncService.isRunning,
         config: !!cloudSyncService.config,
-        lastSyncTime: cloudSyncService.lastSyncTime,
+        lastSyncTime: cloudSyncService.lastSyncTime ?? null,
       };
 
       logger.info("✅ Cloud sync service found:", results.cloudSync);

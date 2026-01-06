@@ -1,12 +1,11 @@
 import { clearFirebaseData, forcePushToCloud } from "../firebaseUtils";
-import { cloudSyncService } from "../../../services/sync/cloudSyncService";
+import { syncOrchestrator } from "../../../services/sync/syncOrchestrator";
 import { vi } from "vitest";
 
-vi.mock("../../../services/sync/cloudSyncService", () => ({
-  cloudSyncService: {
-    clearAllData: vi.fn(),
+vi.mock("../../../services/sync/syncOrchestrator", () => ({
+  syncOrchestrator: {
     stop: vi.fn(),
-    forcePushToCloud: vi.fn(),
+    forceSync: vi.fn(),
   },
 }));
 
@@ -16,25 +15,25 @@ describe("firebaseUtils", () => {
   });
 
   describe("clearFirebaseData", () => {
-    it("should call clearAllData", async () => {
+    it("should call forceSync", async () => {
       await clearFirebaseData();
-      expect(cloudSyncService.clearAllData).toHaveBeenCalled();
+      expect(syncOrchestrator.forceSync).toHaveBeenCalled();
     });
   });
 
   describe("forcePushToCloud", () => {
-    it("should stop service, force push, and return success", async () => {
-      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({
+    it("should stop orchestrator, force sync, and return success", async () => {
+      (syncOrchestrator.forceSync as never as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
       });
       const result = await forcePushToCloud();
-      expect(cloudSyncService.stop).toHaveBeenCalled();
-      expect(cloudSyncService.forcePushToCloud).toHaveBeenCalled();
+      expect(syncOrchestrator.stop).toHaveBeenCalled();
+      expect(syncOrchestrator.forceSync).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
     });
 
-    it("should throw an error if force push fails", async () => {
-      (cloudSyncService.forcePushToCloud as never as ReturnType<typeof vi.fn>).mockResolvedValue({
+    it("should throw an error if force sync fails", async () => {
+      (syncOrchestrator.forceSync as never as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: false,
         error: "Test Error",
       });

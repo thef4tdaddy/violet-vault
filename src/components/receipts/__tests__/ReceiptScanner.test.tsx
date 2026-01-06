@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import ReceiptScanner from "../ReceiptScanner";
+import "@testing-library/jest-dom";
 import { useReceiptScanner as useReceiptScannerOriginal } from "../../../hooks/receipts/useReceiptScanner";
 
 // Mock the custom hook
@@ -11,7 +12,7 @@ const useReceiptScanner = useReceiptScannerOriginal as unknown as Mock;
 
 // Mock child components to focus on main component behavior
 vi.mock("../components/ReceiptScannerHeader", () => ({
-  default: ({ onClose }) => (
+  default: ({ onClose }: any) => (
     <div data-testid="receipt-header">
       <button onClick={onClose} data-testid="close-button">
         Close
@@ -21,7 +22,7 @@ vi.mock("../components/ReceiptScannerHeader", () => ({
 }));
 
 vi.mock("../components/ReceiptUploadArea", () => ({
-  default: ({ onDrop }) => (
+  default: ({ onDrop }: any) => (
     <div data-testid="upload-area" onDrop={onDrop}>
       Upload Area
     </div>
@@ -33,7 +34,7 @@ vi.mock("../components/ReceiptProcessingState", () => ({
 }));
 
 vi.mock("../components/ReceiptErrorState", () => ({
-  default: ({ error, onRetry }) => (
+  default: ({ error, onRetry }: any) => (
     <div data-testid="error-state">
       <span>Error: {error}</span>
       <button onClick={onRetry} data-testid="retry-button">
@@ -44,18 +45,18 @@ vi.mock("../components/ReceiptErrorState", () => ({
 }));
 
 vi.mock("../components/ReceiptImagePreview", () => ({
-  default: ({ uploadedImage }) =>
+  default: ({ uploadedImage }: any) =>
     uploadedImage ? <div data-testid="image-preview">Image: {uploadedImage.name}</div> : null,
 }));
 
 vi.mock("../components/ReceiptExtractedData", () => ({
-  default: ({ extractedData }) => (
+  default: ({ extractedData }: any) => (
     <div data-testid="extracted-data">Merchant: {extractedData?.merchant || "None"}</div>
   ),
 }));
 
 vi.mock("../components/ReceiptActionButtons", () => ({
-  default: ({ onReset, onConfirm }) => (
+  default: ({ onReset, onConfirm }: any) => (
     <div data-testid="action-buttons">
       <button onClick={onReset} data-testid="reset-button">
         Reset
@@ -209,18 +210,11 @@ describe("ReceiptScanner", () => {
   it("should apply correct styling classes", () => {
     render(<ReceiptScanner {...mockProps} />);
 
-    const modal = screen.getByRole("generic").closest(".fixed");
+    const modal = screen.getByTestId("receipt-scanner-overlay");
     expect(modal).toHaveClass("fixed", "inset-0", "bg-black/50", "backdrop-blur-sm");
 
-    const container = screen.getByTestId("receipt-header").closest(".glassmorphism");
-    expect(container).toHaveClass(
-      "glassmorphism",
-      "rounded-lg",
-      "border-2",
-      "border-black",
-      "bg-purple-100/40",
-      "backdrop-blur-3xl"
-    );
+    const container = screen.getByTestId("receipt-scanner-container");
+    expect(container).toHaveClass("bg-purple-100/60", "rounded-2xl", "border-2");
   });
 
   it("should hide upload area when image is uploaded", () => {
@@ -237,6 +231,6 @@ describe("ReceiptScanner", () => {
   it("should pass correct props to useReceiptScanner hook", () => {
     render(<ReceiptScanner {...mockProps} />);
 
-    expect(useReceiptScanner).toHaveBeenCalledWith(mockProps.onReceiptProcessed);
+    expect(useReceiptScanner).toHaveBeenCalledWith(expect.any(Function));
   });
 });

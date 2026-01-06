@@ -358,8 +358,9 @@ interface TransactionStats {
   totalExpenses: number;
   netAmount: number;
   averageTransaction: number;
-  categories: Record<string, { count: number; total: number }>;
+  categories: Record<string, { income: number; expenses: number; count: number }>;
   accounts: Record<string, { count: number; total: number }>;
+  dailyBreakdown: Record<string, { income: number; expenses: number; count: number }>;
   dateRange: {
     earliest: Date | null;
     latest: Date | null;
@@ -368,7 +369,7 @@ interface TransactionStats {
 }
 
 /**
- * Calculate transaction statistics
+ * Calculate comprehensive transaction statistics and analytics
  * @param {Array} transactions - Transactions to analyze
  * @returns {Object} Transaction statistics
  */
@@ -382,6 +383,7 @@ export const calculateTransactionStats = (transactions: Transaction[] = []): Tra
       averageTransaction: 0,
       categories: {},
       accounts: {},
+      dailyBreakdown: {},
       dateRange: {
         earliest: null,
         latest: null,
@@ -390,29 +392,33 @@ export const calculateTransactionStats = (transactions: Transaction[] = []): Tra
 
     if (transactions.length === 0) return stats;
 
-    let totalAmount = 0;
+    let totalAbsoluteAmount = 0;
     const dates: Date[] = [];
 
     transactions.forEach((transaction) => {
       const amount = transaction.amount;
-      totalAmount += Math.abs(amount);
-      dates.push(new Date(transaction.date));
+      totalAbsoluteAmount += Math.abs(amount);
 
+      const date = new Date(transaction.date);
+      dates.push(date);
+      const dateKey = date.toISOString().split("T")[0];
+
+      // Income vs Expense
       if (amount > 0) {
         stats.totalIncome += amount;
       } else {
         stats.totalExpenses += Math.abs(amount);
       }
-
       stats.netAmount += amount;
 
       // Category stats
       const category = transaction.category || "Uncategorized";
       if (!stats.categories[category]) {
-        stats.categories[category] = { count: 0, total: 0 };
+        stats.categories[category] = { income: 0, expenses: 0, count: 0 };
       }
       stats.categories[category].count++;
-      stats.categories[category].total += Math.abs(amount);
+      if (amount > 0) stats.categories[category].income += amount;
+      else stats.categories[category].expenses += Math.abs(amount);
 
       // Account stats
       const account = transaction.account || "Unknown";
@@ -421,9 +427,17 @@ export const calculateTransactionStats = (transactions: Transaction[] = []): Tra
       }
       stats.accounts[account].count++;
       stats.accounts[account].total += Math.abs(amount);
+
+      // Daily breakdown
+      if (!stats.dailyBreakdown[dateKey]) {
+        stats.dailyBreakdown[dateKey] = { income: 0, expenses: 0, count: 0 };
+      }
+      if (amount > 0) stats.dailyBreakdown[dateKey].income += amount;
+      else stats.dailyBreakdown[dateKey].expenses += Math.abs(amount);
+      stats.dailyBreakdown[dateKey].count++;
     });
 
-    stats.averageTransaction = totalAmount / transactions.length;
+    stats.averageTransaction = totalAbsoluteAmount / transactions.length;
 
     if (dates.length > 0) {
       dates.sort((a, b) => a.getTime() - b.getTime());
@@ -443,8 +457,35 @@ export const calculateTransactionStats = (transactions: Transaction[] = []): Tra
       averageTransaction: 0,
       categories: {},
       accounts: {},
+      dailyBreakdown: {},
       dateRange: { earliest: null, latest: null },
       error: errorMessage,
     };
   }
+};
+
+/**
+ * Common date range helpers
+ */
+export const getDateRanges = () => {
+  const now = new Date();
+
+  const getThisMonth = () => ({
+    start: new Date(now.getFullYear(), now.getMonth(), 1),
+    end: new Date(now.getFullYear(), now.getMonth() + 1, 0),
+  });
+
+  const getLastMonth = () => ({
+    start: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+    end: new Date(now.getFullYear(), now.getMonth(), 0),
+  });
+
+  const getLast30Days = () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    return { start, end };
+  };
+
+  return { getThisMonth, getLastMonth, getLast30Days };
 };

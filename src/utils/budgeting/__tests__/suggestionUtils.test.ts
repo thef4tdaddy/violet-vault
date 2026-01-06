@@ -123,7 +123,7 @@ describe("suggestionUtils", () => {
 
   describe("calculateMonthsOfData", () => {
     it("should calculate months correctly", () => {
-      const transactions = [{ date: "2024-01-01" }, { date: "2024-03-15" }];
+      const transactions = [{ date: "2024-01-01T12:00:00" }, { date: "2024-03-15T12:00:00" }];
 
       const result = calculateMonthsOfData(transactions as never[]);
       expect(result).toBe(3); // Jan, Feb, Mar
@@ -135,7 +135,7 @@ describe("suggestionUtils", () => {
     });
 
     it("should handle same month transactions", () => {
-      const transactions = [{ date: "2024-01-01" }, { date: "2024-01-15" }];
+      const transactions = [{ date: "2024-01-01T12:00:00" }, { date: "2024-01-15T12:00:00" }];
 
       const result = calculateMonthsOfData(transactions as never[]);
       expect(result).toBe(1);
