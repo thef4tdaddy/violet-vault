@@ -91,8 +91,9 @@ export class WebSocketSignalingService {
     }
 
     if (this.ws) {
-      this.ws.close();
+      const wsToClose = this.ws;
       this.ws = null;
+      wsToClose.close();
     }
 
     this.updateStatus("disconnected");
