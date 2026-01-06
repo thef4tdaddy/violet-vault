@@ -36,7 +36,7 @@ export function useServiceAvailability(
       try {
         if (serviceName) {
           // Check specific service
-          const available = await serviceAvailability.checkService(serviceName, forceRefresh);
+          await serviceAvailability.checkService(serviceName, forceRefresh);
           const serviceStatus = serviceAvailability.getStatus(serviceName);
           setStatus(serviceStatus);
         } else {
