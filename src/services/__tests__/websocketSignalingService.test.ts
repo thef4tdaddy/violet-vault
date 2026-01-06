@@ -69,7 +69,8 @@ describe("WebSocketSignalingService", () => {
 
       // Check that sent data contains only metadata
       expect(sendSpy).toHaveBeenCalled();
-      const sentData = JSON.parse(sendSpy.mock.calls[0][0]) as WebSocketSignalMessage;
+      const lastCallArgs = sendSpy.mock.calls[sendSpy.mock.calls.length - 1];
+      const sentData = JSON.parse(lastCallArgs[0]) as WebSocketSignalMessage;
 
       // Verify structure contains no sensitive data
       expect(sentData).toHaveProperty("type");
