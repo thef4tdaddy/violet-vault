@@ -3,10 +3,13 @@ import logger from "@/utils/common/logger";
 import { executeBillUpdate } from "@/utils/bills/billUpdateHelpers";
 import { globalToast } from "@/stores/ui/toastStore";
 import type { Bill, Envelope } from "@/types/bills";
+import useBills from "@/hooks/bills/useBills";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useBudgetMetadata } from "@/hooks/budgeting/useBudgetMetadata";
 
 /**
  * Hook for individual bill payment operations
- * Extracted from useBillOperations.js to reduce complexity
+ * Refactored to be self-contained without prop drilling
  */
 type ModificationHistoryEntry = {
   timestamp?: string;
@@ -23,11 +26,6 @@ type BillRecord = Bill & {
 type EnvelopeRecord = Envelope & {
   currentBalance?: number;
 };
-
-type BudgetRecord = {
-  unassignedCash?: number;
-  updateBill?: (bill: Bill) => void | Promise<void>;
-} & Record<string, unknown>;
 
 interface PayBillOverrides {
   amount?: number;
@@ -155,28 +153,14 @@ const buildUpdatedBillRecord = (
   };
 };
 
-interface UseBillPaymentParams {
-  bills: BillRecord[];
-  envelopes: EnvelopeRecord[];
-  budget?: BudgetRecord;
-  updateBill: (options: { id: string; updates: Record<string, unknown> }) => Promise<void>;
-  onUpdateBill?: (bill: Bill) => void | Promise<void>;
-  markBillPaid?: (params: {
-    billId: string;
-    paidAmount: number;
-    paidDate?: string;
-    envelopeId?: string;
-  }) => Promise<unknown>;
-}
+/**
+ * Hook for bill payment operations
+ */
+export const useBillPayment = () => {
+  const { bills: tanStackBills, updateBillAsync, markBillPaidAsync } = useBills();
+  const { envelopes } = useEnvelopes();
+  const { unassignedCash } = useBudgetMetadata();
 
-export const useBillPayment = ({
-  bills,
-  envelopes,
-  budget,
-  updateBill,
-  onUpdateBill,
-  markBillPaid,
-}: UseBillPaymentParams) => {
   /**
    * Validate envelope balance for bill payment
    */
@@ -210,23 +194,23 @@ export const useBillPayment = ({
           billAmount,
         };
       } else {
-        const unassignedCash = Number(budget?.unassignedCash ?? 0);
+        const availableCash = Number(unassignedCash ?? 0);
         const billAmount = Math.abs(Number(bill.amount ?? 0));
 
-        if (unassignedCash < billAmount) {
-          const message = `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`;
+        if (availableCash < billAmount) {
+          const message = `Insufficient unassigned cash. Available: $${availableCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`;
           globalToast.showError(message, "Payment Blocked");
           throw new Error(message);
         }
 
         return {
           paymentSource: "unassigned" as const,
-          availableBalance: unassignedCash,
+          availableBalance: availableCash,
           billAmount,
         };
       }
     },
-    [envelopes, budget]
+    [envelopes, unassignedCash]
   );
 
   /**
@@ -238,7 +222,13 @@ export const useBillPayment = ({
       try {
         const { normalizedBillId: derivedId, providedBill } = normalizeBillIdentifier(billInput);
         normalizedBillId = derivedId;
-        const bill = selectBillForPayment(bills, normalizedBillId, providedBill);
+
+        // Cast tanStackBills to BillRecord[] for compatibility
+        const bill = selectBillForPayment(
+          tanStackBills as unknown as BillRecord[],
+          normalizedBillId,
+          providedBill
+        );
         if (bill.isPaid) {
           throw new Error("Bill is already paid");
         }
@@ -255,19 +245,24 @@ export const useBillPayment = ({
           overrides
         );
 
-        if (markBillPaid) {
-          await markBillPaid({
-            billId: normalizedBillId,
-            paidAmount: paymentAmount,
-            paidDate: paymentDate,
-            envelopeId: effectiveEnvelopeId,
-          });
-        }
+        await markBillPaidAsync({
+          billId: normalizedBillId,
+          paidAmount: paymentAmount,
+          paidDate: paymentDate,
+          envelopeId: effectiveEnvelopeId,
+        });
+
+        // We also need to update other fields if needed using executeBillUpdate logic
+        // But markBillPaidAsync handles the 'paid' status.
+        // If we have other updates (like modification history), we might need updateBillAsync.
+        // The original code called executeBillUpdate AND markBillPaid.
+        // markBillPaidAsync only updates specific fields.
+        // Let's ensure we persist the history if important.
 
         await executeBillUpdate(updatedBill, {
-          updateBill,
-          onUpdateBill,
-          budget,
+          updateBill: async ({ id, updates }) => {
+            await updateBillAsync({ billId: id, updates });
+          },
         });
 
         logger.info("Bill payment completed", {
@@ -294,7 +289,7 @@ export const useBillPayment = ({
         throw error;
       }
     },
-    [bills, validatePaymentFunds, updateBill, onUpdateBill, budget, markBillPaid]
+    [tanStackBills, validatePaymentFunds, updateBillAsync, markBillPaidAsync]
   );
 
   return {

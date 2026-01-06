@@ -8,7 +8,8 @@ import { useMemo, useCallback } from "react";
 import { useTransactions } from "@/hooks/common/useTransactions";
 import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import useBills from "@/hooks/bills/useBills";
-import { useBillOperations } from "@/hooks/bills/useBillOperations";
+import { useBillPayment } from "@/hooks/bills/useBillPayment";
+import { useBillBulkMutations } from "@/hooks/bills/useBillBulkMutations";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 import {
@@ -78,20 +79,16 @@ export const useBillManager = ({
     addBill,
     updateBillAsync,
     deleteBill,
-    markBillPaidAsync,
     isLoading: billsLoading,
   } = useBills();
+
+  // Initialize sub-hooks
+  const { handlePayBill } = useBillPayment();
+  const { handleBulkUpdate: handleBulkUpdateAction } = useBillBulkMutations();
 
   const updateBillWithFullRecord = useCallback(
     async (bill: Bill) => {
       await updateBillAsync({ billId: bill.id, updates: bill as Record<string, unknown> });
-    },
-    [updateBillAsync]
-  );
-
-  const updateBillForOperations = useCallback(
-    async (options: { id: string; updates: Record<string, unknown> }) => {
-      await updateBillAsync({ billId: options.id, updates: options.updates });
     },
     [updateBillAsync]
   );
@@ -142,16 +139,6 @@ export const useBillManager = ({
       uiState.filterOptions,
     ]);
 
-  const billOperations = useBillOperations({
-    bills: bills as Bill[],
-    envelopes: envelopes as Envelope[],
-    updateBill: updateBillForOperations,
-    onUpdateBill: onUpdateBill as never,
-    onError,
-    budget: budget as never,
-    markBillPaid: markBillPaidAsync,
-  });
-
   const searchNewBills = useCallback(
     () =>
       handleSearchNewBills(
@@ -190,10 +177,10 @@ export const useBillManager = ({
 
   const handleBulkUpdate = useCallback(
     async (updatedBills: Bill[]) => {
-      const result = await billOperations.handleBulkUpdate(updatedBills);
+      const result = await handleBulkUpdateAction(updatedBills);
       if (result.success) uiState.setSelectedBills(new Set());
     },
-    [billOperations, uiState]
+    [handleBulkUpdateAction, uiState]
   );
 
   const uiActions = createUIActions({
@@ -209,6 +196,7 @@ export const useBillManager = ({
     setHistoryBill: (bill) => uiState.setHistoryBill(bill),
     setFilterOptions: uiState.setFilterOptions,
   });
+
   const isLoading = transactionsLoading || envelopesLoading || billsLoading;
 
   return {
@@ -224,9 +212,18 @@ export const useBillManager = ({
     handleAddDiscoveredBills,
     handleBulkUpdate,
     ...uiActions,
-    billOperations,
+
+    // Expose operations directly
     addBill,
     updateBill: updateBillWithFullRecord,
     deleteBill,
+    handlePayBill,
+
+    // Legacy support (some components might expect 'billOperations' object)
+    // We can phase this out or keep it if current UI relies on it deep down
+    billOperations: {
+      handlePayBill,
+      handleBulkUpdate: handleBulkUpdateAction,
+    },
   };
 };
