@@ -2,6 +2,7 @@ import { encryptionManager } from "../security/encryptionManager";
 import logger from "@/utils/common/logger";
 import { syncHealthMonitor } from "@/utils/sync/syncHealthMonitor";
 import { autoBackupService } from "@/utils/sync/autoBackupService";
+import { offlineRequestQueueService } from "./offlineRequestQueueService";
 import type { SafeUnknown, TypedResponse } from "@/types/firebase";
 
 /**
@@ -85,6 +86,9 @@ export class SyncOrchestrator {
     // Initialize Provider
     await this.provider.initialize(this.budgetId, key);
 
+    // Initialize offline request queue
+    await offlineRequestQueueService.initialize();
+
     this.isRunning = true;
     logger.production("SyncOrchestrator: Started", {
       budgetId: this.budgetId.substring(0, 8),
@@ -104,6 +108,10 @@ export class SyncOrchestrator {
     this.isSyncInProgress = false;
     this.provider = null;
     this.budgetId = null;
+
+    // Stop offline queue processing
+    offlineRequestQueueService.stopProcessingInterval();
+
     logger.production("SyncOrchestrator: Stopped");
   }
 
