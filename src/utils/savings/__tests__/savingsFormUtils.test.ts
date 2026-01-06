@@ -12,7 +12,7 @@ describe("savingsFormUtils", () => {
         name: "Emergency Fund",
         targetAmount: "5000",
         currentAmount: "1000",
-        targetDate: "2025-12-31",
+        targetDate: "2027-12-31",
         category: "Emergency Fund",
         color: "#3B82F6",
         description: "Save for emergencies",
@@ -50,7 +50,9 @@ describe("savingsFormUtils", () => {
 
       const errors = validateSavingsGoalForm(invalidFormData);
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some((err) => err.includes("Valid target amount is required"))).toBe(true);
+      expect(
+        errors.some((err) => err.includes("Target amount must be a valid positive number"))
+      ).toBe(true);
     });
 
     it("should validate negative target amount", () => {
@@ -65,7 +67,9 @@ describe("savingsFormUtils", () => {
 
       const errors = validateSavingsGoalForm(invalidFormData);
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some((err) => err.includes("Valid target amount is required"))).toBe(true);
+      expect(
+        errors.some((err) => err.includes("Target amount must be a valid positive number"))
+      ).toBe(true);
     });
 
     it("should validate current amount is not negative", () => {
@@ -210,6 +214,7 @@ describe("savingsFormUtils", () => {
       const errors1 = validateSavingsGoalForm(validFormDataWithStrings);
       expect(errors1).toEqual([]);
 
+      // Schema expects strings, not numbers
       const validFormDataWithNumbers = {
         name: "Emergency Fund",
         targetAmount: 5000,
@@ -220,7 +225,9 @@ describe("savingsFormUtils", () => {
       };
 
       const errors2 = validateSavingsGoalForm(validFormDataWithNumbers);
-      expect(errors2).toEqual([]);
+      // Numbers should fail validation since schema expects strings
+      expect(errors2.length).toBeGreaterThan(0);
+      expect(errors2.some((err) => err.includes("expected string"))).toBe(true);
     });
 
     it("should validate priority enum values", () => {

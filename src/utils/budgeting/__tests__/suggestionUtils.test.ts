@@ -15,10 +15,17 @@ import {
 } from "../suggestionUtils";
 
 describe("suggestionUtils", () => {
+  // Use dates relative to current date to avoid time-based test failures
+  const now = new Date();
+  const fifteenDaysAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000);
+  const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+  const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
   const mockTransactions = [
     {
       id: "1",
-      date: "2024-01-15",
+      date: fifteenDaysAgo.toISOString().split("T")[0],
       amount: -50,
       description: "Starbucks Coffee",
       category: "Food",
@@ -26,7 +33,7 @@ describe("suggestionUtils", () => {
     },
     {
       id: "2",
-      date: "2024-01-10",
+      date: tenDaysAgo.toISOString().split("T")[0],
       amount: -100,
       description: "Amazon Purchase",
       category: "Shopping",
@@ -34,7 +41,7 @@ describe("suggestionUtils", () => {
     },
     {
       id: "3",
-      date: "2024-01-05",
+      date: fiveDaysAgo.toISOString().split("T")[0],
       amount: -75,
       description: "Grocery Store",
       category: "Food",
@@ -42,9 +49,17 @@ describe("suggestionUtils", () => {
     },
     {
       id: "4",
-      date: "2023-12-20", // Older transaction
+      date: sixtyDaysAgo.toISOString().split("T")[0], // Older transaction
       amount: -30,
       description: "Coffee Shop",
+      category: "Food",
+      envelopeId: null,
+    },
+    {
+      id: "5",
+      date: fiveDaysAgo.toISOString().split("T")[0],
+      amount: -25,
+      description: "Fast Food",
       category: "Food",
       envelopeId: null,
     },
@@ -91,16 +106,18 @@ describe("suggestionUtils", () => {
     it("should filter by 30 days", () => {
       const result = filterTransactionsByDateRange(mockTransactions, 30);
 
-      // Should exclude the December transaction
-      expect(result).toHaveLength(3);
-      expect(result.every((t) => new Date(t.date) >= new Date("2024-01-01"))).toBe(true);
+      // Should exclude the 60-day-old transaction
+      expect(result).toHaveLength(4);
+      expect(
+        result.every((t) => new Date(t.date) >= new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000))
+      ).toBe(true);
     });
 
     it("should handle default range", () => {
       const result = filterTransactionsByDateRange(mockTransactions, "invalid");
 
       // Should use 6months default and include all transactions
-      expect(result).toHaveLength(4);
+      expect(result).toHaveLength(5);
     });
   });
 
@@ -168,20 +185,20 @@ describe("suggestionUtils", () => {
     it("should detect coffee merchant pattern", () => {
       const coffeeTransactions = [
         {
-          date: "2024-01-01",
-          amount: -5,
+          date: fiveDaysAgo.toISOString().split("T")[0],
+          amount: -20,
           description: "Starbucks Store",
           envelopeId: null,
         },
         {
-          date: "2024-01-02",
-          amount: -4,
+          date: tenDaysAgo.toISOString().split("T")[0],
+          amount: -18,
           description: "Dunkin Donuts",
           envelopeId: null,
         },
         {
-          date: "2024-01-03",
-          amount: -6,
+          date: fifteenDaysAgo.toISOString().split("T")[0],
+          amount: -22,
           description: "Local Coffee Shop",
           envelopeId: null,
         },

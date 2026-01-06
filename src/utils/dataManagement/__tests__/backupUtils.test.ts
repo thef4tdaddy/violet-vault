@@ -1,5 +1,14 @@
 import { backupCurrentData, validateBackupStructure } from "../backupUtils";
-import { vi, describe, it, expect } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+
+// Mock logger
+vi.mock("../../common/logger", () => ({
+  default: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
 
 vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
@@ -52,6 +61,12 @@ vi.mock("../../../db/budgetDb", () => ({
 }));
 
 describe("backupUtils", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Clear localStorage before each test
+    localStorage.clear();
+  });
+
   describe("backupCurrentData", () => {
     it("should backup current data to localStorage", async () => {
       const setItemSpy = vi.spyOn(Storage.prototype, "setItem");

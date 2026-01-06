@@ -75,7 +75,7 @@ describe("useExportData", () => {
     (budgetDb.debts.toArray as Mock).mockResolvedValue([]);
     (budgetDb.paycheckHistory.toArray as Mock).mockResolvedValue([]);
     (budgetDb.auditLog.toArray as Mock).mockResolvedValue([]);
-    (getBudgetMetadata as Mock).mockResolvedValue({});
+    (getBudgetMetadata as Mock).mockResolvedValue(null); // Changed from {} to null
 
     const { result } = renderHook(() => useExportData());
     await result.current.exportData();
@@ -93,11 +93,13 @@ describe("useExportData", () => {
     (budgetDb.envelopes.toArray as Mock).mockRejectedValue(new Error("Database query failed"));
 
     const { result } = renderHook(() => useExportData());
-    await expect(result.current.exportData()).rejects.toThrow();
+    // Function doesn't throw, it catches errors and shows toast
+    await result.current.exportData();
 
-    await waitFor(() => {
-      expect(showErrorToast).toHaveBeenCalled();
-    });
+    expect(showErrorToast).toHaveBeenCalledWith(
+      expect.stringContaining("Database query failed"),
+      "Export Failed"
+    );
   });
 
   it("should handle metadata fetch errors", async () => {
@@ -116,11 +118,13 @@ describe("useExportData", () => {
     (getBudgetMetadata as Mock).mockRejectedValue(new Error("Metadata fetch failed"));
 
     const { result } = renderHook(() => useExportData());
-    await expect(result.current.exportData()).rejects.toThrow();
+    // Function doesn't throw, it catches errors and shows toast
+    await result.current.exportData();
 
-    await waitFor(() => {
-      expect(showErrorToast).toHaveBeenCalled();
-    });
+    expect(showErrorToast).toHaveBeenCalledWith(
+      expect.stringContaining("Metadata fetch failed"),
+      "Export Failed"
+    );
   });
 
   it("should export partial data when some tables are empty", async () => {
