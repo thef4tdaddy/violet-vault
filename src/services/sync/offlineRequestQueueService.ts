@@ -278,7 +278,7 @@ export class OfflineRequestQueueService {
    */
   private calculateRetryDelay(retryCount: number): number {
     const baseDelay = 1000; // 1 second
-    const delay = baseDelay * Math.pow(2, retryCount);
+    const delay = baseDelay * Math.pow(2, retryCount - 1);
     return Math.min(delay, 30000); // Cap at 30 seconds
   }
 
