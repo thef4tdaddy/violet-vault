@@ -2,7 +2,9 @@ import { encryptionManager } from "../security/encryptionManager";
 import logger from "@/utils/common/logger";
 import { syncHealthMonitor } from "@/utils/sync/syncHealthMonitor";
 import { autoBackupService } from "@/utils/sync/autoBackupService";
+import { websocketSignalingService } from "./websocketSignalingService";
 import type { SafeUnknown, TypedResponse } from "@/types/firebase";
+import type { WebSocketSignalMessage } from "@/types/sync";
 
 /**
  * Snapshot of local Dexie data for sync.
@@ -91,6 +93,9 @@ export class SyncOrchestrator {
       provider: this.provider.name,
     });
 
+    // Setup WebSocket signaling for real-time sync notifications
+    this.setupWebSocketSignaling();
+
     // Initial sync
     this.scheduleSync("high");
   }
@@ -100,6 +105,14 @@ export class SyncOrchestrator {
    */
   public stop(): void {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    
+    // Cleanup WebSocket signaling
+    if (this.wsUnsubscribe) {
+      this.wsUnsubscribe();
+      this.wsUnsubscribe = null;
+    }
+    websocketSignalingService.disconnect();
+
     this.isRunning = false;
     this.isSyncInProgress = false;
     this.provider = null;
@@ -164,6 +177,11 @@ export class SyncOrchestrator {
       if (result.success) {
         syncHealthMonitor.recordSyncSuccess(syncId);
         logger.info("SyncOrchestrator: Sync successful");
+        
+        // Send WebSocket signal to notify other clients (SIGNALING ONLY - NO DATA)
+        websocketSignalingService.sendSignal("data_changed", {
+          version: "2.0",
+        });
       } else {
         syncHealthMonitor.recordSyncFailure(
           syncId,
@@ -228,6 +246,50 @@ export class SyncOrchestrator {
       lastModified: Date.now(),
       syncVersion: "2.0",
     };
+  }
+
+  /**
+   * Setup WebSocket signaling for real-time sync notifications
+   * PRIVACY: Only signals are transmitted, no data
+   */
+  private setupWebSocketSignaling(): void {
+    if (!this.budgetId) {
+      return;
+    }
+
+    // Check if WebSocket is enabled
+    const wsEnabled = import.meta.env.VITE_WEBSOCKET_ENABLED === "true";
+    if (!wsEnabled) {
+      logger.debug("WebSocket signaling is disabled");
+      return;
+    }
+
+    const wsUrl = import.meta.env.VITE_WEBSOCKET_URL;
+    if (!wsUrl) {
+      logger.debug("VITE_WEBSOCKET_URL not configured");
+      return;
+    }
+
+    // Connect to WebSocket signaling service
+    websocketSignalingService.connect({
+      url: wsUrl,
+      budgetId: this.budgetId,
+    });
+
+    // Listen for sync signals from other clients
+    this.wsUnsubscribe = websocketSignalingService.onSignal((signal: WebSocketSignalMessage) => {
+      logger.debug("WebSocket signal received", { type: signal.type });
+
+      // Handle sync-related signals
+      if (signal.type === "data_changed" || signal.type === "sync_required") {
+        // Trigger a sync when another client has made changes
+        // This ensures all clients stay in sync without transmitting data via WebSocket
+        logger.info("Remote data change detected, scheduling sync");
+        this.scheduleSync("high");
+      }
+    });
+
+    logger.info("WebSocket signaling setup complete", { budgetId: this.budgetId.substring(0, 8) });
   }
 }
 
