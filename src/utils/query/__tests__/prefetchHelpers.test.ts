@@ -132,7 +132,14 @@ describe("prefetchHelpers", () => {
       };
 
       (budgetDatabaseService.getTransactions as Mock).mockResolvedValue(mockTransactions);
-      (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockTransactions);
+
+      // Make prefetchQuery actually call the queryFn
+      (mockQueryClient.prefetchQuery as Mock).mockImplementation(async (options) => {
+        if (options.queryFn) {
+          return await options.queryFn();
+        }
+        return mockTransactions;
+      });
 
       const result = await prefetchHelpers.prefetchTransactions(
         mockQueryClient as unknown as QueryClient,
@@ -254,7 +261,14 @@ describe("prefetchHelpers", () => {
       };
 
       (budgetDb.getCachedValue as Mock).mockResolvedValue(mockDashboardData);
-      (mockQueryClient.prefetchQuery as Mock).mockResolvedValue(mockDashboardData);
+
+      // Make prefetchQuery actually call the queryFn
+      (mockQueryClient.prefetchQuery as Mock).mockImplementation(async (options) => {
+        if (options.queryFn) {
+          return await options.queryFn();
+        }
+        return mockDashboardData;
+      });
 
       const result = await prefetchHelpers.prefetchDashboard(
         mockQueryClient as unknown as QueryClient

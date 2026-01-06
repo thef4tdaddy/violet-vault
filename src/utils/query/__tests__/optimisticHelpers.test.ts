@@ -10,15 +10,20 @@ import { queryKeys } from "../queryKeys";
 vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
-      update: vi.fn(),
+      get: vi.fn(),
+      put: vi.fn(),
       add: vi.fn(),
       delete: vi.fn(),
     },
     transactions: {
+      get: vi.fn(),
+      put: vi.fn(),
       update: vi.fn(),
       add: vi.fn(),
     },
     bills: {
+      get: vi.fn(),
+      put: vi.fn(),
       update: vi.fn(),
     },
   },
@@ -73,7 +78,8 @@ describe("optimisticHelpers", () => {
         return updater;
       });
 
-      (budgetDb.envelopes.update as Mock).mockResolvedValue(true);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(existingEnvelope);
+      (budgetDb.envelopes.put as Mock).mockResolvedValue(true);
 
       await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
 
@@ -89,10 +95,11 @@ describe("optimisticHelpers", () => {
         expect.any(Function)
       );
 
-      // Should update database
-      expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
-        envelopeId,
+      // Should update database using get + put pattern
+      expect(budgetDb.envelopes.get).toHaveBeenCalledWith(envelopeId);
+      expect(budgetDb.envelopes.put).toHaveBeenCalledWith(
         expect.objectContaining({
+          ...existingEnvelope,
           ...updates,
           lastModified: expect.any(Number),
         })
@@ -104,7 +111,8 @@ describe("optimisticHelpers", () => {
       const updates = { name: "Updated Food" };
       const error = new Error("Database update failed");
 
-      (budgetDb.envelopes.update as Mock).mockRejectedValue(error);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue({ id: envelopeId, name: "Food" });
+      (budgetDb.envelopes.put as Mock).mockRejectedValue(error);
 
       // Should not throw error
       await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
