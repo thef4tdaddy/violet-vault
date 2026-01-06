@@ -126,9 +126,9 @@ useOfflineMutation({
 
 Requests automatically retry with exponential backoff:
 
-- Retry 1: after 1 second
-- Retry 2: after 2 seconds
-- Retry 3: after 4 seconds
+- Retry 1: after 2 seconds
+- Retry 2: after 4 seconds
+- Retry 3: after 8 seconds
 - Max retries: 3 (configurable)
 - Max delay: 30 seconds
 
