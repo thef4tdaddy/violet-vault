@@ -286,6 +286,7 @@ export class ImportService {
 
         // Validate required fields
         if (!item.date) errors.push("Missing date");
+        // Note: Amount can be 0, which is valid. We check for undefined/null explicitly.
         if (item.amount === undefined || item.amount === null) errors.push("Missing amount");
         if (!item.type || !["income", "expense", "transfer"].includes(item.type)) {
           errors.push("Missing or invalid type");

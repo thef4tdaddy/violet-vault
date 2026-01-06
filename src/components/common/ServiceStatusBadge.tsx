@@ -47,8 +47,9 @@ export const ServiceStatusBadge: React.FC<ServiceStatusBadgeProps> = ({
         onClick={() => refresh()}
         className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className}`}
         title={status.error || "Click to refresh"}
+        aria-label={`${service} service status: ${statusText}. Click to refresh`}
       >
-        <div className={`w-2 h-2 rounded-full ${statusColor}`}></div>
+        <div className={`w-2 h-2 rounded-full ${statusColor}`} role="status" aria-label={statusText}></div>
         {showLabel && (
           <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>
         )}
@@ -81,8 +82,9 @@ export const ServiceStatusBadge: React.FC<ServiceStatusBadgeProps> = ({
         onClick={() => refresh()}
         className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className}`}
         title="Click to refresh service status"
+        aria-label={`All services status: ${statusText}. Click to refresh`}
       >
-        <div className={`w-2 h-2 rounded-full ${statusColor}`}></div>
+        <div className={`w-2 h-2 rounded-full ${statusColor}`} role="status" aria-label={statusText}></div>
         {showLabel && (
           <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>
         )}
@@ -174,6 +176,7 @@ export const ServiceStatusDetails: React.FC<ServiceStatusDetailsProps> = ({ clas
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"

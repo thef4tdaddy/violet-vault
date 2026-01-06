@@ -135,6 +135,88 @@ describe("ImportService", () => {
     });
   });
 
+  describe("importTransactions with fallback behavior", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it("should use backend when available and preferBackend is true", async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          success: true,
+          transactions: [],
+          invalid: [],
+        },
+      };
+
+      vi.spyOn(ApiClient, "post").mockResolvedValue(mockResponse);
+      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(true);
+
+      const csvContent = "date,amount,description\n2024-01-01,100,Test";
+      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
+
+      const result = await ImportService.importTransactions(csvFile);
+
+      expect(result.success).toBe(true);
+      expect(ApiClient.post).toHaveBeenCalled();
+    });
+
+    it("should fallback to client-side when backend is unavailable", async () => {
+      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(false);
+
+      const csvContent = "date,amount,description\n2024-01-01,100,Test";
+      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
+
+      const result = await ImportService.importTransactions(csvFile);
+
+      expect(result.success).toBe(true);
+      expect(ApiClient.post).not.toHaveBeenCalled();
+    });
+
+    it("should use client-side when forceClientSide is true", async () => {
+      const csvContent = "date,amount,description\n2024-01-01,100,Test";
+      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
+
+      const result = await ImportService.importTransactions(csvFile, undefined, {
+        forceClientSide: true,
+      });
+
+      expect(result.success).toBe(true);
+      expect(ApiClient.post).not.toHaveBeenCalled();
+    });
+
+    it("should fallback to client-side when backend fails", async () => {
+      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(true);
+      vi.spyOn(ApiClient, "post").mockResolvedValue({
+        success: false,
+        error: "Backend error",
+      });
+
+      const csvContent = "date,amount,description\n2024-01-01,100,Test";
+      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
+
+      const result = await ImportService.importTransactions(csvFile);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("should respect preferBackend option", async () => {
+      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(false);
+
+      const csvContent = "date,amount,description\n2024-01-01,100,Test";
+      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
+
+      const result = await ImportService.importTransactions(csvFile, undefined, {
+        preferBackend: false,
+        forceClientSide: true,
+      });
+
+      expect(result.success).toBe(true);
+      expect(ApiClient.post).not.toHaveBeenCalled();
+    });
+  });
+
   describe("isAvailable", () => {
     it("should return false when offline", async () => {
       vi.spyOn(ApiClient, "isOnline").mockReturnValue(false);

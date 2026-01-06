@@ -171,6 +171,7 @@ const result = mapRowsToTransactions(rows, {
   amount: 'Amount',
   description: 'Description',
   category: 'Category',
+  dateFormat: 'US', // Specify 'US' (MM/DD/YYYY) or 'EU' (DD/MM/YYYY) to avoid ambiguity
 });
 
 // Valid transactions

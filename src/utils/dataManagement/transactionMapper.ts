@@ -217,6 +217,11 @@ function parseDate(dateStr: string, format: "US" | "EU" | "auto" = "auto"): Date
       // Both numbers ≤ 12: ambiguous, default to US format
       // Note: Users should specify format explicitly in this case
       else {
+        // Warn about ambiguous date
+        logger.warn(
+          `Ambiguous date detected: "${dateStr}". Both day and month are ≤ 12. ` +
+            'Defaulting to US format (MM/DD/YYYY). Specify dateFormat as "US" or "EU" in mapping config to avoid ambiguity.'
+        );
         const date = new Date(yearNum, firstNum - 1, secondNum);
         if (
           !isNaN(date.getTime()) &&
@@ -275,8 +280,12 @@ export function validateTransaction(transaction: Transaction): string[] {
 
   if (!transaction.date) {
     errors.push("Missing date");
-  } else if (isNaN(new Date(transaction.date).getTime())) {
-    errors.push("Invalid date");
+  } else {
+    // Handle both Date objects and timestamps
+    const dateValue = transaction.date instanceof Date ? transaction.date : new Date(transaction.date);
+    if (isNaN(dateValue.getTime())) {
+      errors.push("Invalid date");
+    }
   }
 
   if (transaction.amount === undefined || transaction.amount === null) {

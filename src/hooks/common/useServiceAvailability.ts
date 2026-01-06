@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   serviceAvailability,
   type ServiceName,
@@ -13,7 +13,7 @@ import logger from "@/utils/common/logger";
  *
  * @param serviceName - Optional specific service to monitor
  * @param autoRefresh - Enable automatic periodic refresh (default: true)
- * @param refreshInterval - Refresh interval in ms (default: 60000ms = 1 minute)
+ * @param refreshInterval - Base refresh interval in ms (default: 60000ms = 1 minute)
  * @returns Service status and control functions
  */
 export function useServiceAvailability(
@@ -24,6 +24,8 @@ export function useServiceAvailability(
   const [status, setStatus] = useState<ServiceStatus | AllServicesStatus | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [failureCount, setFailureCount] = useState(0);
+  const checkAvailabilityRef = useRef<(forceRefresh: boolean) => Promise<void>>();
 
   /**
    * Check service availability
@@ -36,17 +38,33 @@ export function useServiceAvailability(
       try {
         if (serviceName) {
           // Check specific service
-          await serviceAvailability.checkService(serviceName, forceRefresh);
+          const available = await serviceAvailability.checkService(serviceName, forceRefresh);
           const serviceStatus = serviceAvailability.getStatus(serviceName);
           setStatus(serviceStatus);
+          
+          // Track failures for exponential backoff
+          if (!available) {
+            setFailureCount((prev) => prev + 1);
+          } else {
+            setFailureCount(0);
+          }
         } else {
           // Check all services
           const allStatus = await serviceAvailability.checkAllServices(forceRefresh);
           setStatus(allStatus);
+          
+          // Track failures if all services are down
+          const allDown = !allStatus.api.available && !allStatus.budgetEngine.available && !allStatus.import.available;
+          if (allDown) {
+            setFailureCount((prev) => prev + 1);
+          } else {
+            setFailureCount(0);
+          }
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Failed to check service";
         setLastError(errorMessage);
+        setFailureCount((prev) => prev + 1);
         logger.error("Service availability check failed", error);
       } finally {
         setIsChecking(false);
@@ -55,10 +73,16 @@ export function useServiceAvailability(
     [serviceName]
   );
 
+  // Store the latest checkAvailability in ref to avoid stale closures
+  useEffect(() => {
+    checkAvailabilityRef.current = checkAvailability;
+  }, [checkAvailability]);
+
   /**
    * Force refresh service status
    */
   const refresh = useCallback(() => {
+    setFailureCount(0); // Reset failure count on manual refresh
     return checkAvailability(true);
   }, [checkAvailability]);
 
@@ -74,22 +98,27 @@ export function useServiceAvailability(
     checkAvailability(false);
   }, [checkAvailability]);
 
-  // Auto-refresh interval
+  // Auto-refresh interval with exponential backoff
   useEffect(() => {
     if (!autoRefresh) return;
 
+    // Calculate backoff interval: base * (2 ^ failureCount), capped at 10 minutes
+    const backoffMultiplier = Math.min(Math.pow(2, failureCount), 10);
+    const currentInterval = refreshInterval * backoffMultiplier;
+
     const intervalId = setInterval(() => {
-      checkAvailability(false);
-    }, refreshInterval);
+      checkAvailabilityRef.current?.(false);
+    }, currentInterval);
 
     return () => clearInterval(intervalId);
-  }, [autoRefresh, refreshInterval, checkAvailability]);
+  }, [autoRefresh, refreshInterval, failureCount]);
 
   // Listen for network status changes
   useEffect(() => {
     const handleOnline = () => {
       logger.info("Network online - refreshing service availability");
-      checkAvailability(true);
+      setFailureCount(0); // Reset failure count when coming online
+      checkAvailabilityRef.current?.(true);
     };
 
     const handleOffline = () => {
@@ -117,7 +146,7 @@ export function useServiceAvailability(
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [serviceName, checkAvailability]);
+  }, [serviceName]); // Only depend on serviceName, not checkAvailability
 
   return {
     status,

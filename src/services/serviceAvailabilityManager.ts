@@ -66,8 +66,8 @@ export class ServiceAvailabilityManager {
       return inProgress;
     }
 
-    // Start new health check
-    const checkPromise = this.performHealthCheck(service);
+    // Start new health check with timeout
+    const checkPromise = this.performHealthCheckWithTimeout(service);
     this.healthCheckInProgress.set(service, checkPromise);
 
     try {
@@ -80,6 +80,24 @@ export class ServiceAvailabilityManager {
     } finally {
       this.healthCheckInProgress.delete(service);
     }
+  }
+
+  /**
+   * Perform health check with timeout to prevent hanging promises
+   */
+  private async performHealthCheckWithTimeout(service: ServiceName): Promise<boolean> {
+    const HEALTH_CHECK_TIMEOUT = 10000; // 10 seconds
+
+    return Promise.race([
+      this.performHealthCheck(service),
+      new Promise<boolean>((_, reject) =>
+        setTimeout(() => reject(new Error("Health check timeout")), HEALTH_CHECK_TIMEOUT)
+      ),
+    ]).catch((error) => {
+      const errorMessage = error instanceof Error ? error.message : "Health check failed";
+      this.updateCache(service, false, errorMessage);
+      return false;
+    });
   }
 
   /**
