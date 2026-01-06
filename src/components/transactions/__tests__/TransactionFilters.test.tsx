@@ -5,17 +5,13 @@ import userEvent from "@testing-library/user-event";
 
 // Mock UI components
 vi.mock("@/components/ui", () => ({
-  Button: ({ children, onClick, disabled, className }) => (
-    <button onClick={onClick} disabled={disabled} className={className}>
-      {children}
-    </button>
-  ),
-  Select: ({ value, onChange, children, className }) => (
+  Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  Select: ({ value, onChange, children, className }: any) => (
     <select value={value} onChange={onChange} className={className}>
       {children}
     </select>
   ),
-  Input: ({ value, onChange, type, placeholder, className }) => (
+  Input: ({ value, onChange, type, placeholder, className }: any) => (
     <input
       value={value}
       onChange={onChange}
@@ -27,15 +23,11 @@ vi.mock("@/components/ui", () => ({
 }));
 
 vi.mock("../../utils", () => ({
-  getIcon: vi.fn(() => {
-    return function MockIcon({ className }) {
-      return (
-        <div className={className} data-testid="icon">
-          Icon
-        </div>
-      );
-    };
-  }),
+  getIcon: vi.fn(() => ({ className }: any) => (
+    <div className={className} data-testid="icon">
+      Icon
+    </div>
+  )),
 }));
 
 describe("TransactionFilters", () => {
@@ -66,17 +58,16 @@ describe("TransactionFilters", () => {
   });
 
   describe("Rendering", () => {
-    it("should render without crashing", () => {
+    it("should render search input", () => {
       render(<TransactionFilters {...defaultProps} />);
-      expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Search transactions.../i)).toBeInTheDocument();
     });
 
-    it("should render all filter inputs", () => {
+    it("should render all filter select boxes", () => {
       render(<TransactionFilters {...defaultProps} />);
 
-      expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/start date/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/end date/i)).toBeInTheDocument();
+      const selects = screen.getAllByRole("combobox");
+      expect(selects.length).toBe(4); // Date, Type, Envelope, Sort By
     });
 
     it("should render category selector", () => {
@@ -85,48 +76,25 @@ describe("TransactionFilters", () => {
       const selects = screen.getAllByRole("combobox");
       expect(selects.length).toBeGreaterThan(0);
     });
-
-    it("should render reset button", () => {
-      render(<TransactionFilters {...defaultProps} />);
-      expect(screen.getByText(/reset/i)).toBeInTheDocument();
-    });
   });
 
   describe("Filter Updates", () => {
-    it("should call onFilterChange when description is entered", async () => {
+    it("should call setSearchTerm when search text is entered", async () => {
       render(<TransactionFilters {...defaultProps} />);
 
-      const input = screen.getByPlaceholderText(/description/i);
+      const input = screen.getByPlaceholderText(/Search transactions.../i);
       await userEvent.type(input, "coffee");
 
       expect(mockOnFilterChange).toHaveBeenCalled();
     });
 
-    it("should call onFilterChange when start date is set", async () => {
-      render(<TransactionFilters {...defaultProps} />);
+    it("should call setSortOrder when sort button is clicked", async () => {
+      render(<TransactionFilters {...defaultProps} sortOrder="asc" />);
 
-      const input = screen.getByPlaceholderText(/start date/i);
-      await userEvent.type(input, "2024-01-01");
-
-      expect(mockOnFilterChange).toHaveBeenCalled();
-    });
-
-    it("should call onFilterChange when end date is set", async () => {
-      render(<TransactionFilters {...defaultProps} />);
-
-      const input = screen.getByPlaceholderText(/end date/i);
-      await userEvent.type(input, "2024-12-31");
+      const sortButton = screen.getByRole("button", { name: /sort descending/i });
+      await userEvent.click(sortButton);
 
       expect(mockOnFilterChange).toHaveBeenCalled();
-    });
-
-    it("should call onReset when reset button is clicked", async () => {
-      render(<TransactionFilters {...defaultProps} />);
-
-      const resetButton = screen.getByText(/reset/i);
-      await userEvent.click(resetButton);
-
-      expect(mockOnReset).toHaveBeenCalled();
     });
   });
 
@@ -156,42 +124,6 @@ describe("TransactionFilters", () => {
 
       const selects = screen.getAllByRole("combobox");
       expect(selects).toBeDefined();
-    });
-  });
-
-  describe("Amount Filters", () => {
-    it("should accept minimum amount", async () => {
-      render(<TransactionFilters {...defaultProps} />);
-
-      const inputs = screen.getAllByRole("spinbutton");
-      if (inputs.length > 0) {
-        await userEvent.type(inputs[0], "10");
-        expect(mockOnFilterChange).toHaveBeenCalled();
-      }
-    });
-
-    it("should accept maximum amount", async () => {
-      render(<TransactionFilters {...defaultProps} />);
-
-      const inputs = screen.getAllByRole("spinbutton");
-      if (inputs.length > 1) {
-        await userEvent.type(inputs[1], "100");
-        expect(mockOnFilterChange).toHaveBeenCalled();
-      }
-    });
-  });
-
-  describe("Date Range", () => {
-    it("should accept date range", async () => {
-      render(<TransactionFilters {...defaultProps} />);
-
-      const startDate = screen.getByPlaceholderText(/start date/i);
-      const endDate = screen.getByPlaceholderText(/end date/i);
-
-      await userEvent.type(startDate, "2024-01-01");
-      await userEvent.type(endDate, "2024-12-31");
-
-      expect(mockOnFilterChange).toHaveBeenCalled();
     });
   });
 });

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
 import { useTransactionQuery } from "@/hooks/transactions/useTransactionQuery";
-import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { getDateRange } from "../utils/dateRangeUtils";
 import {
   calculateFinancialSummary,
@@ -42,7 +42,7 @@ export const useSpendingAnalyticsQuery = (options: SpendingAnalyticsOptions = {}
   // Dynamic limit based on period to optimize performance
   const transactionLimit = period === "allTime" || period === "thisYear" ? 5000 : 2000;
   const { transactions } = useTransactionQuery({ limit: transactionLimit });
-  const { envelopes } = useEnvelopesQuery();
+  const { envelopes } = useEnvelopes();
 
   const queryKeySeed = JSON.stringify({
     period,

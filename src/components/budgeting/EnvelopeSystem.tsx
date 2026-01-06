@@ -27,6 +27,7 @@ interface AddEnvelopeData {
   targetAmount?: number;
   description?: string;
   envelopeType?: string;
+  [key: string]: unknown;
 }
 
 interface CreateEnvelopeResult {
@@ -173,7 +174,7 @@ const useEnvelopeSystem = () => {
   const modifyEnvelope = useCallback(
     async (envelopeId: string, updates: Partial<Envelope>): Promise<UpdateEnvelopeResult> => {
       try {
-        await updateEnvelope({ id: envelopeId, updates });
+        await updateEnvelope(envelopeId, updates);
         return { success: true };
       } catch (error) {
         logger.error("Failed to update envelope:", error);
@@ -186,7 +187,7 @@ const useEnvelopeSystem = () => {
   const removeEnvelope = useCallback(
     async (envelopeId: string, deleteBillsToo: boolean = false): Promise<DeleteEnvelopeResult> => {
       try {
-        await deleteEnvelope(envelopeId, deleteBillsToo);
+        await deleteEnvelope({ envelopeId, deleteBillsToo });
         return { success: true };
       } catch (error) {
         logger.error("Failed to delete envelope:", error);

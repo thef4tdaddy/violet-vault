@@ -1,189 +1,196 @@
-/**
- * Transaction Operations Hook
- * Focused hook for CRUD operations on transactions
- * Created for Issue #508 - extracted from useTransactions.js
- */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import type { Transaction } from "@/types/finance";
+import { budgetDb } from "../../db/budgetDb.ts";
+import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient.ts";
+import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
+import type { Transaction } from "../../db/types.ts";
 import {
-  createAddTransactionMutationConfig,
-  createUpdateTransactionMutationConfig,
-  createDeleteTransactionMutationConfig,
-  createSplitTransactionMutationConfig,
-  createTransferFundsMutationConfig,
-  createBulkOperationMutationConfig,
-} from "./useTransactionOperationsHelpers";
+  normalizeTransactionAmount,
+  validateAndNormalizeTransaction,
+  validateTransactionPartialSafe,
+} from "@/domain/schemas/transaction";
 
-interface UseTransactionOperationsOptions {
-  categoryRules?: Array<{
-    pattern: string;
-    category: string;
-    envelopeId?: string | number;
-  }>;
+export interface TransactionInput {
+  date?: string;
+  amount?: number;
+  type?: "income" | "expense" | "transfer";
+  category?: string;
+  description?: string;
+  envelopeId?: string;
+  merchant?: string;
+  receiptUrl?: string;
+  notes?: string;
+  [key: string]: unknown;
 }
 
-/**
- * Hook for transaction CRUD operations
- * @param options - Hook options
- * @returns Transaction operations and state
- */
-const useTransactionOperations = (options: UseTransactionOperationsOptions = {}) => {
-  const queryClient = useQueryClient();
-  const { categoryRules = [] } = options;
-
-  // Create mutation configurations
-  const addTransactionMutation = useMutation<{ id: string }, Error, Partial<Transaction>>({
-    ...createAddTransactionMutationConfig(queryClient, categoryRules),
-  });
-
-  const updateTransactionMutation = useMutation<
-    unknown,
-    Error,
-    { id: string; updates: Partial<Transaction> }
-  >({
-    ...createUpdateTransactionMutationConfig(queryClient),
-  });
-
-  const deleteTransactionMutation = useMutation<{ id: string }, Error, string>({
-    ...createDeleteTransactionMutationConfig(queryClient),
-  });
-
-  const splitTransactionMutation = useMutation<
-    { originalTransaction: { id: string }; splitTransactions: unknown[] },
-    Error,
-    { originalTransaction: Transaction; splitTransactions: Partial<Transaction>[] }
-  >({
-    ...createSplitTransactionMutationConfig(queryClient),
-  });
-
-  type TransferVars = {
-    fromEnvelopeId: string | number;
-    toEnvelopeId: string | number;
-    amount: number;
-    date: string;
-    description?: string;
+const triggerSync = (changePath: string) => {
+  const ws = window as unknown as {
+    cloudSyncService?: { triggerSyncForCriticalChange: (path: string) => void };
   };
+  if (ws.cloudSyncService)
+    ws.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changePath}`);
+};
 
-  const transferFundsMutation = useMutation<
-    { outgoing: unknown; incoming: unknown; transferId?: unknown },
-    Error,
-    TransferVars
-  >({
-    ...createTransferFundsMutationConfig(queryClient),
+/**
+ * Consolidated Transaction Operations Hook
+ */
+export const useTransactionOperations = () => {
+  const queryClient = useQueryClient();
+  const { updateBalancesForTransaction } = useTransactionBalanceUpdater();
+
+  const handleSuccess = useCallback(
+    (type: string, invalidateEnvelopes = false) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      if (invalidateEnvelopes) queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      triggerSync(type);
+    },
+    [queryClient]
+  );
+
+  const addM = useMutation({
+    mutationFn: async (data: TransactionInput): Promise<Transaction> => {
+      const envelope = await budgetDb.envelopes.get(data.envelopeId || "");
+      if (!envelope) throw new Error("Envelope not found");
+
+      const raw: Transaction = {
+        id: Date.now().toString(),
+        date: new Date(data.date || new Date().toISOString().split("T")[0]),
+        type: data.type || "expense",
+        category: data.category || envelope.category || "other",
+        amount: data.amount || 0,
+        envelopeId: data.envelopeId!,
+        description: data.description,
+        createdAt: Date.now(),
+        lastModified: Date.now(),
+      };
+
+      const validated = validateAndNormalizeTransaction(normalizeTransactionAmount(raw));
+      const final: Transaction = {
+        ...validated,
+        date: new Date(validated.date as string),
+      } as Transaction;
+
+      await optimisticHelpers.addTransaction(queryClient, final);
+      await budgetDb.transactions.put(final);
+      await updateBalancesForTransaction(final);
+      return final;
+    },
+    onSuccess: () => handleSuccess("added", true),
   });
 
-  const bulkOperationMutation = useMutation<
-    unknown[],
-    Error,
-    { operation: string; transactions: Transaction[]; updates?: Partial<Transaction> }
-  >({
-    ...createBulkOperationMutationConfig(queryClient, categoryRules),
+  const updateM = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Transaction> }) => {
+      const validation = validateTransactionPartialSafe(updates);
+      if (!validation.success) throw new Error("Invalid data");
+      const normalized = { ...validation.data, lastModified: Date.now() };
+      if (normalized.date)
+        (normalized as Record<string, unknown>).date = new Date(normalized.date as string);
+
+      await optimisticHelpers.updateTransaction(
+        queryClient,
+        id,
+        normalized as Partial<Transaction>
+      );
+      await budgetDb.transactions.update(id, normalized as Partial<Transaction>);
+      return { id, updates: normalized };
+    },
+    onSuccess: () => handleSuccess("updated"),
   });
 
-  // Convenience methods
-  const addTransaction = useCallback(
-    (transactionData: Partial<Transaction>) => {
-      return addTransactionMutation.mutateAsync(transactionData);
+  const deleteM = useMutation({
+    mutationFn: async (id: string) => {
+      const txn = await budgetDb.transactions.get(id);
+      await optimisticHelpers.removeTransaction(queryClient, id);
+      await budgetDb.transactions.delete(id);
+      if (txn) await updateBalancesForTransaction(txn, true);
+      return id;
     },
-    [addTransactionMutation]
-  );
+    onSuccess: () => handleSuccess("deleted"),
+  });
 
-  const updateTransaction = useCallback(
-    (id: string | number, updates: Partial<Transaction>) => {
-      return updateTransactionMutation.mutateAsync({ id: String(id), updates });
-    },
-    [updateTransactionMutation]
-  );
-
-  const deleteTransaction = useCallback(
-    (transactionId: string | number) => {
-      return deleteTransactionMutation.mutateAsync(String(transactionId));
-    },
-    [deleteTransactionMutation]
-  );
-
-  const splitTransaction = useCallback(
-    (originalTransaction: Transaction, splitTransactions: Partial<Transaction>[]) => {
-      return splitTransactionMutation.mutateAsync({
-        originalTransaction,
-        splitTransactions,
-      });
-    },
-    [splitTransactionMutation]
-  );
-
-  const transferFunds = useCallback(
-    (transferData: {
-      fromEnvelopeId: string | number;
-      toEnvelopeId: string | number;
-      amount: number;
-      date: string;
-      description?: string;
+  const splitM = useMutation({
+    mutationFn: async ({
+      originalId,
+      splits,
+    }: {
+      originalId: string;
+      splits: TransactionInput[];
     }) => {
-      return transferFundsMutation.mutateAsync(transferData);
-    },
-    [transferFundsMutation]
-  );
+      const original = await budgetDb.transactions.get(originalId);
+      if (!original) throw new Error("Not found");
+      await budgetDb.transactions.delete(originalId);
+      await updateBalancesForTransaction(original, true);
 
-  const bulkOperation = useCallback(
-    (
-      operation: "delete" | "update" | "categorize",
-      transactions: Transaction[],
-      updates?: Partial<Transaction>
-    ) => {
-      return bulkOperationMutation.mutateAsync({
-        operation,
-        transactions,
-        updates,
-      });
+      for (const split of splits) {
+        const s: Transaction = {
+          id: `${originalId}-s-${Date.now()}-${Math.random()}`,
+          date: original.date,
+          amount: split.amount || 0,
+          envelopeId: split.envelopeId || original.envelopeId,
+          category: split.category || original.category,
+          type: original.type,
+          lastModified: Date.now(),
+        };
+        await budgetDb.transactions.put(s);
+        await updateBalancesForTransaction(s);
+      }
+      return originalId;
     },
-    [bulkOperationMutation]
-  );
+    onSuccess: () => handleSuccess("split"),
+  });
+
+  const bulkM = useMutation({
+    mutationFn: async ({
+      operation,
+      transactions,
+      updates,
+    }: {
+      operation: string;
+      transactions: Transaction[];
+      updates?: Partial<Transaction>;
+    }) => {
+      const results = [];
+      if (operation === "delete") {
+        for (const t of transactions) {
+          await deleteM.mutateAsync(t.id);
+          results.push(t.id);
+        }
+      } else if (operation === "update" || operation === "classify") {
+        if (!updates) throw new Error("Updates required for bulk update");
+        for (const t of transactions) {
+          await updateM.mutateAsync({ id: t.id, updates });
+          results.push(t.id);
+        }
+      }
+      return results;
+    },
+    onSuccess: () => handleSuccess("bulk"),
+  });
 
   return {
-    // Mutations
-    addTransactionMutation,
-    updateTransactionMutation,
-    deleteTransactionMutation,
-    splitTransactionMutation,
-    transferFundsMutation,
-    bulkOperationMutation,
-
-    // Convenience methods
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    splitTransaction,
-    transferFunds,
-    bulkOperation,
-
-    // Loading states
-    isAdding: addTransactionMutation.isPending,
-    isUpdating: updateTransactionMutation.isPending,
-    isDeleting: deleteTransactionMutation.isPending,
-    isSplitting: splitTransactionMutation.isPending,
-    isTransferring: transferFundsMutation.isPending,
-    isBulkProcessing: bulkOperationMutation.isPending,
-
-    // Overall loading state
-    isProcessing: [
-      addTransactionMutation,
-      updateTransactionMutation,
-      deleteTransactionMutation,
-      splitTransactionMutation,
-      transferFundsMutation,
-      bulkOperationMutation,
-    ].some((mutation) => mutation.isPending),
-
-    // Error states
-    addError: addTransactionMutation.error,
-    updateError: updateTransactionMutation.error,
-    deleteError: deleteTransactionMutation.error,
-    splitError: splitTransactionMutation.error,
-    transferError: transferFundsMutation.error,
-    bulkError: bulkOperationMutation.error,
+    addTransaction: useCallback((d: TransactionInput) => addM.mutateAsync(d), [addM]),
+    updateTransaction: useCallback(
+      (id: string, u: Partial<Transaction>) => updateM.mutateAsync({ id, updates: u }),
+      [updateM]
+    ),
+    deleteTransaction: useCallback((id: string) => deleteM.mutateAsync(id), [deleteM]),
+    splitTransaction: useCallback(
+      (id: string, s: TransactionInput[]) => splitM.mutateAsync({ originalId: id, splits: s }),
+      [splitM]
+    ),
+    bulkOperation: useCallback(
+      (op: string, trans: Transaction[], u?: Partial<Transaction>) =>
+        bulkM.mutateAsync({ operation: op, transactions: trans, updates: u }),
+      [bulkM]
+    ),
+    isProcessing:
+      addM.isPending ||
+      updateM.isPending ||
+      deleteM.isPending ||
+      splitM.isPending ||
+      bulkM.isPending,
+    error: addM.error || updateM.error || deleteM.error || splitM.error || bulkM.error,
   };
 };
 
-export { useTransactionOperations };
+export default useTransactionOperations;

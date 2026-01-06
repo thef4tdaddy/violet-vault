@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import {
-  USER_COLORS,
-  validateSetupData,
-  getStepTitle,
-  getStepSubtitle,
-} from "../userSetupHelpers.jsx";
+import { USER_COLORS, validateSetupData, getStepTitle, getStepSubtitle } from "../userSetupHelpers";
 
 describe("userSetupHelpers", () => {
   describe("USER_COLORS", () => {
