@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { offlineRequestQueueService } from "../offlineRequestQueueService";
 import { budgetDb } from "@/db/budgetDb";
 
