@@ -13,11 +13,11 @@ type BatchRequest struct {
 
 // BatchItem represents a single calculation request in a batch
 type BatchItem struct {
-	UserID       string                    `json:"userId"`       // User identifier (for result matching only, not stored)
-	Envelopes    []Envelope                `json:"envelopes"`
-	Transactions []Transaction             `json:"transactions"`
-	Bills        []Bill                    `json:"bills"`
-	Metadata     map[string]interface{}    `json:"metadata,omitempty"` // Optional metadata for client use
+	UserID       string                 `json:"userId"` // User identifier (for result matching only, not stored)
+	Envelopes    []Envelope             `json:"envelopes"`
+	Transactions []Transaction          `json:"transactions"`
+	Bills        []Bill                 `json:"bills"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"` // Optional metadata for client use
 }
 
 // BatchResponse represents the response for a batch calculation request
@@ -30,22 +30,22 @@ type BatchResponse struct {
 
 // BatchResultItem represents a single calculation result in a batch
 type BatchResultItem struct {
-	UserID   string           `json:"userId"`
-	Success  bool             `json:"success"`
-	Data     []EnvelopeData   `json:"data,omitempty"`
-	Totals   GlobalTotals     `json:"totals,omitempty"`
-	Error    string           `json:"error,omitempty"`
+	UserID   string                 `json:"userId"`
+	Success  bool                   `json:"success"`
+	Data     []EnvelopeData         `json:"data,omitempty"`
+	Totals   GlobalTotals           `json:"totals,omitempty"`
+	Error    string                 `json:"error,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"` // Echo back metadata
 }
 
 // BatchSummary provides aggregate statistics for the batch
 type BatchSummary struct {
-	TotalRequests    int `json:"totalRequests"`
-	SuccessfulCount  int `json:"successfulCount"`
-	FailedCount      int `json:"failedCount"`
-	TotalEnvelopes   int `json:"totalEnvelopes"`
+	TotalRequests     int `json:"totalRequests"`
+	SuccessfulCount   int `json:"successfulCount"`
+	FailedCount       int `json:"failedCount"`
+	TotalEnvelopes    int `json:"totalEnvelopes"`
 	TotalTransactions int `json:"totalTransactions"`
-	TotalBills       int `json:"totalBills"`
+	TotalBills        int `json:"totalBills"`
 }
 
 // BatchHandler is the Vercel entry point for batch calculations
@@ -55,7 +55,7 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	// Security Headers
 	AddSecurityHeaders(w)
 
