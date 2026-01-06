@@ -83,7 +83,7 @@ export const useUpdateEnvelope = () => {
 
       triggerEnvelopeSync("updated");
 
-      return { id, updates };
+      return { id, updates: safeUpdates };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });

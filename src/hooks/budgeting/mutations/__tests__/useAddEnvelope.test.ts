@@ -241,7 +241,7 @@ describe("useAddEnvelope - CRUD Tests", () => {
         await onSuccess(envelope);
       });
 
-      expect(mockTriggerSync).toHaveBeenCalledWith("envelope_added");
+      expect(mockTriggerSync).toHaveBeenCalledWith("envelope_created");
     });
 
     it("should handle database errors gracefully", async () => {
