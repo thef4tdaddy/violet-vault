@@ -65,7 +65,11 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		_ = json.NewEncoder(w).Encode(BatchResponse{
+			Success: false,
+			Error:   "Method not allowed",
+		})
 		return
 	}
 
