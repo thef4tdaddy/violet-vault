@@ -131,15 +131,6 @@ func ProcessBatch(requests []BatchItem) ([]BatchResultItem, BatchSummary) {
 
 // processBatchItem processes a single batch item
 func processBatchItem(item BatchItem) BatchResultItem {
-	// Validate user ID
-	if item.UserID == "" {
-		return BatchResultItem{
-			UserID:  "",
-			Success: false,
-			Error:   "userId is required for batch items",
-		}
-	}
-
 	// Perform calculation using existing Calculate function
 	envelopeData, totals := Calculate(item.Envelopes, item.Transactions, item.Bills)
 
