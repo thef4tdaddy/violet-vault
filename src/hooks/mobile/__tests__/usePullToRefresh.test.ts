@@ -211,16 +211,16 @@ describe("usePullToRefresh", () => {
       } as unknown as React.TouchEvent);
     });
 
-    const endPromise = act(async () => {
-      await result.current.touchHandlers.onTouchEnd();
-    });
+    // Start the touch end which will trigger refresh
+    const endPromise = result.current.touchHandlers.onTouchEnd();
 
-    // Wait a tick for isRefreshing to be set
+    // The implementation sets isRefreshing synchronously before awaiting onRefresh
+    // Wait a tick for React state to update
     await act(async () => {
       await Promise.resolve();
     });
 
-    // During refresh
+    // Verify isRefreshing is true during the refresh operation
     expect(result.current.isRefreshing).toBe(true);
 
     // Complete refresh
@@ -228,9 +228,11 @@ describe("usePullToRefresh", () => {
       if (resolveRefresh) resolveRefresh();
     });
 
-    await endPromise;
+    await act(async () => {
+      await endPromise;
+    });
 
-    // After refresh
+    // After refresh completes, state should be reset
     expect(result.current.isRefreshing).toBe(false);
   });
 

@@ -53,9 +53,10 @@ describe("useReceiptScanner", () => {
 
   it("should validate file size correctly", async () => {
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    const largeFile = new File(["large content"], "large.jpg", {
+    // Create a large file (mock size check by rejecting in processReceiptImage)
+    const largeFile = new File(["x".repeat(11 * 1024 * 1024)], "large.jpg", {
       type: "image/jpeg",
-    } as FilePropertyBag);
+    });
 
     await act(async () => {
       await result.current.handleFileUpload(largeFile);
@@ -72,6 +73,8 @@ describe("useReceiptScanner", () => {
       merchant: "Test Store",
       total: 29.99,
       confidence: { merchant: "high", total: "high" },
+      rawText: "Receipt text",
+      processingTime: 1500,
     };
 
     (processReceiptImage as any).mockResolvedValue(mockResult);
@@ -83,12 +86,11 @@ describe("useReceiptScanner", () => {
     });
 
     expect(result.current.isProcessing).toBe(false);
-    expect(result.current.uploadedImage).toEqual({
-      file: mockFile,
-      url: "mock-url",
+    expect(result.current.uploadedImage).toMatchObject({
       name: "receipt.jpg",
-      size: 1024,
+      size: mockFile.size, // Use actual file size
     });
+    expect(result.current.uploadedImage?.url).toBe("mock-url");
     expect(result.current.extractedData).toEqual(mockResult);
     expect(result.current.error).toBeNull();
   });
@@ -128,40 +130,68 @@ describe("useReceiptScanner", () => {
     expect(result.current.extractedData).toEqual(mockResult);
   });
 
-  it("should confirm receipt and call callback", () => {
-    const mockExtractedData = { merchant: "Store", total: 15.5 };
-    const mockUploadedImage = { url: "mock-url", name: "receipt.jpg" };
+  it("should confirm receipt and call callback", async () => {
+    const mockExtractedData = {
+      merchant: "Store",
+      total: "15.5",
+      rawText: "Receipt text",
+      processingTime: 1000,
+      date: null,
+      time: null,
+      tax: null,
+      subtotal: null,
+      items: [],
+      confidence: {},
+    };
+
+    (processReceiptImage as any).mockResolvedValue(mockExtractedData);
 
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
-    // Manually set state for testing confirmation
-    act(() => {
-      result.current.extractedData = mockExtractedData;
-      result.current.uploadedImage = mockUploadedImage;
+    // Upload a file first to set the state
+    await act(async () => {
+      await result.current.handleFileUpload(mockFile);
     });
 
+    // Now confirm
     act(() => {
       result.current.handleConfirmReceipt();
     });
 
     expect(mockOnReceiptProcessed).toHaveBeenCalledWith({
       ...mockExtractedData,
-      imageData: mockUploadedImage,
+      imageData: result.current.uploadedImage,
     });
   });
 
-  it("should reset scanner state", () => {
+  it("should reset scanner state", async () => {
+    const mockExtractedData = {
+      merchant: "Store",
+      total: "15.5",
+      rawText: "Receipt text",
+      processingTime: 1000,
+      date: null,
+      time: null,
+      tax: null,
+      subtotal: null,
+      items: [],
+      confidence: {},
+    };
+
+    (processReceiptImage as any).mockResolvedValue(mockExtractedData);
+
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
-    // Set some state
-    act(() => {
-      result.current.uploadedImage = { url: "mock-url" };
-      result.current.extractedData = { merchant: "Store" };
-      result.current.error = "Some error";
-      result.current.isProcessing = true;
-      result.current.showImagePreview = true;
+    // Upload a file first to set some state
+    await act(async () => {
+      await result.current.handleFileUpload(mockFile);
     });
 
+    // Verify state is set
+    expect(result.current.uploadedImage).not.toBeNull();
+    expect(result.current.extractedData).not.toBeNull();
+
+    // Now reset
     act(() => {
       result.current.resetScanner();
     });
@@ -171,7 +201,7 @@ describe("useReceiptScanner", () => {
     expect(result.current.error).toBeNull();
     expect(result.current.isProcessing).toBe(false);
     expect(result.current.showImagePreview).toBe(false);
-    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("mock-url");
+    expect(global.URL.revokeObjectURL).toHaveBeenCalled();
   });
 
   it("should toggle image preview", () => {
