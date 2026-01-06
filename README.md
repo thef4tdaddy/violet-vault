@@ -267,6 +267,7 @@ For a complete overview of all documentation in the repository, see the **[Docum
 - **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
 - **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
+- **[🔄 WebSocket Real-Time Signaling](docs/WEBSOCKET_SIGNALING.md)** - Privacy-preserving real-time sync notifications
 - **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
 - **[📝 Zod Integration Guide](docs/ZOD-INTEGRATION-GUIDE.md)** - Comprehensive guide for Zod validation patterns and form hooks
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
