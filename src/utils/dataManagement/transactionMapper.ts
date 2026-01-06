@@ -17,6 +17,7 @@ export interface MappingConfig {
   category?: string;
   merchant?: string;
   notes?: string;
+  dateFormat?: "US" | "EU" | "auto"; // Date format preference (default: "auto")
 }
 
 export interface TransactionMappingResult {
@@ -37,6 +38,7 @@ export function mapRowsToTransactions(
 ): TransactionMappingResult {
   const transactions: Transaction[] = [];
   const invalid: Array<{ index: number; row: string; errors: string[] }> = [];
+  const dateFormat = mapping.dateFormat || "auto";
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -64,8 +66,8 @@ export function mapRowsToTransactions(
         continue;
       }
 
-      // Parse date
-      const date = parseDate(dateStr);
+      // Parse date with format preference
+      const date = parseDate(dateStr, dateFormat);
       if (!date) {
         invalid.push({
           index: i + 1,
@@ -128,15 +130,16 @@ export function mapRowsToTransactions(
 
 /**
  * Parse date string to Date object
- * Supports multiple date formats: YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY, etc.
+ * Supports multiple date formats: YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY
  *
  * @param dateStr - Date string
+ * @param format - Date format preference ("US", "EU", or "auto")
  * @returns Date object or null if invalid
  */
-function parseDate(dateStr: string): Date | null {
+function parseDate(dateStr: string, format: "US" | "EU" | "auto" = "auto"): Date | null {
   if (!dateStr) return null;
 
-  // Try ISO format first (YYYY-MM-DD)
+  // Try ISO format first (YYYY-MM-DD) - unambiguous
   const isoMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (isoMatch) {
     const [, year, month, day] = isoMatch;
@@ -144,22 +147,40 @@ function parseDate(dateStr: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
 
-  // Try MM/DD/YYYY format (US)
-  const usMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (usMatch) {
-    const [, month, day, year] = usMatch;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    if (!isNaN(date.getTime())) return date;
-  }
+  // Parse slash-separated dates (MM/DD/YYYY or DD/MM/YYYY)
+  const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (slashMatch) {
+    const [, first, second, year] = slashMatch;
+    const firstNum = parseInt(first);
+    const secondNum = parseInt(second);
 
-  // Try DD/MM/YYYY format (EU) - different pattern with day validation
-  const euMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (euMatch) {
-    const [, first, second, year] = euMatch;
-    // If first number > 12, it must be day (EU format)
-    if (parseInt(first) > 12) {
-      const date = new Date(parseInt(year), parseInt(second) - 1, parseInt(first));
+    // Use explicit format if specified
+    if (format === "US") {
+      // MM/DD/YYYY
+      const date = new Date(parseInt(year), firstNum - 1, secondNum);
       if (!isNaN(date.getTime())) return date;
+    } else if (format === "EU") {
+      // DD/MM/YYYY
+      const date = new Date(parseInt(year), secondNum - 1, firstNum);
+      if (!isNaN(date.getTime())) return date;
+    } else {
+      // Auto-detect based on values
+      // If first number > 12, it must be day (EU format)
+      if (firstNum > 12) {
+        const date = new Date(parseInt(year), secondNum - 1, firstNum);
+        if (!isNaN(date.getTime())) return date;
+      }
+      // If second number > 12, it must be day (US format)
+      else if (secondNum > 12) {
+        const date = new Date(parseInt(year), firstNum - 1, secondNum);
+        if (!isNaN(date.getTime())) return date;
+      }
+      // Both numbers ≤ 12: ambiguous, default to US format
+      // Note: Users should specify format explicitly in this case
+      else {
+        const date = new Date(parseInt(year), firstNum - 1, secondNum);
+        if (!isNaN(date.getTime())) return date;
+      }
     }
   }
 
