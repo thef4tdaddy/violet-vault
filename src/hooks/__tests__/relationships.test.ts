@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { budgetDb } from "@/db/budgetDb";
-import { useEnvelopeOperations } from "@/hooks/budgeting/useEnvelopeOperations";
+import { useEnvelopeOperations } from "@/hooks/budgeting/useEnvelopes";
 import { useAddBillMutation, useDeleteBillMutation } from "@/hooks/bills/useBills";
 import { useTransactionOperations } from "@/hooks/transactions/useTransactionOperations";
 import { useDebtManagement } from "@/hooks/debts/useDebtManagement";

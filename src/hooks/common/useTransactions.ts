@@ -1,6 +1,6 @@
 import { useTransactionQuery } from "../transactions/useTransactionQuery";
 import { useTransactionOperations } from "../transactions/useTransactionOperations";
-import { useEnvelopeOperations } from "../budgeting/useEnvelopeOperations";
+import { useEnvelopeOperations } from "../budgeting/useEnvelopes";
 
 /**
  * Main transaction aggregator hook.

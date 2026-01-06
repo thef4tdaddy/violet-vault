@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEnvelopeOperations } from "../useEnvelopeOperations";
+import { useEnvelopeOperations } from "../useEnvelopes";
 import { budgetDb, getUnassignedCash, setUnassignedCash } from "@/db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
 
@@ -65,6 +65,11 @@ vi.mock("@/utils/common/logger", () => ({
 
 vi.mock("@/constants/categories", () => ({
   AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn(() => "variable"),
+  ENVELOPE_TYPES: {
+    VARIABLE: "variable",
+    SINKING_FUND: "sinking_fund",
+    SAVINGS: "savings",
+  },
 }));
 
 vi.mock("@/domain/schemas/envelope", () => ({
