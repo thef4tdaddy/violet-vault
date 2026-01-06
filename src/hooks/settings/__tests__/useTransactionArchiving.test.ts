@@ -13,33 +13,38 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-vi.mock("../../../utils/transactionArchiving", () => ({
-  createArchiver: vi.fn(() => ({
-    calculateCutoffDate: vi.fn(
-      (months) => new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000)
-    ),
-    getTransactionsForArchiving: vi.fn(() =>
-      Promise.resolve([
-        {
-          id: 1,
-          amount: 100,
-          description: "Test transaction 1",
-          category: "Food",
-          envelopeId: "env1",
-          date: "2023-01-01",
-        },
-        {
-          id: 2,
-          amount: -50,
-          description: "Test transaction 2",
-          category: "Entertainment",
-          envelopeId: "env2",
-          date: "2023-02-01",
-        },
-      ])
-    ),
-  })),
-}));
+vi.mock("../../../utils/common/transactionArchiving", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../../utils/common/transactionArchiving")>();
+  return {
+    ...actual,
+    createArchiver: vi.fn(() => ({
+      calculateCutoffDate: vi.fn(
+        (months) => new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000)
+      ),
+      getTransactionsForArchiving: vi.fn(() =>
+        Promise.resolve([
+          {
+            id: 1,
+            amount: 100,
+            description: "Test transaction 1",
+            category: "Food",
+            envelopeId: "env1",
+            date: "2023-01-01",
+          },
+          {
+            id: 2,
+            amount: -50,
+            description: "Test transaction 2",
+            category: "Entertainment",
+            envelopeId: "env2",
+            date: "2023-02-01",
+          },
+        ])
+      ),
+    })),
+  };
+});
 
 describe("useTransactionArchivingUI", () => {
   it("should initialize with default state", () => {
