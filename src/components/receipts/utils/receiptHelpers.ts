@@ -24,6 +24,12 @@ export const mapReceiptData = (data: HookReceiptData): ReceiptProcessedData => {
 
 import type { ExtendedReceiptData } from "../../../hooks/receipts/useReceiptScanner";
 
+const parseOptionalFloat = (value: string | null | undefined): number | undefined => {
+  if (!value) return undefined;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? undefined : parsed;
+};
+
 /**
  * Maps extracted data for display in the UI
  */
@@ -32,24 +38,18 @@ export const mapExtractedDataForDisplay = (extractedData: ExtendedReceiptData | 
 
   return {
     merchant: extractedData.merchant ?? undefined,
-    total: extractedData.total ? parseFloat(extractedData.total) : undefined,
+    total: parseOptionalFloat(extractedData.total),
     date: extractedData.date ?? undefined,
-    tax: extractedData.tax ? parseFloat(extractedData.tax) : undefined,
-    subtotal: extractedData.subtotal ? parseFloat(extractedData.subtotal) : undefined,
+    tax: parseOptionalFloat(extractedData.tax),
+    subtotal: parseOptionalFloat(extractedData.subtotal),
     processingTime: extractedData.processingTime,
     items: extractedData.items,
     confidence: {
-      merchant: extractedData.confidence.merchant
-        ? parseFloat(extractedData.confidence.merchant)
-        : undefined,
-      total: extractedData.confidence.total
-        ? parseFloat(extractedData.confidence.total)
-        : undefined,
-      date: extractedData.confidence.date ? parseFloat(extractedData.confidence.date) : undefined,
-      tax: extractedData.confidence.tax ? parseFloat(extractedData.confidence.tax) : undefined,
-      subtotal: extractedData.confidence.subtotal
-        ? parseFloat(extractedData.confidence.subtotal)
-        : undefined,
+      merchant: parseOptionalFloat(extractedData.confidence?.merchant),
+      total: parseOptionalFloat(extractedData.confidence?.total),
+      date: parseOptionalFloat(extractedData.confidence?.date),
+      tax: parseOptionalFloat(extractedData.confidence?.tax),
+      subtotal: parseOptionalFloat(extractedData.confidence?.subtotal),
     },
   };
 };

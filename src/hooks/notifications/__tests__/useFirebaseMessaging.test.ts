@@ -85,7 +85,7 @@ describe("useFirebaseMessaging", () => {
       response = await result.current.requestPermissionAndGetToken();
     });
 
-    expect(response.success).toBe(true);
+    expect(response!.success).toBe(true);
 
     await waitFor(() => {
       expect(result.current.token).toBe("test-token-123");
@@ -106,9 +106,12 @@ describe("useFirebaseMessaging", () => {
       expect(result.current.isInitialized).toBe(true);
     });
 
-    const response = await result.current.requestPermissionAndGetToken();
+    let response;
+    await act(async () => {
+      response = await result.current.requestPermissionAndGetToken();
+    });
 
-    expect(response.success).toBe(false);
+    expect(response!.success).toBe(false);
     expect(permissionUtils.trackPermissionDenial).toHaveBeenCalled();
   });
 
