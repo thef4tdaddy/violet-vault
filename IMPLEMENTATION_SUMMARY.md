@@ -36,7 +36,7 @@ All core functionality has been implemented, tested, and documented.
 **Core Service:** `offlineRequestQueueService.ts` (456 lines)
 - Singleton pattern for global queue management
 - Priority-based queue with automatic sorting
-- Exponential backoff retry logic (1s, 2s, 4s, 8s, up to 30s)
+- Exponential backoff retry logic (2s, 4s, 8s, 16s, up to 30s)
 - Smart error classification (retryable vs permanent)
 - Online/offline event handling
 - Automatic periodic processing (30s intervals)
