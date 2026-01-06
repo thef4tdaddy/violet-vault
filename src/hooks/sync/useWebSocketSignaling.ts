@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { websocketSignalingService } from "@/services/sync/websocketSignalingService";
 import type {
   WebSocketSignalMessage,
@@ -12,6 +12,10 @@ import logger from "@/utils/common/logger";
  *
  * Provides connection status and signal handling for real-time sync notifications.
  * Follows the privacy-preserving pattern: signals only, no data transmission.
+ *
+ * Note: This hook manages a singleton service. Multiple instances will share the same
+ * WebSocket connection, and the connection will only be closed when all components
+ * using this hook have unmounted.
  *
  * @param budgetId - The budget ID to connect to
  * @param onSignal - Callback for handling incoming signals
@@ -28,6 +32,14 @@ export const useWebSocketSignaling = (
     reconnectAttempts: 0,
     error: null,
   });
+
+  // Use ref to store the latest callback to avoid re-subscribing
+  const onSignalRef = useRef(onSignal);
+
+  // Update ref when callback changes
+  useEffect(() => {
+    onSignalRef.current = onSignal;
+  }, [onSignal]);
 
   // Connect to WebSocket when budgetId is available
   useEffect(() => {
@@ -61,25 +73,31 @@ export const useWebSocketSignaling = (
       setStatus(newStatus);
     });
 
-    // Cleanup on unmount or budgetId change
+    // Note: We don't disconnect on unmount to allow multiple components to share
+    // the same connection. The service manages its own lifecycle.
+    // If you need to explicitly disconnect, use the disconnect method.
     return () => {
       unsubscribeStatus();
-      websocketSignalingService.disconnect();
     };
   }, [budgetId]);
 
-  // Subscribe to signals
+  // Subscribe to signals using the ref pattern to avoid re-subscribing
   useEffect(() => {
-    if (!onSignal) {
+    if (!onSignalRef.current) {
       return;
     }
 
-    const unsubscribeSignal = websocketSignalingService.onSignal(onSignal);
+    const unsubscribeSignal = websocketSignalingService.onSignal((signal) => {
+      // Call the latest callback from ref
+      if (onSignalRef.current) {
+        onSignalRef.current(signal);
+      }
+    });
 
     return () => {
       unsubscribeSignal();
     };
-  }, [onSignal]);
+  }, []); // Empty deps - only subscribe once
 
   // Send signal method
   const sendSignal = useCallback(
@@ -108,7 +126,7 @@ export const useWebSocketSignaling = (
     });
   }, [budgetId]);
 
-  // Disconnect method
+  // Disconnect method - use with caution as it affects all components using this hook
   const disconnect = useCallback(() => {
     websocketSignalingService.disconnect();
   }, []);

@@ -44,12 +44,14 @@ describe("WebSocketSignalingService", () => {
     vi.stubEnv("VITE_WEBSOCKET_ENABLED", "true");
     vi.stubEnv("VITE_WEBSOCKET_URL", "ws://localhost:8080");
 
-    // Get fresh instance for each test
+    // Get singleton instance and reset its state for test isolation
     service = WebSocketSignalingService.getInstance();
+    service.reset();
   });
 
   afterEach(() => {
     service.disconnect();
+    service.reset(); // Clean up after each test
     vi.unstubAllEnvs();
   });
 

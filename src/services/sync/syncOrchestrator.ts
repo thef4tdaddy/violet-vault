@@ -263,6 +263,12 @@ export class SyncOrchestrator {
       return;
     }
 
+    // Clean up existing WebSocket subscription if any
+    if (this.wsUnsubscribe) {
+      this.wsUnsubscribe();
+      this.wsUnsubscribe = null;
+    }
+
     // Check if WebSocket is enabled
     const wsEnabled = import.meta.env.VITE_WEBSOCKET_ENABLED === "true";
     if (!wsEnabled) {

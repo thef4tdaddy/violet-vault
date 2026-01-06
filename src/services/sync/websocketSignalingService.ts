@@ -66,6 +66,12 @@ export class WebSocketSignalingService {
       return;
     }
 
+    // If already connected or connecting, disconnect first to avoid connection leaks
+    if (this.ws && (this.status === "connected" || this.status === "connecting")) {
+      logger.warn("WebSocket already active, disconnecting before new connection");
+      this.disconnect();
+    }
+
     this.config = {
       reconnectInterval: 5000,
       heartbeatInterval: 30000,
@@ -357,6 +363,20 @@ export class WebSocketSignalingService {
         logger.error("Error in signal listener", { error });
       }
     });
+  }
+
+  /**
+   * Reset service state for testing
+   * This method is primarily for test isolation
+   */
+  public reset(): void {
+    this.disconnect();
+    this.signalListeners.clear();
+    this.statusListeners.clear();
+    this.reconnectAttempts = 0;
+    this.lastHeartbeat = null;
+    this.errorMessage = null;
+    this.config = null;
   }
 }
 
