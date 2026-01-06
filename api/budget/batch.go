@@ -89,7 +89,7 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(BatchResponse{
 			Success: false,
-			Error:   fmt.Sprintf("Validation failed: %d errors", len(validation.Errors)),
+			Error:   fmt.Sprintf("Validation failed (%d errors): %v", len(validation.Errors), validation.Errors),
 		})
 		return
 	}
