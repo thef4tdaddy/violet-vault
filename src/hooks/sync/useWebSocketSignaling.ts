@@ -82,9 +82,11 @@ export const useWebSocketSignaling = (
   }, [budgetId]);
 
   // Subscribe to signals using the ref pattern to avoid re-subscribing
+  // Note: We check onSignal parameter but use empty deps to prevent re-subscription
+  // when the callback reference changes. The ref always points to the latest callback.
   useEffect(() => {
-    // Only subscribe if there's a callback to handle signals
-    if (!onSignalRef.current) {
+    // Only subscribe if a callback was provided
+    if (!onSignal) {
       return;
     }
 
@@ -98,7 +100,8 @@ export const useWebSocketSignaling = (
     return () => {
       unsubscribeSignal();
     };
-  }, [onSignal]); // Re-subscribe when onSignal changes from null to valid or vice versa
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - subscribe once if callback provided, ref keeps it updated
 
   // Send signal method
   const sendSignal = useCallback(
