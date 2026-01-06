@@ -245,3 +245,48 @@ vi.mock("firebase/firestore", () => {
     })),
   };
 });
+
+// Mock Tesseract.js for receipt scanner tests
+vi.mock("tesseract.js", () => ({
+  createWorker: vi.fn(() =>
+    Promise.resolve({
+      loadLanguage: vi.fn(() => Promise.resolve()),
+      initialize: vi.fn(() => Promise.resolve()),
+      setParameters: vi.fn(() => Promise.resolve()),
+      recognize: vi.fn(() =>
+        Promise.resolve({
+          data: {
+            text: "MOCK RECEIPT\nStore Name: Test Store\nTotal: $29.99\nDate: 2024-01-01",
+            confidence: 85,
+          },
+        })
+      ),
+      terminate: vi.fn(() => Promise.resolve()),
+    })
+  ),
+}));
+
+// Mock Recharts for analytics tests
+vi.mock("recharts", () => ({
+  ResponsiveContainer: vi.fn(({ children }) => children),
+  LineChart: vi.fn(() => null),
+  BarChart: vi.fn(() => null),
+  AreaChart: vi.fn(() => null),
+  ComposedChart: vi.fn(() => null),
+  Line: vi.fn(() => null),
+  Bar: vi.fn(() => null),
+  Area: vi.fn(() => null),
+  XAxis: vi.fn(() => null),
+  YAxis: vi.fn(() => null),
+  CartesianGrid: vi.fn(() => null),
+  Tooltip: vi.fn(() => null),
+  Legend: vi.fn(() => null),
+  Cell: vi.fn(() => null),
+  PieChart: vi.fn(() => null),
+  Pie: vi.fn(() => null),
+  RadarChart: vi.fn(() => null),
+  Radar: vi.fn(() => null),
+  PolarGrid: vi.fn(() => null),
+  PolarAngleAxis: vi.fn(() => null),
+  PolarRadiusAxis: vi.fn(() => null),
+}));

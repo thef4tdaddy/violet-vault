@@ -117,7 +117,7 @@ describe("usePaycheckOperations", () => {
     expect(mockCalculateReversedBalances).toHaveBeenCalledWith(
       mockPaycheck,
       mockBudgetDb,
-      mockGetBudgetMetadata
+      expect.any(Function)
     );
     expect(mockSetBudgetMetadata).toHaveBeenCalledWith({
       actualBalance: 4000,

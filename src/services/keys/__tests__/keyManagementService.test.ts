@@ -13,6 +13,9 @@ vi.mock("@/utils/security/encryption", () => ({
         salt: new Uint8Array([25, 26, 27, 28, 29, 30, 31, 32]),
       })
     ),
+    deriveKeyFromSalt: vi.fn((password: string, salt: Uint8Array) =>
+      Promise.resolve(new Uint8Array([17, 18, 19, 20, 21, 22, 23, 24]))
+    ),
     encrypt: vi.fn(() => Promise.resolve("encrypted-data")),
     decrypt: vi.fn(() => Promise.resolve('{"key":[1,2,3,4],"salt":[5,6,7,8]}')),
   },
@@ -55,7 +58,12 @@ Object.assign(global, {
     createObjectURL: vi.fn(() => "blob:test"),
     revokeObjectURL: vi.fn(),
   },
-  Blob: vi.fn(() => ({})),
+  Blob: class MockBlob {
+    constructor(
+      public content: BlobPart[],
+      public options?: BlobPropertyBag
+    ) {}
+  },
   btoa: vi.fn((str) => Buffer.from(str).toString("base64")),
 });
 
@@ -83,7 +91,7 @@ describe("keyManagementService", () => {
     it("should throw error when no encryption key available", async () => {
       await expect(
         keyManagementService.getCurrentKeyFingerprint(null as unknown as Uint8Array)
-      ).rejects.toThrow("No encryption key available");
+      ).rejects.toThrow("Encryption key is required");
     });
   });
 
@@ -93,9 +101,10 @@ describe("keyManagementService", () => {
 
       await keyManagementService.copyKeyToClipboard(mockEncryptionKey, mockSalt, 5);
 
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining('"type":"unprotected"')
-      );
+      expect(navigator.clipboard.writeText).toHaveBeenCalled();
+      const clipboardCall = (navigator.clipboard.writeText as Mock).mock.calls[0][0];
+      expect(clipboardCall).toContain('"type": "unprotected"');
+      expect(clipboardCall).toContain('"version": "1.0"');
 
       // Fast-forward time to test auto-clear
       vi.advanceTimersByTime(5000);
@@ -135,7 +144,7 @@ describe("keyManagementService", () => {
           null as unknown as Uint8Array,
           "testuser"
         )
-      ).rejects.toThrow("No encryption key or salt available");
+      ).rejects.toThrow("Encryption key and salt are required");
     });
   });
 
@@ -181,7 +190,7 @@ describe("keyManagementService", () => {
           null as unknown as Uint8Array,
           null as unknown as Uint8Array
         )
-      ).rejects.toThrow("No encryption key or salt available");
+      ).rejects.toThrow("Encryption key and salt are required");
     });
   });
 
