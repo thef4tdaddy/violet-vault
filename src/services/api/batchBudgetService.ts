@@ -198,13 +198,18 @@ export class BatchBudgetService {
         failedCount: combinedSummary.failedCount,
       });
 
+      // Determine overall success based on whether any results were obtained
+      const hasResults = allResults.length > 0;
+      const allChunksFailed = allResults.length === 0 && chunks.length > 0;
+
       return {
-        success: true,
+        success: hasResults,
         data: {
-          success: true,
+          success: hasResults,
           results: allResults,
           summary: combinedSummary,
         },
+        error: allChunksFailed ? "All batch chunks failed to process" : undefined,
       };
     } catch (error) {
       logger.error("Chunked batch calculation error", error);

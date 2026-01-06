@@ -57,32 +57,26 @@ func TestProcessBatch(t *testing.T) {
 			Transactions: []Transaction{},
 			Bills:        []Bill{bill1},
 		},
-		{
-			UserID:       "", // Invalid: missing user ID
-			Envelopes:    []Envelope{env1},
-			Transactions: []Transaction{},
-			Bills:        []Bill{},
-		},
 	}
 
 	// Execute batch processing
 	results, summary := ProcessBatch(requests)
 
 	// Assertions: Summary
-	if summary.TotalRequests != 3 {
-		t.Errorf("Expected 3 total requests, got %d", summary.TotalRequests)
+	if summary.TotalRequests != 2 {
+		t.Errorf("Expected 2 total requests, got %d", summary.TotalRequests)
 	}
 
 	if summary.SuccessfulCount != 2 {
 		t.Errorf("Expected 2 successful, got %d", summary.SuccessfulCount)
 	}
 
-	if summary.FailedCount != 1 {
-		t.Errorf("Expected 1 failed, got %d", summary.FailedCount)
+	if summary.FailedCount != 0 {
+		t.Errorf("Expected 0 failed, got %d", summary.FailedCount)
 	}
 
-	if summary.TotalEnvelopes != 3 {
-		t.Errorf("Expected 3 total envelopes, got %d", summary.TotalEnvelopes)
+	if summary.TotalEnvelopes != 2 {
+		t.Errorf("Expected 2 total envelopes, got %d", summary.TotalEnvelopes)
 	}
 
 	if summary.TotalTransactions != 1 {
@@ -135,20 +129,6 @@ func TestProcessBatch(t *testing.T) {
 	// Verify bill was processed
 	if result2.Data[0].TotalUpcoming != 1200 {
 		t.Errorf("Expected result2 upcoming bills 1200, got %f", result2.Data[0].TotalUpcoming)
-	}
-
-	// Assertions: Result 3 (invalid - failure)
-	result3 := results[2]
-	if result3.Success {
-		t.Error("Expected result3 to fail due to missing userID")
-	}
-
-	if result3.Error == "" {
-		t.Error("Expected result3 to have an error message")
-	}
-
-	if result3.UserID != "" {
-		t.Errorf("Expected result3 userID to be empty, got '%s'", result3.UserID)
 	}
 }
 

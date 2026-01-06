@@ -390,12 +390,11 @@ Multiple users can make requests simultaneously. Each request is:
 
 **No cross-user contamination is possible.**
 
-### Scenario 2: Batch Processing (Future Enhancement)
+### Scenario 2: Batch Processing
 
 For scenarios where a single client needs to calculate budgets for multiple users:
 
 ```typescript
-// Future API (not yet implemented)
 POST /api/budget/batch
 
 {
@@ -421,15 +420,25 @@ POST /api/budget/batch
   results: [
     {
       userId: "user1",
+      success: true,
       data: [...],
       totals: {...}
     },
     {
       userId: "user2",
+      success: true,
       data: [...],
       totals: {...}
     }
-  ]
+  ],
+  summary: {
+    totalRequests: 2,
+    successfulCount: 2,
+    failedCount: 0,
+    totalEnvelopes: 150,
+    totalTransactions: 1500,
+    totalBills: 50
+  }
 }
 ```
 
