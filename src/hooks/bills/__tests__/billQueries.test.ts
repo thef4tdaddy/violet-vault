@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useBillsQuery, useUpcomingBillsQuery } from "../billQueries";
+import { useBillsQuery, useUpcomingBillsQuery } from "../useBills";
 import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
 import { createMockDexie, mockDataGenerators } from "@/test/queryMocks";
 

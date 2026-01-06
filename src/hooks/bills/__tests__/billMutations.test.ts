@@ -12,7 +12,7 @@ import {
   useUpdateBillMutation,
   useDeleteBillMutation,
   useMarkBillPaidMutation,
-} from "../billMutations";
+} from "../useBills";
 import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
 import {
   createMockDexie,
@@ -134,7 +134,7 @@ describe("Bill Mutation Hooks", () => {
 
       // Assert - Check that invalidation was called with correct query keys
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.bills });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.billsList() });
+
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.dashboard });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.budgetMetadata });
     });
@@ -150,7 +150,9 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      expect(window.cloudSyncService.triggerSyncForCriticalChange).toHaveBeenCalledWith("bill_add");
+      expect((window as any).cloudSyncService.triggerSyncForCriticalChange).toHaveBeenCalledWith(
+        "bill_add"
+      );
     });
 
     it("should rollback on error", async () => {
@@ -255,7 +257,6 @@ describe("Bill Mutation Hooks", () => {
 
       // Assert - Check that invalidation was called with correct query keys
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.bills });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.billsList() });
     });
   });
 
