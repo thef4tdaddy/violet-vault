@@ -114,6 +114,7 @@ export class WebSocketSignalingService {
           deviceId: typeof metadata.deviceId === "string" ? metadata.deviceId : undefined,
           userId: typeof metadata.userId === "string" ? metadata.userId : undefined,
           version: typeof metadata.version === "string" ? metadata.version : undefined,
+          budgetId: typeof metadata.budgetId === "string" ? metadata.budgetId : undefined,
         }
       : undefined;
 
