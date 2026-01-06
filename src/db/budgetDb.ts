@@ -18,6 +18,7 @@ import type {
   DateRange,
   BulkUpdate,
   DatabaseStats,
+  OfflineRequestQueueEntry,
 } from "./types";
 
 export class VioletVaultDB extends Dexie {
@@ -36,6 +37,7 @@ export class VioletVaultDB extends Dexie {
   budgetBranches!: Table<BudgetBranch, number>;
   budgetTags!: Table<BudgetTag, number>;
   autoBackups!: Table<AutoBackup, string>;
+  offlineRequestQueue!: Table<OfflineRequestQueueEntry, number>;
 
   constructor() {
     super("VioletVault");
@@ -101,6 +103,13 @@ export class VioletVaultDB extends Dexie {
       // Add paycheckId and isInternalTransfer indexes to transactions table for paycheck queries
       transactions:
         "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer]",
+    });
+
+    // Version 10: Offline Request Queuing - Add offlineRequestQueue table for handling offline operations
+    this.version(10).stores({
+      // Offline request queue table with indexes for efficient queue management
+      offlineRequestQueue:
+        "++id, requestId, timestamp, priority, status, nextRetryAt, entityType, entityId, [status+priority], [status+nextRetryAt], [entityType+entityId]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -533,15 +542,23 @@ export class VioletVaultDB extends Dexie {
 
   // Data integrity and statistics
   async getDatabaseStats(): Promise<DatabaseStats> {
-    const [envelopeCount, transactionCount, billCount, goalCount, paycheckCount, cacheCount] =
-      await Promise.all([
-        this.envelopes.count(),
-        this.transactions.count(),
-        this.bills.count(),
-        this.savingsGoals.count(),
-        this.paycheckHistory.count(),
-        this.cache.count(),
-      ]);
+    const [
+      envelopeCount,
+      transactionCount,
+      billCount,
+      goalCount,
+      paycheckCount,
+      cacheCount,
+      offlineQueueCount,
+    ] = await Promise.all([
+      this.envelopes.count(),
+      this.transactions.count(),
+      this.bills.count(),
+      this.savingsGoals.count(),
+      this.paycheckHistory.count(),
+      this.cache.count(),
+      this.offlineRequestQueue.count(),
+    ]);
 
     return {
       envelopes: envelopeCount,
@@ -550,6 +567,7 @@ export class VioletVaultDB extends Dexie {
       savingsGoals: goalCount,
       paychecks: paycheckCount,
       cache: cacheCount,
+      offlineQueue: offlineQueueCount,
       lastOptimized: Date.now(),
     };
   }
@@ -683,6 +701,7 @@ export const clearData = async (): Promise<void> => {
     budgetDb.budgetChanges.clear(),
     budgetDb.budgetBranches.clear(),
     budgetDb.budgetTags.clear(),
+    budgetDb.offlineRequestQueue.clear(),
   ]);
 };
 

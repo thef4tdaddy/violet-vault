@@ -243,6 +243,28 @@ export type BulkUpdate = {
   data: unknown;
 };
 
+// Offline Request Queue Entry
+export interface OfflineRequestQueueEntry {
+  id?: number; // Auto-increment primary key
+  requestId: string; // UUID for the request
+  url: string; // Target API endpoint
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  headers: Record<string, string>;
+  body?: string; // Stringified JSON body
+  timestamp: number; // When the request was queued
+  priority: "low" | "normal" | "high"; // Request priority
+  retryCount: number; // Number of retry attempts
+  maxRetries: number; // Maximum retry attempts before failure
+  lastRetryAt?: number; // Timestamp of last retry attempt
+  nextRetryAt?: number; // Timestamp for next retry (exponential backoff)
+  status: "pending" | "processing" | "failed" | "completed";
+  errorMessage?: string; // Last error message if failed
+  entityType?: string; // Type of entity being modified (envelope, transaction, etc.)
+  entityId?: string; // ID of entity being modified
+  conflictResolution?: "local" | "remote" | "merge"; // Conflict resolution strategy
+  metadata?: Record<string, unknown>; // Additional metadata
+}
+
 // Database statistics type
 export interface DatabaseStats {
   envelopes: number;
@@ -252,4 +274,5 @@ export interface DatabaseStats {
   paychecks: number;
   cache: number;
   lastOptimized: number;
+  offlineQueue?: number;
 }
