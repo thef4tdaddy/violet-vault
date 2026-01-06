@@ -71,11 +71,21 @@ Object.defineProperty(global, "crypto", {
     randomUUID: vi.fn(() => "mock-uuid-" + Math.random().toString(36).substring(2, 9)),
     getRandomValues: mockGetRandomValues,
     subtle: {
-      encrypt: vi.fn(),
-      decrypt: vi.fn(),
-      generateKey: vi.fn(),
-      exportKey: vi.fn(),
-      importKey: vi.fn(),
+      encrypt: vi.fn(async (_alg, _key, data) =>
+        data instanceof Uint8Array
+          ? data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+          : data
+      ),
+      decrypt: vi.fn(async (_alg, _key, data) =>
+        data instanceof Uint8Array
+          ? data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+          : data
+      ),
+      generateKey: vi.fn(async () => ({ type: "secret", algorithm: { name: "AES-GCM" } })),
+      exportKey: vi.fn(async () => new ArrayBuffer(32)),
+      importKey: vi.fn(async () => ({ type: "secret", algorithm: { name: "AES-GCM" } })),
+      deriveKey: vi.fn(async () => ({ type: "secret", algorithm: { name: "AES-GCM" } })),
+      deriveBits: vi.fn(async () => new ArrayBuffer(32)),
       digest: mockDigest,
     },
   },

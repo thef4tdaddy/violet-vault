@@ -5,7 +5,7 @@
 
 import { runImmediateSyncHealthCheck } from "./syncHealthChecker";
 import { validateAllSyncFlows } from "./syncFlowValidator";
-import syncEdgeCaseTester from "./syncEdgeCaseTester";
+import { runSyncEdgeCaseTests } from "./syncEdgeCaseTester";
 import logger from "../common/logger";
 
 // Type definitions
@@ -53,7 +53,8 @@ interface ValidationResults {
 declare global {
   interface Window {
     forceCloudDataReset?: () => Promise<{ success: boolean; message?: string; error?: string }>;
-    runMasterSyncValidation?: () => Promise<ValidationResults>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    runMasterSyncValidation?: () => Promise<any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getQuickSyncStatus?: () => Promise<any>;
   }
@@ -295,10 +296,9 @@ const runEdgeCaseTestingPhase = async (): Promise<unknown[]> => {
   logger.info("\n🧪 PHASE 3: EDGE CASE TESTING");
   logger.info("-".repeat(40));
 
-  const edgeCases = await syncEdgeCaseTester.runAllTests();
+  const edgeCases = await runSyncEdgeCaseTests();
   logger.info(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    `✅ Edge case testing complete: ${edgeCases.filter((r: any) => r.status === "passed").length} passed`
+    `✅ Edge case testing complete: ${edgeCases.filter((r: unknown) => (r as { status: string }).status === "passed").length} passed`
   );
   return edgeCases;
 };
@@ -519,19 +519,19 @@ export const getQuickSyncStatus = async () => {
       failed++;
     }
 
-    // Check 2: Cloud sync service availability
+    // Check 2: Sync orchestrator availability
     try {
-      const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
-      const isRunning = Boolean(cloudSyncService);
+      const { syncOrchestrator } = await import("@/services/sync/syncOrchestrator");
+      const isRunning = Boolean(syncOrchestrator);
       checks.push({
-        name: "Cloud Sync Service",
+        name: "Sync Orchestrator",
         status: isRunning ? "✅ PASSED" : "❌ FAILED",
         details: isRunning ? "Service available" : "Service not available",
       });
       if (!isRunning) failed++;
     } catch (error) {
       checks.push({
-        name: "Cloud Sync Service",
+        name: "Sync Orchestrator",
         status: "❌ FAILED",
         error: error instanceof Error ? error.message : String(error),
       });

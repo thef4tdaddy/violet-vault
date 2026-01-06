@@ -95,6 +95,14 @@ export const createSetAuthenticated =
 
 export const createClearAuth = (setAuthState: SetAuthState) => (): void => {
   logger.auth("AuthContext: Clearing auth state");
+
+  // Stop sync orchestrator on logout
+  import("@/services/sync/syncOrchestrator")
+    .then(({ syncOrchestrator }) => {
+      syncOrchestrator.stop();
+    })
+    .catch((err) => logger.error("Failed to stop syncOrchestrator on clearAuth", err));
+
   setAuthState(initialAuthState);
 };
 
@@ -144,6 +152,14 @@ export const createUpdateActivity = (setAuthState: SetAuthState) => (): void => 
 
 export const createLockSession = (setAuthState: SetAuthState) => (): void => {
   logger.auth("AuthContext: Locking session");
+
+  // Stop sync orchestrator on lock (since key is cleared)
+  import("@/services/sync/syncOrchestrator")
+    .then(({ syncOrchestrator }) => {
+      syncOrchestrator.stop();
+    })
+    .catch((err) => logger.error("Failed to stop syncOrchestrator on lockSession", err));
+
   setAuthState((prev) => ({
     ...prev,
     isUnlocked: false,

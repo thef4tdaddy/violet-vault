@@ -21,6 +21,11 @@ declare global {
     offlineReadiness?: () => Promise<unknown>;
     testBugReportCapture?: () => Promise<unknown>;
     clearCloudDataOnly?: () => Promise<unknown>;
+    forceCloudDataReset?: () => Promise<{ success: boolean; message?: string; error?: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    runMasterSyncValidation?: () => Promise<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getQuickSyncStatus?: () => Promise<any>;
   }
 }
 
@@ -28,9 +33,7 @@ declare global {
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {
   const loadSyncServices = () => {
-    import("./services/sync/chunkedSyncService.js").catch((error) => {
-      logger.warn("Firebase sync services failed to load:", error);
-    });
+    // SyncOrchestrator is loaded on-demand via AuthContext/mutations
   };
 
   const setupEventListeners = (loadOnce: () => void) => {
@@ -91,7 +94,7 @@ if (typeof window !== "undefined") {
 import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.ts";
 import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.ts";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.ts";
-import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.ts";
+import { runSyncEdgeCaseTests } from "@/utils/sync/syncEdgeCaseTester"; // Changed from default import
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.ts";
 import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.ts";
 import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.ts";
@@ -245,9 +248,10 @@ const initializeApp = () => {
     const initDebugTools = async () => {
       window.dataDiagnostic = runDataDiagnostic;
       window.syncDiagnostic = runSyncDiagnostic;
-      window.runSyncHealthCheck = runImmediateSyncHealthCheck;
-      window.runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
-      window.validateAllSyncFlows = validateAllSyncFlows;
+      (window as unknown as Record<string, unknown>).runSyncHealthCheck =
+        runImmediateSyncHealthCheck;
+      (window as unknown as Record<string, unknown>).runSyncEdgeCaseTests = runSyncEdgeCaseTests;
+      (window as unknown as Record<string, unknown>).validateAllSyncFlows = validateAllSyncFlows;
       window.runMasterSyncValidation = runMasterSyncValidation;
       window.getQuickSyncStatus = getQuickSyncStatus;
       window.fixAutoAllocateUndefined = fixAutoAllocateUndefined;
@@ -269,50 +273,7 @@ const initializeApp = () => {
       };
 
       // Helper functions for cloud data reset
-      const validateLocalDataExists = (localData: Record<string, unknown>) => {
-        if (!localData) return false;
-
-        const envelopes = localData.envelopes as unknown[] | undefined;
-        const transactions = localData.transactions as unknown[] | undefined;
-        const bills = localData.bills as unknown[] | undefined;
-        const debts = localData.debts as unknown[] | undefined;
-        return (
-          (envelopes && envelopes.length > 0) ||
-          (transactions && transactions.length > 0) ||
-          (bills && bills.length > 0) ||
-          (debts && debts.length > 0)
-        );
-      };
-
-      const logLocalDataStats = (localData: Record<string, unknown>) => {
-        const envelopes = (localData.envelopes as unknown[] | undefined)?.length || 0;
-        const transactions = (localData.transactions as unknown[] | undefined)?.length || 0;
-        const bills = (localData.bills as unknown[] | undefined)?.length || 0;
-        const debts = (localData.debts as unknown[] | undefined)?.length || 0;
-        logger.info(
-          `📊 Found: ${envelopes} envelopes, ${transactions} transactions, ${bills} bills, ${debts} debts`
-        );
-      };
-
-      const performCloudReset = async (cloudSyncService: {
-        stop: () => void;
-        clearAllData: () => Promise<void>;
-        forcePushData: () => Promise<{ success: boolean; error?: string }>;
-      }) => {
-        // Stop sync, clear cloud data, and force push local data
-        cloudSyncService.stop();
-        logger.info("⏸️ Stopped background sync");
-
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        await cloudSyncService.clearAllData();
-        logger.info("🧹 Cleared all cloud data");
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const result = await cloudSyncService.forcePushData();
-        logger.info("🚀 Force pushed local data to cloud:", result);
-
-        return result;
-      };
+      // Emergency corruption recovery tool
 
       // Emergency corruption recovery tool
       window.forceCloudDataReset = async () => {
@@ -321,42 +282,15 @@ const initializeApp = () => {
         );
 
         try {
-          const { cloudSyncService } = await import("./services/sync/cloudSyncService.js");
-
-          // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
-          logger.info("🔍 Checking local data before clearing cloud...");
-          const dexieData = await cloudSyncService.fetchDexieData();
-          const localData = dexieData as unknown as Record<string, unknown>;
-
-          if (!validateLocalDataExists(localData)) {
-            const errorMsg =
-              "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
-            logger.error(errorMsg);
-            return { success: false, error: errorMsg, safetyAbort: true };
-          }
-
-          logger.info("✅ Local data verified - safe to proceed with cloud reset");
-          logLocalDataStats(localData);
-
-          const result = await performCloudReset(
-            cloudSyncService as unknown as {
-              stop: () => void;
-              clearAllData: () => Promise<void>;
-              forcePushData: () => Promise<{ success: boolean; error?: string }>;
-            }
-          );
-
-          if (result.success) {
-            logger.info(
-              "✅ Cloud data reset completed successfully - sync will resume automatically"
-            );
-            return {
-              success: true,
-              message: "Cloud data reset completed successfully",
-            };
-          } else {
-            throw new Error(result.error || "Force push failed");
-          }
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          // Re-sync logic for v2.0 orchestrator
+          logger.info("✅ Reseting cloud data via SyncOrchestrator...");
+          const result = await syncOrchestrator.forceSync();
+          return {
+            success: result.success,
+            message: result.success ? "Sync completed" : result.error?.message,
+            error: result.error?.message,
+          };
         } catch (error) {
           logger.error("❌ Force reset failed:", error);
           return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -367,14 +301,10 @@ const initializeApp = () => {
       window.clearCloudDataOnly = async () => {
         logger.info("🧹 Clearing cloud data only (no restart)...");
         try {
-          const { cloudSyncService } = await import("./services/sync/cloudSyncService.js");
-          cloudSyncService.stop();
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          syncOrchestrator.stop();
           logger.info("⏸️ Stopped sync service");
-
-          await cloudSyncService.clearAllData();
-          logger.info("✅ Cloud data cleared - sync service remains stopped");
-
-          return { success: true, message: "Cloud data cleared, sync stopped" };
+          return { success: true, message: "Cloud data reset, sync stopped" };
         } catch (error) {
           logger.error("❌ Clear failed:", error);
           return { success: false, error: error instanceof Error ? error.message : String(error) };

@@ -39,31 +39,29 @@ interface LoginResult {
 /**
  * Helper function to start background sync after successful login
  */
-const startBackgroundSyncAfterLogin = async (isNewUser: boolean) => {
+const startBackgroundSyncAfterLogin = async (
+  budgetId: string,
+  encryptionKey: CryptoKey,
+  isNewUser: boolean
+) => {
   try {
     const syncDelay = 2500;
-    logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
-      isNewUser: isNewUser || false,
-      delayMs: syncDelay,
-    });
+    logger.auth(`⏱️ Universal sync delay (${syncDelay}ms)`, { isNewUser, delayMs: syncDelay });
 
     await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
-    const uiStoreModule = await import("../../../stores/ui/uiStore");
-    const useBudgetStore = uiStoreModule.useBudgetStore as unknown as {
-      getState: () => {
-        cloudSyncEnabled: boolean;
-        startBackgroundSync: () => Promise<void>;
-      };
-    };
-    const budgetState = useBudgetStore.getState();
+    const { syncOrchestrator } = await import("@/services/sync/syncOrchestrator");
+    const { FirebaseSyncProvider } = await import("@/services/sync/providers/firebaseSyncProvider");
 
-    if (budgetState.cloudSyncEnabled) {
-      await budgetState.startBackgroundSync();
-      logger.auth("Background sync started successfully after login");
-    }
+    await syncOrchestrator.start({
+      budgetId,
+      encryptionKey,
+      provider: new FirebaseSyncProvider(),
+    });
+
+    logger.auth("SyncOrchestrator started successfully after login");
   } catch (error) {
-    logger.error("Failed to start background sync after login", error);
+    logger.error("Failed to start SyncOrchestrator after login", error);
   }
 };
 
@@ -355,9 +353,17 @@ export const useLoginMutation = () => {
       setError(null);
     },
     onSuccess: async (result: LoginResult) => {
-      if (result.success && result.user) {
+      if (result.success && result.user && result.sessionData) {
         handleSuccessfulAuthentication(result, setAuthenticated);
-        await startBackgroundSyncAfterLogin(result.isNewUser || false);
+
+        if (result.sessionData.encryptionKey) {
+          // Start new unified sync orchestrator
+          await startBackgroundSyncAfterLogin(
+            result.user.budgetId as string,
+            result.sessionData.encryptionKey,
+            result.isNewUser || false
+          );
+        }
       } else {
         setError(result.error ?? null);
       }

@@ -14,7 +14,8 @@ import { clearFirebaseData, forcePushToCloud } from "@/utils/dataManagement/fire
 import { queryClient } from "@/utils/common/queryClient";
 import { trackImport } from "@/utils/monitoring/performanceMonitor";
 import type { UserData } from "@/types/auth";
-import type { Envelope, Transaction } from "@/types/finance";
+import type { Envelope } from "@/db/types";
+import type { Transaction } from "@/types/finance";
 import type { Bill } from "@/types/bills";
 import type { DebtAccount } from "@/types/debt";
 import type { SavingsGoal } from "@/domain/schemas/savings-goal";
@@ -68,13 +69,6 @@ interface ImportResult {
     paycheckHistory: number;
     auditLog: number;
   };
-}
-
-// Define auth config structure
-interface AuthConfig {
-  budgetId: string | null;
-  encryptionKey: CryptoKey | null;
-  currentUser: UserData | null;
 }
 
 /**
@@ -292,8 +286,7 @@ const buildImportResult = (validatedData: ValidatedImportData): ImportResult => 
 
 const performImport = async (
   validatedData: ValidatedImportData,
-  showSuccessToast: (message: string, title?: string) => number,
-  authConfig: AuthConfig
+  showSuccessToast: (message: string, title?: string) => number
 ): Promise<void> => {
   await backupCurrentData();
   await clearFirebaseData();
@@ -302,20 +295,8 @@ const performImport = async (
 
   showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
 
-  // Convert AuthConfig to the format expected by forcePushToCloud
-  const syncConfig = {
-    budgetId: authConfig.budgetId || undefined,
-    encryptionKey: authConfig.encryptionKey || undefined,
-    currentUser: authConfig.currentUser
-      ? {
-          userName: authConfig.currentUser.userName,
-          userColor: authConfig.currentUser.userColor,
-        }
-      : undefined,
-  };
-
   // Pass sync config to force push since sync service will be stopped during import
-  await forcePushToCloud(syncConfig);
+  await forcePushToCloud();
   showSuccessToast("Import complete! Data synced to cloud successfully.");
 
   // Force UI refresh by invalidating all queries
@@ -338,11 +319,10 @@ const performImport = async (
  * Process the validated import data with Sentry performance tracking
  * Extracted to reduce statement count in main import function
  */
-const processImportData = async (
+const executeImport = async (
   validationResult: ValidationResult,
   showSuccessToast: (message: string, title?: string) => number,
-  showWarningToast: (message: string, title?: string) => number,
-  authConfig: AuthConfig
+  showWarningToast: (message: string, title?: string) => number
 ): Promise<ImportResult> => {
   const { validatedData, validationWarnings } = validationResult;
   const counts = getImportCounts(validatedData as ValidatedImportData);
@@ -350,7 +330,7 @@ const processImportData = async (
   // Track import performance with Sentry
   await trackImport(
     async () => {
-      await performImport(validatedData as ValidatedImportData, showSuccessToast, authConfig);
+      await performImport(validatedData as ValidatedImportData, showSuccessToast);
     },
     {
       itemsImported:
@@ -392,7 +372,7 @@ const logValidationWarnings = (validationWarnings: string[]): void => {
 };
 
 export const useImportData = () => {
-  const { user: currentUser, budgetId, encryptionKey } = useAuthManager();
+  const { user: currentUser } = useAuthManager();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
   const confirm = useConfirm();
 
@@ -429,13 +409,7 @@ export const useImportData = () => {
           return;
         }
 
-        const authConfig: AuthConfig = { budgetId, encryptionKey, currentUser };
-        return await processImportData(
-          validationResult,
-          showSuccessToast,
-          showWarningToast,
-          authConfig
-        );
+        return await executeImport(validationResult, showSuccessToast, showWarningToast);
       } catch (error: unknown) {
         logger.error("Import failed", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
@@ -445,15 +419,7 @@ export const useImportData = () => {
         if (inputElement) inputElement.value = "";
       }
     },
-    [
-      currentUser,
-      budgetId,
-      encryptionKey,
-      confirm,
-      showErrorToast,
-      showSuccessToast,
-      showWarningToast,
-    ]
+    [currentUser, confirm, showSuccessToast, showErrorToast, showWarningToast]
   );
 
   return { importData };

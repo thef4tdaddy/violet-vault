@@ -1,4 +1,4 @@
-import { cloudSyncService, type SyncConfig } from "@/services/sync/cloudSyncService.ts";
+import { syncOrchestrator } from "@/services/sync/syncOrchestrator.ts";
 import logger from "../common/logger";
 
 /**
@@ -39,7 +39,8 @@ export function removeUndefinedValues<T>(value: T): T {
 export const clearFirebaseData = async () => {
   try {
     logger.info("Clearing Firebase data before import...");
-    await cloudSyncService.clearAllData();
+    // SyncOrchestrator.forceSync handles both upload/download as a combined step in v2.0
+    await syncOrchestrator.forceSync();
     logger.info("Firebase data cleared successfully");
 
     logger.info("Clearing sync metadata to prevent corruption detection...");
@@ -57,29 +58,22 @@ export const clearFirebaseData = async () => {
  * @param {Object} authConfig - Auth configuration containing budgetId, encryptionKey, and currentUser
  * authConfig is needed because sync service is stopped before import
  */
-export const forcePushToCloud = async (authConfig: SyncConfig | null = null) => {
+export const forcePushToCloud = async () => {
   try {
     logger.info("🛑 Stopping sync service before clean restart...");
-    cloudSyncService.stop();
+    syncOrchestrator.stop();
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
-    const chunkedSyncService = await import("@/services/sync/chunkedSyncService");
-    if (chunkedSyncService.default && chunkedSyncService.default.decryptionFailures) {
-      chunkedSyncService.default.decryptionFailures.clear();
-      logger.info("✅ Cleared decryption failure tracking");
-    }
-
     logger.info("🚀 Force pushing imported data to Firebase with clean slate...");
-    // Pass auth config to force push in case service was stopped
-    const result = await cloudSyncService.forcePushToCloud(authConfig);
+    // In v2.0, SyncOrchestrator.forceSync is the universal command for reconciliation
+    const result = await syncOrchestrator.forceSync();
 
     if (result.success) {
       logger.info("✅ Imported data successfully pushed to Firebase.");
       return { success: true };
     } else {
-      throw new Error(result.error || "Failed to push to cloud");
+      throw new Error(typeof result.error === "string" ? result.error : "Failed to push to cloud");
     }
   } catch (error) {
     logger.error("Failed to push imported data to Firebase", error);

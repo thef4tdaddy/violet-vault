@@ -272,54 +272,10 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
   // Start background sync service
   // Note: Auth data should be passed as a parameter from components using AuthContext
   // This method is kept for backward compatibility but should receive auth data externally
-  async startBackgroundSync(authData?: {
-    isUnlocked: boolean;
-    budgetId: string;
-    encryptionKey: CryptoKey | Uint8Array<ArrayBufferLike>;
-    currentUser?:
-      | {
-          uid?: string;
-          userName?: string;
-          userColor?: string;
-        }
-      | string;
-  }) {
-    try {
-      // Safe external store access (prevents React error #185)
-      const state = useUiStore.getState();
-      if (!state.cloudSyncEnabled) {
-        logger.info("Cloud sync disabled - skipping background sync start");
-        return;
-      }
-
-      if (!authData || !authData.isUnlocked || !authData.budgetId || !authData.encryptionKey) {
-        logger.warn("Cannot start background sync - missing auth data", {
-          isUnlocked: authData?.isUnlocked,
-          hasBudgetId: !!authData?.budgetId,
-          hasEncryptionKey: !!authData?.encryptionKey,
-        });
-        return;
-      }
-
-      // Import and start the cloud sync service
-      const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
-
-      const normalizedUser =
-        typeof authData.currentUser === "string"
-          ? { userName: authData.currentUser }
-          : authData.currentUser;
-
-      const syncConfig = {
-        budgetId: authData.budgetId,
-        encryptionKey: authData.encryptionKey,
-        currentUser: normalizedUser,
-      };
-
-      cloudSyncService.start(syncConfig);
-      logger.info("Background sync service started successfully");
-    } catch (error) {
-      logger.error("Failed to start background sync service", error);
-    }
+  async startBackgroundSync() {
+    logger.info(
+      "uiStore: startBackgroundSync is deprecated, use SyncOrchestrator directly via AuthContext"
+    );
   },
 
   // Reset UI state only - data arrays handled by TanStack Query/Dexie

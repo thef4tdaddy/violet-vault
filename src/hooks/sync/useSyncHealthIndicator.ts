@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type RefObject } from "react";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
-import { cloudSyncService } from "@/services/sync/cloudSyncService";
+import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import logger from "../../utils/common/logger";
 
 /**
@@ -87,10 +87,7 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = (): void => {
-      const isRunning =
-        (cloudSyncService as { isRunning?: boolean; activeSyncPromise?: unknown }).isRunning &&
-        (cloudSyncService as { activeSyncPromise?: unknown }).activeSyncPromise;
-      setIsBackgroundSyncing(!!isRunning);
+      setIsBackgroundSyncing(syncOrchestrator.isSyncInProgress);
     };
 
     // Check immediately

@@ -3,7 +3,7 @@ import { budgetDb } from "@/db/budgetDb";
 import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "@/utils/common/logger";
-import { cloudSyncService } from "@/services/sync/cloudSyncService";
+import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import type { SavingsGoal, Envelope, Transaction, Bill } from "@/db/types";
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -59,8 +59,8 @@ export const optimisticHelpers = {
       });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic envelope update", {
@@ -99,8 +99,8 @@ export const optimisticHelpers = {
       });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic envelope addition", {
@@ -260,8 +260,8 @@ export const optimisticHelpers = {
       });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic transaction removal", {
@@ -327,8 +327,8 @@ export const optimisticHelpers = {
       });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic savings goal addition", {
@@ -356,8 +356,8 @@ export const optimisticHelpers = {
       });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic savings goal update", {
@@ -379,8 +379,8 @@ export const optimisticHelpers = {
       logger.debug("Optimistic savings goal removal completed", { goalId });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
-      if (cloudSyncService?.isRunning) {
-        cloudSyncService.scheduleSync("normal");
+      if (syncOrchestrator?.isRunning) {
+        syncOrchestrator.scheduleSync("normal");
       }
     } catch (error) {
       logger.warn("Failed to persist optimistic savings goal removal", {

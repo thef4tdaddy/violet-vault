@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/common/queryClient";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
-import { cloudSyncService } from "./services/sync/cloudSyncService";
+import { syncOrchestrator } from "./services/sync/syncOrchestrator";
 // import BugReportButton from "./components/feedback/BugReportButton"; // Now in MainLayout
 import ConfirmProvider from "./components/ui/ConfirmProvider";
 import PromptProvider from "./components/ui/PromptProvider";
@@ -75,13 +75,8 @@ const App = () => {
             <div className="font-sans">
               <ErrorBoundary context="MainLayout">
                 <MainLayout
-                  firebaseSync={
-                    cloudSyncService as unknown as {
-                      start: (config: unknown) => void;
-                      forceSync: () => Promise<unknown>;
-                      isRunning: boolean;
-                    }
-                  }
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  firebaseSync={syncOrchestrator as any}
                 />
               </ErrorBoundary>
               <ConfirmProvider />

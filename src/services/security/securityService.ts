@@ -1,4 +1,5 @@
 import logger from "@/utils/common/logger";
+import { encryptionManager, EncryptionManager } from "./encryptionManager";
 
 /**
  * Security settings interface
@@ -35,9 +36,11 @@ export interface SecurityStats {
 
 /**
  * Security Service
- * Handles security event logging, serialization, and storage
+ * Unified entry point for security events, settings, and encryption orchestration.
+ * Leveraging EncryptionManager for core crypto operations.
  */
 class SecurityService {
+  public encryption: EncryptionManager = encryptionManager;
   private storageKeys: {
     events: string;
     settings: string;
@@ -48,6 +51,7 @@ class SecurityService {
       events: "violetVault_securityEvents",
       settings: "violetVault_securitySettings",
     };
+    logger.debug("SecurityService: Initialized with EncryptionManager");
   }
 
   /**
