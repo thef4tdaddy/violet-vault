@@ -143,43 +143,89 @@ function parseDate(dateStr: string, format: "US" | "EU" | "auto" = "auto"): Date
   const isoMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (isoMatch) {
     const [, year, month, day] = isoMatch;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    if (!isNaN(date.getTime())) return date;
+    const yearNum = parseInt(year, 10);
+    const monthNum = parseInt(month, 10);
+    const dayNum = parseInt(day, 10);
+    const date = new Date(yearNum, monthNum - 1, dayNum);
+    if (
+      !isNaN(date.getTime()) &&
+      date.getFullYear() === yearNum &&
+      date.getMonth() === monthNum - 1 &&
+      date.getDate() === dayNum
+    ) {
+      return date;
+    }
   }
 
   // Parse slash-separated dates (MM/DD/YYYY or DD/MM/YYYY)
   const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (slashMatch) {
     const [, first, second, year] = slashMatch;
-    const firstNum = parseInt(first);
-    const secondNum = parseInt(second);
+    const firstNum = parseInt(first, 10);
+    const secondNum = parseInt(second, 10);
+    const yearNum = parseInt(year, 10);
 
     // Use explicit format if specified
     if (format === "US") {
       // MM/DD/YYYY
-      const date = new Date(parseInt(year), firstNum - 1, secondNum);
-      if (!isNaN(date.getTime())) return date;
+      const date = new Date(yearNum, firstNum - 1, secondNum);
+      if (
+        !isNaN(date.getTime()) &&
+        date.getFullYear() === yearNum &&
+        date.getMonth() === firstNum - 1 &&
+        date.getDate() === secondNum
+      ) {
+        return date;
+      }
     } else if (format === "EU") {
       // DD/MM/YYYY
-      const date = new Date(parseInt(year), secondNum - 1, firstNum);
-      if (!isNaN(date.getTime())) return date;
+      const date = new Date(yearNum, secondNum - 1, firstNum);
+      if (
+        !isNaN(date.getTime()) &&
+        date.getFullYear() === yearNum &&
+        date.getMonth() === secondNum - 1 &&
+        date.getDate() === firstNum
+      ) {
+        return date;
+      }
     } else {
       // Auto-detect based on values
       // If first number > 12, it must be day (EU format)
       if (firstNum > 12) {
-        const date = new Date(parseInt(year), secondNum - 1, firstNum);
-        if (!isNaN(date.getTime())) return date;
+        const date = new Date(yearNum, secondNum - 1, firstNum);
+        if (
+          !isNaN(date.getTime()) &&
+          date.getFullYear() === yearNum &&
+          date.getMonth() === secondNum - 1 &&
+          date.getDate() === firstNum
+        ) {
+          return date;
+        }
       }
       // If second number > 12, it must be day (US format)
       else if (secondNum > 12) {
-        const date = new Date(parseInt(year), firstNum - 1, secondNum);
-        if (!isNaN(date.getTime())) return date;
+        const date = new Date(yearNum, firstNum - 1, secondNum);
+        if (
+          !isNaN(date.getTime()) &&
+          date.getFullYear() === yearNum &&
+          date.getMonth() === firstNum - 1 &&
+          date.getDate() === secondNum
+        ) {
+          return date;
+        }
       }
       // Both numbers ≤ 12: ambiguous, default to US format
       // Note: Users should specify format explicitly in this case
       else {
-        const date = new Date(parseInt(year), firstNum - 1, secondNum);
-        if (!isNaN(date.getTime())) return date;
+        const date = new Date(yearNum, firstNum - 1, secondNum);
+        if (
+          !isNaN(date.getTime()) &&
+          date.getFullYear() === yearNum &&
+          date.getMonth() === firstNum - 1 &&
+          date.getDate() === secondNum
+        ) {
+          return date;
+        }
       }
     }
   }
