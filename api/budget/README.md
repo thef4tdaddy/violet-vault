@@ -31,7 +31,7 @@ curl -X POST https://violet-vault.vercel.app/api/budget \
   }'
 ```
 
-### Batch Calculation (Future)
+### Batch Calculation
 
 ```bash
 curl -X POST https://violet-vault.vercel.app/api/budget/batch \
