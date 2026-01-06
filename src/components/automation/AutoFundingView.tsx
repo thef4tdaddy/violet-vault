@@ -4,7 +4,7 @@ import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/autofunding";
-import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
 import { globalToast } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
@@ -15,7 +15,7 @@ import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 function AutoFundingView() {
   const navigate = useNavigate();
-  const { envelopes } = useEnvelopesQuery();
+  const { envelopes } = useEnvelopes();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);

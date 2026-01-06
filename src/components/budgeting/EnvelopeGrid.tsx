@@ -358,8 +358,9 @@ const useResolvedData = (
     },
     isLoading,
     addEnvelope,
-    updateEnvelope: updateEnvelopeAsync,
-    deleteEnvelope,
+    updateEnvelope: (params: { id: string; updates: Partial<Envelope> }) =>
+      updateEnvelopeAsync(params.id, params.updates),
+    deleteEnvelope: (id: string) => deleteEnvelope({ envelopeId: id }),
     updateBill,
   };
 };

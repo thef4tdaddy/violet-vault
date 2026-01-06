@@ -69,7 +69,7 @@ describe("backupUtils", () => {
 
   describe("backupCurrentData", () => {
     it("should backup current data to localStorage", async () => {
-      const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
+      const setItemSpy = vi.spyOn(localStorage, "setItem");
 
       await backupCurrentData();
 
@@ -80,7 +80,7 @@ describe("backupUtils", () => {
     });
 
     it("should include all envelope types in backup (v2.0 model)", async () => {
-      const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
+      const setItemSpy = vi.spyOn(localStorage, "setItem");
 
       await backupCurrentData();
 

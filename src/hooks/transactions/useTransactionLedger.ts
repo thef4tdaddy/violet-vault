@@ -11,7 +11,7 @@ import { useShallow } from "zustand/react/shallow";
 import logger from "@/utils/common/logger";
 import { useLedgerState } from "./helpers/useLedgerState";
 import { useLedgerOperations } from "./helpers/useLedgerOperations";
-import type { TransactionInput } from "./useTransactionMutations";
+import type { TransactionInput } from "./useTransactionOperations";
 import type { Transaction as FinanceTransaction } from "@/types/finance";
 
 /**
@@ -124,18 +124,15 @@ export const useTransactionLedger = (currentUser: unknown) => {
       } as TransactionInput);
     },
     onUpdateTransaction: async (transaction) => {
-      await updateTransactionAsync({
-        id: String(transaction.id),
-        updates: {
-          date: new Date(transaction.date),
-          amount: transaction.amount,
-          category: transaction.category,
-          description: transaction.description,
-          envelopeId:
-            transaction.envelopeId !== undefined ? String(transaction.envelopeId) : undefined,
-          notes: transaction.notes,
-          type: transaction.type,
-        },
+      await updateTransactionAsync(String(transaction.id), {
+        date: new Date(transaction.date),
+        amount: transaction.amount,
+        category: transaction.category,
+        description: transaction.description,
+        envelopeId:
+          transaction.envelopeId !== undefined ? String(transaction.envelopeId) : undefined,
+        notes: transaction.notes,
+        type: transaction.type,
       });
     },
     onDeleteTransaction: async (id) => {
@@ -161,20 +158,17 @@ export const useTransactionLedger = (currentUser: unknown) => {
         id: (ledgerState.editingTransaction as { id: string | number }).id,
       };
       try {
-        await updateTransactionAsync({
-          id: String(transactionWithId.id),
-          updates: {
-            date: new Date(transactionWithId.date),
-            amount: transactionWithId.amount,
-            category: transactionWithId.category,
-            description: transactionWithId.description,
-            envelopeId:
-              transactionWithId.envelopeId !== undefined
-                ? String(transactionWithId.envelopeId)
-                : undefined,
-            notes: transactionWithId.notes,
-            type: transactionWithId.type as FinanceTransaction["type"] | undefined,
-          },
+        await updateTransactionAsync(String(transactionWithId.id), {
+          date: new Date(transactionWithId.date),
+          amount: transactionWithId.amount,
+          category: transactionWithId.category,
+          description: transactionWithId.description,
+          envelopeId:
+            transactionWithId.envelopeId !== undefined
+              ? String(transactionWithId.envelopeId)
+              : undefined,
+          notes: transactionWithId.notes,
+          type: transactionWithId.type as FinanceTransaction["type"] | undefined,
         });
         logger.info("✅ Transaction updated", {
           id: transactionWithId.id,

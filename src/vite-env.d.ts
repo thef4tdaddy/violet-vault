@@ -42,7 +42,18 @@ interface ImportMetaEnv {
 }
 
 // Global type declarations for browser APIs
+interface CloudSyncService {
+  triggerSyncForCriticalChange(change: string): void;
+  isRunning?: boolean;
+  config?: unknown;
+  lastSyncTime?: string;
+}
+
 declare global {
+  interface Window {
+    cloudSyncService?: CloudSyncService;
+  }
+
   // Service Worker types
   interface ServiceWorkerGlobalScope {
     skipWaiting(): Promise<void>;

@@ -151,7 +151,7 @@ describe("useEnvelopeSystem", () => {
       const response = await result.current.updateEnvelope("env1", { name: "Updated" });
 
       expect(response.success).toBe(true);
-      expect(mockUpdateEnvelope).toHaveBeenCalledWith({ id: "env1", updates: { name: "Updated" } });
+      expect(mockUpdateEnvelope).toHaveBeenCalledWith("env1", { name: "Updated" });
     });
 
     it("should delete envelope successfully", async () => {
@@ -170,7 +170,10 @@ describe("useEnvelopeSystem", () => {
       const response = await result.current.deleteEnvelope("env1", false);
 
       expect(response.success).toBe(true);
-      expect(mockDeleteEnvelope).toHaveBeenCalledWith("env1", false);
+      expect(mockDeleteEnvelope).toHaveBeenCalledWith({
+        envelopeId: "env1",
+        deleteBillsToo: false,
+      });
     });
   });
 
