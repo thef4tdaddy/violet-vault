@@ -21,8 +21,8 @@ class MockWebSocket {
   }
 
   send(data: string): void {
-    // Mock send - no-op in tests
-    console.log("Mock WebSocket send:", data);
+    // Mock send - stored for test verification
+    // Intentionally no-op in tests - verifiable via spy
   }
 
   close(): void {

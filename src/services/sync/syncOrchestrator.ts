@@ -7,6 +7,11 @@ import type { SafeUnknown, TypedResponse } from "@/types/firebase";
 import type { WebSocketSignalMessage } from "@/types/sync";
 
 /**
+ * Sync version constant
+ */
+const SYNC_VERSION = "2.0";
+
+/**
  * Snapshot of local Dexie data for sync.
  */
 export interface DexieData extends Record<string, unknown> {
@@ -49,6 +54,7 @@ export class SyncOrchestrator {
   public isSyncInProgress: boolean = false;
   private syncQueue: Promise<void> = Promise.resolve();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private wsUnsubscribe: (() => void) | null = null;
 
   private constructor() {}
 
@@ -177,10 +183,10 @@ export class SyncOrchestrator {
       if (result.success) {
         syncHealthMonitor.recordSyncSuccess(syncId);
         logger.info("SyncOrchestrator: Sync successful");
-        
+
         // Send WebSocket signal to notify other clients (SIGNALING ONLY - NO DATA)
         websocketSignalingService.sendSignal("data_changed", {
-          version: "2.0",
+          version: SYNC_VERSION,
         });
       } else {
         syncHealthMonitor.recordSyncFailure(
@@ -244,7 +250,7 @@ export class SyncOrchestrator {
       unassignedCash: Number(meta?.unassignedCash || 0),
       actualBalance: Number(meta?.actualBalance || 0),
       lastModified: Date.now(),
-      syncVersion: "2.0",
+      syncVersion: SYNC_VERSION,
     };
   }
 

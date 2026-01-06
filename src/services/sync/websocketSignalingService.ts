@@ -8,6 +8,11 @@ import type {
 } from "@/types/sync";
 
 /**
+ * WebSocket protocol version
+ */
+const WEBSOCKET_PROTOCOL_VERSION = "2.0";
+
+/**
  * WebSocket Signaling Service
  *
  * PRIVACY-PRESERVING REAL-TIME SYNC NOTIFICATIONS
@@ -103,11 +108,20 @@ export class WebSocketSignalingService {
       return;
     }
 
+    // Validate and sanitize metadata
+    const safeMetadata: WebSocketSignalMessage["metadata"] = metadata
+      ? {
+          deviceId: typeof metadata.deviceId === "string" ? metadata.deviceId : undefined,
+          userId: typeof metadata.userId === "string" ? metadata.userId : undefined,
+          version: typeof metadata.version === "string" ? metadata.version : undefined,
+        }
+      : undefined;
+
     const signal: WebSocketSignalMessage = {
       type,
       budgetId: this.config?.budgetId,
       timestamp: Date.now(),
-      metadata: metadata as WebSocketSignalMessage["metadata"],
+      metadata: safeMetadata,
     };
 
     try {
@@ -195,7 +209,7 @@ export class WebSocketSignalingService {
     // Send initial connection signal
     this.sendSignal("connected", {
       budgetId: this.config?.budgetId,
-      version: "2.0",
+      version: WEBSOCKET_PROTOCOL_VERSION,
     });
 
     // Notify listeners
