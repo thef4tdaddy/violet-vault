@@ -83,6 +83,7 @@ export const useWebSocketSignaling = (
 
   // Subscribe to signals using the ref pattern to avoid re-subscribing
   useEffect(() => {
+    // Only subscribe if there's a callback to handle signals
     if (!onSignalRef.current) {
       return;
     }
@@ -97,7 +98,7 @@ export const useWebSocketSignaling = (
     return () => {
       unsubscribeSignal();
     };
-  }, []); // Empty deps - only subscribe once
+  }, [onSignal]); // Re-subscribe when onSignal changes from null to valid or vice versa
 
   // Send signal method
   const sendSignal = useCallback(
@@ -126,7 +127,8 @@ export const useWebSocketSignaling = (
     });
   }, [budgetId]);
 
-  // Disconnect method - use with caution as it affects all components using this hook
+  // Disconnect method - disconnects the shared WebSocket for ALL components using this hook
+  // Use only when intentionally shutting down all WebSocket connections
   const disconnect = useCallback(() => {
     websocketSignalingService.disconnect();
   }, []);
