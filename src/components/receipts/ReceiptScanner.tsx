@@ -101,15 +101,19 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }: ReceiptScannerProps) =>
   const modalRef = useModalAutoScroll(true);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
+      data-testid="receipt-scanner-overlay"
+    >
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl bg-purple-100/60 my-auto"
+        className="rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl bg-purple-100/60 my-auto"
+        data-testid="receipt-scanner-container"
       >
         <div className="p-6">
           <ReceiptScannerHeader onClose={onClose} />
 
-          {!uploadedImage && (
+          {!uploadedImage && !isProcessing && (
             <ReceiptUploadArea
               onDrop={handleDrop}
               onDragOver={handleDragOver}

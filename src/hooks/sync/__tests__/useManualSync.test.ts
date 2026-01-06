@@ -4,9 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { useManualSync } from "../useManualSync";
 
-// Mock cloudSyncService
-vi.mock("@/services/sync/cloudSyncService", () => ({
-  cloudSyncService: {
+// Mock SyncOrchestrator
+vi.mock("@/services/sync/syncOrchestrator", () => ({
+  syncOrchestrator: {
     isRunning: true,
     forceSync: vi.fn(),
     getStatus: vi.fn(() => ({
@@ -40,7 +40,7 @@ vi.mock("@/utils/common/logger", () => ({
 describe("useManualSync", () => {
   let queryClient: QueryClient;
   let wrapper: React.FC<{ children: React.ReactNode }>;
-  let mockCloudSyncService: { isRunning: boolean; forceSync: ReturnType<typeof vi.fn> };
+  let mockSyncOrchestrator: { isRunning: boolean; forceSync: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -55,13 +55,10 @@ describe("useManualSync", () => {
     wrapper = ({ children }: { children: React.ReactNode }) =>
       React.createElement(QueryClientProvider, { client: queryClient }, children);
 
-    const cloudSync = await import("@/services/sync/cloudSyncService");
-    mockCloudSyncService = cloudSync.cloudSyncService as {
-      isRunning: boolean;
-      forceSync: ReturnType<typeof vi.fn>;
-    };
-    mockCloudSyncService.isRunning = true;
-    mockCloudSyncService.forceSync.mockResolvedValue({
+    const { syncOrchestrator } = await import("@/services/sync/syncOrchestrator");
+    mockSyncOrchestrator = syncOrchestrator as any;
+    mockSyncOrchestrator.isRunning = true;
+    mockSyncOrchestrator.forceSync.mockResolvedValue({
       success: true,
       direction: "upload",
       counts: { envelopes: 5, transactions: 10 },
@@ -114,7 +111,7 @@ describe("useManualSync", () => {
   it("should set isUploadingSyncInProgress during upload", async () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
-    mockCloudSyncService.forceSync.mockImplementation(
+    mockSyncOrchestrator.forceSync.mockImplementation(
       () =>
         new Promise((resolve) => {
           setTimeout(
@@ -150,7 +147,7 @@ describe("useManualSync", () => {
   it("should handle upload sync error", async () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
-    mockCloudSyncService.forceSync.mockResolvedValue({
+    mockSyncOrchestrator.forceSync.mockResolvedValue({
       success: false,
       error: "Upload failed",
     });
@@ -172,7 +169,7 @@ describe("useManualSync", () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
     let resolveSync: ((value: unknown) => void) | null = null;
-    mockCloudSyncService.forceSync.mockImplementation(
+    mockSyncOrchestrator.forceSync.mockImplementation(
       () =>
         new Promise((resolve) => {
           resolveSync = resolve;
@@ -239,7 +236,7 @@ describe("useManualSync", () => {
   it("should set isDownloadingSyncInProgress during download", async () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
-    mockCloudSyncService.forceSync.mockImplementation(
+    mockSyncOrchestrator.forceSync.mockImplementation(
       () =>
         new Promise((resolve) => {
           setTimeout(
@@ -275,7 +272,7 @@ describe("useManualSync", () => {
   it("should handle service not running error", async () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
-    mockCloudSyncService.isRunning = false;
+    mockSyncOrchestrator.isRunning = false;
 
     let syncResult;
     await act(async () => {
@@ -291,7 +288,7 @@ describe("useManualSync", () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
     // Set up error mock
-    mockCloudSyncService.forceSync.mockRejectedValue(new Error("Test error"));
+    mockSyncOrchestrator.forceSync.mockRejectedValue(new Error("Test error"));
 
     // Try a sync to generate error
     await act(async () => {
@@ -331,13 +328,13 @@ describe("useManualSync", () => {
     });
 
     expect(syncResult?.success).toBe(true);
-    expect(mockCloudSyncService.forceSync).toHaveBeenCalled();
+    expect(mockSyncOrchestrator.forceSync).toHaveBeenCalled();
   });
 
   it("should handle sync errors gracefully", async () => {
     const { result } = renderHook(() => useManualSync(), { wrapper });
 
-    mockCloudSyncService.forceSync.mockRejectedValue(new Error("Network error"));
+    mockSyncOrchestrator.forceSync.mockRejectedValue(new Error("Network error"));
 
     let syncResult;
     await act(async () => {

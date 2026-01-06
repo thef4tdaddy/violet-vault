@@ -7,10 +7,10 @@ vi.mock("@/utils/sync/masterSyncValidator", () => ({
   getQuickSyncStatus: vi.fn(),
 }));
 
-vi.mock("@/services/sync/cloudSyncService", () => ({
-  cloudSyncService: {
+vi.mock("@/services/sync/syncOrchestrator", () => ({
+  syncOrchestrator: {
     isRunning: false,
-    activeSyncPromise: null,
+    isSyncInProgress: false,
   },
 }));
 
@@ -106,7 +106,7 @@ describe("useSyncHealthIndicator", () => {
   });
 
   it("should monitor background sync activity", async () => {
-    const { cloudSyncService } = await import("@/services/sync/cloudSyncService");
+    const { syncOrchestrator } = await import("@/services/sync/syncOrchestrator");
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
@@ -115,8 +115,7 @@ describe("useSyncHealthIndicator", () => {
 
     // Simulate sync starting
     act(() => {
-      cloudSyncService.isRunning = true;
-      cloudSyncService.activeSyncPromise = Promise.resolve();
+      (syncOrchestrator as any).isSyncInProgress = true;
     });
 
     // Fast-forward the interval
@@ -128,8 +127,7 @@ describe("useSyncHealthIndicator", () => {
 
     // Simulate sync ending
     act(() => {
-      cloudSyncService.isRunning = false;
-      cloudSyncService.activeSyncPromise = null;
+      (syncOrchestrator as any).isSyncInProgress = false;
     });
 
     act(() => {

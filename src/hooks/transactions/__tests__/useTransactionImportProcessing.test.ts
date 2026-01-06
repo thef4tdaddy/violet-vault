@@ -26,9 +26,10 @@ describe("useTransactionImportProcessing", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(ImportService, "isAvailable").mockResolvedValue(true);
   });
 
-  describe("processFileWithBackend", () => {
+  describe("processFileImport", () => {
     it("should process file using backend API", async () => {
       const mockFile = new File(["test"], "test.csv", { type: "text/csv" });
       const mockResponse = {
@@ -55,7 +56,7 @@ describe("useTransactionImportProcessing", () => {
 
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
-      const processResult = await result.current.processFileWithBackend(mockFile);
+      const processResult = await result.current.processFileImport(mockFile);
 
       expect(processResult.valid.length).toBe(1);
       expect(processResult.invalid.length).toBe(0);
@@ -73,9 +74,8 @@ describe("useTransactionImportProcessing", () => {
 
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
-      await expect(result.current.processFileWithBackend(mockFile)).rejects.toThrow(
-        "Invalid file type"
-      );
+      const processResult = await result.current.processFileImport(mockFile);
+      expect(processResult.source).toBe("client");
     });
 
     it("should handle backend errors", async () => {
@@ -89,9 +89,8 @@ describe("useTransactionImportProcessing", () => {
 
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
-      await expect(result.current.processFileWithBackend(mockFile)).rejects.toThrow(
-        "Backend error"
-      );
+      const processResult = await result.current.processFileImport(mockFile);
+      expect(processResult.source).toBe("client");
     });
 
     it("should update progress during processing", async () => {
@@ -107,7 +106,7 @@ describe("useTransactionImportProcessing", () => {
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
       const initialProgress = result.current.importProgress;
-      await result.current.processFileWithBackend(mockFile);
+      await result.current.processFileImport(mockFile);
 
       // Progress should have been updated during processing
       await waitFor(() => {
@@ -128,7 +127,7 @@ describe("useTransactionImportProcessing", () => {
 
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
-      await result.current.processFileWithBackend(mockFile, fieldMapping);
+      await result.current.processFileImport(mockFile, fieldMapping);
 
       expect(ImportService.importTransactions).toHaveBeenCalledWith(mockFile, fieldMapping);
     });
@@ -165,7 +164,7 @@ describe("useTransactionImportProcessing", () => {
 
       const { result } = renderHook(() => useTransactionImportProcessing(mockUser));
 
-      const processResult = await result.current.processFileWithBackend(mockFile);
+      const processResult = await result.current.processFileImport(mockFile);
 
       expect(processResult.valid.length).toBe(1);
       expect(processResult.invalid.length).toBe(1);

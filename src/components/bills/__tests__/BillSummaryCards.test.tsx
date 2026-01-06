@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import BillSummaryCards from "../BillSummaryCards";
+import "@testing-library/jest-dom";
 
 // Mock child components and utilities
-vi.mock("../ui/PageSummaryCard", () => ({
-  default: ({ label, value, subtext }) => (
+vi.mock("../../ui/PageSummaryCard", () => ({
+  default: ({ label, value, subtext }: any) => (
     <div data-testid="summary-card">
       <span data-testid="card-label">{label}</span>
       <span data-testid="card-value">{value}</span>
@@ -14,15 +15,11 @@ vi.mock("../ui/PageSummaryCard", () => ({
 }));
 
 vi.mock("../../utils", () => ({
-  getIcon: vi.fn(() => {
-    return function MockIcon({ className }) {
-      return (
-        <div className={className} data-testid="icon">
-          Icon
-        </div>
-      );
-    };
-  }),
+  getIcon: vi.fn(() => ({ className }: any) => (
+    <div className={className} data-testid="icon">
+      Icon
+    </div>
+  )),
 }));
 
 describe("BillSummaryCards", () => {
@@ -44,10 +41,10 @@ describe("BillSummaryCards", () => {
   });
 
   describe("Rendering", () => {
-    it("should render without crashing", () => {
+    it("should render 4 summary cards", () => {
       render(<BillSummaryCards {...defaultProps} />);
       const cards = screen.getAllByTestId("summary-card");
-      expect(cards.length).toBeGreaterThan(0);
+      expect(cards.length).toBe(4);
     });
 
     it("should display total bills amount", () => {
@@ -149,7 +146,7 @@ describe("BillSummaryCards", () => {
     it("should handle empty totals object gracefully", () => {
       render(<BillSummaryCards totals={{}} />);
       const cards = screen.getAllByTestId("summary-card");
-      expect(cards.length).toBeGreaterThan(0);
+      expect(cards.length).toBe(4);
     });
   });
 });
