@@ -144,7 +144,7 @@ function parseDate(dateStr: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
 
-  // Try MM/DD/YYYY format
+  // Try MM/DD/YYYY format (US)
   const usMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (usMatch) {
     const [, month, day, year] = usMatch;
@@ -152,12 +152,15 @@ function parseDate(dateStr: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
 
-  // Try DD/MM/YYYY format
+  // Try DD/MM/YYYY format (EU) - different pattern with day validation
   const euMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (euMatch) {
-    const [, day, month, year] = euMatch;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    if (!isNaN(date.getTime())) return date;
+    const [, first, second, year] = euMatch;
+    // If first number > 12, it must be day (EU format)
+    if (parseInt(first) > 12) {
+      const date = new Date(parseInt(year), parseInt(second) - 1, parseInt(first));
+      if (!isNaN(date.getTime())) return date;
+    }
   }
 
   // Try browser's Date.parse as fallback
@@ -213,6 +216,8 @@ export function validateTransaction(transaction: Transaction): string[] {
     errors.push("Missing amount");
   } else if (isNaN(transaction.amount)) {
     errors.push("Invalid amount");
+  } else if (transaction.amount < 0) {
+    errors.push("Amount must be positive (type indicates direction)");
   }
 
   if (!transaction.type || !["income", "expense", "transfer"].includes(transaction.type)) {

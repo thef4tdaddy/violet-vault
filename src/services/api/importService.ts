@@ -274,24 +274,45 @@ export class ImportService {
         };
       }
 
-      // Validate transactions
+      // Validate and map transactions
       const transactions: Transaction[] = [];
       const invalid: InvalidRow[] = [];
 
       for (let i = 0; i < data.length; i++) {
         const item = data[i];
+        const errors: string[] = [];
 
         // Validate required fields
-        if (!item.date || !item.amount) {
+        if (!item.date) errors.push("Missing date");
+        if (item.amount === undefined || item.amount === null) errors.push("Missing amount");
+        if (!item.type || !["income", "expense", "transfer"].includes(item.type)) {
+          errors.push("Missing or invalid type");
+        }
+        if (!item.id) errors.push("Missing id");
+
+        if (errors.length > 0) {
           invalid.push({
             index: i + 1,
             row: JSON.stringify(item),
-            errors: ["Missing required fields: date, amount"],
+            errors,
           });
           continue;
         }
 
-        transactions.push(item as Transaction);
+        // Add transaction with validated fields
+        transactions.push({
+          id: item.id,
+          date: new Date(item.date),
+          amount: typeof item.amount === "number" ? item.amount : parseFloat(item.amount),
+          type: item.type,
+          description: item.description || "Transaction",
+          category: item.category || "uncategorized",
+          envelopeId: item.envelopeId || "",
+          merchant: item.merchant,
+          notes: item.notes,
+          createdAt: item.createdAt || Date.now(),
+          lastModified: item.lastModified || Date.now(),
+        });
       }
 
       logger.info("Client-side JSON import successful", {

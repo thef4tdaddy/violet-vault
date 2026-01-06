@@ -73,6 +73,10 @@ export class ServiceAvailabilityManager {
     try {
       const available = await checkPromise;
       return available;
+    } catch (error) {
+      // Clean up failed promise from map
+      logger.warn(`Health check failed for ${service}`, { error });
+      return false;
     } finally {
       this.healthCheckInProgress.delete(service);
     }
