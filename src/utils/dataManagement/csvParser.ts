@@ -25,54 +25,114 @@ export interface CSVParseResult {
  */
 export function parseCSV(content: string): CSVParseResult {
   const errors: Array<{ row: number; error: string }> = [];
-  const lines = content.split(/\r?\n/);
 
-  if (lines.length === 0) {
+  // Treat completely empty content as an empty CSV
+  if (!content) {
     logger.warn("Empty CSV content");
     return { headers: [], rows: [], errors: [{ row: 0, error: "Empty CSV file" }] };
   }
 
-  // Parse headers from first line
-  const headers = parseCSVLine(lines[0]);
+  // Character-by-character CSV parsing to correctly handle commas and newlines
+  // inside quoted fields.
+  const records: string[][] = [];
+  let currentRecord: string[] = [];
+  let currentField = "";
+  let inQuotes = false;
+
+  const length = content.length;
+  for (let i = 0; i < length; i++) {
+    const char = content[i];
+
+    if (inQuotes) {
+      if (char === '"') {
+        // Handle escaped quote ("")
+        if (i + 1 < length && content[i + 1] === '"') {
+          currentField += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        currentField += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ",") {
+        currentRecord.push(currentField);
+        currentField = "";
+      } else if (char === "\r" || char === "\n") {
+        // End of record (handle CRLF as a single newline)
+        currentRecord.push(currentField);
+        currentField = "";
+
+        records.push(currentRecord);
+        currentRecord = [];
+
+        if (char === "\r" && i + 1 < length && content[i + 1] === "\n") {
+          i++;
+        }
+      } else {
+        currentField += char;
+      }
+    }
+  }
+
+  // Finalize the last field/record if any content remains
+  if (inQuotes) {
+    errors.push({
+      row: records.length + 1,
+      error: "Unterminated quoted field in CSV content",
+    });
+  }
+
+  if (currentField.length > 0 || currentRecord.length > 0) {
+    currentRecord.push(currentField);
+    records.push(currentRecord);
+  }
+
+  // Find first non-empty record to use as headers
+  const firstNonEmptyIndex = records.findIndex((record) =>
+    record.some((field) => field.trim().length > 0)
+  );
+
+  if (firstNonEmptyIndex === -1) {
+    logger.warn("Empty CSV content");
+    return { headers: [], rows: [], errors: [{ row: 0, error: "Empty CSV file" }] };
+  }
+
+  const headers = records[firstNonEmptyIndex];
 
   if (headers.length === 0) {
     logger.error("CSV has no headers");
-    return { headers: [], rows: [], errors: [{ row: 1, error: "No headers found" }] };
+    return { headers: [], rows: [], errors: [{ row: firstNonEmptyIndex + 1, error: "No headers found" }] };
   }
 
   // Parse data rows
   const rows: ParsedCSVRow[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
+  for (let recordIndex = firstNonEmptyIndex + 1; recordIndex < records.length; recordIndex++) {
+    const record = records[recordIndex];
 
-    // Skip empty lines
-    if (line.length === 0) continue;
-
-    try {
-      const values = parseCSVLine(line);
-
-      // Skip rows with wrong column count
-      if (values.length !== headers.length) {
-        errors.push({
-          row: i + 1,
-          error: `Expected ${headers.length} columns, got ${values.length}`,
-        });
-        continue;
-      }
-
-      // Create row object
-      const row: ParsedCSVRow = {};
-      headers.forEach((header, index) => {
-        row[header] = values[index];
-      });
-
-      rows.push(row);
-    } catch (error) {
-      errors.push({
-        row: i + 1,
-        error: error instanceof Error ? error.message : "Failed to parse row",
-      });
+    // Skip empty records (equivalent to skipping empty lines)
+    const hasData = record.some((field) => field.trim().length > 0);
+    if (!hasData) {
+      continue;
     }
+
+    if (record.length !== headers.length) {
+      errors.push({
+        row: recordIndex + 1,
+        error: `Expected ${headers.length} columns, got ${record.length}`,
+      });
+      continue;
+    }
+
+    const row: ParsedCSVRow = {};
+    headers.forEach((header, index) => {
+      row[header] = record[index];
+    });
+
+    rows.push(row);
   }
 
   logger.info("CSV parsed successfully", {
