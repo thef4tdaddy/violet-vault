@@ -185,36 +185,41 @@ export class OfflineRequestQueueService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      const response = await fetch(request.url, {
-        method: request.method,
-        headers: request.headers,
-        body: request.body,
-        signal: controller.signal,
-      });
+      try {
+        const response = await fetch(request.url, {
+          method: request.method,
+          headers: request.headers,
+          body: request.body,
+          signal: controller.signal,
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      // Success - mark as completed and remove from queue
-      await budgetDb.offlineRequestQueue.update(request.id, {
-        status: "completed",
-      });
-
-      // Remove completed request after short delay (for audit purposes)
-      setTimeout(() => {
-        if (request.id) {
-          budgetDb.offlineRequestQueue.delete(request.id);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-      }, 5000);
 
-      logger.info("OfflineRequestQueue: Request completed successfully", {
-        requestId: request.requestId,
-        method: request.method,
-        url: request.url,
-      });
+        // Success - mark as completed and remove from queue
+        await budgetDb.offlineRequestQueue.update(request.id, {
+          status: "completed",
+        });
+
+        // Remove completed request after short delay (for audit purposes)
+        setTimeout(() => {
+          if (request.id) {
+            budgetDb.offlineRequestQueue.delete(request.id);
+          }
+        }, 5000);
+
+        logger.info("OfflineRequestQueue: Request completed successfully", {
+          requestId: request.requestId,
+          method: request.method,
+          url: request.url,
+        });
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
     } catch (error) {
       await this.handleRequestFailure(request, error);
     }
@@ -233,7 +238,7 @@ export class OfflineRequestQueueService {
     const newRetryCount = (request.retryCount || 0) + 1;
     const isRetryable = this.isRetryableError(error);
 
-    if (newRetryCount >= request.maxRetries || !isRetryable) {
+    if (newRetryCount > request.maxRetries || !isRetryable) {
       // Permanent failure
       await budgetDb.offlineRequestQueue.update(request.id, {
         status: "failed",

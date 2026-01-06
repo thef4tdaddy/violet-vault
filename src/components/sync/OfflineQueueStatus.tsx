@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { offlineRequestQueueService } from "@/services/sync/offlineRequestQueueService";
-import { WifiOff, Wifi, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
+import { WifiOff, Wifi, RefreshCw, AlertCircle, CheckCircle } from "@/utils/icons";
+import logger from "@/utils/common/logger";
 
 /**
  * Offline Queue Status Component
@@ -49,7 +50,7 @@ export const OfflineQueueStatus: React.FC = () => {
       const currentStatus = await offlineRequestQueueService.getStatus();
       setStatus(currentStatus);
     } catch (error) {
-      console.error("Failed to load queue status:", error);
+      logger.error("Failed to load queue status", error);
     }
   };
 
@@ -58,7 +59,7 @@ export const OfflineQueueStatus: React.FC = () => {
       await offlineRequestQueueService.retryRequest(requestId);
       await loadStatus();
     } catch (error) {
-      console.error("Failed to retry request:", error);
+      logger.error("Failed to retry request", error);
     }
   };
 
@@ -67,7 +68,7 @@ export const OfflineQueueStatus: React.FC = () => {
       await offlineRequestQueueService.clearFailedRequests();
       await loadStatus();
     } catch (error) {
-      console.error("Failed to clear failed requests:", error);
+      logger.error("Failed to clear failed requests", error);
     }
   };
 
@@ -76,7 +77,7 @@ export const OfflineQueueStatus: React.FC = () => {
       await offlineRequestQueueService.processQueue();
       await loadStatus();
     } catch (error) {
-      console.error("Failed to process queue:", error);
+      logger.error("Failed to process queue", error);
     }
   };
 
