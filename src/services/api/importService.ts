@@ -1,6 +1,7 @@
 /**
- * Import Service - Go Backend Integration
- * High-performance CSV/JSON parsing and transaction normalization via Go serverless functions
+ * Import Service - Hybrid Backend/Client Import
+ * High-performance CSV/JSON parsing via Go backend with client-side fallback
+ * Implements progressive enhancement for offline capability
  *
  * @module services/api/importService
  */
@@ -8,6 +9,12 @@
 import { ApiClient, type ApiResponse } from "@/services/api/client";
 import logger from "@/utils/common/logger";
 import type { Transaction } from "@/domain/schemas/transaction";
+import {
+  parseCSV,
+  readFileAsText,
+  autoDetectFieldMapping as autoDetectCSVMapping,
+} from "@/utils/dataManagement/csvParser";
+import { mapRowsToTransactions } from "@/utils/dataManagement/transactionMapper";
 
 // --- Request/Response Types ---
 // These match the Go backend structs in /api/import.go
@@ -37,13 +44,62 @@ export class ImportService {
   private static readonly ENDPOINT = "/api/import";
 
   /**
-   * Import and parse transactions using Go backend
+   * Import and parse transactions with automatic backend/client fallback
    *
    * @param file - CSV or JSON file to import
    * @param fieldMapping - Optional field mapping for CSV columns
+   * @param options - Import options
    * @returns Parsed transactions and validation errors
    */
   static async importTransactions(
+    file: File,
+    fieldMapping?: Record<string, string>,
+    options: { preferBackend?: boolean; forceClientSide?: boolean } = {}
+  ): Promise<ApiResponse<ImportResponse>> {
+    const { preferBackend = true, forceClientSide = false } = options;
+
+    // Force client-side parsing if requested
+    if (forceClientSide) {
+      logger.info("Using client-side import (forced)", {
+        fileName: file.name,
+        fileSize: file.size,
+      });
+      return this.importTransactionsClientSide(file, fieldMapping);
+    }
+
+    // Try backend import if preferred
+    if (preferBackend) {
+      const backendAvailable = await this.isAvailable();
+
+      if (backendAvailable) {
+        try {
+          const result = await this.importTransactionsBackend(file, fieldMapping);
+
+          if (result.success) {
+            return result;
+          }
+
+          logger.warn("Backend import failed, falling back to client-side", {
+            error: result.error,
+          });
+        } catch (error) {
+          logger.warn("Backend import error, falling back to client-side", {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } else {
+        logger.info("Backend unavailable, using client-side import");
+      }
+    }
+
+    // Fallback to client-side parsing
+    return this.importTransactionsClientSide(file, fieldMapping);
+  }
+
+  /**
+   * Import transactions using Go backend
+   */
+  private static async importTransactionsBackend(
     file: File,
     fieldMapping?: Record<string, string>
   ): Promise<ApiResponse<ImportResponse>> {
@@ -69,23 +125,194 @@ export class ImportService {
       });
 
       if (!response.success) {
-        logger.error("Import failed", {
+        logger.error("Backend import failed", {
           error: response.error,
         });
         return response;
       }
 
-      logger.info("Import successful", {
+      logger.info("Backend import successful", {
         transactionCount: response.data?.transactions?.length || 0,
         invalidCount: response.data?.invalid?.length || 0,
       });
 
       return response;
     } catch (error) {
-      logger.error("Import error", error);
+      logger.error("Backend import error", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Import failed",
+        error: error instanceof Error ? error.message : "Backend import failed",
+      };
+    }
+  }
+
+  /**
+   * Import transactions using client-side parsing
+   */
+  private static async importTransactionsClientSide(
+    file: File,
+    fieldMapping?: Record<string, string>
+  ): Promise<ApiResponse<ImportResponse>> {
+    try {
+      logger.info("Importing transactions via client-side parsing", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        hasMappings: !!fieldMapping,
+      });
+
+      const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+
+      if (fileExtension === ".csv") {
+        return this.importCSVClientSide(file, fieldMapping);
+      } else if (fileExtension === ".json") {
+        return this.importJSONClientSide(file);
+      } else {
+        return {
+          success: false,
+          error: "Unsupported file type. Please use CSV or JSON.",
+        };
+      }
+    } catch (error) {
+      logger.error("Client-side import error", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Client-side import failed",
+      };
+    }
+  }
+
+  /**
+   * Import CSV file using client-side parser
+   */
+  private static async importCSVClientSide(
+    file: File,
+    fieldMapping?: Record<string, string>
+  ): Promise<ApiResponse<ImportResponse>> {
+    try {
+      // Read file content
+      const content = await readFileAsText(file);
+
+      // Parse CSV
+      const parseResult = parseCSV(content);
+
+      if (parseResult.errors.length > 0 && parseResult.rows.length === 0) {
+        return {
+          success: false,
+          error: `Failed to parse CSV: ${parseResult.errors[0].error}`,
+        };
+      }
+
+      // Auto-detect or use provided field mapping
+      const mapping = fieldMapping || autoDetectCSVMapping(parseResult.headers);
+
+      // Validate required fields
+      if (!mapping.date || !mapping.amount) {
+        return {
+          success: false,
+          error: "Could not detect required fields (date, amount). Please provide field mapping.",
+          data: {
+            success: false,
+            transactions: [],
+            invalid: [],
+            message: "Missing required field mappings",
+          },
+        };
+      }
+
+      // Map rows to transactions
+      const mappingResult = mapRowsToTransactions(parseResult.rows, {
+        date: mapping.date,
+        amount: mapping.amount,
+        description: mapping.description,
+        category: mapping.category,
+        merchant: mapping.merchant,
+        notes: mapping.notes,
+      });
+
+      logger.info("Client-side CSV import successful", {
+        transactionCount: mappingResult.transactions.length,
+        invalidCount: mappingResult.invalid.length,
+      });
+
+      return {
+        success: true,
+        data: {
+          success: true,
+          transactions: mappingResult.transactions,
+          invalid: mappingResult.invalid,
+          message: `Imported ${mappingResult.transactions.length} transactions (client-side)`,
+        },
+      };
+    } catch (error) {
+      logger.error("Client-side CSV import error", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to parse CSV",
+      };
+    }
+  }
+
+  /**
+   * Import JSON file using client-side parser
+   */
+  private static async importJSONClientSide(
+    file: File
+  ): Promise<ApiResponse<ImportResponse>> {
+    try {
+      // Read file content
+      const content = await readFileAsText(file);
+
+      // Parse JSON
+      const data = JSON.parse(content);
+
+      // Validate JSON structure
+      if (!Array.isArray(data)) {
+        return {
+          success: false,
+          error: "Invalid JSON format. Expected an array of transactions.",
+        };
+      }
+
+      // Validate transactions
+      const transactions: Transaction[] = [];
+      const invalid: InvalidRow[] = [];
+
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+
+        // Validate required fields
+        if (!item.date || !item.amount) {
+          invalid.push({
+            index: i + 1,
+            row: JSON.stringify(item),
+            errors: ["Missing required fields: date, amount"],
+          });
+          continue;
+        }
+
+        transactions.push(item as Transaction);
+      }
+
+      logger.info("Client-side JSON import successful", {
+        transactionCount: transactions.length,
+        invalidCount: invalid.length,
+      });
+
+      return {
+        success: true,
+        data: {
+          success: true,
+          transactions,
+          invalid,
+          message: `Imported ${transactions.length} transactions (client-side)`,
+        },
+      };
+    } catch (error) {
+      logger.error("Client-side JSON import error", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to parse JSON",
       };
     }
   }
