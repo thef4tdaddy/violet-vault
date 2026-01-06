@@ -59,6 +59,11 @@
 
 ### ⚡ Advanced Technical Features
 
+- **Progressive Enhancement** - Automatic fallback to client-side logic when backend unavailable
+  - Client-side CSV/JSON parser as fallback for import service
+  - Local budget calculations when Go engine unreachable
+  - Service availability tracking with health checks
+  - Real-time service status indicators in UI
 - **Offline Support** - Works without internet, syncs when reconnected
 - **Performance Optimized** - Virtual scrolling and intelligent caching for large datasets
 - **Smart Caching System** - 7-day localStorage cache with automatic invalidation
