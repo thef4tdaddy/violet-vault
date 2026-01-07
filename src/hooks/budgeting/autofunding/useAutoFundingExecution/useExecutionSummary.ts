@@ -11,8 +11,8 @@ interface ExecutionRecord {
   executedAt: string;
   rulesExecuted: number;
   totalFunded: number;
-  remainingCash: number;
-  initialCash: number;
+  remainingCash?: number;
+  initialCash?: number;
   success?: boolean;
   results?: ExecutionResult[];
 }

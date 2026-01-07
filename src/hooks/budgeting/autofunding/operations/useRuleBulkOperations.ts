@@ -1,72 +1,79 @@
-import React, { useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { budgetDb } from "@/db/budgetDb";
+import { queryKeys } from "@/utils/common/queryClient";
 import logger from "@/utils/common/logger";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
-
-interface UseRuleBulkOperationsProps {
-  setRules: React.Dispatch<React.SetStateAction<AutoFundingRule[]>>;
-}
+import type { AutoFundingRule } from "@/db/types";
 
 /**
  * Hook for bulk rule operations
  */
-export const useRuleBulkOperations = ({ setRules }: UseRuleBulkOperationsProps) => {
-  // Bulk update rules
-  const bulkUpdateRules = useCallback(
-    (ruleIds: string[], updates: Partial<AutoFundingRule>) => {
-      try {
-        setRules((prevRules) =>
-          prevRules.map((rule) =>
-            ruleIds.includes(rule.id)
-              ? { ...rule, ...updates, updatedAt: new Date().toISOString() }
-              : rule
-          )
-        );
+export const useRuleBulkOperations = () => {
+  const queryClient = useQueryClient();
 
-        logger.info("Bulk rule update completed", {
-          ruleIds,
-          updates: Object.keys(updates),
-        });
-      } catch (error) {
-        logger.error("Failed to bulk update rules", error);
-        throw error;
-      }
+  // Bulk update mutation
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({
+      ruleIds,
+      updates,
+    }: {
+      ruleIds: string[];
+      updates: Partial<AutoFundingRule>;
+    }) => {
+      return budgetDb.transaction("rw", budgetDb.autoFundingRules, async () => {
+        const rules = await budgetDb.autoFundingRules.where("id").anyOf(ruleIds).toArray();
+        const updatedRules = rules.map((rule) => ({
+          ...rule,
+          ...updates,
+          lastModified: Date.now(),
+        }));
+
+        await budgetDb.autoFundingRules.bulkPut(updatedRules);
+        return updatedRules;
+      });
     },
-    [setRules]
-  );
-
-  // Bulk delete rules
-  const bulkDeleteRules = useCallback(
-    (ruleIds: string[]) => {
-      try {
-        setRules((prevRules) => prevRules.filter((rule) => !ruleIds.includes(rule.id)));
-
-        logger.info("Bulk rule deletion completed", { ruleIds });
-      } catch (error) {
-        logger.error("Failed to bulk delete rules", error);
-        throw error;
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+      logger.info("Bulk rule update completed");
     },
-    [setRules]
-  );
+  });
 
-  // Bulk toggle rules
-  const bulkToggleRules = useCallback(
-    (ruleIds: string[], enabled: boolean) => {
-      try {
-        bulkUpdateRules(ruleIds, { enabled });
-
-        logger.info("Bulk rule toggle completed", { ruleIds, enabled });
-      } catch (error) {
-        logger.error("Failed to bulk toggle rules", error);
-        throw error;
-      }
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ruleIds: string[]) => {
+      await budgetDb.autoFundingRules.bulkDelete(ruleIds);
+      return ruleIds;
     },
-    [bulkUpdateRules]
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+      logger.info("Bulk rule deletion completed");
+    },
+  });
+
+  // Bulk toggle mutation (convenience wrapper around bulkUpdate)
+  const bulkToggleMutation = useMutation({
+    mutationFn: async ({ ruleIds, enabled }: { ruleIds: string[]; enabled: boolean }) => {
+      return budgetDb.transaction("rw", budgetDb.autoFundingRules, async () => {
+        const rules = await budgetDb.autoFundingRules.where("id").anyOf(ruleIds).toArray();
+        const updatedRules = rules.map((rule) => ({
+          ...rule,
+          enabled,
+          lastModified: Date.now(),
+        }));
+
+        await budgetDb.autoFundingRules.bulkPut(updatedRules);
+        return updatedRules;
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+    },
+  });
 
   return {
-    bulkUpdateRules,
-    bulkDeleteRules,
-    bulkToggleRules,
+    bulkUpdateRules: bulkUpdateMutation.mutateAsync,
+    bulkDeleteRules: bulkDeleteMutation.mutateAsync,
+    bulkToggleRules: bulkToggleMutation.mutateAsync,
+    isBulkPending:
+      bulkUpdateMutation.isPending || bulkDeleteMutation.isPending || bulkToggleMutation.isPending,
   };
 };

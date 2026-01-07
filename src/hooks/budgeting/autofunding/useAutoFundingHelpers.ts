@@ -28,7 +28,7 @@ export const isLikelyIncome = (transaction: Transaction): boolean => {
  */
 export const handleIncomeDetection = async (
   transaction: Transaction,
-  rulesHook: UseAutoFundingRulesReturn,
+  rulesHook: Pick<UseAutoFundingRulesReturn, "getRulesByTrigger">,
   executeRules: (trigger: string, data: Record<string, unknown>) => Promise<ExecutionResult>
 ): Promise<void> => {
   const incomeRules = rulesHook.getRulesByTrigger(TRIGGER_TYPES.INCOME_DETECTED);
@@ -39,7 +39,7 @@ export const handleIncomeDetection = async (
       triggerTransaction: transaction,
     });
 
-    if (result.success) {
+    if (result.success && result.execution) {
       logger.info("Auto-funding triggered by income detection", {
         transactionAmount: transaction.amount,
         rulesExecuted: result.execution.rulesExecuted,
@@ -63,7 +63,7 @@ export const getScheduledTriggers = () => [
  * Check and execute scheduled rules
  */
 export const checkScheduledRules = async (
-  rulesHook: UseAutoFundingRulesReturn,
+  rulesHook: Pick<UseAutoFundingRulesReturn, "getRulesByTrigger" | "getExecutableRules">,
   budget: BudgetContext,
   executeRules: (trigger: string, triggerData?: Record<string, unknown>) => Promise<ExecutionResult>
 ): Promise<void> => {
@@ -78,7 +78,11 @@ export const checkScheduledRules = async (
         trigger,
         currentDate: now.toISOString(),
         data: {
-          envelopes: budget.envelopes || [],
+          envelopes: (budget.envelopes || []).map((e) => ({
+            ...e,
+            id: String(e.id),
+            currentBalance: e.currentBalance || 0,
+          })),
           unassignedCash: budget.unassignedCash || 0,
           transactions: budget.allTransactions || [],
         },
@@ -187,16 +191,19 @@ export const importAndUpdateData = (
  */
 export const processExecutionResults = (
   result: ExecutionResult,
-  historyHook: UseAutoFundingHistoryReturn,
-  rulesHook: UseAutoFundingRulesReturn,
-  dataHook: UseAutoFundingDataReturn
+  historyHook: Pick<UseAutoFundingHistoryReturn, "addToHistory" | "addToUndoStack">,
+  rulesHook: Pick<UseAutoFundingRulesReturn, "updateRule" | "getRuleById">,
+  dataHook: Pick<UseAutoFundingDataReturn, "markUnsavedChanges">
 ): void => {
-  if (result.success) {
+  if (result.success && result.execution && result.results) {
     // Ensure the history entry has a `timestamp` field (required by ExecutionHistoryEntry)
     const historyEntry: ExecutionHistoryEntry = {
       ...result.execution,
       // execution.executedAt exists on ExecutionDetails; use it for timestamp if timestamp is missing
       timestamp: result.execution.timestamp ?? result.execution.executedAt,
+      // Ensure required properties are present
+      totalFunded: result.execution.totalFunded,
+      rulesExecuted: result.execution.rulesExecuted,
     };
 
     historyHook.addToHistory(historyEntry);
@@ -209,7 +216,7 @@ export const processExecutionResults = (
       .filter((r: RuleExecutionResult) => r.success)
       .forEach((ruleResult: RuleExecutionResult) => {
         rulesHook.updateRule(ruleResult.ruleId, {
-          lastExecuted: result.execution.executedAt,
+          lastExecuted: result.execution!.executedAt,
           executionCount: (rulesHook.getRuleById(ruleResult.ruleId)?.executionCount || 0) + 1,
         });
       });
@@ -225,8 +232,8 @@ export const createExecuteRules =
   (
     rulesHook: UseAutoFundingRulesReturn,
     executionHook: UseAutoFundingExecutionReturn,
-    historyHook: UseAutoFundingHistoryReturn,
-    dataHook: UseAutoFundingDataReturn
+    historyHook: Pick<UseAutoFundingHistoryReturn, "addToHistory" | "addToUndoStack">,
+    dataHook: Pick<UseAutoFundingDataReturn, "markUnsavedChanges">
   ) =>
   async (trigger = TRIGGER_TYPES.MANUAL, triggerData: Record<string, unknown> = {}) => {
     try {

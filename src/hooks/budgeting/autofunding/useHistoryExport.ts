@@ -1,15 +1,7 @@
 import { useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
-interface HistoryExecution {
-  id: string;
-  trigger: string;
-  executedAt: string;
-  rulesExecuted?: number;
-  totalFunded?: number;
-  success?: boolean;
-  [key: string]: unknown;
-}
+import type { ExecutionRecord } from "@/db/types";
 
 interface UndoStackEntry {
   action: string;
@@ -43,7 +35,7 @@ export const useHistoryExport = () => {
   }, []);
 
   const exportToCsv = useCallback(
-    (historyToExport: HistoryExecution[]): ExportResult => {
+    (historyToExport: ExecutionRecord[]): ExportResult => {
       const csvHeaders = [
         "Execution ID",
         "Trigger",
@@ -57,7 +49,7 @@ export const useHistoryExport = () => {
         [
           execution.id,
           execution.trigger,
-          execution.executedAt,
+          execution.executedAt || "",
           execution.rulesExecuted || 0,
           execution.totalFunded || 0,
           execution.success !== false ? "true" : "false",
@@ -76,7 +68,7 @@ export const useHistoryExport = () => {
   // Export history data
   const exportHistory = useCallback(
     (
-      executionHistory: HistoryExecution[],
+      executionHistory: ExecutionRecord[],
       undoStack: UndoStackEntry[],
       options: ExportOptions = {}
     ): ExportResult => {
@@ -88,14 +80,14 @@ export const useHistoryExport = () => {
         if (dateFrom) {
           const fromDate = new Date(dateFrom);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate
+            (execution) => execution.executedAt && new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (dateTo) {
           const toDate = new Date(dateTo);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) <= toDate
+            (execution) => execution.executedAt && new Date(execution.executedAt) <= toDate
           );
         }
 

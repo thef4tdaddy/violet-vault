@@ -4,7 +4,10 @@ import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 
 interface UseRuleTogglesProps {
   rules: AutoFundingRule[];
-  updateRule: (ruleId: string, updates: Partial<AutoFundingRule>) => AutoFundingRule | undefined;
+  updateRule: (
+    ruleId: string,
+    updates: Partial<AutoFundingRule>
+  ) => Promise<AutoFundingRule | undefined>;
 }
 
 /**

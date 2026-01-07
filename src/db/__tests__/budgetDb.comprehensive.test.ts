@@ -43,7 +43,7 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
   describe("Database Initialization & Schema", () => {
     it("should initialize database with correct name", () => {
       expect(testDb.name).toBe("VioletVault");
-      expect(testDb.verno).toBe(9);
+      expect(testDb.verno).toBe(10);
     });
 
     it("should have all required tables defined", () => {

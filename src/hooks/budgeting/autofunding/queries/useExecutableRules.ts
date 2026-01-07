@@ -6,17 +6,17 @@ import {
 } from "@/utils/budgeting/autofunding/conditions";
 import logger from "@/utils/common/logger";
 
-interface UseExecutableRulesProps {
-  rules: Rule[];
+interface UseExecutableRulesProps<T extends Rule> {
+  rules: T[];
 }
 
 /**
  * Hook for executable rule operations
  */
-export const useExecutableRules = ({ rules }: UseExecutableRulesProps) => {
+export const useExecutableRules = <T extends Rule>({ rules }: UseExecutableRulesProps<T>) => {
   // Get executable rules for a given context
   const getExecutableRules = useCallback(
-    (context: ExecutionContext) => {
+    (context: ExecutionContext): T[] => {
       try {
         return rules.filter((rule) => shouldRuleExecute(rule, context));
       } catch (error) {

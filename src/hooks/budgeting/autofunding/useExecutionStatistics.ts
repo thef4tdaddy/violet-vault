@@ -1,13 +1,7 @@
 import { useCallback } from "react";
 import logger from "../../../utils/common/logger";
 
-interface ExecutionHistoryItem {
-  success?: boolean;
-  totalFunded?: number;
-  isUndo?: boolean;
-  trigger: string;
-  executedAt: string | number | Date;
-}
+import type { ExecutionRecord } from "@/db/types";
 
 /**
  * Hook for managing auto-funding execution statistics
@@ -15,7 +9,7 @@ interface ExecutionHistoryItem {
  */
 export const useExecutionStatistics = () => {
   // Get execution statistics
-  const getExecutionStatistics = useCallback((executionHistory: ExecutionHistoryItem[]) => {
+  const getExecutionStatistics = useCallback((executionHistory: ExecutionRecord[]) => {
     try {
       const totalExecutions = executionHistory.length;
       const successfulExecutions = executionHistory.filter(
@@ -40,7 +34,7 @@ export const useExecutionStatistics = () => {
       last30Days.setDate(last30Days.getDate() - 30);
 
       const recentExecutions = executionHistory.filter(
-        (execution) => new Date(execution.executedAt) >= last30Days
+        (execution) => execution.executedAt && new Date(execution.executedAt) >= last30Days
       );
 
       return {

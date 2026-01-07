@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useTransactionSplitterUI } from "../useTransactionSplitterUI";
 
 describe("useTransactionSplitterUI", () => {
@@ -24,11 +24,15 @@ describe("useTransactionSplitterUI", () => {
       const { result } = renderHook(() => useTransactionSplitterUI());
 
       // Modify state first
-      result.current.setSplitAllocations([{ id: 1, amount: 100 }]);
-      result.current.setIsProcessing(true);
+      act(() => {
+        result.current.setSplitAllocations([{ id: 1, amount: 100 } as any]);
+        result.current.setIsProcessing(true);
+      });
 
       // Reset
-      result.current.resetState();
+      act(() => {
+        result.current.resetState();
+      });
 
       expect(result.current.splitAllocations).toEqual([]);
       expect(result.current.isProcessing).toBe(false);

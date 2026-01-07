@@ -4,15 +4,16 @@
  */
 
 import type {
-  AutoFundingRule,
   RuleStatistics,
   RuleSummary,
   RuleCondition,
 } from "@/utils/budgeting/autofunding/rules";
+import type { ExecutionContext } from "@/utils/budgeting/autofunding/conditions";
 import type { Transaction, Envelope } from "@/types/finance";
 import type { ExecutionRecord, ExecutionFilters } from "./useExecutionHistory";
+import type { AutoFundingRule } from "@/db/types";
 
-// Re-export commonly used types from rules.ts for convenience
+// Re-export commonly used types for convenience
 export type { AutoFundingRule, RuleStatistics, RuleSummary, RuleCondition, ExecutionRecord };
 
 /**
@@ -44,8 +45,8 @@ export interface ExecutionDetails {
 
 export interface ExecutionResult {
   success: boolean;
-  execution: ExecutionDetails;
-  results: RuleExecutionResult[];
+  execution?: ExecutionDetails;
+  results?: RuleExecutionResult[];
   error?: string;
 }
 
@@ -115,7 +116,7 @@ export interface UseAutoFundingRulesReturn {
   toggleRule: (ruleId: string) => void;
   duplicateRule: (ruleId: string) => void;
   getFilteredRules: (filters: Record<string, unknown>) => AutoFundingRule[];
-  getExecutableRules: (context: Record<string, unknown>) => AutoFundingRule[];
+  getExecutableRules: (context: ExecutionContext) => AutoFundingRule[];
   getRuleById: (ruleId: string) => AutoFundingRule | undefined;
   getRulesByType: (type: string) => AutoFundingRule[];
   getRulesByTrigger: (trigger: string) => AutoFundingRule[];

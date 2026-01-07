@@ -18,6 +18,8 @@ import type {
   DateRange,
   BulkUpdate,
   DatabaseStats,
+  AutoFundingRule,
+  ExecutionRecord,
 } from "./types";
 
 export class VioletVaultDB extends Dexie {
@@ -36,6 +38,8 @@ export class VioletVaultDB extends Dexie {
   budgetBranches!: Table<BudgetBranch, number>;
   budgetTags!: Table<BudgetTag, number>;
   autoBackups!: Table<AutoBackup, string>;
+  autoFundingRules!: Table<AutoFundingRule, string>;
+  autoFundingHistory!: Table<ExecutionRecord, string>;
 
   constructor() {
     super("VioletVault");
@@ -101,6 +105,12 @@ export class VioletVaultDB extends Dexie {
       // Add paycheckId and isInternalTransfer indexes to transactions table for paycheck queries
       transactions:
         "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer]",
+    });
+
+    // Version 10: Auto-Funding Hooks Refactor
+    this.version(10).stores({
+      autoFundingRules: "id, name, type, trigger, priority, enabled, lastModified",
+      autoFundingHistory: "id, trigger, executedAt, [trigger+executedAt]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -206,6 +216,8 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.savingsGoals);
     addTimestampHooks(this.paycheckHistory);
     addTimestampHooks(this.debts);
+    addTimestampHooks(this.autoFundingRules);
+    addTimestampHooks(this.autoFundingHistory);
 
     // Audit log hook
     this.auditLog.hook("creating", (_primKey: number, obj: AuditLogEntry, _trans: unknown) => {
@@ -533,23 +545,26 @@ export class VioletVaultDB extends Dexie {
 
   // Data integrity and statistics
   async getDatabaseStats(): Promise<DatabaseStats> {
-    const [envelopeCount, transactionCount, billCount, goalCount, paycheckCount, cacheCount] =
-      await Promise.all([
-        this.envelopes.count(),
-        this.transactions.count(),
-        this.bills.count(),
-        this.savingsGoals.count(),
-        this.paycheckHistory.count(),
-        this.cache.count(),
-      ]);
+    const stats = await Promise.all([
+      this.envelopes.count(),
+      this.transactions.count(),
+      this.bills.count(),
+      this.savingsGoals.count(),
+      this.paycheckHistory.count(),
+      this.autoFundingRules.count(),
+      this.autoFundingHistory.count(),
+      this.cache.count(),
+    ]);
 
     return {
-      envelopes: envelopeCount,
-      transactions: transactionCount,
-      bills: billCount,
-      savingsGoals: goalCount,
-      paychecks: paycheckCount,
-      cache: cacheCount,
+      envelopes: stats[0],
+      transactions: stats[1],
+      bills: stats[2],
+      savingsGoals: stats[3],
+      paychecks: stats[4],
+      autoFundingRules: stats[5],
+      autoFundingHistory: stats[6],
+      cache: stats[7],
       lastOptimized: Date.now(),
     };
   }

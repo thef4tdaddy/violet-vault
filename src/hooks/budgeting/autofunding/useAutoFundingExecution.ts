@@ -5,6 +5,7 @@ import { useRuleExecution } from "./useAutoFundingExecution/useRuleExecution";
 import { useExecutionUtils } from "./useAutoFundingExecution/useExecutionUtils";
 import { useExecutionSummary } from "./useAutoFundingExecution/useExecutionSummary";
 import type { ExecutionContext, Envelope } from "../../../utils/budgeting/autofunding/conditions";
+import type { ExecutionResult, ExecutionDetails } from "./types";
 import logger from "../../../utils/common/logger";
 
 interface BudgetData {
@@ -14,25 +15,7 @@ interface BudgetData {
   transferFunds?: (from: string, to: string, amount: number, description?: string) => Promise<void>;
 }
 
-interface ExecutionResult {
-  success: boolean;
-  error?: string;
-  execution?: {
-    rulesExecuted: number;
-    totalFunded: number;
-  };
-}
-
-interface ExecutionRecord {
-  id: string;
-  trigger: string;
-  executedAt: string;
-  rulesExecuted: number;
-  totalFunded: number;
-  remainingCash: number;
-  initialCash: number;
-  success?: boolean;
-}
+// Internal interfaces moved to types.ts or unified
 
 // Extended store interface for legacy budget property
 interface ExtendedUiStore extends UiStore {
@@ -76,7 +59,7 @@ export const useAutoFundingExecution = () => {
     calculateImpact,
     canExecuteRules,
   } = useExecutionUtils(budgetForExecution);
-  const { getExecutionSummary } = useExecutionSummary(lastExecution as ExecutionRecord | null);
+  const { getExecutionSummary } = useExecutionSummary(lastExecution as ExecutionDetails | null);
 
   // Execute rules with given trigger
   const executeRules = useCallback(
@@ -87,7 +70,10 @@ export const useAutoFundingExecution = () => {
     ): Promise<ExecutionResult> => {
       if (isExecuting) {
         logger.warn("Auto-funding execution already in progress");
-        return { success: false, error: "Execution already in progress" };
+        return {
+          success: false,
+          error: "Execution already in progress",
+        };
       }
 
       setIsExecuting(true);
@@ -123,10 +109,16 @@ export const useAutoFundingExecution = () => {
           });
         }
 
-        return result;
+        return {
+          ...result,
+          results: result.results || [],
+        };
       } catch (error) {
         logger.error("Error during auto-funding execution", error);
-        return { success: false, error: error instanceof Error ? error.message : String(error) };
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        };
       } finally {
         setIsExecuting(false);
       }

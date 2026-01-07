@@ -1,57 +1,83 @@
-import { useState } from "react";
+import { useCallback } from "react";
 import { useRuleOperations } from "./operations/useRuleOperations";
 import { useRuleToggles } from "./operations/useRuleToggles";
 import { useRuleBulkOperations } from "./operations/useRuleBulkOperations";
-import { useRuleQueries } from "./queries/useRuleQueries";
+import { useRulesQuery } from "./queries/useRuleQueries";
 import { useRuleFilters } from "./queries/useRuleFilters";
 import { useExecutableRules } from "./queries/useExecutableRules";
 import { useRuleValidation } from "./utils/useRuleValidation";
 import { useRuleStatistics } from "./utils/useRuleStatistics";
-import { useRuleOrganization } from "./utils/useRuleOrganization";
 import { useRuleSummaries } from "./utils/useRuleSummaries";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import { useQueryClient } from "@tanstack/react-query";
+import { budgetDb } from "@/db/budgetDb";
+import { queryKeys } from "@/utils/common/queryClient";
+import type { AutoFundingRule } from "@/db/types";
+import type { AutoFundingRule as LegacyRule } from "@/utils/budgeting/autofunding/rules";
 
 /**
  * Hook for managing auto-funding rules (CRUD operations, validation, filtering)
- * Composes focused sub-hooks for better maintainability and testability
+ * Synchronized with Dexie and TanStack Query
  */
-export const useAutoFundingRules = (initialRules: AutoFundingRule[] = []) => {
-  const [rules, setRules] = useState(initialRules);
+export const useAutoFundingRules = () => {
+  // Main query
+  const { data: rules = [], isLoading, isError } = useRulesQuery();
 
-  // Extract operation hooks
-  const operations = useRuleOperations({ rules, setRules });
-  const toggles = useRuleToggles({ rules, updateRule: operations.updateRule });
-  const bulkOps = useRuleBulkOperations({ setRules });
+  // Operation hooks
+  const operations = useRuleOperations();
+  const bulkOps = useRuleBulkOperations();
 
-  // Extract query hooks
-  const queries = useRuleQueries({ rules });
-  const filters = useRuleFilters({ rules });
-  const executables = useExecutableRules({
-    rules: rules as unknown as import("@/utils/budgeting/autofunding/conditions").Rule[],
+  // Toggle hook (adapted for new operations)
+  const toggles = useRuleToggles({
+    rules: rules as unknown as LegacyRule[],
+    updateRule: (async (id: string, updates: Partial<AutoFundingRule>) => {
+      return operations.updateRule({ ruleId: id, updates: updates as Partial<AutoFundingRule> });
+    }) as unknown as (
+      ruleId: string,
+      updates: Partial<LegacyRule>
+    ) => Promise<LegacyRule | undefined>,
   });
 
   // Extract utility hooks
-  const validation = useRuleValidation({ rules });
-  const statistics = useRuleStatistics({ rules });
-  const organization = useRuleOrganization({ setRules });
-  const summaries = useRuleSummaries({ rules });
+  const filters = useRuleFilters({ rules: rules as unknown as LegacyRule[] });
+  const executables = useExecutableRules({
+    rules,
+  });
 
-  // State management functions
-  const resetRules = () => {
-    setRules(initialRules);
-  };
+  // Utility hooks
+  const validation = useRuleValidation({ rules: rules as unknown as LegacyRule[] });
+  const statistics = useRuleStatistics({ rules: rules as unknown as LegacyRule[] });
+  const summaries = useRuleSummaries({ rules: rules as unknown as LegacyRule[] });
 
-  const setAllRules = (newRules: AutoFundingRule[]) => {
-    setRules(newRules);
-  };
+  const queryClient = useQueryClient();
+
+  // Specialized reorder that uses a transaction
+  const reorderRules = useCallback(
+    async (ruleIds: string[]) => {
+      await budgetDb.transaction("rw", budgetDb.autoFundingRules, async () => {
+        for (let i = 0; i < ruleIds.length; i++) {
+          await budgetDb.autoFundingRules.update(ruleIds[i], {
+            priority: (i + 1) * 10,
+            lastModified: Date.now(),
+          });
+        }
+      });
+
+      // Invalidate the cache to trigger a refresh
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+    },
+    [queryClient]
+  );
 
   return {
     // State
     rules,
+    isLoading,
+    isError,
 
     // CRUD operations
     addRule: operations.addRule,
-    updateRule: operations.updateRule,
+    updateRule: (ruleId: string, updates: Partial<AutoFundingRule>) =>
+      operations.updateRule({ ruleId, updates }),
     deleteRule: operations.deleteRule,
     toggleRule: toggles.toggleRule,
     duplicateRule: operations.duplicateRule,
@@ -59,16 +85,16 @@ export const useAutoFundingRules = (initialRules: AutoFundingRule[] = []) => {
     // Querying and filtering
     getFilteredRules: filters.getFilteredRules,
     getExecutableRules: executables.getExecutableRules,
-    getRuleById: queries.getRuleById,
-    getRulesByType: queries.getRulesByType,
-    getRulesByTrigger: queries.getRulesByTrigger,
+    getRuleById: (id: string) => rules.find((r) => r.id === id),
+    getRulesByType: (type: string) => rules.filter((r) => r.type === type),
+    getRulesByTrigger: (trigger: string) => rules.filter((r) => r.trigger === trigger),
     getRuleSummaries: summaries.getRuleSummaries,
 
     // Validation
     validateAllRules: validation.validateAllRules,
 
     // Organization
-    reorderRules: organization.reorderRules,
+    reorderRules,
     getRulesStatistics: statistics.getRulesStatistics,
 
     // Bulk operations
@@ -76,8 +102,7 @@ export const useAutoFundingRules = (initialRules: AutoFundingRule[] = []) => {
     bulkDeleteRules: bulkOps.bulkDeleteRules,
     bulkToggleRules: bulkOps.bulkToggleRules,
 
-    // State management
-    resetRules,
-    setAllRules,
+    // Status
+    isPending: operations.isPending || bulkOps.isBulkPending,
   };
 };

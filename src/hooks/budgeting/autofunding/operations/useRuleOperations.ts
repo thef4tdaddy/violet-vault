@@ -1,144 +1,161 @@
-import React, { useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { budgetDb } from "@/db/budgetDb";
+import { queryKeys } from "@/utils/common/queryClient";
+import logger from "@/utils/common/logger";
 import {
   createDefaultRule,
   validateRule,
-  type AutoFundingRule,
+  type AutoFundingRule as LegacyRule,
 } from "@/utils/budgeting/autofunding/rules";
-import logger from "@/utils/common/logger";
-
-interface UseRuleOperationsProps {
-  rules: AutoFundingRule[];
-  setRules: React.Dispatch<React.SetStateAction<AutoFundingRule[]>>;
-}
+import type { AutoFundingRule } from "@/db/types";
 
 /**
- * Hook for basic rule operations (CRUD)
+ * Hook for single rule operations
  */
-export const useRuleOperations = ({ rules, setRules }: UseRuleOperationsProps) => {
-  // Add new rule
-  const addRule = useCallback(
-    (ruleConfig: Partial<AutoFundingRule>) => {
-      try {
-        const validation = validateRule(ruleConfig);
-        if (!validation.isValid) {
-          throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
-        }
+export const useRuleOperations = () => {
+  const queryClient = useQueryClient();
 
-        const newRule: AutoFundingRule = {
-          ...createDefaultRule(),
-          ...ruleConfig,
-        } as AutoFundingRule;
-
-        setRules((prevRules) => [...prevRules, newRule]);
-
-        logger.info("Auto-funding rule added", {
-          ruleId: newRule.id,
-          name: newRule.name,
-          type: newRule.type,
-        });
-
-        return newRule;
-      } catch (error) {
-        logger.error("Failed to add auto-funding rule", error);
-        throw error;
+  // Add rule mutation
+  const addRuleMutation = useMutation({
+    mutationFn: async (ruleConfig: Partial<AutoFundingRule>) => {
+      const validation = validateRule(ruleConfig as LegacyRule);
+      if (!validation.isValid) {
+        throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
       }
+
+      const newRule: AutoFundingRule = {
+        ...createDefaultRule(),
+        ...ruleConfig,
+        lastModified: Date.now(),
+      } as AutoFundingRule;
+
+      await budgetDb.autoFundingRules.add(newRule);
+      return newRule;
     },
-    [setRules]
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+      logger.info("Auto-funding rule added");
+    },
+  });
 
-  // Update existing rule
-  const updateRule = useCallback(
-    (ruleId: string, updates: Partial<AutoFundingRule>) => {
-      try {
-        setRules((prevRules) => {
-          const ruleIndex = prevRules.findIndex((rule) => rule.id === ruleId);
-          if (ruleIndex === -1) {
-            throw new Error(`Rule not found: ${ruleId}`);
-          }
+  const updateRuleMutation = useMutation({
+    mutationFn: async ({
+      ruleId,
+      updates,
+    }: {
+      ruleId: string;
+      updates: Partial<AutoFundingRule>;
+    }) => {
+      const existing = await budgetDb.autoFundingRules.get(ruleId);
+      if (!existing) throw new Error(`Rule not found: ${ruleId}`);
 
-          const updatedRule: AutoFundingRule = {
-            ...prevRules[ruleIndex],
-            ...updates,
-            updatedAt: new Date().toISOString(),
-          } as AutoFundingRule;
+      const updatedRule = {
+        ...existing,
+        ...updates,
+        lastModified: Date.now(),
+      };
 
-          const validation = validateRule(updatedRule);
-          if (!validation.isValid) {
-            throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
-          }
-
-          const newRules = [...prevRules];
-          newRules[ruleIndex] = updatedRule;
-          return newRules;
-        });
-
-        logger.info("Auto-funding rule updated", {
-          ruleId,
-          updates: Object.keys(updates),
-        });
-
-        return rules.find((rule) => rule.id === ruleId);
-      } catch (error) {
-        logger.error("Failed to update auto-funding rule", error);
-        throw error;
+      const validation = validateRule(updatedRule as LegacyRule);
+      if (!validation.isValid) {
+        throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
       }
+
+      await budgetDb.autoFundingRules.put(updatedRule);
+      return updatedRule;
     },
-    [rules, setRules]
-  );
+    onMutate: async ({ ruleId, updates }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.autoFunding.rules() });
+      const previousRules = queryClient.getQueryData<AutoFundingRule[]>(
+        queryKeys.autoFunding.rules()
+      );
 
-  // Delete rule
-  const deleteRule = useCallback(
-    (ruleId: string) => {
-      try {
-        setRules((prevRules) => {
-          const ruleExists = prevRules.some((rule) => rule.id === ruleId);
-          if (!ruleExists) {
-            return prevRules;
-          }
-
-          return prevRules.filter((rule) => rule.id !== ruleId);
-        });
-
-        logger.info("Auto-funding rule deleted", { ruleId });
-        return true;
-      } catch (error) {
-        logger.error("Failed to delete auto-funding rule", error);
-        throw error;
+      if (previousRules) {
+        queryClient.setQueryData<AutoFundingRule[]>(
+          queryKeys.autoFunding.rules(),
+          previousRules.map((r) => (r.id === ruleId ? { ...r, ...updates } : r))
+        );
       }
+
+      return { previousRules };
     },
-    [setRules]
-  );
-
-  // Duplicate rule
-  const duplicateRule = useCallback(
-    (ruleId: string) => {
-      try {
-        const rule = rules.find((r) => r.id === ruleId);
-        if (!rule) {
-          throw new Error(`Rule not found: ${ruleId}`);
-        }
-
-        const duplicatedRule: Partial<AutoFundingRule> = {
-          ...rule,
-          name: `${rule.name} (Copy)`,
-          enabled: false, // Disable copies by default
-          lastExecuted: null,
-          executionCount: 0,
-        };
-
-        return addRule(duplicatedRule);
-      } catch (error) {
-        logger.error("Failed to duplicate auto-funding rule", error);
-        throw error;
+    onError: (err, _variables, context) => {
+      if (context?.previousRules) {
+        queryClient.setQueryData(queryKeys.autoFunding.rules(), context.previousRules);
       }
+      logger.error("Failed to update auto-funding rule", err);
     },
-    [rules, addRule]
-  );
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+    },
+  });
+
+  // Delete rule mutation
+  const deleteRuleMutation = useMutation({
+    mutationFn: async (ruleId: string) => {
+      await budgetDb.autoFundingRules.delete(ruleId);
+      return ruleId;
+    },
+    onMutate: async (ruleId) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.autoFunding.rules() });
+      const previousRules = queryClient.getQueryData<AutoFundingRule[]>(
+        queryKeys.autoFunding.rules()
+      );
+
+      if (previousRules) {
+        queryClient.setQueryData<AutoFundingRule[]>(
+          queryKeys.autoFunding.rules(),
+          previousRules.filter((r) => r.id !== ruleId)
+        );
+      }
+
+      return { previousRules };
+    },
+    onError: (err, _ruleId, context) => {
+      if (context?.previousRules) {
+        queryClient.setQueryData(queryKeys.autoFunding.rules(), context.previousRules);
+      }
+      logger.error("Failed to delete auto-funding rule", err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+    },
+  });
+
+  // Duplicate rule mutation
+  const duplicateRuleMutation = useMutation({
+    mutationFn: async (ruleId: string) => {
+      const rule = await budgetDb.autoFundingRules.get(ruleId);
+      if (!rule) throw new Error(`Rule not found: ${ruleId}`);
+
+      const duplicatedRule: AutoFundingRule = {
+        ...rule,
+        id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: `${rule.name} (Copy)`,
+        enabled: false,
+        lastExecuted: null,
+        executionCount: 0,
+        lastModified: Date.now(),
+        createdAt: new Date().toISOString(),
+      };
+
+      await budgetDb.autoFundingRules.add(duplicatedRule);
+      return duplicatedRule;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.autoFunding.rules() });
+      logger.info("Auto-funding rule duplicated");
+    },
+  });
 
   return {
-    addRule,
-    updateRule,
-    deleteRule,
-    duplicateRule,
+    addRule: addRuleMutation.mutateAsync,
+    updateRule: updateRuleMutation.mutateAsync,
+    deleteRule: deleteRuleMutation.mutateAsync,
+    duplicateRule: duplicateRuleMutation.mutateAsync,
+    isPending:
+      addRuleMutation.isPending ||
+      updateRuleMutation.isPending ||
+      deleteRuleMutation.isPending ||
+      duplicateRuleMutation.isPending,
   };
 };
