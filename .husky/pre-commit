@@ -6,31 +6,34 @@ echo "🔍 Running lint-staged..."
 npx lint-staged || exit 1
 
 # 2. Check for recent Full Salvo run (last 10 minutes)
-# This replaces heavy typecheck/vet on every commit
-SALVO_TOKEN=".git/FULL_SALVO_SUCCESS"
-if [ -f "$SALVO_TOKEN" ]; then
-    # Get file modification time (portable way?)
-    # macOS 'stat -f %m', Linux 'stat -c %Y'
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        LAST_RUN=$(stat -f %m "$SALVO_TOKEN")
+# Bypass if only non-core files (infra/docs) are staged
+if git diff --cached --name-only | grep -E '^(api/|src/|configs/|scripts/|package\.json|package-lock\.json|tsconfig\.json|vitest\.config\.ts)' > /dev/null; then
+    SALVO_TOKEN=".git/FULL_SALVO_SUCCESS"
+    if [ -f "$SALVO_TOKEN" ]; then
+        # Get file modification time
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            LAST_RUN=$(stat -f %m "$SALVO_TOKEN")
+        else
+            LAST_RUN=$(stat -c %Y "$SALVO_TOKEN" 2>/dev/null || date +%s)
+        fi
+        
+        NOW=$(date +%s)
+        DIFF=$((NOW - LAST_RUN))
+        
+        if [ $DIFF -gt 600 ]; then
+            echo "❌ Full Salvo outdated (last run: ${DIFF}s ago)."
+            echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
+            exit 1
+        else
+            echo "✅ Full Salvo verified (${DIFF}s ago)."
+        fi
     else
-        LAST_RUN=$(stat -c %Y "$SALVO_TOKEN" 2>/dev/null || date +%s)
-    fi
-    
-    NOW=$(date +%s)
-    DIFF=$((NOW - LAST_RUN))
-    
-    if [ $DIFF -gt 600 ]; then
-        echo "❌ Full Salvo outdated (last run: ${DIFF}s ago)."
+        echo "❌ Full Salvo never run."
         echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
         exit 1
-    else
-        echo "✅ Full Salvo verified (${DIFF}s ago)."
     fi
 else
-    echo "❌ Full Salvo never run."
-    echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
-    exit 1
+    echo "ℹ️  Non-core changes detected (infra/docs). Bypassing Full Salvo requirement."
 fi
 
 
