@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useLayoutData } from "@/hooks/layout";
 import useDataManagement from "@/hooks/common/useDataManagement";
 import usePasswordRotation from "@/hooks/auth/usePasswordRotation";
@@ -64,13 +64,13 @@ interface MainLayoutProps {
   firebaseSync: FirebaseSyncService;
 }
 
-type AuthManagerType = ReturnType<typeof useAuthManager>;
+type AuthHookType = ReturnType<typeof useAuth>;
 type LayoutDataType = ReturnType<typeof useLayoutData>;
-type ExtractUserType = AuthManagerType["user"];
+type ExtractUserType = AuthHookType["user"];
 
 interface MainContentProps {
   currentUser: ExtractUserType;
-  auth: AuthManagerType;
+  auth: AuthHookType;
   layoutData: LayoutDataType;
   _onExport: () => void;
   _onImport: (event: React.ChangeEvent<HTMLInputElement>) => Promise<
@@ -97,7 +97,7 @@ interface MainContentProps {
   setSyncConflicts: (conflicts: unknown) => void;
   rotationDue: boolean;
   isLocalOnlyMode: boolean;
-  securityManager: AuthManagerType["securityManager"];
+  securityManager: AuthHookType["securityManager"];
 }
 
 // ============================================================================
@@ -112,7 +112,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   const location = useLocation();
 
   // Auth state
-  const auth = useAuthManager();
+  const auth = useAuth();
   const { isUnlocked, user: currentUser, securityContext } = auth;
 
   // Extract handlers and security context
@@ -408,7 +408,7 @@ interface MainContentLayoutViewProps {
   onResetEncryption: () => void;
   resetAllData: () => void;
   onChangePassword: (old: string, pwd: string) => Promise<void>;
-  securityManager: ReturnType<typeof useAuthManager>["securityManager"];
+  securityManager: ReturnType<typeof useAuth>["securityManager"];
 }
 
 const MainContentLayoutView = ({

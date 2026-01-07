@@ -9,8 +9,8 @@ import { useAuthCompatibility, useAuth } from "../useAuthCompatibility";
  */
 
 // Mock dependencies
-vi.mock("../useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
+vi.mock("../useAuth", () => ({
+  useAuth: vi.fn(() => ({
     // State properties
     isUnlocked: false,
     user: null,
@@ -29,10 +29,6 @@ vi.mock("../useAuthManager", () => ({
     updateProfile: vi.fn().mockResolvedValue({ success: true }),
     updateUser: vi.fn(),
     updateActivity: vi.fn(),
-    lockSession: vi.fn(),
-    createPasswordValidator: vi.fn(() => ({
-      refetch: vi.fn().mockResolvedValue({ data: { isValid: true } }),
-    })),
   })),
 }));
 
@@ -45,14 +41,14 @@ vi.mock("../../../utils/common/logger", () => ({
 }));
 
 // Import mocked dependencies
-import { useAuthManager } from "../useAuthManager";
+import { useAuth as useAuthHook } from "../useAuth";
 import logger from "../../../utils/common/logger";
 
 describe("useAuthCompatibility", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(useAuthManager).mockReturnValue({
+    vi.mocked(useAuthHook).mockReturnValue({
       isUnlocked: false,
       user: null as any,
       budgetId: null,
@@ -68,10 +64,6 @@ describe("useAuthCompatibility", () => {
       updateProfile: vi.fn().mockResolvedValue({ success: true }),
       updateUser: vi.fn(),
       updateActivity: vi.fn(),
-      lockSession: vi.fn(),
-      createPasswordValidator: vi.fn(() => ({
-        refetch: vi.fn().mockResolvedValue({ data: { isValid: true } }),
-      })),
       isAuthenticated: false,
       hasError: false,
       securityContext: {
@@ -79,9 +71,8 @@ describe("useAuthCompatibility", () => {
         budgetId: null,
         salt: new Uint8Array([5, 6, 7, 8]),
         hasValidKeys: false,
-      },
+      } as any,
       shouldShowAuthGateway: () => true,
-      _legacy: {} as any,
       setError: vi.fn(),
       setAuthenticated: vi.fn(),
       setLoading: vi.fn(),
@@ -104,7 +95,7 @@ describe("useAuthCompatibility", () => {
     it("should map currentUser to user", () => {
       const mockUser = { userName: "testuser", budgetId: "budget-123", userColor: "#888888" };
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: mockUser,
         budgetId: null,
@@ -187,7 +178,7 @@ describe("useAuthCompatibility", () => {
     it("should pass login parameters to authManager", async () => {
       const mockLogin = vi.fn().mockResolvedValue({ success: true });
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -221,13 +212,13 @@ describe("useAuthCompatibility", () => {
       const userData = { userName: "newuser", shareCode: "SHARE-123" };
       await result.current.login("password123", userData);
 
-      expect(mockLogin).toHaveBeenCalledWith("password123", userData);
+      expect(mockLogin).toHaveBeenCalledWith({ password: "password123", userData });
     });
 
     it("should pass joinBudget data to authManager", async () => {
       const mockJoinBudget = vi.fn().mockResolvedValue({ success: true });
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -291,7 +282,7 @@ describe("useAuthCompatibility", () => {
     it("should pass password change parameters to authManager", async () => {
       const mockChangePassword = vi.fn().mockResolvedValue({ success: true });
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -324,7 +315,10 @@ describe("useAuthCompatibility", () => {
 
       await result.current.changePassword("oldpass", "newpass");
 
-      expect(mockChangePassword).toHaveBeenCalledWith("oldpass", "newpass");
+      expect(mockChangePassword).toHaveBeenCalledWith({
+        oldPassword: "oldpass",
+        newPassword: "newpass",
+      });
     });
   });
 
@@ -352,7 +346,7 @@ describe("useAuthCompatibility", () => {
     it("should pass profile update to authManager", async () => {
       const mockUpdateProfile = vi.fn().mockResolvedValue({ success: true });
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -403,7 +397,7 @@ describe("useAuthCompatibility", () => {
     it("should call updateActivity on authManager", () => {
       const mockUpdateActivity = vi.fn();
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,

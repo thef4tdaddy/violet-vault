@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import useEditLock from "@/hooks/common/useEditLock";
 import { initializeEditLocks } from "@/services/sync/editLockService";
@@ -74,10 +74,7 @@ const useSupplementalAccounts = ({
   const [transferForm, setTransferForm] = useState(getEmptyTransferForm());
 
   // Auth and Locking
-  const {
-    securityContext: { budgetId },
-    user: authCurrentUser,
-  } = useAuthManager();
+  const { budgetId, user: authCurrentUser } = useAuth();
   const confirm = useConfirm();
 
   // Initialize edit lock service when component mounts

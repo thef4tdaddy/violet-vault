@@ -42,9 +42,9 @@ vi.mock("@/hooks/ui/useMobileDetection", () => ({
   useMobileDetection: vi.fn(() => false),
 }));
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
-    securityContext: { budgetId: "test-budget" },
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => ({
+    budgetId: "test-budget",
     user: { id: "test-user", name: "Test User" },
   })),
 }));

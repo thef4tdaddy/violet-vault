@@ -12,16 +12,9 @@ describe("useMainLayoutHandlers", () => {
     login: vi.fn().mockResolvedValue(undefined),
     changePassword: vi.fn().mockResolvedValue(undefined),
     securityManager: { rotate: vi.fn(), validate: vi.fn() },
-    _legacy: {},
-    userData: null,
+    user: null,
     loading: false,
     error: null,
-    initialized: true,
-    checkAuth: vi.fn(),
-    unlockSession: vi.fn(),
-    lockApp: vi.fn(),
-    updateProfile: vi.fn(),
-    isAuthenticated: false,
     ...overrides,
   });
 
@@ -45,10 +38,10 @@ describe("useMainLayoutHandlers", () => {
     expect(result.current.securityManager).toBeUndefined();
   });
 
-  it("should extract isLocalOnlyMode from auth._legacy", () => {
+  it("should extract isLocalOnlyMode from auth.user.isLocalOnly", () => {
     const auth = createMockAuth({
-      _legacy: {
-        isLocalOnlyMode: true,
+      user: {
+        isLocalOnly: true,
       },
     });
 
@@ -80,7 +73,10 @@ describe("useMainLayoutHandlers", () => {
     const { result } = renderHook(() => useMainLayoutHandlers(auth as any));
 
     await result.current.handleSetup("password123", { name: "Test User" } as any);
-    expect(mockLogin).toHaveBeenCalledWith("password123", { name: "Test User" });
+    expect(mockLogin).toHaveBeenCalledWith({
+      password: "password123",
+      userData: { name: "Test User" },
+    });
   });
 
   it("should wrap auth.changePassword for handleChangePassword", async () => {
@@ -92,7 +88,10 @@ describe("useMainLayoutHandlers", () => {
     const { result } = renderHook(() => useMainLayoutHandlers(auth as any));
 
     await result.current.handleChangePassword("oldPass", "newPass");
-    expect(mockChangePassword).toHaveBeenCalledWith("oldPass", "newPass");
+    expect(mockChangePassword).toHaveBeenCalledWith({
+      oldPassword: "oldPass",
+      newPassword: "newPass",
+    });
   });
 
   it("should extract securityManager directly", () => {
@@ -112,15 +111,15 @@ describe("useMainLayoutHandlers", () => {
 
   it("should handle non-boolean isLocalOnlyMode values gracefully", () => {
     const auth = createMockAuth({
-      _legacy: {
-        isLocalOnlyMode: "true", // string instead of boolean
+      user: {
+        isLocalOnly: "true", // string instead of boolean
       },
     });
 
     const { result } = renderHook(() => useMainLayoutHandlers(auth as any));
 
     // Should default to false for non-boolean values strictly, or truthy if just !! check
-    // Implementation uses !!_legacy.isLocalOnlyMode, so "true" string becomes true.
+    // Implementation uses !!auth?.user?.isLocalOnly, so "true" string becomes true.
     expect(result.current.isLocalOnlyMode).toBe(true);
   });
 });

@@ -2,7 +2,7 @@
 import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import React, { ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { AuthProvider, useAuth } from "../AuthContext";
+import { AuthProvider, useAuthContext as useAuth } from "../AuthContext";
 import { UserData } from "../../types/auth";
 
 /**
@@ -84,7 +84,7 @@ describe("AuthContext", () => {
       const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       expect(() => render(<TestComponent />)).toThrow(
-        "useAuth must be used within an AuthProvider"
+        "useAuthContext must be used within an AuthProvider"
       );
 
       spy.mockRestore();

@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useImportData } from "../useImportData";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useToastHelpers } from "../../../utils/common/toastHelpers";
 import { useConfirm } from "../useConfirm";
 import { readFileContent } from "../../../utils/dataManagement/fileUtils";
@@ -11,7 +11,7 @@ import { clearFirebaseData, forcePushToCloud } from "../../../utils/dataManageme
 import { queryClient } from "../../../utils/common/queryClient";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 
-vi.mock("@/hooks/auth/useAuthManager");
+vi.mock("@/hooks/auth/useAuth");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../useConfirm");
 vi.mock("../../../utils/dataManagement/fileUtils");
@@ -30,7 +30,7 @@ describe("useImportData", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAuthManager as Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: mockUser,
       budgetId: "123",
       encryptionKey: {} as CryptoKey,

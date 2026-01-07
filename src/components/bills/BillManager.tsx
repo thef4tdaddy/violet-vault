@@ -8,7 +8,7 @@ import React, { useMemo } from "react";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import BillManagerHeader from "./BillManagerHeader";
 import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
@@ -146,10 +146,7 @@ const BillManager: React.FC<BillManagerProps> = ({
   });
 
   // Edit lock for collaborative editing
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
   const { isLocked: isEditLocked, lockedBy } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User"

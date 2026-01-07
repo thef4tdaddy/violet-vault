@@ -4,8 +4,8 @@ import ShareCodeModal from "../ShareCodeModal";
 import userEvent from "@testing-library/user-event";
 
 // Mock hooks
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => ({
     user: {
       userName: "Test User",
       shareCode: null,
@@ -82,14 +82,14 @@ describe("ShareCodeModal", () => {
     });
 
     it("should display loading state when generating", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
-      vi.mocked(useAuthManager).mockReturnValue({
+      const { useAuth } = await import("@/hooks/auth/useAuth");
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: null,
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -102,14 +102,14 @@ describe("ShareCodeModal", () => {
 
   describe("Share Code Display", () => {
     it("should load existing share code if available", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
-      vi.mocked(useAuthManager).mockReturnValue({
+      const { useAuth } = await import("@/hooks/auth/useAuth");
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "existing-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -119,14 +119,14 @@ describe("ShareCodeModal", () => {
     });
 
     it("should display QR code when share data is available", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
-      vi.mocked(useAuthManager).mockReturnValue({
+      const { useAuth } = await import("@/hooks/auth/useAuth");
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -146,17 +146,17 @@ describe("ShareCodeModal", () => {
     });
 
     it("should copy share code to clipboard when copy button is clicked", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
+      const { useAuth } = await import("@/hooks/auth/useAuth");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
 
       const mockShowSuccessToast = vi.fn();
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: mockShowSuccessToast,
@@ -184,17 +184,17 @@ describe("ShareCodeModal", () => {
     });
 
     it("should show success message after copying", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
+      const { useAuth } = await import("@/hooks/auth/useAuth");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
 
       const mockShowSuccessToast = vi.fn();
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: mockShowSuccessToast,
@@ -214,17 +214,17 @@ describe("ShareCodeModal", () => {
 
   describe("Error Handling", () => {
     it("should show error when user is not authenticated", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
+      const { useAuth } = await import("@/hooks/auth/useAuth");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
 
       const mockShowErrorToast = vi.fn();
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: null,
           shareCode: null,
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: vi.fn(),
@@ -242,17 +242,17 @@ describe("ShareCodeModal", () => {
     });
 
     it("should handle errors when generating share code", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
+      const { useAuth } = await import("@/hooks/auth/useAuth");
       const { useToastHelpers } = await import("@/utils/common/toastHelpers");
 
       const mockShowErrorToast = vi.fn();
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: null,
         },
         updateProfile: vi.fn().mockRejectedValue(new Error("Failed to generate")),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       vi.mocked(useToastHelpers).mockReturnValue({
         showSuccessToast: vi.fn(),
@@ -273,14 +273,14 @@ describe("ShareCodeModal", () => {
 
   describe("Modal Actions", () => {
     it("should call onClose when close button is clicked", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
-      vi.mocked(useAuthManager).mockReturnValue({
+      const { useAuth } = await import("@/hooks/auth/useAuth");
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -298,14 +298,14 @@ describe("ShareCodeModal", () => {
 
   describe("Share URL", () => {
     it("should generate share URL with encoded share code", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
-      vi.mocked(useAuthManager).mockReturnValue({
+      const { useAuth } = await import("@/hooks/auth/useAuth");
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "test-share-code",
         },
         updateProfile: vi.fn(),
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 
@@ -319,16 +319,16 @@ describe("ShareCodeModal", () => {
 
   describe("Regenerate Share Code", () => {
     it("should allow regenerating share code", async () => {
-      const { useAuthManager } = await import("@/hooks/auth/useAuthManager");
+      const { useAuth } = await import("@/hooks/auth/useAuth");
       const mockUpdateProfile = vi.fn();
 
-      vi.mocked(useAuthManager).mockReturnValue({
+      vi.mocked(useAuth).mockReturnValue({
         user: {
           userName: "Test User",
           shareCode: "old-share-code",
         },
         updateProfile: mockUpdateProfile,
-      } as unknown as ReturnType<typeof useAuthManager>);
+      } as unknown as ReturnType<typeof useAuth>);
 
       render(<ShareCodeModal {...defaultProps} />);
 

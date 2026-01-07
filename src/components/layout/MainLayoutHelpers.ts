@@ -1,5 +1,5 @@
-import type { useLayoutData } from "@/hooks/layout";
-import type { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useLayoutData } from "@/hooks/layout";
+import type { useAuth } from "@/hooks/auth/useAuth";
 import type { UserData } from "@/types/auth";
 
 /**
@@ -7,8 +7,8 @@ import type { UserData } from "@/types/auth";
  * Extracted to reduce complexity
  */
 
-type AuthManagerType = ReturnType<typeof useAuthManager>;
-type ExtractUserType = AuthManagerType["user"];
+type AuthHookType = ReturnType<typeof useAuth>;
+type ExtractUserType = AuthHookType["user"];
 
 /**
  * Interface for user data used in sync services
@@ -30,7 +30,7 @@ export interface SyncUser {
 interface ExtendedUserData extends UserData {
   uid?: string;
   email?: string;
-  joinedVia?: string;
+  joinedVia?: "shareCode" | "link" | "standard" | null;
 }
 
 /**
@@ -46,7 +46,7 @@ export const getUserForSync = (currentUser: ExtractUserType): SyncUser | null =>
     email: user.email || undefined,
     userName: user.userName,
     userColor: user.userColor,
-    joinedVia: user.joinedVia,
+    joinedVia: user.joinedVia ?? undefined,
     sharedBy: user.sharedBy,
     shareCode: user.shareCode,
   };
@@ -66,7 +66,7 @@ export const extractLayoutData = (layoutData: ReturnType<typeof useLayoutData>) 
 /**
  * Extract auth-related data
  */
-export const extractAuthData = (auth: ReturnType<typeof useAuthManager>) => {
+export const extractAuthData = (auth: ReturnType<typeof useAuth>) => {
   return {
     securityContext: auth?.securityContext,
     isUnlocked: auth?.isUnlocked as boolean,

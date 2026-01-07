@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useMemo } from "react";
-import { useAuthManager } from "../auth/useAuthManager";
+import { useAuth } from "../auth/useAuth";
 import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEditLock from "../common/useEditLock";
 import { useEnvelopes } from "../budgeting/useEnvelopes";
@@ -28,7 +28,7 @@ export const useDebtModalLogic = (
   const {
     securityContext: { budgetId },
     user: currentUser,
-  } = useAuthManager();
+  } = useAuth();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {

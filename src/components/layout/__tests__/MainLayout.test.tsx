@@ -10,7 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 // ============================================================================
 
 // 1. Hook Mock Results (Defined once for reference stability)
-const MOCK_AUTH_MANAGER = {
+const MOCK_AUTH = {
   isUnlocked: true,
   isAuthenticated: true,
   shouldShowAuthGateway: () => false,
@@ -40,7 +40,7 @@ const MOCK_LAYOUT_HANDLERS = {
   handleLogout: vi.fn(),
   handleSetup: vi.fn(),
   handleChangePassword: vi.fn(),
-  securityManager: MOCK_AUTH_MANAGER.securityManager,
+  securityManager: MOCK_AUTH.securityManager,
 };
 
 const MOCK_CONTENT_MODALS = {
@@ -48,8 +48,8 @@ const MOCK_CONTENT_MODALS = {
   security: { open: vi.fn(), close: vi.fn(), isOpen: false },
 };
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => MOCK_AUTH_MANAGER),
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => MOCK_AUTH),
 }));
 
 vi.mock("@/hooks/layout", () => ({
@@ -195,7 +195,7 @@ vi.mock("@/stores/ui/uiStore", () => ({ useBudgetStore: vi.fn(() => ({ budget: {
 // Test Suite
 // ============================================================================
 
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 describe("MainLayout (Full Alias Standardization)", () => {
   let queryClient: QueryClient;
@@ -225,7 +225,7 @@ describe("MainLayout (Full Alias Standardization)", () => {
   });
 
   it("should show AuthGateway when shouldShowAuthGateway returns true", async () => {
-    vi.mocked(useAuthManager).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: false,
       shouldShowAuthGateway: () => true,
     } as any);
@@ -235,7 +235,7 @@ describe("MainLayout (Full Alias Standardization)", () => {
   });
 
   it("should show LockScreen when isUnlocked is false", async () => {
-    vi.mocked(useAuthManager).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       isUnlocked: false,
       shouldShowAuthGateway: () => false,

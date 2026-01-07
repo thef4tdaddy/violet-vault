@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuthManager } from "../auth/useAuthManager";
+import { useAuth } from "../auth/useAuth";
 import useEditLock from "../common/useEditLock";
 import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEnvelopeForm from "./useEnvelopeForm";
@@ -42,7 +42,7 @@ const useEnvelopeEdit = ({
   const {
     securityContext: { budgetId },
     user: authCurrentUser,
-  } = useAuthManager();
+  } = useAuth();
 
   // Initialize edit lock service when modal opens
   useEffect(() => {

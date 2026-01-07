@@ -1,26 +1,16 @@
 import { useMemo } from "react";
-import { useAuthManager } from "./useAuthManager";
+import { useAuth as useAuthHook } from "./useAuth";
 import logger from "../../utils/common/logger";
 import { encryptionUtils } from "../../utils/security/encryption";
+
+import type { UserData, UpdateProfileInput as UpdatedProfile } from "./useAuth.types";
 
 interface JoinData {
   budgetId: string;
   password: string;
-  userInfo: {
-    userName?: string;
-    email?: string;
-    userColor?: string;
-    [key: string]: unknown;
-  };
+  userInfo: UserData;
   sharedBy: string;
   shareCode?: string;
-}
-
-interface UpdatedProfile {
-  userName?: string;
-  userColor?: string;
-  email?: string;
-  displayName?: string;
 }
 
 /**
@@ -34,53 +24,53 @@ interface UpdatedProfile {
  * @deprecated Use useAuthManager() directly for new components
  */
 export const useAuthCompatibility = () => {
-  const authManager = useAuthManager();
+  const auth = useAuthHook();
 
   // Legacy interface that matches the old authStore API
   const legacyAuth = useMemo(
     () => ({
       // State properties (matching old authStore)
-      isUnlocked: authManager.isUnlocked,
-      currentUser: authManager.user,
-      budgetId: authManager.budgetId,
-      encryptionKey: authManager.encryptionKey,
-      salt: authManager.salt,
-      lastActivity: authManager.lastActivity,
+      isUnlocked: auth.isUnlocked,
+      currentUser: auth.user,
+      budgetId: auth.budgetId,
+      encryptionKey: auth.encryptionKey,
+      salt: auth.salt,
+      lastActivity: auth.lastActivity,
 
       // Action methods (matching old authStore)
-      login: async (password: string, userData: unknown = null) => {
-        const result = await authManager.login(
+      login: async (password: string, userData: UserData | null = null) => {
+        const result = await auth.login({
           password,
-          userData as Record<string, unknown> | null
-        );
+          userData: userData || undefined,
+        });
         return result;
       },
 
       joinBudgetWithShareCode: async (joinData: unknown) => {
-        const result = await authManager.joinBudget(joinData as JoinData);
+        const result = await auth.joinBudget(joinData as JoinData);
         return result;
       },
 
       logout: () => {
-        authManager.logout();
+        auth.logout();
       },
 
       updateUser: (updatedUser: unknown) => {
-        authManager.updateUser(updatedUser as Partial<UpdatedProfile>);
+        auth.updateUser(updatedUser as Partial<UpdatedProfile>);
       },
 
       changePassword: async (oldPassword: string, newPassword: string) => {
-        const result = await authManager.changePassword(oldPassword, newPassword);
+        const result = await auth.changePassword({ oldPassword, newPassword });
         return result;
       },
 
       updateProfile: async (updatedProfile: unknown) => {
-        const result = await authManager.updateProfile(updatedProfile as UpdatedProfile);
+        const result = await auth.updateProfile(updatedProfile as UpdatedProfile);
         return result;
       },
 
       setLastActivity: (_timestamp: number) => {
-        authManager.updateActivity();
+        auth.updateActivity();
       },
 
       validatePassword: async (password: string) => {
@@ -108,7 +98,7 @@ export const useAuthCompatibility = () => {
         return { success: true };
       },
     }),
-    [authManager]
+    [auth]
   );
 
   // Log usage for migration tracking

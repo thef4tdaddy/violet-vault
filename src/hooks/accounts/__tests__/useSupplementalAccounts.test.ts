@@ -3,9 +3,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import useSupplementalAccounts from "../useSupplementalAccounts";
 
 // Mock dependencies
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: () => ({
-    securityContext: { budgetId: "test-budget-123" },
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: () => ({
+    budgetId: "test-budget-123",
     user: { userName: "Test User", userColor: "#ff5733" },
   }),
 }));
