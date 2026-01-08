@@ -3,7 +3,8 @@ import { useTransactionFilters } from "./useTransactionFilters";
 import { useTransactionForm } from "./useTransactionForm";
 import { suggestEnvelope } from "@/utils/transactions/envelopeMatching";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
-import { useTransactions } from "@/hooks/common/useTransactions";
+import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useShallow } from "zustand/react/shallow";
 import { useLedgerState } from "./helpers/useLedgerState";
@@ -21,13 +22,12 @@ import type { Transaction as FinanceTransaction } from "@/types/finance";
 // eslint-disable-next-line max-lines-per-function
 export const useTransactionLedger = (currentUser: unknown) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
+  const { transactions = [], isLoading: transactionsLoading } = useTransactionQuery();
   const {
-    transactions = [],
-    addTransactionAsync,
+    addTransaction: addTransactionAsync,
     deleteTransaction,
-    updateTransactionAsync,
-    isLoading: transactionsLoading,
-  } = useTransactions();
+    updateTransaction: updateTransactionAsync,
+  } = useTransactionOperations();
 
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 

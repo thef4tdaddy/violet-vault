@@ -1,0 +1,12 @@
+
+> violetvault@2.0.0-alpha.56 typecheck
+> tsc --noEmit
+
+src/components/bills/BillManager.tsx(10,1): error TS6192: All imports in import declaration are unused.
+src/components/bills/BillManager.tsx(58,17): error TS6133: 'propTransactions' is declared but its value is never read.
+src/components/bills/BillManager.tsx(59,14): error TS6133: 'propEnvelopes' is declared but its value is never read.
+src/components/budgeting/PaycheckProcessor.tsx(84,9): error TS2322: Type '(paycheck: PaycheckHistory) => void | Promise<void>' is not assignable to type '(paycheck: PaycheckHistoryItem) => void | Promise<void>'.
+  Types of parameters 'paycheck' and 'paycheck' are incompatible.
+    Property 'lastModified' is missing in type 'PaycheckHistoryItem' but required in type 'PaycheckHistory'.
+src/components/layout/ViewRenderer.tsx(350,13): error TS2322: Type '{ id: string | number; payerName?: string | undefined; amount?: number | undefined; }[]' is not assignable to type 'PaycheckHistory[]'.
+  Property 'lastModified' is missing in type '{ id: string | number; payerName?: string | undefined; amount?: number | undefined; }' but required in type 'PaycheckHistory'.

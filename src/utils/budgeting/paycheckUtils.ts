@@ -26,10 +26,11 @@ interface ValidationResult {
 /**
  * Paycheck prediction interface
  */
-interface PaycheckPrediction {
+export interface PaycheckPrediction {
   amount: number;
   confidence: number;
   sampleSize: number;
+  mostRecent: number;
   range: {
     min: number;
     max: number;
@@ -40,30 +41,31 @@ interface PaycheckPrediction {
  * Historical paycheck record
  */
 interface PaycheckRecord {
-  payerName: string;
+  payerName?: string;
   amount: number;
-  processedAt?: string;
+  processedAt?: string | Date;
 }
 
 /**
  * Envelope interface for allocations
  */
-interface Envelope {
+export interface Envelope {
   id: string;
   name: string;
   autoAllocate?: boolean;
-  envelopeType: string;
+  envelopeType?: string;
   monthlyAmount?: number;
   priority?: string;
   currentBalance?: number;
   biweeklyAllocation?: number;
   category?: string;
+  [key: string]: unknown;
 }
 
 /**
  * Allocation result
  */
-interface AllocationItem {
+export interface AllocationItem {
   envelopeId: string;
   envelopeName: string;
   amount: number;
@@ -75,7 +77,7 @@ interface AllocationItem {
 /**
  * Allocation calculations result
  */
-interface AllocationResult {
+export interface AllocationResult {
   allocations: AllocationItem[];
   totalAllocated: number;
   remainingAmount: number;
@@ -83,9 +85,19 @@ interface AllocationResult {
 }
 
 /**
+ * Gets default empty allocations
+ */
+export const getDefaultAllocations = (): AllocationResult => ({
+  allocations: [],
+  totalAllocated: 0,
+  remainingAmount: 0,
+  allocationRate: 0,
+});
+
+/**
  * Paycheck transaction
  */
-interface PaycheckTransaction {
+export interface PaycheckTransaction {
   id: number;
   amount: number;
   payerName: string;
@@ -103,7 +115,7 @@ interface PaycheckTransaction {
 /**
  * User info
  */
-interface UserInfo {
+export interface UserInfo {
   userName?: string;
 }
 
@@ -116,7 +128,7 @@ interface PaycheckStatistics {
   averageAmount: number;
   minAmount: number;
   maxAmount: number;
-  lastPaycheckDate: string | null;
+  lastPaycheckDate: string | Date | null;
 }
 
 /**
@@ -187,6 +199,7 @@ export const getPayerPrediction = (
     amount: Math.round(average * 100) / 100,
     confidence: Math.round(consistency),
     sampleSize: payerPaychecks.length,
+    mostRecent: payerPaychecks[0] || 0,
     range: {
       min: Math.min(...payerPaychecks),
       max: Math.max(...payerPaychecks),
@@ -300,7 +313,7 @@ export const calculateEnvelopeAllocations = (
           envelopeName: envelope.name,
           amount: allocationAmount,
           monthlyAmount: envelope.monthlyAmount || 0,
-          envelopeType: envelope.envelopeType,
+          envelopeType: envelope.envelopeType || "variable",
           priority: envelope.priority || "medium",
         });
         totalAllocated += allocationAmount;
@@ -323,7 +336,7 @@ export const calculateEnvelopeAllocations = (
             envelopeName: envelope.name,
             amount: allocationAmount,
             monthlyAmount: envelope.monthlyAmount || 0,
-            envelopeType: envelope.envelopeType,
+            envelopeType: envelope.envelopeType || "variable",
             priority: envelope.priority || "medium",
           });
           totalAllocated += allocationAmount;
@@ -451,6 +464,6 @@ export const getPaycheckStatistics = (
     averageAmount: totalAmount / filteredHistory.length,
     minAmount: Math.min(...amounts),
     maxAmount: Math.max(...amounts),
-    lastPaycheckDate: filteredHistory[0]?.processedAt || null,
-  };
+    lastPaycheckDate: (filteredHistory[0]?.processedAt || null) as string | Date | null,
+  } as PaycheckStatistics;
 };

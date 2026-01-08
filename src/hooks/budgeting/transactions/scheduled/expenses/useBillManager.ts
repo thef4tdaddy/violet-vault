@@ -10,37 +10,26 @@
  */
 import { useCallback } from "react";
 import { useBillProcessing } from "./useBillProcessing";
-import { useTransactions } from "@/hooks/common/useTransactions";
+import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useBillPayment } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillPayment";
 import { useBillBulkMutations } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillBulkMutations";
 import { useBillDiscovery } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillDiscovery";
-import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useBillManagerUIState } from "./useBillManagerUIState";
+
 // Types
 import type { Bill } from "@/types/bills";
-import type { BillRecord, EnvelopeRecord, TransactionRecord } from "./useBillCalculations";
+import type { BillRecord } from "./useBillCalculations";
 
 interface UseBillManagerOptions {
-  propTransactions?: TransactionRecord[];
-  propEnvelopes?: EnvelopeRecord[];
   onUpdateBill?: (bill: Bill) => void | Promise<void>;
   onCreateRecurringBill?: (bill: Bill) => void | Promise<void>;
   onSearchNewBills?: () => void | Promise<void>;
   onError?: (error: string) => void;
 }
 
-interface LegacyBudgetStoreState extends UiStore {
-  allTransactions?: TransactionRecord[];
-  envelopes?: EnvelopeRecord[];
-  bills?: BillRecord[];
-}
-
-// eslint-disable-next-line max-lines-per-function
 export const useBillManager = ({
-  propTransactions,
-  propEnvelopes,
   onUpdateBill,
   onCreateRecurringBill,
   onSearchNewBills,
@@ -48,7 +37,7 @@ export const useBillManager = ({
 }: UseBillManagerOptions = {}) => {
   // 1. Data Access
   const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } =
-    useTransactions();
+    useTransactionQuery();
   const { envelopes: tanStackEnvelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const {
     bills: tanStackBills = [],
@@ -90,26 +79,7 @@ export const useBillManager = ({
   const { handlePayBill } = useBillPayment();
   const { handleBulkUpdate: handleBulkUpdateAction } = useBillBulkMutations();
 
-  // 4. Global State (Legacy Store Support)
-  const legacyAllTransactions = useBudgetStore(
-    (state) => (state as LegacyBudgetStoreState).allTransactions ?? []
-  ) as TransactionRecord[];
-
-  const legacyEnvelopes = useBudgetStore(
-    (state) => (state as LegacyBudgetStoreState).envelopes ?? []
-  ) as EnvelopeRecord[];
-
-  const legacyBills = useBudgetStore(
-    (state) => (state as LegacyBudgetStoreState).bills ?? []
-  ) as BillRecord[];
-
-  const budget = {
-    allTransactions: legacyAllTransactions,
-    envelopes: legacyEnvelopes,
-    bills: legacyBills,
-  };
-
-  // 5. Data Resolution & Processing
+  // 4. Data Resolution & Processing (Purified)
   const {
     categorizedBills,
     totals,
@@ -121,18 +91,11 @@ export const useBillManager = ({
     bills,
     resolvedTransactions,
     resolvedEnvelopes,
-    // resolvedBills,
   } = useBillProcessing({
-    propTransactions: propTransactions || [],
-    storeTransactions: budget.allTransactions,
     tanStackTransactions,
-    propEnvelopes: propEnvelopes || [],
-    storeEnvelopes: budget.envelopes,
     tanStackEnvelopes,
-    storeBills: budget.bills,
     tanStackBills,
     onUpdateBill,
-    // Use correct types from useBillProcessing
     onCreateRecurringBill: onCreateRecurringBill
       ? async (b: Bill) => {
           await onCreateRecurringBill(b);
@@ -153,7 +116,6 @@ export const useBillManager = ({
     },
     updateBillAsync: async (data: { billId: string; updates: Record<string, unknown> }) => {
       if (updateBillAsync) {
-        // Enforce the correct shape for updateBillAsync prop
         await updateBillAsync({ billId: data.billId, updates: data.updates });
       }
     },

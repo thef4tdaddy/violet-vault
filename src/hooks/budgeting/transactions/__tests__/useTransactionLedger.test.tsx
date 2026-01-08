@@ -2,13 +2,18 @@ import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTransactionLedger } from "../useTransactionLedger";
 
-const mockUseTransactions = vi.hoisted(() =>
+const mockUseTransactionQuery = vi.hoisted(() =>
   vi.fn(() => ({
     transactions: [],
-    addTransactionAsync: vi.fn(),
-    deleteTransaction: vi.fn(),
-    updateTransactionAsync: vi.fn(),
     isLoading: false,
+  }))
+);
+
+const mockUseTransactionOperations = vi.hoisted(() =>
+  vi.fn(() => ({
+    addTransaction: vi.fn(),
+    deleteTransaction: vi.fn(),
+    updateTransaction: vi.fn(),
   }))
 );
 
@@ -54,8 +59,12 @@ const mockUseTransactionImport = vi.hoisted(() =>
 const mockUseTransactionFilters = vi.hoisted(() => vi.fn(() => []));
 
 // Mock dependencies
-vi.mock("../../common/useTransactions", () => ({
-  useTransactions: mockUseTransactions,
+vi.mock("../useTransactionQuery", () => ({
+  useTransactionQuery: mockUseTransactionQuery,
+}));
+
+vi.mock("../useTransactionOperations", () => ({
+  useTransactionOperations: mockUseTransactionOperations,
 }));
 
 vi.mock("../../budgeting/useEnvelopes", () => ({
@@ -94,12 +103,14 @@ describe("useTransactionLedger", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseTransactionFilters.mockReturnValue([]);
-    mockUseTransactions.mockReturnValue({
+    mockUseTransactionQuery.mockReturnValue({
       transactions: [],
-      addTransactionAsync: vi.fn(),
-      deleteTransaction: vi.fn(),
-      updateTransactionAsync: vi.fn(),
       isLoading: false,
+    });
+    mockUseTransactionOperations.mockReturnValue({
+      addTransaction: vi.fn(),
+      deleteTransaction: vi.fn(),
+      updateTransaction: vi.fn(),
     });
   });
 
@@ -220,11 +231,8 @@ describe("useTransactionLedger", () => {
 
   it("should return loading state from dependencies", () => {
     // Mock loading state
-    mockUseTransactions.mockReturnValue({
+    mockUseTransactionQuery.mockReturnValue({
       transactions: [],
-      addTransactionAsync: vi.fn(),
-      deleteTransaction: vi.fn(),
-      updateTransactionAsync: vi.fn(),
       isLoading: true,
     });
 

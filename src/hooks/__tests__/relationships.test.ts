@@ -445,7 +445,10 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const { useBills } =
         await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
       const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { default: useTransactions } = await import("@/hooks/common/useTransactions");
+      const { useTransactionQuery } =
+        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useTransactionOperations } =
+        await import("@/hooks/budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -464,8 +467,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         addEnvelope: vi.fn(),
         addEnvelopeAsync: vi.fn(),
       });
-      (useTransactions as Mock).mockReturnValue({
+      (useTransactionQuery as Mock).mockReturnValue({
         transactions: [],
+        isLoading: false,
+      });
+      (useTransactionOperations as Mock).mockReturnValue({
         addTransaction: vi.fn(),
       });
 
@@ -492,7 +498,10 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const { useBills } =
         await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
       const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { default: useTransactions } = await import("@/hooks/common/useTransactions");
+      const { useTransactionQuery } =
+        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useTransactionOperations } =
+        await import("@/hooks/budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [],
@@ -511,8 +520,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         addEnvelope: vi.fn(),
         addEnvelopeAsync: vi.fn().mockResolvedValue({ id: "env-1" }),
       });
-      (useTransactions as Mock).mockReturnValue({
+      (useTransactionQuery as Mock).mockReturnValue({
         transactions: [],
+        isLoading: false,
+      });
+      (useTransactionOperations as Mock).mockReturnValue({
         addTransaction: vi.fn(),
       });
 
@@ -543,7 +555,10 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const { useBills } =
         await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
       const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { default: useTransactions } = await import("@/hooks/common/useTransactions");
+      const { useTransactionQuery } =
+        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useTransactionOperations } =
+        await import("@/hooks/budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -562,8 +577,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         addEnvelope: vi.fn(),
         addEnvelopeAsync: vi.fn(),
       });
-      (useTransactions as Mock).mockReturnValue({
+      (useTransactionQuery as Mock).mockReturnValue({
         transactions: [],
+        isLoading: false,
+      });
+      (useTransactionOperations as Mock).mockReturnValue({
         addTransaction: vi.fn(),
       });
 
@@ -599,7 +617,10 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const { useBills } =
         await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
       const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { default: useTransactions } = await import("@/hooks/common/useTransactions");
+      const { useTransactionQuery } =
+        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useTransactionOperations } =
+        await import("@/hooks/budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -618,8 +639,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         addEnvelope: vi.fn(),
         addEnvelopeAsync: vi.fn(),
       });
-      (useTransactions as Mock).mockReturnValue({
+      (useTransactionQuery as Mock).mockReturnValue({
         transactions: [],
+        isLoading: false,
+      });
+      (useTransactionOperations as Mock).mockReturnValue({
         addTransaction: vi.fn(),
       });
 

@@ -34,15 +34,6 @@ export interface FilterOptions {
 }
 
 export const useBillCalculations = () => {
-  // Helper to resolve data from multiple sources (Props > TanStack > Budget Store)
-  const resolveData = useMemo(() => {
-    return (propData: unknown[], tanStackData: unknown[], storeData: unknown[]) => {
-      if (propData && propData.length) return propData;
-      if (tanStackData && tanStackData.length) return tanStackData;
-      return storeData || [];
-    };
-  }, []);
-
   const processAllBills = useMemo(() => {
     return (
       transactions: TransactionRecord[],
@@ -132,7 +123,6 @@ export const useBillCalculations = () => {
   }, []);
 
   return {
-    resolveData,
     processAllBills,
     getCategorizedBills,
     getFilteredBills,

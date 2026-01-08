@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/common/queryClient";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
+import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import { useBudgetMetadata } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 
 interface Envelope {
@@ -110,7 +110,9 @@ export const useBalanceAnalyticsQuery = () => {
                   0
                 ) / envelopeAnalysis.length
               : 0,
-          completedSavingsGoals: savingsAnalysis.filter((goal) => goal.isCompleted).length,
+          completedSavingsGoals: savingsAnalysis.filter(
+            (goal: { isCompleted: boolean }) => goal.isCompleted
+          ).length,
           totalSavingsTarget: savingsAnalysis.reduce((sum: number, goal: unknown) => {
             const g = goal as SavingsGoal;
             return sum + (g.targetAmount || 0);
