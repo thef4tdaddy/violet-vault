@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { usePaycheckForm } from "../../hooks/budgeting/usePaycheckForm";
-import { usePaycheckHistory } from "../../hooks/budgeting/usePaycheckHistory";
+import { usePaycheckForm } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckForm";
+import { usePaycheckHistory } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckHistory";
 import PaycheckAmountInput from "./paycheck/PaycheckAmountInput";
 import PaycheckPayerSelector from "./paycheck/PaycheckPayerSelector";
 import PaycheckAllocationModes from "./paycheck/PaycheckAllocationModes";

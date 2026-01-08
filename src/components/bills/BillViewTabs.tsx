@@ -1,6 +1,6 @@
 import StandardTabs, { type Tab } from "../ui/StandardTabs";
 import StandardFilters, { type FilterConfig } from "../ui/StandardFilters";
-import type { FilterOptions } from "@/hooks/bills/useBillManagerHelpers";
+import type { FilterOptions } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillCalculations";
 
 interface BillViewTabsProps {
   viewModes: Tab[];

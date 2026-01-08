@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAuth as useAuthHook } from "./useAuth";
-import logger from "../../utils/common/logger";
-import { encryptionUtils } from "../../utils/security/encryption";
+import logger from "@/utils/common/logger";
+import { encryptionUtils } from "@/utils/security/encryption";
 
 import type { UserData, UpdateProfileInput as UpdatedProfile } from "./useAuth.types";
 
@@ -116,12 +116,12 @@ export const useAuthCompatibility = () => {
  *
  * Components can change:
  * ```
- * import { useAuth } from "../../stores/auth/authStore";
+ * import { useAuth } from "@/stores/auth/authStore";
  * ```
  *
  * To:
  * ```
- * import { useAuth } from "../../hooks/auth/useAuthCompatibility";
+ * import { useAuth } from "@/hooks/auth/useAuthCompatibility";
  * ```
  *
  * And everything should work the same way.

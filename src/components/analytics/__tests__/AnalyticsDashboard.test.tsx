@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 
 class ResizeObserverMock {
   observe() {}
@@ -64,12 +64,12 @@ const { useEnvelopesMock } = vi.hoisted(() => ({
   useEnvelopesMock: vi.fn(() => ({ envelopes: [] })),
 }));
 
-vi.mock("@/hooks/analytics/useAnalytics", () => ({
+vi.mock("@/hooks/platform/analytics/useAnalytics", () => ({
   __esModule: true,
   default: useAnalyticsMock,
 }));
 
-vi.mock("@/hooks/analytics/useAnalyticsData", () => ({
+vi.mock("@/hooks/platform/analytics/useAnalyticsData", () => ({
   __esModule: true,
   useAnalyticsData: useAnalyticsDataMock,
   default: useAnalyticsDataMock,
@@ -80,7 +80,7 @@ vi.mock("@/hooks/common/useTransactions", () => ({
   useTransactions: useTransactionsMock,
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   __esModule: true,
   useEnvelopes: useEnvelopesMock,
 }));

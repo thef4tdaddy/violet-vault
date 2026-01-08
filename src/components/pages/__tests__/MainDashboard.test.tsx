@@ -10,7 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 // ============================================================================
 
 // 1. Hook Mocks
-vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
+vi.mock("@/hooks/budgeting/metadata/useBudgetMetadata", () => ({
   useActualBalance: vi.fn(() => ({
     actualBalance: 1000,
     updateActualBalance: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
   useUnassignedCash: vi.fn(() => ({ unassignedCash: 200, isLoading: false })),
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => ({
     envelopes: [{ id: "1", name: "Groceries", currentBalance: 500 }],
     isLoading: false,
@@ -40,7 +40,7 @@ vi.mock("@/hooks/common/useTransactions", () => ({
   })),
 }));
 
-vi.mock("@/hooks/budgeting/useBudgetData", () => ({
+vi.mock("@/hooks/budgeting/core/useBudgetData", () => ({
   default: vi.fn(() => ({
     reconcileTransaction: vi.fn(),
     paycheckHistory: [],
@@ -147,7 +147,7 @@ vi.mock("@/utils/common/validation", () => ({
 // Test Suite
 // ============================================================================
 
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { usePaydayManager } from "@/hooks/dashboard/useMainDashboard";
 
 describe("MainDashboard (Full Alias Standardization)", () => {

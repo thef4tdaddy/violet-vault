@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
-import { predictNextPayday, type PaycheckEntry } from "../../utils/budgeting/paydayPredictor";
-import logger from "../../utils/common/logger";
+import { globalToast } from "@/stores/ui/toastStore";
+import { predictNextPayday, type PaycheckEntry } from "@/utils/budgeting/paydayPredictor";
+import logger from "@/utils/common/logger";
 import type { UseMutateFunction } from "@tanstack/react-query";
 import type {
   Envelope as DbEnvelope,

@@ -1,5 +1,5 @@
 import React from "react";
-import { usePerformanceMonitor } from "../../hooks/analytics/usePerformanceMonitor";
+import { usePerformanceMonitor } from "@/hooks/platform/analytics/usePerformanceMonitor";
 import PerformanceHeader from "./performance/PerformanceHeader";
 import OverallScore from "./performance/OverallScore";
 import MetricsGrid from "./performance/MetricsGrid";

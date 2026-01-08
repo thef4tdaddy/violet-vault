@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 
 // Mock hooks
-vi.mock("@/hooks/budgeting/useBudgetData", () => ({
+vi.mock("@/hooks/budgeting/core/useBudgetData", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
+vi.mock("@/hooks/budgeting/metadata/useBudgetMetadata", () => ({
   useUnassignedCash: vi.fn(),
   useActualBalance: vi.fn(),
   useBudgetMetadataQuery: vi.fn(() => ({
@@ -25,7 +25,7 @@ vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
   })),
 }));
 
-vi.mock("@/hooks/bills/useBills", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({
   default: vi.fn(),
 }));
 
@@ -98,9 +98,9 @@ describe("useLayoutData", () => {
       React.createElement(QueryClientProvider, { client: queryClient }, children);
 
     // Import mocked modules
-    const budgetDataModule = await import("@/hooks/budgeting/useBudgetData");
-    const budgetMetadataModule = await import("@/hooks/budgeting/useBudgetMetadata");
-    const billsModule = await import("@/hooks/bills/useBills");
+    const budgetDataModule = await import("@/hooks/budgeting/core/useBudgetData");
+    const budgetMetadataModule = await import("@/hooks/budgeting/metadata/useBudgetMetadata");
+    const billsModule = await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
     const envelopeCalcs = await import("@/utils/budgeting/envelopeCalculations");
 
     mockUseBudgetData = budgetDataModule.default as ReturnType<typeof vi.fn>;

@@ -5,12 +5,12 @@ import PaydayPrediction from "../budgeting/PaydayPrediction";
 import AccountBalanceOverview from "../dashboard/AccountBalanceOverview";
 import RecentTransactionsWidget from "../dashboard/RecentTransactionsWidget";
 import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
-import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
 import { useTransactions } from "@/hooks/common/useTransactions";
-import useBudgetData from "@/hooks/budgeting/useBudgetData";
+import useBudgetData from "@/hooks/budgeting/core/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 import {
   useMainDashboardUI,

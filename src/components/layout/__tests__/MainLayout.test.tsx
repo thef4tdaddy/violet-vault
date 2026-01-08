@@ -189,7 +189,13 @@ vi.mock("@/hooks/common/useOnboardingAutoComplete", () => ({
   useOnboardingAutoComplete: vi.fn(() => ({})),
 }));
 vi.mock("@/stores/ui/toastStore", () => ({ useToastStore: vi.fn(() => ({ toasts: [] })) }));
-vi.mock("@/stores/ui/uiStore", () => ({ useBudgetStore: vi.fn(() => ({ budget: {} })) }));
+vi.mock("@/stores/ui/uiStore", () => {
+  const mockStore = vi.fn(() => ({ budget: {} }));
+  return {
+    default: mockStore,
+    useBudgetStore: mockStore,
+  };
+});
 
 // ============================================================================
 // Test Suite

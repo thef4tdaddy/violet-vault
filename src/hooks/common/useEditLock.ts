@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { editLockService } from "@/services/sync/editLockService";
 import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 import useToast from "./useToast";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import {
   getCurrentUserId,
   isOwnLock as checkIsOwnLock,

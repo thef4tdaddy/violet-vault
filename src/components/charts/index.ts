@@ -16,4 +16,4 @@ export {
 
 // Hook exports for convenience
 export { useChartConfig } from "../../hooks/common/useChartConfig.tsx";
-export { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";
+export { useAnalyticsData } from "@/hooks/platform/analytics/useAnalyticsData";

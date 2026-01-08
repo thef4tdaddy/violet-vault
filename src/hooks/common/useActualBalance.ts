@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 interface UpdateBalanceOptions {
   isManual?: boolean;

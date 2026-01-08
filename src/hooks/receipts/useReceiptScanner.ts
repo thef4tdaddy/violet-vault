@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
-import { processReceiptImage } from "../../utils/common/ocrProcessor";
-import logger from "../../utils/common/logger";
+import { processReceiptImage } from "@/utils/common/ocrProcessor";
+import logger from "@/utils/common/logger";
 
 // Define types for the hook
 interface UploadedImage {

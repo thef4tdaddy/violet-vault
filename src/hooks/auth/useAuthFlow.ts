@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { useAuth } from "./useAuth";
-import logger from "../../utils/common/logger";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
+import logger from "@/utils/common/logger";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
 import {
   handleExistingUserLogin,
   handleSharedBudgetJoin,
   handleNewUserSetup,
-} from "../../utils/auth/authFlowHelpers";
+} from "@/utils/auth/authFlowHelpers";
 
 import type { UserData, UpdateProfileInput as UserProfile } from "./useAuth.types";
 

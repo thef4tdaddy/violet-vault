@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
-import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
-import logger from "../../../utils/common/logger";
+import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
+import logger from "@/utils/common/logger";
 import { validateBalanceValue } from "@/domain/schemas/budget-record";
 
 export const useActualBalanceOperations = () => {

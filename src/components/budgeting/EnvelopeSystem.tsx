@@ -1,7 +1,7 @@
 // src/components/budgeting/EnvelopeSystem.tsx - Refactored with separated logic
 import { useEffect, useCallback, useRef } from "react";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import useBills from "../../hooks/bills/useBills";
+import { useEnvelopes } from "../../hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "../../hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useUnassignedCash } from "../../hooks/budgeting/metadata/useUnassignedCash";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
 import logger from "../../utils/common/logger";

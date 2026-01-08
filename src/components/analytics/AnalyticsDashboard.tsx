@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import useAnalytics from "@/hooks/analytics/useAnalytics";
+import useAnalytics from "@/hooks/platform/analytics/useAnalytics";
 import ReportExporter from "./ReportExporter";
 import AnalyticsSummaryCards from "./AnalyticsSummaryCards";
 import AnalyticsDashboardHeader from "./dashboard/AnalyticsDashboardHeader";
@@ -17,8 +17,8 @@ import type {
 } from "./tabs/EnvelopesTab";
 import logger from "@/utils/common/logger";
 import { useTransactions } from "@/hooks/common/useTransactions";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { useAnalyticsData } from "@/hooks/analytics/useAnalyticsData";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import { useAnalyticsData } from "@/hooks/platform/analytics/useAnalyticsData";
 import type { AnalyticsData } from "@/types/analytics";
 
 /**

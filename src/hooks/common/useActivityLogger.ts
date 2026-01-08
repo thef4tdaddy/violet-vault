@@ -1,7 +1,7 @@
 // src/hooks/useActivityLogger.js
 import { useEffect } from "react";
 import activityLogger, { ACTIVITY_TYPES, ENTITY_TYPES } from "@/services/logging/activityLogger";
-import { useAuth } from "../auth/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 /**
  * Hook to provide activity logging functionality

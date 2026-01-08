@@ -6,7 +6,7 @@ import CategoryTrendsSection from "./trends/CategoryTrendsSection";
 import SeasonalPatternsSection from "./trends/SeasonalPatternsSection";
 import InsightsPanel from "./trends/InsightsPanel";
 
-import { useTrendAnalysis } from "../../hooks/analytics/useTrendAnalysis";
+import { useTrendAnalysis } from "@/hooks/platform/analytics/useTrendAnalysis";
 
 import { AnalyticsData } from "@/types/analytics";
 

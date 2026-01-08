@@ -7,7 +7,7 @@
  */
 import { useEffect, useCallback, useMemo } from "react";
 import type { FormEvent, RefObject } from "react";
-import { useBillForm } from "@/hooks/bills/useBillForm";
+import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
 import useEditLock from "@/hooks/common/useEditLock";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
@@ -19,9 +19,9 @@ import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
 import { useLayoutData } from "@/hooks/layout/useLayoutData";
-import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
+import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 

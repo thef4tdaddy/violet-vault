@@ -1,14 +1,14 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useImportData } from "../useImportData";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useToastHelpers } from "../../../utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
 import { useConfirm } from "../useConfirm";
-import { readFileContent } from "../../../utils/dataManagement/fileUtils";
-import { validateImportedData } from "../../../utils/dataManagement/validationUtils";
-import { backupCurrentData } from "../../../utils/dataManagement/backupUtils";
-import { clearAllDexieData, importDataToDexie } from "../../../utils/dataManagement/dexieUtils";
-import { clearFirebaseData, forcePushToCloud } from "../../../utils/dataManagement/firebaseUtils";
-import { queryClient } from "../../../utils/common/queryClient";
+import { readFileContent } from "@/utils/dataManagement/fileUtils";
+import { validateImportedData } from "@/utils/dataManagement/validationUtils";
+import { backupCurrentData } from "@/utils/dataManagement/backupUtils";
+import { clearAllDexieData, importDataToDexie } from "@/utils/dataManagement/dexieUtils";
+import { clearFirebaseData, forcePushToCloud } from "@/utils/dataManagement/firebaseUtils";
+import { queryClient } from "@/utils/common/queryClient";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 
 vi.mock("@/hooks/auth/useAuth");

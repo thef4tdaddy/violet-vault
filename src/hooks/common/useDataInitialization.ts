@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useBudgetStore, type UiStore } from "../../stores/ui/uiStore";
-import logger from "../../utils/common/logger";
-import { budgetDb } from "../../db/budgetDb";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
+import logger from "@/utils/common/logger";
+import { budgetDb } from "@/db/budgetDb";
 
 /**
  * Auto-fix undefined autoAllocate values - set all to true by default

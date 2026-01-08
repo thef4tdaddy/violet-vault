@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
+import { useBulkBillUpdate } from "../../hooks/budgeting/transactions/scheduled/expenses/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
   transformBillsForUpdate,

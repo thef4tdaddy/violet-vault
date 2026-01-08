@@ -1,5 +1,5 @@
 import React from "react";
-import { useTransactionSplitter } from "../../hooks/transactions/useTransactionSplitter.ts";
+import { useTransactionSplitter } from "../../hooks/budgeting/transactions/useTransactionSplitter.ts";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { calculateSplitTotals } from "../../utils/transactions/splitterHelpers";

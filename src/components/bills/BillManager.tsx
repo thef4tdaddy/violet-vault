@@ -5,8 +5,12 @@
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
 import React, { useMemo } from "react";
-import { useBillManager } from "../../hooks/bills/useBillManager";
-import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
+import { useBillManager } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManager";
+import { useBillManagerUI } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManagerUI";
+import type {
+  TransactionRecord,
+  EnvelopeRecord,
+} from "../../hooks/budgeting/transactions/scheduled/expenses/useBillCalculations";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useAuth } from "@/hooks/auth/useAuth";
 import BillManagerHeader from "./BillManagerHeader";
@@ -102,8 +106,8 @@ const BillManager: React.FC<BillManagerProps> = ({
     updateBill,
     deleteBill,
   } = useBillManager({
-    propTransactions,
-    propEnvelopes,
+    propTransactions: propTransactions as unknown as TransactionRecord[],
+    propEnvelopes: propEnvelopes as unknown as EnvelopeRecord[],
     onUpdateBill,
     onCreateRecurringBill,
     onSearchNewBills,
@@ -233,7 +237,7 @@ const BillManager: React.FC<BillManagerProps> = ({
         updateBill={updateBill as never}
         deleteBill={deleteBill as never}
         handleBulkUpdate={(entities) => handleBulkUpdate(entities as never)}
-        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as never)}
+        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as Bill[])}
         billOperations={billOperations}
         onError={onError ?? (() => {})}
       />

@@ -42,7 +42,7 @@ vi.mock("../../../utils/common/logger", () => ({
 
 // Import mocked dependencies
 import { useAuth as useAuthHook } from "../useAuth";
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 describe("useAuthCompatibility", () => {
   beforeEach(() => {

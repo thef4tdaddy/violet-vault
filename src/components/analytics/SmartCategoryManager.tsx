@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useSmartCategoryAnalysis } from "@/hooks/analytics/useSmartCategoryAnalysis";
-import { useSmartCategoryManager } from "@/hooks/analytics/useSmartCategoryManager";
+import { useSmartCategoryAnalysis } from "@/hooks/platform/analytics/useSmartCategoryAnalysis";
+import { useSmartCategoryManager } from "@/hooks/platform/analytics/useSmartCategoryManager";
 import {
   calculateCategoryStats,
   processSuggestions,

@@ -9,7 +9,7 @@ import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {

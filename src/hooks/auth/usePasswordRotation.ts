@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
-import { useAuth } from "../auth/useAuth";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
-import logger from "../../utils/common/logger";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import logger from "@/utils/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
 
 /**

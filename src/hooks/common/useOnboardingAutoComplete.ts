@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import useBills from "@/hooks/bills/useBills";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useTransactions } from "./useTransactions";
-import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
+import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import useOnboardingStore from "@/stores/ui/onboardingStore";
 import logger from "@/utils/common/logger";
 

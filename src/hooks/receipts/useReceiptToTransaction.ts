@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useReceipts } from "../common/useReceipts";
-import { useTransactions } from "../common/useTransactions";
-import { useEnvelopes } from "../budgeting/useEnvelopes";
-import logger from "../../utils/common/logger";
+import { useReceipts } from "@/hooks/common/useReceipts";
+import { useTransactions } from "@/hooks/common/useTransactions";
+import { useEnvelopes } from "../budgeting/envelopes/useEnvelopes";
+import logger from "@/utils/common/logger";
 import type { Envelope } from "@/types/finance";
 
 interface ReceiptData {

@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { queryKeys } from "../../../utils/common/queryClient";
-import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "../../../db/budgetDb";
-import type { BudgetRecord } from "../../../db/types";
-import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
-import logger from "../../../utils/common/logger";
+import { queryKeys } from "@/utils/common/queryClient";
+import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "@/db/budgetDb";
+import type { BudgetRecord } from "@/db/types";
+import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
+import logger from "@/utils/common/logger";
 import { validateBalanceValue } from "@/domain/schemas/budget-record";
 
 // Helper to initialize default metadata

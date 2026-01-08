@@ -1,4 +1,4 @@
-import type { useAuth } from "../auth/useAuth";
+import type { useAuth } from "@/hooks/auth/useAuth";
 import type { UserData } from "@/types/auth";
 
 /**

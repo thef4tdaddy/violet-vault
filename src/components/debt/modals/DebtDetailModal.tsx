@@ -1,4 +1,4 @@
-import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
+import { useDebtDetailModal } from "@/hooks/budgeting/envelopes/liabilities/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
 import QuickPaymentForm from "../ui/QuickPaymentForm";

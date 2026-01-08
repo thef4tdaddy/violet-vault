@@ -10,8 +10,8 @@ import {
   useCloudSyncManager,
   useSettingsSections,
   useSettingsActions,
-} from "../../hooks/settings/useSettingsDashboard";
-import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionRenderer";
+} from "@/hooks/platform/settings/useSettingsDashboard";
+import useSettingsSectionRenderer from "@/hooks/platform/settings/useSettingsSectionRenderer";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));

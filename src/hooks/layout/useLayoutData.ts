@@ -1,15 +1,15 @@
 import { useMemo } from "react";
-import useBudgetData from "../budgeting/useBudgetData";
+import useBudgetData from "@/hooks/budgeting/core/useBudgetData";
 import {
   useUnassignedCash,
   useActualBalance,
   useBudgetMetadataQuery,
-} from "../budgeting/useBudgetMetadata";
-import useBills from "../bills/useBills";
+} from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
-} from "../../utils/budgeting/envelopeCalculations";
+} from "@/utils/budgeting/envelopeCalculations";
 import type { Transaction as DbTransaction, Bill as DbBill } from "@/db/types";
 
 /**
@@ -35,7 +35,7 @@ export const useLayoutData = () => {
   // Filter out null/undefined transactions for safe operations
   const safeTransactions = useMemo<DbTransaction[]>(() => {
     return (budgetData.transactions || [])
-      .filter((t): t is DbTransaction => {
+      .filter((t: unknown): t is DbTransaction => {
         if (!t || typeof t !== "object") {
           return false;
         }
@@ -51,7 +51,7 @@ export const useLayoutData = () => {
           typeof record.lastModified === "number"
         );
       })
-      .map((transaction) => ({
+      .map((transaction: DbTransaction) => ({
         ...transaction,
         date: transaction.date instanceof Date ? transaction.date : new Date(transaction.date),
       }));

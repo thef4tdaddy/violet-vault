@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useFABActions, useFABSelectors } from "../../stores/ui/fabStore";
+import { useFABActions, useFABSelectors } from "@/stores/ui/fabStore";
 
 /**
  * FABAction interface - matches the interface in fabStore.ts

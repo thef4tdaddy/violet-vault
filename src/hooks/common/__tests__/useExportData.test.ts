@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useExportData } from "../useExportData";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useToastHelpers } from "../../../utils/common/toastHelpers";
-import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import { constructExportObject } from "../useExportDataHelpers";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 

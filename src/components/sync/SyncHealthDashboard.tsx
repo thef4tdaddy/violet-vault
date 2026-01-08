@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils/icons";
-import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
+import { useSyncHealthMonitor } from "@/hooks/platform/sync/useSyncHealthMonitor";
 import { useExportData } from "@/hooks/common/useExportData";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 

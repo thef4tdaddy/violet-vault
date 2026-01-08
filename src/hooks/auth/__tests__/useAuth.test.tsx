@@ -2,7 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "../useAuth";
-import * as authHelpers from "../authHelpers";
+import * as authHelpers from "@/hooks/auth/authHelpers";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useSecurityManager } from "../useSecurityManager";
 import localStorageService from "@/services/storage/localStorageService";
@@ -18,7 +18,7 @@ vi.mock("../useSecurityManager", () => ({
   useSecurityManager: vi.fn(),
 }));
 
-vi.mock("../authHelpers", () => ({
+vi.mock("@/hooks/auth/authHelpers", () => ({
   handleNewUserSetup: vi.fn(),
   deriveLoginEncryptionKey: vi.fn(),
   startBackgroundSyncAfterLogin: vi.fn(),

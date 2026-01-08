@@ -3,9 +3,9 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { usePrompt } from "@/hooks/common/usePrompt";
-import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import {

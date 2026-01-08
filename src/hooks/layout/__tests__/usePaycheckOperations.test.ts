@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { usePaycheckOperations } from "../usePaycheckOperations";
+import { usePaycheckOperations } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckOperations";
 
 // Mock logger
 vi.mock("@/utils/common/logger", () => ({
