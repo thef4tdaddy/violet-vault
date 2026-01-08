@@ -3,11 +3,7 @@ import { useConfirm } from "@/hooks/common/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 
-interface Paycheck {
-  id: string | number;
-  payerName: string;
-  amount: number;
-}
+import type { PaycheckHistory } from "@/db/types";
 
 interface UsePaycheckHistoryProps {
   onDeletePaycheck?: (id: string | number) => Promise<void>;
@@ -21,7 +17,7 @@ export const usePaycheckHistory = ({ onDeletePaycheck }: UsePaycheckHistoryProps
   const [deletingPaycheckId, setDeletingPaycheckId] = useState<string | number | null>(null);
   const confirm = useConfirm();
 
-  const handleDeletePaycheck = async (paycheck: Paycheck) => {
+  const handleDeletePaycheck = async (paycheck: PaycheckHistory) => {
     if (!onDeletePaycheck) return;
 
     const isConfirmed = await confirm({

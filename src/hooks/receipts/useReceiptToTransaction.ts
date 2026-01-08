@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useReceipts } from "@/hooks/common/useReceipts";
-import { useTransactions } from "@/hooks/common/useTransactions";
-import { useEnvelopes } from "../budgeting/envelopes/useEnvelopes";
+import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import logger from "@/utils/common/logger";
 import type { Envelope } from "@/types/finance";
 
@@ -24,7 +24,7 @@ interface ReceiptData {
  */
 export const useReceiptToTransaction = (receiptData: ReceiptData) => {
   const { addReceiptAsync } = useReceipts();
-  const { addTransactionAsync } = useTransactions();
+  const { addTransaction: addTransactionAsync } = useTransactionOperations();
   const { envelopes } = useEnvelopes();
 
   const [transactionForm, setTransactionForm] = useState<{

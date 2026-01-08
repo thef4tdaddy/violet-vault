@@ -8,8 +8,8 @@ import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
-import { useTransactions } from "@/hooks/common/useTransactions";
+import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import useBudgetData from "@/hooks/budgeting/core/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 import {

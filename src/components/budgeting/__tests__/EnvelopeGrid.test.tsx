@@ -5,7 +5,7 @@ import EnvelopeGrid from "../EnvelopeGrid";
 
 // Import hooks for vi.mocked usage
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import { useTransactions } from "@/hooks/common/useTransactions";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 
@@ -75,8 +75,8 @@ vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => MOCK_ENVELOPES_DATA),
 }));
 
-vi.mock("@/hooks/common/useTransactions", () => ({
-  useTransactions: vi.fn(() => MOCK_TRANSACTIONS_DATA),
+vi.mock("@/hooks/budgeting/transactions/useTransactionQuery", () => ({
+  useTransactionQuery: vi.fn(() => MOCK_TRANSACTIONS_DATA),
 }));
 
 vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({

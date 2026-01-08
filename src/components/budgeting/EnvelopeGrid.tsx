@@ -3,8 +3,8 @@ import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "rea
 import useUiStoreRaw from "@/stores/ui/uiStore";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import { useTransactions } from "@/hooks/common/useTransactions";
-import useBills from "../../hooks/budgeting/transactions/scheduled/expenses/useBills";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,

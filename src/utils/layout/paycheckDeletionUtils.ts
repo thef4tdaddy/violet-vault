@@ -4,10 +4,9 @@
  */
 import logger from "../common/logger";
 
-interface Paycheck {
-  id: string | number;
-  amount: number;
-  mode?: string;
+import type { PaycheckHistory } from "@/db/types";
+
+export interface Paycheck extends PaycheckHistory {
   envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
 }
 
@@ -53,10 +52,12 @@ export const reverseEnvelopeAllocations = async (
     return 0;
   }
 
-  logger.info("Reversing envelope allocations for allocate mode paycheck");
+  const allocations =
+    paycheckToDelete.envelopeAllocations ||
+    (Array.isArray(paycheckToDelete.allocations) ? paycheckToDelete.allocations : []);
 
   // Subtract from envelope balances
-  for (const allocation of paycheckToDelete.envelopeAllocations) {
+  for (const allocation of allocations) {
     const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
     if (envelope) {
       const envelopeData = envelope as { currentBalance?: number; [key: string]: unknown };
@@ -71,11 +72,11 @@ export const reverseEnvelopeAllocations = async (
   }
 
   // Calculate how much went to unassigned cash originally
-  const totalAllocated = paycheckToDelete.envelopeAllocations.reduce(
+  const totalAllocated = allocations.reduce(
     (sum: number, alloc: { amount: number }) => sum + alloc.amount,
     0
   );
-  return paycheckToDelete.amount - totalAllocated;
+  return (paycheckToDelete.amount || 0) - totalAllocated;
 };
 
 /**
@@ -106,7 +107,10 @@ export const calculateReversedBalances = async (
   let newUnassignedCash = currentUnassignedCash;
 
   // Handle envelope balance reversals if this was an "allocate" paycheck
-  if (paycheckToDelete.mode === "allocate" && paycheckToDelete.envelopeAllocations) {
+  if (
+    paycheckToDelete.mode === "allocate" &&
+    (paycheckToDelete.envelopeAllocations || Array.isArray(paycheckToDelete.allocations))
+  ) {
     const leftoverAmount = await reverseEnvelopeAllocations(paycheckToDelete, budgetDb);
     newUnassignedCash = Math.max(0, currentUnassignedCash - leftoverAmount);
   } else {
