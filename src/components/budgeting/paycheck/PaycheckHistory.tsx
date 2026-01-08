@@ -4,19 +4,8 @@ import {
   PaycheckEmptyState,
   PaycheckStatsDisplay,
   PaycheckHistoryItemCard,
+  type PaycheckHistoryItem,
 } from "./PaycheckHistoryComponents";
-
-interface PaycheckHistoryItem {
-  id: string | number;
-  payerName?: string;
-  allocationMode?: string;
-  amount?: number;
-  processedAt?: string;
-  processedBy?: string;
-  totalAllocated?: number;
-  remainingAmount?: number;
-  allocations?: { envelopeName: string }[];
-}
 
 interface PaycheckStats {
   count?: number;

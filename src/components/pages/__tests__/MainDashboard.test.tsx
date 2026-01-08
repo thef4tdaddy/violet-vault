@@ -26,15 +26,15 @@ vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   })),
 }));
 
-vi.mock("@/hooks/common/useSavingsGoals", () => ({
-  useSavingsGoals: vi.fn(() => ({
+vi.mock("@/hooks/budgeting/envelopes/goals/useSavingsGoals", () => ({
+  default: vi.fn(() => ({
     savingsGoals: [{ id: "1", name: "Emergency Fund", currentAmount: 1000, targetAmount: 5000 }],
     isLoading: false,
   })),
 }));
 
-vi.mock("@/hooks/common/useTransactions", () => ({
-  useTransactions: vi.fn(() => ({
+vi.mock("@/hooks/budgeting/transactions/useTransactionQuery", () => ({
+  useTransactionQuery: vi.fn(() => ({
     transactions: [{ id: "1", description: "Food", amount: -50, date: "2025-01-01" }],
     isLoading: false,
   })),

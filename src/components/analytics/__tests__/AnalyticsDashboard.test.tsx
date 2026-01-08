@@ -75,9 +75,9 @@ vi.mock("@/hooks/platform/analytics/useAnalyticsData", () => ({
   default: useAnalyticsDataMock,
 }));
 
-vi.mock("@/hooks/common/useTransactions", () => ({
+vi.mock("@/hooks/budgeting/transactions/useTransactionQuery", () => ({
   __esModule: true,
-  useTransactions: useTransactionsMock,
+  useTransactionQuery: useTransactionsMock,
 }));
 
 vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({

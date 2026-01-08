@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
-import { useTransactions } from "./useTransactions";
+import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import useOnboardingStore from "@/stores/ui/onboardingStore";
 import logger from "@/utils/common/logger";
@@ -25,7 +25,7 @@ export const useOnboardingAutoComplete = () => {
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();
-  const transactionsResult = useTransactions();
+  const transactionsResult = useTransactionQuery();
 
   // Wrap transactions initialization in useMemo to fix exhaustive-deps warning
   const transactions = useMemo(() => {

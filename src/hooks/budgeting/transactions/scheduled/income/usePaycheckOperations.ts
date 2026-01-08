@@ -7,13 +7,7 @@ import {
   invalidatePaycheckCaches,
 } from "@/utils/layout/paycheckDeletionUtils";
 
-interface PaycheckHistory {
-  id: string | number;
-  amount: number;
-  mode?: string;
-  envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
-  allocations?: unknown[];
-}
+import type { PaycheckHistory } from "@/db/types";
 
 interface BudgetDb {
   paycheckHistory: {

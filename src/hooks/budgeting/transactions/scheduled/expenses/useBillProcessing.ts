@@ -11,14 +11,9 @@ import {
 type Bill = BillType;
 
 interface UseBillProcessingProps {
-  propTransactions?: TransactionRecord[];
   tanStackTransactions?: TransactionRecord[];
-  storeTransactions?: TransactionRecord[];
-  propEnvelopes?: Envelope[];
   tanStackEnvelopes?: Envelope[];
-  storeEnvelopes?: Envelope[];
   tanStackBills?: BillRecord[];
-  storeBills?: BillRecord[];
   onUpdateBill?: (bill: Bill) => void;
   updateBillAsync?: (data: { billId: string; updates: Record<string, unknown> }) => Promise<void>;
   uiState: {
@@ -45,14 +40,9 @@ interface UseBillProcessingProps {
 }
 
 export const useBillProcessing = ({
-  propTransactions,
-  tanStackTransactions,
-  storeTransactions,
-  propEnvelopes,
-  tanStackEnvelopes,
-  storeEnvelopes,
-  tanStackBills,
-  storeBills,
+  tanStackTransactions = [],
+  tanStackEnvelopes = [],
+  tanStackBills = [],
   onUpdateBill,
   updateBillAsync,
   uiState,
@@ -64,38 +54,16 @@ export const useBillProcessing = ({
   onSearchNewBills,
   onError,
 }: UseBillProcessingProps) => {
-  const { resolveData, processAllBills, getCategorizedBills, getFilteredBills } =
-    useBillCalculations();
+  const { processAllBills, getCategorizedBills, getFilteredBills } = useBillCalculations();
 
   const resolvedTransactions = useMemo(
-    () =>
-      resolveData(
-        (propTransactions || []) as unknown[],
-        (tanStackTransactions || []) as unknown[],
-        (storeTransactions || []) as unknown[]
-      ) as Transaction[],
-    [propTransactions, tanStackTransactions, storeTransactions, resolveData]
+    () => tanStackTransactions as Transaction[],
+    [tanStackTransactions]
   );
 
-  const resolvedEnvelopes = useMemo(
-    () =>
-      resolveData(
-        (propEnvelopes || []) as unknown[],
-        (tanStackEnvelopes || []) as unknown[],
-        (storeEnvelopes || []) as unknown[]
-      ) as Envelope[],
-    [propEnvelopes, tanStackEnvelopes, storeEnvelopes, resolveData]
-  );
+  const resolvedEnvelopes = useMemo(() => tanStackEnvelopes as Envelope[], [tanStackEnvelopes]);
 
-  const resolvedBills = useMemo(
-    () =>
-      resolveData(
-        [],
-        (tanStackBills || []) as unknown[],
-        (storeBills || []) as unknown[]
-      ) as Bill[],
-    [tanStackBills, storeBills, resolveData]
-  );
+  const resolvedBills = useMemo(() => tanStackBills as unknown as Bill[], [tanStackBills]);
 
   const handleUpdateBill = useCallback(
     async ({ billId, updates }: { billId: string; updates: Record<string, unknown> }) => {

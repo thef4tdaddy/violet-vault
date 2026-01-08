@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useDebts } from "./useDebts";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import useEnvelopes from "@/hooks/budgeting/envelopes/useEnvelopes";
-import useTransactions from "@/hooks/common/useTransactions";
+import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
 import type { DebtType, DebtAccount, DebtFormData } from "@/types/debt";
 import type { Bill } from "@/db/types"; // Correct Bill type from Dexie
 import type { Envelope } from "@/db/types";
@@ -72,7 +73,8 @@ export const useDebtManagement = () => {
       : undefined,
   }));
   const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
-  const { transactions = [], addTransaction: createTransaction } = useTransactions();
+  const { transactions = [] } = useTransactionQuery();
+  const { addTransaction: createTransaction } = useTransactionOperations();
 
   const { createEnvelopeWrapper, createBillWrapper, updateBillWrapper, createTransactionWrapper } =
     createAPIWrappers(
