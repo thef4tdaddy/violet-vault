@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSwipeable, type SwipeEventData } from "react-swipeable";
-import { hapticFeedback } from "../utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/touchFeedback";
 
 /**
  * Swipe state interface
