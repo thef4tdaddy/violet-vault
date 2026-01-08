@@ -4,57 +4,61 @@ import type { Transaction, Envelope } from "@/db/types";
 import {
   useBillCalculations,
   type BillRecord,
+  type EnvelopeRecord,
   type FilterOptions,
   type TransactionRecord,
 } from "./useBillCalculations";
+import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "./useBills";
+import { useBillDiscovery as useBillDiscoveryHook } from "./useBillDiscovery";
+import { useBillBulkMutations } from "./useBillBulkMutations";
 
 type Bill = BillType;
 
 interface UseBillProcessingProps {
-  tanStackTransactions?: TransactionRecord[];
-  tanStackEnvelopes?: Envelope[];
-  tanStackBills?: BillRecord[];
   onUpdateBill?: (bill: Bill) => void;
-  updateBillAsync?: (data: { billId: string; updates: Record<string, unknown> }) => Promise<void>;
+  onCreateRecurringBill?: (bill: Bill) => Promise<void>;
+  onSearchNewBills?: () => void;
+  onError?: (message: string) => void;
   uiState: {
     filterOptions: FilterOptions;
     viewMode: "list" | "calendar";
     setSelectedBills: (bills: Set<string>) => void;
   };
-  discoverBills: (
-    transactions: Transaction[],
-    bills: Bill[],
-    envelopes: Envelope[],
-    callback?: () => void
-  ) => Promise<void>;
-  performAddDiscoveredBills: (
-    bills: Bill[],
-    onRecurring: (bill: Bill) => Promise<void>,
-    onStandard: (bill: Bill) => Promise<void>
-  ) => Promise<void>;
-  handleBulkUpdateAction: (bills: Bill[]) => Promise<{ success: boolean }>;
-  onCreateRecurringBill?: (bill: Bill) => Promise<void>;
-  addBillAsync: (bill: Bill) => Promise<void>;
-  onSearchNewBills?: () => void;
-  onError?: (message: string) => void;
 }
 
 export const useBillProcessing = ({
-  tanStackTransactions = [],
-  tanStackEnvelopes = [],
-  tanStackBills = [],
   onUpdateBill,
-  updateBillAsync,
-  uiState,
-  discoverBills,
-  performAddDiscoveredBills,
-  handleBulkUpdateAction,
   onCreateRecurringBill,
-  addBillAsync,
+  uiState,
   onSearchNewBills,
   onError,
 }: UseBillProcessingProps) => {
+  // 1. Domain Data Hooks
+  const { transactions: tanStackTransactions = [], isLoading: transactionsLoading } =
+    useTransactionQuery();
+  const { envelopes: tanStackEnvelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const {
+    bills: tanStackBills = [],
+    addBill,
+    addBillAsync,
+    updateBillAsync,
+    deleteBill,
+    isLoading: billsLoading,
+  } = useBills();
+
+  // 2. Logic & Processing Utility Hooks
   const { processAllBills, getCategorizedBills, getFilteredBills } = useBillCalculations();
+  const {
+    discoverBills,
+    addDiscoveredBills,
+    isSearching,
+    discoveredBills,
+    showDiscoveryModal,
+    setShowDiscoveryModal,
+  } = useBillDiscoveryHook();
+  const { handleBulkUpdate: handleBulkUpdateAction } = useBillBulkMutations();
 
   const resolvedTransactions = useMemo(
     () => tanStackTransactions as Transaction[],
@@ -78,16 +82,15 @@ export const useBillProcessing = ({
   const bills = useMemo(
     () =>
       processAllBills(
-        resolvedTransactions as TransactionRecord[],
-        resolvedBills as unknown as BillRecord[],
+        tanStackTransactions as TransactionRecord[],
+        tanStackBills as unknown as BillRecord[],
         onUpdateBill,
         handleUpdateBill
       ) as Bill[],
-    [processAllBills, resolvedBills, resolvedTransactions, onUpdateBill, handleUpdateBill]
+    [processAllBills, tanStackBills, tanStackTransactions, onUpdateBill, handleUpdateBill]
   );
 
   // Categorize & Total
-
   const { categorizedBills, totals } = useMemo(
     () => getCategorizedBills(bills),
     [bills, getCategorizedBills]
@@ -107,27 +110,39 @@ export const useBillProcessing = ({
   // Action Handlers
   const searchNewBills = useCallback(async () => {
     try {
-      await discoverBills(resolvedTransactions, bills, resolvedEnvelopes, onSearchNewBills);
+      await discoverBills(
+        tanStackTransactions as unknown as TransactionRecord[],
+        tanStackBills as unknown as BillRecord[],
+        tanStackEnvelopes as unknown as EnvelopeRecord[],
+        onSearchNewBills
+      );
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to discover bills";
       onError?.(message);
     }
-  }, [discoverBills, resolvedTransactions, bills, resolvedEnvelopes, onSearchNewBills, onError]);
+  }, [
+    discoverBills,
+    tanStackTransactions,
+    tanStackBills,
+    tanStackEnvelopes,
+    onSearchNewBills,
+    onError,
+  ]);
 
   const handleAddDiscoveredBills = useCallback(
-    async (billsToAdd: Bill[]) => {
+    async (billsToAdd: BillRecord[]) => {
       try {
-        await performAddDiscoveredBills(
+        await addDiscoveredBills(
           billsToAdd,
           onCreateRecurringBill
-            ? async (b: Bill) => {
-                await onCreateRecurringBill(b);
+            ? async (b: BillRecord) => {
+                await onCreateRecurringBill(b as unknown as Bill);
               }
-            : async (b: Bill) => {
-                await addBillAsync(b);
+            : async (b: BillRecord) => {
+                await addBillAsync(b as unknown as Bill);
               },
-          async (b: Bill) => {
-            await addBillAsync(b);
+          async (b: BillRecord) => {
+            await addBillAsync(b as unknown as Bill);
           }
         );
       } catch (err) {
@@ -135,7 +150,7 @@ export const useBillProcessing = ({
         onError?.(message);
       }
     },
-    [performAddDiscoveredBills, onCreateRecurringBill, addBillAsync, onError]
+    [addDiscoveredBills, onCreateRecurringBill, addBillAsync, onError]
   );
 
   const handleBulkUpdate = useCallback(
@@ -147,16 +162,33 @@ export const useBillProcessing = ({
   );
 
   return {
+    // Raw Data
     resolvedTransactions,
     resolvedEnvelopes,
     resolvedBills,
+    isLoading: transactionsLoading || envelopesLoading || billsLoading,
+
+    // Processed Data
     bills,
     categorizedBills: categorizedBills as unknown as Record<string, Bill[]>,
     totals,
     filteredBills,
+
+    // Discovery State
+    isSearching,
+    discoveredBills,
+    showDiscoveryModal,
+    setShowDiscoveryModal,
+
+    // Action Handlers
     searchNewBills,
     handleAddDiscoveredBills,
     handleBulkUpdate,
     handleUpdateBill,
+
+    // Direct Mutations (for convenience)
+    addBill,
+    addBillAsync,
+    deleteBill,
   };
 };
