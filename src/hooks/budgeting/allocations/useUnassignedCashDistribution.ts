@@ -29,7 +29,7 @@ export interface DistributionPreviewItem extends EnvelopeRecord {
  * Custom hook for managing unassigned cash distribution logic
  */
 const useUnassignedCashDistribution = () => {
-  const { unassignedCash, setUnassignedCash } = useUnassignedCash();
+  const { unassignedCash, updateUnassignedCash } = useUnassignedCash();
   const { envelopes: rawEnvelopes } = useEnvelopes();
   const { bills = [] } = useBills();
   const queryClient = useQueryClient();
@@ -112,7 +112,10 @@ const useUnassignedCashDistribution = () => {
       });
       if (updates.length > 0) {
         await budgetDb.bulkUpsertEnvelopes(updates as DbEnvelope[]);
-        await setUnassignedCash(remainingCash, { author: "Family Member", source: "distribution" });
+        await updateUnassignedCash(remainingCash, {
+          author: "Family Member",
+          source: "distribution",
+        });
         queryClient.invalidateQueries({ queryKey: [queryKeys.envelopes] });
       }
       setDistributions({});
@@ -126,7 +129,7 @@ const useUnassignedCashDistribution = () => {
     distributions,
     envelopeList,
     queryClient,
-    setUnassignedCash,
+    updateUnassignedCash,
     remainingCash,
   ]);
 

@@ -78,11 +78,13 @@ export const checkScheduledRules = async (
         trigger,
         currentDate: now.toISOString(),
         data: {
-          envelopes: (budget.envelopes || []).map((e) => ({
-            ...e,
-            id: String(e.id),
-            currentBalance: e.currentBalance || 0,
-          })),
+          envelopes: ((budget.envelopes as unknown as import("@/db/types").Envelope[]) || []).map(
+            (e) => ({
+              ...e,
+              id: String(e.id),
+              currentBalance: e.currentBalance || 0,
+            })
+          ),
           unassignedCash: budget.unassignedCash || 0,
           transactions: budget.allTransactions || [],
         },

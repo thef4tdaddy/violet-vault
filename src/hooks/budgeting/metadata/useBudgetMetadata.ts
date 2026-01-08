@@ -1,8 +1,8 @@
 // Main budget metadata hook that combines all focused hooks
 import { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
-import { useUnassignedCashOperations } from "./useUnassignedCashOperations";
-import { useActualBalanceOperations } from "./useActualBalanceOperations";
+import { useUnassignedCash } from "./useUnassignedCash";
+import { useActualBalance } from "./useActualBalance";
 import { useBudgetMetadataUtils } from "./useBudgetMetadataUtils";
 
 /**
@@ -27,9 +27,9 @@ export const useBudgetMetadata = () => {
   // Mutation operations
   const { updateMetadata, isUpdating } = useBudgetMetadataMutation();
 
-  // Specific operations
-  const { updateUnassignedCash } = useUnassignedCashOperations();
-  const { updateActualBalance } = useActualBalanceOperations();
+  // Specific operations (Unified domain hooks)
+  const { updateUnassignedCash } = useUnassignedCash();
+  const { updateActualBalance } = useActualBalance();
 
   // Utility functions
   const {
@@ -74,6 +74,4 @@ export { useUnassignedCash } from "./useUnassignedCash";
 export { useActualBalance } from "./useActualBalance";
 export { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 export { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
-export { useUnassignedCashOperations } from "./useUnassignedCashOperations";
-export { useActualBalanceOperations } from "./useActualBalanceOperations";
 export { useBudgetMetadataUtils } from "./useBudgetMetadataUtils";
