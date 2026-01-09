@@ -43,14 +43,10 @@ The progressive enhancement system operates on three layers:
 **Fallback**: Client-side JavaScript calculations
 
 ```typescript
-import { BudgetCalculationService } from '@/services/budget/budgetCalculationService';
+import { BudgetCalculationService } from "@/services/budget/budgetCalculationService";
 
 // Automatically uses backend or falls back to client
-const result = await BudgetCalculationService.calculate(
-  envelopes,
-  transactions,
-  bills
-);
+const result = await BudgetCalculationService.calculate(envelopes, transactions, bills);
 
 console.log(`Calculated using: ${result.source}`); // "backend" or "client"
 ```
@@ -61,17 +57,15 @@ console.log(`Calculated using: ${result.source}`); // "backend" or "client"
 **Fallback**: Client-side CSV/JSON parser
 
 ```typescript
-import { ImportService } from '@/services/api/importService';
+import { ImportService } from "@/services/api/importService";
 
 // Automatically tries backend, falls back to client
 const result = await ImportService.importTransactions(file, fieldMapping);
 
 // Force client-side parsing
-const clientResult = await ImportService.importTransactions(
-  file,
-  fieldMapping,
-  { forceClientSide: true }
-);
+const clientResult = await ImportService.importTransactions(file, fieldMapping, {
+  forceClientSide: true,
+});
 ```
 
 ### 3. Service Availability Tracking
@@ -79,16 +73,16 @@ const clientResult = await ImportService.importTransactions(
 Track the health and availability of all backend services:
 
 ```typescript
-import { serviceAvailability } from '@/services/serviceAvailabilityManager';
+import { serviceAvailability } from "@/services/serviceAvailabilityManager";
 
 // Check specific service
-const isAvailable = await serviceAvailability.checkService('budgetEngine');
+const isAvailable = await serviceAvailability.checkService("budgetEngine");
 
 // Check all services
 const allStatus = await serviceAvailability.checkAllServices();
 
 // Get cached status
-const status = serviceAvailability.getStatus('import');
+const status = serviceAvailability.getStatus("import");
 ```
 
 ## React Integration
@@ -141,7 +135,7 @@ import { ServiceStatusDetails } from '@/components/common/ServiceStatusBadge';
 Parse CSV files locally when backend is unavailable:
 
 ```typescript
-import { parseCSV, autoDetectFieldMapping } from '@/utils/dataManagement/csvParser';
+import { parseCSV, autoDetectFieldMapping } from "@/utils/dataManagement/csvParser";
 
 // Read file
 const content = await readFileAsText(file);
@@ -154,6 +148,7 @@ const mapping = autoDetectFieldMapping(result.headers);
 ```
 
 **Features:**
+
 - Handles quoted fields with commas
 - Supports escaped quotes
 - Skips empty lines
@@ -164,14 +159,14 @@ const mapping = autoDetectFieldMapping(result.headers);
 Transform parsed CSV data into Transaction objects:
 
 ```typescript
-import { mapRowsToTransactions } from '@/utils/dataManagement/transactionMapper';
+import { mapRowsToTransactions } from "@/utils/dataManagement/transactionMapper";
 
 const result = mapRowsToTransactions(rows, {
-  date: 'Date',
-  amount: 'Amount',
-  description: 'Description',
-  category: 'Category',
-  dateFormat: 'US', // Specify 'US' (MM/DD/YYYY) or 'EU' (DD/MM/YYYY) to avoid ambiguity
+  date: "Date",
+  amount: "Amount",
+  description: "Description",
+  category: "Category",
+  dateFormat: "US", // Specify 'US' (MM/DD/YYYY) or 'EU' (DD/MM/YYYY) to avoid ambiguity
 });
 
 // Valid transactions
@@ -182,6 +177,7 @@ console.log(result.invalid);
 ```
 
 **Features:**
+
 - Multiple date formats: ISO, US (MM/DD/YYYY), EU (DD/MM/YYYY)
 - Currency symbol handling: $, €, £, ¥
 - Comma removal in amounts: 1,000.00 → 1000.00
@@ -211,7 +207,7 @@ The application uses TanStack Query configured with `offlineFirst` network mode:
 Changes made offline are automatically synchronized when connectivity returns:
 
 ```typescript
-import { backgroundSync } from '@/utils/query/backgroundSyncService';
+import { backgroundSync } from "@/utils/query/backgroundSyncService";
 
 // Sync all data manually
 await backgroundSync.syncAllData();
@@ -228,7 +224,7 @@ await backgroundSync.restoreFromDexie();
 Automatic network status tracking:
 
 ```typescript
-import useNetworkStatus from '@/hooks/common/useNetworkStatus';
+import useNetworkStatus from "@/hooks/common/useNetworkStatus";
 
 // In your component
 useNetworkStatus(); // Sets up event listeners
@@ -258,10 +254,10 @@ const result = await ImportService.importTransactions(file, null, {
 Inform users when operating in fallback mode:
 
 ```typescript
-const { status } = useServiceAvailability('budgetEngine');
+const { status } = useServiceAvailability("budgetEngine");
 
 if (!status?.available) {
-  showToast('Using local calculations', 'info');
+  showToast("Using local calculations", "info");
 }
 ```
 
@@ -274,12 +270,12 @@ try {
   const result = await ImportService.importTransactions(file);
   if (!result.success) {
     // Handle import failure
-    showToast(result.error || 'Import failed', 'error');
+    showToast(result.error || "Import failed", "error");
   }
 } catch (error) {
   // Handle unexpected errors
-  logger.error('Import error', error);
-  showToast('An unexpected error occurred', 'error');
+  logger.error("Import error", error);
+  showToast("An unexpected error occurred", "error");
 }
 ```
 
@@ -289,7 +285,7 @@ Test your features in offline mode:
 
 ```typescript
 // In your tests
-vi.mock('@/services/api/client', () => ({
+vi.mock("@/services/api/client", () => ({
   ApiClient: {
     isOnline: vi.fn().mockReturnValue(false),
     healthCheck: vi.fn().mockResolvedValue(false),
@@ -297,7 +293,7 @@ vi.mock('@/services/api/client', () => ({
 }));
 
 // Your test
-it('should work offline', async () => {
+it("should work offline", async () => {
   const result = await ImportService.importTransactions(file);
   expect(result.success).toBe(true);
 });
@@ -307,11 +303,11 @@ it('should work offline', async () => {
 
 Backend services report availability through health checks:
 
-| Status | Meaning | User Impact |
-|--------|---------|-------------|
-| **Available** | Backend responding | Optimal performance |
+| Status          | Meaning                | User Impact               |
+| --------------- | ---------------------- | ------------------------- |
+| **Available**   | Backend responding     | Optimal performance       |
 | **Unavailable** | Backend not responding | Automatic client fallback |
-| **Offline** | Device has no network | Full offline mode |
+| **Offline**     | Device has no network  | Full offline mode         |
 
 ## Performance Considerations
 
@@ -321,10 +317,10 @@ Service availability checks are cached for 1 minute to reduce network requests:
 
 ```typescript
 // Uses cache (if < 1 minute old)
-await serviceAvailability.checkService('api');
+await serviceAvailability.checkService("api");
 
 // Forces fresh check
-await serviceAvailability.checkService('api', true);
+await serviceAvailability.checkService("api", true);
 ```
 
 ### Deduplication
@@ -334,9 +330,9 @@ Concurrent health checks are deduplicated:
 ```typescript
 // Only makes 1 actual health check, despite 3 calls
 const [check1, check2, check3] = await Promise.all([
-  serviceAvailability.checkService('api'),
-  serviceAvailability.checkService('api'),
-  serviceAvailability.checkService('api'),
+  serviceAvailability.checkService("api"),
+  serviceAvailability.checkService("api"),
+  serviceAvailability.checkService("api"),
 ]);
 ```
 

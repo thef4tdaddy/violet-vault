@@ -4,20 +4,20 @@ info:
   version: 2.0.0
   description: |
     Stateless Go backend for high-performance envelope budget calculations.
-    
+
     ## Privacy & Security
     - **Stateless**: No data is stored on the server
     - **Privacy-First**: All calculations happen in memory and are discarded immediately
     - **No Logging**: User data is never logged or persisted
     - **CORS Enabled**: Can be called from any origin
-    
+
     ## Features
     - Envelope balance calculations
     - Bill due date tracking and partitioning (upcoming/overdue)
     - Utilization rate computation
     - Global budget totals aggregation
     - Biweekly funding needs calculation
-    
+
   contact:
     name: VioletVault API Support
     url: https://github.com/thef4tdaddy/violet-vault
@@ -37,12 +37,12 @@ paths:
       summary: Calculate envelope budgets
       description: |
         Performs comprehensive budget calculations for multiple envelopes.
-        
+
         **Multi-User Support**: This endpoint is stateless and can handle calculations
         for multiple users simultaneously. Each request is independent and isolated.
-        
+
         **Performance**: Optimized for large datasets (1000+ envelopes, 10000+ transactions)
-        
+
       operationId: calculateBudget
       tags:
         - Budget Calculations
@@ -51,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BudgetCalculationRequest'
+              $ref: "#/components/schemas/BudgetCalculationRequest"
             examples:
               singleEnvelope:
                 summary: Single envelope with transactions
@@ -92,12 +92,12 @@ paths:
                       isPaid: false
                       name: Rent Payment
       responses:
-        '200':
+        "200":
           description: Budget calculations completed successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BudgetCalculationResponse'
+                $ref: "#/components/schemas/BudgetCalculationResponse"
               examples:
                 success:
                   summary: Successful calculation
@@ -126,30 +126,30 @@ paths:
                       totalBiweeklyNeed: 277.15
                       billsDueCount: 0
                       envelopeCount: 1
-        '400':
+        "400":
           description: Invalid request body
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 invalidJson:
                   summary: Malformed JSON
                   value:
                     success: false
                     error: "Invalid JSON: unexpected end of JSON input"
-        '405':
+        "405":
           description: Method not allowed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     options:
       summary: CORS preflight
@@ -158,7 +158,7 @@ paths:
       tags:
         - CORS
       responses:
-        '200':
+        "200":
           description: CORS headers returned
           headers:
             Access-Control-Allow-Origin:
@@ -179,13 +179,13 @@ paths:
       summary: Calculate budgets for multiple users in batch
       description: |
         Performs budget calculations for multiple users in a single request.
-        
+
         **Batch Processing**: Process up to 100 users per request with automatic isolation.
         Each user's data is processed independently with guaranteed privacy.
-        
+
         **Performance**: Batch processing is ~40x faster than sequential individual requests
         for 100 users (2.5ms vs 100ms+).
-        
+
       operationId: calculateBudgetBatch
       tags:
         - Budget Calculations
@@ -194,7 +194,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BatchRequest'
+              $ref: "#/components/schemas/BatchRequest"
             examples:
               twoUsers:
                 summary: Batch calculation for two users
@@ -227,12 +227,12 @@ paths:
                           dueDate: "2026-01-15"
                           isPaid: false
       responses:
-        '200':
+        "200":
           description: Batch calculations completed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchResponse'
+                $ref: "#/components/schemas/BatchResponse"
               examples:
                 success:
                   summary: Successful batch calculation
@@ -265,24 +265,24 @@ paths:
                       totalEnvelopes: 2
                       totalTransactions: 1
                       totalBills: 1
-        '400':
+        "400":
           description: Invalid request body or validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchErrorResponse'
-        '405':
+                $ref: "#/components/schemas/BatchErrorResponse"
+        "405":
           description: Method not allowed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchErrorResponse'
-        '500':
+                $ref: "#/components/schemas/BatchErrorResponse"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchErrorResponse'
+                $ref: "#/components/schemas/BatchErrorResponse"
 
     options:
       summary: CORS preflight for batch endpoint
@@ -291,7 +291,7 @@ paths:
       tags:
         - CORS
       responses:
-        '200':
+        "200":
           description: CORS headers returned
           headers:
             Access-Control-Allow-Origin:
@@ -320,17 +320,17 @@ components:
           type: array
           description: Array of envelopes to calculate budgets for
           items:
-            $ref: '#/components/schemas/Envelope'
+            $ref: "#/components/schemas/Envelope"
         transactions:
           type: array
           description: Array of transactions for calculations
           items:
-            $ref: '#/components/schemas/Transaction'
+            $ref: "#/components/schemas/Transaction"
         bills:
           type: array
           description: Array of bills for calculations
           items:
-            $ref: '#/components/schemas/Bill'
+            $ref: "#/components/schemas/Bill"
 
     Envelope:
       type: object
@@ -496,7 +496,7 @@ components:
 
     EnvelopeData:
       allOf:
-        - $ref: '#/components/schemas/Envelope'
+        - $ref: "#/components/schemas/Envelope"
         - type: object
           required:
             - totalSpent
@@ -553,22 +553,22 @@ components:
               type: array
               description: List of upcoming bills
               items:
-                $ref: '#/components/schemas/Bill'
+                $ref: "#/components/schemas/Bill"
             overdueBills:
               type: array
               description: List of overdue bills
               items:
-                $ref: '#/components/schemas/Bill'
+                $ref: "#/components/schemas/Bill"
             transactions:
               type: array
               description: Associated transactions
               items:
-                $ref: '#/components/schemas/Transaction'
+                $ref: "#/components/schemas/Transaction"
             bills:
               type: array
               description: All bills for this envelope
               items:
-                $ref: '#/components/schemas/Bill'
+                $ref: "#/components/schemas/Bill"
             biweeklyNeed:
               type: number
               format: double
@@ -635,9 +635,9 @@ components:
           type: array
           description: Calculated envelope data
           items:
-            $ref: '#/components/schemas/EnvelopeData'
+            $ref: "#/components/schemas/EnvelopeData"
         totals:
-          $ref: '#/components/schemas/GlobalTotals'
+          $ref: "#/components/schemas/GlobalTotals"
         error:
           type: string
           description: Error message if success is false
@@ -668,7 +668,7 @@ components:
           minItems: 1
           maxItems: 100
           items:
-            $ref: '#/components/schemas/BatchItem'
+            $ref: "#/components/schemas/BatchItem"
 
     BatchItem:
       type: object
@@ -686,17 +686,17 @@ components:
           type: array
           description: User's envelopes
           items:
-            $ref: '#/components/schemas/Envelope'
+            $ref: "#/components/schemas/Envelope"
         transactions:
           type: array
           description: User's transactions
           items:
-            $ref: '#/components/schemas/Transaction'
+            $ref: "#/components/schemas/Transaction"
         bills:
           type: array
           description: User's bills
           items:
-            $ref: '#/components/schemas/Bill'
+            $ref: "#/components/schemas/Bill"
         metadata:
           type: object
           description: Optional metadata for client use
@@ -720,9 +720,9 @@ components:
           type: array
           description: Array of calculation results per user
           items:
-            $ref: '#/components/schemas/BatchResultItem'
+            $ref: "#/components/schemas/BatchResultItem"
         summary:
-          $ref: '#/components/schemas/BatchSummary'
+          $ref: "#/components/schemas/BatchSummary"
         error:
           type: string
           description: Error message if success is false
@@ -746,9 +746,9 @@ components:
           type: array
           description: Calculated envelope data (if successful)
           items:
-            $ref: '#/components/schemas/EnvelopeData'
+            $ref: "#/components/schemas/EnvelopeData"
         totals:
-          $ref: '#/components/schemas/GlobalTotals'
+          $ref: "#/components/schemas/GlobalTotals"
         error:
           type: string
           description: Error message if this user's calculation failed

@@ -1,6 +1,7 @@
 import React from "react";
-import { useServiceAvailability } from "@/hooks/common/useServiceAvailability";
+import { useServiceAvailability } from "@/hooks/platform/common/useServiceAvailability";
 import type { ServiceName } from "@/services/serviceAvailabilityManager";
+import { Button } from "@/components/ui";
 
 interface ServiceStatusBadgeProps {
   service?: ServiceName;
@@ -8,14 +9,6 @@ interface ServiceStatusBadgeProps {
   className?: string;
 }
 
-/**
- * ServiceStatusBadge - Display service availability status
- * Shows a badge indicating whether a backend service is available
- *
- * @param service - Specific service to display (undefined = all services)
- * @param showLabel - Show text label (default: true)
- * @param className - Additional CSS classes
- */
 export const ServiceStatusBadge: React.FC<ServiceStatusBadgeProps> = ({
   service,
   showLabel = true,
@@ -24,12 +17,7 @@ export const ServiceStatusBadge: React.FC<ServiceStatusBadgeProps> = ({
   const { status, isChecking, refresh } = useServiceAvailability(service);
 
   if (isChecking && !status) {
-    return (
-      <div className={`inline-flex items-center space-x-2 ${className}`}>
-        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
-        {showLabel && <span className="text-sm text-gray-600">Checking...</span>}
-      </div>
-    );
+    return <StatusCheckingBadge showLabel={showLabel} className={className} />;
   }
 
   if (!status) {
@@ -38,61 +26,110 @@ export const ServiceStatusBadge: React.FC<ServiceStatusBadgeProps> = ({
 
   // Single service status
   if (service && "available" in status) {
-    const statusColor = status.available ? "bg-green-500" : "bg-amber-500";
-    const statusText = status.available ? "Online" : "Offline";
-    const statusTextColor = status.available ? "text-green-700" : "text-amber-700";
-
     return (
-      <button
-        onClick={() => refresh()}
-        className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className}`}
-        title={status.error || "Click to refresh"}
-        aria-label={`${service} service status: ${statusText}. Click to refresh`}
-      >
-        <div className={`w-2 h-2 rounded-full ${statusColor}`} role="status" aria-label={statusText}></div>
-        {showLabel && (
-          <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>
-        )}
-      </button>
+      <SingleServiceBadge
+        service={service}
+        status={status}
+        showLabel={showLabel}
+        className={className}
+        onRefresh={refresh}
+      />
     );
   }
 
   // All services status
   if ("api" in status && "budgetEngine" in status && "import" in status) {
-    const allAvailable = status.api.available && status.budgetEngine.available && status.import.available;
-    const someAvailable =
-      status.api.available || status.budgetEngine.available || status.import.available;
-
-    let statusColor = "bg-red-500";
-    let statusText = "All Offline";
-    let statusTextColor = "text-red-700";
-
-    if (allAvailable) {
-      statusColor = "bg-green-500";
-      statusText = "All Online";
-      statusTextColor = "text-green-700";
-    } else if (someAvailable) {
-      statusColor = "bg-amber-500";
-      statusText = "Partial";
-      statusTextColor = "text-amber-700";
-    }
-
     return (
-      <button
-        onClick={() => refresh()}
-        className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className}`}
-        title="Click to refresh service status"
-        aria-label={`All services status: ${statusText}. Click to refresh`}
-      >
-        <div className={`w-2 h-2 rounded-full ${statusColor}`} role="status" aria-label={statusText}></div>
-        {showLabel && (
-          <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>
-        )}
-      </button>
+      <AggregateServiceBadge
+        status={status as unknown as Record<string, { available: boolean; error?: string }>}
+        showLabel={showLabel}
+        className={className}
+        onRefresh={refresh}
+      />
     );
   }
 
   return null;
+};
+
+const StatusCheckingBadge: React.FC<{ showLabel: boolean; className: string }> = ({
+  showLabel,
+  className,
+}) => (
+  <div className={`inline-flex items-center space-x-2 ${className}`}>
+    <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
+    {showLabel && <span className="text-sm text-gray-600">Checking...</span>}
+  </div>
+);
+
+const SingleServiceBadge: React.FC<{
+  service: ServiceName;
+  status: { available: boolean; error?: string };
+  showLabel: boolean;
+  className: string;
+  onRefresh: () => void;
+}> = ({ service, status, showLabel, className, onRefresh }) => {
+  const statusColor = status.available ? "bg-green-500" : "bg-amber-500";
+  const statusText = status.available ? "Online" : "Offline";
+  const statusTextColor = status.available ? "text-green-700" : "text-amber-700";
+
+  return (
+    <Button
+      onClick={() => onRefresh()}
+      className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className} h-auto p-0 bg-transparent hover:bg-transparent`}
+      title={status.error || "Click to refresh"}
+      aria-label={`${service} service status: ${statusText}. Click to refresh`}
+    >
+      <div
+        className={`w-2 h-2 rounded-full ${statusColor}`}
+        role="status"
+        aria-label={statusText}
+      ></div>
+      {showLabel && <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>}
+    </Button>
+  );
+};
+
+const AggregateServiceBadge: React.FC<{
+  status: Record<string, { available: boolean; error?: string }>;
+  showLabel: boolean;
+  className: string;
+  onRefresh: () => void;
+}> = ({ status, showLabel, className, onRefresh }) => {
+  const allAvailable =
+    status.api?.available && status.budgetEngine?.available && status.import?.available;
+  const someAvailable =
+    status.api?.available || status.budgetEngine?.available || status.import?.available;
+
+  let statusColor = "bg-red-500";
+  let statusText = "All Offline";
+  let statusTextColor = "text-red-700";
+
+  if (allAvailable) {
+    statusColor = "bg-green-500";
+    statusText = "All Online";
+    statusTextColor = "text-green-700";
+  } else if (someAvailable) {
+    statusColor = "bg-amber-500";
+    statusText = "Partial";
+    statusTextColor = "text-amber-700";
+  }
+
+  return (
+    <Button
+      onClick={() => onRefresh()}
+      className={`inline-flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity ${className} h-auto p-0 bg-transparent hover:bg-transparent`}
+      title="Click to refresh service status"
+      aria-label={`All services status: ${statusText}. Click to refresh`}
+    >
+      <div
+        className={`w-2 h-2 rounded-full ${statusColor}`}
+        role="status"
+        aria-label={statusText}
+      ></div>
+      {showLabel && <span className={`text-sm font-medium ${statusTextColor}`}>{statusText}</span>}
+    </Button>
+  );
 };
 
 interface ServiceStatusDetailsProps {
@@ -121,13 +158,13 @@ export const ServiceStatusDetails: React.FC<ServiceStatusDetailsProps> = ({ clas
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Service Status</h3>
-        <button
+        <Button
           onClick={() => refresh()}
           disabled={isChecking}
-          className="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed h-auto"
         >
           {isChecking ? "Checking..." : "Refresh"}
-        </button>
+        </Button>
       </div>
 
       {/* Device Status */}
@@ -172,7 +209,7 @@ export const ServiceStatusDetails: React.FC<ServiceStatusDetailsProps> = ({ clas
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-start space-x-2">
             <svg
-              className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
+              className="w-5 h-5 text-blue-600 mt-0.5 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -188,7 +225,8 @@ export const ServiceStatusDetails: React.FC<ServiceStatusDetailsProps> = ({ clas
             <div>
               <div className="font-medium text-blue-900">Offline Mode Active</div>
               <div className="text-sm text-blue-700 mt-1">
-                The app will use local data and client-side calculations. Changes will sync when you're back online.
+                The app will use local data and client-side calculations. Changes will sync when
+                you're back online.
               </div>
             </div>
           </div>

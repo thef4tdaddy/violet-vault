@@ -131,9 +131,7 @@ export class BatchBudgetService {
    * @param items - Array of batch items (can exceed max batch size)
    * @returns Combined batch calculation results
    */
-  static async processBatchChunked(
-    items: BatchItem[]
-  ): Promise<ApiResponse<BatchResponse>> {
+  static async processBatchChunked(items: BatchItem[]): Promise<ApiResponse<BatchResponse>> {
     try {
       // If within limit, process normally
       if (items.length <= this.MAX_BATCH_SIZE) {
@@ -163,32 +161,12 @@ export class BatchBudgetService {
       };
 
       for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        logger.info(`Processing chunk ${i + 1}/${chunks.length}`, {
-          chunkSize: chunk.length,
-        });
+        const chunkResponse = await this.processChunk(chunks[i], i, chunks.length);
 
-        const chunkResponse = await this.processBatch(chunk);
-
-        if (!chunkResponse.success || !chunkResponse.data) {
-          logger.error(`Chunk ${i + 1} failed`, {
-            error: chunkResponse.error,
-          });
-          // Continue processing other chunks
-          continue;
+        if (chunkResponse && chunkResponse.data) {
+          allResults.push(...chunkResponse.data.results);
+          this.updateCombinedSummary(combinedSummary, chunkResponse.data.summary);
         }
-
-        // Combine results
-        allResults.push(...chunkResponse.data.results);
-
-        // Combine summary
-        const summary = chunkResponse.data.summary;
-        combinedSummary.totalRequests += summary.totalRequests;
-        combinedSummary.successfulCount += summary.successfulCount;
-        combinedSummary.failedCount += summary.failedCount;
-        combinedSummary.totalEnvelopes += summary.totalEnvelopes;
-        combinedSummary.totalTransactions += summary.totalTransactions;
-        combinedSummary.totalBills += summary.totalBills;
       }
 
       logger.info("Chunked batch processing complete", {
@@ -218,6 +196,42 @@ export class BatchBudgetService {
         error: error instanceof Error ? error.message : "Chunked batch calculation failed",
       };
     }
+  }
+
+  /**
+   * Helper to process a single chunk
+   */
+  private static async processChunk(
+    chunk: BatchItem[],
+    index: number,
+    total: number
+  ): Promise<ApiResponse<BatchResponse> | null> {
+    logger.info(`Processing chunk ${index + 1}/${total}`, {
+      chunkSize: chunk.length,
+    });
+
+    const response = await this.processBatch(chunk);
+
+    if (!response.success || !response.data) {
+      logger.error(`Chunk ${index + 1} failed`, {
+        error: response.error,
+      });
+      return null;
+    }
+
+    return response;
+  }
+
+  /**
+   * Helper to update combined summary
+   */
+  private static updateCombinedSummary(combined: BatchSummary, chunk: BatchSummary): void {
+    combined.totalRequests += chunk.totalRequests;
+    combined.successfulCount += chunk.successfulCount;
+    combined.failedCount += chunk.failedCount;
+    combined.totalEnvelopes += chunk.totalEnvelopes;
+    combined.totalTransactions += chunk.totalTransactions;
+    combined.totalBills += chunk.totalBills;
   }
 
   /**
@@ -264,10 +278,7 @@ export class BatchBudgetService {
   /**
    * Extract results for a specific user from batch response
    */
-  static getResultForUser(
-    response: BatchResponse,
-    userId: string
-  ): BatchResultItem | undefined {
+  static getResultForUser(response: BatchResponse, userId: string): BatchResultItem | undefined {
     return response.results.find((result) => result.userId === userId);
   }
 

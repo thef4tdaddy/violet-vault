@@ -162,8 +162,7 @@ export class ImportService {
       });
 
       const lastDotIndex = file.name.lastIndexOf(".");
-      const fileExtension =
-        lastDotIndex === -1 ? "" : file.name.slice(lastDotIndex).toLowerCase();
+      const fileExtension = lastDotIndex === -1 ? "" : file.name.slice(lastDotIndex).toLowerCase();
 
       if (fileExtension === ".csv") {
         return this.importCSVClientSide(file, fieldMapping);
@@ -258,9 +257,7 @@ export class ImportService {
   /**
    * Import JSON file using client-side parser
    */
-  private static async importJSONClientSide(
-    file: File
-  ): Promise<ApiResponse<ImportResponse>> {
+  private static async importJSONClientSide(file: File): Promise<ApiResponse<ImportResponse>> {
     try {
       // Read file content
       const content = await readFileAsText(file);
@@ -281,41 +278,22 @@ export class ImportService {
       const invalid: InvalidRow[] = [];
 
       for (let i = 0; i < data.length; i++) {
-        const item = data[i];
-        const errors: string[] = [];
-
-        // Validate required fields
-        if (!item.date) errors.push("Missing date");
-        // Note: Amount can be 0, which is valid. We check for undefined/null explicitly.
-        if (item.amount === undefined || item.amount === null) errors.push("Missing amount");
-        if (!item.type || !["income", "expense", "transfer"].includes(item.type)) {
-          errors.push("Missing or invalid type");
-        }
-        if (!item.id) errors.push("Missing id");
+        const { transaction, errors } = this.validateAndMapJSONItem(
+          data[i] as Record<string, unknown>
+        );
 
         if (errors.length > 0) {
           invalid.push({
             index: i + 1,
-            row: JSON.stringify(item),
+            row: JSON.stringify(data[i]),
             errors,
           });
           continue;
         }
 
-        // Add transaction with validated fields
-        transactions.push({
-          id: item.id,
-          date: new Date(item.date),
-          amount: typeof item.amount === "number" ? item.amount : parseFloat(item.amount),
-          type: item.type,
-          description: item.description || "Transaction",
-          category: item.category || "uncategorized",
-          envelopeId: item.envelopeId || "",
-          merchant: item.merchant,
-          notes: item.notes,
-          createdAt: item.createdAt || Date.now(),
-          lastModified: item.lastModified || Date.now(),
-        });
+        if (transaction) {
+          transactions.push(transaction);
+        }
       }
 
       logger.info("Client-side JSON import successful", {
@@ -339,6 +317,66 @@ export class ImportService {
         error: error instanceof Error ? error.message : "Failed to parse JSON",
       };
     }
+  }
+
+  /**
+   * Helper to validate and map a single JSON item to a Transaction
+   */
+  private static validateAndMapJSONItem(item: Record<string, unknown>): {
+    transaction: Transaction | null;
+    errors: string[];
+  } {
+    const errors = this.validateJSONItem(item);
+
+    if (errors.length > 0) {
+      return { transaction: null, errors };
+    }
+
+    return { transaction: this.mapJSONItemToTransaction(item), errors: [] };
+  }
+
+  /**
+   * Validate JSON item fields
+   */
+  private static validateJSONItem(item: Record<string, unknown>): string[] {
+    const errors: string[] = [];
+
+    if (!item.date) errors.push("Missing date");
+    if (item.amount === undefined || item.amount === null) errors.push("Missing amount");
+    if (!item.type || !["income", "expense", "transfer"].includes(String(item.type))) {
+      errors.push("Missing or invalid type");
+    }
+    if (!item.id) errors.push("Missing id");
+
+    return errors;
+  }
+
+  /**
+   * Map JSON item to Transaction object
+   */
+  private static mapJSONItemToTransaction(item: Record<string, unknown>): Transaction {
+    const amount = typeof item.amount === "number" ? item.amount : parseFloat(String(item.amount));
+    const type = item.type as "income" | "expense" | "transfer";
+
+    // Notes field is removed from Transaction type in issue #1551 refactor
+    // Append it to description instead
+    let description = String(item.description || "Transaction");
+    if (item.notes) {
+      description = `${description} (${item.notes})`;
+    }
+
+    return {
+      id: String(item.id),
+      date: new Date(String(item.date)),
+      amount,
+      type,
+      description,
+      category: String(item.category || "uncategorized"),
+      envelopeId: String(item.envelopeId || ""),
+      merchant: item.merchant ? String(item.merchant) : undefined,
+      createdAt: typeof item.createdAt === "number" ? item.createdAt : Date.now(),
+      lastModified: typeof item.lastModified === "number" ? item.lastModified : Date.now(),
+    };
   }
 
   /**
@@ -382,7 +420,7 @@ export class ImportService {
 
       // Perform a lightweight health check
       const health = await ApiClient.healthCheck();
-      return health;
+      return health === true;
     } catch (error) {
       logger.warn("Import service not available", {
         error: error instanceof Error ? error.message : String(error),

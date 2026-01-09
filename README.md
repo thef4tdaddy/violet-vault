@@ -135,13 +135,12 @@
    - Copy your config to `src/utils/firebaseConfig.js`
 
 4. **Configure WebSocket Real-Time Signaling** (optional)
-   
+
    VioletVault supports privacy-preserving real-time sync notifications via WebSocket:
-   
    - Copy `.env.example` to `.env`
    - Set `VITE_WEBSOCKET_ENABLED=true`
    - Set `VITE_WEBSOCKET_URL` to your WebSocket server URL
-   
+
    **Privacy Note:** WebSocket signaling transmits only metadata signals (e.g., "data changed") - never decrypted data or encrypted blobs. This maintains end-to-end encryption while enabling real-time notifications.
 
 5. **Start development server**

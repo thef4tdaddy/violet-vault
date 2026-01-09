@@ -86,9 +86,10 @@ export const useWebSocketSignaling = (
   // 1. Component mounts without callback → no subscription
   // 2. Callback becomes defined later → create subscription
   // 3. Callback reference changes → keep subscription, ref keeps it updated
+  const hasCallback = !!onSignal;
   useEffect(() => {
     // Only subscribe if a callback was provided
-    if (!onSignal) {
+    if (!hasCallback) {
       return;
     }
 
@@ -102,7 +103,7 @@ export const useWebSocketSignaling = (
     return () => {
       unsubscribeSignal();
     };
-  }, [!!onSignal]); // Re-run only when callback existence changes (not reference)
+  }, [hasCallback]); // Re-run only when callback existence changes (not reference)
 
   // Send signal method
   const sendSignal = useCallback(

@@ -21,6 +21,7 @@ POST /api/budget
 ## Request Format
 
 ### Content-Type
+
 ```
 application/json
 ```
@@ -39,17 +40,17 @@ application/json
 
 ```typescript
 interface Envelope {
-  id: string;                    // Required: Unique identifier
-  name?: string;                 // Envelope name
-  budget?: number;               // Budget amount
-  allocated?: number;            // Allocated amount
-  currentBalance?: number;       // Current balance
-  envelopeType?: string;         // bill | variable | savings | sinking_fund | supplemental
-  category?: string;             // Category for auto-classification
-  biweeklyAllocation?: number;   // Biweekly allocation amount
-  targetAmount?: number;         // Target amount for savings
-  monthlyBudget?: number;        // Monthly budget
-  monthlyAmount?: number;        // Monthly amount
+  id: string; // Required: Unique identifier
+  name?: string; // Envelope name
+  budget?: number; // Budget amount
+  allocated?: number; // Allocated amount
+  currentBalance?: number; // Current balance
+  envelopeType?: string; // bill | variable | savings | sinking_fund | supplemental
+  category?: string; // Category for auto-classification
+  biweeklyAllocation?: number; // Biweekly allocation amount
+  targetAmount?: number; // Target amount for savings
+  monthlyBudget?: number; // Monthly budget
+  monthlyAmount?: number; // Monthly amount
 }
 ```
 
@@ -57,15 +58,15 @@ interface Envelope {
 
 ```typescript
 interface Transaction {
-  id: string;                    // Required: Unique identifier
-  envelopeId: string;            // Required: Associated envelope
-  type: string;                  // Required: expense | income | transfer | bill | recurring_bill
-  amount: number;                // Required: Transaction amount (negative for expenses)
-  isPaid?: boolean;              // Whether paid
-  date?: string;                 // ISO 8601 date
-  dueDate?: string;              // ISO 8601 date for bills
-  provider?: string;             // Merchant or provider
-  description?: string;          // Description
+  id: string; // Required: Unique identifier
+  envelopeId: string; // Required: Associated envelope
+  type: string; // Required: expense | income | transfer | bill | recurring_bill
+  amount: number; // Required: Transaction amount (negative for expenses)
+  isPaid?: boolean; // Whether paid
+  date?: string; // ISO 8601 date
+  dueDate?: string; // ISO 8601 date for bills
+  provider?: string; // Merchant or provider
+  description?: string; // Description
 }
 ```
 
@@ -73,17 +74,17 @@ interface Transaction {
 
 ```typescript
 interface Bill {
-  id: string;                    // Required: Unique identifier
-  envelopeId?: string;           // Associated envelope
-  isPaid?: boolean;              // Whether paid
-  amount: number;                // Required: Bill amount (negative by convention)
-  dueDate?: string;              // ISO 8601 date
-  name?: string;                 // Bill name
-  type?: string;                 // Bill type
-  frequency?: string;            // monthly | biweekly | weekly | quarterly | yearly
-  provider?: string;             // Bill provider
-  description?: string;          // Description
-  date?: string;                 // ISO 8601 date
+  id: string; // Required: Unique identifier
+  envelopeId?: string; // Associated envelope
+  isPaid?: boolean; // Whether paid
+  amount: number; // Required: Bill amount (negative by convention)
+  dueDate?: string; // ISO 8601 date
+  name?: string; // Bill name
+  type?: string; // Bill type
+  frequency?: string; // monthly | biweekly | weekly | quarterly | yearly
+  provider?: string; // Bill provider
+  description?: string; // Description
+  date?: string; // ISO 8601 date
 }
 ```
 
@@ -105,19 +106,19 @@ Extends `Envelope` with calculated fields:
 
 ```typescript
 interface EnvelopeData extends Envelope {
-  totalSpent: number;            // Total spent from envelope
-  totalUpcoming: number;         // Total upcoming bills
-  totalOverdue: number;          // Total overdue bills
-  allocated: number;             // Total allocated
-  available: number;             // Available after commitments
-  committed: number;             // Amount committed to bills
-  utilizationRate: number;       // 0.0 to 1.0+ (can exceed 1.0 if overspent)
-  status: string;                // healthy | underfunded | overspent | overdue
-  upcomingBills: Bill[];         // Bills due in future
-  overdueBills: Bill[];          // Bills past due date
-  transactions: Transaction[];   // All transactions for envelope
-  bills: Bill[];                 // All bills for envelope
-  biweeklyNeed: number;          // Calculated biweekly funding need
+  totalSpent: number; // Total spent from envelope
+  totalUpcoming: number; // Total upcoming bills
+  totalOverdue: number; // Total overdue bills
+  allocated: number; // Total allocated
+  available: number; // Available after commitments
+  committed: number; // Amount committed to bills
+  utilizationRate: number; // 0.0 to 1.0+ (can exceed 1.0 if overspent)
+  status: string; // healthy | underfunded | overspent | overdue
+  upcomingBills: Bill[]; // Bills due in future
+  overdueBills: Bill[]; // Bills past due date
+  transactions: Transaction[]; // All transactions for envelope
+  bills: Bill[]; // All bills for envelope
+  biweeklyNeed: number; // Calculated biweekly funding need
 }
 ```
 
@@ -125,13 +126,13 @@ interface EnvelopeData extends Envelope {
 
 ```typescript
 interface GlobalTotals {
-  totalAllocated: number;        // Sum of all envelope balances
-  totalSpent: number;            // Sum of all spending
-  totalBalance: number;          // Sum of all balances
-  totalUpcoming: number;         // Sum of all upcoming bills
-  totalBiweeklyNeed: number;     // Sum of all biweekly needs
-  billsDueCount: number;         // Count of bills due in next 30 days
-  envelopeCount: number;         // Number of envelopes processed
+  totalAllocated: number; // Sum of all envelope balances
+  totalSpent: number; // Sum of all spending
+  totalBalance: number; // Sum of all balances
+  totalUpcoming: number; // Sum of all upcoming bills
+  totalBiweeklyNeed: number; // Sum of all biweekly needs
+  billsDueCount: number; // Count of bills due in next 30 days
+  envelopeCount: number; // Number of envelopes processed
 }
 ```
 
@@ -140,7 +141,7 @@ interface GlobalTotals {
 ```typescript
 {
   success: false;
-  error: string;                 // Error message
+  error: string; // Error message
 }
 ```
 
@@ -176,6 +177,7 @@ Calculated based on envelope type and configuration:
 ### 4. Bill Partitioning
 
 Bills are partitioned into:
+
 - **Upcoming**: `dueDate > currentDate`
 - **Overdue**: `dueDate < currentDate`
 - Bills with `dueDate == currentDate` are excluded from both (edge case)
@@ -189,6 +191,7 @@ Counts bills with due dates within the next 30 days from current date.
 ### Example 1: Single Envelope Calculation
 
 **Request:**
+
 ```json
 POST /api/budget
 Content-Type: application/json
@@ -217,6 +220,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -265,6 +269,7 @@ Content-Type: application/json
 ### Example 2: Multi-Envelope with Bills
 
 **Request:**
+
 ```json
 POST /api/budget
 
@@ -301,6 +306,7 @@ POST /api/budget
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -384,6 +390,7 @@ The API is designed to handle multiple concurrent users efficiently:
 ### Scenario 1: Concurrent Single-User Requests
 
 Multiple users can make requests simultaneously. Each request is:
+
 - Processed independently
 - Isolated in memory
 - Discarded after response
@@ -448,11 +455,11 @@ POST /api/budget/batch
 
 Based on Go benchmark tests:
 
-| Dataset Size | Processing Time | Memory Usage |
-|-------------|-----------------|--------------|
-| 10 envelopes, 100 transactions | ~1ms | ~50KB |
-| 100 envelopes, 1000 transactions | ~5ms | ~500KB |
-| 1000 envelopes, 10000 transactions | ~50ms | ~5MB |
+| Dataset Size                       | Processing Time | Memory Usage |
+| ---------------------------------- | --------------- | ------------ |
+| 10 envelopes, 100 transactions     | ~1ms            | ~50KB        |
+| 100 envelopes, 1000 transactions   | ~5ms            | ~500KB       |
+| 1000 envelopes, 10000 transactions | ~50ms           | ~5MB         |
 
 ### Optimization Tips
 
@@ -465,11 +472,11 @@ Based on Go benchmark tests:
 
 ### Common Errors
 
-| Error | Status | Cause | Solution |
-|-------|--------|-------|----------|
-| Invalid JSON | 400 | Malformed request body | Validate JSON before sending |
-| Method not allowed | 405 | Wrong HTTP method | Use POST |
-| Internal server error | 500 | Server error | Retry with exponential backoff |
+| Error                 | Status | Cause                  | Solution                       |
+| --------------------- | ------ | ---------------------- | ------------------------------ |
+| Invalid JSON          | 400    | Malformed request body | Validate JSON before sending   |
+| Method not allowed    | 405    | Wrong HTTP method      | Use POST                       |
+| Internal server error | 500    | Server error           | Retry with exponential backoff |
 
 ### Error Response Format
 
@@ -511,6 +518,7 @@ In production, all requests must use HTTPS.
 ### Unit Tests
 
 Run unit tests:
+
 ```bash
 cd api/budget
 go test -v
@@ -519,6 +527,7 @@ go test -v
 ### Integration Tests
 
 Test against live endpoint:
+
 ```bash
 curl -X POST https://violet-vault.vercel.app/api/budget \
   -H "Content-Type: application/json" \
@@ -528,6 +537,7 @@ curl -X POST https://violet-vault.vercel.app/api/budget \
 ### Load Testing
 
 Benchmark concurrent requests:
+
 ```bash
 go test -bench=. -benchmem
 ```
@@ -537,13 +547,9 @@ go test -bench=. -benchmem
 ### TypeScript/JavaScript
 
 ```typescript
-import { BudgetEngineService } from '@/services/api/budgetEngineService';
+import { BudgetEngineService } from "@/services/api/budgetEngineService";
 
-const response = await BudgetEngineService.calculateBudget(
-  envelopes,
-  transactions,
-  bills
-);
+const response = await BudgetEngineService.calculateBudget(envelopes, transactions, bills);
 
 if (response.success) {
   const { data, totals } = response.data;
@@ -587,6 +593,7 @@ curl -X POST https://violet-vault.vercel.app/api/budget \
 Current version: **2.0.0**
 
 API versioning follows Semantic Versioning:
+
 - **Major**: Breaking changes
 - **Minor**: New features (backwards compatible)
 - **Patch**: Bug fixes
@@ -594,6 +601,7 @@ API versioning follows Semantic Versioning:
 ## Rate Limiting
 
 Currently, no rate limiting is enforced. For production use:
+
 - Recommended: Max 100 requests/minute per IP
 - Timeout: 60 seconds per request
 

@@ -72,6 +72,7 @@ export interface WebSocketSignalMessage {
     deviceId?: string;
     userId?: string;
     version?: string;
+    budgetId?: string;
   };
 }
 

@@ -58,19 +58,19 @@ Your WebSocket server should:
 
 ```javascript
 // Simple Node.js WebSocket server example
-const WebSocket = require('ws');
+const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8080 });
 
 const rooms = new Map(); // budgetId -> Set of clients
 
-wss.on('connection', (ws) => {
+wss.on("connection", (ws) => {
   let budgetId = null;
 
-  ws.on('message', (data) => {
+  ws.on("message", (data) => {
     const signal = JSON.parse(data);
 
     // Handle connection signal
-    if (signal.type === 'connected') {
+    if (signal.type === "connected") {
       budgetId = signal.budgetId;
       if (!rooms.has(budgetId)) {
         rooms.set(budgetId, new Set());
@@ -79,8 +79,8 @@ wss.on('connection', (ws) => {
     }
 
     // Handle heartbeat
-    if (signal.type === 'ping') {
-      ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
+    if (signal.type === "ping") {
+      ws.send(JSON.stringify({ type: "pong", timestamp: Date.now() }));
       return;
     }
 
@@ -94,7 +94,7 @@ wss.on('connection', (ws) => {
     }
   });
 
-  ws.on('close', () => {
+  ws.on("close", () => {
     if (budgetId && rooms.has(budgetId)) {
       rooms.get(budgetId).delete(ws);
     }
@@ -118,7 +118,7 @@ function MyComponent() {
   // Handle incoming signals
   const handleSignal = useCallback((signal) => {
     console.log('Signal received:', signal.type);
-    
+
     if (signal.type === 'data_changed') {
       // Optionally show a notification or UI indicator
       console.log('Remote data changed, sync will trigger automatically');
@@ -140,7 +140,7 @@ function MyComponent() {
       <p>WebSocket Status: {connectionStatus}</p>
       {isConnected && <p>✓ Real-time sync active</p>}
       {error && <p>Error: {error}</p>}
-      
+
       <button onClick={() => sendSignal('sync_required')}>
         Request Sync
       </button>
@@ -154,30 +154,30 @@ function MyComponent() {
 Use the WebSocket service directly:
 
 ```typescript
-import { websocketSignalingService } from '@/services/sync/websocketSignalingService';
+import { websocketSignalingService } from "@/services/sync/websocketSignalingService";
 
 // Connect
 await websocketSignalingService.connect({
-  url: 'ws://localhost:8080',
-  budgetId: 'your-budget-id',
+  url: "ws://localhost:8080",
+  budgetId: "your-budget-id",
   reconnectInterval: 5000,
   heartbeatInterval: 30000,
-  maxReconnectAttempts: 10
+  maxReconnectAttempts: 10,
 });
 
 // Listen for signals
 const unsubscribe = websocketSignalingService.onSignal((signal) => {
-  console.log('Signal:', signal);
+  console.log("Signal:", signal);
 });
 
 // Send a signal
-websocketSignalingService.sendSignal('data_changed', {
-  version: '2.0'
+websocketSignalingService.sendSignal("data_changed", {
+  version: "2.0",
 });
 
 // Check status
 const status = websocketSignalingService.getStatus();
-console.log('Connected:', status.isConnected);
+console.log("Connected:", status.isConnected);
 
 // Cleanup
 unsubscribe();
@@ -187,6 +187,7 @@ websocketSignalingService.disconnect();
 ## Signal Types
 
 ### `connected`
+
 Sent when a client connects to the WebSocket server.
 
 ```typescript
@@ -201,6 +202,7 @@ Sent when a client connects to the WebSocket server.
 ```
 
 ### `data_changed`
+
 Sent when data has been modified and saved to cloud.
 
 ```typescript
@@ -215,6 +217,7 @@ Sent when data has been modified and saved to cloud.
 ```
 
 ### `sync_required`
+
 Explicit request for clients to sync.
 
 ```typescript
@@ -226,6 +229,7 @@ Explicit request for clients to sync.
 ```
 
 ### `ping` / `pong`
+
 Heartbeat signals to maintain connection.
 
 ```typescript
@@ -336,6 +340,7 @@ The app will continue to work normally, falling back to periodic sync or manual 
 ```
 
 **Signal Flow:**
+
 1. Client A → WebSocket Server (signal only)
 2. WebSocket Server → Client B (signal only)
 3. Client B → Firebase (fetch encrypted data)

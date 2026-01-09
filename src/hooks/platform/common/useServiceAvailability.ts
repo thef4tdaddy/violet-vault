@@ -25,7 +25,7 @@ export function useServiceAvailability(
   const [isChecking, setIsChecking] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [failureCount, setFailureCount] = useState(0);
-  const checkAvailabilityRef = useRef<(forceRefresh: boolean) => Promise<void>>();
+  const checkAvailabilityRef = useRef<((forceRefresh: boolean) => Promise<void>) | null>(null);
 
   /**
    * Check service availability
@@ -41,7 +41,7 @@ export function useServiceAvailability(
           const available = await serviceAvailability.checkService(serviceName, forceRefresh);
           const serviceStatus = serviceAvailability.getStatus(serviceName);
           setStatus(serviceStatus);
-          
+
           // Track failures for exponential backoff
           if (!available) {
             setFailureCount((prev) => prev + 1);
@@ -52,9 +52,12 @@ export function useServiceAvailability(
           // Check all services
           const allStatus = await serviceAvailability.checkAllServices(forceRefresh);
           setStatus(allStatus);
-          
+
           // Track failures if all services are down
-          const allDown = !allStatus.api.available && !allStatus.budgetEngine.available && !allStatus.import.available;
+          const allDown =
+            !allStatus.api.available &&
+            !allStatus.budgetEngine.available &&
+            !allStatus.import.available;
           if (allDown) {
             setFailureCount((prev) => prev + 1);
           } else {

@@ -126,7 +126,7 @@ describe("transactionMapper", () => {
       expect(result.transactions[0]).toMatchObject({
         category: "groceries",
         merchant: "Whole Foods",
-        notes: "Weekly shopping",
+        description: expect.stringContaining("Weekly shopping"),
       });
     });
 
@@ -145,9 +145,7 @@ describe("transactionMapper", () => {
     });
 
     it("should report invalid rows with missing amount", () => {
-      const rows: ParsedCSVRow[] = [
-        { date: "2024-01-01", amount: "", description: "Store" },
-      ];
+      const rows: ParsedCSVRow[] = [{ date: "2024-01-01", amount: "", description: "Store" }];
 
       const mapping = { date: "date", amount: "amount", description: "description" };
       const result = mapRowsToTransactions(rows, mapping);
@@ -202,9 +200,7 @@ describe("transactionMapper", () => {
     });
 
     it("should default to uncategorized category", () => {
-      const rows: ParsedCSVRow[] = [
-        { date: "2024-01-01", amount: "100.00", description: "Store" },
-      ];
+      const rows: ParsedCSVRow[] = [{ date: "2024-01-01", amount: "100.00", description: "Store" }];
 
       const mapping = { date: "date", amount: "amount", description: "description" };
       const result = mapRowsToTransactions(rows, mapping);

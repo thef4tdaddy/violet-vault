@@ -42,80 +42,16 @@ export function mapRowsToTransactions(
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    const errors: string[] = [];
+    const { transaction, errors } = processTransactionRow(row, mapping, dateFormat);
 
-    try {
-      // Extract required fields
-      const dateStr = row[mapping.date];
-      const amountStr = row[mapping.amount];
-
-      // Validate required fields
-      if (!dateStr) {
-        errors.push("Missing date");
-      }
-      if (!amountStr) {
-        errors.push("Missing amount");
-      }
-
-      if (errors.length > 0) {
-        invalid.push({
-          index: i + 1,
-          row: JSON.stringify(row),
-          errors,
-        });
-        continue;
-      }
-
-      // Parse date with format preference
-      const date = parseDate(dateStr, dateFormat);
-      if (!date) {
-        invalid.push({
-          index: i + 1,
-          row: JSON.stringify(row),
-          errors: ["Invalid date format"],
-        });
-        continue;
-      }
-
-      // Parse amount
-      const amount = parseAmount(amountStr);
-      if (isNaN(amount)) {
-        invalid.push({
-          index: i + 1,
-          row: JSON.stringify(row),
-          errors: ["Invalid amount format"],
-        });
-        continue;
-      }
-
-      // Extract optional fields
-      const description = mapping.description ? row[mapping.description] : "";
-      const category = mapping.category ? row[mapping.category] : "uncategorized";
-      const merchant = mapping.merchant ? row[mapping.merchant] : undefined;
-      const notes = mapping.notes ? row[mapping.notes] : undefined;
-
-      // Create transaction object
-      const transaction: Transaction = {
-        id: uuidv4(),
-        date,
-        amount: Math.abs(amount), // Store as positive value
-        type: amount < 0 ? "expense" : "income",
-        description: description || merchant || "Transaction",
-        category,
-        merchant,
-        notes,
-        envelopeId: "", // Will be assigned by user later
-        createdAt: Date.now(),
-        lastModified: Date.now(),
-      };
-
-      transactions.push(transaction);
-    } catch (error) {
+    if (errors.length > 0) {
       invalid.push({
         index: i + 1,
         row: JSON.stringify(row),
-        errors: [error instanceof Error ? error.message : "Unknown error"],
+        errors,
       });
+    } else if (transaction) {
+      transactions.push(transaction);
     }
   }
 
@@ -126,6 +62,81 @@ export function mapRowsToTransactions(
   });
 
   return { transactions, invalid };
+}
+
+function processTransactionRow(
+  row: ParsedCSVRow,
+  mapping: MappingConfig,
+  dateFormat: "US" | "EU" | "auto"
+): { transaction: Transaction | null; errors: string[] } {
+  try {
+    const errors: string[] = [];
+
+    // Extract required fields
+    const dateStr = row[mapping.date];
+    const amountStr = row[mapping.amount];
+
+    if (!dateStr) errors.push("Missing date");
+    if (!amountStr) errors.push("Missing amount");
+
+    if (errors.length > 0) return { transaction: null, errors };
+
+    // Parse date
+    const date = parseDate(dateStr, dateFormat);
+    if (!date) return { transaction: null, errors: ["Invalid date format"] };
+
+    // Parse amount
+    const amount = parseAmount(amountStr);
+    if (isNaN(amount)) return { transaction: null, errors: ["Invalid amount format"] };
+
+    return {
+      transaction: createTransaction(row, mapping, date, amount),
+      errors: [],
+    };
+  } catch (error) {
+    return {
+      transaction: null,
+      errors: [error instanceof Error ? error.message : "Unknown error"],
+    };
+  }
+}
+
+function createTransaction(
+  row: ParsedCSVRow,
+  mapping: MappingConfig,
+  date: Date,
+  amount: number
+): Transaction {
+  let description = mapping.description ? row[mapping.description] : "";
+  const merchant = mapping.merchant ? row[mapping.merchant] : undefined;
+  const notes = mapping.notes ? row[mapping.notes] : undefined;
+
+  if (notes) {
+    description = description ? `${description} (${notes})` : notes;
+  }
+
+  // Clean description if empty but merchant exists
+  if (!description && merchant) {
+    description = merchant;
+  }
+
+  // Default description if still empty
+  if (!description) {
+    description = "Transaction";
+  }
+
+  return {
+    id: uuidv4(),
+    date,
+    amount: Math.abs(amount), // Store as positive value
+    type: amount < 0 ? "expense" : "income",
+    description,
+    category: mapping.category ? row[mapping.category] : "uncategorized",
+    merchant,
+    envelopeId: "", // Will be assigned by user later
+    createdAt: Date.now(),
+    lastModified: Date.now(),
+  };
 }
 
 /**
@@ -140,107 +151,93 @@ function parseDate(dateStr: string, format: "US" | "EU" | "auto" = "auto"): Date
   if (!dateStr) return null;
 
   // Try ISO format first (YYYY-MM-DD) - unambiguous
-  const isoMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-  if (isoMatch) {
-    const [, year, month, day] = isoMatch;
-    const yearNum = parseInt(year, 10);
-    const monthNum = parseInt(month, 10);
-    const dayNum = parseInt(day, 10);
-    const date = new Date(yearNum, monthNum - 1, dayNum);
-    if (
-      !isNaN(date.getTime()) &&
-      date.getFullYear() === yearNum &&
-      date.getMonth() === monthNum - 1 &&
-      date.getDate() === dayNum
-    ) {
-      return date;
-    }
-  }
+  const isoDate = tryISOFormat(dateStr);
+  if (isoDate) return isoDate;
 
   // Parse slash-separated dates (MM/DD/YYYY or DD/MM/YYYY)
+  const slashDate = trySlashDate(dateStr, format);
+  if (slashDate) return slashDate;
+
+  // Handle other formats or fallbacks
+  return tryFallbackParse(dateStr);
+}
+
+function trySlashDate(dateStr: string, format: "US" | "EU" | "auto"): Date | null {
   const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (slashMatch) {
-    const [, first, second, year] = slashMatch;
-    const firstNum = parseInt(first, 10);
-    const secondNum = parseInt(second, 10);
-    const yearNum = parseInt(year, 10);
-
-    // Use explicit format if specified
-    if (format === "US") {
-      // MM/DD/YYYY
-      const date = new Date(yearNum, firstNum - 1, secondNum);
-      if (
-        !isNaN(date.getTime()) &&
-        date.getFullYear() === yearNum &&
-        date.getMonth() === firstNum - 1 &&
-        date.getDate() === secondNum
-      ) {
-        return date;
-      }
-    } else if (format === "EU") {
-      // DD/MM/YYYY
-      const date = new Date(yearNum, secondNum - 1, firstNum);
-      if (
-        !isNaN(date.getTime()) &&
-        date.getFullYear() === yearNum &&
-        date.getMonth() === secondNum - 1 &&
-        date.getDate() === firstNum
-      ) {
-        return date;
-      }
-    } else {
-      // Auto-detect based on values
-      // If first number > 12, it must be day (EU format)
-      if (firstNum > 12) {
-        const date = new Date(yearNum, secondNum - 1, firstNum);
-        if (
-          !isNaN(date.getTime()) &&
-          date.getFullYear() === yearNum &&
-          date.getMonth() === secondNum - 1 &&
-          date.getDate() === firstNum
-        ) {
-          return date;
-        }
-      }
-      // If second number > 12, it must be day (US format)
-      else if (secondNum > 12) {
-        const date = new Date(yearNum, firstNum - 1, secondNum);
-        if (
-          !isNaN(date.getTime()) &&
-          date.getFullYear() === yearNum &&
-          date.getMonth() === firstNum - 1 &&
-          date.getDate() === secondNum
-        ) {
-          return date;
-        }
-      }
-      // Both numbers ≤ 12: ambiguous, default to US format
-      // Note: Users should specify format explicitly in this case
-      else {
-        // Warn about ambiguous date
-        logger.warn(
-          `Ambiguous date detected: "${dateStr}". Both day and month are ≤ 12. ` +
-            'Defaulting to US format (MM/DD/YYYY). Specify dateFormat as "US" or "EU" in mapping config to avoid ambiguity.'
-        );
-        const date = new Date(yearNum, firstNum - 1, secondNum);
-        if (
-          !isNaN(date.getTime()) &&
-          date.getFullYear() === yearNum &&
-          date.getMonth() === firstNum - 1 &&
-          date.getDate() === secondNum
-        ) {
-          return date;
-        }
-      }
-    }
+    return trySlashFormat(slashMatch, format, dateStr);
   }
+  return null;
+}
 
-  // Try browser's Date.parse as fallback
+function tryFallbackParse(dateStr: string): Date | null {
   const timestamp = Date.parse(dateStr);
   if (!isNaN(timestamp)) {
     return new Date(timestamp);
   }
+  return null;
+}
 
+function tryISOFormat(dateStr: string): Date | null {
+  const isoMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return isValidDate(parseInt(year, 10), parseInt(month, 10), parseInt(day, 10));
+  }
+  return null;
+}
+
+function trySlashFormat(
+  match: RegExpMatchArray,
+  format: "US" | "EU" | "auto",
+  originalStr: string
+): Date | null {
+  const [, first, second, year] = match;
+  const firstNum = parseInt(first, 10);
+  const secondNum = parseInt(second, 10);
+  const yearNum = parseInt(year, 10);
+
+  if (format === "US") {
+    return isValidDate(yearNum, firstNum, secondNum);
+  } else if (format === "EU") {
+    return isValidDate(yearNum, secondNum, firstNum);
+  } else {
+    return tryAutoDetectFormat(yearNum, firstNum, secondNum, originalStr);
+  }
+}
+
+function tryAutoDetectFormat(
+  year: number,
+  first: number,
+  second: number,
+  originalStr: string
+): Date | null {
+  if (first > 12) {
+    // Must be EU (DD/MM/YYYY)
+    return isValidDate(year, second, first);
+  } else if (second > 12) {
+    // Must be US (MM/DD/YYYY)
+    return isValidDate(year, first, second);
+  } else {
+    // Ambiguous
+    logger.warn(
+      `Ambiguous date detected: "${originalStr}". Both day and month are ≤ 12. ` +
+        'Defaulting to US format (MM/DD/YYYY). Specify dateFormat as "US" or "EU" in mapping config to avoid ambiguity.'
+    );
+    return isValidDate(year, first, second);
+  }
+}
+
+function isValidDate(year: number, month: number, day: number): Date | null {
+  const date = new Date(year, month - 1, day);
+  if (
+    !isNaN(date.getTime()) &&
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  ) {
+    return date;
+  }
   return null;
 }
 
@@ -282,7 +279,8 @@ export function validateTransaction(transaction: Transaction): string[] {
     errors.push("Missing date");
   } else {
     // Handle both Date objects and timestamps
-    const dateValue = transaction.date instanceof Date ? transaction.date : new Date(transaction.date);
+    const dateValue =
+      transaction.date instanceof Date ? transaction.date : new Date(transaction.date);
     if (isNaN(dateValue.getTime())) {
       errors.push("Invalid date");
     }

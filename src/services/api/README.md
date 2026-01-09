@@ -117,13 +117,13 @@ Batch budget calculations for multiple users with automatic chunking.
 import { BatchBudgetService } from "@/services/api/batchBudgetService";
 
 // Create batch items
-const items = users.map(user => 
+const items = users.map((user) =>
   BatchBudgetService.createBatchItem(
     user.id,
     user.envelopes,
     user.transactions,
     user.bills,
-    { source: 'dashboard' } // Optional metadata
+    { source: "dashboard" } // Optional metadata
   )
 );
 
@@ -132,13 +132,13 @@ const response = await BatchBudgetService.processBatchChunked(items);
 
 if (response.success) {
   const { results, summary } = response.data;
-  
+
   // Access specific user's result
-  const userResult = BatchBudgetService.getResultForUser(response.data, 'user1');
-  
+  const userResult = BatchBudgetService.getResultForUser(response.data, "user1");
+
   // Get all successful results
   const successful = BatchBudgetService.getSuccessfulResults(response.data);
-  
+
   // Get all failed results
   const failed = BatchBudgetService.getFailedResults(response.data);
 }
@@ -150,8 +150,6 @@ if (response.success) {
 - **Reduced Latency**: Single network round-trip
 - **Lower Overhead**: Shared JSON parsing and validation
 - **Better UX**: Faster dashboard loads for multi-user scenarios
-
-
 
 ### BudgetCalculationService (Hybrid)
 

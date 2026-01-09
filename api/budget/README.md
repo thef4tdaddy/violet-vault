@@ -121,12 +121,12 @@ Then access the API at `http://localhost:3000/api/budget`
 
 ## 📊 Performance
 
-| Dataset Size | Processing Time | Memory Usage |
-|-------------|----------------|--------------|
-| Small (2 envelopes, 2 transactions) | ~2 µs | 2.4 KB |
-| Medium (50 envelopes, 500 transactions) | ~382 µs | 522 KB |
-| Standard (100 envelopes, 1,000 transactions) | ~1.1 ms | 1.05 MB |
-| Large (500 envelopes, 5,000 transactions) | ~21 ms | 5.2 MB |
+| Dataset Size                                 | Processing Time | Memory Usage |
+| -------------------------------------------- | --------------- | ------------ |
+| Small (2 envelopes, 2 transactions)          | ~2 µs           | 2.4 KB       |
+| Medium (50 envelopes, 500 transactions)      | ~382 µs         | 522 KB       |
+| Standard (100 envelopes, 1,000 transactions) | ~1.1 ms         | 1.05 MB      |
+| Large (500 envelopes, 5,000 transactions)    | ~21 ms          | 5.2 MB       |
 
 **Batch Processing**: 100 users in ~2.5ms
 
@@ -212,6 +212,7 @@ Content-Security-Policy: default-src 'none'
 ### Rate Limiting (Recommended)
 
 For production deployments:
+
 - 100 requests/minute per IP (recommended)
 - 60 second timeout per request
 
@@ -309,13 +310,9 @@ go test ./budget -bench=. -benchtime=10s
 ### TypeScript/JavaScript
 
 ```typescript
-import { BudgetEngineService } from '@/services/api/budgetEngineService';
+import { BudgetEngineService } from "@/services/api/budgetEngineService";
 
-const response = await BudgetEngineService.calculateBudget(
-  envelopes,
-  transactions,
-  bills
-);
+const response = await BudgetEngineService.calculateBudget(envelopes, transactions, bills);
 
 if (response.success) {
   const { data, totals } = response.data;
@@ -407,6 +404,7 @@ curl https://violet-vault.vercel.app/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "healthy",

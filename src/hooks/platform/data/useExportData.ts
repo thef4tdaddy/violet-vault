@@ -101,20 +101,21 @@ export const useExportData = () => {
       }
 
       // Track export performance with Sentry
-      const exportResult = await trackExport(
-        async () => {
-          const exportableData = constructExportObject(data, currentUser);
-          const fileSize = triggerDownload(exportableData);
-          const pureTransactions = exportableData.transactions;
-          return { exportableData, fileSize, pureTransactions };
-        },
-        {
-          envelopes: (data[0] as unknown[]).length,
-          transactions: (data[2] as unknown[]).length,
-          bills: (data[1] as unknown[]).length,
-          debts: (data[3] as unknown[]).length,
-        }
-      );
+      const exportFn = async () => {
+        const exportableData = constructExportObject(data, currentUser);
+        const fileSize = triggerDownload(exportableData);
+        const pureTransactions = exportableData.transactions;
+        return { exportableData, fileSize, pureTransactions };
+      };
+
+      const exportMetadata = {
+        envelopes: (data[0] as unknown[]).length,
+        transactions: (data[2] as unknown[]).length,
+        bills: (data[1] as unknown[]).length,
+        debts: (data[3] as unknown[]).length,
+      };
+
+      const exportResult = await trackExport(exportFn, exportMetadata);
 
       const counts = logExportSuccess(data, exportResult.pureTransactions, exportResult.fileSize);
       const exportSummary = buildExportSummary(counts);

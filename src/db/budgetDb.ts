@@ -18,6 +18,7 @@ import type {
   DateRange,
   BulkUpdate,
   DatabaseStats,
+  OfflineRequestQueueEntry,
   AutoFundingRule,
   ExecutionRecord,
 } from "./types";
@@ -38,6 +39,7 @@ export class VioletVaultDB extends Dexie {
   budgetBranches!: Table<BudgetBranch, number>;
   budgetTags!: Table<BudgetTag, number>;
   autoBackups!: Table<AutoBackup, string>;
+  offlineRequestQueue!: Table<OfflineRequestQueueEntry, number>;
   autoFundingRules!: Table<AutoFundingRule, string>;
   autoFundingHistory!: Table<ExecutionRecord, string>;
 
@@ -107,8 +109,10 @@ export class VioletVaultDB extends Dexie {
         "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer]",
     });
 
-    // Version 10: Auto-Funding Hooks Refactor
+    // Version 10: Combined Offline Request Queue & Auto-Funding Hooks
     this.version(10).stores({
+      offlineRequestQueue:
+        "++id, requestId, timestamp, priority, status, nextRetryAt, entityType, entityId, [status+priority], [status+nextRetryAt], [entityType+entityId]",
       autoFundingRules: "id, name, type, trigger, priority, enabled, lastModified",
       autoFundingHistory: "id, trigger, executedAt, [trigger+executedAt]",
     });
@@ -545,26 +549,38 @@ export class VioletVaultDB extends Dexie {
 
   // Data integrity and statistics
   async getDatabaseStats(): Promise<DatabaseStats> {
-    const stats = await Promise.all([
+    const [
+      envelopeCount,
+      transactionCount,
+      billCount,
+      goalCount,
+      paycheckCount,
+      cacheCount,
+      offlineQueueCount,
+      autoFundingRuleCount,
+      autoFundingHistoryCount,
+    ] = await Promise.all([
       this.envelopes.count(),
       this.transactions.count(),
       this.bills.count(),
       this.savingsGoals.count(),
       this.paycheckHistory.count(),
+      this.cache.count(),
+      this.offlineRequestQueue.count(),
       this.autoFundingRules.count(),
       this.autoFundingHistory.count(),
-      this.cache.count(),
     ]);
 
     return {
-      envelopes: stats[0],
-      transactions: stats[1],
-      bills: stats[2],
-      savingsGoals: stats[3],
-      paychecks: stats[4],
-      autoFundingRules: stats[5],
-      autoFundingHistory: stats[6],
-      cache: stats[7],
+      envelopes: envelopeCount,
+      transactions: transactionCount,
+      bills: billCount,
+      savingsGoals: goalCount,
+      paychecks: paycheckCount,
+      cache: cacheCount,
+      offlineQueue: offlineQueueCount,
+      autoFundingRules: autoFundingRuleCount,
+      autoFundingHistory: autoFundingHistoryCount,
       lastOptimized: Date.now(),
     };
   }
@@ -698,6 +714,7 @@ export const clearData = async (): Promise<void> => {
     budgetDb.budgetChanges.clear(),
     budgetDb.budgetBranches.clear(),
     budgetDb.budgetTags.clear(),
+    budgetDb.offlineRequestQueue.clear(),
   ]);
 };
 

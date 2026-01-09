@@ -233,7 +233,31 @@ export class WebSocketSignalingService {
    */
   private handleMessage(event: MessageEvent): void {
     try {
-      const signal = JSON.parse(event.data) as WebSocketSignalMessage;
+      const rawSignal = JSON.parse(event.data);
+      // Explicitly construct signal with ONLY the properties we want to expose
+      // This protects against data leakage from malicious payloads
+      const signal: WebSocketSignalMessage = {
+        type: rawSignal.type as WebSocketSignalType,
+        budgetId: typeof rawSignal.budgetId === "string" ? rawSignal.budgetId : undefined,
+        timestamp: typeof rawSignal.timestamp === "number" ? rawSignal.timestamp : Date.now(),
+      };
+
+      if (rawSignal.metadata && typeof rawSignal.metadata === "object") {
+        signal.metadata = {
+          deviceId:
+            typeof rawSignal.metadata.deviceId === "string"
+              ? rawSignal.metadata.deviceId
+              : undefined,
+          userId:
+            typeof rawSignal.metadata.userId === "string" ? rawSignal.metadata.userId : undefined,
+          version:
+            typeof rawSignal.metadata.version === "string" ? rawSignal.metadata.version : undefined,
+          budgetId:
+            typeof rawSignal.metadata.budgetId === "string"
+              ? rawSignal.metadata.budgetId
+              : undefined,
+        };
+      }
 
       logger.debug("WebSocket signal received", { type: signal.type });
 

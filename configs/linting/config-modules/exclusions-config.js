@@ -430,4 +430,11 @@ export default [
       "zustand-safe-patterns/zustand-selective-subscriptions": "off",
     },
   },
+  {
+    // ServiceStatusBadge.tsx - Custom status badge using native buttons for specific styling
+    files: ["src/components/common/ServiceStatusBadge.tsx"],
+    rules: {
+      "enforce-ui-library/enforce-ui-library": "off",
+    },
+  },
 ];
