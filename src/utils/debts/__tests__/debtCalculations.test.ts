@@ -234,7 +234,7 @@ describe("debtCalculations", () => {
       };
       const enriched = enrichDebt(debtWithDate);
 
-      expect(enriched.nextPaymentDate).toBeDefined();
+      expect(enriched.nextPaymentDate).toBe("2024-03-01");
     });
   });
 
