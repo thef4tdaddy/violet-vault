@@ -423,4 +423,11 @@ export default [
       "zustand-safe-patterns/zustand-selective-subscriptions": "off",
     },
   },
+  {
+    // MainDashboard.tsx - False positive for selective subscriptions on local state hook
+    files: ["src/components/pages/MainDashboard.tsx"],
+    rules: {
+      "zustand-safe-patterns/zustand-selective-subscriptions": "off",
+    },
+  },
 ];

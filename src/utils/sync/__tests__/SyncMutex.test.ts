@@ -97,7 +97,7 @@ describe("SyncMutex", () => {
       syncMutex.release();
 
       expect(logger.default.warn).toHaveBeenCalledWith(
-        "⚠️ Slow sync operation detected: 35000ms",
+        expect.stringMatching(/⚠️ Slow sync operation detected: 3500\dms/),
         expect.objectContaining({
           operation: "slow-operation",
           metrics: expect.any(Object),

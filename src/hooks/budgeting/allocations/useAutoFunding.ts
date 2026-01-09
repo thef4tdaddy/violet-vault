@@ -1,30 +1,39 @@
-import { useEffect, useCallback, useMemo } from "react";
-import { useAutoFundingRules } from "@/hooks/budgeting/allocations/useAutoFundingRules";
-import { useAutoFundingExecution } from "@/hooks/budgeting/allocations/useAutoFundingExecution";
-import { useAutoFundingHistory } from "@/hooks/budgeting/allocations/useAutoFundingHistory";
-import type { BudgetContext } from "@/hooks/budgeting/allocations/types";
+import { useEffect, useCallback } from "react";
+import { useAutoFundingRules } from "./useAutoFundingRules";
+import { useAutoFundingExecution } from "./useAutoFundingExecution";
+import { useAutoFundingHistory } from "./useAutoFundingHistory";
+import type { BudgetContext } from "./types";
 import type { Transaction } from "@/types/finance";
 import {
   isLikelyIncome,
   handleIncomeDetection,
   checkScheduledRules,
-} from "@/hooks/budgeting/allocations/useAutoFundingHelpers";
+} from "./useAutoFundingHelpers";
 import logger from "@/utils/common/logger";
+import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
+
+// Extended store interface for legacy budget property
+interface ExtendedUiStore extends UiStore {
+  budget?: {
+    envelopes?: unknown[];
+    unassignedCash?: number;
+    allTransactions?: unknown[];
+    transferFunds?: (
+      from: string,
+      to: string,
+      amount: number,
+      description?: string
+    ) => Promise<void>;
+  };
+}
 
 /**
  * Master hook that combines all auto-funding functionality
  * Unified with TanStack Query and Dexie (Hybrid v2.0 Architecture)
  */
 export const useAutoFunding = () => {
-  // Budget context (default empty, but should be managed by consumers)
-  const budget = useMemo<BudgetContext>(
-    () => ({
-      envelopes: [],
-      unassignedCash: 0,
-      allTransactions: [],
-    }),
-    []
-  );
+  // Get budget context from store
+  const budget = useUiStore((state) => (state as ExtendedUiStore).budget);
 
   // Initialize individual hooks (new architecture)
   const rulesHook = useAutoFundingRules();
@@ -41,14 +50,7 @@ export const useAutoFunding = () => {
           const executeWrapper = async (trigger: string, data: Record<string, unknown> = {}) => {
             return executionHook.executeRules(rulesHook.rules, trigger, data);
           };
-          await handleIncomeDetection(
-            transaction,
-            rulesHook,
-            executeWrapper as (
-              trigger: string,
-              data: Record<string, unknown>
-            ) => Promise<import("./types").ExecutionResult>
-          );
+          await handleIncomeDetection(transaction, rulesHook, executeWrapper);
         }
       } catch (error) {
         logger.error("Error handling transaction-based auto-funding", error);
@@ -58,7 +60,10 @@ export const useAutoFunding = () => {
   );
 
   // Periodic check for scheduled rules
+  // TODO: Move this to a dedicated scheduler service/worker in the future
   useEffect(() => {
+    if (!budget) return; // Wait for budget to be ready
+
     const checkRules = () => {
       const executeWrapper = async (trigger: string, data: Record<string, unknown> = {}) => {
         return executionHook.executeRules(
@@ -67,14 +72,17 @@ export const useAutoFunding = () => {
           data
         );
       };
-      checkScheduledRules(
-        rulesHook,
-        budget,
-        executeWrapper as (
-          trigger: string,
-          triggerData?: Record<string, unknown>
-        ) => Promise<import("./types").ExecutionResult>
-      );
+
+      const budgetContext: BudgetContext = {
+        envelopes:
+          (budget.envelopes as unknown as import("@/utils/budgeting/autofunding/conditions").Envelope[]) ||
+          [],
+        unassignedCash: budget.unassignedCash || 0,
+        allTransactions:
+          (budget.allTransactions as unknown as import("@/types/finance").Transaction[]) || [],
+      };
+
+      checkScheduledRules(rulesHook, budgetContext, executeWrapper);
     };
 
     // Check every 5 minutes
@@ -94,6 +102,7 @@ export const useAutoFunding = () => {
 
     // Execution
     ...executionHook,
+    // Override executeRules to provide default arguments
     executeRules: (trigger: string = "manual", data: Record<string, unknown> = {}) =>
       executionHook.executeRules(rulesHook.rules, trigger, data),
 

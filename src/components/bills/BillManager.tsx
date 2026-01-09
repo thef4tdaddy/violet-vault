@@ -15,6 +15,7 @@ import BillViewTabs from "./BillViewTabs";
 import BillTable from "./BillTable";
 import BillManagerModals from "./BillManagerModals";
 import type { Bill } from "@/types/bills";
+import type { BillRecord } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillCalculations";
 
 interface Transaction {
   id: string;
@@ -229,7 +230,7 @@ const BillManager: React.FC<BillManagerProps> = ({
         updateBill={updateBill as never}
         deleteBill={deleteBill as never}
         handleBulkUpdate={(entities) => handleBulkUpdate(entities as never)}
-        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as Bill[])}
+        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as BillRecord[])}
         billOperations={billOperations}
         onError={onError ?? (() => {})}
       />
