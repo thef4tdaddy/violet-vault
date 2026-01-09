@@ -2,7 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { useImportData } from "../useImportData";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
-import { useConfirm } from "../useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { readFileContent } from "@/utils/dataManagement/fileUtils";
 import { validateImportedData } from "@/utils/dataManagement/validationUtils";
 import { backupCurrentData } from "@/utils/dataManagement/backupUtils";
@@ -12,14 +12,14 @@ import { queryClient } from "@/utils/common/queryClient";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 
 vi.mock("@/hooks/auth/useAuth");
-vi.mock("../../../utils/common/toastHelpers");
-vi.mock("../useConfirm");
-vi.mock("../../../utils/dataManagement/fileUtils");
-vi.mock("../../../utils/dataManagement/validationUtils");
-vi.mock("../../../utils/dataManagement/backupUtils");
-vi.mock("../../../utils/dataManagement/dexieUtils");
-vi.mock("../../../utils/dataManagement/firebaseUtils");
-vi.mock("../../../utils/common/queryClient");
+vi.mock("@/utils/common/toastHelpers");
+vi.mock("@/hooks/platform/ux/useConfirm");
+vi.mock("@/utils/dataManagement/fileUtils");
+vi.mock("@/utils/dataManagement/validationUtils");
+vi.mock("@/utils/dataManagement/backupUtils");
+vi.mock("@/utils/dataManagement/dexieUtils");
+vi.mock("@/utils/dataManagement/firebaseUtils");
+vi.mock("@/utils/common/queryClient");
 
 describe("useImportData", () => {
   const mockUser = { userName: "testuser", budgetId: "123", userColor: "#000000" };

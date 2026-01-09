@@ -7,7 +7,7 @@ import { BillDetailHeader } from "./BillDetailHeader";
 import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill as BillFromTypes } from "@/types/bills";
 
 interface PaymentData {

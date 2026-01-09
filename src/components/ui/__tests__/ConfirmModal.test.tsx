@@ -28,7 +28,7 @@ vi.mock("@/components/ui/ModalCloseButton", () => ({
   ),
 }));
 
-vi.mock("@/hooks/ui/useModalAutoScroll", () => ({
+vi.mock("@/hooks/platform/ux/useModalAutoScroll", () => ({
   useModalAutoScroll: vi.fn(() => ({ current: null })),
 }));
 

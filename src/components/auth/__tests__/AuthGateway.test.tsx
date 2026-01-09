@@ -2,10 +2,10 @@ import { render, screen, waitFor } from "@/test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import AuthGateway from "../AuthGateway";
 import userEvent from "@testing-library/user-event";
-import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
+import { useLocalOnlyMode } from "@/hooks/platform/data/useLocalOnlyMode";
 
 // Mock hooks
-vi.mock("@/hooks/common/useLocalOnlyMode", () => ({
+vi.mock("@/hooks/platform/data/useLocalOnlyMode", () => ({
   useLocalOnlyMode: vi.fn(() => ({
     isLocalOnlyMode: false,
     localOnlyUser: null,

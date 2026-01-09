@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
-import useEnvelopes from "../budgeting/envelopes/useEnvelopes";
+import useEnvelopes from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useDebts } from "@/hooks/budgeting/envelopes/liabilities/useDebts";
-import { useConnectionConfig } from "./useConnectionManager/useConnectionConfig";
-import { useConnectionOperations } from "./useConnectionManager/useConnectionOperations";
-import { useConnectionData } from "./useConnectionManager/useConnectionData";
-import { useAutoPopulate } from "./useConnectionManager/useAutoPopulate";
+import { useConnectionConfig } from "./useConnectionConfig";
+import { useConnectionOperations } from "./useConnectionOperations";
+import { useConnectionData } from "./useConnectionData";
+import { useAutoPopulate } from "./useAutoPopulate";
 import type { Envelope, Bill, Debt } from "@/db/types";
 
 type EntityType = "bill" | "envelope" | "debt";

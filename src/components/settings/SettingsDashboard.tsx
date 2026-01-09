@@ -3,9 +3,9 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";
 import ResetConfirmModal from "./modals/ResetConfirmModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
-import { useSettingsModals } from "../../hooks/common/useModalManager";
+import { useSettingsModals } from "../../hooks/platform/ux/useModalManager";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import {
   useCloudSyncManager,
   useSettingsSections,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import BugReportService from "../../../services/logging/bugReportingService.ts";
+import BugReportService from "@/services/logging/bugReportingService.ts";
 import logger from "@/utils/common/logger.ts";
 import { validateBugReportSubmission } from "@/utils/validation";
 import { useBugReportSentry } from "./useBugReportSentry";

@@ -2,7 +2,7 @@ import React, { lazy, Suspense, memo } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
-import { usePrompt } from "@/hooks/common/usePrompt";
+import { usePrompt } from "@/hooks/platform/ux/usePrompt";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";

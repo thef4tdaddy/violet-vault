@@ -10,7 +10,7 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/hooks/common/useConfirm", () => ({
+vi.mock("@/hooks/platform/ux/useConfirm", () => ({
   useConfirm: () => vi.fn(async () => true),
 }));
 

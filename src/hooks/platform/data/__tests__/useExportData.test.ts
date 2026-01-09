@@ -7,8 +7,10 @@ import { constructExportObject } from "../useExportDataHelpers";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 
 vi.mock("@/hooks/auth/useAuth");
-vi.mock("../../../utils/common/toastHelpers");
-vi.mock("../../../db/budgetDb");
+vi.mock("@/utils/common/toastHelpers");
+vi.mock("@/hooks/auth/useAuth");
+vi.mock("@/utils/common/toastHelpers");
+vi.mock("@/db/budgetDb");
 vi.mock("../useExportDataHelpers");
 
 describe("useExportData", () => {

@@ -18,7 +18,7 @@ import HistoryControls from "./viewer/HistoryControls";
 import HistoryList from "./viewer/HistoryList";
 import ChangeDetails from "./viewer/ChangeDetails";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface BudgetHistoryViewerProps {
   onClose: () => void;

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
-import useEditLock from "@/hooks/common/useEditLock";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
 import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEnvelopeForm from "./useEnvelopeForm";
 

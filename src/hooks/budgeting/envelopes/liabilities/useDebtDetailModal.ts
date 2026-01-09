@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import type { DebtAccount, PayoffProjection } from "@/types/debt";
 
 // Extended type to handle runtime data that may have additional properties

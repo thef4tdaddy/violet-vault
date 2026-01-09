@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import useToast from "@/hooks/common/useToast";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 
 /**

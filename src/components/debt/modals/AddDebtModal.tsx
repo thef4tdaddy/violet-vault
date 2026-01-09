@@ -3,7 +3,7 @@ import { useDebtModalLogic } from "@/hooks/budgeting/envelopes/liabilities/useDe
 import EditLockIndicator from "../../ui/EditLockIndicator";
 import DebtModalHeader from "./DebtModalHeader";
 import DebtFormFields from "./DebtFormFields";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { DebtAccount } from "@/types/debt";
 import type { DebtSubmissionData } from "@/hooks/budgeting/envelopes/liabilities/useDebtForm";
 

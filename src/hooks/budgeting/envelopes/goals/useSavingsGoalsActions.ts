@@ -1,7 +1,7 @@
 // hooks/savings/useSavingsGoalsActions.js - UI action handlers for savings goals
 import { useState } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import logger from "@/utils/common/logger";
 
 interface SavingsGoal {

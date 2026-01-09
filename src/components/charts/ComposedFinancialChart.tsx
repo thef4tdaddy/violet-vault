@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/common/useChartConfig";
+import { useChartConfig } from "../../hooks/platform/ux/useChartConfig";
 
 // Chart datum type
 type ChartDatum = Record<string, unknown>;

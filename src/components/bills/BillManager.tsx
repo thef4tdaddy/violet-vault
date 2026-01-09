@@ -7,7 +7,7 @@
 import React, { useMemo } from "react";
 import { useBillManager } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManager";
 import { useBillManagerUI } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManagerUI";
-import useEditLock from "../../hooks/common/useEditLock";
+import useEditLock from "../../hooks/core/auth/security/useEditLock";
 import { useAuth } from "@/hooks/auth/useAuth";
 import BillManagerHeader from "./BillManagerHeader";
 import BillSummaryCards from "./BillSummaryCards";

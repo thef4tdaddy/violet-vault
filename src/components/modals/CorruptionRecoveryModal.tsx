@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import ConfirmModal from "../ui/ConfirmModal";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
-import useDataManagement from "../../hooks/common/useDataManagement";
+import useDataManagement from "../../hooks/platform/data/useDataManagement";
 import logger from "../../utils/common/logger";
 
 // Type definitions for props

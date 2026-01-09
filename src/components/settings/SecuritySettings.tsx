@@ -8,7 +8,7 @@ import SecurityLoggingSection from "./sections/SecurityLoggingSection";
 import SecurityActionsSection from "./sections/SecurityActionsSection";
 import ClearConfirmationModal from "./modals/ClearConfirmationModal";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface SecuritySettingsProps {
   isOpen: boolean;

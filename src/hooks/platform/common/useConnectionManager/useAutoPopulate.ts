@@ -2,7 +2,7 @@
  * Auto-populate functionality for connection manager
  * Extracted for better maintainability and ESLint compliance
  */
-import useToast from "../useToast";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 import { Envelope, Bill } from "@/db/types";
 

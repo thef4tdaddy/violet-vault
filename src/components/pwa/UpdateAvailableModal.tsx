@@ -6,7 +6,7 @@ import patchNotesManager from "@/utils/pwa/patchNotesManager";
 import { APP_VERSION } from "@/utils/common/version";
 import logger from "@/utils/common/logger";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface PatchNote {
   type: "feature" | "fix" | "breaking" | "other";

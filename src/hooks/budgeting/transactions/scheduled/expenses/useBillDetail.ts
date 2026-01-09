@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import logger from "@/utils/common/logger";
 import type { Bill as BillFromTypes } from "@/types/bills";
 import { useBillStatus } from "./useBillStatus";

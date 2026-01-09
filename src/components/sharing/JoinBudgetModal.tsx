@@ -7,7 +7,7 @@ import { generateRandomColor } from "@/utils/sharing/colorUtils";
 import ShareCodeStep from "./steps/ShareCodeStep";
 import UserSetupStep from "./steps/UserSetupStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface JoinBudgetModalProps {
   isOpen: boolean;

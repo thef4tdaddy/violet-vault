@@ -14,7 +14,7 @@ import {
 } from "@/hooks/budgeting/allocations/useUnassignedCashDistributionHelpers";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 

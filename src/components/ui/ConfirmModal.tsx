@@ -2,7 +2,7 @@ import React, { useEffect, useRef, ComponentType } from "react";
 import { getIcon } from "@/utils";
 import { useTouchFeedback } from "@/utils/ui/touchFeedback";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 type IconComponentType = ComponentType<{ className?: string }>;
 

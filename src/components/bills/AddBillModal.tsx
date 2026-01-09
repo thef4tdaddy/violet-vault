@@ -8,16 +8,16 @@
 import { useEffect, useCallback, useMemo } from "react";
 import type { FormEvent, RefObject } from "react";
 import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
-import useEditLock from "@/hooks/common/useEditLock";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
-import { useEditLockInit } from "@/hooks/common/useEditLockInit";
+import { useEditLockInit } from "@/hooks/core/auth/security/useEditLockInit";
 import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";

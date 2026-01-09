@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
+import { useLocalOnlyMode } from "@/hooks/platform/data/useLocalOnlyMode";
 import LocalOnlyHeader from "./local-only/LocalOnlyHeader";
 import PrivacyStatusBanner from "./local-only/PrivacyStatusBanner";
 import ErrorDisplay from "./local-only/ErrorDisplay";
@@ -12,7 +12,7 @@ import LoadingOverlay from "./local-only/LoadingOverlay";
 import ExitConfirmationModal from "./local-only/ExitConfirmationModal";
 import ClearDataConfirmationModal from "./local-only/ClearDataConfirmationModal";
 import logger from "@/utils/common/logger";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface LocalOnlyModeSettingsProps {
   isOpen: boolean;

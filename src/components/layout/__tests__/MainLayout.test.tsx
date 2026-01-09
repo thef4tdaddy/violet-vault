@@ -161,7 +161,7 @@ vi.mock("@/utils/common/logger", () => ({
 vi.mock("@/stores/ui/onboardingStore", () => ({
   default: vi.fn(() => ({ hasCompletedTutorial: true, currentStep: 0, isOnboarded: true })),
 }));
-vi.mock("@/hooks/common/useDataManagement", () => ({
+vi.mock("@/hooks/platform/data/useDataManagement", () => ({
   default: vi.fn(() => ({
     exportData: vi.fn(),
     importData: vi.fn(),
@@ -179,9 +179,11 @@ vi.mock("@/hooks/auth/usePasswordRotation", () => ({
 vi.mock("@/hooks/platform/sync/useFirebaseSync", () => ({
   useFirebaseSync: vi.fn(() => ({ syncState: "idle", handleSync: vi.fn() })),
 }));
-vi.mock("@/hooks/common/useNetworkStatus", () => ({ default: vi.fn(() => ({ isOnline: true })) }));
+vi.mock("@/hooks/platform/common/useNetworkStatus", () => ({
+  default: vi.fn(() => ({ isOnline: true })),
+}));
 // Migrated Hooks
-vi.mock("@/hooks/common/useOnboardingAutoComplete", () => ({
+vi.mock("@/hooks/platform/common/useOnboardingAutoComplete", () => ({
   useOnboardingAutoComplete: vi.fn(() => ({})),
 }));
 vi.mock("@/stores/ui/toastStore", () => ({ useToastStore: vi.fn(() => ({ toasts: [] })) }));

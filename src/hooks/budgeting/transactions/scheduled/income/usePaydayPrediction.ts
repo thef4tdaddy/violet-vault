@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { predictNextPayday, checkRecentPayday } from "@/utils/budgeting/paydayPredictor";
-import useToast from "@/hooks/common/useToast";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
 

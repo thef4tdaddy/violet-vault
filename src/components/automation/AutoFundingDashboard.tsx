@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
@@ -8,7 +8,7 @@ import { useAutoFunding } from "@/hooks/budgeting/allocations";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import logger from "@/utils/common/logger";
 import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
 import type { Envelope } from "@/types/finance";
 

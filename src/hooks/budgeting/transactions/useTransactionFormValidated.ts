@@ -23,7 +23,7 @@
  */
 
 import { useCallback, useEffect } from "react";
-import { useValidatedForm } from "@/hooks/common/validation";
+import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { TransactionFormDataSchema, type TransactionFormData } from "@/domain/schemas/transaction";
 import type { Transaction } from "@/types/finance";
 import logger from "@/utils/common/logger";

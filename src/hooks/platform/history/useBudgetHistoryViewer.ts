@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { getIcon } from "@/utils";
-import { useConfirm } from "@/hooks/common/useConfirm";
-import { usePrompt } from "@/hooks/common/usePrompt";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
+import { usePrompt } from "@/hooks/platform/ux/usePrompt";
 import logger from "@/utils/common/logger";
 
 /**

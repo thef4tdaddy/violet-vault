@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
+import { useLocalOnlyMode } from "@/hooks/platform/data/useLocalOnlyMode";
 import UnsupportedBrowserView from "./setup/UnsupportedBrowserView";
 import SetupHeader from "./setup/SetupHeader";
 import WelcomeStep from "./setup/WelcomeStep";

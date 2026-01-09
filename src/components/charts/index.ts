@@ -15,5 +15,5 @@ export {
 } from "./ComposedFinancialChart";
 
 // Hook exports for convenience
-export { useChartConfig } from "../../hooks/common/useChartConfig.tsx";
+export { useChartConfig } from "../../hooks/platform/ux/useChartConfig.tsx";
 export { useAnalyticsData } from "@/hooks/platform/analytics/useAnalyticsData";

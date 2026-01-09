@@ -3,7 +3,7 @@ import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils";
-import useActivityLogger from "@/hooks/common/useActivityLogger";
+import useActivityLogger from "@/hooks/platform/common/useActivityLogger";
 import { ENTITY_TYPES } from "@/services/logging/activityLogger";
 import logger from "@/utils/common/logger";
 import { formatActivityDescription } from "@/utils/activity/activityFormatters";

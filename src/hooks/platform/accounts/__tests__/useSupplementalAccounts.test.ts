@@ -10,11 +10,11 @@ vi.mock("@/hooks/auth/useAuth", () => ({
   }),
 }));
 
-vi.mock("@/hooks/common/useConfirm", () => ({
+vi.mock("@/hooks/platform/ux/useConfirm", () => ({
   useConfirm: () => vi.fn(async () => true),
 }));
 
-vi.mock("@/hooks/common/useEditLock", () => ({
+vi.mock("@/hooks/core/auth/security/useEditLock", () => ({
   default: () => ({
     isLocked: false,
     isOwnLock: false,

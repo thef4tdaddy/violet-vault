@@ -5,7 +5,7 @@ import ModalHeader from "./key-management/ModalHeader";
 import MainContent from "./key-management/MainContent";
 import Footer from "./key-management/Footer";
 import logger from "@/utils/common/logger";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface KeyManagementSettingsProps {
   isOpen: boolean;

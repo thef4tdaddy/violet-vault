@@ -1,14 +1,14 @@
 import React, { useMemo } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import useEditLock from "@/hooks/common/useEditLock";
-import { useEditLockInit } from "@/hooks/common/useEditLockInit";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
+import { useEditLockInit } from "@/hooks/core/auth/security/useEditLockInit";
 import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties

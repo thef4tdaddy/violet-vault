@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useModalManager } from "@/hooks/common/useModalManager";
+import { useModalManager } from "@/hooks/platform/ux/useModalManager";
 
 /**
  * Hook that provides FAB action handlers that open slide-up modals

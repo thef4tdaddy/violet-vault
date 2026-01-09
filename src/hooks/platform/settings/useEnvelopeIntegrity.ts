@@ -4,8 +4,8 @@ import {
   repairCorruptedEnvelopes,
   getEnvelopeIntegrityReport,
 } from "@/utils/budgeting/envelopeIntegrityChecker";
-import { useConfirm } from "@/hooks/common/useConfirm";
-import useToast from "@/hooks/common/useToast";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 
 /**

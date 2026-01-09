@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
 import { createDefaultRule, validateRule } from "@/utils/budgeting/autofunding";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { Button } from "@/components/ui";
 import StepNavigation from "./components/StepNavigation";

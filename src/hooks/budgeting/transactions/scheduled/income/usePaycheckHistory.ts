@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import logger from "@/utils/common/logger";
 

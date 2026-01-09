@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useReceipts } from "@/hooks/common/useReceipts";
+import { useReceipts } from "@/hooks/platform/data/useReceipts";
 import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import logger from "@/utils/common/logger";

@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect } from "react";
-import { useValidatedForm } from "@/hooks/common/validation";
+import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { DebtFormSchema, type DebtFormData, type Debt } from "@/domain/schemas/debt";
 import type { Bill } from "@/types/bills";
 import type { Envelope } from "@/types/finance";

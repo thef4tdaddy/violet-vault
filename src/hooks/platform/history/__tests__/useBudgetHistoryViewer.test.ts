@@ -5,15 +5,15 @@ import {
   useBudgetHistoryRestore,
   useBudgetHistoryUIHelpers,
 } from "../useBudgetHistoryViewer";
-import { useConfirm } from "@/hooks/common/useConfirm";
-import { usePrompt } from "@/hooks/common/usePrompt";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
+import { usePrompt } from "@/hooks/platform/ux/usePrompt";
 
 // Mock dependencies
-vi.mock("@/hooks/common/useConfirm", () => ({
+vi.mock("@/hooks/platform/ux/useConfirm", () => ({
   useConfirm: vi.fn(() => vi.fn()),
 }));
 
-vi.mock("@/hooks/common/usePrompt", () => ({
+vi.mock("@/hooks/platform/ux/usePrompt", () => ({
   usePrompt: vi.fn(() => vi.fn()),
 }));
 

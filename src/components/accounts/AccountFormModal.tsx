@@ -1,4 +1,4 @@
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import SlideUpModal from "../mobile/SlideUpModal";
 import AccountModalHeader from "./form/AccountModalHeader";
@@ -6,7 +6,7 @@ import AccountBasicFields from "./form/AccountBasicFields";
 import AccountFinancialFields from "./form/AccountFinancialFields";
 import AccountColorAndSettings from "./form/AccountColorAndSettings";
 import AccountFormActions from "./form/AccountFormActions";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 
 interface AccountForm {

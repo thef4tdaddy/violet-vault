@@ -6,7 +6,7 @@ import { useFABModalIntegration } from "../useFABModalIntegration";
 const mockOpenModal = vi.fn();
 const mockCloseModal = vi.fn();
 
-vi.mock("@/hooks/common/useModalManager", () => ({
+vi.mock("@/hooks/platform/ux/useModalManager", () => ({
   useModalManager: () => ({
     openModal: mockOpenModal,
     closeModal: mockCloseModal,

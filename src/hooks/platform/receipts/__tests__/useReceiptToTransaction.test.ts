@@ -6,7 +6,7 @@ import { useReceiptToTransaction } from "../useReceiptToTransaction";
 const mockAddReceiptAsync = vi.fn();
 const mockAddTransactionAsync = vi.fn();
 
-vi.mock("@/hooks/common/useReceipts", () => ({
+vi.mock("@/hooks/platform/data/useReceipts", () => ({
   useReceipts: () => ({
     addReceiptAsync: mockAddReceiptAsync,
   }),

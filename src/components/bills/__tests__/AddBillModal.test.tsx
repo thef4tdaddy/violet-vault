@@ -28,7 +28,7 @@ vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBillForm", () => (
   })),
 }));
 
-vi.mock("@/hooks/common/useEditLock", () => ({
+vi.mock("@/hooks/core/auth/security/useEditLock", () => ({
   default: vi.fn(() => ({
     isLocked: false,
     isOwnLock: false,
@@ -38,7 +38,7 @@ vi.mock("@/hooks/common/useEditLock", () => ({
   })),
 }));
 
-vi.mock("@/hooks/ui/useMobileDetection", () => ({
+vi.mock("@/hooks/platform/common/useMobileDetection", () => ({
   useMobileDetection: vi.fn(() => false),
 }));
 

@@ -5,7 +5,7 @@ import { useFABLoadingStates } from "../useFABLoadingStates";
 // Mock useToast
 const mockShowError = vi.fn();
 
-vi.mock("@/hooks/common/useToast", () => ({
+vi.mock("@/hooks/platform/ux/useToast", () => ({
   default: () => ({
     showError: mockShowError,
   }),

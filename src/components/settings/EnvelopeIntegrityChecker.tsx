@@ -7,7 +7,7 @@ import { EnvelopeIntegrityActions } from "./EnvelopeIntegrityActions";
 import { EnvelopeIntegrityCorruptedList } from "./EnvelopeIntegrityCorruptedList";
 import { EnvelopeIntegrityRecommendations } from "./EnvelopeIntegrityRecommendations";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 /**
  * Envelope Integrity Checker Component

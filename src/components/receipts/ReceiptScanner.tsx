@@ -6,7 +6,7 @@ import ReceiptErrorState from "./components/ReceiptErrorState";
 import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { mapExtractedDataForDisplay } from "./utils/receiptHelpers";
 
 /**

@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock hooks
-vi.mock("@/hooks/common/useModalManager", () => ({
+vi.mock("@/hooks/platform/ux/useModalManager", () => ({
   useSettingsModals: vi.fn(() => ({
     showPasswordModal: false,
     showActivityFeed: false,

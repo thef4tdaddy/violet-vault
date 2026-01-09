@@ -8,7 +8,7 @@ import {
   EmptyHistoryState,
   LoadingState,
 } from "./ObjectHistoryViewerHelpers";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface ObjectHistoryViewerProps {
   objectId: string;

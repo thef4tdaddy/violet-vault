@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { editLockService } from "@/services/sync/editLockService";
 import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
-import useToast from "./useToast";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 import {
   getCurrentUserId,
@@ -109,6 +109,7 @@ function useEditLock(
   // Auto-acquire lock if requested
   useEffect(() => {
     if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       acquireLock();
     }
   }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock, acquireLock]);

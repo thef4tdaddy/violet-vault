@@ -1,6 +1,6 @@
 import React from "react";
 import ConfirmModal from "./ConfirmModal";
-import { useConfirmModal } from "../../hooks/common/useConfirm";
+import { useConfirmModal } from "../../hooks/platform/ux/useConfirm";
 
 /**
  * ConfirmProvider - Global provider for confirm modals

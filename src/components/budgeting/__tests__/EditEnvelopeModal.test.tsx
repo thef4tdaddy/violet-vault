@@ -4,15 +4,15 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // Mock all hooks and services BEFORE importing component
 vi.mock("@/hooks/budgeting/envelopes/useEnvelopeEdit");
-vi.mock("@/hooks/ui/useMobileDetection");
-vi.mock("@/hooks/ui/useModalAutoScroll");
+vi.mock("@/hooks/platform/common/useMobileDetection");
+vi.mock("@/hooks/platform/ux/useModalAutoScroll");
 vi.mock("@/utils/common/logger");
 
 // Now import component and mocked modules
 import EditEnvelopeModal from "../EditEnvelopeModal";
 import useEnvelopeEdit from "@/hooks/budgeting/envelopes/useEnvelopeEdit";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import logger from "@/utils/common/logger";
 
 // Get mocked functions

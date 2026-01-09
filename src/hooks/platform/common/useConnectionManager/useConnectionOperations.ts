@@ -2,7 +2,7 @@
  * Connection operations logic for useConnectionManager
  * Extracted for better maintainability and ESLint compliance
  */
-import useToast from "../useToast";
+import useToast from "@/hooks/platform/ux/useToast";
 import logger from "@/utils/common/logger";
 import type { Envelope, Bill, Debt } from "@/db/types";
 

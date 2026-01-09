@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import { readFileContent } from "@/utils/dataManagement/fileUtils";

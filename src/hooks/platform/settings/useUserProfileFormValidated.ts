@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect } from "react";
-import { useValidatedForm } from "@/hooks/common/validation";
+import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { UserProfileFormSchema, type UserProfileFormData } from "@/domain/schemas/auth";
 import type { UserData } from "@/types/auth";
 import logger from "@/utils/common/logger";

@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect } from "react";
-import { useValidatedForm } from "@/hooks/common/validation";
+import { useValidatedForm } from "@/hooks/platform/common/validation";
 import {
   SavingsGoalFormSchema,
   type SavingsGoalFormData,

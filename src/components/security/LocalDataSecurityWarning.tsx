@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useSecurityAcknowledgment } from "@/hooks/platform/security/useSecurityAcknowledgment";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface LocalDataSecurityWarningProps {
   onClose?: () => void;

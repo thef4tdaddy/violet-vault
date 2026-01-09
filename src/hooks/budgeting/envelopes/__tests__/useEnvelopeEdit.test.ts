@@ -4,7 +4,7 @@ import useEnvelopeEdit from "../useEnvelopeEdit";
 
 // Mock dependencies
 vi.mock("@/hooks/auth/useAuth");
-vi.mock("@/hooks/common/useEditLock");
+vi.mock("@/hooks/core/auth/security/useEditLock");
 vi.mock("@/services/sync/editLockService");
 vi.mock("../useEnvelopeForm");
 vi.mock("@/utils/common/logger", () => ({
@@ -18,7 +18,7 @@ vi.mock("@/utils/common/logger", () => ({
 
 // Import mocked modules
 import { useAuth } from "@/hooks/auth/useAuth";
-import useEditLock from "@/hooks/common/useEditLock";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
 import { initializeEditLocks } from "@/services/sync/editLockService";
 import useEnvelopeForm from "../useEnvelopeForm";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { renderIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import type { Transaction } from "@/types/finance";

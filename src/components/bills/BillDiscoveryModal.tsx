@@ -4,7 +4,7 @@ import { getIcon } from "@/utils";
 import { BillDiscoveryStep } from "./BillDiscoveryModal/BillDiscoveryStep";
 import { useBillDiscoveryState } from "./BillDiscoveryModal/useBillDiscoveryState";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 export interface DiscoveredBill {
   id: string;

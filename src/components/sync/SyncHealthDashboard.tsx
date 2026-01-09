@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { renderIcon } from "@/utils/icons";
 import { useSyncHealthMonitor } from "@/hooks/platform/sync/useSyncHealthMonitor";
-import { useExportData } from "@/hooks/common/useExportData";
+import { useExportData } from "@/hooks/platform/data/useExportData";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 
 interface SyncHealthDashboardProps {

@@ -1,7 +1,7 @@
 import React from "react";
 import { getIcon } from "@/utils";
 import { Button } from "@/components/ui";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { useReportExporter } from "@/hooks/platform/analytics/useReportExporter";
 import { ExportFormatSelector } from "./report-exporter/ExportFormatSelector";
 import { ExportTemplates } from "./report-exporter/ExportTemplates";

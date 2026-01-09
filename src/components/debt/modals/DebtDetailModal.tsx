@@ -9,7 +9,7 @@ import {
   RecentPayments,
   ModalActions,
 } from "./DebtDetailModalComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import logger from "@/utils/common/logger";
 
 interface DebtDetailModalProps {
