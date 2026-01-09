@@ -10,11 +10,18 @@ import type {
 } from "@/utils/budgeting/autofunding/rules";
 import type { ExecutionContext } from "@/utils/budgeting/autofunding/conditions";
 import type { Transaction, Envelope } from "@/types/finance";
-import type { ExecutionRecord, ExecutionFilters } from "./useExecutionHistory";
+// type definition updates
 import type { AutoFundingRule } from "@/db/types";
 
-// Re-export commonly used types for convenience
-export type { AutoFundingRule, RuleStatistics, RuleSummary, RuleCondition, ExecutionRecord };
+// Re-export commonly used types for convienience
+export type { AutoFundingRule, RuleStatistics, RuleSummary, RuleCondition };
+
+export interface ExecutionFilters {
+  startDate?: string;
+  endDate?: string;
+  trigger?: string;
+  status?: "success" | "failure";
+}
 
 /**
  * Execution result types
@@ -40,6 +47,7 @@ export interface ExecutionDetails {
   trigger: string;
   rulesExecuted: number;
   totalFunded: number;
+  results?: RuleExecutionResult[];
   [key: string]: unknown;
 }
 
@@ -100,8 +108,8 @@ export interface AutoFundingData {
  */
 export interface BudgetContext {
   unassignedCash?: number;
-  envelopes?: Envelope[];
-  allTransactions?: Transaction[];
+  envelopes?: Envelope[] | unknown[];
+  allTransactions?: Transaction[] | unknown[];
   [key: string]: unknown;
 }
 

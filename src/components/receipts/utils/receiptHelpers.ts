@@ -33,6 +33,37 @@ const parseOptionalFloat = (value: string | null | undefined): number | undefine
 /**
  * Maps extracted data for display in the UI
  */
+const parseConfidence = (
+  confidence: ExtendedReceiptData["confidence"]
+): {
+  merchant?: number;
+  total?: number;
+  date?: number;
+  tax?: number;
+  subtotal?: number;
+} => {
+  if (!confidence) {
+    return {
+      merchant: undefined,
+      total: undefined,
+      date: undefined,
+      tax: undefined,
+      subtotal: undefined,
+    };
+  }
+
+  return {
+    merchant: parseOptionalFloat(confidence.merchant),
+    total: parseOptionalFloat(confidence.total),
+    date: parseOptionalFloat(confidence.date),
+    tax: parseOptionalFloat(confidence.tax),
+    subtotal: parseOptionalFloat(confidence.subtotal),
+  };
+};
+
+/**
+ * Maps extracted data for display in the UI
+ */
 export const mapExtractedDataForDisplay = (extractedData: ExtendedReceiptData | null) => {
   if (!extractedData) return null;
 
@@ -44,12 +75,6 @@ export const mapExtractedDataForDisplay = (extractedData: ExtendedReceiptData | 
     subtotal: parseOptionalFloat(extractedData.subtotal),
     processingTime: extractedData.processingTime,
     items: extractedData.items,
-    confidence: {
-      merchant: parseOptionalFloat(extractedData.confidence?.merchant),
-      total: parseOptionalFloat(extractedData.confidence?.total),
-      date: parseOptionalFloat(extractedData.confidence?.date),
-      tax: parseOptionalFloat(extractedData.confidence?.tax),
-      subtotal: parseOptionalFloat(extractedData.confidence?.subtotal),
-    },
+    confidence: parseConfidence(extractedData.confidence),
   };
 };

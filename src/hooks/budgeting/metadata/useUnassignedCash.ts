@@ -20,7 +20,7 @@ interface UseUnassignedCashReturn {
   isLoading: boolean;
   error: Error | null;
   isUpdating: boolean;
-  setUnassignedCash: (amount: number, options?: SetUnassignedCashOptions) => Promise<boolean>;
+  updateUnassignedCash: (amount: number, options?: SetUnassignedCashOptions) => Promise<boolean>;
   refetch: () => Promise<unknown>;
 }
 
@@ -87,7 +87,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     },
   });
 
-  const setUnassignedCash = useCallback(
+  const updateUnassignedCash = useCallback(
     async (amount: number, options: SetUnassignedCashOptions = {}) => {
       if (typeof amount !== "number" || isNaN(amount)) {
         logger.warn("Invalid unassigned cash amount:", { amount });
@@ -122,7 +122,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     isLoading,
     error,
     isUpdating: updateUnassignedCashMutation.isPending,
-    setUnassignedCash,
+    updateUnassignedCash,
     refetch,
   };
 };

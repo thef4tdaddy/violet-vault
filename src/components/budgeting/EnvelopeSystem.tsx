@@ -58,7 +58,7 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Use proper hook for unassigned cash
-  const { unassignedCash = 0, setUnassignedCash: setUnassignedCashDb } = useUnassignedCash();
+  const { unassignedCash = 0, updateUnassignedCash: setUnassignedCashDb } = useUnassignedCash();
 
   const lastBillsRef = useRef<string | null>(null);
   const isCalculatingRef = useRef(false);
