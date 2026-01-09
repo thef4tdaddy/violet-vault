@@ -1,4 +1,4 @@
-import { useLayoutData } from "@/hooks/layout";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import type { useAuth } from "@/hooks/auth/useAuth";
 import type { UserData } from "@/types/auth";
 

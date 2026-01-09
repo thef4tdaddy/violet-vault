@@ -17,7 +17,7 @@ const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "../ui/ErrorBoundary";
-import { useLayoutData } from "@/hooks/layout";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { usePaycheckOperations } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckOperations";
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
