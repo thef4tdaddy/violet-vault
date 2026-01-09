@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { queryKeys } from "../../../utils/common/queryClient";
+import { queryKeys } from "@/utils/common/queryClient";
 import {
   getBudgetMetadata,
   setBudgetMetadata,
   setUnassignedCash as setUnassignedCashDb,
   getUnassignedCash,
-} from "../../../db/budgetDb";
-import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
-import logger from "../../../utils/common/logger";
+} from "@/db/budgetDb";
+import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
+import logger from "@/utils/common/logger";
 
 interface SetUnassignedCashOptions {
   author?: string;
@@ -20,7 +20,7 @@ interface UseUnassignedCashReturn {
   isLoading: boolean;
   error: Error | null;
   isUpdating: boolean;
-  setUnassignedCash: (amount: number, options?: SetUnassignedCashOptions) => Promise<boolean>;
+  updateUnassignedCash: (amount: number, options?: SetUnassignedCashOptions) => Promise<boolean>;
   refetch: () => Promise<unknown>;
 }
 
@@ -87,7 +87,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     },
   });
 
-  const setUnassignedCash = useCallback(
+  const updateUnassignedCash = useCallback(
     async (amount: number, options: SetUnassignedCashOptions = {}) => {
       if (typeof amount !== "number" || isNaN(amount)) {
         logger.warn("Invalid unassigned cash amount:", { amount });
@@ -122,7 +122,7 @@ export const useUnassignedCash = (): UseUnassignedCashReturn => {
     isLoading,
     error,
     isUpdating: updateUnassignedCashMutation.isPending,
-    setUnassignedCash,
+    updateUnassignedCash,
     refetch,
   };
 };

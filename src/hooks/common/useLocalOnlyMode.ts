@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
-import type { LocalOnlyUser } from "../../types/auth";
+import type { LocalOnlyUser } from "@/types/auth";
 
 /**
  * DEPRECATED: Legacy local-only mode hook

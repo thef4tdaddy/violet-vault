@@ -9,7 +9,7 @@ import SavingsSummaryCard from "./SavingsSummaryCard";
 import SavingsGoalCard from "./SavingsGoalCard";
 import AddEditGoalModal from "./AddEditGoalModal";
 import DistributeModal from "./DistributeModal";
-import useSavingsGoalsActions from "../../hooks/savings/useSavingsGoalsActions";
+import useSavingsGoalsActions from "@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions";
 import { SAVINGS_PRIORITIES } from "../../utils/savings/savingsFormUtils";
 
 const SavingsGoals = ({

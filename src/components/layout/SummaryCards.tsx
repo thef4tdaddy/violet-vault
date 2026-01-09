@@ -3,10 +3,10 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { usePrompt } from "@/hooks/common/usePrompt";
-import { useActualBalance } from "@/hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { useSavingsGoals } from "@/hooks/common/useSavingsGoals";
+import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import {
   calculateEnvelopeData,
@@ -241,7 +241,7 @@ const SummaryCard = memo(
         <Button
           type="button"
           onClick={onClick}
-          className={`${baseClasses} ${clickableClasses} !grid w-full justify-items-center`}
+          className={`${baseClasses} ${clickableClasses} grid! w-full justify-items-center`}
           disabled={!onClick}
           data-tour={dataTour}
         >

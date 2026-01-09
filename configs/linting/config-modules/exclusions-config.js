@@ -416,4 +416,18 @@ export default [
       "zustand-safe-patterns/zustand-no-store-actions-in-deps": "off", // updateBiweeklyAllocations is a useCallback, not a Zustand action
     },
   },
+  {
+    // useBillManager.ts - False positive for selective subscriptions on local state hook
+    files: ["src/hooks/budgeting/transactions/scheduled/expenses/useBillManager.ts"],
+    rules: {
+      "zustand-safe-patterns/zustand-selective-subscriptions": "off",
+    },
+  },
+  {
+    // MainDashboard.tsx - False positive for selective subscriptions on local state hook
+    files: ["src/components/pages/MainDashboard.tsx"],
+    rules: {
+      "zustand-safe-patterns/zustand-selective-subscriptions": "off",
+    },
+  },
 ];

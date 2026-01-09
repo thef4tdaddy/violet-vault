@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
-import { useSmartBillSuggestions } from "../../hooks/bills/useSmartBillSuggestions";
+import { useSmartBillSuggestions } from "../../hooks/budgeting/transactions/scheduled/expenses/useSmartBillSuggestions";
 import { getConfidenceColor, getConfidenceIcon } from "./smartBillMatcherHelpers";
 
 interface Envelope {

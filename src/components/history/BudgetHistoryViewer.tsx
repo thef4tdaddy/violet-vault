@@ -4,13 +4,13 @@ import { useState } from "react";
 import {
   useBudgetHistory,
   useBudgetCommitDetails,
-} from "../../hooks/budgeting/useBudgetHistoryQuery";
+} from "@/hooks/platform/history/useBudgetHistoryQuery";
 import { getIcon } from "../../utils";
 import {
   useBudgetHistoryViewerUI,
   useBudgetHistoryRestore,
   useBudgetHistoryUIHelpers,
-} from "../../hooks/history/useBudgetHistoryViewer";
+} from "@/hooks/platform/history/useBudgetHistoryViewer";
 import HistoryHeader from "./viewer/HistoryHeader";
 import IntegrityWarning from "./viewer/IntegrityWarning";
 import HistoryStatistics from "./viewer/HistoryStatistics";

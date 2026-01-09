@@ -10,7 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 // ============================================================================
 
 // 1. Hook Mock Results (Defined once for reference stability)
-const MOCK_AUTH_MANAGER = {
+const MOCK_AUTH = {
   isUnlocked: true,
   isAuthenticated: true,
   shouldShowAuthGateway: () => false,
@@ -40,7 +40,7 @@ const MOCK_LAYOUT_HANDLERS = {
   handleLogout: vi.fn(),
   handleSetup: vi.fn(),
   handleChangePassword: vi.fn(),
-  securityManager: MOCK_AUTH_MANAGER.securityManager,
+  securityManager: MOCK_AUTH.securityManager,
 };
 
 const MOCK_CONTENT_MODALS = {
@@ -48,20 +48,25 @@ const MOCK_CONTENT_MODALS = {
   security: { open: vi.fn(), close: vi.fn(), isOpen: false },
 };
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => MOCK_AUTH_MANAGER),
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => MOCK_AUTH),
 }));
 
-vi.mock("@/hooks/layout", () => ({
+vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
   useLayoutData: vi.fn(() => MOCK_LAYOUT_DATA),
 }));
 
-vi.mock("@/hooks/layout/useMainLayoutHandlers", () => ({
-  useMainLayoutHandlers: vi.fn(() => MOCK_LAYOUT_HANDLERS),
+vi.mock("@/hooks/platform/ux/layout/useLayoutModals", () => ({
+  useLayoutModals: vi.fn(() => MOCK_CONTENT_MODALS),
 }));
 
-vi.mock("@/hooks/layout/useMainContentModals", () => ({
-  useMainContentModals: vi.fn(() => MOCK_CONTENT_MODALS),
+vi.mock("@/hooks/platform/ux/layout/useLayoutLifecycle", () => ({
+  useLayoutLifecycle: vi.fn(() => ({
+    showSecurityWarning: false,
+    setShowSecurityWarning: vi.fn(),
+    showCorruptionModal: false,
+    setShowCorruptionModal: vi.fn(),
+  })),
 }));
 
 // 2. Component Mocks (Use @/ aliases for EVERYTHING)
@@ -171,31 +176,28 @@ vi.mock("@/hooks/auth/usePasswordRotation", () => ({
     handlePasswordRotation: vi.fn(),
   })),
 }));
-vi.mock("@/hooks/sync/useFirebaseSync", () => ({
+vi.mock("@/hooks/platform/sync/useFirebaseSync", () => ({
   useFirebaseSync: vi.fn(() => ({ syncState: "idle", handleSync: vi.fn() })),
 }));
 vi.mock("@/hooks/common/useNetworkStatus", () => ({ default: vi.fn(() => ({ isOnline: true })) }));
-vi.mock("@/hooks/budgeting/usePaydayPrediction", () => ({
-  default: vi.fn(() => ({ prediction: null })),
-}));
-vi.mock("@/hooks/common/useDataInitialization", () => ({ default: vi.fn(() => ({})) }));
-vi.mock("@/hooks/layout/useSecurityWarning", () => ({
-  useSecurityWarning: vi.fn(() => ({ showSecurityWarning: false })),
-}));
-vi.mock("@/hooks/layout/useCorruptionDetection", () => ({
-  useCorruptionDetection: vi.fn(() => ({ corruptionDetected: false })),
-}));
+// Migrated Hooks
 vi.mock("@/hooks/common/useOnboardingAutoComplete", () => ({
   useOnboardingAutoComplete: vi.fn(() => ({})),
 }));
 vi.mock("@/stores/ui/toastStore", () => ({ useToastStore: vi.fn(() => ({ toasts: [] })) }));
-vi.mock("@/stores/ui/uiStore", () => ({ useBudgetStore: vi.fn(() => ({ budget: {} })) }));
+vi.mock("@/stores/ui/uiStore", () => {
+  const mockStore = vi.fn(() => ({ budget: {} }));
+  return {
+    default: mockStore,
+    useBudgetStore: mockStore,
+  };
+});
 
 // ============================================================================
 // Test Suite
 // ============================================================================
 
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 describe("MainLayout (Full Alias Standardization)", () => {
   let queryClient: QueryClient;
@@ -225,7 +227,7 @@ describe("MainLayout (Full Alias Standardization)", () => {
   });
 
   it("should show AuthGateway when shouldShowAuthGateway returns true", async () => {
-    vi.mocked(useAuthManager).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: false,
       shouldShowAuthGateway: () => true,
     } as any);
@@ -235,7 +237,7 @@ describe("MainLayout (Full Alias Standardization)", () => {
   });
 
   it("should show LockScreen when isUnlocked is false", async () => {
-    vi.mocked(useAuthManager).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       isUnlocked: false,
       shouldShowAuthGateway: () => false,

@@ -3,8 +3,8 @@
  * Replaces useBugReportHighlight.ts for Sentry migration
  */
 
-import logger from "../../../utils/common/logger";
-import { getSentryEventUrl, Sentry } from "../../../utils/common/sentry";
+import logger from "@/utils/common/logger";
+import { getSentryEventUrl, Sentry } from "@/utils/common/sentry";
 
 /**
  * Sentry session state

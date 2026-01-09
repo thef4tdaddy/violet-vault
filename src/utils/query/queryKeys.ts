@@ -108,6 +108,14 @@ export const queryKeys = {
   syncStatus: () => [...queryKeys.sync, "status"],
   cloudData: () => [...queryKeys.sync, "cloudData"],
   syncActivity: () => [...queryKeys.sync, "activity"],
+
+  // Auto-Funding
+  autoFunding: {
+    all: ["autoFunding"],
+    rules: () => [...queryKeys.autoFunding.all, "rules"],
+    rule: (id: EntityId) => [...queryKeys.autoFunding.all, "rule", id],
+    history: (limit?: number) => [...queryKeys.autoFunding.all, "history", limit].filter(Boolean),
+  },
 };
 
 /**

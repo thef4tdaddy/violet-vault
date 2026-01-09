@@ -3,7 +3,7 @@
  * Extracted for better maintainability and ESLint compliance
  */
 import { useMemo } from "react";
-import { Envelope, Bill, Debt } from "../../../db/types";
+import { Envelope, Bill, Debt } from "@/db/types";
 
 interface ConnectionDataParams {
   entityType: "bill" | "envelope" | "debt";

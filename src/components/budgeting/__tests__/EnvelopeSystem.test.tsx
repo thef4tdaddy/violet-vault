@@ -2,8 +2,8 @@ import { renderHook } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import useEnvelopeSystem from "../EnvelopeSystem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import useBills from "@/hooks/bills/useBills";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 
 // Mock dependencies
 vi.mock("@/stores/ui/uiStore", () => ({
@@ -18,7 +18,7 @@ vi.mock("@/stores/ui/uiStore", () => ({
   }),
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => ({
     envelopes: [],
     addEnvelope: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
   })),
 }));
 
-vi.mock("@/hooks/bills/useBills", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({
   default: vi.fn(() => ({
     bills: [],
     isLoading: false,
@@ -97,7 +97,7 @@ describe("useEnvelopeSystem", () => {
   describe("Envelope Operations", () => {
     it("should create envelope successfully", async () => {
       const mockAddEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: mockAddEnvelope,
@@ -117,7 +117,7 @@ describe("useEnvelopeSystem", () => {
 
     it("should handle create envelope error", async () => {
       const mockAddEnvelope = vi.fn().mockRejectedValue(new Error("Create failed"));
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: mockAddEnvelope,
@@ -137,7 +137,7 @@ describe("useEnvelopeSystem", () => {
 
     it("should update envelope successfully", async () => {
       const mockUpdateEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),
@@ -156,7 +156,7 @@ describe("useEnvelopeSystem", () => {
 
     it("should delete envelope successfully", async () => {
       const mockDeleteEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),

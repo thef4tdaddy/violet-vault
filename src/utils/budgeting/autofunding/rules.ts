@@ -4,7 +4,7 @@
  * Extracted from autoFundingEngine.js for Issue #506
  */
 
-import type { Condition } from "./conditions.ts";
+import type { Condition } from "./conditions";
 
 // TypeScript interfaces for auto-funding rules
 export interface RuleConfig {

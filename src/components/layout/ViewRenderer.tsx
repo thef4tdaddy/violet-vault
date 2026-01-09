@@ -17,14 +17,18 @@ const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "../ui/ErrorBoundary";
-import { useLayoutData } from "@/hooks/layout";
-import { usePaycheckOperations } from "@/hooks/layout/usePaycheckOperations";
-import useSavingsGoals from "@/hooks/savings/useSavingsGoals";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
+import { usePaycheckOperations } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckOperations";
+import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 import logger from "@/utils/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
-import type { Transaction as DbTransaction, Envelope as DbEnvelope } from "@/db/types";
+import type {
+  Transaction as DbTransaction,
+  Envelope as DbEnvelope,
+  PaycheckHistory,
+} from "@/db/types";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -347,26 +351,14 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         <Suspense fallback={<LoadingSpinner />}>
           <PaycheckProcessor
             envelopes={envelopes}
-            paycheckHistory={
-              tanStackPaycheckHistory as unknown as Array<{
-                id: string | number;
-                payerName?: string;
-                amount?: number;
-              }>
-            }
+            paycheckHistory={tanStackPaycheckHistory as unknown as PaycheckHistory[]}
             onProcessPaycheck={
               tanStackProcessPaycheck as unknown as (data: unknown) => Promise<void>
             }
-            onDeletePaycheck={async (paycheck: { id: string | number }) => {
+            onDeletePaycheck={async (paycheck: PaycheckHistory) => {
               await handleDeletePaycheck(
                 paycheck.id,
-                tanStackPaycheckHistory as unknown as Array<{
-                  id: string | number;
-                  amount: number;
-                  mode?: string;
-                  envelopeAllocations?: Array<{ envelopeId: string | number; amount: number }>;
-                  allocations?: unknown[];
-                }>
+                tanStackPaycheckHistory as unknown as PaycheckHistory[]
               );
             }}
             currentUser={currentUser as unknown as { userName: string }}

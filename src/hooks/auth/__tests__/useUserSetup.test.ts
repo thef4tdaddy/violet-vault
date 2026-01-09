@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { useUserSetup } from "../useUserSetup";
-import { globalToast } from "../../../stores/ui/toastStore";
+import { globalToast } from "@/stores/ui/toastStore";
 
 // Mock dependencies
 vi.mock("../../../stores/ui/toastStore", () => ({

@@ -5,9 +5,9 @@ import {
   createArchiver,
   type ArchivingInfo,
   type ArchiveResult,
-} from "../../utils/common/transactionArchiving";
-import { queryKeys } from "../../utils/common/queryClient";
-import logger from "../../utils/common/logger";
+} from "@/utils/common/transactionArchiving";
+import { queryKeys } from "@/utils/common/queryClient";
+import logger from "@/utils/common/logger";
 
 /**
  * Hook for managing transaction archiving functionality

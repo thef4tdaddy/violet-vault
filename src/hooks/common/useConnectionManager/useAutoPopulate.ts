@@ -3,8 +3,8 @@
  * Extracted for better maintainability and ESLint compliance
  */
 import useToast from "../useToast";
-import logger from "../../../utils/common/logger";
-import { Envelope, Bill } from "../../../db/types";
+import logger from "@/utils/common/logger";
+import { Envelope, Bill } from "@/db/types";
 
 interface AutoPopulateParams {
   entityType: string;

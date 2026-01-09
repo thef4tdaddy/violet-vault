@@ -1,27 +1,14 @@
 import { useCallback } from "react";
-import { useAuthManager } from "./useAuthManager";
-import logger from "../../utils/common/logger";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
+import { useAuth } from "./useAuth";
+import logger from "@/utils/common/logger";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
 import {
   handleExistingUserLogin,
   handleSharedBudgetJoin,
   handleNewUserSetup,
-} from "../../utils/auth/authFlowHelpers";
+} from "@/utils/auth/authFlowHelpers";
 
-// Type definitions
-interface UserData {
-  budgetId?: string;
-  password: string;
-  userName?: string;
-  userColor?: string;
-}
-
-interface UserProfile {
-  userName?: string;
-  userColor?: string;
-  email?: string;
-  displayName?: string;
-}
+import type { UserData, UpdateProfileInput as UserProfile } from "./useAuth.types";
 
 interface AuthError extends Error {
   code?: string;
@@ -32,6 +19,7 @@ interface AuthError extends Error {
  * Extracts authentication logic from Layout component
  */
 const useAuthFlow = () => {
+  const auth = useAuth();
   const {
     isUnlocked,
     user: currentUser,
@@ -40,7 +28,7 @@ const useAuthFlow = () => {
     changePassword,
     updateProfile,
     securityContext: { encryptionKey, budgetId, salt },
-  } = useAuthManager();
+  } = auth;
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
@@ -53,8 +41,8 @@ const useAuthFlow = () => {
       const isExistingUser = typeof userDataOrPassword === "string";
       const isSharedBudgetJoin =
         typeof userDataOrPassword === "object" && userDataOrPassword?.budgetId;
-      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
-      const userData = isExistingUser ? null : userDataOrPassword;
+      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password || "";
+      const userData = isExistingUser ? undefined : userDataOrPassword;
 
       logger.auth("Layout handleSetup called", {
         hasUserData: !!userData,
@@ -62,6 +50,10 @@ const useAuthFlow = () => {
         isSharedBudgetJoin,
         hasPassword: !!password,
       });
+
+      if (!password) {
+        throw new Error("Password is required");
+      }
       logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
 
       try {
@@ -99,7 +91,7 @@ const useAuthFlow = () => {
 
   const handleChangePassword = useCallback(
     async (oldPass: string, newPass: string) => {
-      const result = await changePassword(oldPass, newPass);
+      const result = await changePassword({ oldPassword: oldPass, newPassword: newPass });
       if (!result.success) {
         showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {

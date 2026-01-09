@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
 import useEditLock from "@/hooks/common/useEditLock";
 import { useEditLockInit } from "@/hooks/common/useEditLockInit";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -57,10 +57,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   smartCategorySuggestion,
 }) => {
   // Get auth context for edit locking
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
 
   // Initialize edit lock service when modal opens
   // Using hook to avoid direct service import

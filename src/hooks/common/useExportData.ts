@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
@@ -86,7 +86,7 @@ const buildExportSummary = (counts: {
 };
 
 export const useExportData = () => {
-  const { user: currentUser } = useAuthManager();
+  const { user: currentUser } = useAuth();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
 
   const exportData = useCallback(async () => {

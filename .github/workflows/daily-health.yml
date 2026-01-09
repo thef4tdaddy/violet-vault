@@ -27,6 +27,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # TODO (v2.0 Beta): Update 'alpha' to target 'develop' once the hybrid rewrite reaches beta stability.
+          # TODO (v2.0 Live): Revert to 'github.ref' or explicit 'main' once v2.0 is fully merged to production.
+          ref: ${{ (inputs.context || 'alpha') == 'alpha' && 'feat/polygot-rewrite' || (inputs.context == 'beta' && 'develop' || github.ref) }}
 
       # --- Setup Environments ---
       - name: Setup Node.js
@@ -36,12 +40,16 @@ jobs:
           cache: "npm"
 
       - name: Setup Go
+        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
+        if: hashFiles('api/go.sum') != ''
         uses: actions/setup-go@v5
         with:
           go-version: "1.23.1"
           cache-dependency-path: api/go.sum
 
       - name: Setup Python
+        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
+        if: hashFiles('requirements.txt', 'pyproject.toml', 'api/requirements.txt') != ''
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"

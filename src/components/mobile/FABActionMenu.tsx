@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useFABSelectors, useFABActions } from "@/stores/ui/fabStore";
-import { useFABLoadingStates } from "@/hooks/mobile/useFABLoadingStates";
+import { useFABLoadingStates } from "@/hooks/platform/mobile/useFABLoadingStates";
 import { hapticFeedback } from "@/utils/ui/touchFeedback";
 
 /**

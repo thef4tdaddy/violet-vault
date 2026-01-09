@@ -63,7 +63,7 @@ const MOCK_LEDGER_DATA = {
   handleCompleteSplit: vi.fn(),
 };
 
-vi.mock("@/hooks/transactions/useTransactionLedger", () => ({
+vi.mock("@/hooks/budgeting/transactions/useTransactionLedger", () => ({
   useTransactionLedger: vi.fn(() => MOCK_LEDGER_DATA),
 }));
 
@@ -188,7 +188,7 @@ vi.mock("@/utils/transactions/ledgerHelpers", () => ({
 // Test Suite
 // ============================================================================
 
-import { useTransactionLedger } from "@/hooks/transactions/useTransactionLedger";
+import { useTransactionLedger } from "@/hooks/budgeting/transactions/useTransactionLedger";
 
 describe("TransactionLedger (Surgical Reset)", () => {
   let queryClient: QueryClient;

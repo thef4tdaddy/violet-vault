@@ -35,12 +35,12 @@ import {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 // Custom hook to use auth context
-const useAuth = (): AuthContextValue => {
+export const useAuthContext = (): AuthContextValue => {
   const context = useContext(AuthContext);
 
   if (!context) {
     throw new Error(
-      "useAuth must be used within an AuthProvider. " +
+      "useAuthContext must be used within an AuthProvider. " +
         "Make sure your component is wrapped with <AuthProvider>."
     );
   }
@@ -112,5 +112,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 // Export both the hook and context
-export { useAuth };
 export default AuthContext;

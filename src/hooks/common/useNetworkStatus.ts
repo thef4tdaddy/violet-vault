@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useBudgetStore, type UiStore } from "../../stores/ui/uiStore";
-import logger from "../../utils/common/logger";
+import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
+import logger from "@/utils/common/logger";
 
 /**
  * Custom hook for network status management

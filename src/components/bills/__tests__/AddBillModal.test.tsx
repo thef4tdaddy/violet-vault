@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock all hooks with default exports where needed
-vi.mock("@/hooks/bills/useBillForm", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBillForm", () => ({
   useBillForm: vi.fn(() => ({
     formData: {
       name: "",
@@ -42,9 +42,9 @@ vi.mock("@/hooks/ui/useMobileDetection", () => ({
   useMobileDetection: vi.fn(() => false),
 }));
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
-    securityContext: { budgetId: "test-budget" },
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => ({
+    budgetId: "test-budget",
     user: { id: "test-user", name: "Test User" },
   })),
 }));

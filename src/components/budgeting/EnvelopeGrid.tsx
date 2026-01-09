@@ -1,10 +1,10 @@
 // src/components/budgeting/EnvelopeGrid.tsx - Refactored with separated logic
 import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "react";
 import useUiStoreRaw from "@/stores/ui/uiStore";
-import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { useTransactions } from "@/hooks/common/useTransactions";
-import useBills from "../../hooks/bills/useBills";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,

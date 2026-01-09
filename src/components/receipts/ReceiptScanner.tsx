@@ -1,4 +1,4 @@
-import { useReceiptScanner } from "../../hooks/receipts/useReceiptScanner";
+import { useReceiptScanner } from "@/hooks/platform/receipts/useReceiptScanner";
 import ReceiptScannerHeader from "./components/ReceiptScannerHeader";
 import ReceiptUploadArea from "./components/ReceiptUploadArea";
 import ReceiptProcessingState from "./components/ReceiptProcessingState";

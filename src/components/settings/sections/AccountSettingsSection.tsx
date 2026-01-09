@@ -4,7 +4,7 @@ import { renderIcon } from "@/utils";
 import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";
 import ProfileSettings from "../../auth/ProfileSettings";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import logger from "@/utils/common/logger";
 
 interface CurrentUser {
@@ -32,7 +32,7 @@ const AccountSettingsSection = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
-  const { joinBudget } = useAuthManager();
+  const { joinBudget } = useAuth();
 
   const handleJoinSuccess = async (_joinData?: unknown) => {
     try {

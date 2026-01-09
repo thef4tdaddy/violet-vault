@@ -48,7 +48,7 @@ export interface Rule {
   enabled: boolean;
   trigger: string;
   type: string;
-  lastExecuted?: string;
+  lastExecuted?: string | null;
   config?: {
     conditions?: Condition[];
   };
@@ -165,7 +165,7 @@ export const evaluateTransactionAmountCondition = (
  */
 export const checkSchedule = (
   trigger: string,
-  lastExecuted: string | undefined,
+  lastExecuted: string | null | undefined,
   currentDate: string
 ): boolean => {
   if (!lastExecuted) return true;

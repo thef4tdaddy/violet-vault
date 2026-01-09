@@ -2,11 +2,11 @@ import { render, screen, within } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import TransactionTable from "../TransactionTable";
 import userEvent from "@testing-library/user-event";
-import useTransactionTableOriginal from "@/hooks/transactions/useTransactionTable";
+import useTransactionTable from "@/hooks/budgeting/transactions/useTransactionTable";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock the custom hook
-vi.mock("@/hooks/transactions/useTransactionTable", () => ({
+vi.mock("@/hooks/budgeting/transactions/useTransactionTable", () => ({
   default: vi.fn(() => ({
     parentRef: { current: null },
     rowVirtualizer: {
@@ -93,7 +93,7 @@ vi.mock("@/utils/transactions/tableHelpers", () => ({
   },
 }));
 
-const useTransactionTable = useTransactionTableOriginal as unknown as Mock;
+const useTransactionTableMock = useTransactionTable as unknown as Mock;
 
 describe("TransactionTable", () => {
   const mockOnEdit = vi.fn();
@@ -145,7 +145,7 @@ describe("TransactionTable", () => {
         { index: 1, start: 50, size: 50 },
       ];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -197,7 +197,7 @@ describe("TransactionTable", () => {
     it("should call onEdit when edit button is clicked", async () => {
       const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -232,7 +232,7 @@ describe("TransactionTable", () => {
       const mockHandleDeleteClick = vi.fn();
       const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -266,7 +266,7 @@ describe("TransactionTable", () => {
     it("should call onSplit when split button is clicked", async () => {
       const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -301,7 +301,7 @@ describe("TransactionTable", () => {
       const mockHandleHistoryClick = vi.fn();
       const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -343,7 +343,7 @@ describe("TransactionTable", () => {
 
       const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => mockVirtualItems,
@@ -372,7 +372,7 @@ describe("TransactionTable", () => {
 
       const mockCancelDelete = vi.fn();
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],
@@ -405,7 +405,7 @@ describe("TransactionTable", () => {
 
       const mockCancelDelete = vi.fn();
 
-      useTransactionTable.mockReturnValue({
+      useTransactionTableMock.mockReturnValue({
         parentRef: { current: null },
         rowVirtualizer: {
           getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],

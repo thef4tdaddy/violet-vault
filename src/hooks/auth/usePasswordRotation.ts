@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
-import { useAuthManager } from "./useAuthManager";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
-import logger from "../../utils/common/logger";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import logger from "@/utils/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
 
 /**
@@ -29,7 +29,7 @@ interface UsePasswordRotationReturn {
 const usePasswordRotation = (): UsePasswordRotationReturn => {
   const {
     securityContext: { encryptionKey },
-  } = useAuthManager();
+  } = useAuth();
   const { showErrorToast } = useToastHelpers();
   const [rotationDue, setRotationDue] = useState(false);
   const [showRotationModal, setShowRotationModal] = useState(false);

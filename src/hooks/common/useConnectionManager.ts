@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import useBills from "../bills/useBills";
-import useEnvelopes from "../budgeting/useEnvelopes";
-import { useDebts } from "../debts/useDebts";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
+import useEnvelopes from "../budgeting/envelopes/useEnvelopes";
+import { useDebts } from "@/hooks/budgeting/envelopes/liabilities/useDebts";
 import { useConnectionConfig } from "./useConnectionManager/useConnectionConfig";
 import { useConnectionOperations } from "./useConnectionManager/useConnectionOperations";
 import { useConnectionData } from "./useConnectionManager/useConnectionData";

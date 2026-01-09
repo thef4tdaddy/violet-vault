@@ -1,7 +1,7 @@
 // src/components/budgeting/EnvelopeSystem.tsx - Refactored with separated logic
 import { useEffect, useCallback, useRef } from "react";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import useBills from "../../hooks/bills/useBills";
+import { useEnvelopes } from "../../hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "../../hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useUnassignedCash } from "../../hooks/budgeting/metadata/useUnassignedCash";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
 import logger from "../../utils/common/logger";
@@ -58,7 +58,7 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Use proper hook for unassigned cash
-  const { unassignedCash = 0, setUnassignedCash: setUnassignedCashDb } = useUnassignedCash();
+  const { unassignedCash = 0, updateUnassignedCash: setUnassignedCashDb } = useUnassignedCash();
 
   const lastBillsRef = useRef<string | null>(null);
   const isCalculatingRef = useRef(false);

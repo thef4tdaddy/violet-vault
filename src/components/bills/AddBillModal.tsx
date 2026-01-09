@@ -7,21 +7,21 @@
  */
 import { useEffect, useCallback, useMemo } from "react";
 import type { FormEvent, RefObject } from "react";
-import { useBillForm } from "@/hooks/bills/useBillForm";
+import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
 import useEditLock from "@/hooks/common/useEditLock";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 // Edit locking managed through useEditLock hook, but service needs initialization
 import { useEditLockInit } from "@/hooks/common/useEditLockInit";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import { useLayoutData } from "@/hooks/layout/useLayoutData";
-import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
+import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
@@ -204,10 +204,7 @@ const useBillModalState = ({
     onError,
   });
 
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
 
   // Using hook to avoid direct service import
   useEditLockInit(isOpen ? budgetId : null, isOpen ? currentUser : null);

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import { useEnvelopeIntegrity } from "@/hooks/settings/useEnvelopeIntegrity";
+import { useEnvelopeIntegrity } from "@/hooks/platform/settings/useEnvelopeIntegrity";
 import { EnvelopeIntegrityStatusCards } from "./EnvelopeIntegrityStatusCards";
 import { EnvelopeIntegrityActions } from "./EnvelopeIntegrityActions";
 import { EnvelopeIntegrityCorruptedList } from "./EnvelopeIntegrityCorruptedList";

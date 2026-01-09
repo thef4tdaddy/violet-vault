@@ -4,7 +4,7 @@ import JoinBudgetModal from "../JoinBudgetModal";
 import userEvent from "@testing-library/user-event";
 
 // Mock all hooks
-vi.mock("@/hooks/sharing/useShareCodeValidation", () => ({
+vi.mock("@/hooks/platform/sharing/useShareCodeValidation", () => ({
   useShareCodeValidation: vi.fn(() => ({
     shareInfo: null,
     creatorInfo: null,
@@ -14,14 +14,14 @@ vi.mock("@/hooks/sharing/useShareCodeValidation", () => ({
   })),
 }));
 
-vi.mock("@/hooks/sharing/useBudgetJoining", () => ({
+vi.mock("@/hooks/platform/sharing/useBudgetJoining", () => ({
   useBudgetJoining: vi.fn(() => ({
     isJoining: false,
     joinBudget: vi.fn(),
   })),
 }));
 
-vi.mock("@/hooks/sharing/useQRCodeProcessing", () => ({
+vi.mock("@/hooks/platform/sharing/useQRCodeProcessing", () => ({
   useQRCodeProcessing: vi.fn(() => ({
     handleQRScan: vi.fn(),
   })),
@@ -141,7 +141,8 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should render UserSetupStep on step 2", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
       vi.mocked(useShareCodeValidation).mockReturnValue({
@@ -174,7 +175,8 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should call validateShareCode when validate button is clicked", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
       vi.mocked(useShareCodeValidation).mockReturnValue({
@@ -197,7 +199,8 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should show validating state", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: null,
         creatorInfo: null,
@@ -212,7 +215,8 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should display share info when code is valid", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
       vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
@@ -235,7 +239,8 @@ describe("JoinBudgetModal", () => {
 
   describe("User Setup", () => {
     beforeEach(async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
       vi.mocked(useShareCodeValidation).mockReturnValue({
@@ -280,7 +285,8 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should allow setting user color", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
       vi.mocked(useShareCodeValidation).mockReturnValue({
         shareInfo: { budgetName: "Test Budget" },
@@ -325,8 +331,9 @@ describe("JoinBudgetModal", () => {
 
   describe("Budget Joining", () => {
     it("should call joinBudget when join button is clicked", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
-      const { useBudgetJoining } = await import("@/hooks/sharing/useBudgetJoining");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
+      const { useBudgetJoining } = await import("@/hooks/platform/sharing/useBudgetJoining");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
       const mockJoinBudget = vi.fn();
 
@@ -366,8 +373,9 @@ describe("JoinBudgetModal", () => {
     });
 
     it("should show joining state", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
-      const { useBudgetJoining } = await import("@/hooks/sharing/useBudgetJoining");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
+      const { useBudgetJoining } = await import("@/hooks/platform/sharing/useBudgetJoining");
       const mockValidateShareCode = vi.fn().mockResolvedValue(true);
 
       vi.mocked(useShareCodeValidation).mockReturnValue({
@@ -396,7 +404,8 @@ describe("JoinBudgetModal", () => {
 
   describe("State Reset", () => {
     it("should reset state when modal closes", async () => {
-      const { useShareCodeValidation } = await import("@/hooks/sharing/useShareCodeValidation");
+      const { useShareCodeValidation } =
+        await import("@/hooks/platform/sharing/useShareCodeValidation");
       const mockResetValidation = vi.fn();
 
       vi.mocked(useShareCodeValidation).mockReturnValue({

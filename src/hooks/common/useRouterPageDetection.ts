@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
-import { pathToViewMap } from "../../components/layout/routeConfig";
+import { pathToViewMap } from "@/components/layout/routeConfig";
 
 /**
  * Router-aware page detection hook

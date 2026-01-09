@@ -6,10 +6,12 @@ import { getIcon } from "@/utils";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 /* eslint-enable @typescript-eslint/ban-ts-comment */
 import useUnassignedCashDistribution, {
+  type DistributionPreviewItem,
+} from "@/hooks/budgeting/allocations/useUnassignedCashDistribution";
+import {
   type EnvelopeRecord,
   type BillRecord,
-  type DistributionPreviewItem,
-} from "@/hooks/budgeting/useUnassignedCashDistribution";
+} from "@/hooks/budgeting/allocations/useUnassignedCashDistributionHelpers";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";

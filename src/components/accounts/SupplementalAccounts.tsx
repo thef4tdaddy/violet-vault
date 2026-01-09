@@ -1,5 +1,5 @@
 import React from "react";
-import useSupplementalAccounts from "@/hooks/accounts/useSupplementalAccounts";
+import useSupplementalAccounts from "@/hooks/platform/accounts/useSupplementalAccounts";
 import AccountsHeader from "./AccountsHeader";
 import AccountsSummaryCards from "./AccountsSummaryCards";
 import ExpirationAlert from "./ExpirationAlert";

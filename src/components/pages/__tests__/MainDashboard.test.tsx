@@ -10,7 +10,7 @@ import { QueryClient } from "@tanstack/react-query";
 // ============================================================================
 
 // 1. Hook Mocks
-vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
+vi.mock("@/hooks/budgeting/metadata/useBudgetMetadata", () => ({
   useActualBalance: vi.fn(() => ({
     actualBalance: 1000,
     updateActualBalance: vi.fn(),
@@ -19,28 +19,28 @@ vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
   useUnassignedCash: vi.fn(() => ({ unassignedCash: 200, isLoading: false })),
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => ({
     envelopes: [{ id: "1", name: "Groceries", currentBalance: 500 }],
     isLoading: false,
   })),
 }));
 
-vi.mock("@/hooks/common/useSavingsGoals", () => ({
-  useSavingsGoals: vi.fn(() => ({
+vi.mock("@/hooks/budgeting/envelopes/goals/useSavingsGoals", () => ({
+  default: vi.fn(() => ({
     savingsGoals: [{ id: "1", name: "Emergency Fund", currentAmount: 1000, targetAmount: 5000 }],
     isLoading: false,
   })),
 }));
 
-vi.mock("@/hooks/common/useTransactions", () => ({
-  useTransactions: vi.fn(() => ({
+vi.mock("@/hooks/budgeting/transactions/useTransactionQuery", () => ({
+  useTransactionQuery: vi.fn(() => ({
     transactions: [{ id: "1", description: "Food", amount: -50, date: "2025-01-01" }],
     isLoading: false,
   })),
 }));
 
-vi.mock("@/hooks/budgeting/useBudgetData", () => ({
+vi.mock("@/hooks/budgeting/core/useBudgetData", () => ({
   default: vi.fn(() => ({
     reconcileTransaction: vi.fn(),
     paycheckHistory: [],
@@ -52,8 +52,8 @@ vi.mock("@/hooks/budgeting/useBudgetData", () => ({
   })),
 }));
 
-vi.mock("@/hooks/dashboard/useMainDashboard", () => ({
-  useMainDashboardUI: vi.fn(() => ({
+vi.mock("@/hooks/platform/ux/dashboard", () => ({
+  useDashboardUI: vi.fn(() => ({
     showReconcileModal: false,
     newTransaction: {},
     openReconcileModal: vi.fn(),
@@ -68,7 +68,7 @@ vi.mock("@/hooks/dashboard/useMainDashboard", () => ({
     difference: 0,
     isBalanced: true,
   })),
-  useTransactionReconciliation: vi.fn(() => ({
+  useReconciliation: vi.fn(() => ({
     handleReconcileTransaction: vi.fn(),
     handleAutoReconcileDifference: vi.fn(),
     getEnvelopeOptions: vi.fn(() => []),
@@ -147,12 +147,63 @@ vi.mock("@/utils/common/validation", () => ({
 // Test Suite
 // ============================================================================
 
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { usePaydayManager } from "@/hooks/dashboard/useMainDashboard";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+
+import {
+  useDashboardUI,
+  useDashboardCalculations,
+  useReconciliation,
+  usePaydayManager,
+  useDashboardHelpers,
+} from "@/hooks/platform/ux/dashboard";
 
 describe("MainDashboard (Full Alias Standardization)", () => {
   let queryClient: QueryClient;
   const mockSetActiveView = vi.fn();
+
+  // Define mock states for hooks
+  const mockUIState: ReturnType<typeof useDashboardUI> = {
+    showReconcileModal: false,
+    newTransaction: {
+      amount: "",
+      description: "",
+      type: "expense",
+      envelopeId: "",
+      date: new Date().toISOString(),
+    },
+    openReconcileModal: vi.fn(),
+    closeReconcileModal: vi.fn(),
+    updateNewTransaction: vi.fn(),
+    resetNewTransaction: vi.fn(),
+  };
+
+  const mockCalculations: ReturnType<typeof useDashboardCalculations> = {
+    totalEnvelopeBalance: 1000,
+    totalSavingsBalance: 500,
+    safeUnassignedCash: 100,
+    totalVirtualBalance: 1600,
+    difference: 0,
+    isBalanced: true,
+  };
+
+  const mockReconciliation: ReturnType<typeof useReconciliation> = {
+    handleReconcileTransaction: vi.fn(),
+    handleAutoReconcileDifference: vi.fn(),
+    getEnvelopeOptions: vi.fn().mockReturnValue([]),
+  };
+
+  const mockPaydayManager = {
+    paydayPrediction: null,
+    handleProcessPaycheck: vi.fn(),
+    handlePrepareEnvelopes: vi.fn(),
+  };
+
+  const mockDashboardHelpers = {
+    getRecentTransactions: vi.fn((transactions) => transactions || []),
+    formatCurrency: (val: number) => `$${val.toFixed(2)}`,
+    getTransactionIcon: () => "TrendingDown",
+    getTransactionColor: () => "text-red-500",
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();

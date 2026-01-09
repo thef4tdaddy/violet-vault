@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useConfirm } from "@/hooks/common/useConfirm";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
@@ -372,7 +372,7 @@ const logValidationWarnings = (validationWarnings: string[]): void => {
 };
 
 export const useImportData = () => {
-  const { user: currentUser } = useAuthManager();
+  const { user: currentUser } = useAuth();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
   const confirm = useConfirm();
 

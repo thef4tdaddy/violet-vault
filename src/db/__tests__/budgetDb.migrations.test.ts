@@ -19,7 +19,7 @@ describe("VioletVaultDB - Migration Tests", () => {
   describe("Schema Version Management", () => {
     it("should have correct current version", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(9);
+      expect(db.verno).toBe(10);
       expect(db.name).toBe("VioletVault");
     });
 
@@ -310,7 +310,6 @@ describe("VioletVaultDB - Migration Tests", () => {
           category: "Needs",
           archived: false,
           lastModified: Date.now(),
-          // @ts-expect-error - Testing extra field
           extraField: "should be preserved",
         });
 
@@ -453,9 +452,9 @@ describe("VioletVaultDB - Migration Tests", () => {
   });
 
   describe("Version History", () => {
-    it("should document version 9 as current version", () => {
+    it("should document version 10 as current version", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(9);
+      expect(db.verno).toBe(10);
     });
 
     it("should have all version 8 tables", () => {

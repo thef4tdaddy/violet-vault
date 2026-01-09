@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { create } from "zustand";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 interface ConfirmConfig {
   title?: string;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Checkbox } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { useFirebaseMessaging } from "../../../hooks/notifications/useFirebaseMessaging";
+import { useFirebaseMessaging } from "@/hooks/platform/notifications/useFirebaseMessaging";
 import logger from "../../../utils/common/logger";
 
 interface PermissionStatus {

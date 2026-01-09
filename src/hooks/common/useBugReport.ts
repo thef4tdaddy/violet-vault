@@ -4,7 +4,7 @@
  * Created for Issue #513 - replaces the monolithic useBugReport.js
  */
 import { useState } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { useBugReportForm } from "./bug-report/useBugReportForm";
 import { useBugReportScreenshotV2 as useBugReportScreenshot } from "./bug-report/useBugReportScreenshot";
 import { useBugReportSubmissionV2 as useBugReportSubmission } from "./bug-report/useBugReportSubmission";

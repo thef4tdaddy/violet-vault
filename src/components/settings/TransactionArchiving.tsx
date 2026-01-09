@@ -5,7 +5,7 @@ import {
   useTransactionArchivingUI,
   useTransactionArchivingProcess,
   useArchivingUIHelpers,
-} from "../../hooks/settings/useTransactionArchiving";
+} from "@/hooks/platform/settings/useTransactionArchiving";
 import ArchivingHeader from "./archiving/ArchivingHeader";
 import ArchivingStatusOverview from "./archiving/ArchivingStatusOverview";
 import ArchivingConfiguration from "./archiving/ArchivingConfiguration";

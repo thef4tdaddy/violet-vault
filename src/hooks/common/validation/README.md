@@ -300,7 +300,7 @@ npm run test:run -- src/hooks/common/validation/__tests__/
 
 ## Examples
 
-See `/src/hooks/bills/useBillFormValidated.ts` for a complete example of migrating an existing form hook to use the validation pattern.
+See `/src/hooks/budgeting/bills/useBillFormValidated.ts` for a complete example of migrating an existing form hook to use the validation pattern.
 
 ## Best Practices
 

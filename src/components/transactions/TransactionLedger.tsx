@@ -11,15 +11,15 @@ import TransactionLedgerHeader from "./ledger/TransactionLedgerHeader";
 import TransactionPagination from "./ledger/TransactionPagination";
 import TransactionLedgerLoading from "./ledger/TransactionLedgerLoading";
 
-import { useTransactionLedger } from "../../hooks/transactions/useTransactionLedger";
-import { useLayoutData } from "../../hooks/layout/useLayoutData";
+import { useTransactionLedger } from "../../hooks/budgeting/transactions/useTransactionLedger";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import {
   calculateTransactionTotals,
   getTransactionFilterConfigs,
 } from "../../utils/transactions/ledgerHelpers";
 import type { User, Transaction, Envelope } from "../../types/finance";
-import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
+import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
 
 // Types used in interface definitions

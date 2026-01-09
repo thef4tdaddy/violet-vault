@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
+import useEnvelopeForm from "@/hooks/budgeting/envelopes/useEnvelopeForm";
 import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent, DesktopModalHeader } from "./CreateEnvelopeModalComponents";

@@ -5,16 +5,17 @@
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
 import React, { useMemo } from "react";
-import { useBillManager } from "../../hooks/bills/useBillManager";
-import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
+import { useBillManager } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManager";
+import { useBillManagerUI } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import BillManagerHeader from "./BillManagerHeader";
 import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
 import BillTable from "./BillTable";
 import BillManagerModals from "./BillManagerModals";
 import type { Bill } from "@/types/bills";
+import type { BillRecord } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillCalculations";
 
 interface Transaction {
   id: string;
@@ -51,8 +52,6 @@ const BillManagerLoading: React.FC<{ className?: string }> = ({ className = "" }
 );
 
 const BillManager: React.FC<BillManagerProps> = ({
-  transactions: propTransactions = [],
-  envelopes: propEnvelopes = [],
   onUpdateBill,
   onCreateRecurringBill,
   onSearchNewBills,
@@ -102,8 +101,6 @@ const BillManager: React.FC<BillManagerProps> = ({
     updateBill,
     deleteBill,
   } = useBillManager({
-    propTransactions,
-    propEnvelopes,
     onUpdateBill,
     onCreateRecurringBill,
     onSearchNewBills,
@@ -146,10 +143,7 @@ const BillManager: React.FC<BillManagerProps> = ({
   });
 
   // Edit lock for collaborative editing
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
   const { isLocked: isEditLocked, lockedBy } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User"
@@ -236,7 +230,7 @@ const BillManager: React.FC<BillManagerProps> = ({
         updateBill={updateBill as never}
         deleteBill={deleteBill as never}
         handleBulkUpdate={(entities) => handleBulkUpdate(entities as never)}
-        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as never)}
+        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as BillRecord[])}
         billOperations={billOperations}
         onError={onError ?? (() => {})}
       />

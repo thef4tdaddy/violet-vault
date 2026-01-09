@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useExportData } from "../useExportData";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { useToastHelpers } from "../../../utils/common/toastHelpers";
-import { budgetDb, getBudgetMetadata } from "../../../db/budgetDb";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
+import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import { constructExportObject } from "../useExportDataHelpers";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 
-vi.mock("@/hooks/auth/useAuthManager");
+vi.mock("@/hooks/auth/useAuth");
 vi.mock("../../../utils/common/toastHelpers");
 vi.mock("../../../db/budgetDb");
 vi.mock("../useExportDataHelpers");
@@ -16,7 +16,7 @@ describe("useExportData", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAuthManager as Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: mockUser,
     });
     (constructExportObject as Mock).mockImplementation((data, user) => ({

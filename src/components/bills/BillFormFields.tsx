@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import type { BillFormData } from "@/types/bills";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import { Textarea } from "@/components/ui";
 import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
 import { BillBasicFields, BillIconSelector, BillFormActions } from "./BillFormSections";

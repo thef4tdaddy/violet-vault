@@ -1,5 +1,5 @@
 import { useState, useMemo, createElement } from "react";
-import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
+import { useBudgetCommits } from "@/hooks/platform/history/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
 import { BudgetCommit } from "@/domain/schemas";
 import {
