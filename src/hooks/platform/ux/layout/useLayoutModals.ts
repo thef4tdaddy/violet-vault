@@ -23,7 +23,7 @@ interface UseMainContentModalsReturn {
   settings: SettingsModalState;
 }
 
-export const useMainContentModals = (): UseMainContentModalsReturn => {
+export const useLayoutModals = (): UseMainContentModalsReturn => {
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [settingsInitialSection, setSettingsInitialSection] = useState("general");

@@ -12,7 +12,7 @@ import TransactionPagination from "./ledger/TransactionPagination";
 import TransactionLedgerLoading from "./ledger/TransactionLedgerLoading";
 
 import { useTransactionLedger } from "../../hooks/budgeting/transactions/useTransactionLedger";
-import { useLayoutData } from "../../hooks/layout/useLayoutData";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import {
   calculateTransactionTotals,

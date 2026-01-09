@@ -2,17 +2,15 @@ import React, { useState, useEffect, useRef, useCallback, ReactNode } from "reac
 import { useNavigate, useLocation } from "react-router-dom";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useLayoutData } from "@/hooks/layout";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import useDataManagement from "@/hooks/common/useDataManagement";
 import usePasswordRotation from "@/hooks/auth/usePasswordRotation";
 import useNetworkStatus from "@/hooks/common/useNetworkStatus";
 import { useFirebaseSync } from "@/hooks/platform/sync/useFirebaseSync";
 import usePaydayPrediction from "@/hooks/budgeting/transactions/scheduled/income/usePaydayPrediction";
 import useDataInitialization from "@/hooks/common/useDataInitialization";
-import { useMainLayoutHandlers } from "@/hooks/layout/useMainLayoutHandlers";
-import { useSecurityWarning } from "@/hooks/layout/useSecurityWarning";
-import { useCorruptionDetection } from "@/hooks/layout/useCorruptionDetection";
-import { useMainContentModals } from "@/hooks/layout/useMainContentModals";
+import { useLayoutLifecycle } from "@/hooks/platform/ux/layout/useLayoutLifecycle";
+import { useLayoutModals } from "@/hooks/platform/ux/layout/useLayoutModals";
 import AuthGateway from "@/components/auth/AuthGateway";
 import Header from "@/components/ui/Header";
 import { ToastContainer, type ToastItem } from "@/components/ui/Toast";
@@ -116,8 +114,20 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
   const { isUnlocked, user: currentUser, securityContext } = auth;
 
   // Extract handlers and security context
-  const { isLocalOnlyMode, handleLogout, handleSetup, handleChangePassword, securityManager } =
-    useMainLayoutHandlers(auth);
+  // Extract handlers and security context
+  const isLocalOnlyMode = !!auth?.user?.isLocalOnly;
+  const securityManager = auth?.securityManager;
+
+  // Wrap async handlers
+  const handleSetup = async (password: string, userData?: UserData) => {
+    await auth.login({ password, userData });
+  };
+
+  const handleChangePassword = async (oldPassword: string, newPassword: string) => {
+    await auth.changePassword({ oldPassword, newPassword });
+  };
+
+  const handleLogout = auth?.logout || (() => {});
 
   // Data hooks
   useDataInitialization();
@@ -268,18 +278,20 @@ const MainContent = ({
   };
 
   // Modal state management
-  const modals = useMainContentModals();
+  const modals = useLayoutModals();
 
-  // Security warning management using helper
-  const { showSecurityWarning, setShowSecurityWarning } = useSecurityWarning({
+  // Layout lifecycle (Corruption detection & Security warning)
+  const {
+    showSecurityWarning,
+    setShowSecurityWarning,
+    showCorruptionModal,
+    setShowCorruptionModal,
+  } = useLayoutLifecycle({
     isUnlocked: isUnlockedAuth,
     currentUser,
     isOnboarded,
-    hasAcknowledged: hasSecurityAcknowledgement(),
+    hasAcknowledgedSecurity: hasSecurityAcknowledgement(),
   });
-
-  // Corruption detection management
-  const { showCorruptionModal, setShowCorruptionModal } = useCorruptionDetection();
 
   // Firebase sync - use helper to extract user
   const userForSync = getUserForSync(currentUser);
@@ -366,7 +378,7 @@ const MainContent = ({
   );
 };
 
-type MainContentModals = ReturnType<typeof useMainContentModals>;
+type MainContentModals = ReturnType<typeof useLayoutModals>;
 
 interface MainContentLayoutViewProps {
   currentUser: UserData | null;

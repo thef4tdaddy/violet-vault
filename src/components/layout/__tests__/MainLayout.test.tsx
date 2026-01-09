@@ -52,16 +52,21 @@ vi.mock("@/hooks/auth/useAuth", () => ({
   useAuth: vi.fn(() => MOCK_AUTH),
 }));
 
-vi.mock("@/hooks/layout", () => ({
+vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
   useLayoutData: vi.fn(() => MOCK_LAYOUT_DATA),
 }));
 
-vi.mock("@/hooks/layout/useMainLayoutHandlers", () => ({
-  useMainLayoutHandlers: vi.fn(() => MOCK_LAYOUT_HANDLERS),
+vi.mock("@/hooks/platform/ux/layout/useLayoutModals", () => ({
+  useLayoutModals: vi.fn(() => MOCK_CONTENT_MODALS),
 }));
 
-vi.mock("@/hooks/layout/useMainContentModals", () => ({
-  useMainContentModals: vi.fn(() => MOCK_CONTENT_MODALS),
+vi.mock("@/hooks/platform/ux/layout/useLayoutLifecycle", () => ({
+  useLayoutLifecycle: vi.fn(() => ({
+    showSecurityWarning: false,
+    setShowSecurityWarning: vi.fn(),
+    showCorruptionModal: false,
+    setShowCorruptionModal: vi.fn(),
+  })),
 }));
 
 // 2. Component Mocks (Use @/ aliases for EVERYTHING)
@@ -171,20 +176,11 @@ vi.mock("@/hooks/auth/usePasswordRotation", () => ({
     handlePasswordRotation: vi.fn(),
   })),
 }));
-vi.mock("@/hooks/sync/useFirebaseSync", () => ({
+vi.mock("@/hooks/platform/sync/useFirebaseSync", () => ({
   useFirebaseSync: vi.fn(() => ({ syncState: "idle", handleSync: vi.fn() })),
 }));
 vi.mock("@/hooks/common/useNetworkStatus", () => ({ default: vi.fn(() => ({ isOnline: true })) }));
-vi.mock("@/hooks/budgeting/usePaydayPrediction", () => ({
-  default: vi.fn(() => ({ prediction: null })),
-}));
-vi.mock("@/hooks/common/useDataInitialization", () => ({ default: vi.fn(() => ({})) }));
-vi.mock("@/hooks/layout/useSecurityWarning", () => ({
-  useSecurityWarning: vi.fn(() => ({ showSecurityWarning: false })),
-}));
-vi.mock("@/hooks/layout/useCorruptionDetection", () => ({
-  useCorruptionDetection: vi.fn(() => ({ corruptionDetected: false })),
-}));
+// Migrated Hooks
 vi.mock("@/hooks/common/useOnboardingAutoComplete", () => ({
   useOnboardingAutoComplete: vi.fn(() => ({})),
 }));

@@ -9,7 +9,7 @@ vi.mock("@/components/ui/ErrorBoundary", () => ({
 }));
 
 // Mock layout hooks
-vi.mock("@/hooks/layout", () => ({
+vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
   useLayoutData: vi.fn(() => ({
     unassignedCash: 100,
     bills: { addBill: vi.fn() },

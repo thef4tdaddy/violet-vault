@@ -18,7 +18,7 @@ import BillModalHeader from "./BillModalHeader";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import { useLayoutData } from "@/hooks/layout/useLayoutData";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
 import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
