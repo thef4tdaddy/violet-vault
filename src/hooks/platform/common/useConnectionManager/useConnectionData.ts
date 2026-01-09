@@ -45,16 +45,21 @@ export const useConnectionData = ({
   }, [entityType, entityId, currentEntity, bills, envelopes]);
 
   // Get available options for new connections
+  // Note: Connections are defined on the Bill/Debt side via envelopeId, not on the Envelope side.
+  // We just return all eligible envelopes for Bills/Debts, or all eligible Bills for Envelopes.
   const availableOptions = useMemo(() => {
     switch (entityType) {
       case "bill":
-        return envelopes.filter((envelope) => !envelope.billId || envelope.billId === entityId);
+        // Logic: Envelopes don't have billId anymore. We select envelopes that are suitable.
+        // For now, return all standard/liability envelopes or filter as needed by business logic.
+        return envelopes;
 
       case "envelope":
         return bills.filter((bill) => !bill.envelopeId || bill.envelopeId === entityId);
 
       case "debt":
-        return envelopes.filter((envelope) => !envelope.debtId || envelope.debtId === entityId);
+        // Logic: Envelopes don't have debtId anymore.
+        return envelopes;
 
       default:
         return [];

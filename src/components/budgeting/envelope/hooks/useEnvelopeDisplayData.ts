@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { getUtilizationColor } from "@/utils/budgeting";
-import { ENVELOPE_TYPES } from "@/constants/categories";
 import { getBillEnvelopeDisplayInfo } from "@/utils/budgeting/billEnvelopeCalculations";
 import type { BillEnvelopeResult } from "@/utils/budgeting/billEnvelopeCalculations";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
@@ -163,15 +162,13 @@ export const useEnvelopeDisplayData = (
     });
 
     const envelopeData =
-      envelope.envelopeType === ENVELOPE_TYPES.BILL
-        ? getBillEnvelopeData()
-        : getNonBillEnvelopeData();
+      envelope.type === "liability" ? getBillEnvelopeData() : getNonBillEnvelopeData();
 
     return {
       statusIcon: getStatusIcon(envelope.status),
       utilizationColorClass: envelopeData.colorClass,
       financialSummary: envelopeData.financialSummary,
-      showProgressBar: envelope.envelopeType !== ENVELOPE_TYPES.VARIABLE,
+      showProgressBar: envelope.type !== "standard",
       progressBarColor: envelopeData.progressColor,
     };
   }, [envelope, bills]);

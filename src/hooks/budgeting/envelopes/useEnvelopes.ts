@@ -56,7 +56,15 @@ const createAddEnvelopeOp = (queryClient: QueryClient) => async (data: Partial<E
     createdAt: Date.now(),
     ...data,
   } as Envelope;
-  if (!e.envelopeType) e.envelopeType = AUTO_CLASSIFY_ENVELOPE_TYPE(e.category || "expenses");
+  const record = e as Record<string, unknown>;
+  const type =
+    (record.type as string) ||
+    (record.envelopeType as string) ||
+    AUTO_CLASSIFY_ENVELOPE_TYPE(e.category || "expenses");
+
+  // Safely assign proper type depending on what e is. Default to setting 'type'.
+  if (!e.type) (e as unknown as Record<string, string>).type = type;
+  if (!record.envelopeType) (e as unknown as Record<string, string>).envelopeType = type;
   const val = validateEnvelopeSafe(e);
   if (!val.success) throw new Error("Invalid envelope");
   const final = sanitizeForDb(val.data as unknown as Record<string, unknown>) as Envelope;
@@ -83,12 +91,25 @@ const createDeleteEnvelopeOp =
     if (env && (env.currentBalance || 0) > 0) {
       await setUnassignedCash((await getUnassignedCash()) + (env.currentBalance || 0));
     }
-    const bills = await budgetDb.bills.where("envelopeId").equals(id).toArray();
+    const dbLegacy = budgetDb as unknown as Record<
+      string,
+      {
+        where: (prop: string) => {
+          equals: (val: string) => {
+            toArray: () => Promise<Record<string, unknown>[]>;
+          };
+        };
+        delete: (id: string) => Promise<void>;
+        update: (id: string, updates: Record<string, unknown>) => Promise<void>;
+      }
+    >;
+    const bills = await dbLegacy.bills.where("envelopeId").equals(id).toArray();
     for (const b of bills) {
-      if (deleteBillsToo) await budgetDb.bills.delete(b.id);
+      const billId = b.id as string;
+      if (deleteBillsToo) await dbLegacy.bills.delete(billId);
       else {
-        await budgetDb.bills.update(b.id, { envelopeId: undefined });
-        await optimisticHelpers.updateBill(queryClient, b.id, { envelopeId: undefined });
+        await dbLegacy.bills.update(billId, { envelopeId: undefined });
+        await optimisticHelpers.updateBill(queryClient, billId, { envelopeId: undefined });
       }
     }
     await optimisticHelpers.removeEnvelope(queryClient, id);

@@ -62,7 +62,9 @@ export const useUserSetup = (onSetupComplete: (payload: SetupPayload) => Promise
             try {
               // Check Dexie for budget data
               const envelopeCount = await budgetDb.envelopes.count();
-              const billCount = await budgetDb.bills.count();
+              const billCount = await (
+                budgetDb as unknown as Record<string, { count: () => Promise<number> }>
+              ).bills.count();
               hasBudgetData = envelopeCount > 0 || billCount > 0;
 
               if (hasBudgetData) {

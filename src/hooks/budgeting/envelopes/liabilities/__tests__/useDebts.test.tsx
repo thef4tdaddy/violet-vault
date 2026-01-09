@@ -4,33 +4,40 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Mock } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useDebts } from "../useDebts";
-import { budgetDb } from "@/db/budgetDb";
-import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
-import type { Debt } from "@/types/debt";
+import { budgetDb } from "../../../../../db/budgetDb";
+import BudgetHistoryTracker from "../../../../../utils/common/budgetHistoryTracker";
+import type { Debt } from "../../../../../db/types";
 
 // Mock dependencies
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../../../db/budgetDb", () => ({
   budgetDb: {
-    debts: {
+    envelopes: {
       toArray: vi.fn(),
       put: vi.fn(),
       get: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      where: vi.fn().mockReturnValue({
+        equals: vi.fn().mockReturnThis(),
+        toArray: vi.fn(),
+      }),
     },
+    // Keep debts as null for v2 compatibility check if needed,
+    // but the hook uses envelopes.
   },
 }));
 
-vi.mock("@/utils/common/budgetHistoryTracker", () => ({
+vi.mock("../../../../../utils/common/budgetHistoryTracker", () => ({
   default: {
     trackDebtChange: vi.fn(),
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../../../utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -63,20 +70,27 @@ describe("useDebts - CRUD Operations", () => {
     minimumPayment: 150,
     interestRate: 18.5,
     originalBalance: 6000,
-    paymentFrequency: "monthly",
-    compoundFrequency: "monthly",
     lastModified: Date.now(),
     createdAt: Date.now(),
+    color: "#3B82F6",
+    autoAllocate: true,
+    isPaid: false,
+    archived: false,
+    category: "Debt",
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-    (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
-    (budgetDb.debts.put as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-    (budgetDb.debts.update as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-    (budgetDb.debts.delete as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-    (BudgetHistoryTracker.trackDebtChange as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+    const mockWhere = {
+      equals: vi.fn().mockReturnThis(),
+      toArray: vi.fn().mockResolvedValue([]),
+    };
+    (budgetDb.envelopes.where as Mock).mockReturnValue(mockWhere);
+    (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
+    (budgetDb.envelopes.put as Mock).mockResolvedValue(undefined);
+    (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
+    (budgetDb.envelopes.delete as Mock).mockResolvedValue(undefined);
+    (BudgetHistoryTracker.trackDebtChange as Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -86,7 +100,7 @@ describe("useDebts - CRUD Operations", () => {
   describe("Read Operations", () => {
     it("should fetch debts from database", async () => {
       const mockDebts = [mockDebt];
-      (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebts);
+      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue(mockDebts);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -96,11 +110,11 @@ describe("useDebts - CRUD Operations", () => {
         expect(result.current.debts).toEqual(mockDebts);
       });
 
-      expect(budgetDb.debts.toArray).toHaveBeenCalledTimes(1);
+      expect(budgetDb.envelopes.where).toHaveBeenCalledWith("type");
     });
 
     it("should handle empty debt list", async () => {
-      (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue([]);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -113,7 +127,7 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should get debt by ID", async () => {
       const mockDebts = [mockDebt];
-      (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebts);
+      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue(mockDebts);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -128,7 +142,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should return undefined for non-existent debt ID", async () => {
-      (budgetDb.debts.toArray as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue([]);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -146,10 +160,15 @@ describe("useDebts - CRUD Operations", () => {
       const debtWithoutStatus = { ...mockDebt, status: undefined };
       const debtWithStatus = { ...mockDebt, status: "active" };
 
-      (budgetDb.debts.toArray as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce([debtWithoutStatus])
-        .mockResolvedValueOnce([debtWithStatus]);
-      (budgetDb.debts.update as ReturnType<typeof vi.fn>).mockResolvedValue(1);
+      const mockQuery = {
+        equals: vi.fn().mockReturnThis(),
+        toArray: vi
+          .fn()
+          .mockResolvedValueOnce([debtWithoutStatus])
+          .mockResolvedValueOnce([debtWithStatus]),
+      };
+      (budgetDb.envelopes.where as Mock).mockReturnValue(mockQuery);
+      (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -159,12 +178,28 @@ describe("useDebts - CRUD Operations", () => {
         expect(result.current.debts).toEqual([debtWithStatus]);
       });
 
-      expect(budgetDb.debts.update).toHaveBeenCalledWith("debt-1", { status: "active" });
+      expect(budgetDb.envelopes.update).toHaveBeenCalledWith("debt-1", { status: "active" });
     });
   });
 
   describe("Create Operations", () => {
     it("should create a new debt with generated ID", async () => {
+      const mockDebt: Debt = {
+        id: "debt-1",
+        name: "Test Debt",
+        creditor: "Test Creditor",
+        type: "personal" as const,
+        currentBalance: 5000,
+        minimumPayment: 100,
+        interestRate: 15,
+        lastModified: Date.now(),
+        archived: false,
+        category: "Debt",
+        status: "active",
+        color: "#3B82F6",
+        autoAllocate: true,
+        isPaid: false,
+      };
       const newDebtData = {
         name: "New Debt",
         creditor: "New Creditor",
@@ -176,13 +211,13 @@ describe("useDebts - CRUD Operations", () => {
       };
 
       const createdDebt = {
-        ...newDebtData,
+        ...mockDebt,
         id: "generated-id",
         status: "active",
         lastModified: Date.now(),
       };
 
-      (budgetDb.debts.put as ReturnType<typeof vi.fn>).mockImplementation((debt) => {
+      (budgetDb.envelopes.put as Mock).mockImplementation((debt: any) => {
         expect(debt.id).toBeDefined();
         expect(debt.status).toBe("active");
         return Promise.resolve(undefined);
@@ -199,7 +234,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.addDebtAsync(newDebtData);
 
       await waitFor(() => {
-        expect(budgetDb.debts.put).toHaveBeenCalled();
+        expect(budgetDb.envelopes.put).toHaveBeenCalled();
         expect(BudgetHistoryTracker.trackDebtChange).toHaveBeenCalledWith(
           expect.objectContaining({
             changeType: "add",
@@ -231,7 +266,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.addDebtAsync(newDebtData);
 
       await waitFor(() => {
-        expect(budgetDb.debts.put).toHaveBeenCalledWith(
+        expect(budgetDb.envelopes.put).toHaveBeenCalledWith(
           expect.objectContaining({
             id: "custom-id",
             status: "active",
@@ -279,7 +314,7 @@ describe("useDebts - CRUD Operations", () => {
         currentBalance: 4500,
       };
 
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>)
+      (budgetDb.envelopes.get as Mock)
         .mockResolvedValueOnce(mockDebt) // Previous data
         .mockResolvedValueOnce({ ...mockDebt, ...updates }); // New data
 
@@ -297,7 +332,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.debts.update).toHaveBeenCalledWith(
+        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             ...updates,
@@ -318,7 +353,7 @@ describe("useDebts - CRUD Operations", () => {
       const updates = { name: "Updated Name" };
       const beforeUpdate = Date.now();
 
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>)
+      (budgetDb.envelopes.get as Mock)
         .mockResolvedValueOnce(mockDebt)
         .mockResolvedValueOnce({ ...mockDebt, ...updates });
 
@@ -336,7 +371,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        const updateCall = (budgetDb.debts.update as ReturnType<typeof vi.fn>).mock.calls[0];
+        const updateCall = (budgetDb.envelopes.update as Mock).mock.calls[0];
         expect(updateCall[1].lastModified).toBeGreaterThanOrEqual(beforeUpdate);
       });
     });
@@ -344,7 +379,7 @@ describe("useDebts - CRUD Operations", () => {
     it("should track history with author when updating", async () => {
       const updates = { name: "Updated Name" };
 
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>)
+      (budgetDb.envelopes.get as Mock)
         .mockResolvedValueOnce(mockDebt)
         .mockResolvedValueOnce({ ...mockDebt, ...updates });
 
@@ -375,7 +410,7 @@ describe("useDebts - CRUD Operations", () => {
 
   describe("Delete Operations", () => {
     it("should delete a debt", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -388,7 +423,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.deleteDebtAsync({ id: "debt-1" });
 
       await waitFor(() => {
-        expect(budgetDb.debts.delete).toHaveBeenCalledWith("debt-1");
+        expect(budgetDb.envelopes.delete).toHaveBeenCalledWith("debt-1");
         expect(BudgetHistoryTracker.trackDebtChange).toHaveBeenCalledWith(
           expect.objectContaining({
             debtId: "debt-1",
@@ -401,7 +436,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should track history when deleting debt", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -427,7 +462,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should not track history if debt doesn't exist", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(null);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -440,7 +475,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.deleteDebtAsync({ id: "non-existent" });
 
       await waitFor(() => {
-        expect(budgetDb.debts.delete).toHaveBeenCalledWith("non-existent");
+        expect(budgetDb.envelopes.delete).toHaveBeenCalledWith("non-existent");
         expect(BudgetHistoryTracker.trackDebtChange).not.toHaveBeenCalled();
       });
     });
@@ -460,7 +495,7 @@ describe("useDebts - CRUD Operations", () => {
         lastModified: Date.now(),
       };
 
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>)
+      (budgetDb.envelopes.get as Mock)
         .mockResolvedValueOnce(mockDebt)
         .mockResolvedValueOnce(updatedDebt);
 
@@ -478,7 +513,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.debts.update).toHaveBeenCalledWith(
+        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 4800, // 5000 - 200
@@ -500,7 +535,7 @@ describe("useDebts - CRUD Operations", () => {
         date: new Date().toISOString(),
       };
 
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -516,7 +551,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.debts.update).toHaveBeenCalledWith(
+        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 0, // Should be clamped to 0
@@ -551,7 +586,7 @@ describe("useDebts - CRUD Operations", () => {
       // Query invalidation happens in onSuccess callback
       // We verify the mutation completed successfully
       await waitFor(() => {
-        expect(budgetDb.debts.put).toHaveBeenCalled();
+        expect(budgetDb.envelopes.put).toHaveBeenCalled();
       });
     });
   });
@@ -559,7 +594,7 @@ describe("useDebts - CRUD Operations", () => {
   describe("Validation Error Handling", () => {
     it("should handle database error when adding debt", async () => {
       const dbError = new Error("Database write failed");
-      (budgetDb.debts.put as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+      (budgetDb.envelopes.put as Mock).mockRejectedValue(dbError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -586,8 +621,8 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should handle database error when updating debt", async () => {
       const dbError = new Error("Database update failed");
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
-      (budgetDb.debts.update as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.update as Mock).mockRejectedValue(dbError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -607,8 +642,8 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should handle database error when deleting debt", async () => {
       const dbError = new Error("Database delete failed");
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
-      (budgetDb.debts.delete as ReturnType<typeof vi.fn>).mockRejectedValue(dbError);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.delete as Mock).mockRejectedValue(dbError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -625,9 +660,7 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should handle history tracking errors gracefully", async () => {
       const historyError = new Error("History tracking failed");
-      (BudgetHistoryTracker.trackDebtChange as ReturnType<typeof vi.fn>).mockRejectedValue(
-        historyError
-      );
+      (BudgetHistoryTracker.trackDebtChange as Mock).mockRejectedValue(historyError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -655,7 +688,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should handle payment recording with non-existent debt", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(null);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -702,7 +735,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should handle concurrent debt updates", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -725,7 +758,7 @@ describe("useDebts - CRUD Operations", () => {
       ]);
 
       await waitFor(() => {
-        expect(budgetDb.debts.update).toHaveBeenCalledTimes(2);
+        expect(budgetDb.envelopes.update).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -755,7 +788,7 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should handle envelope relationship validation for debt payment", async () => {
       const debtWithEnvelope = { ...mockDebt, envelopeId: "non-existent-envelope" };
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(debtWithEnvelope);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(debtWithEnvelope);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -775,12 +808,12 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.debts.update).toHaveBeenCalled();
+        expect(budgetDb.envelopes.update).toHaveBeenCalled();
       });
     });
 
     it("should handle payment amount exceeding balance", async () => {
-      (budgetDb.debts.get as ReturnType<typeof vi.fn>).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -801,7 +834,7 @@ describe("useDebts - CRUD Operations", () => {
 
       await waitFor(() => {
         // Balance should be clamped to 0
-        expect(budgetDb.debts.update).toHaveBeenCalledWith(
+        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 0,

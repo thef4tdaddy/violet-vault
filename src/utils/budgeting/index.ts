@@ -19,7 +19,7 @@ export {
 export {
   calculateEnvelopeData,
   calculateUtilizationRate,
-  determineEnvelopeStatus,
+  determineEnvelopeHealth,
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,

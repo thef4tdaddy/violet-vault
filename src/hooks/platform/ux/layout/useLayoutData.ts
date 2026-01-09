@@ -68,17 +68,21 @@ export const useLayoutData = () => {
         return (
           typeof record.id === "string" &&
           typeof record.name === "string" &&
-          (record.dueDate instanceof Date || typeof record.dueDate === "string") &&
-          typeof record.amount === "number" &&
-          typeof record.category === "string" &&
-          typeof record.isPaid === "boolean" &&
-          typeof record.isRecurring === "boolean" &&
+          typeof record.name === "string" &&
+          // Relaxed check for legacy properties
+          // typeof record.dueDate ...
+          // typeof record.amount ...
           typeof record.lastModified === "number"
         );
       })
       .map((bill) => ({
         ...bill,
-        dueDate: bill.dueDate instanceof Date ? bill.dueDate : new Date(bill.dueDate),
+        dueDate:
+          (bill as unknown as Record<string, unknown>).dueDate instanceof Date
+            ? ((bill as unknown as Record<string, unknown>).dueDate as Date)
+            : new Date(
+                ((bill as unknown as Record<string, unknown>).dueDate as string) || Date.now()
+              ),
       }));
   }, [bills?.bills]);
 

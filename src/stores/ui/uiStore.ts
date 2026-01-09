@@ -4,6 +4,7 @@ import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "../../utils/common/logger.ts";
 import { budgetDb, setBudgetMetadata } from "../../db/budgetDb.ts";
+import type { Envelope, Transaction } from "../../db/types.ts";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -32,16 +33,40 @@ const transformOldData = (parsedOldData: { state?: Record<string, unknown> }) =>
  * Seed Dexie database with migrated data
  */
 const seedDexieWithMigratedData = async (transformedData: { state: Record<string, unknown> }) => {
-  await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes as never[]);
-  await budgetDb.bulkUpsertBills(transformedData.state.bills as never[]);
-  await budgetDb.bulkUpsertTransactions(
-    (transformedData.state.allTransactions as unknown[]).length > 0
-      ? (transformedData.state.allTransactions as never[])
-      : (transformedData.state.transactions as never[])
-  );
-  await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals as never[]);
-  await budgetDb.bulkUpsertDebts(transformedData.state.debts as never[]);
-  await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory as never[]);
+  const envelopes = (transformedData.state.envelopes as unknown[]) || [];
+  const bills = (transformedData.state.bills as unknown[]) || [];
+  const savingsGoals = (transformedData.state.savingsGoals as unknown[]) || [];
+  const debts = (transformedData.state.debts as unknown[]) || [];
+
+  // Combine legacy tables into unified envelopes
+  const unifiedEnvelopes = [
+    ...envelopes.map((e) => ({
+      ...(e as Record<string, unknown>),
+      type: (e as Record<string, unknown>).type || "standard",
+    })),
+    ...bills.map((b) => ({ ...(b as Record<string, unknown>), type: "liability" })),
+    ...savingsGoals.map((s) => ({ ...(s as Record<string, unknown>), type: "goal" })),
+    ...debts.map((d) => ({ ...(d as Record<string, unknown>), type: "liability" })),
+  ];
+
+  await budgetDb.bulkUpsertEnvelopes(unifiedEnvelopes as unknown as Envelope[]);
+
+  const transactions =
+    ((transformedData.state.allTransactions || transformedData.state.transactions) as unknown[]) ||
+    [];
+  const paycheckHistory = (transformedData.state.paycheckHistory as unknown[]) || [];
+
+  // Combine legacy transactions and paychecks
+  const unifiedTransactions = [
+    ...transactions.map((t) => ({ ...(t as Record<string, unknown>) })),
+    ...paycheckHistory.map((p) => ({
+      ...(p as Record<string, unknown>),
+      type: (p as Record<string, unknown>).type || "income",
+      isScheduled: (p as Record<string, unknown>).isScheduled || false,
+    })),
+  ];
+
+  await budgetDb.bulkUpsertTransactions(unifiedTransactions as unknown as Transaction[]);
 
   await setBudgetMetadata({
     unassignedCash: (transformedData.state.unassignedCash as number) || 0,

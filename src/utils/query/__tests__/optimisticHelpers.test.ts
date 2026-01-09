@@ -2,18 +2,19 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import type { Mock } from "vitest";
 import { optimisticHelpers } from "../optimisticHelpers";
-import { budgetDb } from "@/db/budgetDb";
-import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
+import { budgetDb } from "../../../db/budgetDb";
+import { budgetDatabaseService } from "../../../services/budget/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       get: vi.fn(),
       put: vi.fn(),
       add: vi.fn(),
       delete: vi.fn(),
+      update: vi.fn(),
     },
     transactions: {
       get: vi.fn(),
@@ -24,12 +25,11 @@ vi.mock("@/db/budgetDb", () => ({
     bills: {
       get: vi.fn(),
       put: vi.fn(),
-      update: vi.fn(),
     },
   },
 }));
 
-vi.mock("@/services/budget/budgetDatabaseService", () => ({
+vi.mock("../../../services/budget/budgetDatabaseService", () => ({
   budgetDatabaseService: {
     saveBudgetMetadata: vi.fn(),
   },
@@ -81,7 +81,7 @@ describe("optimisticHelpers", () => {
       (budgetDb.envelopes.get as Mock).mockResolvedValue(existingEnvelope);
       (budgetDb.envelopes.put as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(mockQueryClient as any, envelopeId, updates);
 
       // Should update individual envelope query
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
@@ -115,7 +115,7 @@ describe("optimisticHelpers", () => {
       (budgetDb.envelopes.put as Mock).mockRejectedValue(error);
 
       // Should not throw error
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(mockQueryClient as any, envelopeId, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalled();
     });
@@ -138,12 +138,12 @@ describe("optimisticHelpers", () => {
         return updater;
       });
 
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(mockQueryClient as any, envelopeId, updates);
 
       // Verify the updater function works correctly
-      const updateFn = mockQueryClient.setQueryData.mock.calls.find(
-        (call) => JSON.stringify(call[0]) === JSON.stringify(queryKeys.envelopesList())
-      )[1];
+      const updateFn = (mockQueryClient.setQueryData as Mock).mock.calls.find(
+        (call: any) => JSON.stringify(call[0]) === JSON.stringify(queryKeys.envelopesList())
+      )![1];
 
       const updatedList = updateFn(existingEnvelopes);
       expect(updatedList[0]).toMatchObject({
@@ -173,7 +173,7 @@ describe("optimisticHelpers", () => {
 
       (budgetDb.envelopes.add as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.addEnvelope(mockQueryClient, newEnvelope);
+      await optimisticHelpers.addEnvelope(mockQueryClient as any, newEnvelope);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopesList(),
@@ -199,7 +199,7 @@ describe("optimisticHelpers", () => {
         return updater;
       });
 
-      await optimisticHelpers.addEnvelope(mockQueryClient, newEnvelope);
+      await optimisticHelpers.addEnvelope(mockQueryClient as any, newEnvelope);
 
       const updateFn = mockQueryClient.setQueryData.mock.calls[0][1];
       const result = updateFn(null);
@@ -231,7 +231,7 @@ describe("optimisticHelpers", () => {
 
       (budgetDb.envelopes.delete as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.removeEnvelope(mockQueryClient, envelopeId);
+      await optimisticHelpers.removeEnvelope(mockQueryClient as any, envelopeId);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopesList(),
@@ -266,7 +266,7 @@ describe("optimisticHelpers", () => {
 
       (budgetDb.transactions.update as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.updateTransaction(mockQueryClient, transactionId, updates);
+      await optimisticHelpers.updateTransaction(mockQueryClient as any, transactionId, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.transactionById(transactionId),
@@ -299,7 +299,7 @@ describe("optimisticHelpers", () => {
 
       (budgetDb.transactions.add as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.addTransaction(mockQueryClient, newTransaction);
+      await optimisticHelpers.addTransaction(mockQueryClient as any, newTransaction);
 
       expect(mockQueryClient.setQueriesData).toHaveBeenCalledWith(
         { queryKey: queryKeys.transactions },
@@ -329,9 +329,9 @@ describe("optimisticHelpers", () => {
       const billId = "bill1";
       const updates = { isPaid: true, paidDate: new Date() };
 
-      (budgetDb.bills.update as Mock).mockResolvedValue(true);
+      (budgetDb.envelopes.update as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.updateBill(mockQueryClient, billId, updates);
+      await optimisticHelpers.updateBill(mockQueryClient as any, billId, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.billById(billId),
@@ -343,7 +343,7 @@ describe("optimisticHelpers", () => {
         expect.any(Function)
       );
 
-      expect(budgetDb.bills.update).toHaveBeenCalledWith(
+      expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
         billId,
         expect.objectContaining({
           ...updates,
@@ -359,7 +359,7 @@ describe("optimisticHelpers", () => {
 
       (budgetDatabaseService.saveBudgetMetadata as Mock).mockResolvedValue(true);
 
-      await optimisticHelpers.updateBudgetMetadata(mockQueryClient, updates);
+      await optimisticHelpers.updateBudgetMetadata(mockQueryClient as any, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.budgetMetadata,
@@ -386,7 +386,7 @@ describe("optimisticHelpers", () => {
     it("should handle partial metadata updates", async () => {
       const updates = { unassignedCash: 1500 };
 
-      await optimisticHelpers.updateBudgetMetadata(mockQueryClient, updates);
+      await optimisticHelpers.updateBudgetMetadata(mockQueryClient as any, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.unassignedCash(),
@@ -414,7 +414,7 @@ describe("optimisticHelpers", () => {
       vi.spyOn(optimisticHelpers, "updateTransaction").mockResolvedValue();
       vi.spyOn(optimisticHelpers, "updateBill").mockResolvedValue();
 
-      await optimisticHelpers.batchUpdate(mockQueryClient, updates);
+      await optimisticHelpers.batchUpdate(mockQueryClient as any, updates);
 
       expect(optimisticHelpers.updateEnvelope).toHaveBeenCalledWith(mockQueryClient, "env1", {
         id: "env1",
@@ -449,7 +449,7 @@ describe("optimisticHelpers", () => {
 
       vi.spyOn(optimisticHelpers, "updateEnvelope").mockResolvedValue();
 
-      await optimisticHelpers.batchUpdate(mockQueryClient, updates);
+      await optimisticHelpers.batchUpdate(mockQueryClient as any, updates);
 
       expect(optimisticHelpers.updateEnvelope).not.toHaveBeenCalled();
     });
@@ -460,7 +460,7 @@ describe("optimisticHelpers", () => {
       const queryKey = ["envelopes", "list"];
       const previousData = [{ id: "env1", name: "Food" }];
 
-      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, previousData);
+      await optimisticHelpers.rollbackUpdate(mockQueryClient as any, queryKey, previousData);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, previousData);
     });
@@ -468,7 +468,7 @@ describe("optimisticHelpers", () => {
     it("should invalidate when no previous data", async () => {
       const queryKey = ["envelopes", "list"];
 
-      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, undefined);
+      await optimisticHelpers.rollbackUpdate(mockQueryClient as any, queryKey, undefined);
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey,
@@ -483,7 +483,7 @@ describe("optimisticHelpers", () => {
       const updateFn = vi.fn((old, variables) => [...old, variables.newItem]);
       const rollbackFn = vi.fn();
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
+      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient as any, {
         mutationKey,
         queryKey,
         updateFn,
@@ -507,7 +507,7 @@ describe("optimisticHelpers", () => {
       mockQueryClient.cancelQueries.mockResolvedValue(undefined);
       mockQueryClient.getQueryData.mockReturnValue(previousData);
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
+      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient as any, {
         mutationKey: ["test"],
         queryKey,
         updateFn,
@@ -528,7 +528,7 @@ describe("optimisticHelpers", () => {
       const previousData = [{ id: "env1" }];
       const rollbackFn = vi.fn();
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
+      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient as any, {
         mutationKey: ["test"],
         queryKey,
         updateFn: vi.fn(),
@@ -548,7 +548,7 @@ describe("optimisticHelpers", () => {
     it("should handle onSettled correctly", () => {
       const queryKey = ["envelopes", "list"];
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
+      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient as any, {
         mutationKey: ["test"],
         queryKey,
         updateFn: vi.fn(),

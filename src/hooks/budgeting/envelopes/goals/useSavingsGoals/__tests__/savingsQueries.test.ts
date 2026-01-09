@@ -87,7 +87,7 @@ describe("Savings Goals Query Hooks", () => {
         });
 
         expect(result.current.data).toHaveLength(2);
-        expect(mockDb.savingsGoals.toArray).toHaveBeenCalled();
+        expect(mockDb.envelopes.where).toHaveBeenCalledWith("type");
       });
 
       it("should return empty array when no goals exist", async () => {
@@ -250,13 +250,13 @@ describe("Savings Goals Query Hooks", () => {
           expect(result.current.isLoading).toBe(false);
         });
 
-        const firstCallCount = mockDb.savingsGoals.toArray.mock.calls.length;
+        const firstCallCount = (mockDb.envelopes.where as any).mock.calls.length;
 
         // Rerender
         rerender();
 
         // Assert - Should not refetch
-        expect(mockDb.savingsGoals.toArray.mock.calls.length).toBe(firstCallCount);
+        expect(mockDb.envelopes.where).toHaveBeenCalledTimes(firstCallCount);
       });
 
       it("should keep previous data during refetch", async () => {
@@ -307,7 +307,7 @@ describe("Savings Goals Query Hooks", () => {
         });
 
         // Both queries should have run independently
-        expect(mockDb.savingsGoals.toArray.mock.calls.length).toBeGreaterThan(1);
+        expect(mockDb.envelopes.where).toHaveBeenCalledTimes(2);
       });
     });
   });

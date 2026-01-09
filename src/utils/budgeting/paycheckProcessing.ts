@@ -6,6 +6,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
+import type { Transaction } from "../../db/types";
 import {
   calculatePaycheckBalances,
   validateBalances,
@@ -116,28 +117,38 @@ export const createPaycheckRecord = async (
   allocations: Array<{ envelopeId: string; envelopeName?: string; amount: number }>,
   transactionIds?: { incomeTransactionId: string; transferTransactionIds: string[] }
 ) => {
-  const paycheckRecord = {
+  // Create map of allocations for the transaction record
+  const allocationsMap: Record<string, number> = {};
+  allocations.forEach((a) => {
+    allocationsMap[a.envelopeId] = a.amount;
+  });
+
+  const paycheckRecord: Transaction = {
     id: `paycheck_${Date.now()}`,
     date: new Date(),
     amount: paycheckData.amount,
-    source: paycheckData.payerName || "Unknown",
+    payerName: paycheckData.payerName || "Unknown",
     lastModified: Date.now(),
     createdAt: Date.now(),
+    type: "income",
+    category: "Income",
+    envelopeId: "unassigned",
+    isScheduled: false,
     // Additional custom fields
-    mode: paycheckData.mode,
+    mode: paycheckData.mode as "allocate" | "leftover",
     unassignedCashBefore: currentBalances.unassignedCash,
     unassignedCashAfter: newBalances.unassignedCash,
     actualBalanceBefore: currentBalances.actualBalance,
     actualBalanceAfter: newBalances.actualBalance,
-    envelopeAllocations: allocations,
+    allocations: allocationsMap,
     notes: paycheckData.notes || "",
     // Transaction IDs for audit trail (Issue #1340)
     incomeTransactionId: transactionIds?.incomeTransactionId,
     transferTransactionIds: transactionIds?.transferTransactionIds || [],
   };
 
-  // Save paycheck record to Dexie
-  await budgetDb.paycheckHistory.add(paycheckRecord as never);
+  // Save paycheck record to transactions table
+  await budgetDb.transactions.add(paycheckRecord);
 
   logger.info("Paycheck processing completed successfully", {
     paycheckId: paycheckRecord.id,
@@ -255,20 +266,19 @@ export const processPaycheck = async (
   // Get current balances
   const currentBalances = await getCurrentBalances(envelopesQuery, savingsGoalsQuery);
 
+  // Cast for compatibility with calculatePaycheckBalances
+  const balanceContext = currentBalances as unknown as {
+    actualBalance: number;
+    virtualBalance: number;
+    unassignedCash: number;
+    isActualBalanceManual: boolean;
+  };
+
   // Prepare allocations with envelope names for transaction creation
   const allocations = await prepareAllocationsWithNames(paycheckData.envelopeAllocations);
 
   // Use centralized balance calculator to ensure consistency
-  const newBalances = calculatePaycheckBalances(
-    currentBalances as {
-      actualBalance: number;
-      virtualBalance: number;
-      unassignedCash: number;
-      isActualBalanceManual: boolean;
-    },
-    paycheckData,
-    allocations
-  );
+  const newBalances = calculatePaycheckBalances(balanceContext, paycheckData, allocations);
 
   // Validate the calculation
   const validation = validateBalances(newBalances);

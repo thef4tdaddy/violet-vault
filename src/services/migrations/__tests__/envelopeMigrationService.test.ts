@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { budgetDb } from "@/db/budgetDb";
-import type { SavingsGoal, Envelope } from "@/db/types";
-import { ENVELOPE_TYPES } from "@/constants/categories";
+import { budgetDb } from "../../../db/budgetDb";
+import type { SavingsGoal, Envelope } from "../../../db/types";
+import { ENVELOPE_TYPES } from "../../../constants/categories";
 import {
   convertSavingsGoalToEnvelope,
   convertSupplementalAccountToEnvelope,
@@ -16,8 +16,71 @@ import {
   getMigrationStatus,
 } from "../envelopeMigrationService";
 
+// Mock budgetDb
+vi.mock("../../../db/budgetDb", () => {
+  const mockEnvelopes: any[] = [];
+  const mockSavingsGoals: any[] = [];
+  const mockBudget: Record<string, any> = {};
+
+  return {
+    budgetDb: {
+      envelopes: {
+        clear: vi.fn(async () => {
+          mockEnvelopes.length = 0;
+        }),
+        add: vi.fn(async (item: any) => {
+          mockEnvelopes.push(item);
+          return item.id;
+        }),
+        put: vi.fn(async (item: any) => {
+          const index = mockEnvelopes.findIndex((e) => e.id === item.id);
+          if (index >= 0) mockEnvelopes[index] = item;
+          else mockEnvelopes.push(item);
+          return item.id;
+        }),
+        get: vi.fn(async (id: string) => mockEnvelopes.find((e) => e.id === id)),
+        toArray: vi.fn(async () => mockEnvelopes),
+        toCollection: vi.fn().mockImplementation(() => ({
+          filter: vi.fn().mockImplementation((fn: any) => ({
+            count: vi.fn(async () => mockEnvelopes.filter(fn).length),
+            toArray: vi.fn(async () => mockEnvelopes.filter(fn)),
+          })),
+        })),
+        where: vi.fn().mockImplementation((key: string) => ({
+          equals: vi.fn().mockImplementation((val: any) => ({
+            count: vi.fn(async () => mockEnvelopes.filter((e) => e[key] === val).length),
+            toArray: vi.fn(async () => mockEnvelopes.filter((e) => e[key] === val)),
+          })),
+        })),
+      },
+      savingsGoals: {
+        clear: vi.fn(async () => {
+          mockSavingsGoals.length = 0;
+        }),
+        add: vi.fn(async (item: any) => {
+          mockSavingsGoals.push(item);
+          return item.id;
+        }),
+        toArray: vi.fn(async () => mockSavingsGoals),
+        count: vi.fn(async () => mockSavingsGoals.length),
+      },
+      budget: {
+        clear: vi.fn(async () => {
+          Object.keys(mockBudget).forEach((k) => delete mockBudget[k]);
+        }),
+        get: vi.fn(async (id: string) => mockBudget[id]),
+        put: vi.fn(async (item: any) => {
+          mockBudget[item.id] = item;
+          return item.id;
+        }),
+      },
+      transaction: vi.fn().mockImplementation((_mode, _tables, fn) => fn()),
+    },
+  };
+});
+
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -29,21 +92,21 @@ vi.mock("@/utils/common/logger", () => ({
 describe("Envelope Migration Service", () => {
   beforeEach(async () => {
     // Clean up database before each test
-    await budgetDb.envelopes.clear();
-    await budgetDb.savingsGoals.clear();
-    await budgetDb.budget.clear();
+    await (budgetDb as any).envelopes.clear();
+    await (budgetDb as any).savingsGoals.clear();
+    await (budgetDb as any).budget.clear();
   });
 
   afterEach(async () => {
     // Clean up after tests
-    await budgetDb.envelopes.clear();
-    await budgetDb.savingsGoals.clear();
-    await budgetDb.budget.clear();
+    await (budgetDb as any).envelopes.clear();
+    await (budgetDb as any).savingsGoals.clear();
+    await (budgetDb as any).budget.clear();
   });
 
   describe("convertSavingsGoalToEnvelope", () => {
     it("should convert savings goal to envelope with correct type", () => {
-      const goal: SavingsGoal = {
+      const goal: any = {
         id: "goal-1",
         name: "Emergency Fund",
         category: "Savings",
@@ -63,18 +126,18 @@ describe("Envelope Migration Service", () => {
       expect(envelope.id).toBe("goal-1");
       expect(envelope.name).toBe("Emergency Fund");
       expect(envelope.category).toBe("Savings");
-      expect(envelope.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
+      expect(envelope.type).toBe("goal");
       expect(envelope.currentBalance).toBe(2500);
       expect(envelope.targetAmount).toBe(10000);
-      expect(envelope.priority).toBe("high");
-      expect(envelope.isPaused).toBe(false);
-      expect(envelope.isCompleted).toBe(false);
-      expect(envelope.targetDate).toEqual(goal.targetDate);
-      expect(envelope.monthlyContribution).toBe(500);
+      expect((envelope as any).priority).toBe("high");
+      expect((envelope as any).isPaused).toBe(false);
+      expect((envelope as any).isCompleted).toBe(false);
+      expect((envelope as any).targetDate).toEqual(goal.targetDate);
+      expect((envelope as any).monthlyContribution).toBe(500);
     });
 
     it("should handle missing optional fields", () => {
-      const goal: SavingsGoal = {
+      const goal: any = {
         id: "goal-2",
         name: "Vacation",
         category: "Travel",
@@ -90,14 +153,14 @@ describe("Envelope Migration Service", () => {
 
       expect(envelope.id).toBe("goal-2");
       expect(envelope.name).toBe("Vacation");
-      expect(envelope.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
+      expect(envelope.type).toBe("goal");
       expect(envelope.description).toBe("");
-      expect(envelope.targetDate).toBeUndefined();
-      expect(envelope.monthlyContribution).toBeUndefined();
+      expect((envelope as any).targetDate).toBeUndefined();
+      expect((envelope as any).monthlyContribution).toBeUndefined();
     });
 
     it("should mark completed goals as archived", () => {
-      const goal: SavingsGoal = {
+      const goal: any = {
         id: "goal-3",
         name: "Completed Goal",
         category: "Savings",
@@ -112,7 +175,7 @@ describe("Envelope Migration Service", () => {
       const envelope = convertSavingsGoalToEnvelope(goal);
 
       expect(envelope.archived).toBe(true);
-      expect(envelope.isCompleted).toBe(true);
+      expect((envelope as any).isCompleted).toBe(true);
     });
   });
 
@@ -134,11 +197,11 @@ describe("Envelope Migration Service", () => {
       expect(envelope.id).toBe("hsa-1");
       expect(envelope.name).toBe("Health Savings Account");
       expect(envelope.category).toBe("HSA");
-      expect(envelope.envelopeType).toBe(ENVELOPE_TYPES.SUPPLEMENTAL);
+      expect(envelope.type).toBe("supplemental");
       expect(envelope.currentBalance).toBe(5000);
-      expect(envelope.annualContribution).toBe(3600);
-      expect(envelope.isActive).toBe(true);
-      expect(envelope.accountType).toBe("HSA");
+      expect((envelope as any).annualContribution).toBe(3600);
+      expect((envelope as any).isActive).toBe(true);
+      expect((envelope as any).accountType).toBe("HSA");
       expect(envelope.autoAllocate).toBe(false);
     });
 
@@ -153,7 +216,7 @@ describe("Envelope Migration Service", () => {
 
       expect(envelope.id).toMatch(/^supplemental_\d+_/);
       expect(envelope.name).toBe("FSA Account");
-      expect(envelope.envelopeType).toBe(ENVELOPE_TYPES.SUPPLEMENTAL);
+      expect(envelope.type).toBe("supplemental");
     });
 
     it("should handle accounts with currentBalance property", () => {
@@ -186,13 +249,13 @@ describe("Envelope Migration Service", () => {
 
   describe("convertSinkingFundToSavings", () => {
     it("should convert SINKING_FUND to SAVINGS type", () => {
-      const sinkingFund: Envelope = {
+      const sinkingFund: any = {
         id: "sink-1",
         name: "New Car",
         category: "Transportation",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
         currentBalance: 5000,
         targetAmount: 20000,
       };
@@ -201,19 +264,19 @@ describe("Envelope Migration Service", () => {
 
       expect(converted.id).toBe("sink-1");
       expect(converted.name).toBe("New Car");
-      expect(converted.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
+      expect(converted.type).toBe("goal");
       expect(converted.currentBalance).toBe(5000);
       expect(converted.targetAmount).toBe(20000);
     });
 
     it("should preserve existing fields", () => {
-      const sinkingFund: Envelope = {
+      const sinkingFund: any = {
         id: "sink-2",
         name: "Holiday Fund",
         category: "Travel",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
         currentBalance: 1000,
         targetAmount: 3000,
         targetDate: new Date("2024-12-01"),
@@ -223,27 +286,27 @@ describe("Envelope Migration Service", () => {
 
       const converted = convertSinkingFundToSavings(sinkingFund);
 
-      expect(converted.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
-      expect(converted.targetDate).toEqual(sinkingFund.targetDate);
-      expect(converted.priority).toBe("high");
+      expect(converted.type).toBe("goal");
+      expect((converted as any).targetDate).toEqual(sinkingFund.targetDate);
+      expect((converted as any).priority).toBe("high");
       expect(converted.description).toBe("Holiday savings");
     });
 
     it("should set isCompleted when balance >= target", () => {
-      const sinkingFund: Envelope = {
+      const sinkingFund: any = {
         id: "sink-3",
         name: "Completed Fund",
         category: "Savings",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
         currentBalance: 5000,
         targetAmount: 5000,
       };
 
       const converted = convertSinkingFundToSavings(sinkingFund);
 
-      expect(converted.isCompleted).toBe(true);
+      expect((converted as any).isCompleted).toBe(true);
     });
   });
 
@@ -253,9 +316,9 @@ describe("Envelope Migration Service", () => {
       expect(needed).toBe(false);
     });
 
-    it("should return true when savings goals exist", async () => {
-      await budgetDb.savingsGoals.add({
-        id: "goal-test",
+    it("should return true if savings goals exist", async () => {
+      await (budgetDb as any).savingsGoals.add({
+        id: "goal-1",
         name: "Test Goal",
         category: "Savings",
         priority: "medium",
@@ -270,22 +333,22 @@ describe("Envelope Migration Service", () => {
       expect(needed).toBe(true);
     });
 
-    it("should return true when sinking fund envelopes exist", async () => {
-      await budgetDb.envelopes.add({
-        id: "sink-test",
+    it("should return true if sinking fund envelopes exist", async () => {
+      await (budgetDb as any).envelopes.add({
+        id: "sink-1",
         name: "Sinking Fund Test",
         category: "Savings",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
       });
 
       const needed = await isMigrationNeeded();
       expect(needed).toBe(true);
     });
 
-    it("should return true when supplemental accounts in metadata", async () => {
-      await budgetDb.budget.put({
+    it("should return true if supplemental accounts in metadata", async () => {
+      await (budgetDb as any).budget.put({
         id: "metadata",
         lastModified: Date.now(),
         supplementalAccounts: [{ id: "hsa-1", name: "HSA", type: "HSA", balance: 1000 }],
@@ -299,7 +362,7 @@ describe("Envelope Migration Service", () => {
   describe("getMigrationStatus", () => {
     it("should return correct counts", async () => {
       // Add test data
-      await budgetDb.savingsGoals.add({
+      await (budgetDb as any).savingsGoals.add({
         id: "goal-1",
         name: "Goal 1",
         category: "Savings",
@@ -311,25 +374,25 @@ describe("Envelope Migration Service", () => {
         lastModified: Date.now(),
       });
 
-      await budgetDb.envelopes.add({
+      await (budgetDb as any).envelopes.add({
         id: "sink-1",
         name: "Sinking Fund",
         category: "Savings",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
       });
 
-      await budgetDb.envelopes.add({
+      await (budgetDb as any).envelopes.add({
         id: "savings-1",
         name: "Already Migrated",
         category: "Savings",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SAVINGS,
-      });
+        type: "goal",
+      } as any);
 
-      await budgetDb.budget.put({
+      await (budgetDb as any).budget.put({
         id: "metadata",
         lastModified: Date.now(),
         supplementalAccounts: [{ id: "hsa-1", name: "HSA", type: "HSA", balance: 1000 }],
@@ -347,7 +410,7 @@ describe("Envelope Migration Service", () => {
 
   describe("runEnvelopeMigration", () => {
     it("should migrate savings goals to envelopes", async () => {
-      await budgetDb.savingsGoals.add({
+      await (budgetDb as any).savingsGoals.add({
         id: "goal-migrate-1",
         name: "Goal to Migrate",
         category: "Savings",
@@ -367,21 +430,21 @@ describe("Envelope Migration Service", () => {
       const envelope = await budgetDb.envelopes.get("goal-migrate-1");
       expect(envelope).toBeDefined();
       expect(envelope?.name).toBe("Goal to Migrate");
-      expect(envelope?.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
+      expect(envelope?.type).toBe("goal");
       expect(envelope?.currentBalance).toBe(1000);
     });
 
     it("should migrate sinking funds to savings", async () => {
-      await budgetDb.envelopes.add({
+      await (budgetDb as any).envelopes.add({
         id: "sink-migrate-1",
         name: "Sinking to Migrate",
         category: "Transportation",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        type: ENVELOPE_TYPES.SINKING_FUND,
         targetAmount: 10000,
         currentBalance: 2000,
-      });
+      } as any);
 
       const result = await runEnvelopeMigration();
 
@@ -389,7 +452,7 @@ describe("Envelope Migration Service", () => {
       expect(result.migratedSinkingFunds).toBe(1);
 
       const envelope = await budgetDb.envelopes.get("sink-migrate-1");
-      expect(envelope?.envelopeType).toBe(ENVELOPE_TYPES.SAVINGS);
+      expect(envelope?.type).toBe("goal");
     });
 
     it("should migrate supplemental accounts to envelopes", async () => {
@@ -409,13 +472,13 @@ describe("Envelope Migration Service", () => {
       const envelope = await budgetDb.envelopes.get("hsa-migrate-1");
       expect(envelope).toBeDefined();
       expect(envelope?.name).toBe("HSA Account");
-      expect(envelope?.envelopeType).toBe(ENVELOPE_TYPES.SUPPLEMENTAL);
+      expect(envelope?.type).toBe("supplemental");
       expect(envelope?.currentBalance).toBe(3000);
     });
 
     it("should skip already migrated data", async () => {
       // Add savings goal
-      await budgetDb.savingsGoals.add({
+      await (budgetDb as any).savingsGoals.add({
         id: "goal-existing",
         name: "Existing Goal",
         category: "Savings",
@@ -428,14 +491,14 @@ describe("Envelope Migration Service", () => {
       });
 
       // Also add matching envelope (already migrated)
-      await budgetDb.envelopes.add({
+      await (budgetDb as any).envelopes.add({
         id: "goal-existing",
         name: "Existing Goal",
         category: "Savings",
         archived: false,
         lastModified: Date.now(),
-        envelopeType: ENVELOPE_TYPES.SAVINGS,
-      });
+        type: "goal",
+      } as any);
 
       const result = await runEnvelopeMigration();
 

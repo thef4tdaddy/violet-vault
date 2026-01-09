@@ -149,10 +149,9 @@ export const runSyncDiagnostic = async (): Promise<DiagnosticResults> => {
       const tables = [
         "envelopes",
         "transactions",
-        "bills",
-        "debts",
         "budgetCommits",
         "budgetChanges",
+        "offlineRequestQueue",
       ] as const;
 
       for (const table of tables) {

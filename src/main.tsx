@@ -269,7 +269,10 @@ const initializeApp = () => {
       window.offlineReadiness = async () => {
         const { default: offlineDataValidator } =
           await import("./utils/pwa/offlineDataValidator.js");
-        return await offlineDataValidator.getOfflineReadinessReport();
+        const validator = offlineDataValidator as unknown as {
+          getOfflineReadinessReport: () => Promise<unknown>;
+        };
+        return await validator.getOfflineReadinessReport();
       };
 
       // Helper functions for cloud data reset

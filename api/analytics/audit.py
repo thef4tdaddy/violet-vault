@@ -162,7 +162,7 @@ class EnvelopeIntegrityAuditor:
                 # Determine severity based on envelope type
                 # Some envelope types like credit cards might allow negative balances
                 severity: Literal["error", "warning", "info"] = (
-                    "warning" if env.envelopeType in ["bill", "variable"] else "error"
+                    "warning" if env.type in ["bill", "variable"] else "error"
                 )
 
                 violations.append(
@@ -176,7 +176,7 @@ class EnvelopeIntegrityAuditor:
                             "envelopeId": env.id,
                             "envelopeName": env.name,
                             "currentBalance": env.currentBalance,
-                            "envelopeType": env.envelopeType,
+                            "envelopeType": env.type,
                             "category": env.category,
                         },
                     )

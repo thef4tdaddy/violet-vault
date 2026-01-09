@@ -23,7 +23,7 @@ interface FormData {
   priority: string;
 }
 
-interface Goal {
+export interface Goal {
   id: string;
   name: string;
   targetAmount?: number;

@@ -12,9 +12,9 @@ interface TransactionRecord extends Transaction {
   [key: string]: unknown;
 }
 
-interface EnvelopeRecord extends Envelope {
+type EnvelopeRecord = Envelope & {
   [key: string]: unknown;
-}
+};
 
 export const useBillDiscovery = () => {
   const [isSearching, setIsSearching] = useState(false);
@@ -61,6 +61,16 @@ export const useBillDiscovery = () => {
           isRecurring: Boolean(bill.isRecurring),
           envelopeId: bill.envelopeId ? String(bill.envelopeId) : undefined,
           lastModified: typeof bill.lastModified === "number" ? bill.lastModified : Date.now(),
+          // Add missing properties required by Bill type
+          archived: Boolean(bill.archived),
+          currentBalance: Number(bill.currentBalance || 0),
+          color: bill.color || "gray",
+          autoAllocate: Boolean(bill.autoAllocate),
+          type: "liability" as const,
+          interestRate: Number(bill.interestRate || 0),
+          minimumPayment: Number(bill.minimumPayment || 0),
+          creditLimit: 0,
+          status: "active" as const,
         }));
 
         const normalizedEnvelopes = envelopes.map((envelope) => ({
@@ -70,7 +80,12 @@ export const useBillDiscovery = () => {
           archived: Boolean(envelope.archived),
           lastModified:
             typeof envelope.lastModified === "number" ? envelope.lastModified : Date.now(),
-        }));
+          currentBalance: Number(envelope.currentBalance || 0),
+          color: (envelope as unknown as Record<string, string>).color || "blue",
+          autoAllocate: Boolean((envelope as unknown as Record<string, boolean>).autoAllocate),
+          type: ((envelope as unknown as Record<string, string>).type ||
+            "goal") as Envelope["type"],
+        })) as unknown as Envelope[];
 
         const suggestions = generateBillSuggestions(
           normalizedTransactions,

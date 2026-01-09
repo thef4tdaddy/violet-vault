@@ -1,70 +1,128 @@
 // Budget Database Service Tests
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
-import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "../budget/budgetDatabaseService";
+import { budgetDb } from "../../db/budgetDb";
+
+// Setup repeatable mocks for Dexie chains
+const mockCollection = {
+  equals: vi.fn().mockReturnThis(),
+  toArray: vi.fn().mockResolvedValue([]),
+};
 
 // Mock the database
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../db/budgetDb", () => ({
   budgetDb: {
-    open: vi.fn(),
-    close: vi.fn(),
-    isOpen: vi.fn(),
-    getDatabaseStats: vi.fn(),
-    getActiveEnvelopes: vi.fn(),
-    getEnvelopesByCategory: vi.fn(),
-    bulkUpsertEnvelopes: vi.fn(),
-    getTransactionsByDateRange: vi.fn(),
-    getTransactionsByEnvelope: vi.fn(),
-    getTransactionsByCategory: vi.fn(),
-    getTransactionsByType: vi.fn(),
-    bulkUpsertTransactions: vi.fn(),
-    getBillsByCategory: vi.fn(),
-    getPaidBills: vi.fn(),
-    getUpcomingBills: vi.fn(),
-    getOverdueBills: vi.fn(),
-    bills: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
+    open: vi.fn().mockResolvedValue(undefined),
+    isOpen: vi.fn().mockReturnValue(true),
+    envelopes: {
+      toArray: vi.fn().mockResolvedValue([]),
+      bulkPut: vi.fn().mockResolvedValue(undefined),
+      where: vi.fn().mockReturnThis(),
+      clear: vi.fn().mockResolvedValue(undefined),
     },
-    bulkUpsertBills: vi.fn(),
-    getSavingsGoalsByCategory: vi.fn(),
-    getSavingsGoalsByPriority: vi.fn(),
-    getCompletedSavingsGoals: vi.fn(),
-    getActiveSavingsGoals: vi.fn(),
-    savingsGoals: { toArray: vi.fn(), clear: vi.fn() },
-    bulkUpsertSavingsGoals: vi.fn(),
-    getPaychecksBySource: vi.fn(),
-    getPaychecksByDateRange: vi.fn(),
-    getPaycheckHistory: vi.fn(),
-    bulkUpsertPaychecks: vi.fn(),
-    debts: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
+    transactions: {
+      toArray: vi.fn().mockResolvedValue([]),
+      clear: vi.fn().mockResolvedValue(undefined),
     },
-    bulkUpsertDebts: vi.fn(),
     budget: {
-      get: vi.fn(),
-      put: vi.fn(),
-      clear: vi.fn(),
+      get: vi.fn().mockResolvedValue(null),
+      clear: vi.fn().mockResolvedValue(undefined),
     },
-    envelopes: { clear: vi.fn() },
-    transactions: { clear: vi.fn() },
-    paycheckHistory: { clear: vi.fn() },
-    cache: { clear: vi.fn() },
-    auditLog: { clear: vi.fn() },
-    transaction: vi.fn(),
-    getCachedValue: vi.fn(),
-    setCachedValue: vi.fn(),
-    clearCacheCategory: vi.fn(),
-    getAnalyticsData: vi.fn(),
-    batchUpdate: vi.fn(),
-    optimizeDatabase: vi.fn(),
+    cache: {
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    auditLog: {
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    autoFundingRules: {
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    autoFundingHistory: {
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    offlineRequestQueue: {
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    bulkUpsertEnvelopes: vi.fn().mockResolvedValue(undefined),
+    bulkUpsertTransactions: vi.fn().mockResolvedValue(undefined),
+    saveEnvelopes: vi.fn().mockResolvedValue(undefined),
+    saveTransactions: vi.fn().mockResolvedValue(undefined),
+    getBudgetMetadata: vi.fn().mockResolvedValue(null),
+    saveBudgetMetadata: vi.fn().mockResolvedValue(undefined),
+    getDatabaseStats: vi.fn().mockResolvedValue({}),
+    getActiveEnvelopes: vi.fn().mockResolvedValue([]),
+    getEnvelopesByCategory: vi.fn().mockResolvedValue([]),
+    getCachedValue: vi.fn().mockResolvedValue(null),
+    setCachedValue: vi.fn().mockResolvedValue(undefined),
+    clearCacheCategory: vi.fn().mockResolvedValue(undefined),
+    getTransactionsByDateRange: vi.fn().mockResolvedValue([]),
+    getTransactionsByEnvelope: vi.fn().mockResolvedValue([]),
+    getAnalyticsData: vi.fn().mockResolvedValue({}),
+    transaction: vi.fn().mockImplementation((_mode, _tables, fn) => fn()),
+    bulkUpsertAutoFundingRules: vi.fn().mockResolvedValue(undefined),
+    cleanupCache: vi.fn().mockResolvedValue(undefined),
+    optimizeDatabase: vi.fn().mockResolvedValue(undefined),
+    createBudgetCommit: vi.fn().mockResolvedValue("hash"),
+    createBudgetChanges: vi.fn().mockResolvedValue(1),
+    createBudgetBranch: vi.fn().mockResolvedValue(1),
+    createBudgetTag: vi.fn().mockResolvedValue(1),
   },
 }));
 
 describe("BudgetDatabaseService", () => {
+  const mockEnvelopes = [
+    {
+      id: "1",
+      name: "Food",
+      category: "expenses",
+      archived: false,
+      lastModified: 1700000000000,
+      type: "standard",
+      autoAllocate: true,
+      color: "#3B82F6",
+      currentBalance: 0,
+    },
+    {
+      id: "2",
+      name: "Gas",
+      category: "expenses",
+      archived: false,
+      lastModified: 1700000000000,
+      type: "standard",
+      autoAllocate: true,
+      color: "#3B82F6",
+      currentBalance: 0,
+    },
+  ];
+
+  const mockTransactions = [
+    {
+      id: "1",
+      date: "2024-01-01",
+      amount: -100,
+      envelopeId: "env1",
+      category: "food",
+      type: "expense",
+      lastModified: 1700000000000,
+      isScheduled: false,
+    },
+    {
+      id: "2",
+      date: "2024-01-02",
+      amount: -50,
+      envelopeId: "env2",
+      category: "gas",
+      type: "expense",
+      lastModified: 1700000000000,
+      isScheduled: false,
+    },
+  ];
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default toArray to avoid validation errors with undefined
+    (budgetDb.envelopes.toArray as Mock).mockResolvedValue([]);
+    (budgetDb.transactions.toArray as Mock).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -113,23 +171,6 @@ describe("BudgetDatabaseService", () => {
 
   describe("getEnvelopes", () => {
     it("should get active envelopes with default options", async () => {
-      const mockEnvelopes = [
-        {
-          id: "1",
-          name: "Food",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-        {
-          id: "2",
-          name: "Gas",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-      ];
-
       (budgetDb.getActiveEnvelopes as Mock).mockResolvedValue(mockEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes();
@@ -139,45 +180,27 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should get envelopes by category", async () => {
-      const mockEnvelopes = [
-        {
-          id: "1",
-          name: "Food",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-      ];
-
-      (budgetDb.getEnvelopesByCategory as Mock).mockResolvedValue(mockEnvelopes);
+      const categoryEnvelopes = [mockEnvelopes[0]];
+      (budgetDb.getEnvelopesByCategory as Mock).mockResolvedValue(categoryEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes({
         category: "expenses",
         includeArchived: false,
       });
 
-      expect(result).toEqual(mockEnvelopes);
+      expect(result).toEqual(categoryEnvelopes);
       expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith("expenses", false);
     });
 
     it("should use cached data when available", async () => {
-      const mockEnvelopes = [
-        {
-          id: "1",
-          name: "Food",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-      ];
-
-      (budgetDb.getCachedValue as Mock).mockResolvedValue(mockEnvelopes);
+      const cachedEnvelopes = [mockEnvelopes[0]];
+      (budgetDb.getCachedValue as Mock).mockResolvedValue(cachedEnvelopes);
 
       const result = await budgetDatabaseService.getEnvelopes({
         useCache: true,
       });
 
-      expect(result).toEqual(mockEnvelopes);
+      expect(result).toEqual(cachedEnvelopes);
       expect(budgetDb.getCachedValue).toHaveBeenCalledWith("budget_db_envelopes_active", 300000);
     });
 
@@ -194,27 +217,10 @@ describe("BudgetDatabaseService", () => {
 
   describe("saveEnvelopes", () => {
     it("should save envelopes and invalidate cache", async () => {
-      const envelopes = [
-        {
-          id: "1",
-          name: "Food",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-        {
-          id: "2",
-          name: "Gas",
-          category: "expenses",
-          archived: false,
-          lastModified: Date.now(),
-        },
-      ];
-
-      (budgetDb.bulkUpsertEnvelopes as Mock).mockResolvedValue(true);
+      (budgetDb.envelopes.bulkPut as Mock).mockResolvedValue(true);
       (budgetDb.clearCacheCategory as Mock).mockResolvedValue(true);
 
-      await budgetDatabaseService.saveEnvelopes(envelopes);
+      await budgetDatabaseService.saveEnvelopes(mockEnvelopes);
 
       expect(budgetDb.bulkUpsertEnvelopes).toHaveBeenCalled();
       expect(budgetDb.clearCacheCategory).toHaveBeenCalledWith("envelopes");
@@ -223,36 +229,14 @@ describe("BudgetDatabaseService", () => {
     it("should throw error for invalid envelope data", async () => {
       const invalidEnvelopes = [{ id: "1", name: "Missing required fields" }];
 
-      await expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        budgetDatabaseService.saveEnvelopes(invalidEnvelopes as any)
-      ).rejects.toThrow("Invalid envelope data");
+      await expect(budgetDatabaseService.saveEnvelopes(invalidEnvelopes as any)).rejects.toThrow(
+        /Invalid envelopes data/i
+      );
     });
   });
 
   describe("getTransactions", () => {
     it("should get transactions by date range", async () => {
-      const mockTransactions = [
-        {
-          id: "1",
-          date: "2024-01-01",
-          amount: -100,
-          envelopeId: "env1",
-          category: "food",
-          type: "expense",
-          lastModified: Date.now(),
-        },
-        {
-          id: "2",
-          date: "2024-01-02",
-          amount: -50,
-          envelopeId: "env2",
-          category: "gas",
-          type: "expense",
-          lastModified: Date.now(),
-        },
-      ];
-
       const dateRange = {
         start: new Date("2024-01-01"),
         end: new Date("2024-01-31"),
@@ -273,37 +257,27 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should get transactions by envelope", async () => {
-      const mockTransactions = [
-        {
-          id: "1",
-          envelopeId: "env1",
-          amount: -100,
-          date: new Date(),
-          category: "food",
-          type: "expense",
-          lastModified: Date.now(),
-        },
-      ];
-
-      (budgetDb.getTransactionsByEnvelope as Mock).mockResolvedValue(mockTransactions);
+      const envelopeTransactions = [mockTransactions[0]];
+      (budgetDb.getTransactionsByEnvelope as Mock).mockResolvedValue(envelopeTransactions);
 
       const result = await budgetDatabaseService.getTransactions({
         envelopeId: "env1",
       });
 
-      expect(result).toEqual(mockTransactions);
+      expect(result).toEqual(envelopeTransactions);
       expect(budgetDb.getTransactionsByEnvelope).toHaveBeenCalledWith("env1", undefined);
     });
 
     it("should limit results when specified", async () => {
-      const mockTransactions = Array.from({ length: 200 }, (_, i) => ({
+      const longMockTransactions = Array.from({ length: 200 }, (_, i) => ({
         id: `${i}`,
+        date: "2024-01-01",
         amount: -100,
-        date: new Date(),
         envelopeId: "env1",
         category: "food",
         type: "expense" as const,
-        lastModified: Date.now(),
+        lastModified: 1700000000000,
+        isScheduled: false,
       }));
 
       const dateRange = {
@@ -311,7 +285,7 @@ describe("BudgetDatabaseService", () => {
         end: new Date("2024-01-31"),
       };
 
-      (budgetDb.getTransactionsByDateRange as Mock).mockResolvedValue(mockTransactions);
+      (budgetDb.getTransactionsByDateRange as Mock).mockResolvedValue(longMockTransactions);
 
       const result = await budgetDatabaseService.getTransactions({
         dateRange,
@@ -319,7 +293,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toHaveLength(50);
-      expect(result).toEqual(mockTransactions.slice(0, 50));
+      expect(result).toEqual(longMockTransactions.slice(0, 50));
     });
 
     it("should return empty array for invalid transaction data from database", async () => {
@@ -351,6 +325,7 @@ describe("BudgetDatabaseService", () => {
           category: "food",
           type: "expense" as const,
           lastModified: Date.now(),
+          isScheduled: false,
         },
       ];
 
@@ -367,9 +342,8 @@ describe("BudgetDatabaseService", () => {
       const invalidTransactions = [{ id: "1", amount: "invalid" }];
 
       await expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         budgetDatabaseService.saveTransactions(invalidTransactions as any)
-      ).rejects.toThrow("Invalid transaction data");
+      ).rejects.toThrow(/Invalid transactions data/i);
     });
   });
 
@@ -379,38 +353,57 @@ describe("BudgetDatabaseService", () => {
         {
           id: "1",
           name: "Electric Bill",
-          dueDate: new Date(),
+          type: "bill",
+          dueDate: "2024-01-15",
           amount: 100,
           category: "utilities",
           isPaid: false,
           isRecurring: true,
-          lastModified: Date.now(),
+          lastModified: 1700000000000,
+          autoAllocate: true,
+          color: "#3B82F6",
+          currentBalance: 0,
+          archived: false,
+          interestRate: 0,
+          minimumPayment: 0,
+          status: "active" as const,
         },
       ];
       const overdueBills = [
         {
           id: "2",
           name: "Water Bill",
-          dueDate: new Date(),
+          type: "bill",
+          dueDate: "2024-01-01",
           amount: 50,
           category: "utilities",
           isPaid: false,
           isRecurring: true,
-          lastModified: Date.now(),
+          lastModified: 1700000000000,
+          autoAllocate: true,
+          color: "#3B82F6",
+          currentBalance: 0,
+          archived: false,
+          interestRate: 0,
+          minimumPayment: 0,
+          status: "active" as const,
         },
       ];
 
-      (budgetDb.getUpcomingBills as Mock).mockResolvedValue(upcomingBills);
-      (budgetDb.getOverdueBills as Mock).mockResolvedValue(overdueBills);
+      // Reset the chain and set return value for this test
+      const mockResult = {
+        toArray: vi.fn().mockResolvedValue([...overdueBills, ...upcomingBills]),
+      };
+      (budgetDb.envelopes.where as Mock).mockReturnValue({
+        equals: vi.fn().mockReturnValue(mockResult),
+      });
 
       const result = await budgetDatabaseService.getBills({
         isPaid: false,
-        daysAhead: 30,
       });
 
       expect(result).toEqual([...overdueBills, ...upcomingBills]);
-      expect(budgetDb.getUpcomingBills).toHaveBeenCalledWith(30);
-      expect(budgetDb.getOverdueBills).toHaveBeenCalledTimes(1);
+      expect(budgetDb.envelopes.where).toHaveBeenCalledWith("[type+archived]");
     });
 
     it("should get paid bills", async () => {
@@ -418,23 +411,35 @@ describe("BudgetDatabaseService", () => {
         {
           id: "1",
           name: "Electric Bill",
-          dueDate: new Date(),
+          type: "bill",
+          dueDate: "2024-01-01",
           amount: 100,
           category: "utilities",
           isPaid: true,
           isRecurring: true,
-          lastModified: Date.now(),
+          lastModified: 1700000000000,
+          autoAllocate: true,
+          color: "#3B82F6",
+          currentBalance: 0,
+          archived: false,
+          interestRate: 0,
+          minimumPayment: 0,
+          status: "paid" as const,
         },
       ];
 
-      (budgetDb.getPaidBills as Mock).mockResolvedValue(paidBills);
+      const mockResult = {
+        toArray: vi.fn().mockResolvedValue(paidBills),
+      };
+      (budgetDb.envelopes.where as Mock).mockReturnValue({
+        equals: vi.fn().mockReturnValue(mockResult),
+      });
 
       const result = await budgetDatabaseService.getBills({
         isPaid: true,
       });
 
       expect(result).toEqual(paidBills);
-      expect(budgetDb.getPaidBills).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -512,11 +517,11 @@ describe("BudgetDatabaseService", () => {
       expect(budgetDb.budget.clear).toHaveBeenCalledTimes(1);
       expect(budgetDb.envelopes.clear).toHaveBeenCalledTimes(1);
       expect(budgetDb.transactions.clear).toHaveBeenCalledTimes(1);
-      expect(budgetDb.bills.clear).toHaveBeenCalledTimes(1);
-      expect(budgetDb.savingsGoals.clear).toHaveBeenCalledTimes(1);
-      expect(budgetDb.paycheckHistory.clear).toHaveBeenCalledTimes(1);
-      expect(budgetDb.cache.clear).toHaveBeenCalledTimes(1);
+      expect(budgetDb.cache.clear).toHaveBeenCalledTimes(2);
       expect(budgetDb.auditLog.clear).toHaveBeenCalledTimes(1);
+      expect(budgetDb.autoFundingRules.clear).toHaveBeenCalledTimes(1);
+      expect(budgetDb.autoFundingHistory.clear).toHaveBeenCalledTimes(1);
+      expect(budgetDb.offlineRequestQueue.clear).toHaveBeenCalledTimes(1);
     });
   });
 
