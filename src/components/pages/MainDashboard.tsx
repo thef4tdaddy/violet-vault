@@ -13,12 +13,13 @@ import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transa
 import useBudgetData from "@/hooks/budgeting/core/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 import {
-  useMainDashboardUI,
+  useDashboardUI,
   useDashboardCalculations,
-  useTransactionReconciliation,
+  useReconciliation,
   usePaydayManager,
   useDashboardHelpers,
-} from "@/hooks/dashboard/useMainDashboard";
+} from "@/hooks/platform/ux/dashboard";
+
 import { validateComponentProps } from "@/utils/validation/propValidator";
 import { MainDashboardPropsSchema } from "@/domain/schemas/component-props";
 
@@ -48,7 +49,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   // Get reconcileTransaction and paycheckHistory from useBudgetData
   const { reconcileTransaction, paycheckHistory } = useBudgetData();
 
-  // UI state management
+  // Dashboard Hooks
   const {
     showReconcileModal,
     newTransaction,
@@ -56,15 +57,13 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
     closeReconcileModal,
     updateNewTransaction,
     resetNewTransaction,
-  } = useMainDashboardUI();
+  } = useDashboardUI();
 
-  // Dashboard calculations
   const { totalEnvelopeBalance, totalSavingsBalance, totalVirtualBalance, difference, isBalanced } =
     useDashboardCalculations(envelopes, savingsGoals, unassignedCash, actualBalance);
 
-  // Transaction reconciliation logic
   const { handleReconcileTransaction, handleAutoReconcileDifference, getEnvelopeOptions } =
-    useTransactionReconciliation(reconcileTransaction, envelopes, savingsGoals);
+    useReconciliation(reconcileTransaction, envelopes, savingsGoals);
 
   // Payday management
   const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } = usePaydayManager(

@@ -52,8 +52,8 @@ vi.mock("@/hooks/budgeting/core/useBudgetData", () => ({
   })),
 }));
 
-vi.mock("@/hooks/dashboard/useMainDashboard", () => ({
-  useMainDashboardUI: vi.fn(() => ({
+vi.mock("@/hooks/platform/ux/dashboard", () => ({
+  useDashboardUI: vi.fn(() => ({
     showReconcileModal: false,
     newTransaction: {},
     openReconcileModal: vi.fn(),
@@ -68,7 +68,7 @@ vi.mock("@/hooks/dashboard/useMainDashboard", () => ({
     difference: 0,
     isBalanced: true,
   })),
-  useTransactionReconciliation: vi.fn(() => ({
+  useReconciliation: vi.fn(() => ({
     handleReconcileTransaction: vi.fn(),
     handleAutoReconcileDifference: vi.fn(),
     getEnvelopeOptions: vi.fn(() => []),
@@ -148,11 +148,62 @@ vi.mock("@/utils/common/validation", () => ({
 // ============================================================================
 
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import { usePaydayManager } from "@/hooks/dashboard/useMainDashboard";
+
+import {
+  useDashboardUI,
+  useDashboardCalculations,
+  useReconciliation,
+  usePaydayManager,
+  useDashboardHelpers,
+} from "@/hooks/platform/ux/dashboard";
 
 describe("MainDashboard (Full Alias Standardization)", () => {
   let queryClient: QueryClient;
   const mockSetActiveView = vi.fn();
+
+  // Define mock states for hooks
+  const mockUIState: ReturnType<typeof useDashboardUI> = {
+    showReconcileModal: false,
+    newTransaction: {
+      amount: "",
+      description: "",
+      type: "expense",
+      envelopeId: "",
+      date: new Date().toISOString(),
+    },
+    openReconcileModal: vi.fn(),
+    closeReconcileModal: vi.fn(),
+    updateNewTransaction: vi.fn(),
+    resetNewTransaction: vi.fn(),
+  };
+
+  const mockCalculations: ReturnType<typeof useDashboardCalculations> = {
+    totalEnvelopeBalance: 1000,
+    totalSavingsBalance: 500,
+    safeUnassignedCash: 100,
+    totalVirtualBalance: 1600,
+    difference: 0,
+    isBalanced: true,
+  };
+
+  const mockReconciliation: ReturnType<typeof useReconciliation> = {
+    handleReconcileTransaction: vi.fn(),
+    handleAutoReconcileDifference: vi.fn(),
+    getEnvelopeOptions: vi.fn().mockReturnValue([]),
+  };
+
+  const mockPaydayManager = {
+    paydayPrediction: null,
+    handleProcessPaycheck: vi.fn(),
+    handlePrepareEnvelopes: vi.fn(),
+  };
+
+  const mockDashboardHelpers = {
+    getRecentTransactions: vi.fn((transactions) => transactions || []),
+    formatCurrency: (val: number) => `$${val.toFixed(2)}`,
+    getTransactionIcon: () => "TrendingDown",
+    getTransactionColor: () => "text-red-500",
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
