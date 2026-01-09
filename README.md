@@ -35,6 +35,7 @@
 
 - **Multi-User Support** - Share budgets with family members or partners
 - **Real-Time Sync** - See changes instantly across all devices
+- **Privacy-Preserving WebSocket Signaling** - Optional real-time sync notifications (signals only, no data transmission)
 - **Conflict Resolution** - Smart handling of simultaneous edits
 - **Activity Tracking** - Monitor who made what changes and when
 
@@ -128,13 +129,23 @@
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
    - Copy your config to `src/utils/firebaseConfig.js`
 
-4. **Start development server**
+4. **Configure WebSocket Real-Time Signaling** (optional)
+   
+   VioletVault supports privacy-preserving real-time sync notifications via WebSocket:
+   
+   - Copy `.env.example` to `.env`
+   - Set `VITE_WEBSOCKET_ENABLED=true`
+   - Set `VITE_WEBSOCKET_URL` to your WebSocket server URL
+   
+   **Privacy Note:** WebSocket signaling transmits only metadata signals (e.g., "data changed") - never decrypted data or encrypted blobs. This maintains end-to-end encryption while enabling real-time notifications.
+
+5. **Start development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open your browser** to `http://localhost:5173`
+6. **Open your browser** to `http://localhost:5173`
 
 ### Python Analytics Service (Optional)
 
@@ -256,6 +267,7 @@ For a complete overview of all documentation in the repository, see the **[Docum
 - **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
 - **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
+- **[🔄 WebSocket Real-Time Signaling](docs/WEBSOCKET_SIGNALING.md)** - Privacy-preserving real-time sync notifications
 - **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
 - **[📝 Zod Integration Guide](docs/ZOD-INTEGRATION-GUIDE.md)** - Comprehensive guide for Zod validation patterns and form hooks
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
