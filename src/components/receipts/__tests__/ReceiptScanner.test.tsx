@@ -2,10 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import ReceiptScanner from "../ReceiptScanner";
 import "@testing-library/jest-dom";
-import { useReceiptScanner as useReceiptScannerOriginal } from "../../../hooks/receipts/useReceiptScanner";
+import { useReceiptScanner as useReceiptScannerOriginal } from "@/hooks/platform/receipts/useReceiptScanner";
 
 // Mock the custom hook
-vi.mock("../../../hooks/receipts/useReceiptScanner");
+vi.mock("@/hooks/platform/receipts/useReceiptScanner");
 
 // Type cast the mocked hook
 const useReceiptScanner = useReceiptScannerOriginal as unknown as Mock;

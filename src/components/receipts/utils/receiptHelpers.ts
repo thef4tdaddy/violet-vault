@@ -22,7 +22,7 @@ export const mapReceiptData = (data: HookReceiptData): ReceiptProcessedData => {
   };
 };
 
-import type { ExtendedReceiptData } from "../../../hooks/receipts/useReceiptScanner";
+import type { ExtendedReceiptData } from "@/hooks/platform/receipts/useReceiptScanner";
 
 const parseOptionalFloat = (value: string | null | undefined): number | undefined => {
   if (!value) return undefined;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { useReceiptToTransaction } from "../../hooks/receipts/useReceiptToTransaction";
+import { useReceiptToTransaction } from "@/hooks/platform/receipts/useReceiptToTransaction";
 import ReceiptDataStep from "./steps/ReceiptDataStep";
 import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
