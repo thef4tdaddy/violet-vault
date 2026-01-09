@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
-import { useShareCodeValidation } from "@/hooks/sharing/useShareCodeValidation";
-import { useBudgetJoining } from "@/hooks/sharing/useBudgetJoining";
-import { useQRCodeProcessing } from "@/hooks/sharing/useQRCodeProcessing";
+import { useShareCodeValidation } from "@/hooks/platform/sharing/useShareCodeValidation";
+import { useBudgetJoining } from "@/hooks/platform/sharing/useBudgetJoining";
+import { useQRCodeProcessing } from "@/hooks/platform/sharing/useQRCodeProcessing";
 import { generateRandomColor } from "@/utils/sharing/colorUtils";
 import ShareCodeStep from "./steps/ShareCodeStep";
 import UserSetupStep from "./steps/UserSetupStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface JoinBudgetModalProps {
   isOpen: boolean;

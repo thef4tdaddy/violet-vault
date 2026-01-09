@@ -1,8 +1,8 @@
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import SlideUpModal from "../mobile/SlideUpModal";
 import TransferModalContent from "./TransferModalContent";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface TransferForm {
   envelopeId: string;

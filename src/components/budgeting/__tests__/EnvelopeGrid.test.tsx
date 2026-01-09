@@ -4,10 +4,10 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import EnvelopeGrid from "../EnvelopeGrid";
 
 // Import hooks for vi.mocked usage
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { useTransactions } from "@/hooks/common/useTransactions";
-import useBills from "@/hooks/bills/useBills";
-import { useUnassignedCash } from "@/hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 
 // --- Hoisted Mock Data ---
 
@@ -67,19 +67,19 @@ vi.mock("@/stores/ui/uiStore", () => ({
 }));
 
 // Hooks
-vi.mock("@/hooks/budgeting/useBudgetMetadata", () => ({
+vi.mock("@/hooks/budgeting/metadata/useBudgetMetadata", () => ({
   useUnassignedCash: vi.fn(() => MOCK_METADATA_DATA),
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => MOCK_ENVELOPES_DATA),
 }));
 
-vi.mock("@/hooks/common/useTransactions", () => ({
-  useTransactions: vi.fn(() => MOCK_TRANSACTIONS_DATA),
+vi.mock("@/hooks/budgeting/transactions/useTransactionQuery", () => ({
+  useTransactionQuery: vi.fn(() => MOCK_TRANSACTIONS_DATA),
 }));
 
-vi.mock("@/hooks/bills/useBills", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({
   default: vi.fn(() => MOCK_BILLS_DATA),
 }));
 

@@ -232,6 +232,53 @@ export interface AutoBackup {
   metadata?: Record<string, unknown>;
 }
 
+export interface Condition {
+  id?: string;
+  type: string;
+  envelopeId?: string | null;
+  value: number;
+  operator?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export interface AutoFundingRule {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  trigger: string;
+  priority: number;
+  enabled: boolean;
+  createdAt: string;
+  lastExecuted: string | null;
+  executionCount: number;
+  config: {
+    sourceType: "unassigned" | "envelope" | "income";
+    sourceId: string | null;
+    targetType: "envelope" | "multiple";
+    targetId: string | null;
+    targetIds: string[];
+    amount: number;
+    percentage: number;
+    conditions: Condition[];
+    scheduleConfig: Record<string, unknown>;
+  };
+  lastModified: number;
+}
+
+export interface ExecutionRecord {
+  id: string;
+  trigger: string;
+  totalFunded?: number;
+  success?: boolean;
+  executedAt?: string;
+  rulesExecuted?: number;
+  timestamp?: string; // Legacy/Alias support
+  lastModified: number;
+  [key: string]: unknown;
+}
+
 // Utility types for query operations
 export type DateRange = {
   start: Date;
@@ -239,7 +286,7 @@ export type DateRange = {
 };
 
 export type BulkUpdate = {
-  type: "envelope" | "transaction" | "bill" | "savingsGoal" | "paycheck";
+  type: "envelope" | "transaction" | "bill" | "savingsGoal" | "paycheck" | "autoFundingRule";
   data: unknown;
 };
 
@@ -272,6 +319,8 @@ export interface DatabaseStats {
   bills: number;
   savingsGoals: number;
   paychecks: number;
+  autoFundingRules: number;
+  autoFundingHistory: number;
   cache: number;
   lastOptimized: number;
   offlineQueue?: number;

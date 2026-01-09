@@ -12,6 +12,14 @@ export {
   type GlobalTotals,
 } from "./budgetEngineService";
 export {
+  BatchBudgetService,
+  type BatchItem,
+  type BatchRequest,
+  type BatchResultItem,
+  type BatchResponse,
+  type BatchSummary,
+} from "./batchBudgetService";
+export {
   ImportService,
   type ImportRequest,
   type ImportResponse,

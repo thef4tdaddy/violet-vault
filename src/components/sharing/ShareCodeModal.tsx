@@ -3,12 +3,12 @@ import { Button } from "@/components/ui";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "@/utils";
 import { shareCodeManager } from "@/utils/auth/shareCodeManager";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface ShareData {
   shareCode: string;
@@ -31,7 +31,7 @@ const ShareCodeModal: React.FC<ShareCodeModalProps> = ({ isOpen, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { user: currentUser, updateProfile } = useAuthManager();
+  const { user: currentUser, updateProfile } = useAuth();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 

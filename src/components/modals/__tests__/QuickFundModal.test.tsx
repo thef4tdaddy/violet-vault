@@ -12,7 +12,7 @@ vi.mock("@/utils", () => ({
   )),
 }));
 
-vi.mock("@/hooks/common/useConfirm", () => ({
+vi.mock("@/hooks/platform/ux/useConfirm", () => ({
   useConfirm: vi.fn(() => vi.fn().mockResolvedValue(true)),
 }));
 
@@ -24,7 +24,7 @@ vi.mock("@/components/ui/ModalCloseButton", () => ({
   ),
 }));
 
-vi.mock("@/hooks/ui/useModalAutoScroll", () => ({
+vi.mock("@/hooks/platform/ux/useModalAutoScroll", () => ({
   useModalAutoScroll: vi.fn(() => ({ current: null })),
 }));
 

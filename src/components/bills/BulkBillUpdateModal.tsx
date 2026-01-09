@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
+import { useBulkBillUpdate } from "../../hooks/budgeting/transactions/scheduled/expenses/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
   transformBillsForUpdate,
@@ -9,7 +9,7 @@ import BulkUpdateEditor from "./BulkUpdateEditor";
 import BulkUpdateModeSelector from "./BulkUpdateModeSelector";
 import BulkUpdateSummary from "./BulkUpdateSummary";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill } from "@/types/bills";
 
 interface BulkBillUpdateModalProps {

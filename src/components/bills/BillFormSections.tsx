@@ -5,7 +5,7 @@ import { getIconByName } from "@/utils/common/billIcons";
 import { getFrequencyOptions } from "@/utils/common/frequencyCalculations";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
 import type { BillFormData, Bill } from "@/types/bills";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 /**
  * Bill entity type - flexible to accept any bill-like structure

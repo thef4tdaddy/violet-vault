@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { markVersionAsSeen } from "@/utils/common/version";
 

@@ -1,4 +1,4 @@
-import { useDebtDetailModal } from "@/hooks/debts/useDebtDetailModal";
+import { useDebtDetailModal } from "@/hooks/budgeting/envelopes/liabilities/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
 import QuickPaymentForm from "../ui/QuickPaymentForm";
@@ -9,7 +9,7 @@ import {
   RecentPayments,
   ModalActions,
 } from "./DebtDetailModalComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import logger from "@/utils/common/logger";
 
 interface DebtDetailModalProps {

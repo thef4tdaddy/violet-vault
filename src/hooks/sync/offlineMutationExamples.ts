@@ -7,6 +7,7 @@
 
 import { useOfflineMutation } from "@/hooks/sync/useOfflineMutation";
 import type { Envelope } from "@/db/types";
+import logger from "@/utils/common/logger";
 
 /**
  * Example: Create Envelope with Offline Support
@@ -42,11 +43,11 @@ export function useCreateEnvelopeOffline() {
 
     mutationOptions: {
       onSuccess: (data) => {
-        console.log("Envelope created successfully:", data);
+        logger.production("Envelope created successfully", { data });
         // Invalidate queries, update cache, etc.
       },
       onError: (error) => {
-        console.error("Failed to create envelope:", error);
+        logger.error("Failed to create envelope", error);
         // Note: Network errors will queue the request, other errors will show here
       },
     },
@@ -89,7 +90,7 @@ export function useUpdateTransactionOffline() {
 
     mutationOptions: {
       onSuccess: (data) => {
-        console.log("Transaction updated successfully:", data);
+        logger.production("Transaction updated successfully", { data });
       },
     },
   });
@@ -122,7 +123,7 @@ export function useDeleteBillOffline() {
 
     mutationOptions: {
       onSuccess: () => {
-        console.log("Bill deleted successfully");
+        logger.production("Bill deleted successfully");
       },
     },
   });

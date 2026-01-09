@@ -1,6 +1,6 @@
 import React from "react";
 import PromptModal from "./PromptModal";
-import { usePromptModal } from "../../hooks/common/usePrompt";
+import { usePromptModal } from "../../hooks/platform/ux/usePrompt";
 
 /**
  * PromptProvider - Global provider for prompt modals

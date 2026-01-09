@@ -12,13 +12,7 @@ interface LoginResult {
   suggestion?: string;
 }
 
-interface UserData {
-  budgetId?: string;
-  sharedBy?: string;
-  shareCode?: string;
-  userName?: string;
-  userColor?: string;
-}
+import type { UserData } from "../../hooks/auth/useAuth.types";
 
 interface AuthError extends Error {
   code?: string;
@@ -26,7 +20,7 @@ interface AuthError extends Error {
   suggestion?: string;
 }
 
-type LoginFunction = (password: string, userData: UserData | null) => Promise<LoginResult>;
+type LoginFunction = (variables: { password: string; userData?: UserData }) => Promise<LoginResult>;
 
 /**
  * Handle existing user login flow
@@ -36,7 +30,7 @@ export const handleExistingUserLogin = async (
   login: LoginFunction
 ): Promise<LoginResult> => {
   logger.auth("Existing user login - calling login with password only");
-  const result = await login(password, null);
+  const result = await login({ password });
   logger.auth("Existing user login result", { success: !!result });
 
   if (result.success) {
@@ -65,7 +59,7 @@ export const handleSharedBudgetJoin = async (
     sharedBy: userData.sharedBy,
   });
 
-  const result = await login(password, userData);
+  const result = await login({ password, userData });
   logger.auth("Shared budget join result", { success: !!result });
 
   if (result.success) {
@@ -126,7 +120,7 @@ export const handleNewUserSetup = async (
     budgetId: userDataWithId.budgetId,
   });
 
-  const result = await login(password, userDataWithId);
+  const result = await login({ password, userData: userDataWithId });
   logger.auth("Login result", { success: !!result });
 
   if (result.success) {

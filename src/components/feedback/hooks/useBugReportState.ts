@@ -1,5 +1,5 @@
-import useBugReport from "../../../hooks/common/useBugReport";
-import useToast from "../../../hooks/common/useToast";
+import useBugReport from "../../../hooks/platform/ux/useBugReport";
+import useToast from "../../../hooks/platform/ux/useToast";
 import logger from "../../../utils/common/logger";
 
 interface BugReportHookReturn {

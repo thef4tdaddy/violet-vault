@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { keyExportUtils } from "@/utils/security/keyExport";
 import logger from "@/utils/common/logger";
 
@@ -21,11 +20,9 @@ export const useKeyManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  // Use AuthContext for state + useAuthManager for operations
-  const authContext = useAuth();
-  const authManager = useAuthManager();
-  const { encryptionKey, salt, budgetId } = authContext;
-  const { login } = authManager;
+  // Use unified useAuth hook for both state and operations
+  const auth = useAuth();
+  const { encryptionKey, salt, budgetId, login } = auth;
 
   // Clear error state
   const clearError = useCallback(() => {
@@ -318,9 +315,10 @@ export const useKeyManagement = () => {
 
         // Attempt to login with the imported key data
         // We need to reconstruct the login process with the imported salt and budgetId
-        const loginResult = await login(vaultPassword, {
-          budgetId: importResult.budgetId,
-          importedSalt: importResult.importedKeyData.salt,
+        const loginResult = await login({
+          password: vaultPassword,
+          overrideSalt: Array.from(importResult.importedKeyData.salt),
+          overrideBudgetId: importResult.budgetId,
         });
 
         if (!loginResult.success) {

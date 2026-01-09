@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,

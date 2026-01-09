@@ -9,7 +9,7 @@ vi.mock("../../../stores/ui/toastStore", () => ({
   },
 }));
 
-import { globalToast } from "../../../stores/ui/toastStore";
+import { globalToast } from "@/stores/ui/toastStore";
 
 vi.mock("../../../utils/common/logger", () => ({
   default: {
@@ -17,7 +17,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 describe("useKeyManagementUI", () => {
   beforeEach(() => {

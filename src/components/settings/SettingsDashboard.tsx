@@ -3,15 +3,15 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";
 import ResetConfirmModal from "./modals/ResetConfirmModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
-import { useSettingsModals } from "../../hooks/common/useModalManager";
+import { useSettingsModals } from "../../hooks/platform/ux/useModalManager";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import {
   useCloudSyncManager,
   useSettingsSections,
   useSettingsActions,
-} from "../../hooks/settings/useSettingsDashboard";
-import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionRenderer";
+} from "@/hooks/platform/settings/useSettingsDashboard";
+import useSettingsSectionRenderer from "@/hooks/platform/settings/useSettingsSectionRenderer";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));

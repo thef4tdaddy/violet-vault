@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import useTransactionTable from "@/hooks/transactions/useTransactionTable";
+import useTransactionTable from "@/hooks/budgeting/transactions/useTransactionTable";
 import TransactionRow from "@/components/transactions/components/TransactionRow";
 import DeleteConfirmation from "@/components/transactions/components/DeleteConfirmation";
 import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
-import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
+import type { ExecutionRecord } from "@/db/types";
 
 interface RulesTabProps {
   rules: AutoFundingRule[];
@@ -15,7 +15,7 @@ interface RulesTabProps {
 }
 
 interface HistoryTabProps {
-  executionHistory: ExecutionHistoryEntry[];
+  executionHistory: ExecutionRecord[];
   showExecutionDetails: string | null;
   onToggleDetails: (show: string | null) => void;
 }
@@ -29,13 +29,13 @@ interface DashboardTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   rules: AutoFundingRule[];
-  executionHistory: ExecutionHistoryEntry[];
+  executionHistory: ExecutionRecord[];
 }
 
 interface DashboardContentProps {
   activeTab: string;
   rules: AutoFundingRule[];
-  executionHistory: ExecutionHistoryEntry[];
+  executionHistory: ExecutionRecord[];
   showExecutionDetails: string | null;
   setShowExecutionDetails: (show: string | null) => void;
   handleCreateRule: () => void;

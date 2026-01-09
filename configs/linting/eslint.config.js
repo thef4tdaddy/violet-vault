@@ -10,6 +10,7 @@ import noLegacyToast from './eslint-rules/no-legacy-toast.js';
 import noArchitectureViolations from './eslint-rules/no-architecture-violations.js';
 import noDirectIconImports from './eslint-rules/no-direct-icon-imports.js';
 import enforceUILibrary from './eslint-rules/enforce-ui-library.js';
+import enforceUnifiedHooks from './eslint-rules/enforce-unified-hooks.js';
 
 // Modular config files
 import { baseRules } from './config-modules/base-rules.js';
@@ -101,6 +102,9 @@ export default [
       'enforce-ui-library': {
         rules: { 'enforce-ui-library': enforceUILibrary },
       },
+      'enforce-unified-hooks': {
+        rules: { 'no-legacy-hook-files': enforceUnifiedHooks },
+      },
     },
     rules: {
       ...baseRules,
@@ -142,6 +146,10 @@ export default [
 
       // 🎨 UI Library Enforcement - Use UI library components (Issue #491)
       'enforce-ui-library/enforce-ui-library': 'warn', // warn during migration
+
+      // 🎣 Unified Hook Pattern Enforcement (Issue #1525)
+      // TODO: Enable this rule ('error') once all hooks are refactored to the Unified Hook Pattern
+      'enforce-unified-hooks/no-legacy-hook-files': 'off',
     },
   },
   {
@@ -181,6 +189,20 @@ export default [
         'error',
         {
           max: 400,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
+    },
+  },
+  // Allow larger files for Unified Hook Pattern
+  {
+    files: ['src/hooks/**/*.{ts,tsx}'],
+    rules: {
+      'max-lines': [
+        'error',
+        {
+          max: 600,
           skipBlankLines: true,
           skipComments: true,
         },

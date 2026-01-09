@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../../../utils/common/queryClient";
-import { setBudgetMetadata } from "../../../db/budgetDb";
-import type { BudgetRecord } from "../../../db/types";
-import logger from "../../../utils/common/logger";
+import { queryKeys } from "@/utils/common/queryClient";
+import { setBudgetMetadata } from "@/db/budgetDb";
+import type { BudgetRecord } from "@/db/types";
+import logger from "@/utils/common/logger";
 
 export const useBudgetMetadataMutation = () => {
   const queryClient = useQueryClient();

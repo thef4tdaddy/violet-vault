@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { offlineRequestQueueService } from "@/services/sync/offlineRequestQueueService";
+import { useOfflineQueueStatus } from "@/hooks/sync/useOfflineQueueStatus";
 import { WifiOff, Wifi, RefreshCw, AlertCircle, CheckCircle } from "@/utils/icons";
-import logger from "@/utils/common/logger";
+import { Button } from "@/components/ui";
 
 /**
  * Offline Queue Status Component
@@ -10,76 +10,20 @@ import logger from "@/utils/common/logger";
  * and allows users to manually retry failed requests.
  */
 
-interface QueueStatus {
-  isOnline: boolean;
-  processingQueue: boolean;
-  pendingCount: number;
-  failedCount: number;
-  processingCount: number;
-  requests: Array<{
-    id?: number;
-    requestId: string;
-    method: string;
-    url: string;
-    status: string;
-    priority: string;
-    retryCount: number;
-    maxRetries: number;
-    timestamp: number;
-    nextRetryAt?: number;
-    errorMessage?: string;
-  }>;
-}
-
 export const OfflineQueueStatus: React.FC = () => {
-  const [status, setStatus] = useState<QueueStatus | null>(null);
+  const { status, retryRequest, clearFailedRequests, processQueue } = useOfflineQueueStatus();
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    // Load status on mount
-    loadStatus();
-
-    // Refresh status every 10 seconds
-    const interval = setInterval(loadStatus, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadStatus = async () => {
-    try {
-      const currentStatus = await offlineRequestQueueService.getStatus();
-      setStatus(currentStatus);
-    } catch (error) {
-      logger.error("Failed to load queue status", error);
+    // Expand automatically if there are failed requests - defer to avoid cascading renders warning
+    if (status?.failedCount && status.failedCount > 0) {
+      const timeout = setTimeout(() => {
+        setIsExpanded(true);
+      }, 0);
+      return () => clearTimeout(timeout);
     }
-  };
-
-  const handleRetryRequest = async (requestId: string) => {
-    try {
-      await offlineRequestQueueService.retryRequest(requestId);
-      await loadStatus();
-    } catch (error) {
-      logger.error("Failed to retry request", error);
-    }
-  };
-
-  const handleClearFailed = async () => {
-    try {
-      await offlineRequestQueueService.clearFailedRequests();
-      await loadStatus();
-    } catch (error) {
-      logger.error("Failed to clear failed requests", error);
-    }
-  };
-
-  const handleProcessQueue = async () => {
-    try {
-      await offlineRequestQueueService.processQueue();
-      await loadStatus();
-    } catch (error) {
-      logger.error("Failed to process queue", error);
-    }
-  };
+    return undefined;
+  }, [status?.failedCount]);
 
   if (!status) {
     return null;
@@ -96,9 +40,10 @@ export const OfflineQueueStatus: React.FC = () => {
     <div className="fixed bottom-4 right-4 z-50 max-w-md">
       <div className="rounded-lg border border-gray-300 bg-white shadow-lg">
         {/* Header */}
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50"
+          className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50 h-auto font-normal"
         >
           <div className="flex items-center gap-3">
             {status.isOnline ? (
@@ -131,7 +76,7 @@ export const OfflineQueueStatus: React.FC = () => {
               />
             </svg>
           </div>
-        </button>
+        </Button>
 
         {/* Expanded Content */}
         {isExpanded && (
@@ -154,21 +99,22 @@ export const OfflineQueueStatus: React.FC = () => {
 
             {/* Actions */}
             <div className="mb-4 flex gap-2">
-              <button
-                onClick={handleProcessQueue}
+              <Button
+                onClick={() => processQueue()}
                 disabled={!status.isOnline || status.processingQueue || status.pendingCount === 0}
-                className="flex-1 rounded bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1"
               >
                 <RefreshCw className="mr-1 inline h-4 w-4" />
                 Process Queue
-              </button>
+              </Button>
               {status.failedCount > 0 && (
-                <button
-                  onClick={handleClearFailed}
-                  className="flex-1 rounded bg-red-500 px-3 py-2 text-sm font-medium text-white hover:bg-red-600"
+                <Button
+                  variant="destructive"
+                  onClick={() => clearFailedRequests()}
+                  className="flex-1"
                 >
                   Clear Failed
-                </button>
+                </Button>
               )}
             </div>
 
@@ -216,12 +162,14 @@ export const OfflineQueueStatus: React.FC = () => {
                       Retries: {request.retryCount}/{request.maxRetries}
                     </span>
                     {request.status === "failed" && (
-                      <button
-                        onClick={() => handleRetryRequest(request.requestId)}
-                        className="font-medium text-blue-600 hover:text-blue-800"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => retryRequest(request.requestId)}
+                        className="h-auto p-0 font-medium text-blue-600 hover:text-blue-800"
                       >
                         Retry Now
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

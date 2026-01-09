@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { useConfirm } from "../../../hooks/common/useConfirm";
+import { useConfirm } from "../../../hooks/platform/ux/useConfirm";
 import logger from "../../../utils/common/logger";
 import type { DataDetectionResult } from "@/types/sync";
 

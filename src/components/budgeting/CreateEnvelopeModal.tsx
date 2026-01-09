@@ -1,9 +1,9 @@
 import { createPortal } from "react-dom";
-import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import useEnvelopeForm from "@/hooks/budgeting/envelopes/useEnvelopeForm";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent, DesktopModalHeader } from "./CreateEnvelopeModalComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface Bill {
   id: string;

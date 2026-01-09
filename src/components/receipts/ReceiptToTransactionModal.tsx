@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { useReceiptToTransaction } from "../../hooks/receipts/useReceiptToTransaction";
+import { useReceiptToTransaction } from "@/hooks/platform/receipts/useReceiptToTransaction";
 import ReceiptDataStep from "./steps/ReceiptDataStep";
 import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 // ModalHeader - displays title and close button
 const ModalHeader: React.FC<{ step: number; onClose: () => void }> = ({ step, onClose }) => (

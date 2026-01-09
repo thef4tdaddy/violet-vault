@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils/icons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface ClearConfirmationModalProps {
   isOpen: boolean;

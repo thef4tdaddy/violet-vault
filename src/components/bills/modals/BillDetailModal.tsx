@@ -1,13 +1,13 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
-import { useBillDetail } from "../../../hooks/bills/useBillDetail";
+import { useBillDetail } from "../../../hooks/budgeting/transactions/scheduled/expenses/useBillDetail";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import { BillDetailHeader } from "./BillDetailHeader";
 import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill as BillFromTypes } from "@/types/bills";
 
 interface PaymentData {

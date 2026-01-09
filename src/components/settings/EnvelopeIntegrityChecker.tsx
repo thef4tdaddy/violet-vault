@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import { useEnvelopeIntegrity } from "@/hooks/settings/useEnvelopeIntegrity";
+import { useEnvelopeIntegrity } from "@/hooks/platform/settings/useEnvelopeIntegrity";
 import { EnvelopeIntegrityStatusCards } from "./EnvelopeIntegrityStatusCards";
 import { EnvelopeIntegrityActions } from "./EnvelopeIntegrityActions";
 import { EnvelopeIntegrityCorruptedList } from "./EnvelopeIntegrityCorruptedList";
 import { EnvelopeIntegrityRecommendations } from "./EnvelopeIntegrityRecommendations";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 /**
  * Envelope Integrity Checker Component

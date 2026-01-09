@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import SavingsGoals from "../SavingsGoals";
 import userEvent from "@testing-library/user-event";
-import useSavingsGoalsActionsOriginal from "../../../hooks/savings/useSavingsGoalsActions";
+import useSavingsGoalsActionsOriginal from "@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions";
 
 // Mock the custom hook
-vi.mock("../../../hooks/savings/useSavingsGoalsActions", () => ({
+vi.mock("@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions", () => ({
   default: vi.fn(() => ({
     showDistributeModal: false,
     editingGoal: null,
@@ -66,11 +66,11 @@ vi.mock("@/components/ui", () => ({
   ),
 }));
 
-vi.mock("../../../utils", () => ({
+vi.mock("@/utils", () => ({
   getIcon: vi.fn(() => "div"),
 }));
 
-vi.mock("../../../utils/savings/savingsFormUtils", () => ({
+vi.mock("@/utils/savings/savingsFormUtils", () => ({
   SAVINGS_PRIORITIES: ["High", "Medium", "Low"],
 }));
 

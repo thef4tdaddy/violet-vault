@@ -114,6 +114,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
+	// Security Headers
+	AddSecurityHeaders(w)
+
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -126,7 +129,19 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	var req BudgetCalculationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(BudgetCalculationResponse{Success: false, Error: "Invalid JSON: " + err.Error()})
+		return
+	}
+
+	// Validate request
+	validation := ValidateRequest(req)
+	if !validation.Valid {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(BudgetCalculationResponse{
+			Success: false,
+			Error:   fmt.Sprintf("Validation failed: %d errors", len(validation.Errors)),
+		})
 		return
 	}
 

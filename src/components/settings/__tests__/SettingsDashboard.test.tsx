@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock hooks
-vi.mock("@/hooks/common/useModalManager", () => ({
+vi.mock("@/hooks/platform/ux/useModalManager", () => ({
   useSettingsModals: vi.fn(() => ({
     showPasswordModal: false,
     showActivityFeed: false,
@@ -28,7 +28,7 @@ vi.mock("@/hooks/common/useModalManager", () => ({
   })),
 }));
 
-vi.mock("@/hooks/settings/useSettingsDashboard", () => ({
+vi.mock("@/hooks/platform/settings/useSettingsDashboard", () => ({
   useCloudSyncManager: vi.fn(() => ({
     isSyncing: false,
     lastSync: null,
@@ -49,7 +49,7 @@ vi.mock("@/hooks/settings/useSettingsDashboard", () => ({
   })),
 }));
 
-vi.mock("@/hooks/settings/useSettingsSectionRenderer", () => ({
+vi.mock("@/hooks/platform/settings/useSettingsSectionRenderer", () => ({
   default: vi.fn(() => ({
     renderSectionContent: vi.fn((section) => (
       <div data-testid="section-content">Section: {section}</div>

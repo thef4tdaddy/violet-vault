@@ -1,4 +1,4 @@
-import { useReceiptScanner } from "../../hooks/receipts/useReceiptScanner";
+import { useReceiptScanner } from "@/hooks/platform/receipts/useReceiptScanner";
 import ReceiptScannerHeader from "./components/ReceiptScannerHeader";
 import ReceiptUploadArea from "./components/ReceiptUploadArea";
 import ReceiptProcessingState from "./components/ReceiptProcessingState";
@@ -6,7 +6,7 @@ import ReceiptErrorState from "./components/ReceiptErrorState";
 import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { mapExtractedDataForDisplay } from "./utils/receiptHelpers";
 
 /**

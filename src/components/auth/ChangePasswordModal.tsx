@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { AuthResult } from "@/types/auth";
 
 interface ChangePasswordModalProps {

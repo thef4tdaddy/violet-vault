@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils/icons";
-import { useSecuritySettingsLogic } from "../../hooks/security/useSecuritySettingsLogic";
+import { useSecuritySettingsLogic } from "@/hooks/platform/security/useSecuritySettingsLogic";
 import SecurityStatusSection from "./sections/SecurityStatusSection";
 import AutoLockSettingsSection from "./sections/AutoLockSettingsSection";
 import ClipboardSecuritySection from "./sections/ClipboardSecuritySection";
@@ -8,7 +8,7 @@ import SecurityLoggingSection from "./sections/SecurityLoggingSection";
 import SecurityActionsSection from "./sections/SecurityActionsSection";
 import ClearConfirmationModal from "./modals/ClearConfirmationModal";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface SecuritySettingsProps {
   isOpen: boolean;

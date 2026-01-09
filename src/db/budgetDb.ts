@@ -19,6 +19,8 @@ import type {
   BulkUpdate,
   DatabaseStats,
   OfflineRequestQueueEntry,
+  AutoFundingRule,
+  ExecutionRecord,
 } from "./types";
 
 export class VioletVaultDB extends Dexie {
@@ -38,6 +40,8 @@ export class VioletVaultDB extends Dexie {
   budgetTags!: Table<BudgetTag, number>;
   autoBackups!: Table<AutoBackup, string>;
   offlineRequestQueue!: Table<OfflineRequestQueueEntry, number>;
+  autoFundingRules!: Table<AutoFundingRule, string>;
+  autoFundingHistory!: Table<ExecutionRecord, string>;
 
   constructor() {
     super("VioletVault");
@@ -105,11 +109,12 @@ export class VioletVaultDB extends Dexie {
         "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer]",
     });
 
-    // Version 10: Offline Request Queuing - Add offlineRequestQueue table for handling offline operations
+    // Version 10: Combined Offline Request Queue & Auto-Funding Hooks
     this.version(10).stores({
-      // Offline request queue table with indexes for efficient queue management
       offlineRequestQueue:
         "++id, requestId, timestamp, priority, status, nextRetryAt, entityType, entityId, [status+priority], [status+nextRetryAt], [entityType+entityId]",
+      autoFundingRules: "id, name, type, trigger, priority, enabled, lastModified",
+      autoFundingHistory: "id, trigger, executedAt, [trigger+executedAt]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -215,6 +220,8 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.savingsGoals);
     addTimestampHooks(this.paycheckHistory);
     addTimestampHooks(this.debts);
+    addTimestampHooks(this.autoFundingRules);
+    addTimestampHooks(this.autoFundingHistory);
 
     // Audit log hook
     this.auditLog.hook("creating", (_primKey: number, obj: AuditLogEntry, _trans: unknown) => {
@@ -550,6 +557,8 @@ export class VioletVaultDB extends Dexie {
       paycheckCount,
       cacheCount,
       offlineQueueCount,
+      autoFundingRuleCount,
+      autoFundingHistoryCount,
     ] = await Promise.all([
       this.envelopes.count(),
       this.transactions.count(),
@@ -558,6 +567,8 @@ export class VioletVaultDB extends Dexie {
       this.paycheckHistory.count(),
       this.cache.count(),
       this.offlineRequestQueue.count(),
+      this.autoFundingRules.count(),
+      this.autoFundingHistory.count(),
     ]);
 
     return {
@@ -568,6 +579,8 @@ export class VioletVaultDB extends Dexie {
       paychecks: paycheckCount,
       cache: cacheCount,
       offlineQueue: offlineQueueCount,
+      autoFundingRules: autoFundingRuleCount,
+      autoFundingHistory: autoFundingHistoryCount,
       lastOptimized: Date.now(),
     };
   }

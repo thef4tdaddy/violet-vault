@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import useEnvelopeEdit from "@/hooks/budgeting/useEnvelopeEdit";
+import useEnvelopeEdit from "@/hooks/budgeting/envelopes/useEnvelopeEdit";
 import logger from "@/utils/common/logger";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent } from "./EditEnvelopeModalComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface EnvelopeRef {
   id: string;
