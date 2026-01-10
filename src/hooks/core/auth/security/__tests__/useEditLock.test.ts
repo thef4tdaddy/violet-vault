@@ -50,28 +50,19 @@ describe("useEditLock", () => {
     mockAcquireLock = vi.fn().mockResolvedValue({ success: true });
     mockReleaseLock = vi.fn().mockResolvedValue({ success: true });
 
-    (
-      editLockService as unknown as {
-        watchLock: ReturnType<typeof vi.fn>;
-        acquireLock: ReturnType<typeof vi.fn>;
-        releaseLock: ReturnType<typeof vi.fn>;
-        currentUser?: { id?: string; budgetId?: string; userName?: string };
-      }
-    ).watchLock = mockWatchLock;
-    (
-      editLockService as unknown as {
-        watchLock: ReturnType<typeof vi.fn>;
-        acquireLock: ReturnType<typeof vi.fn>;
-        releaseLock: ReturnType<typeof vi.fn>;
-      }
-    ).acquireLock = mockAcquireLock;
-    (
-      editLockService as unknown as {
-        watchLock: ReturnType<typeof vi.fn>;
-        acquireLock: ReturnType<typeof vi.fn>;
-        releaseLock: ReturnType<typeof vi.fn>;
-      }
-    ).releaseLock = mockReleaseLock;
+    // Type alias for mocked editLockService to reduce duplication
+    type MockedEditLockService = {
+      watchLock: ReturnType<typeof vi.fn>;
+      acquireLock: ReturnType<typeof vi.fn>;
+      releaseLock: ReturnType<typeof vi.fn>;
+      breakLock?: ReturnType<typeof vi.fn>;
+      currentUser?: { id?: string; budgetId?: string; userName?: string };
+    };
+
+    const mockedService = editLockService as unknown as MockedEditLockService;
+    mockedService.watchLock = mockWatchLock;
+    mockedService.acquireLock = mockAcquireLock;
+    mockedService.releaseLock = mockReleaseLock;
 
     // Mock logger
     (logger.debug as ReturnType<typeof vi.fn>) = vi.fn();
@@ -529,6 +520,30 @@ describe("useEditLock", () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockAcquireLock).not.toHaveBeenCalled();
+    });
+
+    it("should auto-acquire when lock is held by another user", async () => {
+      // Setup: Lock held by another user
+      const otherUserLock = {
+        ...mockLockDoc,
+        userId: "other-user-456",
+        userName: "Other User",
+      };
+
+      (helpers.isOwnLock as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
+      mockWatchLock.mockImplementation((_, __, callback) => {
+        // Simulate existing lock by another user
+        callback(otherUserLock);
+        return vi.fn();
+      });
+
+      renderHook(() => useEditLock("envelope", "rec-123", { autoAcquire: true }));
+
+      // Should attempt to acquire lock even though another user has it
+      await waitFor(() => {
+        expect(mockAcquireLock).toHaveBeenCalledWith("envelope", "rec-123");
+      });
     });
   });
 
