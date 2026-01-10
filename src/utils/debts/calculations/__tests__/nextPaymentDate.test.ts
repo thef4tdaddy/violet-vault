@@ -1,11 +1,8 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { calculateNextPaymentDate } from "../nextPaymentDate";
 import { PAYMENT_FREQUENCIES } from "@/constants/debts";
 
 describe("nextPaymentDate", () => {
-  beforeEach(() => {
-    // Clear any mocks or state before each test
-  });
 
   describe("calculateNextPaymentDate", () => {
     describe("Priority 1: Related bill due date", () => {
