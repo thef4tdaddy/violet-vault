@@ -20,9 +20,9 @@ export interface TransactionRecord extends Transaction {
 
 import type { Envelope as DbEnvelope } from "@/db/types";
 
-export interface EnvelopeRecord extends DbEnvelope {
+export type EnvelopeRecord = DbEnvelope & {
   [key: string]: unknown;
-}
+};
 
 export interface FilterOptions {
   search?: string;
@@ -102,7 +102,12 @@ export const useBillCalculations = () => {
 
   const getCategorizedBills = useMemo(() => {
     return (bills: UiBill[]) => {
-      const categorized = categorizeBills(bills as unknown as DbBill[]);
+      // Fix description type from string | null | undefined to string | undefined
+      const billsWithSafeDescription = bills.map((b) => ({
+        ...b,
+        description: b.description === null ? undefined : b.description,
+      }));
+      const categorized = categorizeBills(billsWithSafeDescription as unknown as UiBill[]);
       const totals = calculateBillTotals(categorized);
       return { categorizedBills: categorized, totals };
     };
@@ -115,8 +120,13 @@ export const useBillCalculations = () => {
       filterOptions: FilterOptions
     ) => {
       const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
+      // Fix description type here as well
+      const billsWithSafeDescription = billsToFilter.map((b) => ({
+        ...b,
+        description: b.description === null ? undefined : b.description,
+      }));
       return filterBills(
-        billsToFilter as unknown as DbBill[],
+        billsWithSafeDescription as unknown as UiBill[],
         filterOptions
       ) as unknown as UiBill[];
     };

@@ -1,15 +1,11 @@
 import { Dexie, Table } from "dexie";
 import logger from "../utils/common/logger";
-import type {
+import {
   BudgetRecord,
   Envelope,
   Transaction,
-  Bill,
-  SavingsGoal,
-  PaycheckHistory,
   AuditLogEntry,
   CacheEntry,
-  Debt,
   BudgetCommit,
   BudgetChange,
   BudgetBranch,
@@ -28,12 +24,8 @@ export class VioletVaultDB extends Dexie {
   budget!: Table<BudgetRecord, string>;
   envelopes!: Table<Envelope, string>;
   transactions!: Table<Transaction, string>;
-  bills!: Table<Bill, string>;
-  savingsGoals!: Table<SavingsGoal, string>;
-  paycheckHistory!: Table<PaycheckHistory, string>;
   auditLog!: Table<AuditLogEntry, number>;
   cache!: Table<CacheEntry, string>;
-  debts!: Table<Debt, string>;
   budgetCommits!: Table<BudgetCommit, string>;
   budgetChanges!: Table<BudgetChange, number>;
   budgetBranches!: Table<BudgetBranch, number>;
@@ -115,6 +107,21 @@ export class VioletVaultDB extends Dexie {
         "++id, requestId, timestamp, priority, status, nextRetryAt, entityType, entityId, [status+priority], [status+nextRetryAt], [entityType+entityId]",
       autoFundingRules: "id, name, type, trigger, priority, enabled, lastModified",
       autoFundingHistory: "id, trigger, executedAt, [trigger+executedAt]",
+    });
+
+    // Version 11: Data Unification - Unified Envelopes & Transactions
+    // Dropping legacy tables: bills, debts, savingsGoals, paycheckHistory
+    // Fresh Start Strategy: No data migration required
+    this.version(11).stores({
+      envelopes:
+        "id, name, category, archived, lastModified, type, [category+archived], [category+name], [type+archived]",
+      transactions:
+        "id, date, amount, envelopeId, category, type, lastModified, paycheckId, isInternalTransfer, isScheduled, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date], [paycheckId], [isInternalTransfer], [isScheduled+date]",
+      // Dropping legacy tables
+      bills: null,
+      debts: null,
+      savingsGoals: null,
+      paycheckHistory: null,
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -205,21 +212,13 @@ export class VioletVaultDB extends Dexie {
       });
 
       table.hook("updating", function (modifications) {
-        (
-          modifications as Partial<
-            Envelope | Transaction | Bill | SavingsGoal | PaycheckHistory | Debt
-          >
-        ).lastModified = Date.now();
+        (modifications as Partial<Envelope | Transaction>).lastModified = Date.now();
       });
     };
 
     // Apply hooks to all data tables
     addTimestampHooks(this.envelopes);
     addTimestampHooks(this.transactions);
-    addTimestampHooks(this.bills);
-    addTimestampHooks(this.savingsGoals);
-    addTimestampHooks(this.paycheckHistory);
-    addTimestampHooks(this.debts);
     addTimestampHooks(this.autoFundingRules);
     addTimestampHooks(this.autoFundingHistory);
 
@@ -231,35 +230,11 @@ export class VioletVaultDB extends Dexie {
 
   // Enhanced bulk operations for all data types
   async bulkUpsertEnvelopes(envelopes: Envelope[]): Promise<void> {
-    return this.transaction("rw", this.envelopes, async () => {
-      for (const envelope of envelopes) {
-        await this.envelopes.put(envelope);
-      }
-    });
+    await this.envelopes.bulkPut(envelopes);
   }
 
   async bulkUpsertTransactions(transactions: Transaction[]): Promise<void> {
-    return this.transaction("rw", this.transactions, async () => {
-      for (const transaction of transactions) {
-        await this.transactions.put(transaction);
-      }
-    });
-  }
-
-  async bulkUpsertBills(bills: Bill[]): Promise<void> {
-    return this.transaction("rw", this.bills, async () => {
-      for (const bill of bills) {
-        await this.bills.put(bill);
-      }
-    });
-  }
-
-  async bulkUpsertDebts(debts: Debt[]): Promise<void> {
-    return this.transaction("rw", this.debts, async () => {
-      for (const debt of debts) {
-        await this.debts.put(debt);
-      }
-    });
+    await this.transactions.bulkPut(transactions);
   }
 
   // Enhanced cache management with categories
@@ -354,134 +329,35 @@ export class VioletVaultDB extends Dexie {
     return this.transactions.where("type").equals(type).reverse().toArray();
   }
 
-  // Bill queries with payment status and due date optimization
-  async getUpcomingBills(daysAhead: number = 30): Promise<Bill[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const futureDate = new Date(today);
-    futureDate.setDate(futureDate.getDate() + daysAhead);
-
-    return this.bills
-      .filter(
-        (bill) => bill.isPaid === false && bill.dueDate >= today && bill.dueDate <= futureDate
-      )
+  // Paycheck History queries (derived from Transactions)
+  async getPaycheckHistory(limit: number = 50): Promise<Transaction[]> {
+    return await this.transactions
+      .filter((t) => t.type === "income" && !!t.allocations)
+      .reverse()
+      .limit(limit)
       .toArray();
   }
 
-  async getOverdueBills(): Promise<Bill[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return this.bills.filter((bill) => bill.isPaid === false && bill.dueDate < today).toArray();
-  }
-
-  async getPaidBills(dateRange?: DateRange): Promise<Bill[]> {
-    if (dateRange) {
-      return this.bills
-        .filter(
-          (bill) =>
-            bill.isPaid === true && bill.dueDate >= dateRange.start && bill.dueDate <= dateRange.end
-        )
-        .toArray();
-    }
-    return this.bills.filter((bill) => bill.isPaid === true).toArray();
-  }
-
-  async getBillsByCategory(category: string): Promise<Bill[]> {
-    return this.bills.where("category").equals(category).toArray();
-  }
-
-  async getRecurringBills(): Promise<Bill[]> {
-    return this.bills.filter((bill) => bill.isRecurring === true).toArray();
-  }
-
-  // Savings Goals queries with status and priority optimization
-  async getActiveSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals
-      .filter((goal) => goal.isCompleted === false && goal.isPaused === false)
-      .toArray();
-  }
-
-  async getCompletedSavingsGoals(): Promise<SavingsGoal[]> {
-    return this.savingsGoals.filter((goal) => goal.isCompleted === true).toArray();
-  }
-
-  async getSavingsGoalsByCategory(category: string): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("category").equals(category).toArray();
-  }
-
-  async getSavingsGoalsByPriority(priority: SavingsGoal["priority"]): Promise<SavingsGoal[]> {
-    return this.savingsGoals.where("priority").equals(priority).toArray();
-  }
-
-  async getUpcomingDeadlines(daysAhead: number = 30): Promise<SavingsGoal[]> {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + daysAhead);
-
-    return this.savingsGoals
-      .filter((goal) => {
-        if (!goal.targetDate) return false;
-        const targetDate = new Date(goal.targetDate);
-        return goal.isCompleted === false && targetDate >= new Date() && targetDate <= futureDate;
-      })
-      .toArray();
-  }
-
-  // Paycheck History queries for trend analysis
-  async getPaycheckHistory(limit: number = 50): Promise<PaycheckHistory[]> {
-    return this.paycheckHistory.orderBy("date").reverse().limit(limit).toArray();
-  }
-
-  async getPaychecksByDateRange(startDate: Date, endDate: Date): Promise<PaycheckHistory[]> {
-    return this.paycheckHistory.where("date").between(startDate, endDate, true, true).toArray();
-  }
-
-  async getPaychecksBySource(source: string): Promise<PaycheckHistory[]> {
-    return this.paycheckHistory.where("source").equals(source).toArray();
-  }
-
-  // Enhanced batch operations for all data types
   async batchUpdate(updates: BulkUpdate[]): Promise<unknown[]> {
-    return this.transaction(
-      "rw",
-      [this.envelopes, this.transactions, this.bills, this.savingsGoals, this.paycheckHistory],
-      async () => {
-        const promises = updates.map((update) => {
-          switch (update.type) {
-            case "envelope":
-              return this.envelopes.put(update.data as Envelope);
-            case "transaction":
-              return this.transactions.put(update.data as Transaction);
-            case "bill":
-              return this.bills.put(update.data as Bill);
-            case "savingsGoal":
-              return this.savingsGoals.put(update.data as SavingsGoal);
-            case "paycheck":
-              return this.paycheckHistory.put(update.data as PaycheckHistory);
-            default:
-              return Promise.resolve();
-          }
-        });
-        return Promise.all(promises);
-      }
-    );
-  }
-
-  // Bulk operations for initial data loading
-  async bulkUpsertSavingsGoals(goals: SavingsGoal[]): Promise<void> {
-    return this.transaction("rw", this.savingsGoals, async () => {
-      for (const goal of goals) {
-        await this.savingsGoals.put(goal);
-      }
+    return this.transaction("rw", [this.envelopes, this.transactions], async () => {
+      const promises = updates.map((update) => {
+        switch (update.type) {
+          case "envelope":
+            return this.envelopes.put(update.data as Envelope);
+          case "transaction":
+            return this.transactions.put(update.data as Transaction);
+          case "autoFundingRule":
+            return this.autoFundingRules.put(update.data as AutoFundingRule);
+          default:
+            return Promise.resolve();
+        }
+      });
+      return Promise.all(promises);
     });
   }
 
-  async bulkUpsertPaychecks(paychecks: PaycheckHistory[]): Promise<void> {
-    return this.transaction("rw", this.paycheckHistory, async () => {
-      for (const paycheck of paychecks) {
-        await this.paycheckHistory.put(paycheck);
-      }
-    });
+  async bulkUpsertAutoFundingRules(rules: AutoFundingRule[]): Promise<void> {
+    await this.autoFundingRules.bulkPut(rules);
   }
 
   // Analytics helper queries
@@ -552,9 +428,6 @@ export class VioletVaultDB extends Dexie {
     const [
       envelopeCount,
       transactionCount,
-      billCount,
-      goalCount,
-      paycheckCount,
       cacheCount,
       offlineQueueCount,
       autoFundingRuleCount,
@@ -562,9 +435,6 @@ export class VioletVaultDB extends Dexie {
     ] = await Promise.all([
       this.envelopes.count(),
       this.transactions.count(),
-      this.bills.count(),
-      this.savingsGoals.count(),
-      this.paycheckHistory.count(),
       this.cache.count(),
       this.offlineRequestQueue.count(),
       this.autoFundingRules.count(),
@@ -574,9 +444,6 @@ export class VioletVaultDB extends Dexie {
     return {
       envelopes: envelopeCount,
       transactions: transactionCount,
-      bills: billCount,
-      savingsGoals: goalCount,
-      paychecks: paycheckCount,
       cache: cacheCount,
       offlineQueue: offlineQueueCount,
       autoFundingRules: autoFundingRuleCount,
@@ -704,10 +571,6 @@ export const clearData = async (): Promise<void> => {
     budgetDb.budget.clear(),
     budgetDb.envelopes.clear(),
     budgetDb.transactions.clear(),
-    budgetDb.bills.clear(),
-    budgetDb.debts.clear(),
-    budgetDb.savingsGoals.clear(),
-    budgetDb.paycheckHistory.clear(),
     budgetDb.auditLog.clear(),
     budgetDb.cache.clear(),
     budgetDb.budgetCommits.clear(),
@@ -715,23 +578,9 @@ export const clearData = async (): Promise<void> => {
     budgetDb.budgetBranches.clear(),
     budgetDb.budgetTags.clear(),
     budgetDb.offlineRequestQueue.clear(),
+    budgetDb.autoFundingRules.clear(),
+    budgetDb.autoFundingHistory.clear(),
   ]);
-};
-
-// Migration helper for schema updates
-export const migrateData = async (): Promise<DatabaseStats> => {
-  try {
-    // Check if migration is needed by looking for new tables
-    const stats = await budgetDb.getDatabaseStats();
-    logger.info(
-      "Database migration completed. Stats:",
-      stats as unknown as Record<string, unknown>
-    );
-    return stats;
-  } catch (error) {
-    logger.error("Database migration failed:", error);
-    throw error;
-  }
 };
 
 // Export enhanced query helpers - use function expressions to avoid temporal dead zone
@@ -749,22 +598,6 @@ export const queryHelpers = {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     return budgetDb.getTransactionsByDateRange(startDate, new Date());
-  },
-
-  // Bill helpers
-  getUpcomingBills(days?: number): Promise<Bill[]> {
-    return budgetDb.getUpcomingBills(days);
-  },
-  getOverdueBills(): Promise<Bill[]> {
-    return budgetDb.getOverdueBills();
-  },
-
-  // Savings goal helpers
-  getActiveSavingsGoals(): Promise<SavingsGoal[]> {
-    return budgetDb.getActiveSavingsGoals();
-  },
-  getUpcomingDeadlines(days?: number): Promise<SavingsGoal[]> {
-    return budgetDb.getUpcomingDeadlines(days);
   },
 
   // Analytics helpers

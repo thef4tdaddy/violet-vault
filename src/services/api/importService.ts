@@ -374,6 +374,7 @@ export class ImportService {
       category: String(item.category || "uncategorized"),
       envelopeId: String(item.envelopeId || ""),
       merchant: item.merchant ? String(item.merchant) : undefined,
+      isScheduled: typeof item.isScheduled === "boolean" ? item.isScheduled : false,
       createdAt: typeof item.createdAt === "number" ? item.createdAt : Date.now(),
       lastModified: typeof item.lastModified === "number" ? item.lastModified : Date.now(),
     };

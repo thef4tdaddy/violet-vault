@@ -109,8 +109,6 @@ export const runSyncEdgeCaseTests = async (): Promise<TestResult[]> => {
 async function clearStores() {
   await budgetDb.envelopes.clear();
   await budgetDb.transactions.clear();
-  await budgetDb.bills.clear();
-  await budgetDb.debts.clear();
 }
 
 // Global exposure

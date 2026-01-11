@@ -90,7 +90,7 @@ const filterBillEnvelopes = (envelopes: Envelope[]) => {
       ({ envelope, resolvedType }) =>
         isAutoAllocateEnabled(envelope) &&
         (resolvedType === ENVELOPE_TYPES.BILL ||
-          (BILL_CATEGORIES as readonly string[]).includes(String(envelope.category || "").trim()))
+          (BILL_CATEGORIES as readonly string[]).includes(envelope.category.trim()))
     )
     .map(({ envelope }) => envelope);
 };
@@ -255,32 +255,35 @@ const isAutoAllocateEnabled = (envelope: Envelope) => {
 };
 
 const resolveEnvelopeType = (envelope: Envelope) => {
-  if (typeof envelope.envelopeType === "string" && envelope.envelopeType.trim() !== "") {
-    return envelope.envelopeType;
+  // If it's a special type (goal, liability, supplemental), use it
+  if (envelope.type !== "standard") {
+    return envelope.type;
   }
-  if (typeof envelope.category === "string" && envelope.category.trim() !== "") {
+
+  // Fallback to auto-classification based on category
+  if (envelope.category.trim() !== "") {
     return AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
   }
+
   return ENVELOPE_TYPES.VARIABLE;
 };
 
 const resolveMonthlyBudget = (envelope: Envelope) => {
-  const candidates = [envelope.monthlyBudget, envelope.targetAmount];
-  for (const candidate of candidates) {
-    const numeric = toNumber(candidate);
-    if (numeric !== undefined && numeric > 0) {
-      return numeric;
-    }
+  if (envelope.type === "standard") {
+    return envelope.monthlyBudget || 0;
+  }
+  if (envelope.type === "goal") {
+    return envelope.monthlyContribution || envelope.targetAmount || 0;
+  }
+  if (envelope.type === "liability") {
+    return envelope.amount || envelope.minimumPayment || 0;
   }
   return 0;
 };
 
 const resolveBiweeklyAllocation = (envelope: Envelope) => {
-  const directValue = toNumber(
-    (envelope as Envelope & { biweeklyAllocation?: number }).biweeklyAllocation
-  );
-  if (directValue !== undefined && directValue > 0) {
-    return directValue;
+  if (envelope.type === "standard" && envelope.biweeklyAllocation !== undefined) {
+    return envelope.biweeklyAllocation;
   }
 
   const monthlyBudget = resolveMonthlyBudget(envelope);

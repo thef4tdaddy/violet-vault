@@ -22,26 +22,31 @@ class Envelope(BaseModel):
     archived: bool = Field(default=False, description="Whether envelope is archived")
     lastModified: int = Field(..., gt=0, description="Last modified timestamp")
     createdAt: int | None = Field(None, gt=0, description="Creation timestamp")
-    currentBalance: float | None = Field(None, description="Current balance (can be negative)")
-    targetAmount: float | None = Field(None, ge=0, description="Target amount")
+    currentBalance: float = Field(default=0.0, description="Current balance")
     description: str | None = Field(None, max_length=500, description="Description")
-    envelopeType: Literal["bill", "variable", "savings", "sinking_fund", "supplemental"] | None = (
-        None
+
+    # Discriminated Union Type
+    type: Literal["standard", "goal", "liability", "supplemental"] = Field(
+        default="standard", description="Envelope type"
     )
-    autoAllocate: bool | None = None
-    monthlyBudget: float | None = Field(None, ge=0)
-    biweeklyAllocation: float | None = Field(None, ge=0)
-    billId: str | None = None
-    debtId: str | None = None
+
+    # Goal specific
+    targetAmount: float | None = Field(None, ge=0)
+    targetDate: str | None = None
     priority: Literal["low", "medium", "high"] | None = None
     isPaused: bool | None = None
     isCompleted: bool | None = None
-    targetDate: str | None = None
-    monthlyContribution: float | None = Field(None, ge=0)
-    annualContribution: float | None = Field(None, ge=0)
+    monthlyContribution: float | None = None
+
+    # Liability specific
+    minimumPayment: float | None = None
+    interestRate: float | None = None
+    dueDateDay: int | None = Field(None, ge=1, le=31)
+
+    # Supplemental specific
+    accountType: Literal["FSA", "HSA", "529", "IRA", "401K", "other"] | None = None
+    annualContribution: float | None = None
     expirationDate: str | None = None
-    isActive: bool | None = None
-    accountType: str | None = None
 
 
 class Transaction(BaseModel):
@@ -65,6 +70,15 @@ class Transaction(BaseModel):
     description: str | None = Field(None, max_length=500, description="Description")
     merchant: str | None = Field(None, max_length=200, description="Merchant name")
     receiptUrl: str | None = None
+
+    # Scheduled Transaction support
+    isScheduled: bool = Field(default=False)
+    recurrenceRule: str | None = None  # iCal RRule string
+
+    # Paycheck support
+    allocations: dict[str, float] | None = None  # envelopeId -> amount
+
+    # Connection properties
     isInternalTransfer: bool | None = None
     paycheckId: str | None = None
     fromEnvelopeId: str | None = None

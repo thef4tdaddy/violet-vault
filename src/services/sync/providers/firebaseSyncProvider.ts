@@ -22,10 +22,7 @@ interface SyncData extends Record<string, unknown> {
   unassignedCash?: number;
   actualBalance?: number;
   envelopes?: SafeUnknown[];
-  bills?: SafeUnknown[];
   transactions?: SafeUnknown[];
-  debts?: SafeUnknown[];
-  paycheckHistory?: SafeUnknown[];
 }
 
 /**
@@ -236,28 +233,14 @@ export class FirebaseSyncProvider implements SyncProvider {
     const { budgetDb } = await import("@/db/budgetDb");
     await budgetDb.transaction(
       "rw",
-      [
-        budgetDb.envelopes,
-        budgetDb.bills,
-        budgetDb.transactions,
-        budgetDb.debts,
-        budgetDb.paycheckHistory,
-        budgetDb.budget,
-      ],
+      [budgetDb.envelopes, budgetDb.transactions, budgetDb.budget],
       async () => {
         await budgetDb.envelopes.clear();
-        await budgetDb.bills.clear();
         await budgetDb.transactions.clear();
-        await budgetDb.debts.clear();
-        await budgetDb.paycheckHistory.clear();
 
         if (Array.isArray(data.envelopes)) await budgetDb.envelopes.bulkAdd(data.envelopes);
-        if (Array.isArray(data.bills)) await budgetDb.bills.bulkAdd(data.bills);
         if (Array.isArray(data.transactions))
           await budgetDb.transactions.bulkAdd(data.transactions);
-        if (Array.isArray(data.debts)) await budgetDb.debts.bulkAdd(data.debts);
-        if (Array.isArray(data.paycheckHistory))
-          await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
 
         const syncData = data as SyncData;
         await budgetDb.budget.put({

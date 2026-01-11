@@ -26,17 +26,7 @@ vi.mock("@/db/budgetDb", () => ({
       clear: vi.fn(),
       bulkAdd: vi.fn(),
     },
-    bills: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-      bulkAdd: vi.fn(),
-    },
-    debts: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-      bulkAdd: vi.fn(),
-    },
-    paycheckHistory: {
+    auditLog: {
       toArray: vi.fn(),
       clear: vi.fn(),
       bulkAdd: vi.fn(),
@@ -72,6 +62,7 @@ const generateLargeEnvelopeDataset = (count: number): Envelope[] => {
     lastModified: Date.now(),
     createdAt: Date.now() - i * 1000,
     currentBalance: Math.floor(Math.random() * 1000),
+    type: "standard" as const,
   }));
 };
 
@@ -169,16 +160,14 @@ describe("Performance Edge Cases", () => {
     // Setup mock implementations for large datasets
     vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue(largeEnvelopes);
     vi.mocked(budgetDb.transactions.toArray).mockResolvedValue(largeTransactions);
-    vi.mocked(budgetDb.bills.toArray).mockResolvedValue(largeBills);
-    vi.mocked(budgetDb.debts.toArray).mockResolvedValue(largeDebts);
-    vi.mocked(budgetDb.paycheckHistory.toArray).mockResolvedValue(largePaychecks);
+    vi.mocked(budgetDb.auditLog.toArray).mockResolvedValue([]);
     vi.mocked(budgetDb.budget.get).mockResolvedValue(mockMetadata);
     vi.mocked(budgetDb.autoBackups.put).mockResolvedValue("backup-123");
     vi.mocked(budgetDb.autoBackups.orderBy).mockReturnValue({
       reverse: () => ({
         toArray: () => Promise.resolve([]),
       }),
-    } as ReturnType<typeof budgetDb.autoBackups.orderBy>);
+    } as any);
   });
 
   describe("Large Data Backup Creation (1000+ records)", () => {
@@ -192,9 +181,7 @@ describe("Performance Edge Cases", () => {
       // Verify data was collected
       expect(data.envelopes).toHaveLength(MEDIUM_RECORD_COUNT);
       expect(data.transactions).toHaveLength(LARGE_RECORD_COUNT);
-      expect(data.bills).toHaveLength(SMALL_RECORD_COUNT);
-      expect(data.debts).toHaveLength(SMALL_RECORD_COUNT);
-      expect(data.paycheckHistory).toHaveLength(SMALL_RECORD_COUNT);
+      expect(data.auditLog).toHaveLength(0);
       expect(data.metadata).toBeDefined();
       expect(data.timestamp).toBeDefined();
 
@@ -207,12 +194,7 @@ describe("Performance Edge Cases", () => {
       const totalRecords = autoBackupService.countRecords(data);
 
       // Total = envelopes + transactions + bills + debts + paycheckHistory
-      const expectedTotal =
-        MEDIUM_RECORD_COUNT +
-        LARGE_RECORD_COUNT +
-        SMALL_RECORD_COUNT +
-        SMALL_RECORD_COUNT +
-        SMALL_RECORD_COUNT;
+      const expectedTotal = MEDIUM_RECORD_COUNT + LARGE_RECORD_COUNT;
 
       expect(totalRecords).toBe(expectedTotal);
     });
@@ -246,14 +228,12 @@ describe("Performance Edge Cases", () => {
       data: {
         envelopes: largeEnvelopes,
         transactions: largeTransactions,
-        bills: largeBills,
-        debts: largeDebts,
-        paycheckHistory: largePaychecks,
+        auditLog: [],
         metadata: mockMetadata,
         timestamp: Date.now(),
       },
       metadata: {
-        totalRecords: MEDIUM_RECORD_COUNT + LARGE_RECORD_COUNT + SMALL_RECORD_COUNT * 3,
+        totalRecords: MEDIUM_RECORD_COUNT + LARGE_RECORD_COUNT,
         sizeEstimate: 500000,
         duration: 100,
         version: "2.0",
@@ -264,11 +244,13 @@ describe("Performance Edge Cases", () => {
       vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(createLargeBackupData());
 
       // Mock transaction to execute the callback
-      vi.mocked(budgetDb.transaction).mockImplementation(
-        async (_mode, _tables, callback: () => Promise<void>) => {
-          await callback();
+      vi.mocked((budgetDb as any).transaction).mockImplementation(((...args: any[]) => {
+        const callback = args[args.length - 1];
+        if (typeof callback === "function") {
+          return Promise.resolve(callback());
         }
-      );
+        return Promise.resolve();
+      }) as any);
     });
 
     it("should restore large backup with validation", async () => {
@@ -284,9 +266,7 @@ describe("Performance Edge Cases", () => {
       // Verify clear operations were called
       expect(budgetDb.envelopes.clear).toHaveBeenCalled();
       expect(budgetDb.transactions.clear).toHaveBeenCalled();
-      expect(budgetDb.bills.clear).toHaveBeenCalled();
-      expect(budgetDb.debts.clear).toHaveBeenCalled();
-      expect(budgetDb.paycheckHistory.clear).toHaveBeenCalled();
+      expect(budgetDb.auditLog.clear).toHaveBeenCalled();
 
       // Verify bulk add operations were called with data
       expect(budgetDb.envelopes.bulkAdd).toHaveBeenCalled();
@@ -300,14 +280,12 @@ describe("Performance Edge Cases", () => {
       await autoBackupService.restoreFromBackup("large-backup");
 
       // Verify transaction was used for consistency
-      expect(budgetDb.transaction).toHaveBeenCalledWith(
+      expect((budgetDb as any).transaction).toHaveBeenCalledWith(
         "rw",
         expect.arrayContaining([
           budgetDb.envelopes,
           budgetDb.transactions,
-          budgetDb.bills,
-          budgetDb.debts,
-          budgetDb.paycheckHistory,
+          budgetDb.auditLog,
           budgetDb.budget,
         ]),
         expect.any(Function)
@@ -414,9 +392,7 @@ describe("Performance Edge Cases", () => {
       // Reset mocks to return empty arrays
       vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue([]);
       vi.mocked(budgetDb.transactions.toArray).mockResolvedValue([]);
-      vi.mocked(budgetDb.bills.toArray).mockResolvedValue([]);
-      vi.mocked(budgetDb.debts.toArray).mockResolvedValue([]);
-      vi.mocked(budgetDb.paycheckHistory.toArray).mockResolvedValue([]);
+      vi.mocked(budgetDb.auditLog.toArray).mockResolvedValue([]);
 
       const data = await autoBackupService.collectAllData();
 

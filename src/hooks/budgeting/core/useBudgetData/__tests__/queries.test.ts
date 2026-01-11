@@ -5,15 +5,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useBudgetQueries } from "../queries";
-import { createTestQueryClient, createQueryWrapper } from "@/test/queryTestUtils";
-import { createMockDexie, mockDataGenerators } from "@/test/queryMocks";
+import { createTestQueryClient, createQueryWrapper } from "../../../../../test/queryTestUtils";
+import { createMockDexie, mockDataGenerators } from "../../../../../test/queryMocks";
 
 // Mock dependencies
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../../../db/budgetDb", () => ({
   budgetDb: null, // Will be set in beforeEach
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../../../utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -34,8 +34,8 @@ describe("useBudgetQueries", () => {
     wrapper = createQueryWrapper(queryClient);
 
     // Mock the budgetDb module
-    const budgetDbModule = await import("@/db/budgetDb");
-    // @ts-expect-error - Mocking budgetDb
+    const budgetDbModule = await import("../../../../../db/budgetDb");
+    // @ts-ignore - Mocking budgetDb
     budgetDbModule.budgetDb = mockDb;
   });
 
@@ -53,7 +53,16 @@ describe("useBudgetQueries", () => {
         mockDataGenerators.envelope({ id: "env_2", name: "Rent" }),
       ];
       const mockTransactions = [
-        mockDataGenerators.transaction({ id: "trans_1", description: "Store purchase" }),
+        {
+          id: "t1",
+          date: "2024-01-01",
+          description: "Test",
+          amount: 100,
+          envelopeId: "env1",
+          category: "Groceries",
+          type: "expense",
+          createdAt: new Date().toISOString(),
+        } as any,
       ];
       const mockBills = [mockDataGenerators.bill({ id: "bill_1", name: "Electric" })];
       const mockSavingsGoals = [mockDataGenerators.savingsGoal({ id: "save_1", name: "Vacation" })];
@@ -71,7 +80,11 @@ describe("useBudgetQueries", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.envelopes).toEqual(mockEnvelopes);
+      expect(result.current.envelopes).toEqual([
+        ...mockEnvelopes,
+        ...mockBills,
+        ...mockSavingsGoals,
+      ]);
       expect(result.current.transactions).toEqual(mockTransactions);
       expect(result.current.bills).toEqual(mockBills);
       expect(result.current.savingsGoals).toEqual(mockSavingsGoals);

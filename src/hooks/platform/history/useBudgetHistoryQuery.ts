@@ -180,39 +180,15 @@ export const useBudgetHistoryOperations = () => {
       const snapshot = JSON.parse(decrypted);
 
       // Restore all data to the snapshot state using Dexie
-      await budgetDb.transaction(
-        "rw",
-        [
-          budgetDb.envelopes,
-          budgetDb.transactions,
-          budgetDb.bills,
-          budgetDb.savingsGoals,
-          budgetDb.debts,
-          budgetDb.paycheckHistory,
-        ],
-        async () => {
-          // Clear existing data
-          await Promise.all([
-            budgetDb.envelopes.clear(),
-            budgetDb.transactions.clear(),
-            budgetDb.bills.clear(),
-            budgetDb.savingsGoals.clear(),
-            budgetDb.debts.clear(),
-            budgetDb.paycheckHistory.clear(),
-          ]);
+      await budgetDb.transaction("rw", [budgetDb.envelopes, budgetDb.transactions], async () => {
+        // Clear existing data
+        await Promise.all([budgetDb.envelopes.clear(), budgetDb.transactions.clear()]);
 
-          // Restore snapshot data
-          if (snapshot.envelopes?.length) await budgetDb.envelopes.bulkAdd(snapshot.envelopes);
-          if (snapshot.transactions?.length)
-            await budgetDb.transactions.bulkAdd(snapshot.transactions);
-          if (snapshot.bills?.length) await budgetDb.bills.bulkAdd(snapshot.bills);
-          if (snapshot.savingsGoals?.length)
-            await budgetDb.savingsGoals.bulkAdd(snapshot.savingsGoals);
-          if (snapshot.debts?.length) await budgetDb.debts.bulkAdd(snapshot.debts);
-          if (snapshot.paycheckHistory?.length)
-            await budgetDb.paycheckHistory.bulkAdd(snapshot.paycheckHistory);
-        }
-      );
+        // Restore snapshot data
+        if (snapshot.envelopes?.length) await budgetDb.envelopes.bulkAdd(snapshot.envelopes);
+        if (snapshot.transactions?.length)
+          await budgetDb.transactions.bulkAdd(snapshot.transactions);
+      });
 
       return { commitHash, snapshot };
     },
