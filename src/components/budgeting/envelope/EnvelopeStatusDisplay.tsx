@@ -1,16 +1,14 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
-import type { Envelope } from "@/db/types";
-import type { Bill } from "@/types/bills";
+import type { Bill } from "@/db/types";
 
-interface EnvelopeWithStatus extends Envelope {
-  status?: string;
-  envelopeName?: string;
-  available?: number;
-  envelopeType?: string;
-}
+import type { EnvelopeData } from "../../../utils/budgeting/envelopeCalculations";
+// Use EnvelopeData directly or extend via intersection if needed for UI-only props
+type EnvelopeWithStatus = EnvelopeData & {
+  envelopeName?: string; // Legacy support
+  // available and status are already in EnvelopeData
+};
 
 interface EnvelopeStatusDisplayProps {
   envelope: EnvelopeWithStatus;
@@ -30,8 +28,8 @@ const EnvelopeStatusDisplay = ({
   bills,
   utilizationColorClass,
 }: EnvelopeStatusDisplayProps) => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
+  const getStatusIcon = (health: string) => {
+    switch (health) {
       case "overdue":
       case "overspent":
         return React.createElement(getIcon("AlertTriangle"), {
@@ -49,11 +47,11 @@ const EnvelopeStatusDisplay = ({
 
   const renderBalanceInfo = () => {
     const available = envelope.available ?? 0;
-    if (envelope.envelopeType === ENVELOPE_TYPES.BILL) {
-      const displayInfo = getBillEnvelopeDisplayInfo(
-        envelope,
-        bills as unknown as Parameters<typeof getBillEnvelopeDisplayInfo>[1]
-      );
+    // Check for liability type (standardized)
+    const isLiability = envelope.type === "liability";
+
+    if (isLiability) {
+      const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
       if (displayInfo) {
         const { displayText } = displayInfo;
         return (
@@ -88,11 +86,13 @@ const EnvelopeStatusDisplay = ({
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2">
-          {getStatusIcon(envelope.status ?? "")}
-          <h3 className="font-black text-black text-base">{envelope.envelopeName}</h3>
+          {getStatusIcon(envelope.health ?? "")}
+          <h3 className="font-black text-black text-base">
+            {envelope.name || envelope.envelopeName}
+          </h3>
         </div>
         <span className={`px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}>
-          {envelope.status}
+          {envelope.health}
         </span>
       </div>
       <div className="text-right">{renderBalanceInfo()}</div>

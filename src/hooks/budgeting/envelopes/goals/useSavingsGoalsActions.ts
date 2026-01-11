@@ -4,16 +4,13 @@ import { globalToast } from "@/stores/ui/toastStore";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import logger from "@/utils/common/logger";
 
-interface SavingsGoal {
-  id: string;
-  name: string;
-}
+import type { SavingsGoal } from "@/db/types";
 
 interface UseSavingsGoalsActionsProps {
-  onAddGoal: (goalData: Record<string, unknown>) => Promise<void> | void;
-  onUpdateGoal: (goalId: string, goalData: Record<string, unknown>) => Promise<void> | void;
+  onAddGoal: (goalData: Partial<SavingsGoal>) => Promise<void> | void;
+  onUpdateGoal: (goalId: string, goalData: Partial<SavingsGoal>) => Promise<void> | void;
   onDeleteGoal: (goalId: string) => Promise<void> | void;
-  onDistributeToGoals: (distribution: unknown) => Promise<void> | void;
+  onDistributeToGoals: (distribution: Record<string, number>) => Promise<void> | void;
 }
 
 /**
@@ -33,10 +30,7 @@ const useSavingsGoalsActions = ({
   const confirm = useConfirm();
 
   // Goal submission handler (add/edit)
-  const handleGoalSubmit = async (
-    goalData: Record<string, unknown>,
-    goalId: string | null = null
-  ) => {
+  const handleGoalSubmit = async (goalData: Partial<SavingsGoal>, goalId: string | null = null) => {
     try {
       if (goalId) {
         // Update existing goal
@@ -85,7 +79,7 @@ const useSavingsGoalsActions = ({
   };
 
   // Distribute funds handler
-  const handleDistribute = async (distribution: unknown) => {
+  const handleDistribute = async (distribution: Record<string, number>) => {
     try {
       await onDistributeToGoals(distribution);
       globalToast.showSuccess("Funds distributed successfully!", "Success", 5000);

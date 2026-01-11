@@ -8,10 +8,23 @@
  * - SINKING_FUND envelope type to "savings" with targetDate metadata
  */
 
-import { budgetDb } from "@/db/budgetDb";
-import type { Envelope, SavingsGoal } from "@/db/types";
-import { ENVELOPE_TYPES } from "@/constants/categories";
-import logger from "@/utils/common/logger";
+import { budgetDb } from "../../db/budgetDb";
+import type { Envelope, SavingsGoal } from "../../db/types";
+import { ENVELOPE_TYPES } from "../../constants/categories";
+import logger from "../../utils/common/logger";
+import { SupplementalAccountSchema } from "../../domain/schemas/envelope";
+import { z } from "zod";
+import { Table } from "dexie";
+
+type SupplementalAccountType = z.infer<typeof SupplementalAccountSchema>["accountType"];
+
+interface LegacyTable {
+  count: () => Promise<number>;
+  toArray: () => Promise<Record<string, unknown>[]>;
+}
+interface LegacyDb {
+  savingsGoals: LegacyTable;
+}
 
 /**
  * Supplemental account record structure from budget metadata
@@ -56,10 +69,12 @@ export const convertSavingsGoalToEnvelope = (goal: SavingsGoal): Envelope => {
     currentBalance: goal.currentAmount || 0,
     targetAmount: goal.targetAmount || 0,
     description: goal.description || "",
-    envelopeType: ENVELOPE_TYPES.SAVINGS,
-    priority: goal.priority || "medium",
-    isPaused: goal.isPaused || false,
-    isCompleted: goal.isCompleted || false,
+    type: "goal",
+    priority: (goal.priority as "medium") || "medium",
+    color: "gray",
+
+    isPaused: (goal as Record<string, unknown>).isPaused === true,
+    isCompleted: (goal as Record<string, unknown>).isCompleted === true,
     targetDate: goal.targetDate,
     monthlyContribution: goal.monthlyContribution,
     autoAllocate: true,
@@ -81,15 +96,18 @@ export const convertSupplementalAccountToEnvelope = (
     id: accountId,
     name: account.name || "Unnamed Account",
     category: account.type || "Supplemental",
+    color: account.color || "blue",
     archived: false,
     lastModified: Date.now(),
     createdAt: Date.now(),
     currentBalance: account.balance ?? account.currentBalance ?? 0,
-    envelopeType: ENVELOPE_TYPES.SUPPLEMENTAL,
+    type: "supplemental",
     annualContribution: account.annualContribution,
     expirationDate: account.expirationDate,
     isActive: account.isActive !== false,
-    accountType: account.type,
+
+    accountType: ((account.type as unknown as Record<string, string>)?.toString() ||
+      "other") as SupplementalAccountType,
     description: account.description || "",
     autoAllocate: false,
   };
@@ -102,17 +120,19 @@ export const convertSupplementalAccountToEnvelope = (
 export const convertSinkingFundToSavings = (envelope: Envelope): Envelope => {
   return {
     ...envelope,
-    envelopeType: ENVELOPE_TYPES.SAVINGS,
+    type: "goal",
     lastModified: Date.now(),
     // Ensure savings-specific fields are set
+
     isCompleted:
-      envelope.isCompleted ||
+      (envelope as Record<string, unknown>).isCompleted === true ||
       (envelope.currentBalance !== undefined &&
-        envelope.targetAmount !== undefined &&
-        envelope.currentBalance >= envelope.targetAmount),
-    isPaused: envelope.isPaused || false,
-    priority: envelope.priority || "medium",
-  };
+        typeof (envelope as Record<string, unknown>).targetAmount === "number" &&
+        envelope.currentBalance >= ((envelope as Record<string, unknown>).targetAmount as number)),
+
+    isPaused: (envelope as Record<string, unknown>).isPaused === true,
+    priority: ((envelope as Record<string, unknown>).priority as "medium") || "medium",
+  } as Envelope;
 };
 
 /**
@@ -122,15 +142,22 @@ export const convertSinkingFundToSavings = (envelope: Envelope): Envelope => {
 export const isMigrationNeeded = async (): Promise<boolean> => {
   try {
     // Check for savings goals in separate table
-    const savingsGoalsCount = await budgetDb.savingsGoals.count();
+
+    const savingsGoalsCount = await (budgetDb as unknown as LegacyDb).savingsGoals.count();
     if (savingsGoalsCount > 0) {
       return true;
     }
 
     // Check for SINKING_FUND envelopes
     const sinkingFundEnvelopes = await budgetDb.envelopes
-      .where("envelopeType")
-      .equals(ENVELOPE_TYPES.SINKING_FUND)
+      .toCollection()
+      .filter((e: unknown) => {
+        const record = e as Record<string, unknown>;
+        return (
+          record.type === ENVELOPE_TYPES.SINKING_FUND ||
+          record.envelopeType === ENVELOPE_TYPES.SINKING_FUND
+        );
+      })
       .count();
     if (sinkingFundEnvelopes > 0) {
       return true;
@@ -157,12 +184,13 @@ export const isMigrationNeeded = async (): Promise<boolean> => {
  */
 const migrateSavingsGoals = async (result: MigrationResult): Promise<void> => {
   try {
-    const savingsGoals = await budgetDb.savingsGoals.toArray();
+    const savingsGoals = await (budgetDb as unknown as LegacyDb).savingsGoals.toArray();
 
     for (const goal of savingsGoals) {
       try {
         // Check if an envelope with this ID already exists
-        const existingEnvelope = await budgetDb.envelopes.get(goal.id);
+        const goalId = String(goal.id);
+        const existingEnvelope = await budgetDb.envelopes.get(goalId);
         if (existingEnvelope) {
           result.warnings.push(
             `Savings goal "${goal.name}" (${goal.id}) already has matching envelope - skipping`
@@ -171,7 +199,7 @@ const migrateSavingsGoals = async (result: MigrationResult): Promise<void> => {
         }
 
         // Convert and save as envelope
-        const envelope = convertSavingsGoalToEnvelope(goal);
+        const envelope = convertSavingsGoalToEnvelope(goal as unknown as SavingsGoal);
         await budgetDb.envelopes.put(envelope);
         result.migratedSavingsGoals++;
 
@@ -249,8 +277,14 @@ const migrateSupplementalAccounts = async (result: MigrationResult): Promise<voi
 const migrateSinkingFunds = async (result: MigrationResult): Promise<void> => {
   try {
     const sinkingFundEnvelopes = await budgetDb.envelopes
-      .where("envelopeType")
-      .equals(ENVELOPE_TYPES.SINKING_FUND)
+      .toCollection()
+      .filter((e: unknown) => {
+        const record = e as Record<string, unknown>;
+        return (
+          record.type === ENVELOPE_TYPES.SINKING_FUND ||
+          record.envelopeType === ENVELOPE_TYPES.SINKING_FUND
+        );
+      })
       .toArray();
 
     for (const envelope of sinkingFundEnvelopes) {
@@ -295,7 +329,11 @@ export const runEnvelopeMigration = async (): Promise<MigrationResult> => {
     // Run migrations in transaction if possible
     await budgetDb.transaction(
       "rw",
-      [budgetDb.envelopes, budgetDb.savingsGoals, budgetDb.budget],
+      [
+        budgetDb.envelopes,
+        (budgetDb as unknown as Record<string, Table>).savingsGoals,
+        budgetDb.budget,
+      ],
       async () => {
         // 1. Migrate savings goals to envelopes
         await migrateSavingsGoals(result);
@@ -344,7 +382,7 @@ export const getMigrationStatus = async (): Promise<{
   supplementalEnvelopesCount: number;
 }> => {
   try {
-    const savingsGoalsCount = await budgetDb.savingsGoals.count();
+    const savingsGoalsCount = await (budgetDb as unknown as LegacyDb).savingsGoals.count();
 
     const metadata = await budgetDb.budget.get("metadata");
     const supplementalAccountsCount = Array.isArray(metadata?.supplementalAccounts)
@@ -352,18 +390,21 @@ export const getMigrationStatus = async (): Promise<{
       : 0;
 
     const sinkingFundsCount = await budgetDb.envelopes
-      .where("envelopeType")
-      .equals(ENVELOPE_TYPES.SINKING_FUND)
+      .toCollection()
+      .filter((e: unknown) => {
+        const record = e as Record<string, unknown>;
+        return (
+          record.type === ENVELOPE_TYPES.SINKING_FUND ||
+          record.envelopeType === ENVELOPE_TYPES.SINKING_FUND
+        );
+      })
       .count();
 
-    const savingsEnvelopesCount = await budgetDb.envelopes
-      .where("envelopeType")
-      .equals(ENVELOPE_TYPES.SAVINGS)
-      .count();
+    const savingsEnvelopesCount = await budgetDb.envelopes.where("type").equals("goal").count();
 
     const supplementalEnvelopesCount = await budgetDb.envelopes
-      .where("envelopeType")
-      .equals(ENVELOPE_TYPES.SUPPLEMENTAL)
+      .where("type")
+      .equals("supplemental")
       .count();
 
     const needsMigration =

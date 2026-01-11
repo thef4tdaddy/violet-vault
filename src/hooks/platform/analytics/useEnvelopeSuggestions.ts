@@ -90,14 +90,18 @@ const useEnvelopeSuggestions = ({
         amount: t.amount,
         envelopeId: t.envelopeId,
         category: t.category,
-        description: t.description,
+        description: t.description || undefined,
         date: typeof t.date === "string" ? t.date : t.date.toISOString().split("T")[0],
       }));
       const envs = envelopes.map((e: Envelope) => ({
         id: e.id,
         name: e.name,
         category: e.category,
-        monthlyAmount: e.monthlyBudget,
+        // Safe access for monthlyBudget property (only on StandardEnvelope)
+        monthlyAmount:
+          (e as unknown as Record<string, number>).monthlyBudget ||
+          (e as unknown as Record<string, number>).monthlyAmount ||
+          0,
         currentBalance: e.currentBalance,
       }));
       return generateAllSuggestions(txns, envs, analysisSettings, dateRange, {

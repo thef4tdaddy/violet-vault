@@ -43,9 +43,9 @@ describe("useEnvelopes", () => {
   });
 
   const mockEnvelopes = [
-    { id: "1", name: "Groceries", category: "Food", currentBalance: 100, envelopeType: "expenses" },
-    { id: "2", name: "Rent", category: "Housing", currentBalance: 1000, envelopeType: "expenses" },
-    { id: "3", name: "Savings", category: "Savings", currentBalance: 500, envelopeType: "savings" },
+    { id: "1", name: "Groceries", category: "Food", currentBalance: 100, type: "standard" },
+    { id: "2", name: "Rent", category: "Housing", currentBalance: 1000, type: "standard" },
+    { id: "3", name: "Savings", category: "Savings", currentBalance: 500, type: "goal" },
   ];
 
   it("fetches all envelopes by default", async () => {

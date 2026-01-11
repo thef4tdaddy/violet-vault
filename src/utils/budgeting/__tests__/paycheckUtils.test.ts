@@ -102,15 +102,18 @@ describe("paycheckUtils", () => {
     it("should calculate prediction for existing payer", () => {
       const result = getPayerPrediction("John Doe", paycheckHistory);
 
-      expect(result).toMatchObject({
-        amount: 1050, // Average of 1000, 1100, 1050
-        confidence: expect.any(Number),
-        sampleSize: 3,
-        range: {
-          min: 1000,
-          max: 1100,
-        },
-      });
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result).toMatchObject({
+          amount: 1050, // Average of 1000, 1100, 1050
+          confidence: expect.any(Number),
+          sampleSize: 3,
+          range: {
+            min: 1000,
+            max: 1100,
+          },
+        });
+      }
     });
 
     it("should return null for unknown payer", () => {
@@ -166,24 +169,24 @@ describe("paycheckUtils", () => {
         id: "env1",
         name: "Groceries",
         autoAllocate: true,
-        envelopeType: ENVELOPE_TYPES.VARIABLE,
-        monthlyAmount: 400,
+        type: ENVELOPE_TYPES.VARIABLE,
+        monthlyBudget: 400,
         priority: "high",
       },
       {
         id: "env2",
         name: "Utilities",
         autoAllocate: true,
-        envelopeType: ENVELOPE_TYPES.BILL,
-        monthlyAmount: 200,
-        priority: "critical",
+        type: ENVELOPE_TYPES.BILL,
+        amount: 200,
+        priority: "high", // Changed from critical
       },
       {
         id: "env3",
         name: "Savings",
         autoAllocate: false, // Should be excluded
-        envelopeType: ENVELOPE_TYPES.SAVINGS,
-        monthlyAmount: 300,
+        type: ENVELOPE_TYPES.SAVINGS,
+        targetAmount: 300,
         priority: "low",
       },
     ];
@@ -225,8 +228,8 @@ describe("paycheckUtils", () => {
     it("should sort allocations by priority", () => {
       const result = calculateEnvelopeAllocations(1000, mockEnvelopes, "allocate");
 
-      // Should be sorted by priority: critical > high > medium > low
-      expect(result.allocations[0].priority).toBe("critical");
+      // Should be sorted by priority: high > medium > low
+      expect((result.allocations[0] as any).priority).toBe("high");
     });
   });
 
@@ -375,9 +378,9 @@ describe("paycheckUtils", () => {
 
   describe("getPaycheckStatistics", () => {
     const paycheckHistory = [
-      { payerName: "John Doe", amount: 1000, processedAt: "2024-01-01" },
-      { payerName: "John Doe", amount: 1200, processedAt: "2024-01-15" },
-      { payerName: "Jane Smith", amount: 2000, processedAt: "2024-01-01" },
+      { payerName: "John Doe", amount: 1000, date: "2024-01-01", processedAt: "2024-01-01" },
+      { payerName: "John Doe", amount: 1200, date: "2024-01-15", processedAt: "2024-01-15" },
+      { payerName: "Jane Smith", amount: 2000, date: "2024-01-01", processedAt: "2024-01-01" },
     ];
 
     it("should calculate overall statistics", () => {

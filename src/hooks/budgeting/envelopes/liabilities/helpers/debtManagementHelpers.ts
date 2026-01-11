@@ -275,20 +275,10 @@ const resolveEnvelopeForDebt = async (debt: Debt): Promise<string> => {
   const { budgetDb } = await import("@/db/budgetDb");
   let envelopeId = debt.envelopeId;
 
-  // If debt is linked to a bill, get envelope from bill
-  // Note: billId may exist on debt objects at runtime even though not in strict interface
-  const debtWithPossibleBillId = debt as unknown as { billId?: string };
-  if (!envelopeId && debtWithPossibleBillId.billId) {
-    const bill = await budgetDb.bills.get(debtWithPossibleBillId.billId);
-    envelopeId = bill?.envelopeId;
-  }
-
-  // If still no envelope, try to find via bill relationship
+  // In Unified Schema, Debt is a LiabilityEnvelope, so it IS the envelope.
+  // We double check if debt.envelopeId exists (legacy link) or use debt.id.
   if (!envelopeId) {
-    const bills = await budgetDb.bills.where("debtId").equals(debt.id).toArray();
-    if (bills.length > 0 && bills[0].envelopeId) {
-      envelopeId = bills[0].envelopeId;
-    }
+    envelopeId = debt.id;
   }
 
   // Envelope is REQUIRED - all transactions must route through envelopes

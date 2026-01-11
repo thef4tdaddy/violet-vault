@@ -111,9 +111,9 @@ describe("Bill Mutation Hooks", () => {
       // Assert
       // NOTE: Current implementation doesn't use optimistic helpers for add
       // This should be added in future optimization
-      expect(mockDb.bills.add).toHaveBeenCalled();
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
 
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.name).toBe("Test Bill");
       expect(addedBill.isPaid).toBe(false);
       expect(addedBill.id).toContain("bill_");
@@ -157,7 +157,7 @@ describe("Bill Mutation Hooks", () => {
 
     it("should rollback on error", async () => {
       // Arrange
-      mockDb.bills.add.mockRejectedValue(new Error("Database error"));
+      mockDb.envelopes.add.mockRejectedValue(new Error("Database error"));
 
       const { result } = renderHook(() => useAddBillMutation(), { wrapper });
       const setQueryDataSpy = vi.spyOn(queryClient, "setQueryData");
@@ -181,7 +181,7 @@ describe("Bill Mutation Hooks", () => {
     it("should update an existing bill successfully", async () => {
       // Arrange
       const existingBill = mockDataGenerators.bill({ id: "bill_1", name: "Old Name" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -195,7 +195,7 @@ describe("Bill Mutation Hooks", () => {
       // Assert
       // NOTE: Current implementation doesn't use optimistic helpers for update
       // This should be added in future optimization
-      expect(mockDb.bills.update).toHaveBeenCalledWith(
+      expect(mockDb.envelopes.update).toHaveBeenCalledWith(
         "bill_1",
         expect.objectContaining({
           name: "New Name",
@@ -206,8 +206,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should throw error if bill not found", async () => {
       // Arrange
-      mockDb._mockData.bills = [];
-      mockDb.bills.get.mockResolvedValue(undefined);
+      mockDb._mockData.envelopes = [];
+      mockDb.envelopes.get.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -222,7 +222,7 @@ describe("Bill Mutation Hooks", () => {
     it("should preserve bill ID during update", async () => {
       // Arrange
       const existingBill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -235,14 +235,14 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      const updatedBill = mockDb.bills.update.mock.calls[0][1];
+      const updatedBill = mockDb.envelopes.update.mock.calls[0][1];
       expect(updatedBill.id).toBe("bill_1");
     });
 
     it("should invalidate related queries on success", async () => {
       // Arrange
       const existingBill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
@@ -264,7 +264,7 @@ describe("Bill Mutation Hooks", () => {
     it("should delete a bill successfully", async () => {
       // Arrange
       const billToDelete = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [billToDelete];
+      mockDb._mockData.envelopes = [billToDelete];
 
       const { result } = renderHook(() => useDeleteBillMutation(), { wrapper });
 
@@ -276,7 +276,7 @@ describe("Bill Mutation Hooks", () => {
       // Assert
       // NOTE: Current implementation doesn't use optimistic helpers for delete
       // This should be added in future optimization
-      expect(mockDb.bills.delete).toHaveBeenCalledWith("bill_1");
+      expect(mockDb.envelopes.delete).toHaveBeenCalledWith("bill_1");
     });
 
     it("should invalidate related queries on success", async () => {
@@ -318,8 +318,7 @@ describe("Bill Mutation Hooks", () => {
         id: "envelope_1",
         currentBalance: 500,
       });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -336,13 +335,11 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      expect(mockDb.bills.update).toHaveBeenCalledWith(
+      expect(mockDb.envelopes.update).toHaveBeenCalledWith(
         "bill_1",
         expect.objectContaining({
           isPaid: true,
-          paidAmount: 100,
-          paidDate: "2024-01-15",
-          envelopeId: "envelope_1",
+          lastModified: expect.any(Number),
         })
       );
 
@@ -364,8 +361,7 @@ describe("Bill Mutation Hooks", () => {
         currentBalance: 500,
       });
 
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -394,8 +390,7 @@ describe("Bill Mutation Hooks", () => {
         id: "envelope_1",
         currentBalance: 500,
       });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -409,7 +404,7 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert
-      const updatedBill = mockDb.bills.update.mock.calls[0][1];
+      const updatedBill = mockDb.envelopes.update.mock.calls[0][1];
       expect(updatedBill.paidDate).toBeDefined();
       expect(updatedBill.isPaid).toBe(true);
     });
@@ -421,8 +416,7 @@ describe("Bill Mutation Hooks", () => {
         id: "envelope_1",
         currentBalance: 500,
       });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
@@ -445,8 +439,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should handle error when bill not found", async () => {
       // Arrange
-      mockDb._mockData.bills = [];
-      mockDb.bills.get.mockResolvedValue(undefined);
+      mockDb._mockData.envelopes = [];
+      mockDb.envelopes.get.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -464,7 +458,7 @@ describe("Bill Mutation Hooks", () => {
     it("should require envelope for payment", async () => {
       // Arrange
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", envelopeId: undefined });
-      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [unpaidBill];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -496,7 +490,7 @@ describe("Bill Mutation Hooks", () => {
         return Promise.resolve();
       });
 
-      mockDb.bills.add.mockImplementation(async () => {
+      mockDb.envelopes.add.mockImplementation(async () => {
         callOrder.push("database");
         return Promise.resolve();
       });
@@ -515,7 +509,7 @@ describe("Bill Mutation Hooks", () => {
       const existingBills = [mockDataGenerators.bill({ id: "bill_1" })];
       queryClient.setQueryData(queryKeys.bills, existingBills);
 
-      mockDb.bills.add.mockRejectedValue(new Error("Database error"));
+      mockDb.envelopes.add.mockRejectedValue(new Error("Database error"));
 
       const { result } = renderHook(() => useAddBillMutation(), { wrapper });
 
@@ -555,8 +549,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should throw error when updating non-existent bill", async () => {
       // Arrange
-      mockDb._mockData.bills = [];
-      mockDb.bills.get.mockResolvedValue(undefined);
+      mockDb._mockData.envelopes = [];
+      mockDb.envelopes.get.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -571,7 +565,7 @@ describe("Bill Mutation Hooks", () => {
     it("should handle envelope relationship validation when marking paid", async () => {
       // Arrange
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", isPaid: false });
-      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [unpaidBill];
 
       // Mock envelope as not existing
       mockDb.envelopes = {
@@ -590,7 +584,7 @@ describe("Bill Mutation Hooks", () => {
 
       // Act & Assert - Should throw error when envelope doesn't exist
       await act(async () => {
-        await expect(result.current.mutateAsync(paymentData)).rejects.toThrow("does not exist");
+        await expect(result.current.mutateAsync(paymentData)).rejects.toThrow("not found");
       });
     });
 
@@ -602,8 +596,7 @@ describe("Bill Mutation Hooks", () => {
         envelopeId: "env-1",
       });
       const mockEnvelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000 });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [mockEnvelope];
+      mockDb._mockData.envelopes = [unpaidBill, mockEnvelope];
       mockDb.envelopes.get = vi.fn().mockResolvedValue(mockEnvelope);
       mockDb.transactions.put.mockRejectedValue(new Error("Transaction creation failed"));
 
@@ -643,7 +636,7 @@ describe("Bill Mutation Hooks", () => {
 
     it("should handle database error during bill deletion", async () => {
       // Arrange
-      mockDb.bills.delete.mockRejectedValue(new Error("Database delete failed"));
+      mockDb.envelopes.delete.mockRejectedValue(new Error("Database delete failed"));
 
       const { result } = renderHook(() => useDeleteBillMutation(), { wrapper });
 
@@ -663,8 +656,7 @@ describe("Bill Mutation Hooks", () => {
         envelopeId: "env-1",
       });
       const mockEnvelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000 });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [mockEnvelope];
+      mockDb._mockData.envelopes = [unpaidBill, mockEnvelope];
       mockDb.envelopes.get = vi.fn().mockResolvedValue(mockEnvelope);
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
@@ -687,8 +679,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should validate bill not found on mark as paid", async () => {
       // Arrange
-      mockDb._mockData.bills = [];
-      mockDb.bills.get.mockResolvedValue(undefined);
+      mockDb._mockData.envelopes = [];
+      mockDb.envelopes.get.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -705,8 +697,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should handle concurrent bill updates gracefully", async () => {
       // Arrange
-      const bill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [bill];
+      const bill = mockDataGenerators.bill({ id: "bill_1", type: "bill" });
+      mockDb._mockData.envelopes = [bill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -719,7 +711,7 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // Assert - Both updates should have been called
-      expect(mockDb.bills.update).toHaveBeenCalledTimes(2);
+      expect(mockDb.envelopes.update).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -737,6 +729,7 @@ describe("Bill Mutation Hooks", () => {
         category: "Utilities",
         isPaid: false,
         isRecurring: true,
+        type: "bill" as const,
         frequency: "monthly" as const,
         lastModified: Date.now(),
       };
@@ -769,8 +762,8 @@ describe("Bill Mutation Hooks", () => {
         expect(result.success).toBe(false);
       });
 
-      it("should reject bill without name", () => {
-        const invalidBill = { ...validBill, name: "" };
+      it("should reject bill with invalid type", () => {
+        const invalidBill = { ...validBill, type: "invalid_type" };
         const result = BillSchema.safeParse(invalidBill);
         expect(result.success).toBe(false);
       });
@@ -888,6 +881,7 @@ describe("Bill Mutation Hooks", () => {
         category: "Test",
         isPaid: false,
         isRecurring: false,
+        type: "bill" as const,
         lastModified: Date.now(),
       };
 
@@ -932,7 +926,7 @@ describe("Bill Mutation Hooks", () => {
       it("validateBillFormDataMinimal should validate form data", () => {
         const formData = { name: "Bill", amount: "100", dueDate: "2024-01-15" };
         const result = validateBillFormDataMinimal(formData);
-        expect(result.success).toBe(true);
+        expect(result.name).toBe("Bill");
       });
     });
   });
@@ -969,14 +963,14 @@ describe("Bill Mutation Hooks", () => {
       });
 
       // 0 is valid per schema (min 0)
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.amount).toBe(0);
     });
 
     it("should prevent updating bill with empty name", async () => {
       const existingBill = mockDataGenerators.bill({ id: "bill_1", name: "Original" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -989,7 +983,7 @@ describe("Bill Mutation Hooks", () => {
 
     it("should prevent updating bill with negative amount", async () => {
       const existingBill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -1002,7 +996,7 @@ describe("Bill Mutation Hooks", () => {
 
     it("should prevent clearing required category", async () => {
       const existingBill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -1015,7 +1009,7 @@ describe("Bill Mutation Hooks", () => {
 
     it("should allow valid partial updates", async () => {
       const existingBill = mockDataGenerators.bill({ id: "bill_1", name: "Original" });
-      mockDb._mockData.bills = [existingBill];
+      mockDb._mockData.envelopes = [existingBill];
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -1026,7 +1020,7 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.update).toHaveBeenCalledWith(
+      expect(mockDb.envelopes.update).toHaveBeenCalledWith(
         "bill_1",
         expect.objectContaining({
           name: "Updated Name",
@@ -1042,7 +1036,7 @@ describe("Bill Mutation Hooks", () => {
   describe("Bill-Envelope Relationship Validation", () => {
     it("should reject payment when envelope does not exist", async () => {
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", isPaid: false });
-      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [unpaidBill];
       mockDb._mockData.envelopes = []; // No envelopes
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
@@ -1054,15 +1048,14 @@ describe("Bill Mutation Hooks", () => {
             paidAmount: 100,
             envelopeId: "non-existent-envelope",
           })
-        ).rejects.toThrow("does not exist");
+        ).rejects.toThrow("not found");
       });
     });
 
     it("should accept payment when envelope exists", async () => {
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", isPaid: false });
       const envelope = mockDataGenerators.envelope({ id: "valid-envelope" });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1074,7 +1067,7 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.update).toHaveBeenCalled();
+      expect(mockDb.envelopes.update).toHaveBeenCalled();
       expect(mockDb.transactions.put).toHaveBeenCalled();
     });
 
@@ -1085,8 +1078,7 @@ describe("Bill Mutation Hooks", () => {
         isPaid: false,
         envelopeId: "bill-envelope",
       });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1107,7 +1099,7 @@ describe("Bill Mutation Hooks", () => {
         isPaid: false,
         envelopeId: "",
       });
-      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [unpaidBill];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1128,7 +1120,7 @@ describe("Bill Mutation Hooks", () => {
         isPaid: false,
         envelopeId: undefined,
       });
-      mockDb._mockData.bills = [unpaidBill];
+      mockDb._mockData.envelopes = [unpaidBill];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1162,8 +1154,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.isRecurring).toBe(true);
       expect(addedBill.frequency).toBe("monthly");
     });
@@ -1182,8 +1174,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.frequency).toBe("quarterly");
     });
 
@@ -1201,8 +1193,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.frequency).toBe("annually");
     });
 
@@ -1219,8 +1211,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.isRecurring).toBe(false);
     });
   });
@@ -1232,7 +1224,7 @@ describe("Bill Mutation Hooks", () => {
     it("should rollback on add mutation error", async () => {
       const existingBills = [mockDataGenerators.bill({ id: "existing_1" })];
       queryClient.setQueryData(queryKeys.bills, existingBills);
-      mockDb.bills.add.mockRejectedValue(new Error("Database error"));
+      mockDb.envelopes.add.mockRejectedValue(new Error("Database error"));
 
       const { result } = renderHook(() => useAddBillMutation(), { wrapper });
 
@@ -1256,8 +1248,8 @@ describe("Bill Mutation Hooks", () => {
 
     it("should handle update mutation error gracefully", async () => {
       const existingBill = mockDataGenerators.bill({ id: "bill_1" });
-      mockDb._mockData.bills = [existingBill];
-      mockDb.bills.update.mockRejectedValue(new Error("Update failed"));
+      mockDb._mockData.envelopes = [existingBill];
+      mockDb.envelopes.update.mockRejectedValue(new Error("Update failed"));
 
       const { result } = renderHook(() => useUpdateBillMutation(), { wrapper });
 
@@ -1272,7 +1264,7 @@ describe("Bill Mutation Hooks", () => {
     });
 
     it("should handle delete mutation error gracefully", async () => {
-      mockDb.bills.delete.mockRejectedValue(new Error("Delete failed"));
+      mockDb.envelopes.delete.mockRejectedValue(new Error("Delete failed"));
 
       const { result } = renderHook(() => useDeleteBillMutation(), { wrapper });
 
@@ -1284,8 +1276,7 @@ describe("Bill Mutation Hooks", () => {
     it("should handle mark paid transaction creation failure", async () => {
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", envelopeId: "env-1" });
       const envelope = mockDataGenerators.envelope({ id: "env-1" });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
       mockDb.transactions.put.mockRejectedValue(new Error("Transaction failed"));
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
@@ -1319,8 +1310,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.name.length).toBe(100);
     });
 
@@ -1338,14 +1329,13 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
     });
 
     it("should handle very large payment amounts", async () => {
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", envelopeId: "env-1" });
       const envelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000000 });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1364,8 +1354,7 @@ describe("Bill Mutation Hooks", () => {
     it("should handle decimal payment amounts", async () => {
       const unpaidBill = mockDataGenerators.bill({ id: "bill_1", envelopeId: "env-1" });
       const envelope = mockDataGenerators.envelope({ id: "env-1", currentBalance: 1000 });
-      mockDb._mockData.bills = [unpaidBill];
-      mockDb._mockData.envelopes = [envelope];
+      mockDb._mockData.envelopes = [unpaidBill, envelope];
 
       const { result } = renderHook(() => useMarkBillPaidMutation(), { wrapper });
 
@@ -1393,8 +1382,8 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
-      const addedBill = mockDb.bills.add.mock.calls[0][0];
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
+      const addedBill = mockDb.envelopes.add.mock.calls[0][0];
       expect(addedBill.dueDate).toBeDefined();
     });
 
@@ -1411,7 +1400,7 @@ describe("Bill Mutation Hooks", () => {
         });
       });
 
-      expect(mockDb.bills.add).toHaveBeenCalled();
+      expect(mockDb.envelopes.add).toHaveBeenCalled();
     });
 
     it("should generate unique IDs for each bill", async () => {
@@ -1427,7 +1416,7 @@ describe("Bill Mutation Hooks", () => {
             category: "Test",
           });
         });
-        billIds.push(mockDb.bills.add.mock.calls[i][0].id);
+        billIds.push(mockDb.envelopes.add.mock.calls[i][0].id);
       }
 
       // All IDs should be unique

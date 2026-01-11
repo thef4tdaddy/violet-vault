@@ -5,21 +5,27 @@ import { budgetDb } from "@/db/budgetDb";
 import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
 import logger from "@/utils/common/logger.ts";
 import { validateDebtSafe, validateDebtPartialSafe } from "@/domain/schemas/debt";
+import type { LiabilityEnvelope } from "@/db/types";
 
 // Query function for fetching debts
 const fetchDebtsWithMigration = async () => {
   try {
-    const debts = await budgetDb.debts.toArray();
+    const envelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
+    const debts = envelopes as LiabilityEnvelope[];
 
     // One-time migration: Fix debts with undefined status
     const debtsNeedingStatus = debts.filter((debt) => !debt.status);
     if (debtsNeedingStatus.length > 0) {
       logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
       for (const debt of debtsNeedingStatus) {
-        await budgetDb.debts.update(debt.id, { status: "active" });
+        // Explicitly cast to Record<string, unknown> to allow partial updates of legacy data
+        await budgetDb.envelopes.update(debt.id, {
+          status: "active",
+        } as Partial<LiabilityEnvelope>);
         logger.debug(`✅ Updated debt "${debt.name}" status to active`);
       }
-      return await budgetDb.debts.toArray();
+      const updatedEnvelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
+      return updatedEnvelopes as LiabilityEnvelope[];
     }
 
     return debts || [];
@@ -41,8 +47,8 @@ const addDebtToDb = async (debtData: {
   [key: string]: unknown;
 }) => {
   const debt = debtData.id
-    ? { status: "active", ...debtData }
-    : { id: crypto.randomUUID(), status: "active", ...debtData };
+    ? { status: "active", type: "liability", ...debtData }
+    : { id: crypto.randomUUID(), status: "active", type: "liability", ...debtData };
 
   // Validate with Zod schema before saving
   const validationResult = validateDebtSafe(debt);
@@ -59,7 +65,7 @@ const addDebtToDb = async (debtData: {
     throw new Error(`Invalid debt data: ${errorMessages}`);
   }
 
-  await budgetDb.debts.put(validationResult.data as never);
+  await budgetDb.envelopes.put(validationResult.data);
 
   await BudgetHistoryTracker.trackDebtChange({
     debtId: validationResult.data.id,
@@ -70,7 +76,7 @@ const addDebtToDb = async (debtData: {
   });
 
   // Fetch the complete debt from DB to return proper type
-  const savedDebt = await budgetDb.debts.get(validationResult.data.id);
+  const savedDebt = await budgetDb.envelopes.get(validationResult.data.id);
   if (!savedDebt) {
     throw new Error("Failed to retrieve saved debt");
   }
@@ -87,7 +93,7 @@ const updateDebtInDb = async ({
   updates: Record<string, unknown>;
   author?: string;
 }) => {
-  const previousData = await budgetDb.debts.get(id);
+  const previousData = await budgetDb.envelopes.get(id); // Use envelopes instead of debts
 
   // Validate updates with Zod schema
   const validationResult = validateDebtPartialSafe(updates);
@@ -107,12 +113,12 @@ const updateDebtInDb = async ({
     throw new Error(`Invalid debt update data: ${errorMessages}`);
   }
 
-  await budgetDb.debts.update(id, {
+  await budgetDb.envelopes.update(id, {
     ...validationResult.data,
     lastModified: Date.now(),
   });
 
-  const newData = await budgetDb.debts.get(id);
+  const newData = await budgetDb.envelopes.get(id);
 
   await BudgetHistoryTracker.trackDebtChange({
     debtId: id,
@@ -133,9 +139,9 @@ const deleteDebtFromDb = async ({
   id: string;
   author?: string;
 }) => {
-  const previousData = await budgetDb.debts.get(id);
+  const previousData = await budgetDb.envelopes.get(id);
 
-  await budgetDb.debts.delete(id);
+  await budgetDb.envelopes.delete(id);
 
   if (previousData) {
     await BudgetHistoryTracker.trackDebtChange({
@@ -160,7 +166,7 @@ const recordPaymentInDb = async ({
   payment: { amount: number; [key: string]: unknown };
   author?: string;
 }) => {
-  const debt = await budgetDb.debts.get(id);
+  const debt = (await budgetDb.envelopes.get(id)) as LiabilityEnvelope | undefined;
   if (debt) {
     // Note: paymentHistory is not in the Debt type but may exist in data
     // We keep track of it in memory for history tracking but don't persist it
@@ -170,12 +176,12 @@ const recordPaymentInDb = async ({
       ...debt,
       currentBalance: newBalance,
       lastModified: Date.now(),
-    };
+    } as LiabilityEnvelope;
 
-    await budgetDb.debts.update(id, {
+    await budgetDb.envelopes.update(id, {
       currentBalance: newBalance,
       lastModified: Date.now(),
-    } as never);
+    });
 
     await BudgetHistoryTracker.trackDebtChange({
       debtId: id,
@@ -234,7 +240,7 @@ const useDebts = () => {
         name: debt.name,
         type: debt.type,
         currentBalance: debt.currentBalance,
-        interestRate: debt.interestRate,
+        interestRate: (debt as LiabilityEnvelope).interestRate,
       });
     },
   });

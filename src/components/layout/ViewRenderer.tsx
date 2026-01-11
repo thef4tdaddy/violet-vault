@@ -272,14 +272,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
         <Suspense fallback={<LoadingSpinner />}>
           <SavingsGoals
             savingsGoals={
-              savingsEnvelopesQuery.envelopes as unknown as Array<Record<string, unknown>>
+              savingsEnvelopesQuery.envelopes as unknown as import("@/db/types").SavingsGoal[]
             }
             unassignedCash={unassignedCash}
             onAddGoal={savingsGoalsHook.helpers.addGoal}
             onUpdateGoal={savingsGoalsHook.helpers.updateGoal}
             onDeleteGoal={savingsGoalsHook.helpers.deleteGoal}
-            onDistributeToGoals={(amount: number, goals: unknown[]) => {
-              const distribution = { amount, goals };
+            onDistributeToGoals={(distribution: Record<string, number>) => {
               savingsGoalsHook.helpers.distributeFunds(distribution, "").catch((err) => {
                 logger.error("Failed to distribute funds:", err);
               });

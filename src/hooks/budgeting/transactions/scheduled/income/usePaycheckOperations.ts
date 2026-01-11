@@ -74,7 +74,8 @@ export const usePaycheckOperations = () => {
         });
 
         // Delete paycheck record
-        await deletePaycheckRecord(paycheckId, budgetDb as BudgetDb);
+        const budgetDbTyped = budgetDb as unknown as BudgetDb;
+        await deletePaycheckRecord(paycheckId, budgetDbTyped);
 
         // Invalidate caches
         const { queryClient, queryKeys } = await import("@/utils/common/queryClient");

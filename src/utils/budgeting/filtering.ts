@@ -1,19 +1,20 @@
 import type { Envelope as DbEnvelope } from "@/db/types";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
-import { isValidEnvelopeType } from "@/utils/validation/envelopeValidation";
 import logger from "@/utils/common/logger";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
+import { isValidEnvelopeType } from "@/utils/validation/envelopeValidation";
 
 /**
  * Enhanced Envelope type with computed properties
  */
-export interface EnhancedEnvelope extends DbEnvelope {
-  envelopeType: string;
+export type EnhancedEnvelope = DbEnvelope & {
   status: string;
   utilizationRate: number;
   available: number;
   monthlyBudget?: number;
   monthlyAmount?: number;
-}
+  biweeklyAllocation?: number;
+  envelopeType?: string;
+};
 
 /**
  * Comprehensive envelope statistics
@@ -51,17 +52,37 @@ export const processEnvelopes = (
   } = options;
 
   // 1. Transform and Auto-Classify
-  let processed: EnhancedEnvelope[] = envelopes.map((env) => ({
-    ...env,
-    envelopeType: isValidEnvelopeType(env.envelopeType)
-      ? env.envelopeType!
-      : AUTO_CLASSIFY_ENVELOPE_TYPE(env.category || "expenses"),
-    status: "active",
-    utilizationRate: 0,
-    available: env.currentBalance || 0,
-    monthlyBudget: env.targetAmount,
-    monthlyAmount: env.targetAmount,
-  }));
+  let processed: EnhancedEnvelope[] = envelopes.map((env) => {
+    let type: string | undefined = env.type;
+
+    // Use envelopeType for backward compatibility if type is missing
+    const legacyEnv = env as unknown as { envelopeType?: string; biweeklyAllocation?: number };
+    if (!type && legacyEnv.envelopeType) {
+      type = legacyEnv.envelopeType;
+    }
+
+    // Auto-classify if type is invalid or missing
+    if (!type || !isValidEnvelopeType(type)) {
+      type = AUTO_CLASSIFY_ENVELOPE_TYPE(env.category || "General");
+    }
+
+    // Explicitly handle sinking_fund to goal transition if it slipped through validation
+    if (type === ENVELOPE_TYPES.SINKING_FUND) {
+      type = ENVELOPE_TYPES.SAVINGS;
+    }
+
+    return {
+      ...env,
+      status: "active",
+      utilizationRate: 0,
+      available: env.currentBalance || 0,
+      monthlyBudget: env.targetAmount,
+      monthlyAmount: env.targetAmount,
+      biweeklyAllocation: type === "standard" ? legacyEnv.biweeklyAllocation : undefined,
+      envelopeType: type,
+      type: type as DbEnvelope["type"],
+    } as EnhancedEnvelope;
+  });
 
   // Diagnostic logging for corrupted envelopes
   const corrupted = envelopes.filter((env) => !env.name || !env.category);
@@ -82,9 +103,9 @@ export const processEnvelopes = (
   }
 
   if (envelopeTypes && envelopeTypes.length > 0) {
-    processed = processed.filter((env) => envelopeTypes.includes(env.envelopeType));
+    processed = processed.filter((env) => envelopeTypes.includes(env.type));
   } else if (excludeEnvelopeTypes && excludeEnvelopeTypes.length > 0) {
-    processed = processed.filter((env) => !excludeEnvelopeTypes.includes(env.envelopeType));
+    processed = processed.filter((env) => !excludeEnvelopeTypes.includes(env.type));
   }
 
   // 3. Apply Sorting
@@ -139,16 +160,19 @@ export const calculateEnvelopeStats = (envelopes: EnhancedEnvelope[]): EnvelopeS
 /**
  * Repair utility for corrupted envelopes
  */
-export const getRepairUpdates = (name: string, category: string = "utilities") => {
+export const getRepairUpdates = (name: string, category: string) => {
   logger.info("Generating repair updates for envelope", { name, category });
+  const type = AUTO_CLASSIFY_ENVELOPE_TYPE(category);
+
   return {
     name,
     category,
     targetAmount: 100,
     monthlyBudget: 50,
     biweeklyAllocation: 25,
-    envelopeType: AUTO_CLASSIFY_ENVELOPE_TYPE(category),
     description: `Repaired envelope: ${name}`,
     lastModified: Date.now(),
+    envelopeType: type,
+    type: type as DbEnvelope["type"],
   };
 };

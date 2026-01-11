@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
-import type { Bill, Transaction } from "@/db/types";
+import { type LiabilityEnvelope, type Transaction, type Bill } from "@/db/types";
 import { validateBillPartialSafe, validateBillSafe } from "@/domain/schemas/bill";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 
@@ -17,11 +17,11 @@ export interface BillQueryOptions {
   sortOrder?: string;
 }
 
-interface BillExtended extends Bill {
+type BillExtended = LiabilityEnvelope & {
   lastPaid?: string | number | Date;
   estimatedAmount?: number;
   [key: string]: unknown;
-}
+};
 
 // --- Helpers ---
 
@@ -46,6 +46,7 @@ const createPaymentTransaction = (
     envelopeId: envelopeId || "unassigned",
     category: bill.category || "Bills & Utilities",
     type: "expense" as const,
+    isScheduled: false,
     lastModified: Date.now(),
     createdAt: Date.now(),
   };
@@ -63,12 +64,14 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
   } = options;
 
   return useCallback(async () => {
-    let bills: Bill[] = [];
+    let bills: LiabilityEnvelope[] = [];
 
     try {
-      bills = await budgetDb.bills.toArray();
+      // Get all liability type envelopes
+      const envelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
+      bills = envelopes as LiabilityEnvelope[];
       if (bills.length > 0) {
-        logger.debug("TanStack Query: Bills loaded", { count: bills.length });
+        logger.debug("TanStack Query: Bills (Liability Envelopes) loaded", { count: bills.length });
       }
     } catch (error) {
       logger.error("TanStack Query: Dexie fetch failed", error);
@@ -84,11 +87,13 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + daysAhead);
       filteredBills = filteredBills.filter((bill) => {
+        if (!bill.dueDate) return false;
         const dueDate = new Date(bill.dueDate);
         return dueDate >= today && dueDate <= futureDate && !bill.isPaid;
       });
     } else if (status === "overdue") {
       filteredBills = filteredBills.filter((bill) => {
+        if (!bill.dueDate) return false;
         const dueDate = new Date(bill.dueDate);
         return dueDate < today && !bill.isPaid;
       });
@@ -169,18 +174,29 @@ export const useBillsQuery = (options: BillQueryOptions = {}) => {
     enabled: true,
   });
 };
-
-export const useUpcomingBillsQuery = (daysAhead = 30, billsData: Bill[] = []) => {
+export const useUpcomingBillsQuery = (daysAhead = 30, billsData: LiabilityEnvelope[] = []) => {
   return useQuery({
     queryKey: queryKeys.upcomingBills(daysAhead),
-    queryFn: async (): Promise<Bill[]> => {
+    queryFn: async (): Promise<LiabilityEnvelope[]> => {
       const bills = billsData || [];
       const today = new Date();
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + daysAhead);
 
       return bills.filter((bill) => {
-        const dueDate = new Date(bill.dueDate);
+        // Handle both day of month (number) and full date (string) for transition
+        const dueDateRaw = bill.dueDate;
+        if (!dueDateRaw) return false;
+
+        let dueDate: Date;
+        if (typeof dueDateRaw === "number") {
+          dueDate = new Date();
+          dueDate.setDate(dueDateRaw);
+        } else if (dueDateRaw instanceof Date) {
+          dueDate = dueDateRaw;
+        } else {
+          dueDate = new Date(dueDateRaw);
+        }
         return dueDate >= today && dueDate <= futureDate && !bill.isPaid;
       });
     },
@@ -232,6 +248,7 @@ export const useAddBillMutation = () => {
         category: (billData.category as string) || "Uncategorized",
         isPaid: false,
         isRecurring: (billData.isRecurring as boolean) || false,
+        type: "bill" as const,
         lastModified: Date.now(),
         ...billData,
         createdAt: Date.now(),
@@ -249,12 +266,12 @@ export const useAddBillMutation = () => {
         dueDate:
           validationResult.data.dueDate instanceof Date
             ? validationResult.data.dueDate
-            : new Date(validationResult.data.dueDate),
+            : new Date(String(validationResult.data.dueDate || new Date().toISOString())),
         envelopeId: validationResult.data.envelopeId || undefined,
       };
 
-      await budgetDb.bills.add(validatedBill);
-      return validatedBill;
+      await budgetDb.envelopes.add(validatedBill as LiabilityEnvelope);
+      return validatedBill as LiabilityEnvelope;
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: queryKeys.bills });
@@ -290,7 +307,7 @@ export const useUpdateBillMutation = () => {
       billId: string;
       updates: Record<string, unknown>;
     }) => {
-      const existingBill = await budgetDb.bills.get(billId);
+      const existingBill = await budgetDb.envelopes.get(billId);
       if (!existingBill) throw new Error(`Bill with ID ${billId} not found`);
 
       const validationResult = validateBillPartialSafe(updates);
@@ -309,7 +326,7 @@ export const useUpdateBillMutation = () => {
         lastModified: Date.now(),
       };
 
-      await budgetDb.bills.update(billId, validatedBill);
+      await budgetDb.envelopes.update(billId, validatedBill);
       return validatedBill;
     },
     onSuccess: (_bill, variables) => {
@@ -330,7 +347,7 @@ export const useDeleteBillMutation = () => {
   return useMutation({
     mutationKey: ["bills", "delete"],
     mutationFn: async (billId: string) => {
-      await budgetDb.bills.delete(billId);
+      await budgetDb.envelopes.delete(billId);
       return billId;
     },
     onSuccess: (billId) => {
@@ -361,10 +378,10 @@ export const useMarkBillPaidMutation = () => {
       paidDate?: string;
       envelopeId?: string;
     }) => {
-      const bill = await budgetDb.bills.get(billId);
+      const bill = await budgetDb.envelopes.get(billId);
       if (!bill) throw new Error(`Bill with ID ${billId} not found`);
 
-      const effectiveEnvelopeId = envelopeId || bill.envelopeId;
+      const effectiveEnvelopeId = envelopeId || (bill as LiabilityEnvelope).envelopeId;
       if (!effectiveEnvelopeId || effectiveEnvelopeId.trim() === "") {
         throw new Error("Bill payment requires an envelope.");
       }
@@ -375,17 +392,15 @@ export const useMarkBillPaidMutation = () => {
 
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
-      await budgetDb.bills.update(billId, {
+      await budgetDb.envelopes.update(billId, {
         isPaid: true,
         paidAmount,
         paidDate: paymentDate,
-        envelopeId,
-        lastPaid: new Date().toISOString(),
         lastModified: Date.now(),
-      } as Partial<Bill>);
+      } as Record<string, unknown>);
 
       const rawPaymentTransaction = createPaymentTransaction(
-        bill,
+        bill as LiabilityEnvelope,
         billId,
         paidAmount,
         paymentDate,

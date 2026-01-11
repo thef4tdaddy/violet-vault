@@ -134,6 +134,7 @@ function createTransaction(
     category: mapping.category ? row[mapping.category] : "uncategorized",
     merchant,
     envelopeId: "", // Will be assigned by user later
+    isScheduled: false,
     createdAt: Date.now(),
     lastModified: Date.now(),
   };

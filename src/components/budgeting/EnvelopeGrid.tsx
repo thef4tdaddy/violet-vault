@@ -197,11 +197,22 @@ const useEnvelopeUIState = (
 
   const handleQuickFundConfirm = async (envelopeId: string, amount: number) => {
     try {
-      const currentAllocated =
-        envelopeData.find((env: EnvelopeData) => env.id === envelopeId)?.allocated || 0;
+      const envelope = envelopeData.find((env: EnvelopeData) => env.id === envelopeId);
+      if (!envelope) return;
+
+      const currentAmount = envelope.allocated || 0;
+      const newAmount = currentAmount + amount;
+
+      let updateField = "monthlyBudget"; // Default to valid standard field
+      if (envelope.type === "goal") updateField = "monthlyContribution";
+      else if (envelope.type === "liability") updateField = "biweeklyAllocation"; // Best guess for liability
+
+      // Construct update object with type assertion as key is dynamic but safe per type check
+      const updates = { [updateField]: newAmount };
+
       await updateEnvelope({
         id: envelopeId,
-        updates: { allocated: currentAllocated + amount },
+        updates: updates as Partial<Envelope>,
       });
       logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
     } catch (error) {

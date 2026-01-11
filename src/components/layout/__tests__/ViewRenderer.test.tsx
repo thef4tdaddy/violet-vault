@@ -1,15 +1,16 @@
-import { render, screen, waitFor } from "@/test/test-utils";
+import { render, screen, waitFor } from "../../../test/test-utils";
+import "@testing-library/jest-dom";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import ViewRenderer from "../ViewRenderer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock ErrorBoundary (Sentry ErrorBoundary is used, but we'll mock it as a simple wrapper)
-vi.mock("@/components/ui/ErrorBoundary", () => ({
+vi.mock("../../../components/ui/ErrorBoundary", () => ({
   ErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock layout hooks
-vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
+vi.mock("../../../hooks/platform/ux/layout/useLayoutData", () => ({
   useLayoutData: vi.fn(() => ({
     unassignedCash: 100,
     bills: { addBill: vi.fn() },
@@ -20,14 +21,14 @@ vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
   })),
 }));
 
-vi.mock("@/hooks/layout/usePaycheckOperations", () => ({
+vi.mock("../../../hooks/layout/usePaycheckOperations", () => ({
   usePaycheckOperations: vi.fn(() => ({
     handleDeletePaycheck: vi.fn(),
   })),
 }));
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),
@@ -39,59 +40,59 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Mock all child components to simplify testing
-vi.mock("@/components/pages/MainDashboard", () => ({
+vi.mock("../../../components/pages/MainDashboard", () => ({
   default: () => <div data-testid="dashboard-view">Dashboard</div>,
 }));
 
-vi.mock("@/components/budgeting/EnvelopeGrid", () => ({
+vi.mock("../../../components/budgeting/EnvelopeGrid", () => ({
   default: () => <div data-testid="envelope-grid">Envelopes</div>,
 }));
 
-vi.mock("@/components/budgeting/SmartEnvelopeSuggestions", () => ({
+vi.mock("../../../components/budgeting/SmartEnvelopeSuggestions", () => ({
   default: () => <div>Suggestions</div>,
 }));
 
-vi.mock("@/components/savings/SavingsGoals", () => ({
+vi.mock("../../../components/savings/SavingsGoals", () => ({
   default: () => <div data-testid="savings-view">Savings</div>,
 }));
 
-vi.mock("@/components/accounts/SupplementalAccounts", () => ({
+vi.mock("../../../components/accounts/SupplementalAccounts", () => ({
   default: () => <div data-testid="supplemental-view">Supplemental Accounts</div>,
 }));
 
-vi.mock("@/components/budgeting/PaycheckProcessor", () => ({
+vi.mock("../../../components/budgeting/PaycheckProcessor", () => ({
   default: () => <div data-testid="paycheck-view">Paycheck Processor</div>,
 }));
 
-vi.mock("@/components/bills/BillManager", () => ({
+vi.mock("../../../components/bills/BillManager", () => ({
   default: () => <div data-testid="bills-view">Bills</div>,
 }));
 
-vi.mock("@/components/transactions/TransactionLedger", () => ({
+vi.mock("../../../components/transactions/TransactionLedger", () => ({
   default: () => <div data-testid="transactions-view">Transactions</div>,
 }));
 
-vi.mock("@/components/analytics/AnalyticsDashboard", () => ({
+vi.mock("../../../components/analytics/AnalyticsDashboard", () => ({
   default: () => <div data-testid="analytics-view">Analytics</div>,
 }));
 
-vi.mock("@/components/debt/DebtDashboard", () => ({
+vi.mock("../../../components/debt/DebtDashboard", () => ({
   default: () => <div data-testid="debts-view">Debts</div>,
 }));
 
-vi.mock("@/components/automation/AutoFundingView", () => ({
+vi.mock("../../../components/automation/AutoFundingView", () => ({
   default: () => <div data-testid="automation-view">Automation</div>,
 }));
 
-vi.mock("@/components/activity/ActivityFeed", () => ({
+vi.mock("../../../components/activity/ActivityFeed", () => ({
   default: () => <div data-testid="activity-view">Activity</div>,
 }));
 
-vi.mock("@/utils/debts/debtDebugConfig", () => ({
+vi.mock("../../../utils/debts/debtDebugConfig", () => ({
   isDebtFeatureEnabled: vi.fn(() => true),
 }));
 
-vi.mock("@/utils", () => ({
+vi.mock("../../../utils", () => ({
   getIcon: vi.fn(() => "div"),
 }));
 

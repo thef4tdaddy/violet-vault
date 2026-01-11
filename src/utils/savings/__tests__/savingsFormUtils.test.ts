@@ -9,6 +9,7 @@ describe("savingsFormUtils", () => {
   describe("validateSavingsGoalForm - Zod validation", () => {
     it("should return empty array for valid form data", () => {
       const validFormData = {
+        type: "goal",
         name: "Emergency Fund",
         targetAmount: "5000",
         currentAmount: "1000",
@@ -25,6 +26,7 @@ describe("savingsFormUtils", () => {
 
     it("should validate required name field", () => {
       const invalidFormData = {
+        type: "goal",
         name: "",
         targetAmount: "5000",
         currentAmount: "1000",
@@ -175,6 +177,7 @@ describe("savingsFormUtils", () => {
 
     it("should allow optional target date", () => {
       const validFormData = {
+        type: "goal",
         name: "Emergency Fund",
         targetAmount: "5000",
         currentAmount: "1000",
@@ -189,6 +192,7 @@ describe("savingsFormUtils", () => {
 
     it("should allow optional description", () => {
       const validFormData = {
+        type: "goal",
         name: "Emergency Fund",
         targetAmount: "5000",
         currentAmount: "1000",

@@ -30,6 +30,13 @@ interface AddEnvelopeData {
   [key: string]: unknown;
 }
 
+// Interface for handling legacy bill properties during migration
+interface LegacyBill extends Bill {
+  paymentFrequency?: string;
+  frequency?: string;
+  amount?: number;
+}
+
 interface CreateEnvelopeResult {
   success: boolean;
   error?: string;
@@ -101,9 +108,15 @@ const useEnvelopeSystem = () => {
         if (envelopeIndex >= 0) {
           const envelope = updatedEnvelopes[envelopeIndex];
           if (!envelope.biweeklyAllocation || envelope.biweeklyAllocation === 0) {
-            // Calculate this bill's biweekly amount
-            const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency || "monthly"];
-            const annualAmount = bill.amount * multiplier;
+            // Safe access for legacy/unified field mix
+            const legacyBill = bill as LegacyBill;
+            const frequency = (legacyBill.paymentFrequency ||
+              legacyBill.frequency ||
+              "monthly") as string;
+            const amount = legacyBill.amount || bill.minimumPayment || 0;
+
+            const multiplier = FREQUENCY_MULTIPLIERS[frequency] || 12;
+            const annualAmount = amount * multiplier;
             const monthlyAmount = annualAmount / 12;
             const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER;
 

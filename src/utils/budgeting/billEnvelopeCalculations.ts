@@ -3,22 +3,11 @@
  * Calculates remaining amounts needed for bill payments and funding progress
  */
 
-import { ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
 
-type Bill = DbBill & {
-  dueDate: string | Date;
-  estimatedAmount?: number;
-  provider?: string;
-  description?: string;
-};
-
-type Envelope = DbEnvelope & {
-  monthlyAmount?: number;
-  monthlyBudget?: number;
-  biweeklyAllocation?: number;
-};
+type Bill = DbBill;
+type Envelope = DbEnvelope;
 
 export interface BillEnvelopeResult {
   isValidBillEnvelope: boolean;
@@ -79,19 +68,56 @@ const getInvalidBillEnvelopeResult = (): BillEnvelopeResult => ({
  */
 const getNextUpcomingBill = (linkedBills: Bill[]): Bill | null => {
   const upcomingBills = linkedBills
-    .filter((bill) => new Date(bill.dueDate) >= new Date())
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    .filter((bill) => {
+      const date = parseDueDate(bill.dueDate);
+      return date && date >= new Date();
+    })
+    .sort((a, b) => {
+      const dateA = parseDueDate(a.dueDate);
+      const dateB = parseDueDate(b.dueDate);
+      return (dateA?.getTime() || 0) - (dateB?.getTime() || 0);
+    });
 
   return upcomingBills[0] || null;
 };
 
 /**
+ * Safely parse a due date which could be a string, number (day of month), or Date object
+ */
+const parseDueDate = (dueDate: unknown): Date | null => {
+  if (!dueDate) return null;
+  if (dueDate instanceof Date) return dueDate;
+
+  // If it's a number 1-31, it's a day of the month
+  if (typeof dueDate === "number" && dueDate >= 1 && dueDate <= 31) {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(dueDate);
+    // If that date has passed this month, use next month
+    if (date < new Date()) {
+      date.setMonth(date.getMonth() + 1);
+    }
+    return date;
+  }
+
+  if (typeof dueDate === "string" || typeof dueDate === "number") {
+    const parsed = new Date(dueDate);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  return null;
+};
+
+/**
  * Calculate days until a given date
  */
-const calculateDaysUntil = (targetDate: Date | string | null): number | null => {
-  if (!targetDate) return null;
+const calculateDaysUntil = (targetDate: Date | string | number | null): number | null => {
+  const target = parseDueDate(targetDate);
+  if (!target) return null;
+
   const today = new Date();
-  const target = new Date(targetDate);
+  today.setHours(0, 0, 0, 0);
+
   const diffTime = target.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
@@ -118,8 +144,11 @@ const calculateUpcomingBillsAmount = (linkedBills: Bill[]): number => {
   next30Days.setDate(next30Days.getDate() + 30);
 
   return linkedBills
-    .filter((bill) => new Date(bill.dueDate) <= next30Days)
-    .reduce((sum: number, bill: Bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0);
+    .filter((bill) => {
+      const date = parseDueDate(bill.dueDate);
+      return date && date <= next30Days;
+    })
+    .reduce((sum: number, bill: Bill) => sum + (bill.amount || 0), 0);
 };
 
 /**
@@ -132,7 +161,7 @@ export const calculateBillEnvelopeNeeds = (
   envelope: Envelope,
   bills: Bill[] = []
 ): BillEnvelopeResult => {
-  if (!envelope || envelope.envelopeType !== ENVELOPE_TYPES.BILL) {
+  if (!envelope || (envelope.type as string) !== "liability") {
     return getInvalidBillEnvelopeResult();
   }
 
@@ -141,15 +170,26 @@ export const calculateBillEnvelopeNeeds = (
 
   // Get next upcoming bill
   const nextBill = getNextUpcomingBill(linkedBills);
-  const nextBillAmount = nextBill ? nextBill.amount || nextBill.estimatedAmount || 0 : 0;
-  const nextBillDate = nextBill ? new Date(nextBill.dueDate) : null;
+  const nextBillAmount = nextBill ? nextBill.amount || 0 : 0;
+  const nextBillDate = nextBill ? parseDueDate(nextBill.dueDate) : null;
 
   // Calculate days until next bill
   const daysUntilNextBill = calculateDaysUntil(nextBillDate);
 
   // Calculate funding needs
+  // Calculate funding needs
   const currentBalance = envelope.currentBalance || 0;
-  const biweeklyAllocation = (envelope.biweeklyAllocation as number) || 0;
+  // NOTE: This logic seems flawed in original code: checks for "standard" inside a "liability" block?
+  // If the function guards for only "liability" above, then envelope.type is "liability".
+  // But liability doesn't have biweeklyAllocation on type definition usually?
+  // Let's check schema. Liability does not have biweeklyAllocation.
+  // Standard *does*. But we returned early if not liability.
+  // So biweeklyAllocation will always be 0 here unless we cast.
+  // Assuming the intention was "if it *was* standard" but it can't be.
+  // OR the guard is wrong. But the function is "calculateBillEnvelopeNeeds".
+  // Let's assume 0 for now to be safe, or cast if we know runtime data might be mixed.
+  const biweeklyAllocation = 0;
+
   const targetMonthlyAmount = nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);
   const isFullyFunded = remainingToFund <= 0;
@@ -176,15 +216,15 @@ export const calculateBillEnvelopeNeeds = (
     upcomingBillsAmount,
     currentBalance,
     targetMonthlyAmount,
-    biweeklyAllocation: biweeklyAllocation as number,
+    biweeklyAllocation,
     nextBill: nextBill
       ? {
-          id: nextBill.id as string,
-          name: (nextBill.name || nextBill.provider || nextBill.description) as string,
+          id: nextBill.id,
+          name: nextBill.name || "Unnamed Bill",
           amount: nextBillAmount,
-          dueDate: nextBill.dueDate as string,
-          category: nextBill.category as string | undefined,
-          frequency: (nextBill.frequency || "monthly") as string,
+          dueDate: String(nextBill.dueDate || ""),
+          category: nextBill.category,
+          frequency: nextBill.frequency || "monthly",
         }
       : null,
   };

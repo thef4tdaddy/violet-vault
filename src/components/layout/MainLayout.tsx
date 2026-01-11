@@ -454,7 +454,7 @@ const MainContentLayoutView = ({
   const { settings, security } = modals;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 pb-20 sm:px-6 md:px-8 lg:pb-0">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-orange-50/30">
       <div className="relative mx-auto max-w-7xl">
         <div className="relative z-10">
           <Header

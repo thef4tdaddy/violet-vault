@@ -9,11 +9,8 @@
 
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
-import {
-  SavingsGoalFormSchema,
-  type SavingsGoalFormData,
-  type SavingsGoal,
-} from "@/domain/schemas/savings-goal";
+import { SavingsGoalFormSchema, type SavingsGoalFormData } from "@/domain/schemas/savingsGoal";
+import type { GoalEnvelope as SavingsGoal } from "@/db/types";
 import logger from "@/utils/common/logger";
 
 interface UseSavingsGoalFormValidatedOptions {
@@ -35,38 +32,47 @@ export function useSavingsGoalFormValidated({
 
   // Build initial form data
   const buildInitialData = useCallback((): SavingsGoalFormData => {
-    if (goal) {
-      // Edit mode - populate from existing goal
-      // Extended type for runtime fields not in schema
-      type SavingsGoalWithExtras = SavingsGoal & { color?: string };
-      const extendedGoal = goal as unknown as SavingsGoalWithExtras;
+    if (!goal) {
       return {
-        name: goal.name || "",
-        targetAmount: goal.targetAmount?.toString() || "",
-        currentAmount: goal.currentAmount?.toString() || "0",
-        targetDate: goal.targetDate
-          ? typeof goal.targetDate === "string"
-            ? goal.targetDate
-            : new Date(goal.targetDate).toISOString().split("T")[0]
-          : "",
-        category: goal.category || "",
-        color: extendedGoal.color || "#3B82F6",
-        description: goal.description || "",
-        priority: goal.priority || "medium",
-      };
-    } else {
-      // Add mode - empty form with defaults
-      return {
+        type: "goal" as const,
+        archived: false,
+        autoAllocate: false,
+        isPaused: false,
+        isCompleted: false,
         name: "",
         targetAmount: "",
         currentAmount: "0",
-        targetDate: "",
+        currentBalance: 0,
+        targetDate: undefined,
         category: "",
         color: "#3B82F6",
         description: "",
         priority: "medium",
       };
     }
+    const extendedGoal = goal as unknown as Record<string, unknown>;
+    const targetDate = goal.targetDate
+      ? typeof goal.targetDate === "string"
+        ? goal.targetDate
+        : new Date(goal.targetDate).toISOString().split("T")[0]
+      : undefined;
+
+    return {
+      type: "goal" as const,
+      archived: !!goal.archived,
+      autoAllocate: !!goal.autoAllocate,
+      isPaused: !!goal.isPaused,
+      isCompleted: !!goal.isCompleted,
+      name: goal.name || "",
+      targetAmount: goal.targetAmount?.toString() || "",
+      currentAmount: goal.currentAmount?.toString() || "0",
+      currentBalance: goal.currentBalance || 0,
+      targetDate,
+      category: goal.category || "",
+      color: (extendedGoal.color as string) || "#3B82F6",
+      description: goal.description || "",
+      priority: (extendedGoal.priority as "low" | "medium" | "high") || "medium",
+    };
   }, [goal]);
 
   // Initialize form with validation
@@ -81,11 +87,10 @@ export function useSavingsGoalFormValidated({
       }
 
       try {
-        // Submit validated data
         await onSubmit(goal?.id || null, validatedData);
       } catch (error) {
         logger.error(`Error ${isEditMode ? "updating" : "creating"} savings goal:`, error);
-        throw error; // Re-throw to let useValidatedForm handle state
+        throw error;
       }
     },
   });

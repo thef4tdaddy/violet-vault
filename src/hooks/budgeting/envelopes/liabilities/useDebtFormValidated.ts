@@ -9,9 +9,8 @@
 
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
-import { DebtFormSchema, type DebtFormData, type Debt } from "@/domain/schemas/debt";
-import type { Bill } from "@/types/bills";
-import type { Envelope } from "@/types/finance";
+import { DebtFormSchema, type DebtFormData } from "@/domain/schemas/debt";
+import type { LiabilityEnvelope as Debt, Bill, Envelope } from "@/db/types";
 import logger from "@/utils/common/logger";
 
 interface UseDebtFormValidatedOptions {
@@ -20,6 +19,110 @@ interface UseDebtFormValidatedOptions {
   connectedBill?: Bill | null;
   connectedEnvelope?: Envelope | null;
   onSubmit?: (debtId: string | null, data: DebtFormData) => Promise<void>;
+}
+
+/**
+ * Get default debt data for new entries
+ */
+function getDefaultDebtData(connectedBill: Bill | null): DebtFormData {
+  return {
+    type: "personal", // Default to personal for new debts as expected by tests
+    category: "Liabilities",
+    archived: false,
+    autoAllocate: false,
+    isPaid: false,
+    name: "",
+    creditor: "",
+    status: "active",
+    paymentFrequency: "monthly",
+    compoundFrequency: "monthly",
+    currentBalance: "",
+    balance: "",
+    originalBalance: "",
+    interestRate: "0",
+    minimumPayment: "",
+    notes: "",
+    paymentMethod: connectedBill ? "connect_existing_bill" : "create_new",
+    createBill: true,
+    envelopeId: "",
+    existingBillId: "",
+    newEnvelopeName: "",
+    paymentDueDate: "",
+    color: "#EF4444",
+    description: "",
+  };
+}
+
+/**
+ * Get financial form data for debt
+ */
+function getFinancialDebtData(debt: Debt, extendedDebt: Record<string, unknown>) {
+  const balance = debt.currentBalance?.toString() || "0";
+  return {
+    currentBalance: balance,
+    balance: balance,
+    originalBalance: debt.originalBalance?.toString() || "",
+    interestRate: debt.interestRate?.toString() || "0",
+    minimumPayment: debt.minimumPayment?.toString() || "0",
+    paymentFrequency:
+      (extendedDebt.paymentFrequency as
+        | "monthly"
+        | "quarterly"
+        | "annually"
+        | "weekly"
+        | "biweekly") || "monthly",
+    compoundFrequency:
+      (extendedDebt.compoundFrequency as "monthly" | "annually" | "daily") || "monthly",
+    notes: (extendedDebt.notes as string) || "",
+  };
+}
+
+/**
+ * Get connection-related form data for debt
+ */
+function getDebtConnectionData(
+  extendedDebt: Record<string, unknown>,
+  connectedBill: Bill | null,
+  connectedEnvelope: Envelope | null
+) {
+  const envId = extendedDebt.envelopeId || connectedEnvelope?.id;
+  return {
+    paymentMethod: connectedBill ? "connect_existing_bill" : "create_new",
+    envelopeId: envId ? String(envId) : "",
+    existingBillId: connectedBill?.id || "",
+    paymentDueDate:
+      (extendedDebt.paymentDueDate as string) || (extendedDebt.dueDate as string) || "",
+  };
+}
+
+/**
+ * Build initial form data from an existing debt
+ */
+function getPopulatedDebtData(
+  debt: Debt,
+  connectedBill: Bill | null,
+  connectedEnvelope: Envelope | null
+): DebtFormData {
+  const extendedDebt = debt as unknown as Record<string, unknown>;
+  const financialData = getFinancialDebtData(debt, extendedDebt);
+  const connections = getDebtConnectionData(extendedDebt, connectedBill, connectedEnvelope);
+
+  return {
+    type: (extendedDebt.type as DebtFormData["type"]) || "liability",
+    category: debt.category || "Liabilities",
+    archived: !!debt.archived,
+    autoAllocate: !!debt.autoAllocate,
+    isPaid: !!debt.isPaid,
+    name: debt.name || "",
+    creditor: debt.creditor || "",
+    status: debt.status || "active",
+    createBill: false,
+    newEnvelopeName: "",
+    color: debt.color || "#EF4444",
+    description: debt.description || "",
+    ...financialData,
+    ...connections,
+  };
 }
 
 /**
@@ -35,72 +138,12 @@ export function useDebtFormValidated({
 }: UseDebtFormValidatedOptions = {}) {
   const isEditMode = !!debt;
 
-  // Determine payment method based on connections
-  const determinePaymentMethod = useCallback(() => {
-    return connectedBill ? "connect_existing_bill" : "create_new";
-  }, [connectedBill]);
-
   // Build initial form data
-  // Complexity justified: Necessary default value initialization for all form fields
-  // eslint-disable-next-line complexity
-  const buildInitialData = useCallback((): DebtFormData => {
-    if (debt) {
-      // Edit mode - populate from existing debt
-      // Extended type for runtime fields not in schema
-      type DebtWithExtras = Debt & {
-        paymentFrequency?: "monthly" | "quarterly" | "annually" | "weekly" | "biweekly";
-        compoundFrequency?: "monthly" | "annually" | "daily";
-        notes?: string;
-        envelopeId?: string | number;
-      };
-      const extendedDebt = debt as unknown as DebtWithExtras;
-      const currentBalanceStr = debt.currentBalance?.toString() || "";
-      return {
-        name: debt.name || "",
-        creditor: debt.creditor || "",
-        type: debt.type || "personal",
-        status: debt.status || "active",
-        paymentFrequency: extendedDebt.paymentFrequency || "monthly",
-        compoundFrequency: extendedDebt.compoundFrequency || "monthly",
-        currentBalance: currentBalanceStr,
-        balance: currentBalanceStr,
-        originalBalance: debt.originalBalance?.toString() || "",
-        interestRate: debt.interestRate?.toString() || "0",
-        minimumPayment: debt.minimumPayment?.toString() || "",
-        notes: extendedDebt.notes || "",
-        paymentMethod: determinePaymentMethod(),
-        createBill: false,
-        envelopeId: extendedDebt.envelopeId
-          ? String(extendedDebt.envelopeId)
-          : connectedEnvelope?.id
-            ? String(connectedEnvelope.id)
-            : "",
-        existingBillId: connectedBill?.id || "",
-        newEnvelopeName: "",
-      };
-    } else {
-      // Add mode - empty form with defaults
-      return {
-        name: "",
-        creditor: "",
-        type: "personal",
-        status: "active",
-        paymentFrequency: "monthly",
-        compoundFrequency: "monthly",
-        currentBalance: "",
-        balance: "",
-        originalBalance: "",
-        interestRate: "0",
-        minimumPayment: "",
-        notes: "",
-        paymentMethod: "create_new",
-        createBill: true,
-        envelopeId: "",
-        existingBillId: "",
-        newEnvelopeName: "",
-      };
-    }
-  }, [debt, connectedBill, connectedEnvelope, determinePaymentMethod]);
+  const buildInitialData = useCallback(() => {
+    return debt
+      ? getPopulatedDebtData(debt, connectedBill, connectedEnvelope)
+      : getDefaultDebtData(connectedBill);
+  }, [debt, connectedBill, connectedEnvelope]);
 
   // Initialize form with validation
   const form = useValidatedForm({
@@ -144,32 +187,3 @@ export function useDebtFormValidated({
     canSubmit: form.isValid && !form.isSubmitting,
   };
 }
-
-/**
- * Usage Example:
- *
- * ```tsx
- * const debtForm = useDebtFormValidated({
- *   debt: editingDebt,
- *   isOpen: isModalOpen,
- *   connectedBill: connectedBillData,
- *   connectedEnvelope: connectedEnvelopeData,
- *   onSubmit: async (debtId, data) => {
- *     if (debtId) {
- *       await updateDebt(debtId, data);
- *     } else {
- *       await createDebt(data);
- *     }
- *   },
- * });
- *
- * // Access form state
- * const { data, errors, isValid, updateField, handleSubmit } = debtForm;
- *
- * // Update a field
- * updateField('name', 'My Debt');
- *
- * // Submit form
- * await handleSubmit();
- * ```
- */

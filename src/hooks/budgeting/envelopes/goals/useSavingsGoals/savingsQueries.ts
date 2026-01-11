@@ -10,7 +10,7 @@ import {
   filterSavingsGoals,
   type ProcessedSavingsGoal,
 } from "@/utils/savings/savingsCalculations";
-import type { SavingsGoal } from "@/db/types";
+import { type GoalEnvelope } from "@/db/types";
 
 export interface SavingsGoalsQueryOptions {
   status?: string;
@@ -36,7 +36,10 @@ export const useSavingsGoalsQueryFunction = (
     logger.debug("TanStack Query: Fetching savings goals from Dexie");
 
     try {
-      const goals: SavingsGoal[] = await budgetDb.savingsGoals.toArray();
+      const goals: GoalEnvelope[] = (await budgetDb.envelopes
+        .where("type")
+        .equals("goal")
+        .toArray()) as GoalEnvelope[];
 
       // Always fetch from Dexie (single source of truth for local data)
 

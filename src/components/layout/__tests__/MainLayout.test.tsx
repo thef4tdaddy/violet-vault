@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@/test/test-utils";
+import { render, screen, waitFor } from "../../../test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
 import MainLayout from "../MainLayout";
@@ -48,19 +48,19 @@ const MOCK_CONTENT_MODALS = {
   security: { open: vi.fn(), close: vi.fn(), isOpen: false },
 };
 
-vi.mock("@/hooks/auth/useAuth", () => ({
+vi.mock("../../../hooks/auth/useAuth", () => ({
   useAuth: vi.fn(() => MOCK_AUTH),
 }));
 
-vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
+vi.mock("../../../hooks/platform/ux/layout/useLayoutData", () => ({
   useLayoutData: vi.fn(() => MOCK_LAYOUT_DATA),
 }));
 
-vi.mock("@/hooks/platform/ux/layout/useLayoutModals", () => ({
+vi.mock("../../../hooks/platform/ux/layout/useLayoutModals", () => ({
   useLayoutModals: vi.fn(() => MOCK_CONTENT_MODALS),
 }));
 
-vi.mock("@/hooks/platform/ux/layout/useLayoutLifecycle", () => ({
+vi.mock("../../../hooks/platform/ux/layout/useLayoutLifecycle", () => ({
   useLayoutLifecycle: vi.fn(() => ({
     showSecurityWarning: false,
     setShowSecurityWarning: vi.fn(),
@@ -199,7 +199,7 @@ vi.mock("@/stores/ui/uiStore", () => {
 // Test Suite
 // ============================================================================
 
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuth } from "../../../hooks/auth/useAuth";
 
 describe("MainLayout (Full Alias Standardization)", () => {
   let queryClient: QueryClient;

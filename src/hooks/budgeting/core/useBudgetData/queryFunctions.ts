@@ -5,7 +5,7 @@
 
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger.ts";
-import type { Bill as DexieBill } from "@/db/types";
+import type { Bill as DexieBill, PaycheckHistory } from "@/db/types";
 
 interface TransactionFilters {
   dateRange?: {
@@ -13,6 +13,16 @@ interface TransactionFilters {
     end: Date;
   };
   envelopeId?: string;
+}
+
+interface LegacyTable<T = Record<string, unknown>> {
+  toArray: () => Promise<T[]>;
+}
+
+interface LegacyBudgetDb {
+  bills: LegacyTable;
+  savingsGoals: LegacyTable;
+  paycheckHistory: LegacyTable<PaycheckHistory>;
 }
 
 export const queryFunctions = {
@@ -40,24 +50,30 @@ export const queryFunctions = {
   },
 
   bills: async () => {
-    const cachedBills = await budgetDb.bills.toArray();
+    const cachedBills = await (budgetDb as unknown as LegacyBudgetDb).bills.toArray();
     return cachedBills || [];
   },
 
   savingsGoals: async () => {
-    const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
+    const cachedSavingsGoals = await (budgetDb as unknown as LegacyBudgetDb).savingsGoals.toArray();
     return cachedSavingsGoals || [];
   },
 
   paycheckHistory: async () => {
     try {
       // Fetch all paychecks and sort by date/processedAt
-      const cachedPaychecks = await budgetDb.paycheckHistory.toArray();
+      const cachedPaychecks = await (
+        budgetDb as unknown as LegacyBudgetDb
+      ).paycheckHistory.toArray();
 
       // Sort by processedAt (preferred) or date (legacy), most recent first
       const sorted = cachedPaychecks.sort((a, b) => {
-        const dateA = new Date(a.processedAt || a.date || 0).getTime();
-        const dateB = new Date(b.processedAt || b.date || 0).getTime();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pA = a as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pB = b as any;
+        const dateA = new Date(Number(pA.processedAt) || Number(pA.date) || 0).getTime();
+        const dateB = new Date(Number(pB.processedAt) || Number(pB.date) || 0).getTime();
         return dateB - dateA; // Descending order (newest first)
       });
 
@@ -76,8 +92,8 @@ export const queryFunctions = {
 
     // Fetch data from Dexie instead of undefined variables
     const cachedEnvelopes = await budgetDb.envelopes.toArray();
-    const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
-    const cachedBills = await budgetDb.bills.toArray();
+    const cachedSavingsGoals = await (budgetDb as unknown as LegacyBudgetDb).savingsGoals.toArray();
+    const cachedBills = await (budgetDb as unknown as LegacyBudgetDb).bills.toArray();
     const cachedTransactions = await budgetDb.transactions
       .orderBy("date")
       .reverse()
@@ -91,14 +107,17 @@ export const queryFunctions = {
     const safeTransactions = Array.isArray(cachedTransactions) ? cachedTransactions : [];
 
     const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
-      const balance = parseFloat(env?.currentBalance as string | number | undefined as string) || 0;
+      const balance = Number(env?.currentBalance) || 0;
       return sum + (isNaN(balance) ? 0 : balance);
     }, 0);
 
-    const totalSavingsBalance = safeSavingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat(goal?.currentAmount as string | number | undefined as string) || 0;
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
+    const totalSavingsBalance = safeSavingsGoals.reduce(
+      (sum: number, goal: Record<string, unknown>) => {
+        const amount = Number(goal?.currentAmount) || 0;
+        return sum + (isNaN(amount) ? 0 : amount);
+      },
+      0
+    );
 
     // Ensure all values are numbers, not NaN
     const unassignedCashValue =
@@ -113,6 +132,7 @@ export const queryFunctions = {
       actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
       recentTransactions: safeTransactions.slice(0, 10),
       upcomingBills: (safeBills as DexieBill[]).filter((bill) => {
+        if (!bill.dueDate) return false;
         const dueDate = new Date(bill.dueDate);
         const thirtyDaysFromNow = new Date();
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
