@@ -5,7 +5,6 @@
 
 export interface PaycheckEntry {
   date?: Date | string;
-  processedAt?: Date | string;
   [key: string]: unknown;
 }
 
@@ -35,7 +34,7 @@ export const predictNextPayday = (paycheckHistory: PaycheckEntry[]): PaydayPredi
 
   // Helper to get date from either processedAt or date field
   const getPaycheckDate = (paycheck: PaycheckEntry): Date => {
-    return new Date(paycheck.processedAt || paycheck.date || 0);
+    return new Date(paycheck.date || 0);
   };
 
   // Sort paychecks by date (most recent first)

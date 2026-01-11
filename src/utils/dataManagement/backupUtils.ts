@@ -2,9 +2,6 @@ import { budgetDb, getBudgetMetadata } from "../../db/budgetDb.ts";
 import logger from "../common/logger";
 import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
 import { validateTransactionSafe } from "@/domain/schemas/transaction";
-import { validateBillSafe } from "@/domain/schemas/bill";
-import { validateDebtSafe } from "@/domain/schemas/debt";
-import { validatePaycheckHistorySafe } from "@/domain/schemas/paycheck-history";
 
 /**
  * Maximum number of warnings to include in logs to avoid log bloat
@@ -14,7 +11,7 @@ const MAX_WARNINGS_IN_LOG = 10;
 /**
  * Type for backup data keys that can be validated
  */
-type BackupDataKey = "envelopes" | "transactions" | "bills" | "debts" | "paycheckHistory";
+type BackupDataKey = "envelopes" | "transactions";
 
 /**
  * Validation result for backup data
@@ -59,24 +56,19 @@ const validateItems = (
 };
 
 /**
- * Validate backup data structure before saving (Issue #1342)
- * Validates all data types with Zod schemas
+ * Validate backup data structure before saving
  */
 export const validateBackupStructure = (data: {
   envelopes?: unknown[];
   transactions?: unknown[];
-  bills?: unknown[];
-  debts?: unknown[];
-  paycheckHistory?: unknown[];
 }): BackupValidationResult => {
   const result: BackupValidationResult = {
     isValid: true,
-    validCounts: { envelopes: 0, transactions: 0, bills: 0, debts: 0, paycheckHistory: 0 },
-    invalidCounts: { envelopes: 0, transactions: 0, bills: 0, debts: 0, paycheckHistory: 0 },
+    validCounts: { envelopes: 0, transactions: 0 },
+    invalidCounts: { envelopes: 0, transactions: 0 },
     warnings: [],
   };
 
-  // Validate each data type
   const envelopeResult = validateItems(data.envelopes, validateEnvelopeSafe, "envelope");
   result.validCounts.envelopes = envelopeResult.valid;
   result.invalidCounts.envelopes = envelopeResult.invalid;
@@ -91,26 +83,6 @@ export const validateBackupStructure = (data: {
   result.invalidCounts.transactions = transactionResult.invalid;
   result.warnings.push(...transactionResult.warnings);
 
-  const billResult = validateItems(data.bills, validateBillSafe, "bill");
-  result.validCounts.bills = billResult.valid;
-  result.invalidCounts.bills = billResult.invalid;
-  result.warnings.push(...billResult.warnings);
-
-  const debtResult = validateItems(data.debts, validateDebtSafe, "debt");
-  result.validCounts.debts = debtResult.valid;
-  result.invalidCounts.debts = debtResult.invalid;
-  result.warnings.push(...debtResult.warnings);
-
-  const paycheckResult = validateItems(
-    data.paycheckHistory,
-    validatePaycheckHistorySafe,
-    "paycheck history"
-  );
-  result.validCounts.paycheckHistory = paycheckResult.valid;
-  result.invalidCounts.paycheckHistory = paycheckResult.invalid;
-  result.warnings.push(...paycheckResult.warnings);
-
-  // Mark as invalid if any items failed validation
   const totalInvalid = Object.values(result.invalidCounts).reduce((sum, count) => sum + count, 0);
   result.isValid = totalInvalid === 0;
 
@@ -119,37 +91,31 @@ export const validateBackupStructure = (data: {
 
 /**
  * Create a backup of current data (v2.0 data model)
- * All savings goals and supplemental accounts are stored as envelopes with envelopeType
- * Validates backup structure before saving (Issue #1342)
  */
 export const backupCurrentData = async () => {
   try {
     logger.info("Creating backup of current data");
-    const [envelopes, bills, transactions, debts, paycheckHistory, auditLog, metadata] =
-      await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.debts.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-        budgetDb.auditLog.toArray(),
-        getBudgetMetadata(),
-      ]);
+    const [envelopes, transactions, auditLog, metadata] = await Promise.all([
+      budgetDb.envelopes.toArray(),
+      budgetDb.transactions.toArray(),
+      budgetDb.auditLog.toArray(),
+      getBudgetMetadata(),
+    ]);
 
     const currentData = {
       envelopes,
-      bills,
       transactions,
-      debts,
-      paycheckHistory,
       auditLog,
       unassignedCash: metadata?.unassignedCash || 0,
       biweeklyAllocation: metadata?.biweeklyAllocation || 0,
       actualBalance: metadata?.actualBalance || 0,
       isActualBalanceManual: metadata?.isActualBalanceManual || false,
+      // Deprecated fields kept for compatibility during v2.0 transition period if needed
+      bills: [],
+      debts: [],
+      paycheckHistory: [],
     };
 
-    // Validate backup structure before saving (Issue #1342)
     const validation = validateBackupStructure(currentData);
     if (!validation.isValid) {
       logger.warn("⚠️ Backup data contains invalid items", {

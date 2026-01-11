@@ -62,7 +62,7 @@ export const useTransactionImportProcessing = (_currentUser: { userName?: string
 
       // Clear transactions and paycheck history
       await budgetDb.transactions.clear();
-      await budgetDb.paycheckHistory.clear();
+      // await budgetDb.paycheckHistory.clear(); // Deprecated
 
       // Reset budget metadata balances
       const { setBudgetMetadata } = await import("@/db/budgetDb");

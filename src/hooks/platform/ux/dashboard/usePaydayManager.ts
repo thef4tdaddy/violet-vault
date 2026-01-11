@@ -14,11 +14,13 @@ export const usePaydayManager = (
 ) => {
   const normalizedHistory = useMemo<PaycheckEntry[]>(
     () =>
-      paycheckHistory.map((entry) => ({
-        ...entry,
-        date: entry.date ?? entry.processedAt,
-        processedAt: entry.processedAt ?? entry.date,
-      })),
+      paycheckHistory.map(
+        (entry) =>
+          ({
+            ...entry,
+            date: entry.date,
+          }) as PaycheckEntry
+      ),
     [paycheckHistory]
   );
 

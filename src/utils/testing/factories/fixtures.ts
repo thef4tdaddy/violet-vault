@@ -61,19 +61,16 @@ export const standardBills: Bill[] = [
     name: "Electric Bill",
     amount: 150,
     category: "utilities",
-    frequency: "monthly",
   }),
   createRecurringBill({
     name: "Internet",
     amount: 79.99,
     category: "utilities",
-    frequency: "monthly",
   }),
   createRecurringBill({
     name: "Netflix",
     amount: 15.99,
     category: "subscriptions",
-    frequency: "monthly",
   }),
   createBill({
     name: "Car Insurance",

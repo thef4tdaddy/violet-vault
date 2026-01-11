@@ -3,8 +3,9 @@
  * Handles paycheck calculations, allocations, and validation
  */
 
-import { ENVELOPE_TYPES } from "../../constants/categories";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import type { Envelope as DbEnvelope, Transaction as DbTransaction } from "@/db/types";
 
 /**
  * Paycheck form data interface
@@ -40,27 +41,12 @@ export interface PaycheckPrediction {
 /**
  * Historical paycheck record
  */
-interface PaycheckRecord {
-  payerName?: string;
-  amount: number;
-  processedAt?: string | Date;
-}
+type PaycheckRecord = DbTransaction;
 
 /**
  * Envelope interface for allocations
  */
-export interface Envelope {
-  id: string;
-  name: string;
-  autoAllocate?: boolean;
-  envelopeType?: string;
-  monthlyAmount?: number;
-  priority?: string;
-  currentBalance?: number;
-  biweeklyAllocation?: number;
-  category?: string;
-  [key: string]: unknown;
-}
+export type Envelope = DbEnvelope;
 
 /**
  * Allocation result
@@ -170,6 +156,48 @@ export const validatePaycheckForm = (formData: PaycheckFormData): ValidationResu
 };
 
 /**
+ * Resolves the envelope type for logic (bill vs variable)
+ */
+const resolveEnvelopeType = (envelope: Envelope): string => {
+  if (envelope.type !== "standard") {
+    if (envelope.type === "goal") return ENVELOPE_TYPES.SAVINGS;
+    if (envelope.type === "liability") return ENVELOPE_TYPES.BILL;
+    return envelope.type;
+  }
+  return AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+};
+
+/**
+ * Resolves the monthly budget amount across envelope types
+ */
+const resolveMonthlyBudget = (envelope: Envelope): number => {
+  if (envelope.type === "standard") {
+    return envelope.monthlyBudget || 0;
+  }
+  if (envelope.type === "goal") {
+    return envelope.monthlyContribution || envelope.targetAmount || 0;
+  }
+
+  if (
+    [
+      "liability",
+      "bill",
+      "personal",
+      "credit_card",
+      "mortgage",
+      "auto",
+      "student",
+      "business",
+    ].includes(envelope.type)
+  ) {
+    const liability = envelope as unknown as { amount?: number; minimumPayment?: number };
+    return liability.amount || liability.minimumPayment || 0;
+  }
+
+  return 0;
+};
+
+/**
  * Gets smart prediction for a specific payer based on history
  * @param {string} payer - Payer name
  * @param {Array} paycheckHistory - Historical paycheck data
@@ -260,7 +288,9 @@ export const calculateEnvelopeAllocations = (
   const amount = parseFloat(String(paycheckAmount));
   const allocatableEnvelopes = envelopes.filter(
     (env) =>
-      env.autoAllocate && env.envelopeType !== ENVELOPE_TYPES.SAVINGS && env.id !== "unassigned"
+      env.autoAllocate &&
+      resolveEnvelopeType(env) !== ENVELOPE_TYPES.SAVINGS &&
+      env.id !== "unassigned"
   );
 
   if (allocatableEnvelopes.length === 0) {
@@ -278,10 +308,8 @@ export const calculateEnvelopeAllocations = (
   if (allocationMode === "allocate") {
     // Baseline allocation using biweekly conversion
     const baseline = allocatableEnvelopes.map((envelope) => {
-      const biweeklyNeed =
-        typeof envelope.monthlyAmount === "number"
-          ? Math.round((envelope.monthlyAmount / BIWEEKLY_MULTIPLIER) * 100) / 100
-          : 0;
+      const monthlyBudget = resolveMonthlyBudget(envelope);
+      const biweeklyNeed = Math.round((monthlyBudget / BIWEEKLY_MULTIPLIER) * 100) / 100;
 
       return {
         envelope,
@@ -308,36 +336,38 @@ export const calculateEnvelopeAllocations = (
       allocationAmount = Math.round(allocationAmount * 100) / 100;
 
       if (allocationAmount > 0) {
+        const monthlyBudget = resolveMonthlyBudget(envelope);
         allocations.push({
           envelopeId: envelope.id,
           envelopeName: envelope.name,
           amount: allocationAmount,
-          monthlyAmount: envelope.monthlyAmount || 0,
-          envelopeType: envelope.envelopeType || "variable",
-          priority: envelope.priority || "medium",
+          monthlyAmount: monthlyBudget,
+          envelopeType: resolveEnvelopeType(envelope),
+          priority: ((envelope as Record<string, unknown>).priority as string) || "medium",
         });
         totalAllocated += allocationAmount;
       }
     });
   } else if (allocationMode === "leftover") {
     const totalMonthlyNeeds = allocatableEnvelopes.reduce(
-      (sum, env) => sum + (env.monthlyAmount || 0),
+      (sum, env) => sum + resolveMonthlyBudget(env),
       0
     );
 
     if (totalMonthlyNeeds > 0) {
       allocatableEnvelopes.forEach((envelope) => {
-        if ((envelope.monthlyAmount || 0) > 0) {
-          const proportion = (envelope.monthlyAmount || 0) / totalMonthlyNeeds;
+        const monthlyBudget = resolveMonthlyBudget(envelope);
+        if (monthlyBudget > 0) {
+          const proportion = monthlyBudget / totalMonthlyNeeds;
           const allocationAmount = Math.round(amount * proportion * 100) / 100;
 
           allocations.push({
             envelopeId: envelope.id,
             envelopeName: envelope.name,
             amount: allocationAmount,
-            monthlyAmount: envelope.monthlyAmount || 0,
-            envelopeType: envelope.envelopeType || "variable",
-            priority: envelope.priority || "medium",
+            monthlyAmount: monthlyBudget,
+            envelopeType: resolveEnvelopeType(envelope),
+            priority: ((envelope as Record<string, unknown>).priority as string) || "medium",
           });
           totalAllocated += allocationAmount;
         }
@@ -464,6 +494,6 @@ export const getPaycheckStatistics = (
     averageAmount: totalAmount / filteredHistory.length,
     minAmount: Math.min(...amounts),
     maxAmount: Math.max(...amounts),
-    lastPaycheckDate: (filteredHistory[0]?.processedAt || null) as string | Date | null,
+    lastPaycheckDate: (filteredHistory[0]?.date || null) as string | Date | null,
   } as PaycheckStatistics;
 };

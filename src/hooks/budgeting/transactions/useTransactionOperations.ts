@@ -62,6 +62,7 @@ export const useTransactionOperations = () => {
         description: data.description,
         createdAt: Date.now(),
         lastModified: Date.now(),
+        isScheduled: false,
       };
 
       const validated = validateAndNormalizeTransaction(normalizeTransactionAmount(raw));
@@ -129,6 +130,7 @@ export const useTransactionOperations = () => {
           envelopeId: split.envelopeId || original.envelopeId,
           category: split.category || original.category,
           type: original.type,
+          isScheduled: (original as Transaction).isScheduled ?? false,
           lastModified: Date.now(),
         };
         await budgetDb.transactions.put(s);

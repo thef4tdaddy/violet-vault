@@ -1,19 +1,27 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { processEnvelopes, calculateEnvelopeStats, getRepairUpdates } from "../filtering";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
-import { isValidEnvelopeType } from "@/utils/validation/envelopeValidation";
-import logger from "@/utils/common/logger";
-import { type DbEnvelope } from "@/db/types";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "../../../constants/categories";
+import { isValidEnvelopeType } from "../../validation/envelopeValidation";
+import logger from "../../common/logger";
+import { render, screen, waitFor } from "../../../test/test-utils";
+import "@testing-library/jest-dom";
 
-vi.mock("@/constants/categories", () => ({
-  AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((cat: string) => (cat === "savings" ? "savings" : "expenses")),
+vi.mock("../../../constants/categories", () => ({
+  AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((cat: string) => (cat === "Savings" ? "goal" : "standard")),
+  ENVELOPE_TYPES: {
+    BILL: "bill",
+    VARIABLE: "standard",
+    SAVINGS: "goal",
+    SINKING_FUND: "sinking_fund",
+    SUPPLEMENTAL: "supplemental",
+  },
 }));
 
-vi.mock("@/utils/validation/envelopeValidation", () => ({
-  isValidEnvelopeType: vi.fn((type: string) => type === "savings" || type === "expenses"),
+vi.mock("../../validation/envelopeValidation", () => ({
+  isValidEnvelopeType: vi.fn((type: string) => ["goal", "standard", "bill"].includes(type)),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../common/logger", () => ({
   default: {
     warn: vi.fn(),
     info: vi.fn(),
@@ -29,7 +37,7 @@ describe("budgeting filtering utilities", () => {
       category: "expenses",
       currentBalance: 100,
       targetAmount: 200,
-      envelopeType: "expenses",
+      type: "standard",
       archived: false,
     },
     {
@@ -38,7 +46,7 @@ describe("budgeting filtering utilities", () => {
       category: "savings",
       currentBalance: 500,
       targetAmount: 1000,
-      envelopeType: "savings",
+      type: "goal",
       archived: false,
     },
     {
@@ -47,7 +55,7 @@ describe("budgeting filtering utilities", () => {
       category: "savings",
       currentBalance: 200,
       targetAmount: 200,
-      envelopeType: "savings",
+      type: "goal",
       archived: true,
     },
   ];
@@ -75,13 +83,13 @@ describe("budgeting filtering utilities", () => {
     });
 
     it("should filter by envelope types", () => {
-      const result = processEnvelopes(mockEnvelopes as any, { envelopeTypes: ["savings"] });
+      const result = processEnvelopes(mockEnvelopes as any, { envelopeTypes: ["goal"] });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("2");
     });
 
     it("should exclude envelope types", () => {
-      const result = processEnvelopes(mockEnvelopes as any, { excludeEnvelopeTypes: ["expenses"] });
+      const result = processEnvelopes(mockEnvelopes as any, { excludeEnvelopeTypes: ["standard"] });
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("2");
     });
@@ -103,12 +111,12 @@ describe("budgeting filtering utilities", () => {
 
     it("should auto-classify envelopes with invalid types", () => {
       const corrupted = [
-        { id: "corrupt", name: "Bad", category: "expenses", envelopeType: "invalid" },
+        { id: "corrupt", name: "Bad", category: "General", envelopeType: "invalid" },
       ];
       (isValidEnvelopeType as any).mockReturnValue(false);
       const result = processEnvelopes(corrupted as any, {});
-      expect(AUTO_CLASSIFY_ENVELOPE_TYPE).toHaveBeenCalledWith("expenses");
-      expect(result[0].envelopeType).toBe("expenses");
+      expect(AUTO_CLASSIFY_ENVELOPE_TYPE).toHaveBeenCalledWith("General");
+      expect(result[0].type).toBe("standard");
     });
 
     it("should log warnings for corrupted envelopes missing name or category", () => {
@@ -135,11 +143,11 @@ describe("budgeting filtering utilities", () => {
 
   describe("getRepairUpdates", () => {
     it("should return valid repair updates", () => {
-      const updates = getRepairUpdates("Repaired", "utilities");
+      const updates = getRepairUpdates("Repaired", "Housing");
       expect(updates.name).toBe("Repaired");
-      expect(updates.category).toBe("utilities");
+      expect(updates.category).toBe("Housing");
       expect(updates.targetAmount).toBe(100);
-      expect(updates.envelopeType).toBe("expenses");
+      expect(updates.envelopeType).toBe("standard");
     });
   });
 });

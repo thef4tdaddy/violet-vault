@@ -12,7 +12,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDb } from "../../../../../db/budgetDb";
 import {
   DebtSchema,
   DebtPartialSchema,
@@ -24,7 +24,7 @@ import {
   validateDebtPartial,
   validateDebtPartialSafe,
   validateDebtFormDataSafe,
-} from "@/domain/schemas/debt";
+} from "../../../../../domain/schemas/debt";
 
 // Mock dependencies
 vi.mock("@tanstack/react-query", async (importOriginal) => {
@@ -37,31 +37,23 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   };
 });
 
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../../../db/budgetDb", () => ({
   budgetDb: {
-    debts: {
+    envelopes: {
       get: vi.fn(),
       put: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       toArray: vi.fn(),
-    },
-    envelopes: {
-      get: vi.fn(),
-    },
-    bills: {
-      get: vi.fn(),
-      update: vi.fn(),
-      where: vi.fn(() => ({
-        equals: vi.fn(() => ({
-          toArray: vi.fn().mockResolvedValue([]),
-        })),
-      })),
+      where: vi.fn().mockReturnValue({
+        equals: vi.fn().mockReturnThis(),
+        toArray: vi.fn(),
+      }),
     },
   },
 }));
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("../../../../../utils/common/queryClient", () => ({
   queryKeys: {
     debts: ["debts"],
     debtsList: () => ["debts", "list"],
@@ -77,7 +69,7 @@ vi.mock("@/utils/common/queryClient", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../../../utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -86,7 +78,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/common/budgetHistoryTracker", () => ({
+vi.mock("../../../../../utils/common/budgetHistoryTracker", () => ({
   default: {
     trackDebtChange: vi.fn().mockResolvedValue(undefined),
   },
@@ -116,12 +108,10 @@ describe("Debt CRUD Validation Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-    (budgetDb.debts.get as Mock).mockResolvedValue(validDebt);
-    (budgetDb.debts.put as Mock).mockResolvedValue(undefined);
-    (budgetDb.debts.update as Mock).mockResolvedValue(1);
-    (budgetDb.debts.delete as Mock).mockResolvedValue(undefined);
-    (budgetDb.envelopes.get as Mock).mockResolvedValue(undefined);
-    (budgetDb.bills.get as Mock).mockResolvedValue(undefined);
+    (budgetDb.envelopes.get as Mock).mockResolvedValue(validDebt);
+    (budgetDb.envelopes.put as Mock).mockResolvedValue(undefined);
+    (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
+    (budgetDb.envelopes.delete as Mock).mockResolvedValue(undefined);
   });
 
   describe("DebtTypeSchema Validation", () => {
@@ -151,7 +141,7 @@ describe("Debt CRUD Validation Tests", () => {
 
   describe("DebtStatusSchema Validation", () => {
     it("should validate all valid debt statuses", () => {
-      const validStatuses = ["active", "paid_off", "deferred", "default"];
+      const validStatuses = ["active", "paid", "closed", "defaulted"];
 
       validStatuses.forEach((status) => {
         expect(DebtStatusSchema.parse(status)).toBe(status);
@@ -787,11 +777,11 @@ describe("Debt CRUD Validation Tests", () => {
     });
 
     it("should update debt status to paid_off when balance reaches zero", () => {
-      const paidOffDebt = { ...validDebt, currentBalance: 0, status: "paid_off" as const };
+      const paidOffDebt = { ...validDebt, currentBalance: 0, status: "paid" as const };
       const result = DebtSchema.safeParse(paidOffDebt);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.status).toBe("paid_off");
+        expect(result.data.status).toBe("paid");
       }
     });
   });
@@ -819,7 +809,7 @@ describe("Debt CRUD Validation Tests", () => {
       const result = DebtSchema.safeParse(invalidDebt);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const nameError = result.error.issues.find((issue) => issue.path.includes("name"));
+        const nameError = result.error.issues.find((issue: any) => issue.path.includes("name"));
         expect(nameError).toBeDefined();
       }
     });
@@ -848,7 +838,7 @@ describe("Debt CRUD Validation Tests", () => {
 
   describe("Query Invalidation Patterns", () => {
     it("should define proper query keys for debt operations", async () => {
-      const { queryKeys } = await import("@/utils/common/queryClient");
+      const { queryKeys } = await import("../../../../../utils/common/queryClient");
       expect(queryKeys.debts).toBeDefined();
       expect(queryKeys.debtsList).toBeDefined();
       expect(queryKeys.dashboard).toBeDefined();

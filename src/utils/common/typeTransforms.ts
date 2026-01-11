@@ -12,9 +12,9 @@ export const transformEnvelopeFromDB = (
   category: dbEnv.category,
   currentBalance: dbEnv.currentBalance ?? 0,
   targetAmount: dbEnv.targetAmount ?? 0,
-  color: undefined, // Not in DB schema yet
+  color: dbEnv.color,
   icon: undefined, // Not in DB schema yet
-  description: dbEnv.description,
+  description: dbEnv.description ?? undefined,
   createdAt: dbEnv.createdAt ? new Date(dbEnv.createdAt).toISOString() : undefined,
   updatedAt: undefined, // DB uses lastModified
   lastActivity: undefined,
@@ -26,7 +26,9 @@ export const transformTransactionFromDB = (
   dbTx: import("@/db/types").Transaction
 ): import("@/types/finance").Transaction => ({
   id: dbTx.id,
-  date: dbTx.date.toISOString().split("T")[0], // Convert Date to YYYY-MM-DD string
+  date: (typeof dbTx.date === "string" ? new Date(dbTx.date) : dbTx.date)
+    .toISOString()
+    .split("T")[0], // Convert Date to YYYY-MM-DD string
   description: dbTx.description ?? "",
   amount: dbTx.amount,
   category: dbTx.category,

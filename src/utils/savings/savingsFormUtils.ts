@@ -1,9 +1,10 @@
 // Savings Goal Form Utilities - Constants and validation for savings goals
+import { z } from "zod";
 import logger from "@/utils/common/logger";
 import {
   validateSavingsGoalFormSafe,
   type SavingsGoalFormData,
-} from "@/domain/schemas/savings-goal";
+} from "@/domain/schemas/savingsGoal";
 
 // Savings goal categories
 export const SAVINGS_CATEGORIES = [
@@ -104,7 +105,7 @@ export const validateSavingsGoalForm = (formData: unknown): string[] => {
   }
 
   const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
-  return issues.map((err) => err?.message || "Validation error");
+  return issues.map((err: z.ZodIssue) => err?.message || "Validation error");
 };
 
 /**
@@ -122,7 +123,9 @@ export const processSavingsGoalFormData = (
       throw new Error("Validation failed: Invalid error structure");
     }
     const issues = Array.isArray(result.error.issues) ? result.error.issues : [];
-    const errorMessages = issues.map((e) => e?.message || "Validation error").join(", ");
+    const errorMessages = issues
+      .map((e: z.ZodIssue) => e?.message || "Validation error")
+      .join(", ");
     throw new Error(`Validation failed: ${errorMessages}`);
   }
 
@@ -143,6 +146,10 @@ export const processSavingsGoalFormData = (
     createdAt: editingGoal?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
+  if (validatedData.targetDate) {
+    goalData.targetDate = validatedData.targetDate as string;
+  }
 
   return goalData;
 };

@@ -31,36 +31,29 @@ export const detectLocalData = async () => {
     logger.info("📊 Database stats:", JSON.parse(JSON.stringify(stats)));
 
     // 3. Calculate total data items
-    const totalItems =
-      stats.envelopes + stats.transactions + stats.bills + stats.savingsGoals + stats.paychecks;
+    const totalItems = stats.envelopes + stats.transactions;
 
-    // 4. Check for any core budget data (envelopes, transactions, bills)
-    const hasCoreData = stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
+    // 4. Check for any core budget data (envelopes, transactions)
+    const hasCoreData = stats.envelopes > 0 || stats.transactions > 0;
 
     // 5. Sample actual data to verify counts are accurate
     const sampleData = await Promise.all([
       budgetDb.envelopes.limit(1).toArray(),
       budgetDb.transactions.limit(1).toArray(),
-      budgetDb.bills.limit(1).toArray(),
     ]);
 
     const actualEnvelopeSample = sampleData[0];
     const actualTransactionSample = sampleData[1];
-    const actualBillSample = sampleData[2];
 
     logger.info("🔍 Sample data verification:", {
       envelopesSample: actualEnvelopeSample.length,
       transactionsSample: actualTransactionSample.length,
-      billsSample: actualBillSample.length,
     });
 
     // 6. Comprehensive result
     const dataTypes: string[] = [];
     if (stats.envelopes > 0) dataTypes.push("envelopes");
     if (stats.transactions > 0) dataTypes.push("transactions");
-    if (stats.bills > 0) dataTypes.push("bills");
-    if (stats.savingsGoals > 0) dataTypes.push("savingsGoals");
-    if (stats.paychecks > 0) dataTypes.push("paychecks");
 
     const result = {
       hasData: hasCoreData,
@@ -74,7 +67,6 @@ export const detectLocalData = async () => {
         samplesFound: {
           envelopes: actualEnvelopeSample.length > 0,
           transactions: actualTransactionSample.length > 0,
-          bills: actualBillSample.length > 0,
         },
       },
       recommendation: hasCoreData
@@ -117,7 +109,7 @@ export const detectLocalData = async () => {
 export const hasLocalData = async (): Promise<boolean> => {
   try {
     const stats = await budgetDb.getDatabaseStats();
-    return stats.envelopes > 0 || stats.transactions > 0 || stats.bills > 0;
+    return stats.envelopes > 0 || stats.transactions > 0;
   } catch (error) {
     logger.warn("⚠️ Quick data check failed:", {
       message: error instanceof Error ? error.message : String(error),
