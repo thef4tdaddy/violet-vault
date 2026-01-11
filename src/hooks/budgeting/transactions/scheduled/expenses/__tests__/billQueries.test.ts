@@ -52,7 +52,7 @@ describe("Bill Query Hooks", () => {
           mockDataGenerators.bill({ id: "bill_1", name: "Electric Bill" }),
           mockDataGenerators.bill({ id: "bill_2", name: "Water Bill" }),
         ];
-        mockDb._mockData.bills = mockBills;
+        mockDb._mockData.envelopes = mockBills;
 
         // Act
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -63,12 +63,12 @@ describe("Bill Query Hooks", () => {
         });
 
         expect(result.current.data).toEqual(mockBills);
-        expect(mockDb.bills.toArray).toHaveBeenCalled();
+        expect(mockDb.envelopes.where).toHaveBeenCalled();
       });
 
       it("should return empty array when no bills exist", async () => {
         // Arrange
-        mockDb._mockData.bills = [];
+        mockDb._mockData.envelopes = [];
 
         // Act
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -83,7 +83,11 @@ describe("Bill Query Hooks", () => {
 
       it("should handle Dexie fetch errors gracefully", async () => {
         // Arrange
-        mockDb.bills.toArray.mockRejectedValue(new Error("Database error"));
+        mockDb.envelopes.where.mockReturnValue({
+          equals: vi.fn().mockImplementation(() => ({
+            toArray: vi.fn().mockRejectedValue(new Error("Database error")),
+          })),
+        });
 
         // Act
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -107,7 +111,7 @@ describe("Bill Query Hooks", () => {
       nextWeek.setDate(nextWeek.getDate() + 7);
 
       beforeEach(() => {
-        mockDb._mockData.bills = [
+        mockDb._mockData.envelopes = [
           mockDataGenerators.bill({
             id: "bill_1",
             name: "Overdue Bill",
@@ -189,7 +193,7 @@ describe("Bill Query Hooks", () => {
 
       it("should filter by category", async () => {
         // Arrange
-        mockDb._mockData.bills = [
+        mockDb._mockData.envelopes = [
           mockDataGenerators.bill({ id: "bill_1", category: "Utilities" }),
           mockDataGenerators.bill({ id: "bill_2", category: "Rent" }),
           mockDataGenerators.bill({ id: "bill_3", category: "Utilities" }),
@@ -211,7 +215,7 @@ describe("Bill Query Hooks", () => {
 
     describe("Sorting", () => {
       beforeEach(() => {
-        mockDb._mockData.bills = [
+        mockDb._mockData.envelopes = [
           mockDataGenerators.bill({
             id: "bill_1",
             name: "Zebra Bill",
@@ -291,7 +295,7 @@ describe("Bill Query Hooks", () => {
       it("should cache query results", async () => {
         // Arrange
         const mockBills = [mockDataGenerators.bill({ id: "bill_1" })];
-        mockDb._mockData.bills = mockBills;
+        mockDb._mockData.envelopes = mockBills;
 
         // Act - First render
         const { result, rerender } = renderHook(() => useBillsQuery(), { wrapper });
@@ -301,19 +305,19 @@ describe("Bill Query Hooks", () => {
         });
 
         // Clear the mock to verify cache is used
-        mockDb.bills.toArray.mockClear();
+        mockDb.envelopes.where.mockClear();
 
         // Act - Re-render
         rerender();
 
         // Assert - Should use cached data without calling Dexie again
-        expect(mockDb.bills.toArray).not.toHaveBeenCalled();
+        expect(mockDb.envelopes.where).not.toHaveBeenCalled();
         expect(result.current.data).toEqual(mockBills);
       });
 
       it("should use separate cache for different filter options", async () => {
         // Arrange
-        mockDb._mockData.bills = [
+        mockDb._mockData.envelopes = [
           mockDataGenerators.bill({ id: "bill_1", isPaid: true }),
           mockDataGenerators.bill({ id: "bill_2", isPaid: false }),
         ];
@@ -346,7 +350,7 @@ describe("Bill Query Hooks", () => {
       it("should respect staleTime configuration", async () => {
         // Arrange
         const mockBills = [mockDataGenerators.bill({ id: "bill_1" })];
-        mockDb._mockData.bills = mockBills;
+        mockDb._mockData.envelopes = mockBills;
 
         // Act - First fetch
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -364,7 +368,7 @@ describe("Bill Query Hooks", () => {
     describe("Query Invalidation", () => {
       it("should support manual refetch after data changes", async () => {
         // Arrange
-        mockDb._mockData.bills = [mockDataGenerators.bill({ id: "bill_1" })];
+        mockDb._mockData.envelopes = [mockDataGenerators.bill({ id: "bill_1" })];
 
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
 
@@ -375,7 +379,7 @@ describe("Bill Query Hooks", () => {
         expect(result.current.data?.length).toBe(1);
 
         // Modify mock data
-        mockDb._mockData.bills = [
+        mockDb._mockData.envelopes = [
           mockDataGenerators.bill({ id: "bill_1" }),
           mockDataGenerators.bill({ id: "bill_2" }),
         ];

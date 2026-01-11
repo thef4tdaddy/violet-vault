@@ -12,7 +12,6 @@ import {
   type EnvelopeRecord,
   type BillRecord,
 } from "@/hooks/budgeting/allocations/useUnassignedCashDistributionHelpers";
-import { ENVELOPE_TYPES } from "@/constants/categories";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
@@ -248,7 +247,7 @@ const EnvelopeItem = memo(
     bills = [],
   }: EnvelopeItemProps) => {
     const newBalance = (envelope.currentBalance || 0) + distributionAmount;
-    const isBillEnvelope = envelope.envelopeType === ENVELOPE_TYPES.BILL;
+    const isBillEnvelope = envelope.type === "liability";
 
     return (
       <div className="bg-white border rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -260,7 +259,7 @@ const EnvelopeItem = memo(
                 className="w-4 h-4 rounded-full mr-3 flex-shrink-0"
                 style={{ backgroundColor: envelope.color }}
               />
-              <div className="flex-1 min-w-0">
+              <div className="shrink-0">
                 <h5 className="font-medium text-gray-900 text-sm truncate">{envelope.name}</h5>
                 <p className="text-xs text-gray-600 truncate">
                   Current: ${(envelope.currentBalance || 0).toFixed(2)}

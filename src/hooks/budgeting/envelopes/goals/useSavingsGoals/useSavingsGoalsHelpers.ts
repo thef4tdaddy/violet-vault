@@ -6,7 +6,7 @@ import logger from "@/utils/common/logger";
 import type { ProcessedSavingsGoal } from "@/utils/savings/savingsCalculations";
 
 interface MutationHandler {
-  mutateAsync: (...args: never[]) => Promise<unknown>;
+  mutateAsync: <T = unknown>(variables: T) => Promise<unknown>;
   isPending?: boolean;
   isError?: boolean;
   error?: Error | null;
@@ -57,12 +57,12 @@ export const createSavingsGoalHelpers = (
   },
 
   // Distribute funds across multiple goals
-  distributeFunds: async (distribution: unknown, description: string) => {
+  distributeFunds: async (distribution: Record<string, number>, description: string = "") => {
     logger.debug("Distributing funds:", { distribution, description });
     return mutations.distributeFundsMutation.mutateAsync({
       distribution,
       description,
-    } as never);
+    });
   },
 
   // Find goal by ID

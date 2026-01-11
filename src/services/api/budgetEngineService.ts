@@ -20,7 +20,7 @@ export interface BudgetCalculationRequest {
   bills: Bill[];
 }
 
-export interface EnvelopeData extends Envelope {
+export type EnvelopeData = Envelope & {
   totalSpent: number;
   totalUpcoming: number;
   totalOverdue: number;
@@ -34,7 +34,7 @@ export interface EnvelopeData extends Envelope {
   transactions: Transaction[];
   bills: Bill[];
   biweeklyNeed: number;
-}
+};
 
 export interface GlobalTotals {
   totalAllocated: number;

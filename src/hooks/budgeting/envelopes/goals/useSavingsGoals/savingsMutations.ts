@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
-import type { SavingsGoal } from "@/db/types";
+import type { GoalEnvelope } from "@/db/types";
 
 // Helper to trigger sync for savings goal changes
 const triggerSavingsGoalSync = (changeType: string) => {
@@ -13,7 +13,7 @@ const triggerSavingsGoalSync = (changeType: string) => {
 };
 
 // Type for new goal data (without id, createdAt, lastModified which are auto-generated)
-type NewSavingsGoalData = Omit<SavingsGoal, "id" | "createdAt" | "lastModified">;
+type NewSavingsGoalData = Omit<GoalEnvelope, "id" | "createdAt" | "lastModified" | "type">;
 
 /**
  * Add savings goal mutation hook
@@ -24,12 +24,13 @@ export const useAddSavingsGoalMutation = () => {
   return useMutation({
     mutationKey: ["savingsGoals", "add"],
     mutationFn: async (goalData: NewSavingsGoalData) => {
-      const newGoal = {
+      const newGoal: GoalEnvelope = {
         id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: "goal" as const,
         ...goalData,
         createdAt: Date.now(),
         lastModified: Date.now(),
-      } as SavingsGoal;
+      } as GoalEnvelope;
 
       // Apply optimistic update first
       await optimisticHelpers.addSavingsGoal(newGoal);
@@ -81,18 +82,19 @@ export const useUpdateSavingsGoalMutation = () => {
 
   return useMutation({
     mutationKey: ["savingsGoals", "update"],
-    mutationFn: async ({ goalId, updates }: { goalId: string; updates: Partial<SavingsGoal> }) => {
-      const existingGoal = await budgetDb.savingsGoals.get(goalId);
+    mutationFn: async ({ goalId, updates }: { goalId: string; updates: Partial<GoalEnvelope> }) => {
+      const existingGoal = await budgetDb.envelopes.get(goalId);
       if (!existingGoal) {
         throw new Error(`Savings goal with ID ${goalId} not found`);
       }
 
-      const updatedGoal: SavingsGoal = {
+      const updatedGoal: GoalEnvelope = {
         ...existingGoal,
         ...updates,
         id: goalId, // Ensure ID stays the same
+        type: "goal",
         lastModified: Date.now(),
-      };
+      } as GoalEnvelope;
 
       // Apply optimistic update
       await optimisticHelpers.updateSavingsGoal(goalId, {
@@ -138,7 +140,7 @@ export const useDeleteSavingsGoalMutation = () => {
       await optimisticHelpers.deleteSavingsGoal(goalId);
 
       // Delete from Dexie (redundant as optimisticHelpers already does this)
-      // await budgetDb.savingsGoals.delete(goalId);
+      await budgetDb.envelopes.delete(goalId);
 
       return goalId;
     },
@@ -177,7 +179,7 @@ export const useAddContributionMutation = () => {
       amount: string | number;
       description?: string;
     }) => {
-      const goal = await budgetDb.savingsGoals.get(goalId);
+      const goal = (await budgetDb.envelopes.get(goalId)) as GoalEnvelope;
       if (!goal) {
         throw new Error(`Savings goal with ID ${goalId} not found`);
       }
@@ -189,17 +191,17 @@ export const useAddContributionMutation = () => {
 
       const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
-      const updatedGoal: SavingsGoal = {
+      const updatedGoal: GoalEnvelope = {
         ...goal,
         currentAmount: updatedCurrentAmount,
         lastModified: Date.now(),
-      };
+      } as GoalEnvelope;
 
       // Apply optimistic update
       await optimisticHelpers.updateSavingsGoal(goalId, updatedGoal);
 
       // Update in Dexie
-      await budgetDb.savingsGoals.update(goalId, updatedGoal);
+      await budgetDb.envelopes.update(goalId, updatedGoal);
 
       // Create transaction record for the contribution
       const contributionTransaction = {
@@ -212,6 +214,7 @@ export const useAddContributionMutation = () => {
         type: "expense" as const,
         lastModified: Date.now(),
         createdAt: Date.now(),
+        isScheduled: false,
       };
 
       // Add transaction to Dexie
@@ -271,7 +274,7 @@ export const useDistributeFundsMutation = () => {
         const contributionAmount = typeof amount === "string" ? parseFloat(amount) : amount;
         if (contributionAmount <= 0) continue;
 
-        const goal = await budgetDb.savingsGoals.get(goalId);
+        const goal = (await budgetDb.envelopes.get(goalId)) as GoalEnvelope;
         if (!goal) {
           logger.warn(`Savings goal ${goalId} not found during distribution`);
           continue;
@@ -279,17 +282,17 @@ export const useDistributeFundsMutation = () => {
 
         const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
-        const updatedGoal: SavingsGoal = {
+        const updatedGoal: GoalEnvelope = {
           ...goal,
           currentAmount: updatedCurrentAmount,
           lastModified: Date.now(),
-        };
+        } as GoalEnvelope;
 
         // Apply optimistic update
         await optimisticHelpers.updateSavingsGoal(goalId, updatedGoal);
 
         // Update in Dexie
-        await budgetDb.savingsGoals.update(goalId, updatedGoal);
+        await budgetDb.envelopes.update(goalId, updatedGoal);
 
         // Create transaction record
         const contributionTransaction = {
@@ -302,6 +305,7 @@ export const useDistributeFundsMutation = () => {
           type: "expense" as const,
           lastModified: Date.now(),
           createdAt: Date.now(),
+          isScheduled: false,
         };
 
         await budgetDb.transactions.put(contributionTransaction);

@@ -24,12 +24,13 @@ vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       get: vi.fn(),
-      put: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
+      add: vi.fn().mockResolvedValue("new-id"),
+      put: vi.fn().mockResolvedValue("new-id"),
+      update: vi.fn().mockResolvedValue(1),
+      delete: vi.fn().mockResolvedValue(undefined),
       where: vi.fn(() => ({
         equals: vi.fn(() => ({
-          toArray: vi.fn(),
+          toArray: vi.fn().mockResolvedValue([]),
         })),
       })),
     },
@@ -327,7 +328,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         expect(result.envelopeId).toBe("env-1");
       });
 
-      expect(budgetDb.bills.add).toHaveBeenCalledWith(
+      expect(budgetDb.envelopes.add).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1",
         })

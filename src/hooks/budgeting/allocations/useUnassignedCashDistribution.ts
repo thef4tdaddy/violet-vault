@@ -20,10 +20,10 @@ import {
 type Distributions = Record<string, number>;
 
 // Type for distribution preview item
-export interface DistributionPreviewItem extends EnvelopeRecord {
+export type DistributionPreviewItem = EnvelopeRecord & {
   distributionAmount: number;
   newBalance: number;
-}
+};
 
 /**
  * Custom hook for managing unassigned cash distribution logic
@@ -91,7 +91,9 @@ const useUnassignedCashDistribution = () => {
   const distributeBillPriority = useCallback(() => {
     if (envelopeList.length === 0) return;
     const billEnvelopes = envelopeList.filter((envelope) => {
-      const type = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      const type =
+        (envelope as unknown as Record<string, string>).envelopeType ||
+        AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
       return type === ENVELOPE_TYPES.BILL;
     });
     if (billEnvelopes.length === 0) return;

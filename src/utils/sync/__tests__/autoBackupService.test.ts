@@ -6,11 +6,65 @@
 
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
+// Use vi.hoisted for variables needed by vi.mock
+const { mockEnvelopes } = vi.hoisted(() => ({
+  mockEnvelopes: [
+    {
+      id: "env-1",
+      name: "Groceries",
+      category: "Food",
+      archived: false,
+      lastModified: Date.now(),
+      currentBalance: 500,
+      type: "standard",
+    },
+    {
+      id: "env-2",
+      name: "Vacation Fund",
+      category: "Savings",
+      archived: false,
+      lastModified: Date.now(),
+      type: "goal",
+      targetAmount: 5000,
+      currentBalance: 1500,
+      priority: "high",
+      isPaused: false,
+      isCompleted: false,
+    },
+    {
+      id: "env-3",
+      name: "FSA Account",
+      category: "Health",
+      archived: false,
+      lastModified: Date.now(),
+      type: "supplemental",
+      accountType: "FSA",
+      annualContribution: 2850,
+      isActive: true,
+    },
+  ],
+}));
+
 // Mock Dexie and database before importing the service
 vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
-      toArray: vi.fn(),
+      get: vi.fn(async (id: string) => mockEnvelopes.find((e: any) => e.id === id)),
+      toArray: vi.fn(async () => mockEnvelopes),
+      toCollection: vi.fn().mockImplementation(() => ({
+        filter: vi.fn().mockImplementation((fn: any) => ({
+          count: vi.fn(async () => mockEnvelopes.filter(fn).length),
+          toArray: vi.fn(async () => mockEnvelopes.filter(fn)),
+        })),
+      })),
+      where: vi.fn().mockImplementation((key: string) => ({
+        equals: vi.fn().mockImplementation((val: any) => ({
+          count: vi.fn(
+            async () => mockEnvelopes.filter((e: any) => (e as any)[key] === val).length
+          ),
+          toArray: vi.fn(async () => mockEnvelopes.filter((e: any) => (e as any)[key] === val)),
+        })),
+      })),
       clear: vi.fn(),
       bulkAdd: vi.fn(),
     },
@@ -19,17 +73,7 @@ vi.mock("../../../db/budgetDb", () => ({
       clear: vi.fn(),
       bulkAdd: vi.fn(),
     },
-    bills: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-      bulkAdd: vi.fn(),
-    },
-    debts: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-      bulkAdd: vi.fn(),
-    },
-    paycheckHistory: {
+    auditLog: {
       toArray: vi.fn(),
       clear: vi.fn(),
       bulkAdd: vi.fn(),
@@ -46,7 +90,7 @@ vi.mock("../../../db/budgetDb", () => ({
       delete: vi.fn(),
       clear: vi.fn(),
     },
-    transaction: vi.fn(),
+    transaction: vi.fn(() => Promise.resolve()),
   },
 }));
 
@@ -55,46 +99,11 @@ import autoBackupService from "../autoBackupService";
 import { budgetDb } from "../../../db/budgetDb";
 
 describe("AutoBackupService (v2.0 data model)", () => {
-  const mockEnvelopes = [
-    {
-      id: "env-1",
-      name: "Groceries",
-      category: "Food",
-      archived: false,
-      lastModified: Date.now(),
-      currentBalance: 500,
-    },
-    {
-      id: "env-2",
-      name: "Vacation Fund",
-      category: "Savings",
-      archived: false,
-      lastModified: Date.now(),
-      envelopeType: "savings",
-      targetAmount: 5000,
-      currentBalance: 1500,
-      priority: "high",
-      isPaused: false,
-      isCompleted: false,
-    },
-    {
-      id: "env-3",
-      name: "FSA Account",
-      category: "Health",
-      archived: false,
-      lastModified: Date.now(),
-      envelopeType: "supplemental",
-      accountType: "FSA",
-      annualContribution: 2850,
-      isActive: true,
-    },
-  ];
-
   const mockTransactions = [
     {
       id: "txn-1",
       date: new Date(),
-      amount: 50,
+      amount: -50,
       envelopeId: "env-1",
       category: "Food",
       type: "expense",
@@ -115,16 +124,14 @@ describe("AutoBackupService (v2.0 data model)", () => {
     // Setup mock implementations
     vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue(mockEnvelopes);
     vi.mocked(budgetDb.transactions.toArray).mockResolvedValue(mockTransactions);
-    vi.mocked(budgetDb.bills.toArray).mockResolvedValue([]);
-    vi.mocked(budgetDb.debts.toArray).mockResolvedValue([]);
-    vi.mocked(budgetDb.paycheckHistory.toArray).mockResolvedValue([]);
+    vi.mocked(budgetDb.auditLog.toArray).mockResolvedValue([]);
     vi.mocked(budgetDb.budget.get).mockResolvedValue(mockMetadata);
     vi.mocked(budgetDb.autoBackups.put).mockResolvedValue("backup-123");
     vi.mocked(budgetDb.autoBackups.orderBy).mockReturnValue({
       reverse: () => ({
         toArray: () => Promise.resolve([]),
       }),
-    } as ReturnType<typeof budgetDb.autoBackups.orderBy>);
+    } as any);
   });
 
   describe("collectAllData", () => {
@@ -146,18 +153,18 @@ describe("AutoBackupService (v2.0 data model)", () => {
       // Verify standard envelope
       const standardEnvelope = data.envelopes.find((e) => e.id === "env-1");
       expect(standardEnvelope?.name).toBe("Groceries");
-      expect(standardEnvelope?.envelopeType).toBeUndefined();
+      expect(standardEnvelope?.type).toBe("standard");
 
       // Verify savings envelope
       const savingsEnvelope = data.envelopes.find((e) => e.id === "env-2");
       expect(savingsEnvelope?.name).toBe("Vacation Fund");
-      expect(savingsEnvelope?.envelopeType).toBe("savings");
+      expect(savingsEnvelope?.type).toBe("goal");
       expect(savingsEnvelope?.targetAmount).toBe(5000);
 
       // Verify supplemental envelope
       const supplementalEnvelope = data.envelopes.find((e) => e.id === "env-3");
       expect(supplementalEnvelope?.name).toBe("FSA Account");
-      expect(supplementalEnvelope?.envelopeType).toBe("supplemental");
+      expect(supplementalEnvelope?.type).toBe("supplemental");
       expect(supplementalEnvelope?.accountType).toBe("FSA");
     });
 
@@ -174,9 +181,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
       const backupData = {
         envelopes: mockEnvelopes,
         transactions: mockTransactions,
-        bills: [],
-        debts: [],
-        paycheckHistory: [],
+        auditLog: [],
         metadata: mockMetadata,
         timestamp: Date.now(),
       };
@@ -209,9 +214,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
       data: {
         envelopes: mockEnvelopes,
         transactions: mockTransactions,
-        bills: [],
-        debts: [],
-        paycheckHistory: [],
+        auditLog: [],
         metadata: mockMetadata,
         timestamp: Date.now(),
       },
@@ -227,11 +230,13 @@ describe("AutoBackupService (v2.0 data model)", () => {
       vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(mockBackupData);
 
       // Mock transaction to execute the callback
-      vi.mocked(budgetDb.transaction).mockImplementation(
-        async (_mode, _tables, callback: () => Promise<void>) => {
-          await callback();
+      vi.mocked((budgetDb as any).transaction).mockImplementation(((...args: any[]) => {
+        const callback = args[args.length - 1];
+        if (typeof callback === "function") {
+          return Promise.resolve(callback());
         }
-      );
+        return Promise.resolve();
+      }) as any);
     });
 
     it("should restore all envelope types from backup", async () => {
@@ -283,7 +288,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
       const tablesList = transactionCall[1];
 
       // Ensure savingsGoals is not in the tables list
-      const tablesArray = tablesList as unknown[];
+      const tablesArray = tablesList as any as any[];
       const hasSavingsGoals = tablesArray.some(
         (table) => table && (table as { name?: string }).name === "savingsGoals"
       );
@@ -306,15 +311,13 @@ describe("AutoBackupService (v2.0 data model)", () => {
       vi.clearAllMocks();
       vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue(mockEnvelopes);
       vi.mocked(budgetDb.transactions.toArray).mockResolvedValue(mockTransactions);
-      vi.mocked(budgetDb.bills.toArray).mockResolvedValue([]);
-      vi.mocked(budgetDb.debts.toArray).mockResolvedValue([]);
-      vi.mocked(budgetDb.paycheckHistory.toArray).mockResolvedValue([]);
+      vi.mocked(budgetDb.auditLog.toArray).mockResolvedValue([]);
       vi.mocked(budgetDb.budget.get).mockResolvedValue(mockMetadata);
       vi.mocked(budgetDb.autoBackups.orderBy).mockReturnValue({
         reverse: () => ({
           toArray: () => Promise.resolve([]),
         }),
-      } as ReturnType<typeof budgetDb.autoBackups.orderBy>);
+      } as any);
     });
 
     it("should handle backup creation failures", async () => {
@@ -350,11 +353,13 @@ describe("AutoBackupService (v2.0 data model)", () => {
       vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(corruptedBackup);
 
       // Mock transaction to execute callback
-      vi.mocked(budgetDb.transaction).mockImplementation(
-        async (_mode, _tables, callback: () => Promise<void>) => {
-          await callback();
+      vi.mocked((budgetDb as any).transaction).mockImplementation(((...args: any[]) => {
+        const callback = args[args.length - 1];
+        if (typeof callback === "function") {
+          return Promise.resolve(callback());
         }
-      );
+        return Promise.resolve();
+      }) as any);
 
       // Corrupted data (null) will cause validation to skip all items, but restore will still succeed
       // with empty arrays. The method returns true even if no data is restored.
@@ -370,9 +375,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
         data: {
           envelopes: mockEnvelopes,
           transactions: mockTransactions,
-          bills: [],
-          debts: [],
-          paycheckHistory: [],
+          auditLog: [],
           metadata: mockMetadata,
           timestamp: Date.now(),
         },
@@ -399,9 +402,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
         data: {
           envelopes: mockEnvelopes,
           transactions: mockTransactions,
-          bills: [],
-          debts: [],
-          paycheckHistory: [],
+          auditLog: [],
           metadata: mockMetadata,
           timestamp: Date.now(),
         },
@@ -416,11 +417,13 @@ describe("AutoBackupService (v2.0 data model)", () => {
       vi.mocked(budgetDb.envelopes.bulkAdd).mockRejectedValue(new Error("Bulk add failed"));
 
       // Mock transaction to execute callback and propagate error
-      vi.mocked(budgetDb.transaction).mockImplementation(
-        async (_mode, _tables, callback: () => Promise<void>) => {
-          await callback();
+      vi.mocked((budgetDb as any).transaction).mockImplementation(((...args: any[]) => {
+        const callback = args[args.length - 1];
+        if (typeof callback === "function") {
+          return Promise.resolve(callback());
         }
-      );
+        return Promise.resolve();
+      }) as any);
 
       await expect(autoBackupService.restoreFromBackup("backup-123")).rejects.toThrow(
         "Bulk add failed"
@@ -437,11 +440,9 @@ describe("AutoBackupService (v2.0 data model)", () => {
 
     it("should handle invalid backup metadata", async () => {
       // Reset bulkAdd mocks to ensure they don't reject from previous test
-      vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue(undefined);
-      vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue(undefined);
-      vi.mocked(budgetDb.bills.bulkAdd).mockResolvedValue(undefined);
-      vi.mocked(budgetDb.debts.bulkAdd).mockResolvedValue(undefined);
-      vi.mocked(budgetDb.paycheckHistory.bulkAdd).mockResolvedValue(undefined);
+      vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue(undefined as any);
+      vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue(undefined as any);
+      vi.mocked(budgetDb.auditLog.bulkAdd).mockResolvedValue(undefined as any);
 
       const invalidBackup = {
         id: "backup-123",
@@ -450,9 +451,7 @@ describe("AutoBackupService (v2.0 data model)", () => {
         data: {
           envelopes: mockEnvelopes,
           transactions: mockTransactions,
-          bills: [],
-          debts: [],
-          paycheckHistory: [],
+          auditLog: [],
           metadata: mockMetadata,
           timestamp: Date.now(),
         },
@@ -461,11 +460,13 @@ describe("AutoBackupService (v2.0 data model)", () => {
       vi.mocked(budgetDb.autoBackups.get).mockResolvedValue(invalidBackup);
 
       // Mock transaction to execute callback
-      vi.mocked(budgetDb.transaction).mockImplementation(
-        async (_mode, _tables, callback: () => Promise<void>) => {
-          await callback();
+      vi.mocked((budgetDb as any).transaction).mockImplementation(((...args: any[]) => {
+        const callback = args[args.length - 1];
+        if (typeof callback === "function") {
+          return Promise.resolve(callback());
         }
-      );
+        return Promise.resolve();
+      }) as any);
 
       const result = await autoBackupService.restoreFromBackup("backup-123");
 

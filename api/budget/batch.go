@@ -13,11 +13,10 @@ type BatchRequest struct {
 
 // BatchItem represents a single calculation request in a batch
 type BatchItem struct {
-	UserID       string                 `json:"userId"` // User identifier (for result matching only, not stored)
+	UserID       string                 `json:"userId"`
 	Envelopes    []Envelope             `json:"envelopes"`
 	Transactions []Transaction          `json:"transactions"`
-	Bills        []Bill                 `json:"bills"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"` // Optional metadata for client use
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // BatchResponse represents the response for a batch calculation request
@@ -35,7 +34,7 @@ type BatchResultItem struct {
 	Data     []EnvelopeData         `json:"data,omitempty"`
 	Totals   GlobalTotals           `json:"totals,omitempty"`
 	Error    string                 `json:"error,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"` // Echo back metadata
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // BatchSummary provides aggregate statistics for the batch
@@ -45,7 +44,6 @@ type BatchSummary struct {
 	FailedCount       int `json:"failedCount"`
 	TotalEnvelopes    int `json:"totalEnvelopes"`
 	TotalTransactions int `json:"totalTransactions"`
-	TotalBills        int `json:"totalBills"`
 }
 
 // BatchHandler is the Vercel entry point for batch calculations
@@ -56,7 +54,6 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
-	// Security Headers
 	AddSecurityHeaders(w)
 
 	if r.Method == http.MethodOptions {
@@ -83,7 +80,6 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate batch request
 	validation := ValidateBatchRequest(req)
 	if !validation.Valid {
 		w.WriteHeader(http.StatusBadRequest)
@@ -94,7 +90,6 @@ func BatchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Process batch
 	results, summary := ProcessBatch(req.Requests)
 
 	resp := BatchResponse{
@@ -114,12 +109,9 @@ func ProcessBatch(requests []BatchItem) ([]BatchResultItem, BatchSummary) {
 	}
 
 	for i, item := range requests {
-		// Count input items for summary
 		summary.TotalEnvelopes += len(item.Envelopes)
 		summary.TotalTransactions += len(item.Transactions)
-		summary.TotalBills += len(item.Bills)
 
-		// Process individual request
 		result := processBatchItem(item)
 		results[i] = result
 
@@ -135,14 +127,13 @@ func ProcessBatch(requests []BatchItem) ([]BatchResultItem, BatchSummary) {
 
 // processBatchItem processes a single batch item
 func processBatchItem(item BatchItem) BatchResultItem {
-	// Perform calculation using existing Calculate function
-	envelopeData, totals := Calculate(item.Envelopes, item.Transactions, item.Bills)
+	envelopeData, totals := Calculate(item.Envelopes, item.Transactions)
 
 	return BatchResultItem{
 		UserID:   item.UserID,
 		Success:  true,
 		Data:     envelopeData,
 		Totals:   totals,
-		Metadata: item.Metadata, // Echo back metadata
+		Metadata: item.Metadata,
 	}
 }

@@ -8,13 +8,9 @@ export interface DataDetectionDetails {
   samplesFound?: {
     envelopes: boolean;
     transactions: boolean;
-    bills: boolean;
   };
   envelopes: number;
   transactions: number;
-  bills: number;
-  savingsGoals: number;
-  paychecks: number;
   cache: number;
   lastOptimized: number;
   error?: unknown;

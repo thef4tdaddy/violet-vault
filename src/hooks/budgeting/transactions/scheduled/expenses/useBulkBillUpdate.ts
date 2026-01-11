@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Bill } from "@/domain/schemas/bill";
+import type { Bill } from "@/db/types";
 
 // Type for bill changes tracking
 interface BillChange {
@@ -28,16 +28,20 @@ export const useBulkBillUpdate = (selectedBills: Bill[] = [], _isOpen: boolean =
     const initialChanges: BillChanges = {};
     selectedBills.forEach((bill) => {
       initialChanges[bill.id] = {
-        amount: bill.amount,
+        amount: bill.amount || 0,
         dueDate:
-          bill.dueDate instanceof Date
-            ? bill.dueDate.toISOString().split("T")[0]
-            : bill.dueDate || "",
-        originalAmount: bill.amount,
+          typeof bill.dueDate === "string"
+            ? bill.dueDate
+            : bill.dueDate instanceof Date
+              ? bill.dueDate.toISOString().split("T")[0]
+              : "",
+        originalAmount: bill.amount || 0,
         originalDueDate:
-          bill.dueDate instanceof Date
-            ? bill.dueDate.toISOString().split("T")[0]
-            : bill.dueDate || "",
+          typeof bill.dueDate === "string"
+            ? bill.dueDate
+            : bill.dueDate instanceof Date
+              ? bill.dueDate.toISOString().split("T")[0]
+              : "",
       };
     });
     setChanges(initialChanges);
@@ -81,16 +85,20 @@ export const useBulkBillUpdate = (selectedBills: Bill[] = [], _isOpen: boolean =
     const resetChanges: BillChanges = {};
     selectedBills.forEach((bill) => {
       resetChanges[bill.id] = {
-        amount: bill.amount,
+        amount: bill.amount || 0,
         dueDate:
-          bill.dueDate instanceof Date
-            ? bill.dueDate.toISOString().split("T")[0]
-            : bill.dueDate || "",
-        originalAmount: bill.amount,
+          typeof bill.dueDate === "string"
+            ? bill.dueDate
+            : bill.dueDate instanceof Date
+              ? bill.dueDate.toISOString().split("T")[0]
+              : "",
+        originalAmount: bill.amount || 0,
         originalDueDate:
-          bill.dueDate instanceof Date
-            ? bill.dueDate.toISOString().split("T")[0]
-            : bill.dueDate || "",
+          typeof bill.dueDate === "string"
+            ? bill.dueDate
+            : bill.dueDate instanceof Date
+              ? bill.dueDate.toISOString().split("T")[0]
+              : "",
       };
     });
     setChanges(resetChanges);

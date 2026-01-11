@@ -148,7 +148,7 @@ export class BudgetCalculationService {
             : [],
           bills: envData.bills || [],
           biweeklyNeed: envData.biweeklyNeed || 0,
-        } as ClientEnvelopeData;
+        } as unknown as ClientEnvelopeData;
       });
 
       const totals = {
@@ -188,38 +188,55 @@ export class BudgetCalculationService {
     logger.info("Performing client-side budget calculation");
 
     // Convert domain schema types to calculation types
-    const clientTransactions: ClientTransaction[] = transactions.map((tx) => ({
-      id: tx.id,
-      envelopeId: tx.envelopeId,
-      type: tx.type,
-      amount: tx.amount,
-      date:
-        tx.date instanceof Date
-          ? new Date(Date.UTC(tx.date.getFullYear(), tx.date.getMonth(), tx.date.getDate()))
-              .toISOString()
-              .split("T")[0]
-          : tx.date,
-      description: tx.description ?? undefined,
-    }));
+    const clientTransactions: ClientTransaction[] = transactions.map(
+      (tx) =>
+        ({
+          id: tx.id,
+          envelopeId: tx.envelopeId,
+          type: tx.type,
+          amount: tx.amount,
+          date:
+            tx.date instanceof Date
+              ? new Date(Date.UTC(tx.date.getFullYear(), tx.date.getMonth(), tx.date.getDate()))
+                  .toISOString()
+                  .split("T")[0]
+              : tx.date,
+          description: tx.description ?? undefined,
+          category: tx.category,
+          lastModified: tx.lastModified,
+          isScheduled: tx.isScheduled,
+        }) as ClientTransaction
+    );
 
-    const clientBills: ClientBill[] = bills.map((bill) => ({
-      id: bill.id,
-      envelopeId: bill.envelopeId ?? undefined,
-      isPaid: bill.isPaid,
-      amount: bill.amount,
-      dueDate:
-        bill.dueDate instanceof Date ? bill.dueDate.toISOString().split("T")[0] : bill.dueDate,
-      name: bill.name,
-    }));
+    const clientBills: ClientBill[] = bills.map(
+      (bill) =>
+        ({
+          id: bill.id,
+          envelopeId: bill.envelopeId ?? undefined,
+          isPaid: bill.isPaid,
+          amount: bill.amount,
+          dueDate:
+            bill.dueDate instanceof Date ? bill.dueDate.toISOString().split("T")[0] : bill.dueDate,
+          name: bill.name,
+          category: bill.category,
+          archived: bill.archived,
+          lastModified: bill.lastModified,
+          currentBalance: (bill as unknown as Record<string, number>).currentBalance ?? 0,
+        }) as ClientBill
+    );
 
-    const clientEnvelopes: ClientEnvelope[] = envelopes.map((envelope) => ({
-      ...envelope,
-      currentBalance: envelope.currentBalance ?? 0,
-      targetAmount: envelope.targetAmount ?? 0,
-      envelopeType: envelope.envelopeType ?? undefined,
-      biweeklyAllocation: envelope.biweeklyAllocation ?? 0,
-      monthlyBudget: envelope.monthlyBudget ?? 0,
-    }));
+    const clientEnvelopes: ClientEnvelope[] = envelopes.map((envelope) => {
+      const record = envelope as Record<string, unknown>;
+      return {
+        ...envelope,
+        currentBalance: envelope.currentBalance ?? 0,
+        targetAmount: (record.targetAmount as number) ?? 0,
+        // Map 'type' to 'envelopeType' if ClientEnvelope expects it, or use safe access
+        envelopeType: (record.envelopeType as string) ?? (record.type as string),
+        biweeklyAllocation: (record.biweeklyAllocation as number) ?? 0,
+        monthlyBudget: (record.monthlyBudget as number) ?? 0,
+      } as unknown as ClientEnvelope;
+    });
 
     const envelopeData = calculateClientSide(clientEnvelopes, clientTransactions, clientBills);
     const totals = calculateTotalsClientSide(envelopeData);

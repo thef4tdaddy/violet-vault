@@ -90,20 +90,22 @@ export const useBillBulkMutations = () => {
         // We can access `bills` from `useBills()` here!
 
         // But `useBills` returns `bills` query data.
-
-        const bill = (await import("@/db/budgetDb")).budgetDb.bills.get(billId);
+        type LegacyDb = {
+          bills: { get: (id: string) => Promise<Record<string, unknown> | undefined> };
+        };
+        const dbLegacy = (await import("@/db/budgetDb")).budgetDb as unknown as LegacyDb;
+        const billData = await dbLegacy.bills.get(billId);
         // accessing DB directly here might be cleaner than relying on query hook data which might be filtered.
-        if (!bill) throw new Error(`Bill ${billId} not found`);
+        if (!billData) throw new Error(`Bill ${billId} not found`);
 
         // Use default logic: pay full amount from assigned envelope or error.
-        const billData = await bill;
         if (!billData) throw new Error(`Bill ${billId} not found`);
 
         await markBillPaidAsync({
-          billId: billData.id,
-          paidAmount: billData.amount,
+          billId: billData.id as string,
+          paidAmount: (billData.amount as number) || 0,
           paidDate: new Date().toISOString().split("T")[0],
-          envelopeId: billData.envelopeId,
+          envelopeId: billData.envelopeId as string,
         });
       };
 

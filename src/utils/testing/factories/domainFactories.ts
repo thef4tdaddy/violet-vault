@@ -39,15 +39,18 @@ export const createEnvelope = (overrides?: Partial<Envelope>): Envelope => {
       "transportation",
       "healthcare",
     ]),
+    type: "standard",
     archived: false,
+    color: "#3B82F6",
     lastModified: generateTimestamp(),
     createdAt: generateTimestamp(),
     currentBalance: generateAmount(0, 500),
     targetAmount: generateAmount(100, 1000),
     description: "Test envelope description",
+    autoAllocate: false,
   };
 
-  return mergeDefaults(defaults, overrides);
+  return mergeDefaults(defaults as Record<string, unknown>, overrides) as Envelope;
 };
 
 /**
@@ -64,19 +67,25 @@ export const createEnvelopePartial = (overrides?: EnvelopePartial): EnvelopePart
  */
 export const createBill = (overrides?: Partial<Bill>): Bill => {
   const defaults: Bill = {
+    status: "active",
     id: generateId(),
+    type: "bill",
     name: `Bill ${generateId().substring(0, 8)}`,
     dueDate: generateFutureDate(30),
     amount: generateAmount(50, 500),
     category: pickRandom(["utilities", "subscriptions", "insurance", "rent"]),
+    color: "#3B82F6",
     isPaid: false,
     isRecurring: false,
-    frequency: undefined,
     envelopeId: generateId(),
     lastModified: generateTimestamp(),
     createdAt: generateTimestamp(),
     description: "Test bill description",
-    paymentMethod: pickRandom(["credit_card", "debit_card", "bank_transfer", "cash"]),
+    interestRate: 0,
+    minimumPayment: 0,
+    currentBalance: 0,
+    archived: false,
+    autoAllocate: true,
   };
 
   return mergeDefaults(defaults, overrides);
@@ -89,7 +98,7 @@ export const createBill = (overrides?: Partial<Bill>): Bill => {
 export const createRecurringBill = (overrides?: Partial<Bill>): Bill => {
   return createBill({
     isRecurring: true,
-    frequency: pickRandom(["monthly", "quarterly", "annually"]),
+    frequency: "monthly",
     ...overrides,
   });
 };
@@ -120,6 +129,7 @@ export const createTransaction = (overrides?: Partial<Transaction>): Transaction
       "healthcare",
     ]),
     type: "expense",
+    isScheduled: false,
     lastModified: generateTimestamp(),
     createdAt: generateTimestamp(),
     description: "Test transaction description",
@@ -187,8 +197,10 @@ export const createSavingsGoal = (overrides?: Partial<SavingsGoal>): SavingsGoal
 
   const defaults: SavingsGoal = {
     id: generateId(),
+    type: "goal",
     name: `Goal ${generateId().substring(0, 8)}`,
     category: pickRandom(["vacation", "emergency", "purchase", "education", "home"]),
+    color: "#3B82F6",
     priority: pickRandom(["low", "medium", "high"]),
     targetAmount,
     currentAmount,
@@ -199,6 +211,9 @@ export const createSavingsGoal = (overrides?: Partial<SavingsGoal>): SavingsGoal
     createdAt: generateTimestamp(),
     description: "Test savings goal description",
     monthlyContribution: Math.floor(targetAmount / 12),
+    currentBalance: currentAmount,
+    archived: false,
+    autoAllocate: true,
   };
 
   return mergeDefaults(defaults, overrides);

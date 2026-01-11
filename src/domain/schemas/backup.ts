@@ -1,16 +1,10 @@
 /**
  * Auto Backup Domain Schema
- * Runtime validation for automatic backup entries
- * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
- * Enhanced for Issue #1342: Backup/Restore Validation Enhancement
  */
 
 import { z } from "zod";
 import { EnvelopeSchema } from "./envelope";
 import { TransactionSchema } from "./transaction";
-import { BillSchema } from "./bill";
-import { DebtSchema } from "./debt";
-import { PaycheckHistorySchema } from "./paycheck-history";
 
 /**
  * Backup type enum
@@ -37,15 +31,15 @@ export type BackupMetadata = z.infer<typeof BackupMetadataSchema>;
 
 /**
  * BackupDataSchema - Validates complete backup data structure
- * All savings goals and supplemental accounts are stored as envelopes with envelopeType
- * Part of Issue #1342: Backup/Restore Validation Enhancement
+ * Consolidated for Data Unification v2.0
  */
 export const BackupDataSchema = z.object({
   envelopes: z.array(EnvelopeSchema).default([]),
   transactions: z.array(TransactionSchema).default([]),
-  bills: z.array(BillSchema).default([]),
-  debts: z.array(DebtSchema).default([]),
-  paycheckHistory: z.array(PaycheckHistorySchema).default([]),
+  // Deprecated collections kept as loose arrays for backward compatibility during restore
+  bills: z.array(z.any()).optional().default([]),
+  debts: z.array(z.any()).optional().default([]),
+  paycheckHistory: z.array(z.any()).optional().default([]),
   metadata: z.unknown().optional(),
   timestamp: z.number().int().positive("Timestamp must be a positive number"),
 });
@@ -67,7 +61,6 @@ export const validateBackupData = (data: unknown): BackupData => {
 
 /**
  * Zod schema for AutoBackup validation
- * Represents a backup snapshot of budget data
  */
 export const AutoBackupSchema = z.object({
   id: z.string().min(1, "Backup ID is required"),
@@ -79,34 +72,19 @@ export const AutoBackupSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
-/**
- * Type inference from schema
- */
 export type AutoBackup = z.infer<typeof AutoBackupSchema>;
 
-/**
- * Partial backup schema for updates
- */
 export const AutoBackupPartialSchema = AutoBackupSchema.partial();
 export type AutoBackupPartial = z.infer<typeof AutoBackupPartialSchema>;
 
-/**
- * Validation helper - throws on invalid data
- */
 export const validateAutoBackup = (data: unknown): AutoBackup => {
   return AutoBackupSchema.parse(data);
 };
 
-/**
- * Safe validation helper - returns result with error details
- */
 export const validateAutoBackupSafe = (data: unknown) => {
   return AutoBackupSchema.safeParse(data);
 };
 
-/**
- * Validation helper for partial updates
- */
 export const validateAutoBackupPartial = (data: unknown): AutoBackupPartial => {
   return AutoBackupPartialSchema.parse(data);
 };

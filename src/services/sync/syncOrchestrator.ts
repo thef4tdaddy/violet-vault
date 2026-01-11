@@ -18,9 +18,6 @@ const SYNC_VERSION = "2.0";
 export interface DexieData extends Record<string, unknown> {
   envelopes: unknown[];
   transactions: unknown[];
-  bills: unknown[];
-  debts: unknown[];
-  paycheckHistory: unknown[];
   unassignedCash: number;
   actualBalance: number;
   lastModified: number;
@@ -233,17 +230,11 @@ export class SyncOrchestrator {
   public async fetchLocalData(db: {
     envelopes: { toArray: () => Promise<unknown[]> };
     transactions: { toArray: () => Promise<unknown[]> };
-    bills: { toArray: () => Promise<unknown[]> };
-    debts: { toArray: () => Promise<unknown[]> };
-    paycheckHistory: { toArray: () => Promise<unknown[]> };
     budget: { get: (key: string) => Promise<unknown> };
   }): Promise<DexieData> {
-    const [envelopes, transactions, bills, debts, paycheckHistory, metadata] = await Promise.all([
+    const [envelopes, transactions, metadata] = await Promise.all([
       db.envelopes.toArray(),
       db.transactions.toArray(),
-      db.bills.toArray(),
-      db.debts.toArray(),
-      db.paycheckHistory.toArray(),
       db.budget.get("metadata") as Promise<Record<string, unknown>>,
     ]);
 
@@ -252,9 +243,6 @@ export class SyncOrchestrator {
     return {
       envelopes,
       transactions,
-      bills,
-      debts,
-      paycheckHistory,
       unassignedCash: Number(meta?.unassignedCash || 0),
       actualBalance: Number(meta?.actualBalance || 0),
       lastModified: Date.now(),

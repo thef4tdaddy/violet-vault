@@ -13,11 +13,20 @@ export type EnvelopeRecord = DbEnvelope & {
   color?: string;
 };
 
+type LegacyEnvelope = EnvelopeRecord & {
+  envelopeType?: string;
+  category?: string;
+};
+
 export type BillRecord = DbBill;
 
 // Helper to calculate monthly budget for an envelope
 export const calculateMonthlyBudget = (envelope: EnvelopeRecord): number => {
-  const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+  const legacyEnvelope = envelope as LegacyEnvelope;
+  const envelopeType =
+    legacyEnvelope.envelopeType ||
+    envelope.type ||
+    AUTO_CLASSIFY_ENVELOPE_TYPE(legacyEnvelope.category || "");
 
   if (envelopeType === ENVELOPE_TYPES.BILL) {
     return envelope.biweeklyAllocation ? envelope.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 0;

@@ -64,9 +64,9 @@ interface EnhancedBillSuggestion extends BillSuggestion {
   envelopeConfidence?: number;
 }
 
-interface EnvelopeMatch extends Envelope {
+type EnvelopeMatch = Envelope & {
   confidence: number;
-}
+};
 
 // Constants
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -128,7 +128,7 @@ export const analyzeTransactionsForBills = (
 ): BillSuggestion[] => {
   const potentialBills: BillSuggestion[] = [];
   const existingBillDescriptions = new Set(
-    existingBills.map((bill) => bill.description?.toLowerCase() || bill.provider?.toLowerCase())
+    existingBills.map((bill) => (bill.description || bill.name || "").toLowerCase())
   );
 
   // Group similar transactions by description/merchant
@@ -425,8 +425,9 @@ const findBestEnvelopeForBill = (
   let highestScore = 0;
 
   for (const envelope of envelopes) {
+    const env = envelope as Record<string, unknown>;
     let score = 0;
-    const envelopeName = envelope.name.toLowerCase();
+    const envelopeName = ((env.name as string) || "").toLowerCase();
     const billDesc = bill.description.toLowerCase();
     const billCategory = bill.category.toLowerCase();
 
@@ -452,7 +453,7 @@ const findBestEnvelopeForBill = (
     const billWords = billDesc.split(" ");
     const envelopeWords = envelopeName.split(" ");
     const commonWords = billWords.filter(
-      (word) => word.length > 3 && envelopeWords.some((envWord) => envWord.includes(word))
+      (word) => word.length > 3 && envelopeWords.some((envWord: string) => envWord.includes(word))
     );
     score += commonWords.length * 0.3;
 
@@ -462,7 +463,7 @@ const findBestEnvelopeForBill = (
     }
   }
 
-  return highestScore > 0.5 ? bestMatch : null;
+  return highestScore > 0.5 ? (bestMatch as EnvelopeMatch) : null;
 };
 
 export default {

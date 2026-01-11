@@ -9,7 +9,7 @@ type NumericString = string | number | null | undefined;
 
 type DebtFormParsedData = Omit<
   DebtFormData,
-  "currentBalance" | "balance" | "minimumPayment" | "interestRate" | "originalBalance"
+  "currentBalance" | "minimumPayment" | "interestRate" | "originalBalance"
 > & {
   currentBalance: number;
   balance: number;
@@ -58,28 +58,23 @@ const parseNumericInput = (value: NumericString, fallback = 0): number => {
 };
 
 const buildParsedData = (data: DebtFormData): DebtFormParsedData => {
-  const currentBalance = parseNumericInput(data.currentBalance ?? data.balance, 0);
+  const currentBalance = parseNumericInput(data.currentBalance, 0);
   const minimumPayment = parseNumericInput(data.minimumPayment, 0);
   const interestRate = parseNumericInput(data.interestRate, 0);
 
   const originalBalance =
-    data.originalBalance !== undefined &&
-    data.originalBalance !== null &&
-    data.originalBalance !== ""
+    data.originalBalance !== undefined && data.originalBalance !== null
       ? parseNumericInput(data.originalBalance, currentBalance)
       : currentBalance;
 
   return {
-    ...(data as Omit<
-      DebtFormData,
-      "currentBalance" | "balance" | "minimumPayment" | "interestRate" | "originalBalance"
-    >),
+    ...(data as unknown as Record<string, unknown>),
     currentBalance,
     balance: currentBalance,
     minimumPayment,
     interestRate,
     originalBalance,
-  };
+  } as unknown as DebtFormParsedData;
 };
 
 /**
@@ -90,20 +85,56 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
   const result = validateDebtFormDataSafe(formData);
 
   if (!result.success) {
+    const errors: Record<string, string> = {};
+    const errorResult = result as {
+      error: { issues: Array<{ path: Array<string | number>; message: string }> };
+    };
+    errorResult.error.issues.forEach((issue) => {
+      if (issue.path[0]) {
+        errors[issue.path[0].toString()] = issue.message;
+      }
+    });
+
     return {
       isValid: false,
-      errors: result.errors,
+      errors,
       warnings: [],
       parsedData: {} as DebtFormParsedData,
     };
   }
 
-  const parsedData = result.data ? buildParsedData(result.data) : ({} as DebtFormParsedData);
+  const parsedData = result.data
+    ? buildParsedData(result.data as DebtFormData)
+    : ({} as DebtFormParsedData);
+  const warnings: string[] = [];
+
+  // Business logic warnings
+  if (parsedData.currentBalance > 0 && parsedData.minimumPayment > 0) {
+    const paymentRatio = parsedData.minimumPayment / parsedData.currentBalance;
+
+    if (paymentRatio < 0.01) {
+      warnings.push(
+        "Minimum payment is less than 1% of balance - this will take very long to pay off"
+      );
+    } else if (paymentRatio > 0.5) {
+      warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
+    }
+  }
+
+  if (parsedData.interestRate > 25) {
+    warnings.push("Interest rate is very high - consider debt consolidation options");
+  }
+
+  if (parsedData.originalBalance > 0 && parsedData.currentBalance > parsedData.originalBalance) {
+    warnings.push(
+      "Current balance is higher than original balance - interest and fees may have accrued"
+    );
+  }
 
   return {
     isValid: true,
     errors: {},
-    warnings: result.warnings,
+    warnings,
     parsedData,
   };
 }
@@ -115,7 +146,19 @@ export function validateDebtFormData(formData: Record<string, unknown>): Validat
  */
 export function validateDebtFormFields(formData: Record<string, unknown>): Record<string, string> {
   const result = validateDebtFormDataSafe(formData);
-  return result.errors;
+  if (!result.success) {
+    const errors: Record<string, string> = {};
+    const errorResult = result as {
+      error: { issues: Array<{ path: Array<string | number>; message: string }> };
+    };
+    errorResult.error.issues.forEach((issue) => {
+      if (issue.path[0]) {
+        errors[issue.path[0].toString()] = issue.message;
+      }
+    });
+    return errors;
+  }
+  return {};
 }
 
 // Helper to calculate payoff metrics with interest

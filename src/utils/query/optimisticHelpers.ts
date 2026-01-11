@@ -48,7 +48,7 @@ export const optimisticHelpers = {
           ...existing,
           ...updates,
           lastModified: Date.now(),
-        });
+        } as Envelope);
       } else {
         logger.warn(`Envelope ${envelopeId} not found for optimistic update`);
       }
@@ -293,7 +293,7 @@ export const optimisticHelpers = {
       });
 
       // Update database
-      await budgetDb.bills.update(billId, {
+      await budgetDb.envelopes.update(billId, {
         ...updates,
         lastModified: Date.now(),
       });
@@ -320,7 +320,10 @@ export const optimisticHelpers = {
       } as SavingsGoal;
 
       // Add to database
-      await budgetDb.savingsGoals.add(goalWithTimestamp);
+      await budgetDb.envelopes.add({
+        ...goalWithTimestamp,
+        type: "goal",
+      } as Envelope);
 
       logger.debug("Optimistic savings goal addition completed", {
         goalId: newGoal.id,
@@ -345,10 +348,11 @@ export const optimisticHelpers = {
   updateSavingsGoal: async (goalId: string, updatedGoal: Partial<SavingsGoal>) => {
     try {
       // Update database
-      await budgetDb.savingsGoals.update(goalId, {
+      await budgetDb.envelopes.update(goalId, {
         ...updatedGoal,
+        type: "goal",
         lastModified: Date.now(),
-      });
+      } as Envelope);
 
       logger.debug("Optimistic savings goal update completed", {
         goalId,
@@ -374,7 +378,7 @@ export const optimisticHelpers = {
   deleteSavingsGoal: async (goalId: string) => {
     try {
       // Remove from database
-      await budgetDb.savingsGoals.delete(goalId);
+      await budgetDb.envelopes.delete(goalId);
 
       logger.debug("Optimistic savings goal removal completed", { goalId });
 

@@ -3,86 +3,33 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { useToastHelpers } from "@/utils/common/toastHelpers";
 import logger from "@/utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
-import { constructExportObject } from "./useExportDataHelpers";
+import { constructExportObject, triggerDownload } from "./useExportDataHelpers";
 import { trackExport } from "@/utils/monitoring/performanceMonitor";
+import type { Envelope, Transaction } from "@/db/types";
 
-const gatherDataForExport = async (): Promise<
-  [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown]
-> => {
+const gatherDataForExport = async (): Promise<[Envelope[], Transaction[], unknown[], unknown]> => {
   logger.info("Gathering data for export");
-  // v2.0: Savings goals are now stored as envelopes with envelopeType: "savings"
-  // No need to fetch from separate savingsGoals table
   return Promise.all([
     budgetDb.envelopes.toArray(),
-    budgetDb.bills.toArray(),
     budgetDb.transactions.toArray(),
-    budgetDb.debts.toArray(),
-    budgetDb.paycheckHistory.toArray(),
     budgetDb.auditLog.toArray(),
     getBudgetMetadata(),
   ]);
 };
 
-const triggerDownload = (exportableData: unknown): number => {
-  const dataStr = JSON.stringify(exportableData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: "application/json" });
-
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement("a");
-  link.href = url;
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  link.download = `VioletVault Budget Backup ${timestamp}.json`;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-
-  return dataStr.length;
-};
-
 const logExportSuccess = (
-  data: [unknown[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown],
-  pureTransactions: unknown[],
+  counts: { envelopes: number; transactions: number },
   fileSize: number
-): {
-  envelopes: number;
-  bills: number;
-  debts: number;
-  transactions: number;
-  fileSizeKB: number;
-} => {
-  const [envelopes, bills, , debts, , ,] = data;
-
+) => {
   logger.info("Export completed successfully", {
-    envelopes: envelopes.length,
-    bills: bills.length,
-    transactions: pureTransactions.length,
+    envelopes: counts.envelopes,
+    transactions: counts.transactions,
     fileSizeKB: Math.round(fileSize / 1024),
   });
-
-  return {
-    envelopes: envelopes.length,
-    bills: bills.length,
-    debts: debts.length,
-    transactions: pureTransactions.length,
-    fileSizeKB: Math.round(fileSize / 1024),
-  };
 };
 
-const buildExportSummary = (counts: {
-  envelopes: number;
-  bills: number;
-  debts: number;
-  transactions: number;
-}): string => {
-  return [
-    `${counts.envelopes} envelopes`,
-    `${counts.bills} bills`,
-    `${counts.debts} debts`,
-    `${counts.transactions} transactions`,
-  ].join(", ");
+const buildExportSummary = (counts: { envelopes: number; transactions: number }): string => {
+  return [`${counts.envelopes} envelopes`, `${counts.transactions} transactions`].join(", ");
 };
 
 export const useExportData = () => {
@@ -93,44 +40,38 @@ export const useExportData = () => {
     try {
       logger.info("Starting export process");
       const data = await gatherDataForExport();
-      const hasData = data.some((item) => (Array.isArray(item) ? item.length > 0 : item));
+      const [envelopes, transactions, auditLog, metadata] = data;
 
-      if (!hasData) {
+      if (envelopes.length === 0 && transactions.length === 0) {
         showWarningToast("No data found to export", "Export Error");
         return;
       }
 
-      // Track export performance with Sentry
+      // Track export performance
       const exportFn = async () => {
-        const exportableData = constructExportObject(data, currentUser);
+        const safeMetadata = (metadata || {}) as Record<string, unknown>;
+        const exportableData = constructExportObject(
+          [envelopes, transactions, auditLog, safeMetadata],
+          currentUser
+        );
         const fileSize = triggerDownload(exportableData);
-        const pureTransactions = exportableData.transactions;
-        return { exportableData, fileSize, pureTransactions };
+        return { fileSize };
       };
 
       const exportMetadata = {
-        envelopes: (data[0] as unknown[]).length,
-        transactions: (data[2] as unknown[]).length,
-        bills: (data[1] as unknown[]).length,
-        debts: (data[3] as unknown[]).length,
+        envelopes: envelopes.length,
+        transactions: transactions.length,
       };
 
-      const exportResult = await trackExport(exportFn, exportMetadata);
+      const { fileSize } = await trackExport(exportFn, exportMetadata);
 
-      const counts = logExportSuccess(data, exportResult.pureTransactions, exportResult.fileSize);
+      const counts = { envelopes: envelopes.length, transactions: transactions.length };
+      logExportSuccess(counts, fileSize);
       const exportSummary = buildExportSummary(counts);
-
-      // Log successful data export
-      logger.info("✅ Data exported", {
-        envelopes: counts.envelopes,
-        transactions: counts.transactions,
-        bills: counts.bills,
-        debts: counts.debts,
-        fileSizeKB: counts.fileSizeKB,
-      });
+      const fileSizeKB = Math.round(fileSize / 1024);
 
       showSuccessToast(
-        `Export created with ${exportSummary} (${counts.fileSizeKB}KB)`,
+        `Export created with ${exportSummary} (${fileSizeKB}KB)`,
         "Export Completed"
       );
     } catch (error) {
