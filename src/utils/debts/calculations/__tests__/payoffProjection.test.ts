@@ -310,27 +310,21 @@ describe("calculatePayoffProjection", () => {
       });
     });
 
-    it("should return null when logValue is exactly 0 through calculation", () => {
-      // Line 51 check is defensive - it's mathematically equivalent to line 36
-      // To hit this line, we need floating-point precision issues OR test with mocks
-      // Let's create a scenario that forces the code path through mocking
-
-      // Save original functions
-      const originalSubtraction = global.Number.prototype.valueOf;
-
+    it("should return null when logValue is 0", () => {
+      // This happens when (currentBalance * monthlyRate) / minimumPayment = 1
       const debt = {
-        currentBalance: 10000,
-        minimumPayment: 151, // > monthly interest (150) to pass line 36
-        interestRate: 18,
+        currentBalance: 12000,
+        minimumPayment: 100, // 12000 * (0.10 / 12) = 100
+        interestRate: 10,
       };
 
-      // First call should calculate normally and pass line 36
-      // We're testing that line 51 provides defensive protection
       const result = calculatePayoffProjection(debt);
 
-      // Should calculate successfully
-      expect(result.monthsToPayoff).toBeGreaterThan(0);
-      expect(result.totalInterest).toBeGreaterThan(0);
+      expect(result).toEqual({
+        monthsToPayoff: null,
+        totalInterest: null,
+        payoffDate: null,
+      });
     });
 
     it("should return null when logValue is negative", () => {
@@ -387,8 +381,7 @@ describe("calculatePayoffProjection", () => {
   describe("calculatedMonths validation", () => {
     it("should return null when calculatedMonths is not finite", () => {
       // Mock Math.log to return a value that makes calculatedMonths infinite
-      const originalLog = Math.log;
-      Math.log = vi.fn(() => Infinity);
+      const logSpy = vi.spyOn(Math, "log").mockReturnValue(Infinity);
 
       const debt = {
         currentBalance: 5000,
@@ -404,13 +397,12 @@ describe("calculatePayoffProjection", () => {
         payoffDate: null,
       });
 
-      Math.log = originalLog;
+      logSpy.mockRestore();
     });
 
     it("should return null when calculatedMonths is negative", () => {
       // Mock Math.ceil to return negative value
-      const originalCeil = Math.ceil;
-      Math.ceil = vi.fn(() => -5);
+      const ceilSpy = vi.spyOn(Math, "ceil").mockReturnValue(-5);
 
       const debt = {
         currentBalance: 5000,
@@ -426,13 +418,12 @@ describe("calculatePayoffProjection", () => {
         payoffDate: null,
       });
 
-      Math.ceil = originalCeil;
+      ceilSpy.mockRestore();
     });
 
     it("should return null when calculatedMonths is 0", () => {
       // Mock Math.ceil to return 0
-      const originalCeil = Math.ceil;
-      Math.ceil = vi.fn(() => 0);
+      const ceilSpy = vi.spyOn(Math, "ceil").mockReturnValue(0);
 
       const debt = {
         currentBalance: 5000,
@@ -448,7 +439,7 @@ describe("calculatePayoffProjection", () => {
         payoffDate: null,
       });
 
-      Math.ceil = originalCeil;
+      ceilSpy.mockRestore();
     });
   });
 
@@ -456,40 +447,28 @@ describe("calculatePayoffProjection", () => {
     it("should return partial projection when calculatedInterest is negative", () => {
       // This shouldn't normally happen, but testing the validation path
       // When payment * months < balance, calculatedInterest will be negative
+      // Mock the calculation to force 1 month
+      const ceilSpy = vi.spyOn(Math, "ceil").mockReturnValue(1);
+
       const debt = {
-        currentBalance: 10000,
-        minimumPayment: 5000, // Very high payment
-        interestRate: 0.01, // Very low interest
-      };
-
-      const result = calculatePayoffProjection(debt);
-
-      // With very low interest and high payment, calculation should succeed
-      // Let's test a scenario that would actually fail the negative check
-      // by mocking the calculation
-      const originalCeil = Math.ceil;
-      Math.ceil = vi.fn(() => 1); // Force 1 month
-
-      const debt2 = {
         currentBalance: 10000,
         minimumPayment: 5000,
         interestRate: 0.01,
       };
 
-      const result2 = calculatePayoffProjection(debt2);
+      const result = calculatePayoffProjection(debt);
 
-      Math.ceil = originalCeil;
+      ceilSpy.mockRestore();
 
       // With forced 1 month and 5000 payment, totalPayments = 5000
       // calculatedInterest = 5000 - 10000 = -5000 (negative)
-      expect(result2.monthsToPayoff).toBe(1);
-      expect(result2.totalInterest).toBeNull();
-      expect(result2.payoffDate).toBeNull();
+      expect(result.monthsToPayoff).toBe(1);
+      expect(result.totalInterest).toBeNull();
+      expect(result.payoffDate).toBeNull();
     });
 
     it("should return partial projection when calculatedInterest is not finite", () => {
-      const originalCeil = Math.ceil;
-      Math.ceil = vi.fn(() => Infinity);
+      const ceilSpy = vi.spyOn(Math, "ceil").mockReturnValue(Infinity);
 
       const debt = {
         currentBalance: 5000,
@@ -500,7 +479,7 @@ describe("calculatePayoffProjection", () => {
       // First, bypass the calculatedMonths check
       const result = calculatePayoffProjection(debt);
 
-      Math.ceil = originalCeil;
+      ceilSpy.mockRestore();
 
       // Should fail at calculatedMonths validation
       expect(result.monthsToPayoff).toBeNull();
@@ -510,8 +489,7 @@ describe("calculatePayoffProjection", () => {
   describe("try-catch error handling", () => {
     it("should handle errors in calculation and return null projection", () => {
       // Mock Math.log to throw an error
-      const originalLog = Math.log;
-      Math.log = vi.fn(() => {
+      const logSpy = vi.spyOn(Math, "log").mockImplementation(() => {
         throw new Error("Calculation error");
       });
 
@@ -529,7 +507,7 @@ describe("calculatePayoffProjection", () => {
         payoffDate: null,
       });
 
-      Math.log = originalLog;
+      logSpy.mockRestore();
     });
 
     it("should handle errors during date calculation", () => {
