@@ -14,6 +14,11 @@ describe("BaseModal", () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    // Reset body scroll state to prevent test pollution
+    document.body.style.overflow = "";
+  });
+
   describe("Rendering", () => {
     it("should render when isOpen is true", () => {
       render(<BaseModal {...defaultProps} />);

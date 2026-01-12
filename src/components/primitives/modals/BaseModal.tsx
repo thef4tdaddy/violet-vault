@@ -10,6 +10,8 @@ export interface BaseModalProps {
   showCloseButton?: boolean;
   children: React.ReactNode;
   className?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
 }
 
 const SIZE_CLASSES = {
@@ -43,6 +45,8 @@ const BaseModal: React.FC<BaseModalProps> = ({
   showCloseButton = false,
   children,
   className = "",
+  ariaLabelledBy,
+  ariaDescribedBy,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -95,10 +99,12 @@ const BaseModal: React.FC<BaseModalProps> = ({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-2xl w-full ${SIZE_CLASSES[size]} shadow-2xl border-2 border-black animate-[scaleIn_0.2s_ease-out] ${className}`}
+        className={`bg-white rounded-2xl w-full ${SIZE_CLASSES[size]} shadow-2xl border-2 border-black animate-[scaleIn_0.2s_ease-out] relative ${className}`}
         tabIndex={-1}
       >
         {showCloseButton && (

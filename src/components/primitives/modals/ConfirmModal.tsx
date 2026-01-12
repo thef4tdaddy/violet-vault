@@ -86,6 +86,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   loading = false,
 }) => {
   const variantStyle = VARIANT_STYLES[variant];
+  const titleId = React.useId();
 
   const handleConfirm = async () => {
     if (loading) return;
@@ -93,7 +94,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} size="md" closeOnEscape={!loading}>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+      closeOnEscape={!loading}
+      ariaLabelledBy={titleId}
+    >
       <div className="p-6">
         {/* Icon and Title */}
         <div className="flex items-start mb-4">
@@ -105,7 +112,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             })}
           </div>
           <div className="ml-4 flex-1">
-            <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+            <h3 id={titleId} className="text-xl font-semibold text-gray-900">
+              {title}
+            </h3>
           </div>
         </div>
 

@@ -18,7 +18,7 @@ export interface FormModalProps {
  * FormModal.Field - Form field wrapper component
  * Provides consistent styling for form fields
  */
-interface FormFieldProps {
+export interface FormFieldProps {
   label: string;
   required?: boolean;
   error?: string;
@@ -34,23 +34,6 @@ const FormField: React.FC<FormFieldProps> = ({
   children,
 }) => {
   const fieldId = React.useId();
-
-  const enhancedChildren = React.Children.map(children, (child) => {
-    if (!React.isValidElement(child)) {
-      return child;
-    }
-
-    // Preserve an existing id if the child already has one
-    const existingId = (child.props as { id?: string }).id;
-
-    return React.cloneElement(child, {
-      id: existingId ?? fieldId,
-    });
-  });
-
-  return (
-    <div className="mb-4">
-      <label
   const helperId = React.useId();
   const errorId = React.useId();
 
@@ -63,18 +46,33 @@ const FormField: React.FC<FormFieldProps> = ({
 
   let field = children;
   if (React.isValidElement(children)) {
-    const existingDescribedBy = children.props["aria-describedby"] as string | undefined;
-    const mergedDescribedBy = [existingDescribedBy, ...describedByIds].filter(Boolean).join(" ") || undefined;
+    const childProps = children.props as {
+      id?: string;
+      "aria-describedby"?: string;
+      "aria-invalid"?: boolean;
+    };
+    const existingId = childProps.id;
+    const existingDescribedBy = childProps["aria-describedby"];
+    const mergedDescribedBy =
+      [existingDescribedBy, ...describedByIds].filter(Boolean).join(" ") || undefined;
 
-    field = React.cloneElement(children, {
-      "aria-describedby": mergedDescribedBy,
-      "aria-invalid": error ? true : children.props["aria-invalid"],
-    });
+    field = React.cloneElement(
+      children as React.ReactElement<{
+        id?: string;
+        "aria-describedby"?: string;
+        "aria-invalid"?: boolean;
+      }>,
+      {
+        id: existingId ?? fieldId,
+        "aria-describedby": mergedDescribedBy,
+        "aria-invalid": error ? true : childProps["aria-invalid"],
+      }
+    );
   }
 
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={fieldId}>
         {label}
         {required && <span className="text-red-600 ml-1">*</span>}
       </label>
@@ -96,7 +94,7 @@ const FormField: React.FC<FormFieldProps> = ({
 /**
  * FormModal.Section - Section divider for grouping form fields
  */
-interface FormSectionProps {
+export interface FormSectionProps {
   title?: string;
   children: React.ReactNode;
 }
@@ -157,6 +155,8 @@ const FormModalComponent: React.FC<FormModalProps> = ({
   children,
   size = "md",
 }) => {
+  const titleId = React.useId();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -164,19 +164,28 @@ const FormModalComponent: React.FC<FormModalProps> = ({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} size={size} closeOnEscape={!loading}>
-      <form onSubmit={handleSubmit} className="flex flex-col h-full">
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      size={size}
+      closeOnEscape={!loading}
+      ariaLabelledBy={titleId}
+      className="max-h-[calc(100vh-2rem)]"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col max-h-[calc(100vh-2rem)]">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        <div className="px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0">
+          <h2 id={titleId} className="text-2xl font-bold text-gray-900">
+            {title}
+          </h2>
           {subtitle && <p className="mt-1 text-sm text-gray-600">{subtitle}</p>}
         </div>
 
         {/* Content - scrollable if needed */}
-        <div className="px-6 py-4 flex-1 overflow-y-auto">{children}</div>
+        <div className="px-6 py-4 flex-1 overflow-y-auto min-h-0">{children}</div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex gap-3 justify-end bg-gray-50">
+        <div className="px-6 py-4 border-t border-gray-200 flex gap-3 justify-end bg-gray-50 flex-shrink-0">
           {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library */}
           <button
             type="button"
