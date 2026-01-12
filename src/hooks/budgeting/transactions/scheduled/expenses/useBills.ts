@@ -3,9 +3,11 @@ import { useCallback, useEffect, useMemo } from "react";
 import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/common/logger";
-import { type LiabilityEnvelope, type Transaction, type Bill } from "@/db/types";
-import { validateBillPartialSafe, validateBillSafe } from "@/domain/schemas/bill";
-import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
+import { type Transaction } from "@/db/types";
+import {
+  validateAndNormalizeTransaction,
+  validateTransactionPartialSafe,
+} from "@/domain/schemas/transaction";
 
 // --- Types ---
 
@@ -17,10 +19,14 @@ export interface BillQueryOptions {
   sortOrder?: string;
 }
 
-type BillExtended = LiabilityEnvelope & {
-  lastPaid?: string | number | Date;
-  estimatedAmount?: number;
-  [key: string]: unknown;
+// Phase 2 Migration: Bills are now Scheduled Transactions
+// A bill is a scheduled expense transaction with isScheduled=true
+// Paid status is determined by finding matching non-scheduled payment transaction
+type BillTransaction = Transaction & {
+  isPaid?: boolean;
+  paidDate?: string | Date;
+  paidAmount?: number;
+  paymentTransactionId?: string;
 };
 
 // --- Helpers ---
@@ -32,7 +38,7 @@ const triggerBillSync = (changeType: string) => {
 };
 
 const createPaymentTransaction = (
-  bill: Bill,
+  scheduledBill: Transaction,
   billId: string,
   paidAmount: number,
   paymentDate: string,
@@ -41,14 +47,15 @@ const createPaymentTransaction = (
   return {
     id: `${billId}_payment_${Date.now()}`,
     date: new Date(paymentDate),
-    description: bill.name || "Bill Payment",
+    description: scheduledBill.description || "Bill Payment",
     amount: -Math.abs(paidAmount), // Negative for expense
-    envelopeId: envelopeId || "unassigned",
-    category: bill.category || "Bills & Utilities",
+    envelopeId: envelopeId || scheduledBill.envelopeId || "unassigned",
+    category: scheduledBill.category || "Bills & Utilities",
     type: "expense" as const,
-    isScheduled: false,
+    isScheduled: false, // Payment is not scheduled, it's actual
     lastModified: Date.now(),
     createdAt: Date.now(),
+    notes: `Payment for: ${scheduledBill.description || "Bill"}`,
   };
 };
 
@@ -59,19 +66,54 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
     status = "all",
     daysAhead = 30,
     category,
-    sortBy = "dueDate",
+    sortBy = "date",
     sortOrder = "asc",
   } = options;
 
   return useCallback(async () => {
-    let bills: LiabilityEnvelope[] = [];
+    let bills: BillTransaction[] = [];
 
     try {
-      // Get all liability type envelopes
-      const envelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
-      bills = envelopes as LiabilityEnvelope[];
+      // Phase 2 Migration: Query scheduled expense transactions (bills)
+      const scheduledTransactions = await budgetDb.transactions
+        .where("isScheduled")
+        .equals(1) // Dexie stores booleans as 0/1
+        .filter((txn) => txn.type === "expense")
+        .toArray();
+
+      // Get all actual (non-scheduled) transactions to determine paid status
+      const actualTransactions = await budgetDb.transactions
+        .where("isScheduled")
+        .equals(0)
+        .filter((txn) => txn.type === "expense")
+        .toArray();
+
+      // Map scheduled transactions to bill objects with paid status
+      bills = scheduledTransactions.map((scheduledBill) => {
+        // Find matching payment transaction (actual transaction with similar description/date)
+        const paymentTxn = actualTransactions.find(
+          (txn) =>
+            txn.description?.includes(scheduledBill.description || "") ||
+            txn.notes?.includes(scheduledBill.id) ||
+            (Math.abs(new Date(txn.date).getTime() - new Date(scheduledBill.date).getTime()) <
+              7 * 24 * 60 * 60 * 1000 && // Within 7 days
+              Math.abs(Math.abs(txn.amount) - Math.abs(scheduledBill.amount)) < 0.01) // Same amount
+        );
+
+        return {
+          ...scheduledBill,
+          isPaid: !!paymentTxn,
+          paidDate: paymentTxn?.date,
+          paidAmount: paymentTxn ? Math.abs(paymentTxn.amount) : undefined,
+          paymentTransactionId: paymentTxn?.id,
+        } as BillTransaction;
+      });
+
       if (bills.length > 0) {
-        logger.debug("TanStack Query: Bills (Liability Envelopes) loaded", { count: bills.length });
+        logger.debug("TanStack Query: Bills (Scheduled Transactions) loaded", {
+          count: bills.length,
+          paid: bills.filter((b) => b.isPaid).length,
+        });
       }
     } catch (error) {
       logger.error("TanStack Query: Dexie fetch failed", error);
@@ -87,15 +129,13 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + daysAhead);
       filteredBills = filteredBills.filter((bill) => {
-        if (!bill.dueDate) return false;
-        const dueDate = new Date(bill.dueDate);
-        return dueDate >= today && dueDate <= futureDate && !bill.isPaid;
+        const billDate = new Date(bill.date);
+        return billDate >= today && billDate <= futureDate && !bill.isPaid;
       });
     } else if (status === "overdue") {
       filteredBills = filteredBills.filter((bill) => {
-        if (!bill.dueDate) return false;
-        const dueDate = new Date(bill.dueDate);
-        return dueDate < today && !bill.isPaid;
+        const billDate = new Date(bill.date);
+        return billDate < today && !bill.isPaid;
       });
     } else if (status === "paid") {
       filteredBills = filteredBills.filter((bill) => bill.isPaid);
@@ -107,26 +147,23 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
       filteredBills = filteredBills.filter((bill) => bill.category === category);
     }
 
+    // Sorting logic
     filteredBills.sort((a, b) => {
-      const billA = a as BillExtended;
-      const billB = b as BillExtended;
-      let aVal: string | number | Date = billA[sortBy as keyof BillExtended] as
-        | string
-        | number
-        | Date;
-      let bVal: string | number | Date = billB[sortBy as keyof BillExtended] as
-        | string
-        | number
-        | Date;
+      let aVal: string | number | Date;
+      let bVal: string | number | Date;
 
-      if (sortBy === "dueDate" || sortBy === "lastPaid") {
-        aVal = new Date(String(aVal));
-        bVal = new Date(String(bVal));
-      }
-
-      if (sortBy === "amount" || sortBy === "estimatedAmount") {
-        aVal = parseFloat(String(aVal)) || 0;
-        bVal = parseFloat(String(bVal)) || 0;
+      if (sortBy === "date" || sortBy === "dueDate") {
+        aVal = new Date(a.date);
+        bVal = new Date(b.date);
+      } else if (sortBy === "amount") {
+        aVal = Math.abs(a.amount);
+        bVal = Math.abs(b.amount);
+      } else if (sortBy === "description" || sortBy === "name") {
+        aVal = (a.description || "").toLowerCase();
+        bVal = (b.description || "").toLowerCase();
+      } else {
+        aVal = a[sortBy as keyof BillTransaction] as string | number | Date;
+        bVal = b[sortBy as keyof BillTransaction] as string | number | Date;
       }
 
       if (typeof aVal === "string" && typeof bVal === "string") {
@@ -174,30 +211,18 @@ export const useBillsQuery = (options: BillQueryOptions = {}) => {
     enabled: true,
   });
 };
-export const useUpcomingBillsQuery = (daysAhead = 30, billsData: LiabilityEnvelope[] = []) => {
+export const useUpcomingBillsQuery = (daysAhead = 30, billsData: BillTransaction[] = []) => {
   return useQuery({
     queryKey: queryKeys.upcomingBills(daysAhead),
-    queryFn: async (): Promise<LiabilityEnvelope[]> => {
+    queryFn: async (): Promise<BillTransaction[]> => {
       const bills = billsData || [];
       const today = new Date();
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + daysAhead);
 
       return bills.filter((bill) => {
-        // Handle both day of month (number) and full date (string) for transition
-        const dueDateRaw = bill.dueDate;
-        if (!dueDateRaw) return false;
-
-        let dueDate: Date;
-        if (typeof dueDateRaw === "number") {
-          dueDate = new Date();
-          dueDate.setDate(dueDateRaw);
-        } else if (dueDateRaw instanceof Date) {
-          dueDate = dueDateRaw;
-        } else {
-          dueDate = new Date(dueDateRaw);
-        }
-        return dueDate >= today && dueDate <= futureDate && !bill.isPaid;
+        const billDate = new Date(bill.date);
+        return billDate >= today && billDate <= futureDate && !bill.isPaid;
       });
     },
     enabled: !!billsData,
@@ -240,38 +265,26 @@ export const useAddBillMutation = () => {
     mutationFn: async (billData: Record<string, unknown>) => {
       const uniqueId = `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      const newBill = {
+      // Phase 2 Migration: Create a scheduled expense transaction
+      const newBill: Partial<Transaction> = {
         id: uniqueId,
-        name: (billData.name as string) || "Unnamed Bill",
-        dueDate: new Date(billData.dueDate as string | Date),
-        amount: (billData.amount as number) || 0,
-        category: (billData.category as string) || "Uncategorized",
-        isPaid: false,
-        isRecurring: (billData.isRecurring as boolean) || false,
-        type: "bill" as const,
+        description: (billData.name as string) || (billData.description as string) || "Unnamed Bill",
+        date: new Date(billData.dueDate as string | Date),
+        amount: -Math.abs((billData.amount as number) || 0), // Negative for expense
+        envelopeId: (billData.envelopeId as string) || "unassigned",
+        category: (billData.category as string) || "Bills & Utilities",
+        type: "expense" as const,
+        isScheduled: true, // This is a scheduled bill
+        recurrenceRule: (billData.recurrenceRule as string) || undefined,
         lastModified: Date.now(),
-        ...billData,
         createdAt: Date.now(),
+        notes: (billData.notes as string) || undefined,
       };
 
-      const validationResult = validateBillSafe(newBill);
-      if (!validationResult.success) {
-        throw new Error(
-          `Invalid bill data: ${validationResult.error.issues.map((i) => i.message).join(", ")}`
-        );
-      }
+      const validatedBill = validateAndNormalizeTransaction(newBill);
 
-      const validatedBill: Bill = {
-        ...validationResult.data,
-        dueDate:
-          validationResult.data.dueDate instanceof Date
-            ? validationResult.data.dueDate
-            : new Date(String(validationResult.data.dueDate || new Date().toISOString())),
-        envelopeId: validationResult.data.envelopeId || undefined,
-      };
-
-      await budgetDb.envelopes.add(validatedBill as LiabilityEnvelope);
-      return validatedBill as LiabilityEnvelope;
+      await budgetDb.transactions.add(validatedBill);
+      return validatedBill;
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: queryKeys.bills });
@@ -280,10 +293,11 @@ export const useAddBillMutation = () => {
     },
     onSuccess: (bill) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
-      logger.info("✅ Bill added", { name: bill.name });
+      logger.info("✅ Bill added", { description: bill.description });
       triggerBillSync("add");
     },
     onError: (error, _, context) => {
@@ -307,10 +321,24 @@ export const useUpdateBillMutation = () => {
       billId: string;
       updates: Record<string, unknown>;
     }) => {
-      const existingBill = await budgetDb.envelopes.get(billId);
+      const existingBill = await budgetDb.transactions.get(billId);
       if (!existingBill) throw new Error(`Bill with ID ${billId} not found`);
 
-      const validationResult = validateBillPartialSafe(updates);
+      // Map common bill fields to transaction fields
+      const transactionUpdates: Record<string, unknown> = { ...updates };
+      if (updates.name) {
+        transactionUpdates.description = updates.name;
+        delete transactionUpdates.name;
+      }
+      if (updates.dueDate) {
+        transactionUpdates.date = updates.dueDate;
+        delete transactionUpdates.dueDate;
+      }
+      if (updates.amount) {
+        transactionUpdates.amount = -Math.abs(updates.amount as number);
+      }
+
+      const validationResult = validateTransactionPartialSafe(transactionUpdates);
       if (!validationResult.success) {
         throw new Error(
           `Invalid bill update data: ${validationResult.error.issues
@@ -326,11 +354,12 @@ export const useUpdateBillMutation = () => {
         lastModified: Date.now(),
       };
 
-      await budgetDb.envelopes.update(billId, validatedBill);
+      await budgetDb.transactions.update(billId, validatedBill);
       return validatedBill;
     },
     onSuccess: (_bill, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
@@ -347,11 +376,13 @@ export const useDeleteBillMutation = () => {
   return useMutation({
     mutationKey: ["bills", "delete"],
     mutationFn: async (billId: string) => {
-      await budgetDb.envelopes.delete(billId);
+      // Phase 2 Migration: Delete from transactions table
+      await budgetDb.transactions.delete(billId);
       return billId;
     },
     onSuccess: (billId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
 
@@ -378,10 +409,11 @@ export const useMarkBillPaidMutation = () => {
       paidDate?: string;
       envelopeId?: string;
     }) => {
-      const bill = await budgetDb.envelopes.get(billId);
-      if (!bill) throw new Error(`Bill with ID ${billId} not found`);
+      // Phase 2 Migration: Get scheduled transaction (bill)
+      const scheduledBill = await budgetDb.transactions.get(billId);
+      if (!scheduledBill) throw new Error(`Bill with ID ${billId} not found`);
 
-      const effectiveEnvelopeId = envelopeId || (bill as LiabilityEnvelope).envelopeId;
+      const effectiveEnvelopeId = envelopeId || scheduledBill.envelopeId;
       if (!effectiveEnvelopeId || effectiveEnvelopeId.trim() === "") {
         throw new Error("Bill payment requires an envelope.");
       }
@@ -392,15 +424,9 @@ export const useMarkBillPaidMutation = () => {
 
       const paymentDate = paidDate || new Date().toISOString().split("T")[0];
 
-      await budgetDb.envelopes.update(billId, {
-        isPaid: true,
-        paidAmount,
-        paidDate: paymentDate,
-        lastModified: Date.now(),
-      } as Record<string, unknown>);
-
+      // Create the actual payment transaction (non-scheduled)
       const rawPaymentTransaction = createPaymentTransaction(
-        bill as LiabilityEnvelope,
+        scheduledBill,
         billId,
         paidAmount,
         paymentDate,
@@ -424,6 +450,7 @@ export const useMarkBillPaidMutation = () => {
         toEnvelopeId: zodValidated.toEnvelopeId ?? undefined,
       };
 
+      // Add the payment transaction
       await budgetDb.transactions.put(paymentTransaction);
       await optimisticHelpers.addTransaction(queryClient, paymentTransaction);
 
