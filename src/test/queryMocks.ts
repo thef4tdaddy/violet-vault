@@ -58,35 +58,33 @@ export const createMockDexie = () => {
         })),
       })),
       where: vi.fn().mockImplementation((key: string) => ({
-        equals: vi.fn().mockImplementation((val: any) => ({
-          toArray: vi.fn(async () => {
+        equals: vi.fn().mockImplementation((val: any) => {
+          // Shared predicate for this key/value pair, used by both toArray and filter
+          const baseFilter = (t: any): boolean => {
             if (key === "isScheduled") {
-              return mockData.transactions.filter((t: any) => {
-                // Handle both boolean and numeric (0/1) from Dexie
-                const isScheduled = t.isScheduled === true || t.isScheduled === 1;
-                const matchValue = val === true || val === 1;
-                return isScheduled === matchValue;
-              });
+              // Handle both boolean and numeric (0/1) from Dexie
+              const isScheduled = t.isScheduled === true || t.isScheduled === 1;
+              const matchValue = val === true || val === 1;
+              return isScheduled === matchValue;
             }
             if (key === "type") {
-              return mockData.transactions.filter((t: any) => t.type === val);
+              return t.type === val;
             }
-            return mockData.transactions.filter((t: any) => (t as any)[key] === val);
-          }),
-          filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+            return (t as any)[key] === val;
+          };
+
+          return {
             toArray: vi.fn(async () => {
-              let filtered = mockData.transactions;
-              if (key === "isScheduled") {
-                filtered = mockData.transactions.filter((t: any) => {
-                  const isScheduled = t.isScheduled === true || t.isScheduled === 1;
-                  const matchValue = val === true || val === 1;
-                  return isScheduled === matchValue;
-                });
-              }
-              return filtered.filter(fn);
+              return mockData.transactions.filter(baseFilter);
             }),
-          })),
-        })),
+            filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+              toArray: vi.fn(async () => {
+                // Apply both the equals predicate and the additional filter predicate
+                return mockData.transactions.filter((t: any) => baseFilter(t) && fn(t));
+              }),
+            })),
+          };
+        }),
       })),
       add: vi.fn(async (item: Transaction) => {
         mockData.transactions.push(item);
