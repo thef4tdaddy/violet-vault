@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { getIcon } from "@/utils/icons";
 
 export interface PageHeaderProps {
@@ -56,25 +57,41 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       {/* Left side: Icon + Title + Subtitle */}
       <div className="flex-1">
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav className="flex items-center gap-2 text-sm text-slate-600 mb-3">
-            {breadcrumbs.map((crumb, index) => (
-              <React.Fragment key={index}>
-                {crumb.href ? (
-                  <a href={crumb.href} className="hover:text-slate-900 transition-colors">
-                    {crumb.label}
-                  </a>
-                ) : (
-                  <span className="text-slate-900 font-medium">{crumb.label}</span>
-                )}
-                {index < breadcrumbs.length - 1 && (
-                  <span className="text-slate-400">
-                    {React.createElement(getIcon("ChevronRight"), {
-                      className: "h-4 w-4",
-                    })}
-                  </span>
-                )}
-              </React.Fragment>
-            ))}
+          <nav
+            className="flex items-center gap-2 text-sm text-slate-600 mb-3"
+            aria-label="Breadcrumb"
+          >
+            {breadcrumbs.map((crumb, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              const key = `${crumb.href ?? "nohref"}-${crumb.label}`;
+              return (
+                <React.Fragment key={key}>
+                  {crumb.href ? (
+                    <Link
+                      to={crumb.href}
+                      className="hover:text-slate-900 transition-colors"
+                      aria-current={isLast ? "page" : undefined}
+                    >
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span
+                      className="text-slate-900 font-medium"
+                      aria-current={isLast ? "page" : undefined}
+                    >
+                      {crumb.label}
+                    </span>
+                  )}
+                  {!isLast && (
+                    <span className="text-slate-400">
+                      {React.createElement(getIcon("ChevronRight"), {
+                        className: "h-4 w-4",
+                      })}
+                    </span>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </nav>
         )}
 

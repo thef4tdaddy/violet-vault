@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import { BrowserRouter } from "react-router-dom";
 import PageHeader from "../PageHeader";
 import "@testing-library/jest-dom";
 
@@ -16,6 +17,11 @@ vi.mock("@/utils/icons", () => ({
   }),
 }));
 
+// Wrapper component for tests that need Router context
+const renderWithRouter = (ui: React.ReactElement) => {
+  return render(<BrowserRouter>{ui}</BrowserRouter>);
+};
+
 describe("PageHeader", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,40 +29,42 @@ describe("PageHeader", () => {
 
   describe("Basic Rendering", () => {
     it("should render title", () => {
-      render(<PageHeader title="Test Title" />);
+      renderWithRouter(<PageHeader title="Test Title" />);
       expect(screen.getByText("Test Title")).toBeInTheDocument();
     });
 
     it("should render title and subtitle", () => {
-      render(<PageHeader title="Test Title" subtitle="Test Subtitle" />);
+      renderWithRouter(<PageHeader title="Test Title" subtitle="Test Subtitle" />);
       expect(screen.getByText("Test Title")).toBeInTheDocument();
       expect(screen.getByText("Test Subtitle")).toBeInTheDocument();
     });
 
     it("should render without subtitle when not provided", () => {
-      render(<PageHeader title="Test Title" />);
+      renderWithRouter(<PageHeader title="Test Title" />);
       expect(screen.queryByText("Test Subtitle")).not.toBeInTheDocument();
     });
 
     it("should apply custom className", () => {
-      const { container } = render(<PageHeader title="Test Title" className="custom-class" />);
+      const { container } = renderWithRouter(
+        <PageHeader title="Test Title" className="custom-class" />
+      );
       expect(container.firstChild).toHaveClass("custom-class");
     });
   });
 
   describe("Icon Rendering", () => {
     it("should render icon when provided", () => {
-      render(<PageHeader title="Test Title" icon="Receipt" />);
+      renderWithRouter(<PageHeader title="Test Title" icon="Receipt" />);
       expect(screen.getByTestId("icon-Receipt")).toBeInTheDocument();
     });
 
     it("should not render icon when not provided", () => {
-      render(<PageHeader title="Test Title" />);
+      renderWithRouter(<PageHeader title="Test Title" />);
       expect(screen.queryByTestId(/^icon-/)).not.toBeInTheDocument();
     });
 
     it("should apply correct icon styling", () => {
-      render(<PageHeader title="Test Title" icon="Receipt" />);
+      renderWithRouter(<PageHeader title="Test Title" icon="Receipt" />);
       const icon = screen.getByTestId("icon-Receipt");
       expect(icon).toHaveClass("h-8", "w-8", "text-white");
     });
@@ -69,7 +77,7 @@ describe("PageHeader", () => {
         { label: "Settings", href: "/settings" },
         { label: "Profile" },
       ];
-      render(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
       expect(screen.getByText("Home")).toBeInTheDocument();
       expect(screen.getByText("Settings")).toBeInTheDocument();
       expect(screen.getByText("Profile")).toBeInTheDocument();
@@ -77,38 +85,63 @@ describe("PageHeader", () => {
 
     it("should render clickable breadcrumb links", () => {
       const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Current" }];
-      render(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
       const homeLink = screen.getByText("Home");
       expect(homeLink).toHaveAttribute("href", "/");
     });
 
     it("should render last breadcrumb without link", () => {
       const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Current" }];
-      render(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
       const current = screen.getByText("Current");
       expect(current.tagName).toBe("SPAN");
     });
 
     it("should render chevron separators", () => {
       const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Settings" }];
-      render(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
       expect(screen.getByTestId("icon-ChevronRight")).toBeInTheDocument();
     });
 
     it("should not render breadcrumbs when empty array", () => {
-      render(<PageHeader title="Test Title" breadcrumbs={[]} />);
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={[]} />);
       expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     });
 
     it("should not render breadcrumbs when not provided", () => {
-      render(<PageHeader title="Test Title" />);
+      renderWithRouter(<PageHeader title="Test Title" />);
       expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    });
+
+    it("should have aria-label on breadcrumb navigation", () => {
+      const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Current" }];
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      const nav = screen.getByRole("navigation");
+      expect(nav).toHaveAttribute("aria-label", "Breadcrumb");
+    });
+
+    it("should have aria-current on last breadcrumb item", () => {
+      const breadcrumbs = [
+        { label: "Home", href: "/" },
+        { label: "Settings", href: "/settings" },
+        { label: "Profile" },
+      ];
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      const lastItem = screen.getByText("Profile");
+      expect(lastItem).toHaveAttribute("aria-current", "page");
+    });
+
+    it("should not have aria-current on non-last breadcrumb items", () => {
+      const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Current" }];
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      const homeLink = screen.getByText("Home");
+      expect(homeLink).not.toHaveAttribute("aria-current");
     });
   });
 
   describe("Actions", () => {
     it("should render actions when provided", () => {
-      render(<PageHeader title="Test Title" actions={<button>Add New</button>} />);
+      renderWithRouter(<PageHeader title="Test Title" actions={<button>Add New</button>} />);
       expect(screen.getByText("Add New")).toBeInTheDocument();
     });
 
@@ -129,7 +162,7 @@ describe("PageHeader", () => {
     });
 
     it("should not render actions when not provided", () => {
-      const { container } = render(<PageHeader title="Test Title" />);
+      const { container } = renderWithRouter(<PageHeader title="Test Title" />);
       const buttons = container.querySelectorAll("button");
       expect(buttons).toHaveLength(0);
     });
@@ -137,7 +170,7 @@ describe("PageHeader", () => {
 
   describe("Layout and Responsiveness", () => {
     it("should apply responsive flex layout classes", () => {
-      const { container } = render(<PageHeader title="Test Title" />);
+      const { container } = renderWithRouter(<PageHeader title="Test Title" />);
       const header = container.firstChild as HTMLElement;
       expect(header).toHaveClass(
         "flex",
@@ -149,7 +182,7 @@ describe("PageHeader", () => {
     });
 
     it("should apply gap spacing", () => {
-      const { container } = render(<PageHeader title="Test Title" />);
+      const { container } = renderWithRouter(<PageHeader title="Test Title" />);
       expect(container.firstChild).toHaveClass("gap-4");
     });
   });
@@ -157,7 +190,7 @@ describe("PageHeader", () => {
   describe("Complete Example", () => {
     it("should render all elements together", () => {
       const breadcrumbs = [{ label: "Home", href: "/" }, { label: "Bills" }];
-      render(
+      renderWithRouter(
         <PageHeader
           title="Bill Manager"
           subtitle="Manage your scheduled expenses"
@@ -185,13 +218,13 @@ describe("PageHeader", () => {
 
   describe("Typography Styles", () => {
     it("should apply correct title styles", () => {
-      render(<PageHeader title="Test Title" />);
+      renderWithRouter(<PageHeader title="Test Title" />);
       const title = screen.getByText("Test Title");
       expect(title).toHaveClass("text-2xl", "font-bold", "text-slate-900");
     });
 
     it("should apply correct subtitle styles", () => {
-      render(<PageHeader title="Test Title" subtitle="Test Subtitle" />);
+      renderWithRouter(<PageHeader title="Test Title" subtitle="Test Subtitle" />);
       const subtitle = screen.getByText("Test Subtitle");
       expect(subtitle).toHaveClass("text-sm", "text-slate-600", "mt-1");
     });
