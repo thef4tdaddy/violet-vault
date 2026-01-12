@@ -284,14 +284,14 @@ export default defineConfig(() => {
         },
       }),
       viteCompression({
-        verbose: true,
+        verbose: false,
         disable: false,
         threshold: 10240,
         algorithm: "gzip",
         ext: ".gz",
       }),
       viteCompression({
-        verbose: true,
+        verbose: false,
         disable: false,
         threshold: 10240,
         algorithm: "brotliCompress",
@@ -317,7 +317,7 @@ export default defineConfig(() => {
       outDir: "dist",
       emptyOutDir: true,
       target: "esnext",
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 1500, // Increased for feature-rich app with lazy-loaded routes
       reportCompressedSize: isProduction,
       minify: (isDevelopmentMode ? false : "terser") as "terser" | false,
       sourcemap: (enableDebugBuild || isDevelopmentMode ? 'inline' : false) as 'inline' | false,
@@ -332,9 +332,19 @@ export default defineConfig(() => {
             return chunkInfo.name === 'firebase-messaging-sw' ? '[name].js' : 'assets/[name]-[hash].js';
           },
           manualChunks: (id: string) => {
-            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) return "react-vendor";
-            if (id.includes("node_modules/firebase")) return "firebase-vendor";
-            if (id.includes("node_modules/@tanstack/react-query") || id.includes("node_modules/dexie") || id.includes("node_modules/zustand")) return "data-vendor";
+            // Only split vendors that DON'T depend on React to avoid circular dependencies
+            
+            // Firebase bundle (independent of React)
+            if (id.includes("node_modules/firebase") || id.includes("node_modules/@firebase")) {
+              return "firebase-vendor";
+            }
+            // PDF generation (independent of React)
+            if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas")) {
+              return "pdf-vendor";
+            }
+            
+            // Note: React, TanStack Query, Recharts, Dexie, and Zustand are left in main/react bundles
+            // to avoid circular dependencies since they all depend on or integrate with React
           },
         } as any,
       },
