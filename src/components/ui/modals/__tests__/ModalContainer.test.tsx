@@ -322,7 +322,7 @@ describe("ModalContainer", () => {
 
     it("should have backdrop blur on header", () => {
       const { container } = render(<ModalContainer {...defaultProps} title="Test" />);
-      const header = container.querySelector(".backdrop-blur-sm");
+      const header = container.querySelector(".sticky.backdrop-blur-sm");
       expect(header).toBeInTheDocument();
     });
 
@@ -381,7 +381,7 @@ describe("ModalContainer", () => {
       render(<ModalContainer {...defaultProps} onClose={onClose} />);
 
       const backdrop = screen.getByRole("dialog");
-      fireEvent.click(backdrop, { target: backdrop });
+      await userEvent.click(backdrop);
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
