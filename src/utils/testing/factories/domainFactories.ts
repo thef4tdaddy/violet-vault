@@ -67,28 +67,23 @@ export const createEnvelopePartial = (overrides?: EnvelopePartial): EnvelopePart
  */
 export const createBill = (overrides?: Partial<Bill>): Bill => {
   const defaults: Bill = {
-    status: "active",
     id: generateId(),
-    type: "bill",
-    name: `Bill ${generateId().substring(0, 8)}`,
-    dueDate: generateFutureDate(30),
-    amount: generateAmount(50, 500),
-    category: pickRandom(["utilities", "subscriptions", "insurance", "rent"]),
-    color: "#3B82F6",
-    isPaid: false,
-    isRecurring: false,
+    type: "expense",
+    description: `Bill ${generateId().substring(0, 8)}`,
+    date: generateFutureDate(30),
+    amount: -Math.abs(generateAmount(50, 500)), // Expenses are negative
     envelopeId: generateId(),
+    category: pickRandom(["utilities", "subscriptions", "insurance", "rent"]),
+    isScheduled: true,
+    recurrenceRule: undefined,
     lastModified: generateTimestamp(),
     createdAt: generateTimestamp(),
-    description: "Test bill description",
-    interestRate: 0,
-    minimumPayment: 0,
-    currentBalance: 0,
-    archived: false,
-    autoAllocate: true,
   };
 
-  return mergeDefaults(defaults, overrides);
+  const merged = { ...defaults, ...overrides };
+  // Ensure amount is negative for expenses
+  merged.amount = -Math.abs(merged.amount);
+  return merged;
 };
 
 /**
@@ -97,8 +92,8 @@ export const createBill = (overrides?: Partial<Bill>): Bill => {
  */
 export const createRecurringBill = (overrides?: Partial<Bill>): Bill => {
   return createBill({
-    isRecurring: true,
-    frequency: "monthly",
+    isScheduled: true,
+    recurrenceRule: "FREQ=MONTHLY", // Valid recurrencerule
     ...overrides,
   });
 };
@@ -108,7 +103,7 @@ export const createRecurringBill = (overrides?: Partial<Bill>): Bill => {
  * Creates a partial bill for update operations
  */
 export const createBillPartial = (overrides?: BillPartial): BillPartial => {
-  return overrides || { name: "Updated Bill" };
+  return overrides || { description: "Updated Bill" };
 };
 
 /**

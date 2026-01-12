@@ -91,25 +91,21 @@ const createDeleteEnvelopeOp =
     if (env && (env.currentBalance || 0) > 0) {
       await setUnassignedCash((await getUnassignedCash()) + (env.currentBalance || 0));
     }
-    const dbLegacy = budgetDb as unknown as Record<
-      string,
-      {
-        where: (prop: string) => {
-          equals: (val: string) => {
-            toArray: () => Promise<Record<string, unknown>[]>;
-          };
-        };
-        delete: (id: string) => Promise<void>;
-        update: (id: string, updates: Record<string, unknown>) => Promise<void>;
-      }
-    >;
-    const bills = await dbLegacy.bills.where("envelopeId").equals(id).toArray();
+    // Phase 2: Bills are scheduled transactions in the transactions table
+    const bills = await budgetDb.transactions
+      .where("envelopeId")
+      .equals(id)
+      .filter((t) => t.isScheduled === true && t.type === "expense")
+      .toArray();
+
     for (const b of bills) {
       const billId = b.id as string;
-      if (deleteBillsToo) await dbLegacy.bills.delete(billId);
-      else {
-        await dbLegacy.bills.update(billId, { envelopeId: undefined });
-        await optimisticHelpers.updateBill(queryClient, billId, { envelopeId: undefined });
+      if (deleteBillsToo) {
+        await budgetDb.transactions.delete(billId);
+        await optimisticHelpers.removeTransaction(queryClient, billId);
+      } else {
+        await budgetDb.transactions.update(billId, { envelopeId: undefined });
+        await optimisticHelpers.updateTransaction(queryClient, billId, { envelopeId: undefined });
       }
     }
     await optimisticHelpers.removeEnvelope(queryClient, id);

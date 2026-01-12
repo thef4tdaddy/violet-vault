@@ -2,6 +2,11 @@ import logger from "../common/logger";
 import type { Bill } from "@/types/bills";
 
 /**
+ * Recurring bill utilities
+ * Phase 2 Migration: Compatible with Transaction-based bills via computed fields
+ */
+
+/**
  * Calculate the next due date based on payment date and frequency
  * @param {string|Date} paidDate - The date the bill was paid
  * @param {string} frequency - The billing frequency (monthly, biweekly, weekly, quarterly, yearly)
@@ -47,7 +52,8 @@ export const calculateNextDueDate = (paidDate: string | Date, frequency: string)
 
 /**
  * Process a bill for recurring logic - resets paid bills when their next cycle arrives
- * @param {Object} bill - The bill to process
+ * Phase 2 Migration: Uses computed dueDate field (from Transaction.date)
+ * @param {Object} bill - The bill to process (supports both legacy and Transaction fields)
  * @param {Function} updateBillFn - Function to update the bill in database
  * @returns {Object} The processed bill
  */
@@ -62,7 +68,10 @@ export const processRecurringBill = (bill: Bill, updateBillFn: (bill: Bill) => v
     // If today is on or after the next due date, reset the bill to unpaid
     if (nextDueDate && today >= nextDueDate) {
       processedBill.isPaid = false;
-      processedBill.dueDate = nextDueDate.toISOString().split("T")[0];
+      // Update both dueDate (legacy) and date (Transaction) for compatibility
+      const nextDueDateStr = nextDueDate.toISOString().split("T")[0];
+      processedBill.dueDate = nextDueDateStr;
+      processedBill.date = nextDueDateStr; // Keep as string for consistency
       processedBill.paidDate = undefined;
 
       // Update the bill in the database

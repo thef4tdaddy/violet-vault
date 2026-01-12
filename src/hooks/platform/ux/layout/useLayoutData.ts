@@ -58,32 +58,40 @@ export const useLayoutData = () => {
   }, [budgetData.transactions]);
 
   const billsList = useMemo<DbBill[]>(() => {
-    return (bills?.bills || [])
+    // Cast to unknown[] to bypass strict type check between Transaction and LiabilityEnvelope types during migration
+    return ((bills?.bills || []) as unknown[])
       .filter((bill): bill is DbBill => {
         if (!bill || typeof bill !== "object") {
           return false;
         }
 
-        const record = bill as Partial<DbBill>;
+        const record = bill as unknown as Record<string, unknown>;
         return (
           typeof record.id === "string" &&
-          typeof record.name === "string" &&
-          typeof record.name === "string" &&
-          // Relaxed check for legacy properties
-          // typeof record.dueDate ...
-          // typeof record.amount ...
+          // Relaxed checks for compatibility with both Transaction (Bill) and legacy Bill
+          (typeof record.name === "string" || typeof record.description === "string") &&
           typeof record.lastModified === "number"
         );
       })
-      .map((bill) => ({
-        ...bill,
-        dueDate:
-          (bill as unknown as Record<string, unknown>).dueDate instanceof Date
-            ? ((bill as unknown as Record<string, unknown>).dueDate as Date)
-            : new Date(
-                ((bill as unknown as Record<string, unknown>).dueDate as string) || Date.now()
-              ),
-      }));
+      .map((bill) => {
+        const record = bill as unknown as Record<string, unknown>;
+        const name = (record.description as string) || (record.name as string) || "Unknown Bill";
+        const dateRaw = record.date || record.dueDate || Date.now();
+        const dueDate = dateRaw instanceof Date ? dateRaw : new Date(dateRaw as string);
+
+        return {
+          ...bill,
+          name,
+          dueDate,
+          // Defaults for LiabilityEnvelope compatibility
+          archived: (record.archived as boolean) ?? false,
+          currentBalance: (record.currentBalance as number) ?? 0,
+          color: (record.color as string) ?? "#808080",
+          autoAllocate: (record.autoAllocate as boolean) ?? false,
+          category: (record.category as string) ?? "bills",
+          type: "liability",
+        } as unknown as DbBill;
+      });
   }, [bills?.bills]);
 
   // Calculate derived values using existing utilities

@@ -11,6 +11,7 @@ import { createMockDexie, mockDataGenerators } from "../../../../../test/queryMo
 // Mock dependencies
 vi.mock("../../../../../db/budgetDb", () => ({
   budgetDb: null, // Will be set in beforeEach
+  getBudgetMetadata: vi.fn().mockResolvedValue({}),
 }));
 
 vi.mock("../../../../../utils/common/logger", () => ({
@@ -68,8 +69,8 @@ describe("useBudgetQueries", () => {
       const mockSavingsGoals = [mockDataGenerators.savingsGoal({ id: "save_1", name: "Vacation" })];
 
       mockDb._mockData.envelopes = mockEnvelopes;
-      mockDb._mockData.transactions = mockTransactions;
-      mockDb._mockData.bills = mockBills;
+      mockDb._mockData.transactions = [...mockTransactions, ...mockBills];
+      mockDb._mockData.bills = []; // Bills are no longer envelopes
       mockDb._mockData.savingsGoals = mockSavingsGoals;
 
       // Act
@@ -80,12 +81,8 @@ describe("useBudgetQueries", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.envelopes).toEqual([
-        ...mockEnvelopes,
-        ...mockBills,
-        ...mockSavingsGoals,
-      ]);
-      expect(result.current.transactions).toEqual(mockTransactions);
+      expect(result.current.envelopes).toEqual([...mockEnvelopes, ...mockSavingsGoals]);
+      expect(result.current.transactions).toEqual([...mockTransactions, ...mockBills]);
       expect(result.current.bills).toEqual(mockBills);
       expect(result.current.savingsGoals).toEqual(mockSavingsGoals);
     });
@@ -187,6 +184,9 @@ describe("useBudgetQueries", () => {
       mockDb.envelopes.toArray.mockResolvedValue([]);
       mockDb.transactions.orderBy.mockReturnValue({
         reverse: vi.fn().mockReturnValue({
+          limit: vi.fn().mockReturnValue({
+            toArray: vi.fn().mockRejectedValue(new Error("Transaction error")),
+          }),
           toArray: vi.fn().mockRejectedValue(new Error("Transaction error")),
         }),
       });
@@ -206,12 +206,22 @@ describe("useBudgetQueries", () => {
     });
 
     it("should compute error state from failed queries", async () => {
-      // Arrange
+      // Failing the transactions query (which includes bills)
       const testError = new Error("Test error");
-      mockDb.bills.toArray.mockRejectedValue(testError);
-      mockDb.envelopes.toArray.mockResolvedValue([]);
+
+      const filterMock = vi.fn().mockReturnValue({
+        limit: vi.fn().mockReturnValue({
+          toArray: vi.fn().mockRejectedValue(testError),
+        }),
+        toArray: vi.fn().mockRejectedValue(testError),
+      });
+
+      mockDb.transactions.filter = filterMock;
       mockDb.transactions.orderBy.mockReturnValue({
         reverse: vi.fn().mockReturnValue({
+          limit: vi.fn().mockReturnValue({
+            toArray: vi.fn().mockResolvedValue([]),
+          }),
           toArray: vi.fn().mockResolvedValue([]),
         }),
       });

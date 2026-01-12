@@ -5,7 +5,7 @@
 
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger.ts";
-import type { Bill as DexieBill, PaycheckHistory } from "@/db/types";
+import type { Transaction } from "@/db/types";
 
 interface TransactionFilters {
   dateRange?: {
@@ -13,16 +13,6 @@ interface TransactionFilters {
     end: Date;
   };
   envelopeId?: string;
-}
-
-interface LegacyTable<T = Record<string, unknown>> {
-  toArray: () => Promise<T[]>;
-}
-
-interface LegacyBudgetDb {
-  bills: LegacyTable;
-  savingsGoals: LegacyTable;
-  paycheckHistory: LegacyTable<PaycheckHistory>;
 }
 
 export const queryFunctions = {
@@ -50,21 +40,24 @@ export const queryFunctions = {
   },
 
   bills: async () => {
-    const cachedBills = await (budgetDb as unknown as LegacyBudgetDb).bills.toArray();
-    return cachedBills || [];
+    // Phase 2: Bills are scheduled transactions
+    const transactions = await budgetDb.transactions
+      .filter((t) => t.isScheduled === true)
+      .toArray();
+    return transactions || [];
   },
 
   savingsGoals: async () => {
-    const cachedSavingsGoals = await (budgetDb as unknown as LegacyBudgetDb).savingsGoals.toArray();
-    return cachedSavingsGoals || [];
+    // Phase 2: Savings Goals are goal envelopes
+    const goals = await budgetDb.envelopes.where("type").equals("goal").toArray();
+    return goals || [];
   },
 
   paycheckHistory: async () => {
     try {
-      // Fetch all paychecks and sort by date/processedAt
-      const cachedPaychecks = await (
-        budgetDb as unknown as LegacyBudgetDb
-      ).paycheckHistory.toArray();
+      // Phase 1 Fix: Use budgetDb.getPaycheckHistory() which queries transactions table
+      // Filters: type === "income" && !!allocations
+      const cachedPaychecks = await budgetDb.getPaycheckHistory();
 
       // Sort by processedAt (preferred) or date (legacy), most recent first
       const sorted = cachedPaychecks.sort((a, b) => {
@@ -91,9 +84,10 @@ export const queryFunctions = {
     const budgetMetadata = await getBudgetMetadata();
 
     // Fetch data from Dexie instead of undefined variables
+    // Fetch data from Dexie
     const cachedEnvelopes = await budgetDb.envelopes.toArray();
-    const cachedSavingsGoals = await (budgetDb as unknown as LegacyBudgetDb).savingsGoals.toArray();
-    const cachedBills = await (budgetDb as unknown as LegacyBudgetDb).bills.toArray();
+    const cachedSavingsGoals = await budgetDb.envelopes.where("type").equals("goal").toArray();
+    const cachedBills = await budgetDb.transactions.filter((t) => t.isScheduled === true).toArray();
     const cachedTransactions = await budgetDb.transactions
       .orderBy("date")
       .reverse()
@@ -131,9 +125,9 @@ export const queryFunctions = {
       unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
       actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
       recentTransactions: safeTransactions.slice(0, 10),
-      upcomingBills: (safeBills as DexieBill[]).filter((bill) => {
-        if (!bill.dueDate) return false;
-        const dueDate = new Date(bill.dueDate);
+      upcomingBills: (safeBills as unknown as Transaction[]).filter((bill) => {
+        if (!bill.date) return false;
+        const dueDate = new Date(bill.date);
         const thirtyDaysFromNow = new Date();
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
         return dueDate <= thirtyDaysFromNow;

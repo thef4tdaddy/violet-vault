@@ -54,7 +54,57 @@ export const createMockDexie = () => {
       toArray: vi.fn(async () => mockData.transactions),
       orderBy: vi.fn(() => ({
         reverse: vi.fn(() => ({
+          limit: vi.fn((n: number) => ({
+            toArray: vi.fn(async () => mockData.transactions.slice(0, n)),
+          })),
           toArray: vi.fn(async () => mockData.transactions),
+        })),
+      })),
+      where: vi.fn().mockImplementation((key: string) => ({
+        equals: vi.fn().mockImplementation((val: any) => {
+          // Shared predicate for this key/value pair, used by both toArray and filter
+          const baseFilter = (t: any): boolean => {
+            if (key === "isScheduled") {
+              // Handle both boolean and numeric (0/1) from Dexie
+              const isScheduled = t.isScheduled === true || t.isScheduled === 1;
+              const matchValue = val === true || val === 1;
+              return isScheduled === matchValue;
+            }
+            if (key === "type") {
+              return t.type === val;
+            }
+            return (t as any)[key] === val;
+          };
+
+          return {
+            toArray: vi.fn(async () => {
+              return mockData.transactions.filter(baseFilter);
+            }),
+            filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+              toArray: vi.fn(async () => {
+                // Apply both the equals predicate and the additional filter predicate
+                return mockData.transactions.filter((t: any) => baseFilter(t) && fn(t));
+              }),
+            })),
+          };
+        }),
+        aboveOrEqual: vi.fn().mockImplementation((val: any) => ({
+          filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+            toArray: vi.fn(async () => {
+              if (key === "date") {
+                return mockData.transactions.filter((t) => {
+                  return new Date(t.date) >= new Date(val) && fn(t);
+                });
+              }
+              return mockData.transactions.filter(fn);
+            }),
+          })),
+          toArray: vi.fn(async () => {
+            if (key === "date") {
+              return mockData.transactions.filter((t) => new Date(t.date) >= new Date(val));
+            }
+            return mockData.transactions;
+          }),
         })),
       })),
       add: vi.fn(async (item: Transaction) => {
@@ -84,6 +134,9 @@ export const createMockDexie = () => {
           mockData.transactions.splice(index, 1);
         }
       }),
+      filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+        toArray: vi.fn(async () => mockData.transactions.filter(fn)),
+      })),
       get: vi.fn(async (id: string) => {
         return mockData.transactions.find((t) => t.id === id);
       }),
@@ -414,17 +467,29 @@ export const mockDataGenerators = {
     ...overrides,
   }),
 
-  bill: (overrides = {}) => ({
+  bill: (
+    overrides: Partial<Bill & { isPaid?: boolean; paidDate?: string; paidAmount?: number }> = {}
+  ) => ({
     id: `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: "Test Bill",
-    provider: "Test Provider",
-    amount: 50,
-    dueDate: new Date().toISOString().split("T")[0],
+    // Phase 2 Migration: Bills are now scheduled expense transactions
+    description: overrides.name || "Test Bill", // name maps to description
+    date: overrides.dueDate || new Date().toISOString().split("T")[0], // dueDate maps to date
+    // Ensure amount is always negative for expenses - normalize if positive passed
+    amount: -Math.abs((overrides.amount as number) || 50), // Negative for expense
+    envelopeId: overrides.envelopeId || "unassigned",
     category: "Bills & Utilities",
-    isPaid: false,
-    type: "bill",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    type: "expense" as const,
+    isScheduled: true, // Bills are scheduled transactions
+    recurrenceRule: overrides.recurrenceRule || undefined,
+    lastModified: Date.now(),
+    createdAt: Date.now(),
+    notes: overrides.notes || undefined,
+    // Computed fields for backward compatibility
+    name: overrides.name || "Test Bill",
+    dueDate: overrides.dueDate || new Date().toISOString().split("T")[0],
+    isPaid: overrides.isPaid || false,
+    paidDate: overrides.paidDate || undefined,
+    paidAmount: overrides.paidAmount || undefined,
     ...overrides,
   }),
 

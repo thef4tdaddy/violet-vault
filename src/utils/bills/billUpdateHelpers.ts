@@ -1,6 +1,7 @@
 /**
  * Bill update utility functions
  * Extracted from useBillOperations.js to reduce complexity
+ * Phase 2 Migration: Compatible with Transaction-based bills via flexible field handling
  */
 import logger from "@/utils/common/logger";
 import type { Bill } from "@/types/bills";
@@ -78,7 +79,7 @@ interface DateChange {
 // Extended Bill interface to include modification history
 type BillWithHistory = Bill & {
   modificationHistory?: ModificationHistoryEntry[];
-  lastModified?: string;
+  lastModified?: number;
 };
 
 /**
@@ -218,6 +219,7 @@ export const createModificationHistoryEntry = (change: BillChange): Modification
 
 /**
  * Transform bills for update based on changes
+ * Phase 2 Migration: Updates both dueDate and date fields for Transaction compatibility
  */
 export const transformBillsForUpdate = (selectedBills: Bill[], changes: BillChanges): Bill[] => {
   return selectedBills
@@ -232,8 +234,17 @@ export const transformBillsForUpdate = (selectedBills: Bill[], changes: BillChan
       const billWithHistory: BillWithHistory = {
         ...bill,
         amount: Math.abs(change.amount || 0), // Ensure positive amount
-        dueDate: change.dueDate || bill.dueDate, // Keep original due date if not changed
-        lastModified: new Date().toISOString(),
+        dueDate: change.dueDate || bill.dueDate, // Legacy field
+        // Normalize date field - handle both string and Date types safely
+        date:
+          change.dueDate ||
+          (typeof bill.date === "string"
+            ? bill.date
+            : bill.date instanceof Date
+              ? bill.date.toISOString().split("T")[0]
+              : bill.dueDate) ||
+          "",
+        lastModified: Date.now(),
         modificationHistory: [...existingHistory, createModificationHistoryEntry(change)],
       };
 

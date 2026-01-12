@@ -105,9 +105,9 @@ export const useBillCalculations = () => {
       // Fix description type from string | null | undefined to string | undefined
       const billsWithSafeDescription = bills.map((b) => ({
         ...b,
-        description: b.description === null ? undefined : b.description,
+        description: b.description || undefined,
       }));
-      const categorized = categorizeBills(billsWithSafeDescription as unknown as UiBill[]);
+      const categorized = categorizeBills(billsWithSafeDescription);
       const totals = calculateBillTotals(categorized);
       return { categorizedBills: categorized, totals };
     };
@@ -125,10 +125,7 @@ export const useBillCalculations = () => {
         ...b,
         description: b.description === null ? undefined : b.description,
       }));
-      return filterBills(
-        billsWithSafeDescription as unknown as UiBill[],
-        filterOptions
-      ) as unknown as UiBill[];
+      return filterBills(billsWithSafeDescription, filterOptions) as unknown as UiBill[];
     };
   }, []);
 

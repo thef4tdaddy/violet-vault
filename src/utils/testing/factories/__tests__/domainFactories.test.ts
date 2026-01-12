@@ -82,22 +82,21 @@ describe("Domain Factories", () => {
 
       expect(() => validateBill(bill)).not.toThrow();
       expect(bill.id).toBeDefined();
-      expect(bill.name).toBeDefined();
-      expect(bill.amount).toBeGreaterThan(0);
-      expect(bill.isPaid).toBe(false);
-      expect(bill.isRecurring).toBe(false);
+      expect(bill.description).toBeDefined();
+      expect(bill.amount).toBeLessThan(0); // Expenses are negative
+      expect(bill.isScheduled).toBe(true);
+      expect(bill.recurrenceRule).toBeUndefined();
+      expect(bill.recurrenceRule).toBeUndefined();
     });
 
     it("should create bill with custom properties", () => {
       const bill = createBill({
-        name: "Electric Bill",
-        amount: 150,
-        isPaid: true,
+        description: "Electric Bill",
+        amount: 150, // Factory normalizes this to negative for expenses
       });
 
-      expect(bill.name).toBe("Electric Bill");
-      expect(bill.amount).toBe(150);
-      expect(bill.isPaid).toBe(true);
+      expect(bill.description).toBe("Electric Bill");
+      expect(bill.amount).toBe(-150);
     });
 
     it("should create bill that passes schema validation", () => {
@@ -112,16 +111,18 @@ describe("Domain Factories", () => {
     it("should create recurring bill", () => {
       const bill = createRecurringBill();
 
-      expect(bill.isRecurring).toBe(true);
-      expect(bill.frequency).toBeDefined();
-      expect(["monthly", "quarterly", "annually"]).toContain(bill.frequency);
+      expect(bill.isScheduled).toBe(true);
+      expect(bill.recurrenceRule).toBeDefined();
+      expect(bill.recurrenceRule).toContain("FREQ=");
     });
 
     it("should create recurring bill with custom frequency", () => {
-      const bill = createRecurringBill({ frequency: "monthly" });
+      const bill = createRecurringBill({
+        recurrenceRule: "FREQ=WEEKLY",
+      });
 
-      expect(bill.isRecurring).toBe(true);
-      expect(bill.frequency).toBe("monthly");
+      expect(bill.isScheduled).toBe(true);
+      expect(bill.recurrenceRule).toBe("FREQ=WEEKLY");
     });
   });
 
@@ -129,7 +130,7 @@ describe("Domain Factories", () => {
     it("should create partial bill with defaults", () => {
       const partial = createBillPartial();
 
-      expect(partial.name).toBeDefined();
+      expect(partial.description).toBeDefined();
     });
 
     it("should create partial bill with overrides", () => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Bill } from "@/db/types";
+import type { Bill } from "@/types/bills";
 
 // Type for bill changes tracking
 interface BillChange {
