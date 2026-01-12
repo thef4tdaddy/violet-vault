@@ -58,8 +58,8 @@ const BaseModal: React.FC<BaseModalProps> = ({
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-    // eslint-disable-next-line react-hooks/exhaustive-deps, zustand-safe-patterns/zustand-no-store-actions-in-deps
-  }, [isOpen, closeOnEscape]);
+    // eslint-disable-next-line zustand-safe-patterns/zustand-no-store-actions-in-deps
+  }, [isOpen, closeOnEscape, onClose]);
 
   // Handle overlay click
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
