@@ -1,4 +1,4 @@
-export { FormField } from "./FormField";
+export { FormField, default as FormFieldDefault } from "./FormField";
 export type { FormFieldProps } from "./FormField";
 
 export { default as Input } from "./Input";
@@ -10,5 +10,5 @@ export type { SelectProps } from "./Select";
 export { default as Textarea } from "./Textarea";
 export type { TextareaProps } from "./Textarea";
 
-export { FormSection } from "./FormSection";
+export { FormSection, default as FormSectionDefault } from "./FormSection";
 export type { FormSectionProps } from "./FormSection";
