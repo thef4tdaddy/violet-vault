@@ -3,6 +3,12 @@
  * Extracted from BillManager.jsx for Issue #152
  *
  * Pure functions for bill-related calculations, date parsing, and categorization
+ * 
+ * Phase 2 Migration Note: This utility supports both legacy bill fields and
+ * Transaction-based bills via computed properties:
+ * - name/description (both supported)
+ * - dueDate/date (both supported)
+ * - Works with Transaction-based bills that have computed backward-compatible fields
  */
 import logger from "../common/logger";
 
@@ -13,8 +19,8 @@ interface Bill {
   provider?: string;
   amount?: number;
   monthlyAmount?: number;
-  dueDate?: string | Date;
-  date?: string | Date;
+  dueDate?: string | Date; // Legacy field or computed from date
+  date?: string | Date; // Transaction field or computed from dueDate
   paidDate?: string | Date;
   isPaid?: boolean;
   envelopeId?: string;
@@ -188,19 +194,23 @@ export const calculateBillUrgency = (daysUntilDue: number | null | undefined): s
 
 /**
  * Process a single bill to add calculated fields
- * @param {Object} bill - Raw bill object
+ * Phase 2 Migration: Compatible with Transaction-based bills via computed fields
+ * @param {Object} bill - Raw bill object (supports both legacy and Transaction fields)
  * @param {Date} fromDate - Reference date (defaults to today)
  * @returns {Object} Processed bill with daysUntilDue and urgency
  */
 export const processBillCalculations = (bill: Bill, fromDate: Date = new Date()): Bill => {
-  const daysUntilDue = calculateDaysUntilDue(bill.dueDate, fromDate);
+  // Support both dueDate (legacy) and date (Transaction) fields
+  const dueDateValue = bill.dueDate || bill.date;
+  const daysUntilDue = calculateDaysUntilDue(dueDateValue, fromDate);
   const urgency = calculateBillUrgency(daysUntilDue);
 
   return {
     ...bill,
     // Ensure required fields have valid values
     amount: typeof bill.amount === "number" ? bill.amount : 0,
-    description: bill.description || bill.provider || `Bill ${bill.id}`,
+    // Support both description (Transaction) and name/provider (legacy)
+    description: bill.description || bill.name || bill.provider || `Bill ${bill.id}`,
     isPaid: Boolean(bill.isPaid),
     daysUntilDue: daysUntilDue ?? undefined,
     urgency,
