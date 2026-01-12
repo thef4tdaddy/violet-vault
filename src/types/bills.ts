@@ -18,9 +18,13 @@ export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 
 // Phase 2 Migration: Bill is now a Transaction with scheduled properties
 // Extended with computed fields for UI compatibility
-export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt"> {
+export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"> {
+  // Override id to always be string (Transaction allows string | number)
+  id: string;
+  
   // Computed backward-compatibility fields (derived from Transaction fields)
-  name?: string; // Computed getter: maps to Transaction.description
+  // name is required for UI compatibility (maps to Transaction.description)
+  name: string; // Computed getter: maps to Transaction.description (required)
   dueDate?: string | Date; // Computed getter: maps to Transaction.date
   isPaid?: boolean; // Computed: determined by existence of payment transaction
   paidDate?: string | Date; // From paired payment transaction
@@ -43,7 +47,7 @@ export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt"> {
   createdAt?: number | string;
   updatedAt?: number | string;
   
-  // All other Transaction fields inherited: id, date, description, amount,
+  // All other Transaction fields inherited: date, description, amount,
   // envelopeId, category, type, isScheduled, recurrenceRule, lastModified, notes
 }
 
