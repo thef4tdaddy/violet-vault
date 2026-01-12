@@ -273,6 +273,12 @@ describe("ModalContainer", () => {
       const titleElement = screen.getByText("Test Title");
       expect(titleElement).toHaveAttribute("id", "modal-title");
     });
+
+    it("should not have aria-labelledby when title is not provided", () => {
+      render(<ModalContainer {...defaultProps} title={undefined} />);
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).not.toHaveAttribute("aria-labelledby");
+    });
   });
 
   describe("Styling", () => {
