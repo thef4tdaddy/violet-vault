@@ -1,4 +1,4 @@
-export { FormField, default as FormFieldDefault } from "./FormField";
+export { FormField } from "./FormField";
 export type { FormFieldProps } from "./FormField";
 
 export { default as Input } from "./Input";
