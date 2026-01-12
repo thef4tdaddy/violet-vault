@@ -89,11 +89,15 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
         .filter((txn) => txn.type === "expense")
         .toArray();
 
-      // Get all actual (non-scheduled) transactions to determine paid status
+      // Get recent actual (non-scheduled) transactions to determine paid status
+      // Limit to a recent time window to avoid loading the entire transaction history
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
       const actualTransactions = await budgetDb.transactions
-        .where("isScheduled")
-        .equals(0)
-        .filter((txn) => txn.type === "expense")
+        .where("date")
+        .aboveOrEqual(sixMonthsAgo.toISOString())
+        .filter((txn) => !txn.isScheduled && txn.type === "expense")
         .toArray();
 
       // Map scheduled transactions to bill objects with paid status
