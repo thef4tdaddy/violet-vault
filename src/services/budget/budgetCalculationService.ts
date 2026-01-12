@@ -213,15 +213,14 @@ export class BudgetCalculationService {
         ({
           id: bill.id,
           envelopeId: bill.envelopeId ?? undefined,
-          isPaid: bill.isPaid,
+          isPaid: false, // Transaction doesn't track isPaid directly without calculation
           amount: bill.amount,
-          dueDate:
-            bill.dueDate instanceof Date ? bill.dueDate.toISOString().split("T")[0] : bill.dueDate,
-          name: bill.name,
+          dueDate: bill.date instanceof Date ? bill.date.toISOString().split("T")[0] : bill.date,
+          name: bill.description ?? "Unknown Bill",
           category: bill.category,
-          archived: bill.archived,
+          archived: false,
           lastModified: bill.lastModified,
-          currentBalance: (bill as unknown as Record<string, number>).currentBalance ?? 0,
+          currentBalance: 0,
         }) as ClientBill
     );
 

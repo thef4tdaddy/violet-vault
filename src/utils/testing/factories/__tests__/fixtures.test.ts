@@ -54,15 +54,15 @@ describe("Test Fixtures", () => {
     });
 
     it("should include recurring bills", () => {
-      const recurringBills = standardBills.filter((b) => b.isRecurring);
+      const recurringBills = standardBills.filter((b) => b.recurrenceRule);
 
       expect(recurringBills.length).toBeGreaterThan(0);
     });
 
     it("should have reasonable amounts", () => {
       standardBills.forEach((bill) => {
-        expect(bill.amount).toBeGreaterThan(0);
-        expect(bill.amount).toBeLessThan(500);
+        expect(bill.amount).toBeLessThan(0); // Expenses are negative
+        expect(bill.amount).toBeGreaterThan(-500);
       });
     });
   });
@@ -253,9 +253,9 @@ describe("Test Fixtures", () => {
         expect(overBudgetScenario.unassignedCash).toBeLessThan(0);
       });
 
-      it("should have unpaid bills", () => {
-        const unpaidBills = overBudgetScenario.bills.filter((b) => !b.isPaid);
-        expect(unpaidBills.length).toBeGreaterThan(0);
+      it("should have scheduled bills", () => {
+        const scheduledBills = overBudgetScenario.bills.filter((b) => b.isScheduled);
+        expect(scheduledBills.length).toBeGreaterThan(0);
       });
     });
   });

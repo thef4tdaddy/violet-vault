@@ -4,21 +4,10 @@ import { useEnvelopes } from "../../hooks/budgeting/envelopes/useEnvelopes";
 import useBills from "../../hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useUnassignedCash } from "../../hooks/budgeting/metadata/useUnassignedCash";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
+import { calculateBiweeklyAllocations } from "../../utils/budgeting/allocationCalculations";
 import logger from "../../utils/common/logger";
 import type { Bill } from "../../utils/budgeting/envelopeCalculations";
 import type { Envelope } from "../../db/types";
-
-// Define frequency multipliers with proper typing
-const FREQUENCY_MULTIPLIERS: Record<string, number> = {
-  weekly: 52,
-  biweekly: 26,
-  monthly: 12,
-  quarterly: 4,
-  semiannual: 2,
-  annual: 1,
-};
-
-const BIWEEKLY_MULTIPLIER = 2.17;
 
 // Define types for our functions
 interface AddEnvelopeData {
@@ -28,13 +17,6 @@ interface AddEnvelopeData {
   description?: string;
   envelopeType?: string;
   [key: string]: unknown;
-}
-
-// Interface for handling legacy bill properties during migration
-interface LegacyBill extends Bill {
-  paymentFrequency?: string;
-  frequency?: string;
-  amount?: number;
 }
 
 interface CreateEnvelopeResult {
@@ -81,79 +63,59 @@ const useEnvelopeSystem = () => {
       billsCount: bills.length,
       bills: bills.map((b) => ({
         id: b.id,
-        name: b.name,
+        name: b.description || "Unknown Bill",
         amount: b.amount,
-        frequency: b.frequency,
+        frequency: b.recurrenceRule
+          ? b.recurrenceRule.split(";")[0].split("=")[1].toLowerCase()
+          : "monthly",
       })),
     });
 
     isCalculatingRef.current = true;
 
     // Use the utility function for calculation
-    const totalBiweeklyNeed = calculateBiweeklyNeeds(bills as Bill[]);
+    const totalBiweeklyNeed = calculateBiweeklyNeeds(bills as unknown as Bill[]);
 
     logger.info("Calculated total biweekly need", {
       totalBiweeklyNeed,
       billsProcessed: bills.length,
     });
 
-    // Update envelopes with biweekly allocations
-    const updatedEnvelopes = [...envelopes];
-    let envelopesUpdated = 0;
+    // Use utility function to calculate allocations
+    const { updatedEnvelopes, envelopesUpdated } = calculateBiweeklyAllocations(
+      envelopes,
+      bills,
+      billsLoading
+    );
 
-    // Update each bill envelope's biweekly allocation
-    bills.forEach((bill: Bill) => {
-      if (bill.envelopeId) {
-        const envelopeIndex = updatedEnvelopes.findIndex((env) => env.id === bill.envelopeId);
-        if (envelopeIndex >= 0) {
-          const envelope = updatedEnvelopes[envelopeIndex];
-          if (!envelope.biweeklyAllocation || envelope.biweeklyAllocation === 0) {
-            // Safe access for legacy/unified field mix
-            const legacyBill = bill as LegacyBill;
-            const frequency = (legacyBill.paymentFrequency ||
-              legacyBill.frequency ||
-              "monthly") as string;
-            const amount = legacyBill.amount || bill.minimumPayment || 0;
+    if (envelopesUpdated > 0) {
+      logger.info(`Updated ${envelopesUpdated} envelopes with biweekly allocations`);
 
-            const multiplier = FREQUENCY_MULTIPLIERS[frequency] || 12;
-            const annualAmount = amount * multiplier;
-            const monthlyAmount = annualAmount / 12;
-            const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER;
-
-            logger.debug("Updating envelope biweekly allocation", {
-              billId: bill.id,
-              billName: bill.name,
-              envelopeId: bill.envelopeId,
-              envelopeName: envelope.name,
-              billAmount: bill.amount,
-              frequency: bill.frequency,
-              calculatedBiweekly: biweeklyAmount,
-            });
-
-            updatedEnvelopes[envelopeIndex] = {
-              ...envelope,
-              biweeklyAllocation: biweeklyAmount,
-              envelopeType: "bill", // Ensure bill envelopes are typed correctly
-            };
-            envelopesUpdated++;
-          }
-        } else {
-          logger.warn("Bill references non-existent envelope", {
-            billId: bill.id,
-            billName: bill.name,
-            envelopeId: bill.envelopeId,
-          });
-        }
-      }
-    });
-
-    logger.info("Envelope biweekly allocation update completed", {
-      envelopesUpdated,
-      totalEnvelopes: updatedEnvelopes.length,
-    });
-
-    isCalculatingRef.current = false;
-  }, [bills, envelopes]);
+      // Batch update the envelopes
+      Promise.all(updatedEnvelopes.map((env) => updateEnvelope(env.id, env)))
+        .then(() => {
+          isCalculatingRef.current = false;
+        })
+        .catch((err) => {
+          logger.error("Failed to update envelopes with biweekly allocations", err);
+          isCalculatingRef.current = false;
+        });
+    } else {
+      isCalculatingRef.current = false;
+    }
+  }, [
+    bills,
+    envelopes,
+    billsLoading,
+    updateEnvelope,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    bills
+      .map(
+        (b) =>
+          `${b.id}-${b.amount}-${b.recurrenceRule}-${(b as unknown as Record<string, unknown>).frequency}`
+      )
+      .join(","),
+  ]);
 
   // Auto-update allocations when bills change
   useEffect(() => {

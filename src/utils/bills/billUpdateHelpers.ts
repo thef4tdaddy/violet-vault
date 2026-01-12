@@ -79,7 +79,7 @@ interface DateChange {
 // Extended Bill interface to include modification history
 type BillWithHistory = Bill & {
   modificationHistory?: ModificationHistoryEntry[];
-  lastModified?: string;
+  lastModified?: number;
 };
 
 /**

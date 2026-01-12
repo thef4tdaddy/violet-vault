@@ -129,7 +129,8 @@ const buildUpdatedBillRecord = (
     paidDate: paymentDate,
     paidAmount: paymentAmount,
     envelopeId: effectiveEnvelopeId || "unassigned",
-    lastModified: Date.now(),
+    // lastModified handled by update logic or schema validation
+    // lastModified: Date.now(),
     modificationHistory: [
       ...((bill.modificationHistory ?? []) as ModificationHistoryEntry[]),
       {

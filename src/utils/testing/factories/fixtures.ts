@@ -58,29 +58,24 @@ export const standardEnvelopes: Envelope[] = [
  */
 export const standardBills: Bill[] = [
   createRecurringBill({
-    name: "Electric Bill",
     description: "Electric Bill",
     amount: 150,
     category: "utilities",
   }),
   createRecurringBill({
-    name: "Internet",
     description: "Internet",
     amount: 79.99,
     category: "utilities",
   }),
   createRecurringBill({
-    name: "Netflix",
     description: "Netflix",
     amount: 15.99,
     category: "subscriptions",
   }),
   createBill({
-    name: "Car Insurance",
     description: "Car Insurance",
     amount: 125,
     category: "insurance",
-    isPaid: true,
   }),
 ];
 
@@ -193,7 +188,7 @@ export const generateLargeDataset = (size: {
       createEnvelope({ name: `Envelope ${i + 1}` })
     ),
     bills: Array.from({ length: size.bills || 0 }, (_, i) =>
-      createBill({ name: `Bill ${i + 1}`, description: `Bill ${i + 1}` })
+      createBill({ description: `Bill ${i + 1}` })
     ),
     transactions: Array.from({ length: size.transactions || 0 }, (_, i) =>
       createTransaction({ description: `Transaction ${i + 1}` })
@@ -242,12 +237,10 @@ export const overBudgetScenario = {
   ],
   bills: [
     createBill({
-      name: "Overdue Bill",
       description: "Overdue Bill",
-      isPaid: false,
-      dueDate: new Date("2023-01-01"),
+      date: new Date("2023-01-01"),
     }),
-    createBill({ name: "Upcoming Bill", description: "Upcoming Bill", isPaid: false }),
+    createBill({ description: "Upcoming Bill" }),
   ],
   transactions: sampleTransactions,
   savingsGoals: [],

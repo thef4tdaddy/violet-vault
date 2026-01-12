@@ -251,7 +251,11 @@ const useBillModalState = ({
   }, [calculateMonthlyAmount, formData.amount, formData.frequency, formData.customFrequency]);
 
   const computeNextDueDate = useCallback(() => {
-    return getNextDueDate(formData.frequency, formData.dueDate);
+    const dateStr =
+      formData.dueDate instanceof Date
+        ? formData.dueDate.toISOString().split("T")[0]
+        : formData.dueDate;
+    return getNextDueDate(formData.frequency, dateStr);
   }, [getNextDueDate, formData.frequency, formData.dueDate]);
 
   return {

@@ -45,7 +45,7 @@ const useUnassignedCashDistribution = () => {
   );
 
   const billList = useMemo<BillRecord[]>(
-    () => (bills ?? []).map((bill) => bill as BillRecord),
+    () => (bills ?? []).map((bill) => bill as unknown as BillRecord),
     [bills]
   );
 

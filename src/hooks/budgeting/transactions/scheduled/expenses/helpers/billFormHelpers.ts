@@ -154,7 +154,11 @@ export const buildBillData = (
   editingBill: Bill | null,
   suggestedIconName: string
 ): Bill => {
-  const normalizedDueDate = normalizeDateFormatHelper(formData.dueDate);
+  const dateStr =
+    formData.dueDate instanceof Date
+      ? formData.dueDate.toISOString().split("T")[0]
+      : formData.dueDate;
+  const normalizedDueDate = normalizeDateFormatHelper(dateStr);
   const monthlyAmount = calculateMonthlyAmountHelper(
     formData.amount,
     formData.frequency,

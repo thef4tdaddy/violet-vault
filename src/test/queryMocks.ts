@@ -54,6 +54,9 @@ export const createMockDexie = () => {
       toArray: vi.fn(async () => mockData.transactions),
       orderBy: vi.fn(() => ({
         reverse: vi.fn(() => ({
+          limit: vi.fn((n: number) => ({
+            toArray: vi.fn(async () => mockData.transactions.slice(0, n)),
+          })),
           toArray: vi.fn(async () => mockData.transactions),
         })),
       })),
@@ -85,6 +88,24 @@ export const createMockDexie = () => {
             })),
           };
         }),
+        aboveOrEqual: vi.fn().mockImplementation((val: any) => ({
+          filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+            toArray: vi.fn(async () => {
+              if (key === "date") {
+                return mockData.transactions.filter((t) => {
+                  return new Date(t.date) >= new Date(val) && fn(t);
+                });
+              }
+              return mockData.transactions.filter(fn);
+            }),
+          })),
+          toArray: vi.fn(async () => {
+            if (key === "date") {
+              return mockData.transactions.filter((t) => new Date(t.date) >= new Date(val));
+            }
+            return mockData.transactions;
+          }),
+        })),
       })),
       add: vi.fn(async (item: Transaction) => {
         mockData.transactions.push(item);
@@ -113,6 +134,9 @@ export const createMockDexie = () => {
           mockData.transactions.splice(index, 1);
         }
       }),
+      filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+        toArray: vi.fn(async () => mockData.transactions.filter(fn)),
+      })),
       get: vi.fn(async (id: string) => {
         return mockData.transactions.find((t) => t.id === id);
       }),
@@ -443,13 +467,15 @@ export const mockDataGenerators = {
     ...overrides,
   }),
 
-  bill: (overrides = {}) => ({
+  bill: (
+    overrides: Partial<Bill & { isPaid?: boolean; paidDate?: string; paidAmount?: number }> = {}
+  ) => ({
     id: `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     // Phase 2 Migration: Bills are now scheduled expense transactions
     description: overrides.name || "Test Bill", // name maps to description
     date: overrides.dueDate || new Date().toISOString().split("T")[0], // dueDate maps to date
     // Ensure amount is always negative for expenses - normalize if positive passed
-    amount: -(Math.abs(overrides.amount || 50)), // Negative for expense
+    amount: -Math.abs((overrides.amount as number) || 50), // Negative for expense
     envelopeId: overrides.envelopeId || "unassigned",
     category: "Bills & Utilities",
     type: "expense" as const,

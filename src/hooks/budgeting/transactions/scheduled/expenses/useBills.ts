@@ -6,6 +6,8 @@ import logger from "@/utils/common/logger";
 import { type Transaction } from "@/db/types";
 import {
   validateAndNormalizeTransaction,
+  normalizeTransactionAmount,
+  validateTransactionSafe,
   validateTransactionPartialSafe,
 } from "@/domain/schemas/transaction";
 
@@ -70,13 +72,7 @@ const createPaymentTransaction = (
 // --- Query Logic ---
 
 export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
-  const {
-    status = "all",
-    daysAhead = 30,
-    category,
-    sortBy = "date",
-    sortOrder = "asc",
-  } = options;
+  const { status = "all", daysAhead = 30, category, sortBy = "date", sortOrder = "asc" } = options;
 
   return useCallback(async () => {
     let bills: BillTransaction[] = [];
@@ -293,9 +289,15 @@ export const useAddBillMutation = () => {
       // Phase 2 Migration: Create a scheduled expense transaction
       const newBill: Partial<Transaction> = {
         id: uniqueId,
-        description: (billData.name as string) || (billData.description as string) || "Unnamed Bill",
-        // Normalize date to string for consistency
-        date: new Date(billData.dueDate as string | Date).toISOString().split("T")[0],
+        description:
+          (billData.name as string) || (billData.description as string) || "Unnamed Bill",
+        // Normalize date to string for consistency if valid, otherwise undefined to let Zod catch it
+        date:
+          billData.dueDate instanceof Date
+            ? billData.dueDate.toISOString().split("T")[0]
+            : typeof billData.dueDate === "string" && !isNaN(Date.parse(billData.dueDate))
+              ? new Date(billData.dueDate).toISOString().split("T")[0]
+              : (billData.dueDate as string),
         amount: -Math.abs((billData.amount as number) || 0), // Negative for expense
         envelopeId: (billData.envelopeId as string) || "unassigned",
         category: (billData.category as string) || "Bills & Utilities",
@@ -307,7 +309,16 @@ export const useAddBillMutation = () => {
         notes: (billData.notes as string) || undefined,
       };
 
-      const validatedBill = validateAndNormalizeTransaction(newBill);
+      const normalizedBill = normalizeTransactionAmount(newBill as Transaction);
+      const validationResult = validateTransactionSafe(normalizedBill);
+
+      if (!validationResult.success) {
+        throw new Error(
+          `Invalid bill data: ${validationResult.error.issues.map((i) => i.message).join(", ")}`
+        );
+      }
+
+      const validatedBill = validationResult.data;
 
       await budgetDb.transactions.add(validatedBill);
       return validatedBill;
@@ -405,12 +416,13 @@ export const useDeleteBillMutation = () => {
       // Phase 2 Migration: Delete from transactions table
       // Also find and delete any associated payment transactions
       const paymentsToDelete = await budgetDb.transactions
-        .filter(
-          (txn) =>
+        .filter((txn) => {
+          const matches =
             txn.isScheduled === false &&
             txn.type === "expense" &&
-            (txn.notes?.includes(`Scheduled Bill ID: ${billId}`) || txn.notes?.includes(billId))
-        )
+            (txn.notes?.includes(`Scheduled Bill ID: ${billId}`) || txn.notes?.includes(billId));
+          return !!matches;
+        })
         .toArray();
 
       // Delete the scheduled bill

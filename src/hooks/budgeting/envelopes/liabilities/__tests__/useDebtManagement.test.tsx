@@ -13,6 +13,7 @@ import useEnvelopes from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
 import * as debtManagementHelpers from "../helpers/debtManagementHelpers";
+import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
 
 // Mock all dependencies
 vi.mock("../useDebts");
@@ -633,15 +634,7 @@ describe("useDebtManagement", () => {
 
   describe("getUpcomingPayments", () => {
     it("should get upcoming payments with default days ahead", () => {
-      vi.doMock("@/utils/debts/debtCalculations", () => ({
-        getUpcomingPayments: vi.fn().mockReturnValue([
-          {
-            debtId: "debt1",
-            amount: 150,
-            dueDate: "2024-02-01",
-          },
-        ]),
-      }));
+      vi.mocked(getUpcomingPayments).mockReturnValue([]);
 
       const { result } = renderHook(() => useDebtManagement(), {
         wrapper: createWrapper(),
@@ -653,15 +646,13 @@ describe("useDebtManagement", () => {
     });
 
     it("should get upcoming payments with custom days ahead", () => {
-      vi.doMock("@/utils/debts/debtCalculations", () => ({
-        getUpcomingPayments: vi.fn().mockReturnValue([
-          {
-            debtId: "debt1",
-            amount: 150,
-            dueDate: "2024-02-01",
-          },
-        ]),
-      }));
+      vi.mocked(getUpcomingPayments).mockReturnValue([
+        {
+          debtId: "debt1",
+          amount: 150,
+          dueDate: "2024-02-01",
+        },
+      ]);
 
       const { result } = renderHook(() => useDebtManagement(), {
         wrapper: createWrapper(),
@@ -722,7 +713,7 @@ describe("useDebtManagement", () => {
       });
 
       const callArgs = vi.mocked(debtManagementHelpers.createAPIWrappers).mock.calls[0];
-      expect(callArgs).toHaveLength(6);
+      expect(callArgs).toHaveLength(5);
     });
   });
 

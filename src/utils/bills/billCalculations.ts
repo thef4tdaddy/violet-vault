@@ -3,7 +3,7 @@
  * Extracted from BillManager.jsx for Issue #152
  *
  * Pure functions for bill-related calculations, date parsing, and categorization
- * 
+ *
  * Phase 2 Migration Note: This utility supports both legacy bill fields and
  * Transaction-based bills via computed properties:
  * - name/description (both supported)

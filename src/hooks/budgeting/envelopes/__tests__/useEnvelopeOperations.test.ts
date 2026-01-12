@@ -34,6 +34,16 @@ vi.mock("@/db/budgetDb", () => ({
     },
     transactions: {
       put: vi.fn(),
+      where: vi.fn(() => ({
+        equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn(() => []),
+          })),
+          toArray: vi.fn(() => []),
+        })),
+      })),
+      delete: vi.fn(),
+      update: vi.fn(),
     },
   },
   getUnassignedCash: vi.fn(),

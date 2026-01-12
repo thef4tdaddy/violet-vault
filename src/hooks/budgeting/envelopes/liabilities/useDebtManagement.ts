@@ -64,14 +64,23 @@ type CreateDebtPayload = DebtFormData & { connectionData?: ConnectionData; payme
 export const useDebtManagement = () => {
   const debtsHook = useDebts();
   const { bills = [], addBillAsync, updateBillAsync, deleteBillAsync } = useBills();
-  const normalizedBills = (bills || []).map((b) => ({
-    ...b,
-    dueDate: b.dueDate
-      ? typeof b.dueDate === "string"
-        ? b.dueDate
-        : (b.dueDate as Date).toISOString()
-      : undefined,
-  }));
+  const normalizedBills = (bills || []).map((b) => {
+    // Adapter: BillTransaction has 'date', Debt helpers expect 'dueDate'
+    const record = b as unknown as Record<string, unknown>;
+    const dateVal =
+      b.date ||
+      (typeof record.dueDate === "string" || record.dueDate instanceof Date
+        ? record.dueDate
+        : undefined);
+    return {
+      ...b,
+      dueDate: dateVal
+        ? typeof dateVal === "string"
+          ? dateVal
+          : (dateVal as Date).toISOString()
+        : undefined,
+    };
+  });
   const { envelopes = [], addEnvelope: createEnvelope, addEnvelopeAsync } = useEnvelopes();
   const { transactions = [] } = useTransactionQuery();
   const { addTransaction: createTransaction } = useTransactionOperations();
@@ -252,7 +261,9 @@ export const useDebtManagement = () => {
 
   const transformBillsForDelete = () => {
     return (bills || []).map((bill) => {
-      const tb = makeRecordCompatible(transformBillFromDB(bill) as BillWithDebtId);
+      const tb = makeRecordCompatible(
+        transformBillFromDB(bill as unknown as import("@/db/types").Bill) as BillWithDebtId
+      );
       return {
         ...tb,
         dueDate: tb.dueDate

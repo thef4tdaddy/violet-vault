@@ -44,7 +44,7 @@ export const transformFormDataToBill = (
   data: {
     name: string;
     amount: string;
-    dueDate: string;
+    dueDate: string | Date;
     category: string;
     notes?: string;
     isRecurring: boolean;
@@ -63,7 +63,12 @@ export const transformFormDataToBill = (
     isPaid: editingBill?.isPaid,
     envelopeId: data.selectedEnvelope || "unassigned",
     color: editingBill?.color || "#6366f1",
+    type: "expense",
+    isScheduled: true,
+    lastModified: Date.now(),
+    date: data.dueDate instanceof Date ? data.dueDate.toISOString() : (data.dueDate as string),
     createdAt: editingBill?.createdAt || new Date().toISOString(),
+    updatedAt: Date.now(),
   };
 };
 

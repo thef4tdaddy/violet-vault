@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TransactionSchema, type Transaction } from "./transaction";
+import { TransactionSchema, TransactionPartialSchema, type Transaction } from "./transaction";
 
 /**
  * Phase 2 Migration: Bills are now Scheduled Transactions
@@ -22,7 +22,7 @@ export const BillSchema = TransactionSchema.refine(
   }
 );
 
-export const BillPartialSchema = TransactionSchema.partial();
+export const BillPartialSchema = TransactionPartialSchema;
 export const BillFrequencyEnum = z.enum(["monthly", "quarterly", "annually"]);
 export const BillFrequencySchema = BillFrequencyEnum.optional();
 

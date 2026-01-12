@@ -112,7 +112,24 @@ describe("Bill Query Hooks", () => {
       nextWeek.setDate(nextWeek.getDate() + 7);
 
       beforeEach(() => {
-        mockDb._mockData.envelopes = [
+        const paidBill = mockDataGenerators.bill({
+          id: "bill_3",
+          name: "Paid Bill",
+          dueDate: tomorrow.toISOString().split("T")[0],
+          isPaid: true,
+        });
+
+        const paymentTxn = {
+          id: "pay_3",
+          description: "Payment for Paid Bill",
+          amount: -Math.abs(paidBill.amount),
+          date: tomorrow.toISOString().split("T")[0],
+          notes: `Payment for: ${paidBill.description} (Scheduled Bill ID: ${paidBill.id})`,
+          type: "expense",
+          isScheduled: false,
+        };
+
+        mockDb._mockData.transactions = [
           mockDataGenerators.bill({
             id: "bill_1",
             name: "Overdue Bill",
@@ -125,12 +142,8 @@ describe("Bill Query Hooks", () => {
             dueDate: nextWeek.toISOString().split("T")[0],
             isPaid: false,
           }),
-          mockDataGenerators.bill({
-            id: "bill_3",
-            name: "Paid Bill",
-            dueDate: tomorrow.toISOString().split("T")[0],
-            isPaid: true,
-          }),
+          paidBill,
+          paymentTxn,
         ];
       });
 
@@ -194,7 +207,7 @@ describe("Bill Query Hooks", () => {
 
       it("should filter by category", async () => {
         // Arrange
-        mockDb._mockData.envelopes = [
+        mockDb._mockData.transactions = [
           mockDataGenerators.bill({ id: "bill_1", category: "Utilities" }),
           mockDataGenerators.bill({ id: "bill_2", category: "Rent" }),
           mockDataGenerators.bill({ id: "bill_3", category: "Utilities" }),
@@ -216,7 +229,7 @@ describe("Bill Query Hooks", () => {
 
     describe("Sorting", () => {
       beforeEach(() => {
-        mockDb._mockData.envelopes = [
+        mockDb._mockData.transactions = [
           mockDataGenerators.bill({
             id: "bill_1",
             name: "Zebra Bill",
@@ -296,7 +309,7 @@ describe("Bill Query Hooks", () => {
       it("should cache query results", async () => {
         // Arrange
         const mockBills = [mockDataGenerators.bill({ id: "bill_1" })];
-        mockDb._mockData.envelopes = mockBills;
+        mockDb._mockData.transactions = mockBills;
 
         // Act - First render
         const { result, rerender } = renderHook(() => useBillsQuery(), { wrapper });
@@ -306,22 +319,34 @@ describe("Bill Query Hooks", () => {
         });
 
         // Clear the mock to verify cache is used
-        mockDb.envelopes.where.mockClear();
+        mockDb.transactions.where.mockClear();
 
         // Act - Re-render
         rerender();
 
         // Assert - Should use cached data without calling Dexie again
-        expect(mockDb.envelopes.where).not.toHaveBeenCalled();
+        expect(mockDb.transactions.where).not.toHaveBeenCalled();
         expect(result.current.data).toEqual(mockBills);
       });
 
       it("should use separate cache for different filter options", async () => {
         // Arrange
-        mockDb._mockData.envelopes = [
-          mockDataGenerators.bill({ id: "bill_1", isPaid: true }),
-          mockDataGenerators.bill({ id: "bill_2", isPaid: false }),
-        ];
+        // Phase 2: Mock bills as scheduled transactions
+        const paidBill = mockDataGenerators.bill({ id: "bill_1" });
+        const unpaidBill = mockDataGenerators.bill({ id: "bill_2" });
+
+        // Mock payment transaction for paid bill
+        const paymentTxn = {
+          id: "pay_1",
+          description: "Payment for Bill 1",
+          amount: -Math.abs(paidBill.amount),
+          date: new Date().toISOString(),
+          notes: `Payment for: ${paidBill.description} (Scheduled Bill ID: ${paidBill.id})`,
+          type: "expense",
+          isScheduled: false,
+        };
+
+        mockDb._mockData.transactions = [paidBill, unpaidBill, paymentTxn];
 
         // Act - Query with status: "paid"
         const { result: result1 } = renderHook(() => useBillsQuery({ status: "paid" }), {
@@ -351,7 +376,7 @@ describe("Bill Query Hooks", () => {
       it("should respect staleTime configuration", async () => {
         // Arrange
         const mockBills = [mockDataGenerators.bill({ id: "bill_1" })];
-        mockDb._mockData.envelopes = mockBills;
+        mockDb._mockData.transactions = mockBills;
 
         // Act - First fetch
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -369,7 +394,7 @@ describe("Bill Query Hooks", () => {
     describe("Query Invalidation", () => {
       it("should support manual refetch after data changes", async () => {
         // Arrange
-        mockDb._mockData.envelopes = [mockDataGenerators.bill({ id: "bill_1" })];
+        mockDb._mockData.transactions = [mockDataGenerators.bill({ id: "bill_1" })];
 
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
 
@@ -380,7 +405,7 @@ describe("Bill Query Hooks", () => {
         expect(result.current.data?.length).toBe(1);
 
         // Modify mock data
-        mockDb._mockData.envelopes = [
+        mockDb._mockData.transactions = [
           mockDataGenerators.bill({ id: "bill_1" }),
           mockDataGenerators.bill({ id: "bill_2" }),
         ];

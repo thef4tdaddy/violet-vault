@@ -21,7 +21,7 @@ export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"> {
   // Override id to always be string (Transaction allows string | number)
   id: string;
-  
+
   // Computed backward-compatibility fields (derived from Transaction fields)
   // name is required for UI compatibility (maps to Transaction.description)
   name: string; // Computed getter: maps to Transaction.description (required)
@@ -30,7 +30,7 @@ export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"
   paidDate?: string | Date; // From paired payment transaction
   paidAmount?: number; // From paired payment transaction
   paymentTransactionId?: string; // ID of paired payment transaction
-  
+
   // Additional bill-specific fields (not in base Transaction)
   provider?: string; // Bill provider/vendor
   monthlyAmount?: number; // For recurring bills
@@ -43,14 +43,14 @@ export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"
   icon?: string; // UI icon
   status?: BillStatus; // Bill status
   archived?: boolean; // Legacy compatibility field
-  
+
   // Override Transaction timestamp types for flexibility
   createdAt?: number | string;
   updatedAt?: number | string;
-  
+
   // All other Transaction fields inherited: date, description, amount,
   // envelopeId, category, type, isScheduled, recurrenceRule, lastModified, notes
-  
+
   // Index signature to satisfy Record<string, unknown> requirement
   [key: string]: unknown;
 }

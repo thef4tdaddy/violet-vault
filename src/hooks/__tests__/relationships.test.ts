@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { budgetDb } from "@/db/budgetDb";
-import { useEnvelopeOperations } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import { budgetDb } from "../../db/budgetDb";
+import { useEnvelopeOperations } from "../budgeting/envelopes/useEnvelopes";
 import {
   useAddBillMutation,
   useDeleteBillMutation,
-} from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
-import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
-import { useDebtManagement } from "@/hooks/budgeting/envelopes/liabilities/useDebtManagement";
+} from "../budgeting/transactions/scheduled/expenses/useBills";
+import { useTransactionOperations } from "../budgeting/transactions/useTransactionOperations";
+import { useDebtManagement } from "../budgeting/envelopes/liabilities/useDebtManagement";
 
 // Mock dependencies
 vi.mock("@tanstack/react-query", async (importOriginal) => {
@@ -30,37 +30,27 @@ vi.mock("@/db/budgetDb", () => ({
       delete: vi.fn().mockResolvedValue(undefined),
       where: vi.fn(() => ({
         equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue([]),
+          })),
           toArray: vi.fn().mockResolvedValue([]),
-        })),
-      })),
-    },
-    bills: {
-      get: vi.fn(),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      where: vi.fn(() => ({
-        equals: vi.fn(() => ({
-          toArray: vi.fn(),
         })),
       })),
     },
     transactions: {
       get: vi.fn(),
+      add: vi.fn().mockResolvedValue("new-txn-id"),
       put: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       where: vi.fn(() => ({
         equals: vi.fn(() => ({
-          toArray: vi.fn(),
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue([]),
+          })),
+          toArray: vi.fn().mockResolvedValue([]),
         })),
       })),
-    },
-    debts: {
-      get: vi.fn(),
-      put: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
     },
   },
   getUnassignedCash: vi.fn().mockResolvedValue(1000),
@@ -70,7 +60,6 @@ vi.mock("@/db/budgetDb", () => ({
 vi.mock("@/utils/common/queryClient", () => ({
   queryKeys: {
     envelopes: ["envelopes"],
-    bills: ["bills"],
     transactions: ["transactions"],
     dashboard: ["dashboard"],
     budgetMetadata: ["budgetMetadata"],
@@ -79,9 +68,6 @@ vi.mock("@/utils/common/queryClient", () => ({
     addEnvelope: vi.fn(),
     updateEnvelope: vi.fn(),
     removeEnvelope: vi.fn(),
-    addBill: vi.fn(),
-    updateBill: vi.fn(),
-    removeBill: vi.fn(),
     addTransaction: vi.fn(),
     updateTransaction: vi.fn(),
     removeTransaction: vi.fn(),
@@ -117,9 +103,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
     vi.clearAllMocks();
     mockUpdateBalancesForTransaction.mockClear();
     (budgetDb.envelopes.get as Mock).mockResolvedValue(undefined);
-    (budgetDb.bills.get as Mock).mockResolvedValue(undefined);
     (budgetDb.transactions.get as Mock).mockResolvedValue(undefined);
-    (budgetDb.debts.get as Mock).mockResolvedValue(undefined);
   });
 
   describe("Envelope ↔ Transaction Relationships (Envelopes are Source of Truth)", () => {
@@ -265,8 +249,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
           toArray: vi.fn().mockResolvedValue(mockTransactions),
         })),
       });
-      (budgetDb.bills.where as Mock).mockReturnValue({
+      (budgetDb.transactions.where as Mock).mockReturnValue({
         equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue(mockBills),
+          })),
           toArray: vi.fn().mockResolvedValue(mockBills),
         })),
       });
@@ -295,7 +282,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Balance should be transferred before deletion
-      const { setUnassignedCash } = await import("@/db/budgetDb");
+      const { setUnassignedCash } = await import("../../db/budgetDb");
       expect(setUnassignedCash).toHaveBeenCalled();
     });
   });
@@ -312,6 +299,12 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       };
       (useMutation as Mock).mockReturnValue(mockMutation);
 
+      // Dynamically import hook to ensure mocks are applied
+      const { useAddBillMutation } =
+        await import("../budgeting/transactions/scheduled/expenses/useBills");
+
+      // We accept that renderHook might not work perfectly with dynamic imports in this test file structure
+      // simpler to just test the logic if possible, but adhering to existing structure:
       renderHook(() => useAddBillMutation());
 
       const addMutation = (useMutation as Mock).mock.calls[0][0];
@@ -323,14 +316,19 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         envelopeId: "env-1",
       };
 
+      console.log("DEBUG: budgetDb.transactions keys:", Object.keys(budgetDb.transactions || {}));
+      console.log("DEBUG: budgetDb.transactions.add type:", typeof budgetDb.transactions?.add);
+
       await act(async () => {
         const result = await addMutation.mutationFn(billData);
         expect(result.envelopeId).toBe("env-1");
       });
 
-      expect(budgetDb.envelopes.add).toHaveBeenCalledWith(
+      expect(budgetDb.transactions.add).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1",
+          isScheduled: true,
+          type: "expense",
         })
       );
     });
@@ -348,20 +346,18 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const mockTransactions: unknown[] = [];
 
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
-      (budgetDb.bills.where as Mock).mockReturnValue({
-        equals: vi.fn(() => ({
-          toArray: vi.fn().mockResolvedValue(mockBills),
-        })),
-      });
       (budgetDb.transactions.where as Mock).mockReturnValue({
         equals: vi.fn(() => ({
-          toArray: vi.fn().mockResolvedValue(mockTransactions),
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue(mockBills),
+          })),
+          toArray: vi.fn().mockResolvedValue(mockBills),
         })),
       });
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("@/utils/common/queryClient");
+      const { optimisticHelpers } = await import("../../utils/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),
@@ -383,10 +379,14 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Bills should be disconnected (envelopeId set to undefined), not deleted
-      expect(budgetDb.bills.update).toHaveBeenCalledWith("bill-1", { envelopeId: undefined });
-      expect(budgetDb.bills.update).toHaveBeenCalledWith("bill-2", { envelopeId: undefined });
-      expect(budgetDb.bills.delete).not.toHaveBeenCalled();
-      expect(optimisticHelpers.updateBill).toHaveBeenCalledWith(mockQueryClient, "bill-1", {
+      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-1", {
+        envelopeId: undefined,
+      });
+      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-2", {
+        envelopeId: undefined,
+      });
+      expect(budgetDb.transactions.delete).not.toHaveBeenCalled();
+      expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(mockQueryClient, "bill-1", {
         envelopeId: undefined,
       });
     });
@@ -400,8 +400,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const mockBills = [{ id: "bill-1", envelopeId: "env-1", name: "Bill 1" }];
 
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
-      (budgetDb.bills.where as Mock).mockReturnValue({
+      (budgetDb.transactions.where as Mock).mockReturnValue({
         equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue(mockBills),
+          })),
           toArray: vi.fn().mockResolvedValue(mockBills),
         })),
       });
@@ -429,7 +432,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Bills should be deleted, not just disconnected
-      expect(budgetDb.bills.delete).toHaveBeenCalledWith("bill-1");
+      expect(budgetDb.transactions.delete).toHaveBeenCalledWith("bill-1");
     });
   });
 
@@ -442,14 +445,13 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         // No envelopeId or billId
       };
 
-      const { useDebts } = await import("@/hooks/budgeting/envelopes/liabilities/useDebts");
-      const { useBills } =
-        await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
-      const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { useTransactionQuery } =
-        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useDebts } = await import("../budgeting/envelopes/liabilities/useDebts");
+      const { default: useBills } =
+        await import("../budgeting/transactions/scheduled/expenses/useBills");
+      const { default: useEnvelopes } = await import("../budgeting/envelopes/useEnvelopes");
+      const { useTransactionQuery } = await import("../budgeting/transactions/useTransactionQuery");
       const { useTransactionOperations } =
-        await import("@/hooks/budgeting/transactions/useTransactionOperations");
+        await import("../budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -495,14 +497,13 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const mockMutations = [{ mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false }];
       (useMutation as Mock).mockImplementation(() => mockMutations.shift() || mockMutations[0]);
 
-      const { useDebts } = await import("@/hooks/budgeting/envelopes/liabilities/useDebts");
-      const { useBills } =
-        await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
-      const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { useTransactionQuery } =
-        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useDebts } = await import("../budgeting/envelopes/liabilities/useDebts");
+      const { default: useBills } =
+        await import("../budgeting/transactions/scheduled/expenses/useBills");
+      const { default: useEnvelopes } = await import("../budgeting/envelopes/useEnvelopes");
+      const { useTransactionQuery } = await import("../budgeting/transactions/useTransactionQuery");
       const { useTransactionOperations } =
-        await import("@/hooks/budgeting/transactions/useTransactionOperations");
+        await import("../budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [],
@@ -549,17 +550,16 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         dueDate: "2025-12-01",
       };
 
-      (budgetDb.debts.get as Mock).mockResolvedValue(mockDebt);
-      (budgetDb.bills.get as Mock).mockResolvedValue(mockBill);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
+      (budgetDb.transactions.get as Mock).mockResolvedValue(mockBill);
 
-      const { useDebts } = await import("@/hooks/budgeting/envelopes/liabilities/useDebts");
-      const { useBills } =
-        await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
-      const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { useTransactionQuery } =
-        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useDebts } = await import("../budgeting/envelopes/liabilities/useDebts");
+      const { default: useBills } =
+        await import("../budgeting/transactions/scheduled/expenses/useBills");
+      const { default: useEnvelopes } = await import("../budgeting/envelopes/useEnvelopes");
+      const { useTransactionQuery } = await import("../budgeting/transactions/useTransactionQuery");
       const { useTransactionOperations } =
-        await import("@/hooks/budgeting/transactions/useTransactionOperations");
+        await import("../budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -593,7 +593,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Bill should be updated with debtId
-      expect(budgetDb.bills.update).toHaveBeenCalledWith(
+      expect(budgetDb.transactions.update).toHaveBeenCalledWith(
         "bill-1",
         expect.objectContaining({
           debtId: "debt-1",
@@ -612,16 +612,15 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         name: "Test Bill",
       };
 
-      (budgetDb.debts.get as Mock).mockResolvedValue(mockDebt);
+      (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
 
-      const { useDebts } = await import("@/hooks/budgeting/envelopes/liabilities/useDebts");
-      const { useBills } =
-        await import("@/hooks/budgeting/transactions/scheduled/expenses/useBills");
-      const { default: useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
-      const { useTransactionQuery } =
-        await import("@/hooks/budgeting/transactions/useTransactionQuery");
+      const { useDebts } = await import("../budgeting/envelopes/liabilities/useDebts");
+      const { default: useBills } =
+        await import("../budgeting/transactions/scheduled/expenses/useBills");
+      const { default: useEnvelopes } = await import("../budgeting/envelopes/useEnvelopes");
+      const { useTransactionQuery } = await import("../budgeting/transactions/useTransactionQuery");
       const { useTransactionOperations } =
-        await import("@/hooks/budgeting/transactions/useTransactionOperations");
+        await import("../budgeting/transactions/useTransactionOperations");
 
       (useDebts as Mock).mockReturnValue({
         debts: [mockDebt],
@@ -655,9 +654,9 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Related bill should be deleted
-      expect(budgetDb.bills.delete).toHaveBeenCalledWith("bill-1");
+      expect(budgetDb.transactions.delete).toHaveBeenCalledWith("bill-1");
       // Debt should be deleted
-      expect(budgetDb.debts.delete).toHaveBeenCalledWith("debt-1");
+      expect(budgetDb.envelopes.delete).toHaveBeenCalledWith("debt-1");
     });
   });
 
@@ -676,7 +675,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       };
 
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
-      (budgetDb.bills.get as Mock).mockResolvedValue(mockBill);
+      (budgetDb.transactions.get as Mock).mockResolvedValue(mockBill);
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
@@ -734,15 +733,18 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       const mockTransactions = [{ id: "txn-1", envelopeId: "env-1", amount: -50 }];
 
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
-      (budgetDb.bills.where as Mock).mockReturnValue({
+      (budgetDb.transactions.where as Mock).mockReturnValue({
         equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue(mockBills),
+          })),
           toArray: vi.fn().mockResolvedValue(mockBills),
         })),
       });
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("@/utils/common/queryClient");
+      const { optimisticHelpers } = await import("../../utils/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),
@@ -765,12 +767,14 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       // Verify cascade operations:
       // 1. Balance transferred to unassigned cash
-      const { setUnassignedCash } = await import("@/db/budgetDb");
+      const { setUnassignedCash } = await import("../../db/budgetDb");
       expect(setUnassignedCash).toHaveBeenCalled();
 
       // 2. Bills disconnected (envelopeId cleared)
-      expect(budgetDb.bills.update).toHaveBeenCalledWith("bill-1", { envelopeId: undefined });
-      expect(optimisticHelpers.updateBill).toHaveBeenCalled();
+      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-1", {
+        envelopeId: undefined,
+      });
+      expect(optimisticHelpers.updateTransaction).toHaveBeenCalled();
 
       // 3. Envelope deleted
       expect(budgetDb.envelopes.delete).toHaveBeenCalledWith("env-1");
@@ -791,8 +795,11 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockEnvelope);
       (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
-      (budgetDb.bills.where as Mock).mockReturnValue({
+      (budgetDb.transactions.where as Mock).mockReturnValue({
         equals: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            toArray: vi.fn().mockResolvedValue([mockBill]),
+          })),
           toArray: vi.fn().mockResolvedValue([mockBill]),
         })),
       });
