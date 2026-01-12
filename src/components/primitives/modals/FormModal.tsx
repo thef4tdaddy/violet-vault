@@ -33,13 +33,31 @@ const FormField: React.FC<FormFieldProps> = ({
   helperText,
   children,
 }) => {
+  const fieldId = React.useId();
+
+  const enhancedChildren = React.Children.map(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return child;
+    }
+
+    // Preserve an existing id if the child already has one
+    const existingId = (child.props as { id?: string }).id;
+
+    return React.cloneElement(child, {
+      id: existingId ?? fieldId,
+    });
+  });
+
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label
+        className="block text-sm font-medium text-gray-700 mb-1"
+        htmlFor={fieldId}
+      >
         {label}
         {required && <span className="text-red-600 ml-1">*</span>}
       </label>
-      {children}
+      {enhancedChildren}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
     </div>
