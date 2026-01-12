@@ -96,15 +96,12 @@ export const FormSection: React.FC<FormSectionProps> = ({
             <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
             {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
           </div>
-          {collapsible && (
-            <>
-              {React.createElement(getIcon("ChevronDown"), {
-                className: `h-5 w-5 text-slate-400 transition-transform duration-200 ${
-                  isExpanded ? "rotate-180" : ""
-                }`,
-              })}
-            </>
-          )}
+          {collapsible &&
+            React.createElement(getIcon("ChevronDown"), {
+              className: `h-5 w-5 text-slate-400 transition-transform duration-200 ${
+                isExpanded ? "rotate-180" : ""
+              }`,
+            })}
         </div>
         <div className="border-t-2 border-slate-100 mt-4" />
       </div>
