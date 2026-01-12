@@ -124,9 +124,11 @@ jobs:
         continue-on-error: true
         run: |
           source .venv/bin/activate
-          # Run pytest with coverage (assuming tests are discoverable)
-          pytest --cov=api --cov-report=term-missing > python-test.txt 2>&1
+          cd api
+          # Run pytest with coverage
+          pytest --cov=. --cov-report=term-missing > ../python-test.txt 2>&1
           exit_code=$?
+          cd ..
           cat python-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
