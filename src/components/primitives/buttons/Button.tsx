@@ -77,11 +77,16 @@ const buildButtonClasses = (
 // Helper to render an icon
 const renderIconElement = (iconName: string | undefined, className: string) => {
   if (!iconName) return null;
-  const IconComponent = getIcon(iconName);
+  type IconProps = {
+    className?: string;
+    title?: string;
+    "aria-hidden"?: string;
+  };
+  const IconComponent = getIcon(iconName) as React.ComponentType<IconProps>;
   return React.createElement(IconComponent, {
     className,
     "aria-hidden": "true",
-  } as React.ComponentProps<typeof IconComponent>);
+  });
 };
 
 /**
