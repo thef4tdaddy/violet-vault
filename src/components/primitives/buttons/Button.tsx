@@ -8,7 +8,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: "primary" | "secondary" | "success" | "danger" | "ghost" | "link";
   /** Button size */
   size?: "sm" | "md" | "lg";
-  /** Icon name from icon registry */
+  /**
+   * Icon name from the icon registry.
+   *
+   * Note: If an invalid or unknown icon name is provided, {@link getIcon}
+   * will fall back to a default icon (e.g. FileText) without throwing.
+   */
   icon?: string;
   /** Icon position relative to text */
   iconPosition?: "left" | "right";
