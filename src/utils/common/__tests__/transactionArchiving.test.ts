@@ -708,10 +708,6 @@ describe("transactionArchiving", () => {
 
     describe("getArchivingRecommendations", () => {
       beforeEach(() => {
-        const mockCountQuery = {
-          count: vi.fn().mockResolvedValue(100),
-        };
-
         const mockBelowQuery = {
           below: vi.fn().mockReturnThis(),
           count: vi.fn().mockResolvedValue(50),
