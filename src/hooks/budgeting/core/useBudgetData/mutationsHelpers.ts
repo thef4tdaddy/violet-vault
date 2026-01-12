@@ -39,18 +39,6 @@ interface TransactionExtended extends Transaction {
   paycheckId?: string;
 }
 
-interface LegacyTable<T> {
-  get: (id: string) => Promise<T | undefined>;
-  delete: (id: string) => Promise<void>;
-  toArray: () => Promise<T[]>;
-}
-
-interface LegacyBudgetDb {
-  paycheckHistory: LegacyTable<PaycheckRecordExtended>;
-  bills: LegacyTable<unknown>;
-  savingsGoals: LegacyTable<unknown>;
-}
-
 /**
  * Reverse paycheck balance changes
  */
@@ -101,23 +89,27 @@ export const reverseEnvelopeAllocations = async (
 
 /**
  * Delete associated paycheck and reverse effects
+ * Phase 1 Fix: Redirect to budgetDb.transactions (income transactions with allocations)
  */
 export const deleteAssociatedPaycheck = async (
   paycheckId: string,
   transactionId: string
 ): Promise<PaycheckDeletionResult> => {
-  const paycheckRecord = await (budgetDb as unknown as LegacyBudgetDb).paycheckHistory.get(
-    paycheckId
-  );
+  const paycheckRecord = await budgetDb.transactions.get(paycheckId);
 
   if (!paycheckRecord) {
     return { deletedPaycheck: false };
   }
 
   const currentMetadata = await getBudgetMetadata();
-  await reversePaycheckBalances(paycheckRecord, currentMetadata as BudgetMetadata);
-  await reverseEnvelopeAllocations(paycheckRecord.envelopeAllocations ?? []);
-  await (budgetDb as unknown as LegacyBudgetDb).paycheckHistory.delete(paycheckId);
+  await reversePaycheckBalances(
+    paycheckRecord as PaycheckRecordExtended,
+    currentMetadata as BudgetMetadata
+  );
+  await reverseEnvelopeAllocations(
+    (paycheckRecord as PaycheckRecordExtended).envelopeAllocations ?? []
+  );
+  await budgetDb.transactions.delete(paycheckId);
 
   logger.info("Associated paycheck deleted and effects reversed", {
     paycheckId,

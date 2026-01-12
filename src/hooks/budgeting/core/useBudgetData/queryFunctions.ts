@@ -5,7 +5,7 @@
 
 import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger.ts";
-import type { Bill as DexieBill, PaycheckHistory } from "@/db/types";
+import type { Bill as DexieBill } from "@/db/types";
 
 interface TransactionFilters {
   dateRange?: {
@@ -22,7 +22,6 @@ interface LegacyTable<T = Record<string, unknown>> {
 interface LegacyBudgetDb {
   bills: LegacyTable;
   savingsGoals: LegacyTable;
-  paycheckHistory: LegacyTable<PaycheckHistory>;
 }
 
 export const queryFunctions = {
@@ -61,10 +60,9 @@ export const queryFunctions = {
 
   paycheckHistory: async () => {
     try {
-      // Fetch all paychecks and sort by date/processedAt
-      const cachedPaychecks = await (
-        budgetDb as unknown as LegacyBudgetDb
-      ).paycheckHistory.toArray();
+      // Phase 1 Fix: Use budgetDb.getPaycheckHistory() which queries transactions table
+      // Filters: type === "income" && !!allocations
+      const cachedPaychecks = await budgetDb.getPaycheckHistory();
 
       // Sort by processedAt (preferred) or date (legacy), most recent first
       const sorted = cachedPaychecks.sort((a, b) => {

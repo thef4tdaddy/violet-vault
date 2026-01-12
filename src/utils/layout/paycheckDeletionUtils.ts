@@ -129,29 +129,30 @@ export const calculateReversedBalances = async (
 
 /**
  * Delete paycheck record from database
+ * Phase 1 Fix: Redirect to budgetDb.transactions (income transactions with allocations)
  */
 export const deletePaycheckRecord = async (
   paycheckId: string | number,
-  budgetDb: { paycheckHistory: { delete: (id: string | number) => Promise<void> } }
+  budgetDb: {
+    transactions: {
+      get: (id: string | number) => Promise<unknown>;
+      delete: (id: string | number) => Promise<void>;
+    };
+  }
 ): Promise<void> => {
-  logger.info("Deleting paycheck from Dexie", {
+  logger.info("Deleting paycheck from Dexie (transactions table)", {
     paycheckId,
     paycheckIdType: typeof paycheckId,
   });
 
   // Verify the paycheck exists in Dexie before attempting to delete
-  const existsInDexie = await (
-    budgetDb.paycheckHistory as {
-      get: (id: string | number) => Promise<unknown>;
-      delete: (id: string | number) => Promise<void>;
-    }
-  ).get(paycheckId);
+  const existsInDexie = await budgetDb.transactions.get(paycheckId);
   if (!existsInDexie) {
     logger.warn("Paycheck not found in Dexie database", {
       paycheckId,
     });
   } else {
-    await budgetDb.paycheckHistory.delete(paycheckId);
+    await budgetDb.transactions.delete(paycheckId);
     logger.info("Successfully deleted paycheck from Dexie");
   }
 };

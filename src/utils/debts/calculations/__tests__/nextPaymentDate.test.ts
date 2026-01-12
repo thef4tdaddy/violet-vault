@@ -3,7 +3,6 @@ import { calculateNextPaymentDate } from "../nextPaymentDate";
 import { PAYMENT_FREQUENCIES } from "@/constants/debts";
 
 describe("nextPaymentDate", () => {
-
   describe("calculateNextPaymentDate", () => {
     describe("Priority 1: Related bill due date", () => {
       it("should return related bill due date when available", () => {
