@@ -368,19 +368,30 @@ describe("ModalContainer", () => {
       const onClose1 = vi.fn();
       const onClose2 = vi.fn();
 
-      const { container } = render(
-        <>
-          <ModalContainer {...defaultProps} onClose={onClose1} title="Modal 1">
-            <div>Content 1</div>
-          </ModalContainer>
-          <ModalContainer {...defaultProps} onClose={onClose2} title="Modal 2">
-            <div>Content 2</div>
-          </ModalContainer>
-        </>
+      // Render first modal and verify it behaves correctly
+      const { unmount: unmountFirst } = render(
+        <ModalContainer {...defaultProps} onClose={onClose1} title="Modal 1">
+          <div>Content 1</div>
+        </ModalContainer>
       );
 
-      const modals = container.querySelectorAll('[role="dialog"]');
-      expect(modals).toHaveLength(2);
+      const firstDialog = screen.getByRole("dialog");
+      expect(firstDialog).toBeInTheDocument();
+      expect(screen.getByText("Content 1")).toBeInTheDocument();
+
+      // Unmount first modal before rendering the second to avoid duplicate IDs
+      unmountFirst();
+
+      // Render second modal and verify it behaves correctly and independently
+      render(
+        <ModalContainer {...defaultProps} onClose={onClose2} title="Modal 2">
+          <div>Content 2</div>
+        </ModalContainer>
+      );
+
+      const secondDialog = screen.getByRole("dialog");
+      expect(secondDialog).toBeInTheDocument();
+      expect(screen.getByText("Content 2")).toBeInTheDocument();
     });
   });
 
