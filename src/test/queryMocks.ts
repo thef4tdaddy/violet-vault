@@ -57,6 +57,37 @@ export const createMockDexie = () => {
           toArray: vi.fn(async () => mockData.transactions),
         })),
       })),
+      where: vi.fn().mockImplementation((key: string) => ({
+        equals: vi.fn().mockImplementation((val: any) => ({
+          toArray: vi.fn(async () => {
+            if (key === "isScheduled") {
+              return mockData.transactions.filter((t: any) => {
+                // Handle both boolean and numeric (0/1) from Dexie
+                const isScheduled = t.isScheduled === true || t.isScheduled === 1;
+                const matchValue = val === true || val === 1;
+                return isScheduled === matchValue;
+              });
+            }
+            if (key === "type") {
+              return mockData.transactions.filter((t: any) => t.type === val);
+            }
+            return mockData.transactions.filter((t: any) => (t as any)[key] === val);
+          }),
+          filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+            toArray: vi.fn(async () => {
+              let filtered = mockData.transactions;
+              if (key === "isScheduled") {
+                filtered = mockData.transactions.filter((t: any) => {
+                  const isScheduled = t.isScheduled === true || t.isScheduled === 1;
+                  const matchValue = val === true || val === 1;
+                  return isScheduled === matchValue;
+                });
+              }
+              return filtered.filter(fn);
+            }),
+          })),
+        })),
+      })),
       add: vi.fn(async (item: Transaction) => {
         mockData.transactions.push(item);
         return item.id;
@@ -416,15 +447,24 @@ export const mockDataGenerators = {
 
   bill: (overrides = {}) => ({
     id: `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: "Test Bill",
-    provider: "Test Provider",
-    amount: 50,
-    dueDate: new Date().toISOString().split("T")[0],
+    // Phase 2 Migration: Bills are now scheduled expense transactions
+    description: overrides.name || "Test Bill", // name maps to description
+    date: overrides.dueDate || new Date().toISOString().split("T")[0], // dueDate maps to date
+    amount: -(overrides.amount || 50), // Negative for expense
+    envelopeId: overrides.envelopeId || "unassigned",
     category: "Bills & Utilities",
-    isPaid: false,
-    type: "bill",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    type: "expense" as const,
+    isScheduled: true, // Bills are scheduled transactions
+    recurrenceRule: overrides.recurrenceRule || undefined,
+    lastModified: Date.now(),
+    createdAt: Date.now(),
+    notes: overrides.notes || undefined,
+    // Computed fields for backward compatibility
+    name: overrides.name || "Test Bill",
+    dueDate: overrides.dueDate || new Date().toISOString().split("T")[0],
+    isPaid: overrides.isPaid || false,
+    paidDate: overrides.paidDate || undefined,
+    paidAmount: overrides.paidAmount || undefined,
     ...overrides,
   }),
 

@@ -47,12 +47,13 @@ describe("Bill Query Hooks", () => {
   describe("useBillsQuery", () => {
     describe("Data Fetching", () => {
       it("should fetch bills from Dexie successfully", async () => {
-        // Arrange
+        // Arrange - Phase 2: Bills are now scheduled expense transactions
         const mockBills = [
           mockDataGenerators.bill({ id: "bill_1", name: "Electric Bill" }),
           mockDataGenerators.bill({ id: "bill_2", name: "Water Bill" }),
         ];
-        mockDb._mockData.envelopes = mockBills;
+        // Store bills as transactions
+        mockDb._mockData.transactions = mockBills;
 
         // Act
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
@@ -62,13 +63,13 @@ describe("Bill Query Hooks", () => {
           expect(result.current.isLoading).toBe(false);
         });
 
-        expect(result.current.data).toEqual(mockBills);
-        expect(mockDb.envelopes.where).toHaveBeenCalled();
+        expect(result.current.data).toHaveLength(2);
+        expect(mockDb.transactions.where).toHaveBeenCalledWith("isScheduled");
       });
 
       it("should return empty array when no bills exist", async () => {
-        // Arrange
-        mockDb._mockData.envelopes = [];
+        // Arrange - Phase 2: Check transactions table
+        mockDb._mockData.transactions = [];
 
         // Act
         const { result } = renderHook(() => useBillsQuery(), { wrapper });
