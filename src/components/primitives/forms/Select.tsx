@@ -46,7 +46,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       transition-all duration-200
       focus:outline-none
       disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500
-      appearance-none
     `;
 
     // Focus and error state styles
