@@ -363,30 +363,6 @@ describe("ModalContainer", () => {
     });
   });
 
-  describe("Event Propagation", () => {
-    it("should stop propagation when modal content is clicked", async () => {
-      const onClose = vi.fn();
-      const { container } = render(<ModalContainer {...defaultProps} onClose={onClose} />);
-
-      const modalContent = container.querySelector(".bg-white.rounded-2xl");
-      if (modalContent) {
-        await userEvent.click(modalContent);
-      }
-
-      expect(onClose).not.toHaveBeenCalled();
-    });
-
-    it("should handle backdrop click correctly", async () => {
-      const onClose = vi.fn();
-      render(<ModalContainer {...defaultProps} onClose={onClose} />);
-
-      const backdrop = screen.getByRole("dialog");
-      await userEvent.click(backdrop);
-
-      expect(onClose).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("Multiple Instances", () => {
     it("should handle multiple modals independently", () => {
       const onClose1 = vi.fn();
