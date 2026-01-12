@@ -47,6 +47,11 @@ describe("useReportExporter", () => {
     // Mock URL methods
     global.URL.createObjectURL = vi.fn(() => "mock-url");
     global.URL.revokeObjectURL = vi.fn();
+
+    // Mock html2canvas dynamic import
+    vi.mock("html2canvas", () => ({
+      default: vi.fn(),
+    }));
   });
 
   afterEach(() => {
@@ -249,7 +254,7 @@ describe("useReportExporter", () => {
     });
 
     it("should track isExporting state during PDF export", async () => {
-      let resolveExport: () => void;
+      let resolveExport: (() => void) | undefined;
       const exportPromise = new Promise<void>((resolve) => {
         resolveExport = resolve;
       });
@@ -276,7 +281,9 @@ describe("useReportExporter", () => {
 
       // Resolve and wait for completion
       await act(async () => {
-        resolveExport!();
+        if (resolveExport) {
+          resolveExport();
+        }
         await exportPromise;
       });
 
@@ -608,11 +615,6 @@ describe("useReportExporter", () => {
       vi.mocked(csvImageExportUtils.getChartElements).mockReturnValue([mockChartElement]);
       vi.mocked(csvImageExportUtils.exportChartAsImage).mockResolvedValue(undefined);
       vi.mocked(exportHandlerUtils.handleExportComplete).mockImplementation(() => {});
-
-      // Mock html2canvas dynamic import
-      vi.mock("html2canvas", () => ({
-        default: vi.fn(),
-      }));
 
       const { result } = renderHook(() => useReportExporter());
 
