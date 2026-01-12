@@ -10,11 +10,11 @@ import {
   type ArchiveResult,
   type ArchivingInfo,
 } from "../transactionArchiving";
-import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import { budgetDb } from "../../../db/budgetDb";
+import logger from "../logger";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Mock budgetDb
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
     transactions: {
       where: vi.fn(),
@@ -108,7 +108,7 @@ describe("transactionArchiving", () => {
         const date = new Date(cutoffDate);
 
         expect(cutoffDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-        expect(date.getDate()).toBe(1); // Should be first day of month
+        expect(date.getUTCDate()).toBe(1); // Should be first day of month
       });
 
       it("should calculate cutoff date for 12 months", () => {
@@ -116,7 +116,7 @@ describe("transactionArchiving", () => {
         const date = new Date(cutoffDate);
 
         expect(cutoffDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-        expect(date.getDate()).toBe(1);
+        expect(date.getUTCDate()).toBe(1);
       });
 
       it("should handle 0 months", () => {
@@ -273,7 +273,7 @@ describe("transactionArchiving", () => {
         await archiver.createAnalyticsAggregations(transactions);
 
         const putCalls = vi.mocked(budgetDb.cache.put).mock.calls;
-        putCalls.forEach((call) => {
+        putCalls.forEach((call: any) => {
           const value = call[0].value;
           expect(Array.isArray(value.envelopes)).toBe(true);
         });
