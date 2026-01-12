@@ -235,7 +235,7 @@ export const transformBillsForUpdate = (selectedBills: Bill[], changes: BillChan
         ...bill,
         amount: Math.abs(change.amount || 0), // Ensure positive amount
         dueDate: change.dueDate || bill.dueDate, // Legacy field
-        date: change.dueDate ? new Date(change.dueDate) : bill.date, // Transaction field
+        date: change.dueDate || (typeof bill.date === 'string' ? bill.date : bill.date?.toISOString().split("T")[0]), // Transaction field as string
         lastModified: new Date().toISOString(),
         modificationHistory: [...existingHistory, createModificationHistoryEntry(change)],
       };

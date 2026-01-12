@@ -2,11 +2,12 @@
  * Utility functions for bill detail calculations and formatting
  * Extracted from components following Issue #152 pattern
  * Phase 2 Migration: Compatible with Transaction-based bills
+ * Note: Uses minimal local interface - actual Bill type from @/types/bills is more comprehensive
  */
 
 interface Bill {
   status?: string;
-  dueDate?: string; // Legacy field or computed from date
+  dueDate?: string | Date; // Supports both types for flexibility
   date?: string | Date; // Transaction field
   paymentHistory?: Array<{ amount?: number }>;
 }

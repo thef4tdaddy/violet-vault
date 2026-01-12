@@ -69,8 +69,9 @@ export const processRecurringBill = (bill: Bill, updateBillFn: (bill: Bill) => v
     if (nextDueDate && today >= nextDueDate) {
       processedBill.isPaid = false;
       // Update both dueDate (legacy) and date (Transaction) for compatibility
-      processedBill.dueDate = nextDueDate.toISOString().split("T")[0];
-      processedBill.date = nextDueDate; // Transaction field
+      const nextDueDateStr = nextDueDate.toISOString().split("T")[0];
+      processedBill.dueDate = nextDueDateStr;
+      processedBill.date = nextDueDateStr; // Keep as string for consistency
       processedBill.paidDate = undefined;
 
       // Update the bill in the database
