@@ -91,7 +91,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] animate-[fadeIn_0.2s_ease-out]"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-[fadeIn_0.2s_ease-out]"
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
