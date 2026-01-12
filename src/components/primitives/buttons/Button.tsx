@@ -143,7 +143,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       // eslint-disable-next-line enforce-ui-library/enforce-ui-library -- This IS the primitive Button component
-      <button ref={ref} disabled={disabled || loading} className={finalClasses} {...props}>
+      <button
+        ref={ref}
+        disabled={disabled || loading}
+        className={finalClasses}
+        aria-busy={loading}
+        aria-live={loading ? "polite" : undefined}
+        {...props}
+      >
         {loading && <Loader2 className={`animate-spin ${iconClassName}`} aria-hidden="true" />}
         {!loading && iconPosition === "left" && renderIconElement(icon, iconClassName)}
         {!loading && children}
