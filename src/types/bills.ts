@@ -1,8 +1,10 @@
 import React from "react";
 import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { Transaction } from "@/db/types";
 
 /**
  * TypeScript type definitions for bill components
+ * Phase 2 Migration: Bills are now Scheduled Transactions
  */
 
 // Frequency types
@@ -14,30 +16,33 @@ export type CalculationFrequency = Exclude<BillFrequency, "once">;
 // Bill status types
 export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 
-// Base bill interface
-export interface Bill {
-  id: string;
-  name: string;
+// Phase 2 Migration: Bill is now a Transaction with scheduled properties
+// Extended with computed fields for UI compatibility
+export interface Bill extends Transaction {
+  // Computed fields for backward compatibility
+  name?: string; // Maps to description
+  dueDate?: string | Date; // Maps to date
+  isPaid?: boolean; // Computed from payment transaction existence
+  paidDate?: string | Date; // From paired payment transaction
+  paidAmount?: number; // From paired payment transaction
+  paymentTransactionId?: string; // ID of paired payment transaction
+  
+  // Additional bill-specific fields
   provider?: string;
-  amount: number;
   monthlyAmount?: number;
   biweeklyAmount?: number;
-  frequency: BillFrequency;
+  frequency?: BillFrequency;
   customFrequency?: number;
-  dueDate: string;
   nextDue?: string;
-  category: string;
-  color: string;
-  notes?: string;
+  color?: string;
   iconName?: string;
   icon?: string;
-  envelopeId?: string;
-  isPaid?: boolean;
-  paidDate?: string;
   status?: BillStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  [key: string]: unknown;
+  createdAt?: number | string;
+  updatedAt?: number | string;
+  
+  // Transaction fields are inherited:
+  // id, date, description, amount, envelopeId, category, type, isScheduled, recurrenceRule, etc.
 }
 
 // Bill form data interface

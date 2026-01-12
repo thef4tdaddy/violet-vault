@@ -1,25 +1,35 @@
 import { z } from "zod";
-import { LiabilityEnvelopeSchema, type LiabilityEnvelope, type EnvelopePartial } from "./envelope";
+import { TransactionSchema, type Transaction } from "./transaction";
 
-export type Bill = LiabilityEnvelope;
-export type BillPartial = EnvelopePartial;
+/**
+ * Phase 2 Migration: Bills are now Scheduled Transactions
+ * A Bill is a Transaction with isScheduled=true and type='expense'
+ */
+export type Bill = Transaction;
+export type BillPartial = Partial<Transaction>;
 
-export const BillSchema = LiabilityEnvelopeSchema;
-export const BillPartialSchema = LiabilityEnvelopeSchema.partial();
+// Bill is validated as a Transaction with scheduled properties
+export const BillSchema = TransactionSchema.refine(
+  (data) => data.isScheduled === true && data.type === "expense",
+  {
+    message: "Bill must be a scheduled expense transaction",
+  }
+);
+
+export const BillPartialSchema = TransactionSchema.partial();
 export const BillFrequencyEnum = z.enum(["monthly", "quarterly", "annually"]);
 export const BillFrequencySchema = BillFrequencyEnum.optional();
 
-export const validateBill = (data: unknown) => LiabilityEnvelopeSchema.parse(data);
-export const validateBillSafe = (data: unknown) => LiabilityEnvelopeSchema.safeParse(data);
-export const validateBillPartial = (data: unknown) => LiabilityEnvelopeSchema.partial().parse(data);
-export const validateBillPartialSafe = (data: unknown) =>
-  LiabilityEnvelopeSchema.partial().safeParse(data);
-export const validateBillFormDataSafe = (data: unknown) => LiabilityEnvelopeSchema.safeParse(data);
+export const validateBill = (data: unknown) => BillSchema.parse(data);
+export const validateBillSafe = (data: unknown) => BillSchema.safeParse(data);
+export const validateBillPartial = (data: unknown) => BillPartialSchema.parse(data);
+export const validateBillPartialSafe = (data: unknown) => BillPartialSchema.safeParse(data);
+export const validateBillFormDataSafe = (data: unknown) => BillSchema.safeParse(data);
 export const validateBillFormDataMinimal = (data: unknown) => BillFormDataMinimalSchema.parse(data);
 export const validateBillFormDataMinimalSafe = (data: unknown) =>
   BillFormDataMinimalSchema.safeParse(data);
 
-export type BillFormData = LiabilityEnvelope;
+export type BillFormData = Transaction;
 
 export const BillFormDataMinimalSchema = z.object({
   name: z.string().min(1, "Name is required"),
