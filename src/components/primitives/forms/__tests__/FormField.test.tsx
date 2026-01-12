@@ -129,7 +129,7 @@ describe("FormField", () => {
     });
 
     it("should display error icon with error message", () => {
-      const { container } = render(
+      render(
         <FormField label="Email" error="Error message">
           <input type="email" />
         </FormField>
