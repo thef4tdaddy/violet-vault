@@ -51,15 +51,44 @@ const FormField: React.FC<FormFieldProps> = ({
   return (
     <div className="mb-4">
       <label
-        className="block text-sm font-medium text-gray-700 mb-1"
-        htmlFor={fieldId}
-      >
+  const helperId = React.useId();
+  const errorId = React.useId();
+
+  const describedByIds: string[] = [];
+  if (error) {
+    describedByIds.push(errorId);
+  } else if (helperText) {
+    describedByIds.push(helperId);
+  }
+
+  let field = children;
+  if (React.isValidElement(children)) {
+    const existingDescribedBy = children.props["aria-describedby"] as string | undefined;
+    const mergedDescribedBy = [existingDescribedBy, ...describedByIds].filter(Boolean).join(" ") || undefined;
+
+    field = React.cloneElement(children, {
+      "aria-describedby": mergedDescribedBy,
+      "aria-invalid": error ? true : children.props["aria-invalid"],
+    });
+  }
+
+  return (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
         {required && <span className="text-red-600 ml-1">*</span>}
       </label>
-      {enhancedChildren}
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
+      {field}
+      {error && (
+        <p id={errorId} className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {helperText && !error && (
+        <p id={helperId} className="mt-1 text-sm text-gray-500">
+          {helperText}
+        </p>
+      )}
     </div>
   );
 };
