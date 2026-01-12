@@ -67,11 +67,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               return (
                 <React.Fragment key={key}>
                   {crumb.href ? (
-                    <Link
-                      to={crumb.href}
-                      className="hover:text-slate-900 transition-colors"
-                      aria-current={isLast ? "page" : undefined}
-                    >
+                    <Link to={crumb.href} className="hover:text-slate-900 transition-colors">
                       {crumb.label}
                     </Link>
                   ) : (

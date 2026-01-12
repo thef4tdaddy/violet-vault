@@ -120,7 +120,7 @@ describe("PageHeader", () => {
       expect(nav).toHaveAttribute("aria-label", "Breadcrumb");
     });
 
-    it("should have aria-current on last breadcrumb item", () => {
+    it("should have aria-current on last breadcrumb item without href", () => {
       const breadcrumbs = [
         { label: "Home", href: "/" },
         { label: "Settings", href: "/settings" },
@@ -129,6 +129,16 @@ describe("PageHeader", () => {
       renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
       const lastItem = screen.getByText("Profile");
       expect(lastItem).toHaveAttribute("aria-current", "page");
+    });
+
+    it("should not have aria-current on last breadcrumb with href", () => {
+      const breadcrumbs = [
+        { label: "Home", href: "/" },
+        { label: "Current", href: "/current" },
+      ];
+      renderWithRouter(<PageHeader title="Test Title" breadcrumbs={breadcrumbs} />);
+      const currentLink = screen.getByText("Current");
+      expect(currentLink).not.toHaveAttribute("aria-current");
     });
 
     it("should not have aria-current on non-last breadcrumb items", () => {
