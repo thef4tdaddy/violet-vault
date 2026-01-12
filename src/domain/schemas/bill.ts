@@ -9,10 +9,11 @@ export type Bill = Transaction;
 export type BillPartial = Partial<Transaction>;
 
 // Bill is validated as a Transaction with scheduled properties
+// Note: Boolean conversion happens at data layer; schema validates canonical form
 export const BillSchema = TransactionSchema.refine(
   (data) => {
-    // Handle both boolean and numeric (0/1) representations from Dexie
-    const isScheduled = data.isScheduled === true || data.isScheduled === 1;
+    // Validate canonical boolean form (schema should receive normalized data)
+    const isScheduled = data.isScheduled === true;
     const isExpense = data.type === "expense";
     return isScheduled && isExpense;
   },

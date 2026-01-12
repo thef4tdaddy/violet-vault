@@ -210,7 +210,8 @@ export const processBillCalculations = (bill: Bill, fromDate: Date = new Date())
     // Ensure required fields have valid values
     amount: typeof bill.amount === "number" ? bill.amount : 0,
     // Support both description (Transaction) and name/provider (legacy)
-    description: bill.description || bill.name || bill.provider || `Bill ${bill.id}`,
+    // Use nullish coalescing to handle empty strings correctly
+    description: bill.description ?? bill.name ?? bill.provider ?? `Bill ${bill.id}`,
     isPaid: Boolean(bill.isPaid),
     daysUntilDue: daysUntilDue ?? undefined,
     urgency,

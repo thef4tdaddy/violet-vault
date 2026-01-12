@@ -18,31 +18,33 @@ export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 
 // Phase 2 Migration: Bill is now a Transaction with scheduled properties
 // Extended with computed fields for UI compatibility
-export interface Bill extends Transaction {
-  // Computed fields for backward compatibility
-  name?: string; // Maps to description
-  dueDate?: string | Date; // Maps to date
-  isPaid?: boolean; // Computed from payment transaction existence
+export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt"> {
+  // Computed backward-compatibility fields (derived from Transaction fields)
+  name?: string; // Computed getter: maps to Transaction.description
+  dueDate?: string | Date; // Computed getter: maps to Transaction.date
+  isPaid?: boolean; // Computed: determined by existence of payment transaction
   paidDate?: string | Date; // From paired payment transaction
   paidAmount?: number; // From paired payment transaction
   paymentTransactionId?: string; // ID of paired payment transaction
   
-  // Additional bill-specific fields
-  provider?: string;
-  monthlyAmount?: number;
-  biweeklyAmount?: number;
-  frequency?: BillFrequency;
-  customFrequency?: number;
-  nextDue?: string;
-  color?: string;
-  iconName?: string;
-  icon?: string;
-  status?: BillStatus;
+  // Additional bill-specific fields (not in base Transaction)
+  provider?: string; // Bill provider/vendor
+  monthlyAmount?: number; // For recurring bills
+  biweeklyAmount?: number; // For recurring bills
+  frequency?: BillFrequency; // Bill frequency
+  customFrequency?: number; // Custom frequency multiplier
+  nextDue?: string; // Next due date for recurring bills
+  color?: string; // UI color
+  iconName?: string; // UI icon name
+  icon?: string; // UI icon
+  status?: BillStatus; // Bill status
+  
+  // Override Transaction timestamp types for flexibility
   createdAt?: number | string;
   updatedAt?: number | string;
   
-  // Transaction fields are inherited:
-  // id, date, description, amount, envelopeId, category, type, isScheduled, recurrenceRule, etc.
+  // All other Transaction fields inherited: id, date, description, amount,
+  // envelopeId, category, type, isScheduled, recurrenceRule, lastModified, notes
 }
 
 // Bill form data interface

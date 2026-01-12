@@ -103,8 +103,12 @@ export const deleteAssociatedPaycheck = async (
 
   // Validate that the record is a paycheck (income transaction with allocations)
   const typedPaycheck = paycheckRecord as PaycheckRecordExtended;
-  if (!typedPaycheck.envelopeAllocations) {
-    logger.warn("Transaction is not a paycheck (missing envelopeAllocations)", {
+  if (
+    !typedPaycheck.envelopeAllocations ||
+    (typeof typedPaycheck.envelopeAllocations === "object" &&
+      Object.keys(typedPaycheck.envelopeAllocations).length === 0)
+  ) {
+    logger.warn("Transaction is not a paycheck (missing or empty envelopeAllocations)", {
       paycheckId,
       transactionId,
     });

@@ -44,8 +44,8 @@ const createPaymentTransaction = (
   paymentDate: string,
   envelopeId?: string
 ): Transaction => {
-  // Validate inputs
-  if (!paidAmount || paidAmount <= 0) {
+  // Validate inputs - explicit null/undefined check
+  if (paidAmount == null || paidAmount <= 0) {
     throw new Error("Payment amount must be positive");
   }
   if (!paymentDate) {
@@ -103,19 +103,24 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
       // Map scheduled transactions to bill objects with paid status
       bills = scheduledTransactions.map((scheduledBill) => {
         // Find matching payment transaction
-        // TODO: Implement more robust pairing with dedicated scheduledBillId field
-        // Current heuristic: match by description similarity, date proximity, and amount
-        const paymentTxn = actualTransactions.find(
-          (txn) =>
-            // Match by description reference
-            (txn.description?.includes(scheduledBill.description || "") ||
-              txn.notes?.includes(scheduledBill.id)) &&
-            // Match by date (within 7 days)
-            Math.abs(new Date(txn.date).getTime() - new Date(scheduledBill.date).getTime()) <
-              7 * 24 * 60 * 60 * 1000 &&
-            // Match by amount (within $0.01)
-            Math.abs(Math.abs(txn.amount) - Math.abs(scheduledBill.amount)) < 0.01
+        // Prioritize notes-based matching (most reliable) over heuristics
+        let paymentTxn = actualTransactions.find((txn) =>
+          txn.notes?.includes(`Scheduled Bill ID: ${scheduledBill.id}`)
         );
+
+        // Fallback to heuristic matching if no notes-based match found
+        if (!paymentTxn) {
+          paymentTxn = actualTransactions.find(
+            (txn) =>
+              // Match by description similarity
+              txn.description?.includes(scheduledBill.description || "") &&
+              // Match by date (within 7 days)
+              Math.abs(new Date(txn.date).getTime() - new Date(scheduledBill.date).getTime()) <
+                7 * 24 * 60 * 60 * 1000 &&
+              // Match by amount (within $0.01)
+              Math.abs(Math.abs(txn.amount) - Math.abs(scheduledBill.amount)) < 0.01
+          );
+        }
 
         return {
           ...scheduledBill,
@@ -289,7 +294,8 @@ export const useAddBillMutation = () => {
       const newBill: Partial<Transaction> = {
         id: uniqueId,
         description: (billData.name as string) || (billData.description as string) || "Unnamed Bill",
-        date: new Date(billData.dueDate as string | Date),
+        // Normalize date to string for consistency
+        date: new Date(billData.dueDate as string | Date).toISOString().split("T")[0],
         amount: -Math.abs((billData.amount as number) || 0), // Negative for expense
         envelopeId: (billData.envelopeId as string) || "unassigned",
         category: (billData.category as string) || "Bills & Utilities",
@@ -397,7 +403,25 @@ export const useDeleteBillMutation = () => {
     mutationKey: ["bills", "delete"],
     mutationFn: async (billId: string) => {
       // Phase 2 Migration: Delete from transactions table
+      // Also find and delete any associated payment transactions
+      const paymentsToDelete = await budgetDb.transactions
+        .filter(
+          (txn) =>
+            !txn.isScheduled &&
+            txn.type === "expense" &&
+            (txn.notes?.includes(`Scheduled Bill ID: ${billId}`) || txn.notes?.includes(billId))
+        )
+        .toArray();
+
+      // Delete the scheduled bill
       await budgetDb.transactions.delete(billId);
+
+      // Delete associated payments
+      for (const payment of paymentsToDelete) {
+        await budgetDb.transactions.delete(payment.id);
+        logger.info("🗑️ Deleted associated payment", { paymentId: payment.id, billId });
+      }
+
       return billId;
     },
     onSuccess: (billId) => {

@@ -448,7 +448,8 @@ export const mockDataGenerators = {
     // Phase 2 Migration: Bills are now scheduled expense transactions
     description: overrides.name || "Test Bill", // name maps to description
     date: overrides.dueDate || new Date().toISOString().split("T")[0], // dueDate maps to date
-    amount: -(overrides.amount || 50), // Negative for expense
+    // Ensure amount is always negative for expenses - normalize if positive passed
+    amount: -(Math.abs(overrides.amount || 50)), // Negative for expense
     envelopeId: overrides.envelopeId || "unassigned",
     category: "Bills & Utilities",
     type: "expense" as const,

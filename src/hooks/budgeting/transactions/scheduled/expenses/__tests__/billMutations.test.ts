@@ -333,8 +333,14 @@ describe("Bill Mutation Hooks", () => {
         await result.current.mutateAsync(paymentData);
       });
 
-      // Assert - Phase 2: No update to bill, just create payment transaction
-      // The scheduled bill remains unchanged; we create a non-scheduled payment
+      // Assert - Phase 2: Verify transaction pair pattern
+      // 1. The scheduled bill remains unchanged (not modified in database)
+      expect(mockDb.transactions.update).not.toHaveBeenCalledWith(
+        "bill_1",
+        expect.anything()
+      );
+      
+      // 2. A separate payment transaction is created
       expect(mockDb.transactions.put).toHaveBeenCalled();
       const transaction = mockDb.transactions.put.mock.calls[0][0];
       expect(transaction.id).toContain("bill_1"); // Transaction ID contains bill ID
