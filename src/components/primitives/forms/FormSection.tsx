@@ -80,6 +80,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
           className={`flex items-center justify-between ${collapsible ? "cursor-pointer" : ""}`}
           onClick={toggleExpanded}
           role={collapsible ? "button" : undefined}
+          aria-expanded={collapsible ? isExpanded : undefined}
           tabIndex={collapsible ? 0 : undefined}
           onKeyDown={
             collapsible

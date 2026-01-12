@@ -10,6 +10,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   rightIcon?: string;
   /** Callback when right icon is clicked */
   onRightIconClick?: () => void;
+  /** Aria label for the right icon button (required for accessibility when onRightIconClick is provided) */
+  rightIconAriaLabel?: string;
 }
 
 /**
@@ -49,6 +51,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       leftIcon,
       rightIcon,
       onRightIconClick,
+      rightIconAriaLabel,
       className = "",
       disabled = false,
       ...props
@@ -106,6 +109,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             }`}
             onClick={onRightIconClick}
             role={onRightIconClick ? "button" : undefined}
+            aria-label={onRightIconClick ? rightIconAriaLabel : undefined}
             tabIndex={onRightIconClick ? 0 : undefined}
             onKeyDown={
               onRightIconClick
