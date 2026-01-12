@@ -42,6 +42,7 @@ export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"
   iconName?: string; // UI icon name
   icon?: string; // UI icon
   status?: BillStatus; // Bill status
+  archived?: boolean; // Legacy compatibility field
   
   // Override Transaction timestamp types for flexibility
   createdAt?: number | string;
@@ -49,6 +50,9 @@ export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"
   
   // All other Transaction fields inherited: date, description, amount,
   // envelopeId, category, type, isScheduled, recurrenceRule, lastModified, notes
+  
+  // Index signature to satisfy Record<string, unknown> requirement
+  [key: string]: unknown;
 }
 
 // Bill form data interface
@@ -56,7 +60,7 @@ export interface BillFormData {
   name: string;
   amount: string;
   frequency: BillFrequency;
-  dueDate: string;
+  dueDate: string | Date; // Allow Date for compatibility
   category: string;
   color: string;
   notes: string;

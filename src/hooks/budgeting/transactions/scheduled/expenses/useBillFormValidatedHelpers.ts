@@ -61,7 +61,7 @@ export const transformFormDataToBill = (
     notes: data.notes,
     frequency: data.isRecurring ? editingBill?.frequency || "monthly" : "once",
     isPaid: editingBill?.isPaid,
-    envelopeId: data.selectedEnvelope || undefined,
+    envelopeId: data.selectedEnvelope || "unassigned",
     color: editingBill?.color || "#6366f1",
     createdAt: editingBill?.createdAt || new Date().toISOString(),
   };

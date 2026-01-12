@@ -69,7 +69,7 @@ export const createBill = (overrides?: Partial<Bill>): Bill => {
   const defaults: Bill = {
     status: "active",
     id: generateId(),
-    type: "bill",
+    type: "expense",
     name: `Bill ${generateId().substring(0, 8)}`,
     dueDate: generateFutureDate(30),
     amount: generateAmount(50, 500),
@@ -97,7 +97,7 @@ export const createBill = (overrides?: Partial<Bill>): Bill => {
  */
 export const createRecurringBill = (overrides?: Partial<Bill>): Bill => {
   return createBill({
-    isRecurring: true,
+    isScheduled: true,
     frequency: "monthly",
     ...overrides,
   });
@@ -108,7 +108,7 @@ export const createRecurringBill = (overrides?: Partial<Bill>): Bill => {
  * Creates a partial bill for update operations
  */
 export const createBillPartial = (overrides?: BillPartial): BillPartial => {
-  return overrides || { name: "Updated Bill" };
+  return overrides || { description: "Updated Bill", name: "Updated Bill" };
 };
 
 /**

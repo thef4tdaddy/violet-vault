@@ -242,8 +242,9 @@ export const transformBillsForUpdate = (selectedBills: Bill[], changes: BillChan
             ? bill.date
             : bill.date instanceof Date
               ? bill.date.toISOString().split("T")[0]
-              : bill.dueDate),
-        lastModified: new Date().toISOString(),
+              : bill.dueDate) ||
+          "",
+        lastModified: Date.now(),
         modificationHistory: [...existingHistory, createModificationHistoryEntry(change)],
       };
 

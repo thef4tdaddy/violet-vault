@@ -407,7 +407,7 @@ export const useDeleteBillMutation = () => {
       const paymentsToDelete = await budgetDb.transactions
         .filter(
           (txn) =>
-            !txn.isScheduled &&
+            txn.isScheduled === false &&
             txn.type === "expense" &&
             (txn.notes?.includes(`Scheduled Bill ID: ${billId}`) || txn.notes?.includes(billId))
         )

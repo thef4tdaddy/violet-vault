@@ -128,8 +128,8 @@ const buildUpdatedBillRecord = (
     isPaid: true,
     paidDate: paymentDate,
     paidAmount: paymentAmount,
-    envelopeId: effectiveEnvelopeId,
-    lastModified: timestamp,
+    envelopeId: effectiveEnvelopeId || "unassigned",
+    lastModified: Date.now(),
     modificationHistory: [
       ...((bill.modificationHistory ?? []) as ModificationHistoryEntry[]),
       {

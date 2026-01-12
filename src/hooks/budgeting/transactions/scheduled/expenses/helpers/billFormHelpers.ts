@@ -60,7 +60,11 @@ export const getInitialFormData = (bill: Bill | null = null): BillFormData => {
     name: getBillName(bill),
     amount: bill.amount?.toString() || "",
     frequency: bill.frequency || "monthly",
-    dueDate: bill.dueDate || "",
+    dueDate: bill.dueDate
+      ? typeof bill.dueDate === "string"
+        ? bill.dueDate
+        : bill.dueDate.toISOString().split("T")[0]
+      : "",
     category: bill.category || "Bills",
     color: bill.color || "#3B82F6",
     notes: bill.notes || "",
@@ -165,12 +169,14 @@ export const buildBillData = (
   return {
     id: editingBill?.id || "",
     name: formData.name.trim(),
+    description: formData.name.trim(), // Transaction field
     amount: parseFloat(formData.amount),
     monthlyAmount,
     biweeklyAmount,
     frequency: formData.frequency,
     customFrequency: parseInt(formData.customFrequency) || 1,
     dueDate: normalizedDueDate,
+    date: normalizedDueDate, // Transaction field
     nextDue: getNextDueDateHelper(formData.frequency, normalizedDueDate),
     category: formData.category,
     color: formData.color,
@@ -178,6 +184,9 @@ export const buildBillData = (
     iconName: formData.iconName || suggestedIconName,
     envelopeId: formData.selectedEnvelope,
     isPaid: editingBill?.isPaid || false,
+    type: "expense" as const, // Transaction field - required
+    isScheduled: true, // Transaction field - required for bills
+    lastModified: Date.now(), // Transaction field - required
     createdAt: editingBill?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
