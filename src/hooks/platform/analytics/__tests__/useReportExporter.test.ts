@@ -11,6 +11,9 @@ vi.mock("@/utils/common/logger");
 vi.mock("../utils/csvImageExportUtils");
 vi.mock("../utils/exportHandlerUtils");
 vi.mock("../utils/pdfGeneratorUtils");
+vi.mock("html2canvas", () => ({
+  default: vi.fn(),
+}));
 
 describe("useReportExporter", () => {
   const mockAnalyticsData = {
@@ -47,11 +50,6 @@ describe("useReportExporter", () => {
     // Mock URL methods
     global.URL.createObjectURL = vi.fn(() => "mock-url");
     global.URL.revokeObjectURL = vi.fn();
-
-    // Mock html2canvas dynamic import
-    vi.mock("html2canvas", () => ({
-      default: vi.fn(),
-    }));
   });
 
   afterEach(() => {
