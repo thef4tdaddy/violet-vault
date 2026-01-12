@@ -44,6 +44,14 @@ const createPaymentTransaction = (
   paymentDate: string,
   envelopeId?: string
 ): Transaction => {
+  // Validate inputs
+  if (!paidAmount || paidAmount <= 0) {
+    throw new Error("Payment amount must be positive");
+  }
+  if (!paymentDate) {
+    throw new Error("Payment date is required");
+  }
+
   return {
     id: `${billId}_payment_${Date.now()}`,
     date: new Date(paymentDate),
@@ -55,7 +63,7 @@ const createPaymentTransaction = (
     isScheduled: false, // Payment is not scheduled, it's actual
     lastModified: Date.now(),
     createdAt: Date.now(),
-    notes: `Payment for: ${scheduledBill.description || "Bill"}`,
+    notes: `Payment for: ${scheduledBill.description || "Bill"} (Scheduled Bill ID: ${billId})`,
   };
 };
 
@@ -77,7 +85,7 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
       // Phase 2 Migration: Query scheduled expense transactions (bills)
       const scheduledTransactions = await budgetDb.transactions
         .where("isScheduled")
-        .equals(1) // Dexie stores booleans as 0/1
+        .equals(1) // Dexie stores booleans as 0/1 in IndexedDB
         .filter((txn) => txn.type === "expense")
         .toArray();
 
@@ -90,14 +98,19 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
 
       // Map scheduled transactions to bill objects with paid status
       bills = scheduledTransactions.map((scheduledBill) => {
-        // Find matching payment transaction (actual transaction with similar description/date)
+        // Find matching payment transaction
+        // TODO: Implement more robust pairing with dedicated scheduledBillId field
+        // Current heuristic: match by description similarity, date proximity, and amount
         const paymentTxn = actualTransactions.find(
           (txn) =>
-            txn.description?.includes(scheduledBill.description || "") ||
-            txn.notes?.includes(scheduledBill.id) ||
-            (Math.abs(new Date(txn.date).getTime() - new Date(scheduledBill.date).getTime()) <
-              7 * 24 * 60 * 60 * 1000 && // Within 7 days
-              Math.abs(Math.abs(txn.amount) - Math.abs(scheduledBill.amount)) < 0.01) // Same amount
+            // Match by description reference
+            (txn.description?.includes(scheduledBill.description || "") ||
+              txn.notes?.includes(scheduledBill.id)) &&
+            // Match by date (within 7 days)
+            Math.abs(new Date(txn.date).getTime() - new Date(scheduledBill.date).getTime()) <
+              7 * 24 * 60 * 60 * 1000 &&
+            // Match by amount (within $0.01)
+            Math.abs(Math.abs(txn.amount) - Math.abs(scheduledBill.amount)) < 0.01
         );
 
         return {
@@ -106,6 +119,9 @@ export const useBillQueryFunction = (options: BillQueryOptions = {}) => {
           paidDate: paymentTxn?.date,
           paidAmount: paymentTxn ? Math.abs(paymentTxn.amount) : undefined,
           paymentTransactionId: paymentTxn?.id,
+          // Add computed fields for backward compatibility
+          name: scheduledBill.description,
+          dueDate: scheduledBill.date,
         } as BillTransaction;
       });
 

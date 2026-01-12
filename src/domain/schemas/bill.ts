@@ -10,7 +10,12 @@ export type BillPartial = Partial<Transaction>;
 
 // Bill is validated as a Transaction with scheduled properties
 export const BillSchema = TransactionSchema.refine(
-  (data) => data.isScheduled === true && data.type === "expense",
+  (data) => {
+    // Handle both boolean and numeric (0/1) representations from Dexie
+    const isScheduled = data.isScheduled === true || data.isScheduled === 1;
+    const isExpense = data.type === "expense";
+    return isScheduled && isExpense;
+  },
   {
     message: "Bill must be a scheduled expense transaction",
   }
