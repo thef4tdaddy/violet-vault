@@ -7,7 +7,7 @@ import { budgetDb, getBudgetMetadata } from "@/db/budgetDb";
 import logger from "@/utils/common/logger.ts";
 import type { Transaction } from "@/db/types";
 
-interface TransactionFilters {
+export interface TransactionFilters {
   dateRange?: {
     start: Date;
     end: Date;
