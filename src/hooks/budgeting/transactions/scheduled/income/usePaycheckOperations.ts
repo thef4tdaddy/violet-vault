@@ -5,6 +5,7 @@ import {
   calculateReversedBalances,
   deletePaycheckRecord,
   invalidatePaycheckCaches,
+  type BudgetDbTransactions,
 } from "@/utils/layout/paycheckDeletionUtils";
 
 import type { PaycheckHistory } from "@/db/types";
@@ -70,12 +71,7 @@ export const usePaycheckOperations = () => {
         // Delete paycheck record
         await deletePaycheckRecord(
           paycheckId,
-          budgetDb as unknown as {
-            transactions: {
-              get: (id: string | number) => Promise<unknown>;
-              delete: (id: string | number) => Promise<void>;
-            };
-          }
+          budgetDb as unknown as { transactions: BudgetDbTransactions }
         );
 
         // Invalidate caches

@@ -101,14 +101,19 @@ export const deleteAssociatedPaycheck = async (
     return { deletedPaycheck: false };
   }
 
+  // Validate that the record is a paycheck (income transaction with allocations)
+  const typedPaycheck = paycheckRecord as PaycheckRecordExtended;
+  if (!typedPaycheck.envelopeAllocations) {
+    logger.warn("Transaction is not a paycheck (missing envelopeAllocations)", {
+      paycheckId,
+      transactionId,
+    });
+    return { deletedPaycheck: false };
+  }
+
   const currentMetadata = await getBudgetMetadata();
-  await reversePaycheckBalances(
-    paycheckRecord as PaycheckRecordExtended,
-    currentMetadata as BudgetMetadata
-  );
-  await reverseEnvelopeAllocations(
-    (paycheckRecord as PaycheckRecordExtended).envelopeAllocations ?? []
-  );
+  await reversePaycheckBalances(typedPaycheck, currentMetadata as BudgetMetadata);
+  await reverseEnvelopeAllocations(typedPaycheck.envelopeAllocations);
   await budgetDb.transactions.delete(paycheckId);
 
   logger.info("Associated paycheck deleted and effects reversed", {

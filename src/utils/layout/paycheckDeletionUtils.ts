@@ -11,6 +11,15 @@ export interface Paycheck extends PaycheckHistory {
 }
 
 /**
+ * Type definition for budgetDb.transactions table
+ * Used to avoid complex inline type casting
+ */
+export interface BudgetDbTransactions {
+  get: (id: string | number) => Promise<unknown>;
+  delete: (id: string | number) => Promise<void>;
+}
+
+/**
  * Validate paycheck deletion parameters
  */
 export const validatePaycheckDeletion = (
@@ -133,12 +142,7 @@ export const calculateReversedBalances = async (
  */
 export const deletePaycheckRecord = async (
   paycheckId: string | number,
-  budgetDb: {
-    transactions: {
-      get: (id: string | number) => Promise<unknown>;
-      delete: (id: string | number) => Promise<void>;
-    };
-  }
+  budgetDb: { transactions: BudgetDbTransactions }
 ): Promise<void> => {
   logger.info("Deleting paycheck from Dexie (transactions table)", {
     paycheckId,
