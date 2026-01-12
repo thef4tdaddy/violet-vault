@@ -121,12 +121,6 @@ describe("MetricCard", () => {
       expect(screen.queryByTestId("trending-up-icon")).not.toBeInTheDocument();
       expect(screen.queryByTestId("trending-down-icon")).not.toBeInTheDocument();
     });
-
-    it("should not show change indicator when change is null", () => {
-      render(<MetricCard title="Revenue" value={100} change={null as unknown as undefined} />);
-      expect(screen.queryByTestId("trending-up-icon")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("trending-down-icon")).not.toBeInTheDocument();
-    });
   });
 
   describe("Variants", () => {

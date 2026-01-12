@@ -98,7 +98,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   // Get change indicator icon and color
   const getChangeIndicator = () => {
-    if (change === undefined || change === null) {
+    if (change === undefined) {
       return null;
     }
 
