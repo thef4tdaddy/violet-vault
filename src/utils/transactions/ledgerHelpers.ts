@@ -85,7 +85,9 @@ export const getTransactionFilterConfigs = (envelopes: Envelope[]): FilterConfig
 
 /**
  * Format transaction count and net cash flow for display
+ * Properly pluralizes "transaction" based on count
  */
 export const formatLedgerSummary = (transactionCount: number, netCashFlow: number): string => {
-  return `${transactionCount} transactions • Net: $${netCashFlow.toFixed(2)}`;
+  const transactionText = transactionCount === 1 ? "transaction" : "transactions";
+  return `${transactionCount} ${transactionText} • Net: $${netCashFlow.toFixed(2)}`;
 };
