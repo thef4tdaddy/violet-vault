@@ -45,7 +45,7 @@ export const NotesSection: React.FC<NotesSectionProps> = ({
       </div>
 
       {/* Reconciled Checkbox */}
-      <div className="flex items-center">
+      <div>
         <Checkbox
           checked={transactionForm.reconciled || false}
           onChange={(e) =>
@@ -55,8 +55,8 @@ export const NotesSection: React.FC<NotesSectionProps> = ({
             })
           }
           disabled={!!editingTransaction && !canEdit}
+          label="Mark as reconciled"
         />
-        <label className="ml-2 text-sm font-medium text-gray-700">Mark as reconciled</label>
       </div>
 
       {/* Receipt Scanner (only for new transactions) */}

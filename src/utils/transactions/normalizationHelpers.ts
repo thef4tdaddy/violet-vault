@@ -29,12 +29,17 @@ export const normalizeTransaction = (txn: unknown): Transaction | null => {
 
   // Normalize date
   const rawDate = record.date;
-  const date =
-    typeof rawDate === "string"
-      ? rawDate
-      : rawDate instanceof Date
-        ? rawDate.toISOString().split("T")[0]
-        : undefined;
+  let date: string | undefined;
+
+  if (typeof rawDate === "string") {
+    // Validate date string format (basic ISO date check)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}/;
+    if (dateRegex.test(rawDate)) {
+      date = rawDate;
+    }
+  } else if (rawDate instanceof Date) {
+    date = rawDate.toISOString().split("T")[0];
+  }
 
   if (!date) {
     return null;
@@ -128,8 +133,14 @@ export const normalizeEnvelope = (env: unknown): Envelope | null => {
       typeof record.category === "string" && record.category.trim().length > 0
         ? record.category
         : "uncategorized",
-    currentBalance: Number(record.currentBalance ?? 0),
-    targetAmount: Number(record.targetAmount ?? 0),
+    currentBalance: (() => {
+      const balance = Number(record.currentBalance ?? 0);
+      return Number.isNaN(balance) ? 0 : balance;
+    })(),
+    targetAmount: (() => {
+      const target = Number(record.targetAmount ?? 0);
+      return Number.isNaN(target) ? 0 : target;
+    })(),
     color: typeof record.color === "string" ? record.color : undefined,
     icon: typeof record.icon === "string" ? record.icon : undefined,
     description: typeof record.description === "string" ? record.description : undefined,

@@ -120,16 +120,12 @@ vi.mock("../TransactionSplitter", () => ({
     ) : null,
 }));
 
-vi.mock("../ledger/TransactionLedgerHeader", () => ({
-  default: ({ onAddTransaction, onImport, onFilterChange }: any) => (
-    <div data-testid="ledger-header">
-      <button onClick={onAddTransaction}>Add Transaction</button>
-      <button onClick={onImport}>Import</button>
-      <input
-        data-testid="search-input"
-        placeholder="Search"
-        onChange={(e) => onFilterChange("searchTerm", e.target.value)}
-      />
+vi.mock("@/components/primitives/headers", () => ({
+  PageHeader: ({ title, subtitle, icon, actions }: any) => (
+    <div data-testid="page-header">
+      <h1>{title}</h1>
+      {subtitle && <p>{subtitle}</p>}
+      {actions && <div data-testid="page-header-actions">{actions}</div>}
     </div>
   ),
 }));
