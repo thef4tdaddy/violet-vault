@@ -19,7 +19,7 @@ const fetchDebtsWithMigration = async () => {
       logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
       for (const debt of debtsNeedingStatus) {
         // Explicitly cast to Record<string, unknown> to allow partial updates of legacy data
-        await budgetDb.envelopes.update(debt.id, {
+        await budgetDb.updateEnvelope(debt.id, {
           status: "active",
         } as Partial<LiabilityEnvelope>);
         logger.debug(`✅ Updated debt "${debt.name}" status to active`);
@@ -65,7 +65,7 @@ const addDebtToDb = async (debtData: {
     throw new Error(`Invalid debt data: ${errorMessages}`);
   }
 
-  await budgetDb.envelopes.put(validationResult.data);
+  await budgetDb.putEnvelope(validationResult.data);
 
   await BudgetHistoryTracker.trackDebtChange({
     debtId: validationResult.data.id,
@@ -113,7 +113,7 @@ const updateDebtInDb = async ({
     throw new Error(`Invalid debt update data: ${errorMessages}`);
   }
 
-  await budgetDb.envelopes.update(id, {
+  await budgetDb.updateEnvelope(id, {
     ...validationResult.data,
     lastModified: Date.now(),
   });
@@ -178,7 +178,7 @@ const recordPaymentInDb = async ({
       lastModified: Date.now(),
     } as LiabilityEnvelope;
 
-    await budgetDb.envelopes.update(id, {
+    await budgetDb.updateEnvelope(id, {
       currentBalance: newBalance,
       lastModified: Date.now(),
     });

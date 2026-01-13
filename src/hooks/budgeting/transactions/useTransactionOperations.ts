@@ -72,7 +72,7 @@ export const useTransactionOperations = () => {
       } as Transaction;
 
       await optimisticHelpers.addTransaction(queryClient, final);
-      await budgetDb.transactions.put(final);
+      await budgetDb.putTransaction(final);
       await updateBalancesForTransaction(final);
       return final;
     },
@@ -92,7 +92,7 @@ export const useTransactionOperations = () => {
         id,
         normalized as Partial<Transaction>
       );
-      await budgetDb.transactions.update(id, normalized as Partial<Transaction>);
+      await budgetDb.updateTransaction(id, normalized as Partial<Transaction>);
       return { id, updates: normalized };
     },
     onSuccess: () => handleSuccess("updated"),
@@ -133,7 +133,7 @@ export const useTransactionOperations = () => {
           isScheduled: (original as Transaction).isScheduled ?? false,
           lastModified: Date.now(),
         };
-        await budgetDb.transactions.put(s);
+        await budgetDb.putTransaction(s);
         await updateBalancesForTransaction(s);
       }
       return originalId;
