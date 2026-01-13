@@ -24,10 +24,7 @@ export function validateWithSchema<T>(
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages =
-        error.issues && Array.isArray(error.issues)
-          ? error.issues.map((e: z.ZodIssue) => e.message).join(", ")
-          : "Validation failed";
+      const errorMessages = error.issues.map((e: z.ZodIssue) => e.message).join(", ");
       logger.error(`${entityType} validation failed`, {
         errors: error.issues,
         data,
@@ -56,10 +53,7 @@ export function safeValidateWithSchema<T>(
     return { success: true, data: result.data };
   }
 
-  const errorMessages =
-    result.error.issues && Array.isArray(result.error.issues)
-      ? result.error.issues.map((e: z.ZodIssue) => e.message).join(", ")
-      : "Validation failed";
+  const errorMessages = result.error.issues.map((e: z.ZodIssue) => e.message).join(", ");
 
   logger.warn(`${entityType} validation failed`, {
     errors: result.error.issues,

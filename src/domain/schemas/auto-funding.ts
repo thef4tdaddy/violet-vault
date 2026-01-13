@@ -28,11 +28,11 @@ export const AutoFundingConfigSchema = z.object({
   sourceId: z.string().nullable(),
   targetType: z.enum(["envelope", "multiple"]),
   targetId: z.string().nullable(),
-  targetIds: z.array(z.string()),
+  targetIds: z.array(z.string()).default([]),
   amount: z.number().min(0, "Amount cannot be negative"),
   percentage: z.number().min(0).max(100, "Percentage must be between 0 and 100"),
-  conditions: z.array(ConditionSchema),
-  scheduleConfig: z.record(z.string(), z.unknown()),
+  conditions: z.array(ConditionSchema).default([]),
+  scheduleConfig: z.record(z.string(), z.unknown()).default({}),
 });
 
 export type AutoFundingConfig = z.infer<typeof AutoFundingConfigSchema>;
