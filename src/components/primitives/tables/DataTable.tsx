@@ -57,6 +57,9 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
   </div>
 );
 
+// Stable empty Set to avoid recreating on every render
+const EMPTY_SET = new Set<string>();
+
 /**
  * DataTable - Reusable virtualized table component
  *
@@ -67,13 +70,18 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
  * - Loading and empty states
  * - Responsive grid layout
  * - Customizable columns
+ *
+ * Performance Notes:
+ * - For optimal performance, memoize the `columns` and `data` arrays in the parent component
+ * - The `gridTemplate` calculation depends on the `columns` array
+ * - The `handleSelectAll` callback depends on the `data` array
  */
 export const DataTable = <T,>({
   data,
   columns,
   onRowClick,
   selectable = false,
-  selectedRows = new Set(),
+  selectedRows,
   onSelectionChange,
   getRowId,
   virtualized = true,
@@ -82,6 +90,9 @@ export const DataTable = <T,>({
   className = "",
 }: DataTableProps<T>) => {
   const parentRef = useRef<HTMLDivElement | null>(null);
+  
+  // Use stable empty Set if selectedRows is not provided
+  const selectedRowsSet = selectedRows ?? EMPTY_SET;
 
   // Memoize estimateSize for virtualizer
   const estimateSize = useCallback(() => 64, []);
@@ -108,7 +119,7 @@ export const DataTable = <T,>({
       event.stopPropagation();
       if (!onSelectionChange) return;
 
-      const newSelection = new Set(selectedRows);
+      const newSelection = new Set(selectedRowsSet);
       if (newSelection.has(rowId)) {
         newSelection.delete(rowId);
       } else {
@@ -116,7 +127,7 @@ export const DataTable = <T,>({
       }
       onSelectionChange(newSelection);
     },
-    [selectedRows, onSelectionChange]
+    [selectedRowsSet, onSelectionChange]
   );
 
   // Handle select all
@@ -136,8 +147,8 @@ export const DataTable = <T,>({
 
   // Check if all rows are selected
   const isAllSelected = useMemo(() => {
-    return data.length > 0 && selectedRows.size === data.length;
-  }, [data.length, selectedRows.size]);
+    return data.length > 0 && selectedRowsSet.size === data.length;
+  }, [data.length, selectedRowsSet.size]);
 
   // Loading state
   if (loading) {
@@ -162,7 +173,7 @@ export const DataTable = <T,>({
     return rowVirtualizer.getVirtualItems().map((virtualRow) => {
       const row = data[virtualRow.index];
       const rowId = getRowId(row);
-      const isSelected = selectedRows.has(rowId);
+      const isSelected = selectedRowsSet.has(rowId);
 
       return (
         <div
@@ -202,7 +213,7 @@ export const DataTable = <T,>({
   const renderRegularRows = () => {
     return data.map((row) => {
       const rowId = getRowId(row);
-      const isSelected = selectedRows.has(rowId);
+      const isSelected = selectedRowsSet.has(rowId);
 
       return (
         <div
@@ -289,7 +300,6 @@ export const DataTable = <T,>({
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 };

@@ -51,7 +51,7 @@ export const TableActions: React.FC<TableActionsProps> = ({
         {selectedCount} item{selectedCount > 1 ? "s" : ""} selected
       </span>
       <div className="flex items-center gap-2">
-        {actions.map((action, index) => {
+        {actions.map((action) => {
           const Icon = action.icon ? getIcon(action.icon) : null;
           const buttonVariant = action.variant === "destructive" ? "destructive" : "primary";
           const buttonClassName =
@@ -61,7 +61,7 @@ export const TableActions: React.FC<TableActionsProps> = ({
 
           return (
             <Button
-              key={index}
+              key={action.label}
               onClick={action.onClick}
               disabled={action.disabled}
               className={buttonClassName}
