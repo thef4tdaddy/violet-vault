@@ -5,3 +5,7 @@ export type { PageHeaderProps, SectionHeaderProps } from "./headers";
 // Table Primitives
 export { DataTable, TableActions } from "./tables";
 export type { DataTableProps, Column, TableActionsProps, TableAction } from "./tables";
+
+// Card Primitives
+export { Card, MetricCard } from "./cards";
+export type { CardProps, MetricCardProps } from "./cards";
