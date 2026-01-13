@@ -111,6 +111,17 @@ describe("ApiClient", () => {
       expect(result.error).toBe("Network error");
     });
 
+    it("should handle request timeout (AbortError)", async () => {
+      const abortError = new Error("The operation was aborted");
+      abortError.name = "AbortError";
+      global.fetch = vi.fn().mockRejectedValue(abortError);
+
+      const result = await ApiClient.request("/test", { method: "GET" });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Request timeout - please try again");
+    });
+
     it("should handle non-JSON response", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -206,6 +217,8 @@ describe("ApiClient", () => {
       expect(fetchCall[0]).toBe("/upload");
       expect(fetchCall[1].method).toBe("POST");
       expect(fetchCall[1].body).toBeInstanceOf(FormData);
+      // Verify Content-Type header is NOT set for FormData (browser sets it with boundary)
+      expect(fetchCall[1].headers["Content-Type"]).toBeUndefined();
     });
 
     it("should not add body for GET requests", async () => {
