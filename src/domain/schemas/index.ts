@@ -9,6 +9,7 @@ export * from "./auth";
 // Core Finance Schemas & Types
 export {
   EnvelopeSchema,
+  EnvelopePartialSchema,
   StandardEnvelopeSchema,
   GoalEnvelopeSchema,
   LiabilityEnvelopeSchema,

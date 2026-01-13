@@ -24,11 +24,15 @@ export function validateWithSchema<T>(
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const errorMessages =
+        error.issues && Array.isArray(error.issues)
+          ? error.issues.map((e: z.ZodIssue) => e.message).join(", ")
+          : "Validation failed";
       logger.error(`${entityType} validation failed`, {
-        errors: error.errors,
+        errors: error.issues,
         data,
       });
-      throw new Error(`Invalid ${entityType}: ${error.errors.map((e) => e.message).join(", ")}`);
+      throw new Error(`Invalid ${entityType}: ${errorMessages}`);
     }
     throw error;
   }
@@ -52,14 +56,19 @@ export function safeValidateWithSchema<T>(
     return { success: true, data: result.data };
   }
 
+  const errorMessages =
+    result.error.issues && Array.isArray(result.error.issues)
+      ? result.error.issues.map((e: z.ZodIssue) => e.message).join(", ")
+      : "Validation failed";
+
   logger.warn(`${entityType} validation failed`, {
-    errors: result.error.errors,
+    errors: result.error.issues,
     data,
   });
 
   return {
     success: false,
-    error: result.error.errors.map((e) => e.message).join(", "),
+    error: errorMessages,
   };
 }
 
@@ -76,26 +85,22 @@ export function validateArrayWithSchema<T>(
   dataArray: unknown[],
   entityType: string
 ): T[] {
-  try {
-    return dataArray.map((item, index) => {
-      try {
-        return schema.parse(item);
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          logger.error(`${entityType} validation failed at index ${index}`, {
-            errors: error.errors,
-            data: item,
-          });
-          throw new Error(
-            `Invalid ${entityType} at index ${index}: ${error.errors.map((e) => e.message).join(", ")}`
-          );
-        }
-        throw error;
+  return dataArray.map((item, index) => {
+    try {
+      return schema.parse(item);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        logger.error(`${entityType} validation failed at index ${index}`, {
+          errors: error.issues,
+          data: item,
+        });
+        throw new Error(
+          `Invalid ${entityType} at index ${index}: ${error.issues.map((e: z.ZodIssue) => e.message).join(", ")}`
+        );
       }
-    });
-  } catch (error) {
-    throw error;
-  }
+      throw error;
+    }
+  });
 }
 
 /**
@@ -120,9 +125,11 @@ export function safeValidateArrayWithSchema<T>(
       results.push(result.data);
     } else {
       failedIndices.push(index);
-      errors.push(`Index ${index}: ${result.error.errors.map((e) => e.message).join(", ")}`);
+      errors.push(
+        `Index ${index}: ${result.error.issues.map((e: z.ZodIssue) => e.message).join(", ")}`
+      );
       logger.warn(`${entityType} validation failed at index ${index}`, {
-        errors: result.error.errors,
+        errors: result.error.issues,
         data: item,
       });
     }

@@ -17,7 +17,7 @@ async function fixAutoAllocateUndefinedValues() {
       );
 
       for (const envelope of undefinedEnvelopes) {
-        await budgetDb.envelopes.update(envelope.id, {
+        await budgetDb.updateEnvelope(envelope.id, {
           autoAllocate: true, // Set to true by default as user requested
         });
       }

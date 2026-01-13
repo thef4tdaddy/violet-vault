@@ -158,13 +158,7 @@ describe("Select", () => {
   describe("Complex Scenarios", () => {
     it("should handle all props together", () => {
       render(
-        <Select
-          name="category"
-          error={true}
-          disabled={false}
-          className="custom"
-          value="food"
-        >
+        <Select name="category" error={true} disabled={false} className="custom" value="food">
           <option value="">Select...</option>
           <option value="food">Food</option>
           <option value="transport">Transport</option>

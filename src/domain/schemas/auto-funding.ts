@@ -32,7 +32,7 @@ export const AutoFundingConfigSchema = z.object({
   amount: z.number().min(0, "Amount cannot be negative"),
   percentage: z.number().min(0).max(100, "Percentage must be between 0 and 100"),
   conditions: z.array(ConditionSchema),
-  scheduleConfig: z.record(z.unknown()),
+  scheduleConfig: z.record(z.string(), z.unknown()),
 });
 
 export type AutoFundingConfig = z.infer<typeof AutoFundingConfigSchema>;
