@@ -2,7 +2,7 @@
  * API Client Tests
  * Comprehensive tests for the API client module
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { ApiClient } from "@/services/api/client";
 
 // Mock logger
