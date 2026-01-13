@@ -31,7 +31,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
         title="Total Transactions"
         value={(filteredTransactions || []).length}
         subtitle="Transactions in period"
-        icon="Activity"
+        icon="activity"
         variant="info"
         format="number"
       />
