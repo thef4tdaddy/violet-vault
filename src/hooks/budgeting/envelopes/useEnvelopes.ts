@@ -69,7 +69,7 @@ const createAddEnvelopeOp = (queryClient: QueryClient) => async (data: Partial<E
   if (!val.success) throw new Error("Invalid envelope");
   const final = sanitizeForDb(val.data as unknown as Record<string, unknown>) as Envelope;
   await optimisticHelpers.addEnvelope(queryClient, final);
-  await budgetDb.envelopes.put(final);
+  await budgetDb.putEnvelope(final);
   return final;
 };
 
@@ -80,7 +80,7 @@ const createUpdateEnvelopeOp =
     if (!val.success) throw new Error("Invalid update");
     const final = sanitizeForDb(val.data as unknown as Record<string, unknown>);
     await optimisticHelpers.updateEnvelope(queryClient, id, final);
-    await budgetDb.envelopes.update(id, final);
+    await budgetDb.updateEnvelope(id, final);
     return { id, updates: final };
   };
 
@@ -104,7 +104,7 @@ const createDeleteEnvelopeOp =
         await budgetDb.transactions.delete(billId);
         await optimisticHelpers.removeTransaction(queryClient, billId);
       } else {
-        await budgetDb.transactions.update(billId, { envelopeId: undefined });
+        await budgetDb.updateTransaction(billId, { envelopeId: undefined });
         await optimisticHelpers.updateTransaction(queryClient, billId, { envelopeId: undefined });
       }
     }
@@ -130,11 +130,11 @@ const createTransferOp =
     const tEnv = await budgetDb.envelopes.get(to);
     if (!fEnv || !tEnv || (fEnv.currentBalance || 0) < amount) throw new Error("Transfer failed");
 
-    await budgetDb.envelopes.update(from, {
+    await budgetDb.updateEnvelope(from, {
       currentBalance: (fEnv.currentBalance || 0) - amount,
       lastModified: Date.now(),
     });
-    await budgetDb.envelopes.update(to, {
+    await budgetDb.updateEnvelope(to, {
       currentBalance: (tEnv.currentBalance || 0) + amount,
       lastModified: Date.now(),
     });
@@ -150,7 +150,7 @@ const createTransferOp =
       lastModified: Date.now(),
     });
     const finalTxn = { ...txn, date: new Date(txn.date as string) } as Transaction;
-    await budgetDb.transactions.put(finalTxn);
+    await budgetDb.putTransaction(finalTxn);
 
     await optimisticHelpers.updateEnvelope(queryClient, from, {
       currentBalance: (fEnv.currentBalance || 0) - amount,

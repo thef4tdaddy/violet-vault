@@ -201,7 +201,7 @@ export const useAddContributionMutation = () => {
       await optimisticHelpers.updateSavingsGoal(goalId, updatedGoal);
 
       // Update in Dexie
-      await budgetDb.envelopes.update(goalId, updatedGoal);
+      await budgetDb.updateEnvelope(goalId, updatedGoal);
 
       // Create transaction record for the contribution
       const contributionTransaction = {
@@ -218,7 +218,7 @@ export const useAddContributionMutation = () => {
       };
 
       // Add transaction to Dexie
-      await budgetDb.transactions.put(contributionTransaction);
+      await budgetDb.putTransaction(contributionTransaction);
       await optimisticHelpers.addTransaction(queryClient, contributionTransaction);
 
       logger.debug("💰 Added contribution to savings goal", {
@@ -292,7 +292,7 @@ export const useDistributeFundsMutation = () => {
         await optimisticHelpers.updateSavingsGoal(goalId, updatedGoal);
 
         // Update in Dexie
-        await budgetDb.envelopes.update(goalId, updatedGoal);
+        await budgetDb.updateEnvelope(goalId, updatedGoal);
 
         // Create transaction record
         const contributionTransaction = {
@@ -308,7 +308,7 @@ export const useDistributeFundsMutation = () => {
           isScheduled: false,
         };
 
-        await budgetDb.transactions.put(contributionTransaction);
+        await budgetDb.putTransaction(contributionTransaction);
         await optimisticHelpers.addTransaction(queryClient, contributionTransaction);
 
         results.push({
