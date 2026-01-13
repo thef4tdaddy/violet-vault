@@ -47,7 +47,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
         title="Active Envelopes"
         value={(envelopes || []).length}
         subtitle="Envelope count"
-        icon="Package"
+        icon="Mail"
         variant="success"
         format="number"
       />
