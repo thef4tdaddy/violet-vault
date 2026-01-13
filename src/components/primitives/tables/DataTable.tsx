@@ -90,7 +90,7 @@ export const DataTable = <T,>({
   className = "",
 }: DataTableProps<T>) => {
   const parentRef = useRef<HTMLDivElement | null>(null);
-  
+
   // Use stable empty Set if selectedRows is not provided
   const selectedRowsSet = selectedRows ?? EMPTY_SET;
 
@@ -248,58 +248,55 @@ export const DataTable = <T,>({
 
   return (
     <div className={`bg-white shadow-sm rounded-lg overflow-hidden ${className}`}>
-        <div role="table" className="w-full">
-          {/* Header */}
-          <div
-            role="row"
-            className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
-            style={{ gridTemplateColumns: gridTemplate }}
-          >
-            {selectable && (
-              <div
-                role="columnheader"
-                className="px-4 py-4 flex items-center justify-center"
-              >
-                <input
-                  type="checkbox"
-                  checked={isAllSelected}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-            )}
-            {columns.map((column) => (
-              <div
-                key={column.key}
-                role="columnheader"
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                {column.header}
-                {column.sortable && (
-                  <span className="ml-1 text-gray-400" aria-label="Sortable column">
-                    ⇅
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Body */}
-          <div role="rowgroup">
-            {virtualized ? (
-              <div
-                style={{
-                  height: `${rowVirtualizer.getTotalSize()}px`,
-                  position: "relative",
-                }}
-              >
-                {renderVirtualizedRows()}
-              </div>
-            ) : (
-              <div>{renderRegularRows()}</div>
-            )}
-          </div>
+      <div role="table" className="w-full">
+        {/* Header */}
+        <div
+          role="row"
+          className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
+          style={{ gridTemplateColumns: gridTemplate }}
+        >
+          {selectable && (
+            <div role="columnheader" className="px-4 py-4 flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={isAllSelected}
+                onChange={handleSelectAll}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            </div>
+          )}
+          {columns.map((column) => (
+            <div
+              key={column.key}
+              role="columnheader"
+              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              {column.header}
+              {column.sortable && (
+                <span className="ml-1 text-gray-400" aria-label="Sortable column">
+                  ⇅
+                </span>
+              )}
+            </div>
+          ))}
         </div>
+
+        {/* Body */}
+        <div role="rowgroup">
+          {virtualized ? (
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                position: "relative",
+              }}
+            >
+              {renderVirtualizedRows()}
+            </div>
+          ) : (
+            <div>{renderRegularRows()}</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
