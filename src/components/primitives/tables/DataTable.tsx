@@ -216,9 +216,11 @@ export const DataTable = <T,>({
               <input
                 type="checkbox"
                 checked={isSelected}
-                // Selection is handled via onClick to prevent event bubbling issues
-                onChange={() => {}}
-                onClick={(e) => handleRowSelect(rowId, e)}
+                // Handle selection via onChange for better accessibility; stop propagation to avoid triggering row click
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleRowSelect(rowId, e as any);
+                }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </div>
