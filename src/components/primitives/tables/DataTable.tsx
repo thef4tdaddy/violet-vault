@@ -237,49 +237,58 @@ export const DataTable = <T,>({
 
   return (
     <div className={`bg-white shadow-sm rounded-lg overflow-hidden ${className}`}>
-      <div
-        ref={parentRef}
-        className="overflow-auto"
-        style={{ maxHeight: virtualized ? "70vh" : "none" }}
-      >
-        {/* Header */}
-        <div
-          className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
-          style={{ gridTemplateColumns: gridTemplate }}
-        >
-          {selectable && (
-            <div className="px-4 py-4 flex items-center justify-center">
-              <input
-                type="checkbox"
-                checked={isAllSelected}
-                onChange={handleSelectAll}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-            </div>
-          )}
-          {columns.map((column) => (
-            <div
-              key={column.key}
-              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              {column.header}
-            </div>
-          ))}
-        </div>
-
-        {/* Body */}
-        {virtualized ? (
+        <div role="table" className="w-full">
+          {/* Header */}
           <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}
+            role="row"
+            className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
+            style={{ gridTemplateColumns: gridTemplate }}
           >
-            {renderVirtualizedRows()}
+            {selectable && (
+              <div
+                role="columnheader"
+                className="px-4 py-4 flex items-center justify-center"
+              >
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </div>
+            )}
+            {columns.map((column) => (
+              <div
+                key={column.key}
+                role="columnheader"
+                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                {column.header}
+                {column.sortable && (
+                  <span className="ml-1 text-gray-400" aria-label="Sortable column">
+                    ⇅
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
-        ) : (
-          <div>{renderRegularRows()}</div>
-        )}
+
+          {/* Body */}
+          <div role="rowgroup">
+            {virtualized ? (
+              <div
+                style={{
+                  height: `${rowVirtualizer.getTotalSize()}px`,
+                  position: "relative",
+                }}
+              >
+                {renderVirtualizedRows()}
+              </div>
+            ) : (
+              <div>{renderRegularRows()}</div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
