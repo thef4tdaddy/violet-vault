@@ -333,6 +333,7 @@ export default [
     // This is a known limitation of the library, not a design issue
     files: [
       "src/hooks/transactions/useTransactionTable.ts", // Uses TanStack Virtual
+      "src/components/primitives/tables/DataTable.tsx", // Uses TanStack Virtual
     ],
     rules: {
       "react-hooks/incompatible-library": "off", // TanStack Virtual API limitation
