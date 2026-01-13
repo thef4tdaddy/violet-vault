@@ -263,11 +263,6 @@ export const DataTable = <T,>({
               className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               {column.header}
-              {column.sortable && (
-                <span className="ml-1 text-gray-400" aria-label="Sortable column">
-                  ⇅
-                </span>
-              )}
             </div>
           ))}
         </div>
