@@ -116,22 +116,20 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
         header: "Actions",
         accessor: (txn) => (
           <div className="flex items-center justify-end gap-2 flex-nowrap">
-            {onSplit && (
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSplit(txn);
-                }}
-                className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
-                title="Split transaction"
-                aria-label="Split transaction"
-              >
-                {React.createElement(getIcon("SplitSquareHorizontal"), {
-                  className: "h-4 w-4 flex-shrink-0",
-                })}
-                <span className="hidden xl:inline font-semibold">Split</span>
-              </Button>
-            )}
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSplit(txn);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              title="Split transaction"
+              aria-label="Split transaction"
+            >
+              {React.createElement(getIcon("SplitSquareHorizontal"), {
+                className: "h-4 w-4 flex-shrink-0",
+              })}
+              <span className="hidden xl:inline font-semibold">Split</span>
+            </Button>
             <Button
               onClick={(e) => {
                 e.stopPropagation();

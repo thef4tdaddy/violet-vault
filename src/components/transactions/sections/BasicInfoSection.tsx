@@ -75,7 +75,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               disabled={!!editingTransaction && !canEdit}
               className={`p-3 h-auto rounded-lg transition-all ${
                 transactionForm.type === "expense"
-                  ? "border-2 border-black bg-red-600 text-black font-bold shadow-md opacity-100"
+                  ? "border-2 border-black bg-red-600 text-white font-bold shadow-md opacity-100"
                   : "border-2 border-red-600 bg-red-100 text-gray-600 hover:bg-red-200"
               } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               aria-pressed={transactionForm.type === "expense"}
@@ -102,7 +102,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               disabled={!!editingTransaction && !canEdit}
               className={`p-3 h-auto rounded-lg transition-all ${
                 transactionForm.type === "income"
-                  ? "border-2 border-black bg-green-600 text-black font-bold shadow-md opacity-100"
+                  ? "border-2 border-black bg-green-600 text-white font-bold shadow-md opacity-100"
                   : "border-2 border-green-600 bg-green-100 text-gray-600 hover:bg-green-200"
               } ${!!editingTransaction && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               aria-pressed={transactionForm.type === "income"}

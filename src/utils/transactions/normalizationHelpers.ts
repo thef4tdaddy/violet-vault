@@ -45,6 +45,8 @@ export const normalizeTransaction = (txn: unknown): Transaction | null => {
     return null;
   }
 
+  const validatedId = record.id as string | number;
+
   // Normalize amount and metadata
   const amountRaw = Number(record.amount ?? 0);
   const description = typeof record.description === "string" ? record.description : "";
@@ -75,7 +77,7 @@ export const normalizeTransaction = (txn: unknown): Transaction | null => {
         : amountRaw;
 
   return {
-    id: record.id as string | number,
+    id: validatedId,
     date,
     description,
     amount: signedAmount,
