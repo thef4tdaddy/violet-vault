@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { DataTable } from "../DataTable";
-import type { Column } from "../DataTable";
+import { DataTable, type Column } from "../DataTable";
 import "@testing-library/jest-dom";
+import * as virtual from "@tanstack/react-virtual";
 
 // Mock @tanstack/react-virtual
 vi.mock("@tanstack/react-virtual", () => ({
@@ -88,7 +88,8 @@ describe("DataTable", () => {
         <DataTable data={mockData} columns={mockColumns} getRowId={getRowId} virtualized={false} />
       );
 
-      const emailHeader = screen.getByText("Email").parentElement;
+      const emailHeader = screen.getByRole("columnheader", { name: /email/i });
+      expect(within(emailHeader).queryByLabelText("Sortable column")).not.toBeInTheDocument();
       expect(emailHeader).not.toHaveTextContent("⇅");
     });
 
@@ -119,7 +120,9 @@ describe("DataTable", () => {
         />
       );
 
-      const skeletons = screen.getAllByRole("generic").filter((el) => el.classList.contains("animate-pulse"));
+      const skeletons = screen
+        .getAllByRole("generic")
+        .filter((el) => el.classList.contains("animate-pulse"));
       expect(skeletons.length).toBeGreaterThan(0);
     });
 
@@ -140,9 +143,7 @@ describe("DataTable", () => {
 
   describe("Empty State", () => {
     it("should show empty state when data is empty", () => {
-      render(
-        <DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />
-      );
+      render(<DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />);
 
       expect(screen.getByText("No data available")).toBeInTheDocument();
     });
@@ -162,9 +163,7 @@ describe("DataTable", () => {
     });
 
     it("should not render headers in empty state", () => {
-      render(
-        <DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />
-      );
+      render(<DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />);
 
       expect(screen.queryByText("Name")).not.toBeInTheDocument();
     });
@@ -374,13 +373,12 @@ describe("DataTable", () => {
 
   describe("Virtualization", () => {
     it("should use virtualization when virtualized is true", () => {
-      const { useVirtualizer } = require("@tanstack/react-virtual");
-
       render(
         <DataTable data={mockData} columns={mockColumns} getRowId={getRowId} virtualized={true} />
       );
 
-      expect(useVirtualizer).toHaveBeenCalledWith(
+      // useVirtualizer is mocked at the top of the file
+      expect(virtual.useVirtualizer).toHaveBeenCalledWith(
         expect.objectContaining({
           count: mockData.length,
           enabled: true,
@@ -405,8 +403,13 @@ describe("DataTable", () => {
         <DataTable data={mockData} columns={mockColumns} getRowId={getRowId} virtualized={false} />
       );
 
-      const headers = container.querySelectorAll("div[style*='gridTemplateColumns']");
+      const headers = container.querySelectorAll("[role='row']");
       expect(headers.length).toBeGreaterThan(0);
+
+      const headerRow = Array.from(headers).find((el) =>
+        (el as HTMLElement).style.gridTemplateColumns.includes("10rem")
+      );
+      expect(headerRow).toBeDefined();
     });
   });
 });

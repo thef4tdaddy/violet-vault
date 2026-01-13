@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useMemo } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer, type Virtualizer, type VirtualItem } from "@tanstack/react-virtual";
 
 /**
  * Column definition for DataTable
@@ -76,6 +76,186 @@ const EMPTY_SET = new Set<string>();
  * - The `gridTemplate` calculation depends on the `columns` array
  * - The `handleSelectAll` callback depends on the `data` array
  */
+/**
+ * Internal Row component to handle rendering of a single row
+ */
+const TableRow = <T,>({
+  row,
+  columns,
+  gridTemplate,
+  isSelected,
+  selectable,
+  onRowClick,
+  onRowSelect,
+  style,
+  className = "",
+}: {
+  row: T;
+  columns: Column<T>[];
+  gridTemplate: string;
+  isSelected: boolean;
+  selectable: boolean;
+  onRowClick?: (row: T) => void;
+  onRowSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  style?: React.CSSProperties;
+  className?: string;
+}) => (
+  <div
+    role="row"
+    className={`grid items-center hover:bg-gray-50 cursor-pointer border-b border-gray-200 ${className}`}
+    style={{ ...style, gridTemplateColumns: gridTemplate }}
+    onClick={() => onRowClick?.(row)}
+  >
+    {selectable && (
+      <div className="px-4 flex items-center justify-center">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={onRowSelect}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      </div>
+    )}
+    {columns.map((column) => (
+      <div key={column.key} role="cell" className="px-4 py-3 text-sm text-gray-900">
+        {column.accessor(row)}
+      </div>
+    ))}
+  </div>
+);
+
+/**
+ * Internal Header component
+ */
+const DataTableHeader = <T,>({
+  gridTemplate,
+  selectable,
+  isAllSelected,
+  onSelectAll,
+  columns,
+}: {
+  gridTemplate: string;
+  selectable: boolean;
+  isAllSelected: boolean;
+  onSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  columns: Column<T>[];
+}) => (
+  <div
+    role="row"
+    className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
+    style={{ gridTemplateColumns: gridTemplate }}
+  >
+    {selectable && (
+      <div role="columnheader" className="px-4 py-4 flex items-center justify-center">
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          onChange={onSelectAll}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      </div>
+    )}
+    {columns.map((column) => (
+      <div
+        key={column.key}
+        role="columnheader"
+        className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      >
+        <div className="flex items-center gap-1">
+          {column.header}
+          {column.sortable && (
+            <span className="text-gray-400" aria-label="Sortable column">
+              ⇅
+            </span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+/**
+ * Internal Body component
+ */
+const TableBody = <T,>({
+  data,
+  columns,
+  gridTemplate,
+  selectedRowsSet,
+  selectable,
+  onRowClick,
+  handleRowSelect,
+  getRowId,
+  virtualized,
+  rowVirtualizer,
+}: {
+  data: T[];
+  columns: Column<T>[];
+  gridTemplate: string;
+  selectedRowsSet: Set<string>;
+  selectable: boolean;
+  onRowClick?: (row: T) => void;
+  handleRowSelect: (rowId: string, event: React.ChangeEvent<HTMLInputElement>) => void;
+  getRowId: (row: T) => string;
+  virtualized: boolean;
+  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
+}) => (
+  <div role="rowgroup">
+    {virtualized ? (
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          position: "relative",
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
+          const row = data[virtualRow.index];
+          const rowId = getRowId(row);
+          return (
+            <TableRow
+              key={rowId}
+              row={row}
+              columns={columns}
+              gridTemplate={gridTemplate}
+              isSelected={selectedRowsSet.has(rowId)}
+              selectable={selectable}
+              onRowClick={onRowClick}
+              onRowSelect={(e) => handleRowSelect(rowId, e)}
+              className="absolute top-0 left-0 w-full"
+              style={{
+                height: `${virtualRow.size}px`,
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <div>
+        {data.map((row) => {
+          const rowId = getRowId(row);
+          return (
+            <TableRow
+              key={rowId}
+              row={row}
+              columns={columns}
+              gridTemplate={gridTemplate}
+              isSelected={selectedRowsSet.has(rowId)}
+              selectable={selectable}
+              onRowClick={onRowClick}
+              onRowSelect={(e) => handleRowSelect(rowId, e)}
+            />
+          );
+        })}
+      </div>
+    )}
+  </div>
+);
+
+/**
+ * DataTable - Reusable virtualized table component
+ */
 export const DataTable = <T,>({
   data,
   columns,
@@ -90,18 +270,15 @@ export const DataTable = <T,>({
   className = "",
 }: DataTableProps<T>) => {
   const parentRef = useRef<HTMLDivElement | null>(null);
-  
+
   // Use stable empty Set if selectedRows is not provided
   const selectedRowsSet = selectedRows ?? EMPTY_SET;
-
-  // Memoize estimateSize for virtualizer
-  const estimateSize = useCallback(() => 64, []);
 
   // Setup virtualization
   const rowVirtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => parentRef.current,
-    estimateSize,
+    estimateSize: useCallback(() => 64, []),
     overscan: 10,
     enabled: virtualized,
   });
@@ -115,15 +292,14 @@ export const DataTable = <T,>({
 
   // Handle row selection toggle
   const handleRowSelect = useCallback(
-    (rowId: string, event: React.MouseEvent) => {
-      event.stopPropagation();
+    (rowId: string, event: React.ChangeEvent<HTMLInputElement>) => {
       if (!onSelectionChange) return;
 
       const newSelection = new Set(selectedRowsSet);
-      if (newSelection.has(rowId)) {
-        newSelection.delete(rowId);
-      } else {
+      if (event.target.checked) {
         newSelection.add(rowId);
+      } else {
+        newSelection.delete(rowId);
       }
       onSelectionChange(newSelection);
     },
@@ -168,138 +344,33 @@ export const DataTable = <T,>({
     );
   }
 
-  // Render virtualized rows
-  const renderVirtualizedRows = () => {
-    return rowVirtualizer.getVirtualItems().map((virtualRow) => {
-      const row = data[virtualRow.index];
-      const rowId = getRowId(row);
-      const isSelected = selectedRowsSet.has(rowId);
-
-      return (
-        <div
-          key={rowId}
-          className="absolute top-0 left-0 w-full grid items-center hover:bg-gray-50 cursor-pointer border-b border-gray-200"
-          style={{
-            height: `${virtualRow.size}px`,
-            transform: `translateY(${virtualRow.start}px)`,
-            gridTemplateColumns: gridTemplate,
-          }}
-          onClick={() => onRowClick?.(row)}
-        >
-          {selectable && (
-            <div className="px-4 flex items-center justify-center">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  handleRowSelect(rowId, e);
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-            </div>
-          )}
-          {columns.map((column) => (
-            <div key={column.key} className="px-4 py-3 text-sm text-gray-900">
-              {column.accessor(row)}
-            </div>
-          ))}
-        </div>
-      );
-    });
-  };
-
-  // Render non-virtualized rows
-  const renderRegularRows = () => {
-    return data.map((row) => {
-      const rowId = getRowId(row);
-      const isSelected = selectedRowsSet.has(rowId);
-
-      return (
-        <div
-          key={rowId}
-          className="grid items-center hover:bg-gray-50 cursor-pointer border-b border-gray-200"
-          style={{ gridTemplateColumns: gridTemplate }}
-          onClick={() => onRowClick?.(row)}
-        >
-          {selectable && (
-            <div className="px-4 flex items-center justify-center">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                // Handle selection via onChange for better accessibility; stop propagation to avoid triggering row click
-                onChange={(e) => {
-                  e.stopPropagation();
-                  handleRowSelect(rowId, e as any);
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-            </div>
-          )}
-          {columns.map((column) => (
-            <div key={column.key} className="px-4 py-3 text-sm text-gray-900">
-              {column.accessor(row)}
-            </div>
-          ))}
-        </div>
-      );
-    });
-  };
-
   return (
-    <div className={`bg-white shadow-sm rounded-lg overflow-hidden ${className}`}>
-        <div role="table" className="w-full">
-          {/* Header */}
-          <div
-            role="row"
-            className="bg-white sticky top-0 z-10 border-b-2 border-gray-300 grid"
-            style={{ gridTemplateColumns: gridTemplate }}
-          >
-            {selectable && (
-              <div
-                role="columnheader"
-                className="px-4 py-4 flex items-center justify-center"
-              >
-                <input
-                  type="checkbox"
-                  checked={isAllSelected}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-            )}
-            {columns.map((column) => (
-              <div
-                key={column.key}
-                role="columnheader"
-                className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                {column.header}
-                {column.sortable && (
-                  <span className="ml-1 text-gray-400" aria-label="Sortable column">
-                    ⇅
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+    <div
+      ref={parentRef}
+      className={`bg-white shadow-sm rounded-lg overflow-auto max-h-full ${className}`}
+    >
+      <div role="table" className="w-full min-w-full">
+        <DataTableHeader
+          gridTemplate={gridTemplate}
+          selectable={selectable}
+          isAllSelected={isAllSelected}
+          onSelectAll={handleSelectAll}
+          columns={columns}
+        />
 
-          {/* Body */}
-          <div role="rowgroup">
-            {virtualized ? (
-              <div
-                style={{
-                  height: `${rowVirtualizer.getTotalSize()}px`,
-                  position: "relative",
-                }}
-              >
-                {renderVirtualizedRows()}
-              </div>
-            ) : (
-              <div>{renderRegularRows()}</div>
-            )}
-          </div>
-        </div>
+        <TableBody
+          data={data}
+          columns={columns}
+          gridTemplate={gridTemplate}
+          selectedRowsSet={selectedRowsSet}
+          selectable={selectable}
+          onRowClick={onRowClick}
+          handleRowSelect={handleRowSelect}
+          getRowId={getRowId}
+          virtualized={virtualized}
+          rowVirtualizer={rowVirtualizer}
+        />
+      </div>
     </div>
   );
 };

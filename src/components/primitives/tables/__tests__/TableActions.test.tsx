@@ -7,7 +7,12 @@ import "@testing-library/jest-dom";
 
 // Mock UI components and utilities
 vi.mock("@/components/ui", () => ({
-  Button: ({ children, onClick, disabled, className }: {
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    className,
+  }: {
     children: React.ReactNode;
     onClick: () => void;
     disabled?: boolean;
@@ -75,7 +80,11 @@ describe("TableActions", () => {
 
     it("should render singular item text when selectedCount is 1", () => {
       render(
-        <TableActions selectedCount={1} onClearSelection={mockClearSelection} actions={mockActions} />
+        <TableActions
+          selectedCount={1}
+          onClearSelection={mockClearSelection}
+          actions={mockActions}
+        />
       );
 
       expect(screen.getByText("1 item selected")).toBeInTheDocument();
@@ -318,9 +327,7 @@ describe("TableActions", () => {
 
   describe("Empty Actions", () => {
     it("should render with empty actions array", () => {
-      render(
-        <TableActions selectedCount={1} onClearSelection={mockClearSelection} actions={[]} />
-      );
+      render(<TableActions selectedCount={1} onClearSelection={mockClearSelection} actions={[]} />);
 
       expect(screen.getByText("1 item selected")).toBeInTheDocument();
       expect(screen.getByText("Clear")).toBeInTheDocument();
