@@ -1,4 +1,5 @@
 import React from "react";
+import BaseModal from "@/components/primitives/modals/BaseModal";
 import { getIcon } from "../../../utils";
 import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/budgeting/transactions/scheduled/expenses/useBillDetail";
@@ -7,7 +8,6 @@ import { BillDetailHeader } from "./BillDetailHeader";
 import { BillDetailStats } from "./BillDetailStats";
 import { BillDetailPaymentHistory, BillDetailQuickPayment } from "./BillDetailSections";
 import { BillDetailActions } from "./BillDetailActions";
-import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill as BillFromTypes } from "@/types/bills";
 
 interface PaymentData {
@@ -26,6 +26,8 @@ interface BillDetailModalProps {
 }
 
 /**
+ * BillDetailModal - Migrated to use BaseModal primitive (Issue #1594)
+ * 
  * Pure UI component for viewing and managing individual bill details
  * Business logic extracted to useBillDetail hook following Issue #152 pattern
  */
@@ -52,9 +54,9 @@ const BillDetailModal: React.FC<BillDetailModalProps> = ({
     handleHidePaymentForm,
   } = useBillDetail({ bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring });
 
-  const modalRef = useModalAutoScroll(isOpen);
+  const titleId = React.useId();
 
-  if (!isOpen || !bill) return null;
+  if (!bill) return null;
 
   const statusIconName = getBillStatusIcon(
     bill.status ?? "",
@@ -63,13 +65,10 @@ const BillDetailModal: React.FC<BillDetailModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
-      >
+    <BaseModal isOpen={isOpen} onClose={onClose} size="xl" ariaLabelledBy={titleId}>
+      <div className="p-6">
         {/* Header */}
-        <BillDetailHeader bill={bill} statusInfo={statusInfo} onClose={onClose} />
+        <BillDetailHeader bill={bill} statusInfo={statusInfo} onClose={onClose} titleId={titleId} />
 
         {/* Status Badge */}
         <div className="mb-6">
@@ -150,7 +149,7 @@ const BillDetailModal: React.FC<BillDetailModalProps> = ({
           handleCreateRecurring={handleCreateRecurring}
         />
       </div>
-    </div>
+    </BaseModal>
   );
 };
 

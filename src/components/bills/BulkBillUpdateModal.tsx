@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import BaseModal from "@/components/primitives/modals/BaseModal";
 import { useBulkBillUpdate } from "../../hooks/budgeting/transactions/scheduled/expenses/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
@@ -8,8 +9,6 @@ import BulkUpdateConfirmModal from "./modals/BulkUpdateConfirmModal";
 import BulkUpdateEditor from "./BulkUpdateEditor";
 import BulkUpdateModeSelector from "./BulkUpdateModeSelector";
 import BulkUpdateSummary from "./BulkUpdateSummary";
-import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill } from "@/types/bills";
 
 interface BulkBillUpdateModalProps {
@@ -20,6 +19,11 @@ interface BulkBillUpdateModalProps {
   onError?: (error: string) => void;
 }
 
+/**
+ * BulkBillUpdateModal - Migrated to use BaseModal primitive (Issue #1594)
+ * 
+ * Allows bulk editing of bill amounts and due dates
+ */
 const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   isOpen,
   onClose,
@@ -28,6 +32,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
   onError,
 }) => {
   const [updateMode, setUpdateMode] = useState<"amounts" | "dates" | "both">("amounts");
+  const titleId = React.useId();
 
   const {
     changes,
@@ -51,8 +56,6 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
     [selectedBills, changes]
   );
 
-  const modalRef = useModalAutoScroll(isOpen);
-
   const handleSubmit = () => {
     if (!summary.hasChanges) {
       onError?.("No changes to apply");
@@ -71,8 +74,6 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <>
       <BulkUpdateConfirmModal
@@ -84,41 +85,33 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
         summary={summary}
       />
 
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div
-            ref={modalRef}
-            className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black my-auto"
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-lg font-black text-black">BULK UPDATE BILLS</h3>
-                  <p className="text-sm text-purple-800 mt-1 font-medium">
-                    Update amounts and due dates for {selectedBills.length} selected bills
-                  </p>
-                </div>
-                <ModalCloseButton onClick={onClose} />
-              </div>
-
-              {/* Update Mode Selector */}
-              <BulkUpdateModeSelector updateMode={updateMode} setUpdateMode={setUpdateMode} />
-
-              <BulkUpdateEditor
-                selectedBills={selectedBills}
-                changes={changes}
-                updateMode={updateMode}
-                updateChange={updateChange}
-                applyBulkChange={applyBulkChange}
-                resetChanges={resetChanges}
-              />
-
-              {/* Summary and Actions */}
-              <BulkUpdateSummary summary={summary} onClose={onClose} handleSubmit={handleSubmit} />
-            </div>
+      <BaseModal isOpen={isOpen} onClose={onClose} size="xl" ariaLabelledBy={titleId}>
+        <div className="p-6">
+          <div className="mb-6">
+            <h3 id={titleId} className="text-lg font-black text-black">
+              BULK UPDATE BILLS
+            </h3>
+            <p className="text-sm text-purple-800 mt-1 font-medium">
+              Update amounts and due dates for {selectedBills.length} selected bills
+            </p>
           </div>
+
+          {/* Update Mode Selector */}
+          <BulkUpdateModeSelector updateMode={updateMode} setUpdateMode={setUpdateMode} />
+
+          <BulkUpdateEditor
+            selectedBills={selectedBills}
+            changes={changes}
+            updateMode={updateMode}
+            updateChange={updateChange}
+            applyBulkChange={applyBulkChange}
+            resetChanges={resetChanges}
+          />
+
+          {/* Summary and Actions */}
+          <BulkUpdateSummary summary={summary} onClose={onClose} handleSubmit={handleSubmit} />
         </div>
-      )}
+      </BaseModal>
     </>
   );
 };

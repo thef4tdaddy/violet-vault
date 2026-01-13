@@ -18,6 +18,7 @@ interface BillDetailHeaderProps {
   bill: Bill;
   statusInfo: StatusInfo;
   onClose: () => void;
+  titleId?: string;
 }
 
 /**
@@ -28,6 +29,7 @@ export const BillDetailHeader: React.FC<BillDetailHeaderProps> = ({
   bill,
   statusInfo,
   onClose,
+  titleId,
 }) => {
   const BillIcon = getIconByName(bill.iconName || "Receipt");
 
@@ -40,7 +42,9 @@ export const BillDetailHeader: React.FC<BillDetailHeaderProps> = ({
           })}
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">{bill.name}</h3>
+          <h3 id={titleId} className="text-xl font-semibold text-gray-900">
+            {bill.name}
+          </h3>
           <p className="text-gray-600">
             {bill.category} • {getFrequencyDisplayText(bill.frequency)}
           </p>
