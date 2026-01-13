@@ -2,15 +2,8 @@ import React from "react";
 import { Select, Button } from "@/components/ui";
 import { FormSection } from "@/components/primitives/forms";
 import { getIcon } from "@/utils";
-import type { Transaction } from "@/types/finance";
+import type { Transaction, Envelope } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
-
-interface Envelope {
-  id: string;
-  name: string;
-  envelopeType?: string;
-}
-
 interface EnvelopeSectionProps {
   transactionForm: TransactionFormData;
   setTransactionForm: (form: TransactionFormData) => void;
