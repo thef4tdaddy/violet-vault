@@ -320,7 +320,7 @@ export const useAddBillMutation = () => {
 
       const validatedBill = validationResult.data;
 
-      await budgetDb.transactions.add(validatedBill);
+      await budgetDb.addTransaction(validatedBill);
       return validatedBill;
     },
     onMutate: async () => {
@@ -391,7 +391,7 @@ export const useUpdateBillMutation = () => {
         lastModified: Date.now(),
       };
 
-      await budgetDb.transactions.update(billId, validatedBill);
+      await budgetDb.updateTransaction(billId, validatedBill);
       return validatedBill;
     },
     onSuccess: (_bill, variables) => {
@@ -507,7 +507,7 @@ export const useMarkBillPaidMutation = () => {
       };
 
       // Add the payment transaction
-      await budgetDb.transactions.put(paymentTransaction);
+      await budgetDb.putTransaction(paymentTransaction);
       await optimisticHelpers.addTransaction(queryClient, paymentTransaction);
 
       return { billId, paymentTransaction };

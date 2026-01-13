@@ -9,6 +9,7 @@ export * from "./auth";
 // Core Finance Schemas & Types
 export {
   EnvelopeSchema,
+  EnvelopePartialSchema,
   StandardEnvelopeSchema,
   GoalEnvelopeSchema,
   LiabilityEnvelopeSchema,
@@ -68,3 +69,6 @@ export * from "./component-props";
 
 // Sync Schemas & Types
 export * from "./sync";
+
+// Auto-Funding Schemas & Types
+export * from "./auto-funding";
