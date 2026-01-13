@@ -9,7 +9,7 @@ export interface TableAction {
   label: string;
   icon?: string;
   onClick: () => void;
-  variant?: "default" | "danger";
+  variant?: "default" | "destructive";
   disabled?: boolean;
 }
 
@@ -53,9 +53,9 @@ export const TableActions: React.FC<TableActionsProps> = ({
       <div className="flex items-center gap-2">
         {actions.map((action, index) => {
           const Icon = action.icon ? getIcon(action.icon) : null;
-          const buttonVariant = action.variant === "danger" ? "danger" : "primary";
+          const buttonVariant = action.variant === "destructive" ? "destructive" : "primary";
           const buttonClassName =
-            action.variant === "danger"
+            action.variant === "destructive"
               ? "px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               : "px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed";
 

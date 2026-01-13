@@ -35,7 +35,7 @@ describe("TableActions", () => {
       label: "Delete",
       icon: "Trash",
       onClick: vi.fn(),
-      variant: "danger",
+      variant: "destructive",
     },
     {
       label: "Export",
@@ -146,18 +146,18 @@ describe("TableActions", () => {
       expect(action.onClick).toHaveBeenCalledTimes(1);
     });
 
-    it("should apply danger styling for danger variant", () => {
-      const dangerAction: TableAction = {
+    it("should apply danger styling for destructive variant", () => {
+      const destructiveAction: TableAction = {
         label: "Delete",
         onClick: vi.fn(),
-        variant: "danger",
+        variant: "destructive",
       };
 
       render(
         <TableActions
           selectedCount={1}
           onClearSelection={mockClearSelection}
-          actions={[dangerAction]}
+          actions={[destructiveAction]}
         />
       );
 
