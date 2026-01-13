@@ -1,87 +1,21 @@
 import React, { lazy, Suspense, memo } from "react";
-import { Button } from "@/components/ui";
-import { getIcon } from "@/utils";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { usePrompt } from "@/hooks/platform/ux/usePrompt";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
-import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
-const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
-import {
-  calculateEnvelopeData,
-  calculateEnvelopeTotals,
-} from "@/utils/budgeting/envelopeCalculations";
+import { MetricCard } from "@/components/primitives/cards/MetricCard";
+import { useSummaryMetrics } from "./hooks/useSummaryMetrics";
 
-interface SummaryCardProps {
-  icon: React.ElementType;
-  label: string;
-  value: number;
-  color: string;
-  onClick?: () => void;
-  clickable?: boolean;
-  isNegative?: boolean;
-  subtitle?: string;
-  dataTour?: string;
-}
+const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 
 /**
  * Summary cards component showing financial overview
- * Now uses TanStack Query hooks for data loading
+ * Uses MetricCard primitive for consistent UI
+ * Business logic extracted to useSummaryMetrics hook
  */
 const SummaryCards = () => {
   const openUnassignedCashModal = useBudgetStore((state: UiStore) => state.openUnassignedCashModal);
-  const { unassignedCash } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();
-
-  // Get data from TanStack Query hooks (same pattern as Dashboard)
-  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
-  const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
-
-  // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce(
-    (sum: number, env: { currentBalance?: number }) => sum + (env.currentBalance || 0),
-    0
-  );
-  const totalSavingsBalance = savingsGoals.reduce(
-    (sum: number, goal: { currentAmount?: number | string }) =>
-      sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
-    0
-  );
-  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
-
-  // Removed noisy debug log - component renders frequently
-
-  // Calculate biweekly needs using existing utility
-  const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);
-  const envelopeSummary = calculateEnvelopeTotals(processedEnvelopeData);
-  const biweeklyRemaining = envelopeSummary.totalBiweeklyNeed;
-  const biweeklyTotal = envelopeSummary.totalBiweeklyNeed; // For now, use same value - can be refined later
-
-  // Show loading state while data is being fetched
-  if (envelopesLoading || savingsLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="glassmorphism rounded-3xl p-6 animate-pulse border border-white/20 ring-1 ring-gray-800/10"
-          >
-            <div className="flex items-center">
-              <div className="relative mr-4">
-                <div className="bg-gray-300 p-3 rounded-2xl w-12 h-12"></div>
-              </div>
-              <div>
-                <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
-                <div className="h-8 bg-gray-300 rounded w-20"></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   // Handler for setting actual balance
   const handleSetActualBalance = async () => {
@@ -108,58 +42,40 @@ const SummaryCards = () => {
     }
   };
 
-  const cards = [
-    {
-      key: "total-cash",
-      icon: getIcon("Wallet"),
-      label: "Total Cash",
-      value: totalCash,
-      color: "purple",
-      onClick: handleSetActualBalance,
-      clickable: true,
-    },
-    {
-      key: "unassigned-cash",
-      icon: getIcon("TrendingUp"),
-      label: "Unassigned Cash",
-      value: unassignedCash,
-      color: unassignedCash < 0 ? "red" : "emerald",
-      onClick: openUnassignedCashModal, // Always allow clicking to distribute/address negative balance
-      clickable: true,
-      isNegative: unassignedCash < 0,
-    },
-    {
-      key: "savings-total",
-      icon: getIcon("Target"),
-      label: "Savings Total",
-      value: totalSavingsBalance,
-      color: "cyan",
-    },
-    {
-      key: "biweekly-remaining",
-      icon: getIcon("DollarSign"),
-      label: "Biweekly Remaining",
-      value: biweeklyRemaining,
-      color: "amber",
-      subtitle: `Total allocation: ${biweeklyTotal.toFixed(2)}`,
-    },
-  ];
+  // Get metrics from custom hook
+  const { metrics, isLoading } = useSummaryMetrics(openUnassignedCashModal, handleSetActualBalance);
+
+  // Show loading state while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {[1, 2, 3, 4].map((i) => (
+          <MetricCard
+            key={i}
+            title=""
+            value={0}
+            format="currency"
+            variant="default"
+            loading={true}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 auto-rows-fr">
-        {cards.map((card) => (
-          <SummaryCard
-            key={card.key}
-            icon={card.icon}
-            label={card.label}
-            value={card.value}
-            color={card.color}
-            onClick={card.onClick}
-            clickable={card.clickable}
-            isNegative={card.isNegative}
-            subtitle={card.subtitle}
-            dataTour={card.key === "total-cash" ? "actual-balance" : undefined}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {metrics.map((metric) => (
+          <MetricCard
+            key={metric.key}
+            title={metric.label}
+            value={metric.value}
+            icon={metric.icon}
+            variant={metric.variant}
+            format="currency"
+            subtitle={metric.subtitle}
+            onClick={metric.onClick}
           />
         ))}
       </div>
@@ -170,92 +86,5 @@ const SummaryCards = () => {
     </>
   );
 };
-
-const SummaryCard = memo(
-  ({
-    icon: IconComponent,
-    label,
-    value,
-    color,
-    onClick,
-    clickable,
-    isNegative,
-    subtitle,
-    dataTour,
-  }: SummaryCardProps) => {
-    const colorClasses: Record<string, string> = {
-      purple: "bg-purple-500",
-      emerald: "bg-emerald-500",
-      cyan: "bg-cyan-500",
-      amber: "bg-amber-500",
-      red: "bg-red-500",
-    };
-
-    const textColorClasses: Record<string, string> = {
-      purple: "text-gray-900",
-      emerald: "text-emerald-600",
-      cyan: "text-cyan-600",
-      amber: "text-amber-600",
-      red: "text-red-600",
-    };
-
-    const baseClasses =
-      "glassmorphism rounded-xl p-6 transition-all duration-200 border-2 border-black ring-1 ring-gray-800/10 h-full";
-    const clickableClasses = clickable
-      ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-      : "";
-
-    const cardContent = (
-      <div className="grid h-full w-full grid-rows-[auto_1fr_auto] items-start justify-items-center gap-4 text-center">
-        <div className="relative flex items-center justify-center">
-          <div
-            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <IconComponent className="h-6 w-6 text-white" />
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center gap-2">
-          <p className="text-sm font-semibold text-gray-600">{label}</p>
-          <p
-            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
-          >
-            ${value.toFixed(2)}
-            {isNegative && <span className="ml-2 text-sm">⚠️</span>}
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center gap-1">
-          {clickable && !isNegative && <p className="text-xs text-gray-400">Click to distribute</p>}
-          {isNegative && (
-            <p className="text-xs font-medium text-red-500">⚠️ Overspending - click to address</p>
-          )}
-          {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
-        </div>
-      </div>
-    );
-
-    if (clickable) {
-      return (
-        <Button
-          type="button"
-          onClick={onClick}
-          className={`${baseClasses} ${clickableClasses} grid! w-full justify-items-center`}
-          disabled={!onClick}
-          data-tour={dataTour}
-        >
-          {cardContent}
-        </Button>
-      );
-    }
-
-    return (
-      <div className={baseClasses} data-tour={dataTour}>
-        {cardContent}
-      </div>
-    );
-  }
-);
 
 export default memo(SummaryCards);
