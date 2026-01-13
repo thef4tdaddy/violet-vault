@@ -465,12 +465,14 @@ describe("ApiClient", () => {
 
     it("should return true when navigator is undefined", () => {
       const originalNavigator = global.navigator;
-      // @ts-expect-error - Testing undefined navigator
-      delete global.navigator;
+      try {
+        // @ts-expect-error - Testing undefined navigator
+        delete (global as any).navigator;
 
-      expect(ApiClient.isOnline()).toBe(true);
-
-      global.navigator = originalNavigator;
+        expect(ApiClient.isOnline()).toBe(true);
+      } finally {
+        global.navigator = originalNavigator;
+      }
     });
   });
 
