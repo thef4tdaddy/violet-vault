@@ -48,7 +48,11 @@ export const normalizeTransaction = (txn: unknown): Transaction | null => {
   const validatedId = record.id as string | number;
 
   // Normalize amount and metadata
-  const amountRaw = Number(record.amount ?? 0);
+  const amountRaw =
+    record.amount === undefined || record.amount === null ? 0 : Number(record.amount);
+  if (Number.isNaN(amountRaw)) {
+    return null;
+  }
   const description = typeof record.description === "string" ? record.description : "";
   const category =
     typeof record.category === "string" && record.category.trim().length > 0
