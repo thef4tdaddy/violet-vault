@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import Button from "../Button";
+import { Button } from "../Button";
 import "@testing-library/jest-dom";
 
 // Mock the icon utility

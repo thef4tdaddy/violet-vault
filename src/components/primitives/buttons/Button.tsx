@@ -94,6 +94,21 @@ const renderIconElement = (iconName: string | undefined, className: string) => {
   });
 };
 
+// Helper to build button attributes with accessibility
+const buildButtonAttrs = (
+  loading: boolean,
+  disabled: boolean | undefined,
+  finalClasses: string,
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+) => ({
+  type: "button" as const,
+  disabled: disabled || loading,
+  className: finalClasses,
+  "aria-busy": loading,
+  "aria-live": loading ? ("polite" as const) : undefined,
+  ...props,
+});
+
 /**
  * Reusable Button Primitive Component
  *
@@ -115,7 +130,7 @@ const renderIconElement = (iconName: string | undefined, className: string) => {
  * </Button>
  * ```
  */
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       variant = "primary",
@@ -140,17 +155,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     const iconClassName = iconSizeClasses[size];
+    const buttonAttrs = buildButtonAttrs(loading, disabled, finalClasses, props);
 
     return (
       // eslint-disable-next-line enforce-ui-library/enforce-ui-library -- This IS the primitive Button component
-      <button
-        ref={ref}
-        disabled={disabled || loading}
-        className={finalClasses}
-        aria-busy={loading}
-        aria-live={loading ? "polite" : undefined}
-        {...props}
-      >
+      <button ref={ref} {...buttonAttrs}>
         {loading && <Loader2 className={`animate-spin ${iconClassName}`} aria-hidden="true" />}
         {!loading && iconPosition === "left" && renderIconElement(icon, iconClassName)}
         {!loading && children}
@@ -161,5 +170,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
-
-export default Button;
