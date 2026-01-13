@@ -13,7 +13,7 @@ export const ConditionSchema = z.object({
   type: z.string().min(1, "Condition type is required"),
   envelopeId: z.string().nullable().optional(),
   value: z.number(),
-  operator: z.string().optional(),
+  operator: z.string().min(1, "Condition operator is required").optional(),
   startDate: z.string().nullable().optional(),
   endDate: z.string().nullable().optional(),
 });
