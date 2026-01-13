@@ -15,6 +15,44 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 /**
+ * Handles keyboard events for clickable icons (Enter and Space)
+ */
+const handleIconKeyDown = (onClick: () => void) => (e: React.KeyboardEvent) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    onClick();
+  }
+};
+
+/**
+ * Right Icon Component - Handles clickable and non-clickable right icons
+ */
+const RightIcon: React.FC<{
+  IconComponent: React.ComponentType<{ className?: string }>;
+  onRightIconClick?: () => void;
+  rightIconAriaLabel?: string;
+}> = ({ IconComponent, onRightIconClick, rightIconAriaLabel }) => {
+  const isClickable = !!onRightIconClick;
+
+  return (
+    <div
+      className={`absolute right-4 top-1/2 -translate-y-1/2 ${
+        isClickable ? "cursor-pointer hover:text-purple-600" : "pointer-events-none"
+      }`}
+      onClick={onRightIconClick}
+      role={isClickable ? "button" : undefined}
+      aria-label={isClickable ? rightIconAriaLabel : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable && onRightIconClick ? handleIconKeyDown(onRightIconClick) : undefined}
+    >
+      {React.createElement(IconComponent, {
+        className: "h-5 w-5 text-slate-400",
+      })}
+    </div>
+  );
+};
+
+/**
  * Input Component
  *
  * A styled input primitive with icon support and error states.
@@ -103,29 +141,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {/* Right Icon */}
         {RightIconComponent && (
-          <div
-            className={`absolute right-4 top-1/2 -translate-y-1/2 ${
-              onRightIconClick ? "cursor-pointer hover:text-purple-600" : "pointer-events-none"
-            }`}
-            onClick={onRightIconClick}
-            role={onRightIconClick ? "button" : undefined}
-            aria-label={onRightIconClick ? rightIconAriaLabel : undefined}
-            tabIndex={onRightIconClick ? 0 : undefined}
-            onKeyDown={
-              onRightIconClick
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onRightIconClick();
-                    }
-                  }
-                : undefined
-            }
-          >
-            {React.createElement(RightIconComponent, {
-              className: "h-5 w-5 text-slate-400",
-            })}
-          </div>
+          <RightIcon
+            IconComponent={RightIconComponent}
+            onRightIconClick={onRightIconClick}
+            rightIconAriaLabel={rightIconAriaLabel}
+          />
         )}
       </div>
     );
