@@ -18,6 +18,17 @@ import {
   AutoFundingRule,
   ExecutionRecord,
 } from "./types";
+import {
+  EnvelopeSchema,
+  EnvelopePartialSchema,
+  TransactionSchema,
+  TransactionPartialSchema,
+  AutoFundingRuleSchema,
+  AutoFundingRulePartialSchema,
+  ExecutionRecordSchema,
+  ExecutionRecordPartialSchema,
+} from "@/domain/schemas";
+import { validateWithSchema, validateArrayWithSchema } from "./validation";
 
 export class VioletVaultDB extends Dexie {
   // Typed table declarations
@@ -227,6 +238,181 @@ export class VioletVaultDB extends Dexie {
       if (!obj.timestamp) obj.timestamp = Date.now();
     });
   }
+
+  // ==================== VALIDATION METHODS ====================
+  // All database writes should go through these validated methods
+  // to ensure data integrity with Zod validation
+
+  /**
+   * Add envelope with Zod validation
+   * @param envelope - Envelope data to add
+   * @returns Promise with the envelope ID
+   * @throws Error if validation fails
+   */
+  async addEnvelope(envelope: unknown): Promise<string> {
+    const validated = validateWithSchema(EnvelopeSchema, envelope, "Envelope");
+    return this.envelopes.add(validated);
+  }
+
+  /**
+   * Update envelope with Zod validation
+   * @param id - Envelope ID to update
+   * @param updates - Partial envelope data
+   * @returns Promise with number of updated records
+   * @throws Error if validation fails
+   */
+  async updateEnvelope(id: string, updates: unknown): Promise<number> {
+    const validated = validateWithSchema(EnvelopePartialSchema, updates, "Envelope");
+    return this.envelopes.update(id, validated);
+  }
+
+  /**
+   * Put envelope with Zod validation (upsert)
+   * @param envelope - Envelope data to put
+   * @returns Promise with the envelope ID
+   * @throws Error if validation fails
+   */
+  async putEnvelope(envelope: unknown): Promise<string> {
+    const validated = validateWithSchema(EnvelopeSchema, envelope, "Envelope");
+    return this.envelopes.put(validated);
+  }
+
+  /**
+   * Bulk upsert envelopes with Zod validation
+   * @param envelopes - Array of envelope data
+   * @returns Promise that resolves when complete
+   * @throws Error if any validation fails
+   */
+  async bulkUpsertEnvelopesValidated(envelopes: unknown[]): Promise<void> {
+    const validated = validateArrayWithSchema(EnvelopeSchema, envelopes, "Envelope");
+    return this.bulkUpsertEnvelopes(validated);
+  }
+
+  /**
+   * Add transaction with Zod validation
+   * @param transaction - Transaction data to add
+   * @returns Promise with the transaction ID
+   * @throws Error if validation fails
+   */
+  async addTransaction(transaction: unknown): Promise<string> {
+    const validated = validateWithSchema(TransactionSchema, transaction, "Transaction");
+    return this.transactions.add(validated);
+  }
+
+  /**
+   * Update transaction with Zod validation
+   * @param id - Transaction ID to update
+   * @param updates - Partial transaction data
+   * @returns Promise with number of updated records
+   * @throws Error if validation fails
+   */
+  async updateTransaction(id: string, updates: unknown): Promise<number> {
+    const validated = validateWithSchema(TransactionPartialSchema, updates, "Transaction");
+    return this.transactions.update(id, validated);
+  }
+
+  /**
+   * Put transaction with Zod validation (upsert)
+   * @param transaction - Transaction data to put
+   * @returns Promise with the transaction ID
+   * @throws Error if validation fails
+   */
+  async putTransaction(transaction: unknown): Promise<string> {
+    const validated = validateWithSchema(TransactionSchema, transaction, "Transaction");
+    return this.transactions.put(validated);
+  }
+
+  /**
+   * Bulk upsert transactions with Zod validation
+   * @param transactions - Array of transaction data
+   * @returns Promise that resolves when complete
+   * @throws Error if any validation fails
+   */
+  async bulkUpsertTransactionsValidated(transactions: unknown[]): Promise<void> {
+    const validated = validateArrayWithSchema(TransactionSchema, transactions, "Transaction");
+    return this.bulkUpsertTransactions(validated);
+  }
+
+  /**
+   * Add auto-funding rule with Zod validation
+   * @param rule - Auto-funding rule data to add
+   * @returns Promise with the rule ID
+   * @throws Error if validation fails
+   */
+  async addAutoFundingRule(rule: unknown): Promise<string> {
+    const validated = validateWithSchema(AutoFundingRuleSchema, rule, "AutoFundingRule");
+    return this.autoFundingRules.add(validated);
+  }
+
+  /**
+   * Update auto-funding rule with Zod validation
+   * @param id - Rule ID to update
+   * @param updates - Partial rule data
+   * @returns Promise with number of updated records
+   * @throws Error if validation fails
+   */
+  async updateAutoFundingRule(id: string, updates: unknown): Promise<number> {
+    const validated = validateWithSchema(AutoFundingRulePartialSchema, updates, "AutoFundingRule");
+    return this.autoFundingRules.update(id, validated);
+  }
+
+  /**
+   * Put auto-funding rule with Zod validation (upsert)
+   * @param rule - Auto-funding rule data to put
+   * @returns Promise with the rule ID
+   * @throws Error if validation fails
+   */
+  async putAutoFundingRule(rule: unknown): Promise<string> {
+    const validated = validateWithSchema(AutoFundingRuleSchema, rule, "AutoFundingRule");
+    return this.autoFundingRules.put(validated);
+  }
+
+  /**
+   * Bulk upsert auto-funding rules with Zod validation
+   * @param rules - Array of auto-funding rule data
+   * @returns Promise that resolves when complete
+   * @throws Error if any validation fails
+   */
+  async bulkUpsertAutoFundingRulesValidated(rules: unknown[]): Promise<void> {
+    const validated = validateArrayWithSchema(AutoFundingRuleSchema, rules, "AutoFundingRule");
+    return this.bulkUpsertAutoFundingRules(validated);
+  }
+
+  /**
+   * Add execution record with Zod validation
+   * @param record - Execution record data to add
+   * @returns Promise with the record ID
+   * @throws Error if validation fails
+   */
+  async addExecutionRecord(record: unknown): Promise<string> {
+    const validated = validateWithSchema(ExecutionRecordSchema, record, "ExecutionRecord");
+    return this.autoFundingHistory.add(validated);
+  }
+
+  /**
+   * Update execution record with Zod validation
+   * @param id - Record ID to update
+   * @param updates - Partial record data
+   * @returns Promise with number of updated records
+   * @throws Error if validation fails
+   */
+  async updateExecutionRecord(id: string, updates: unknown): Promise<number> {
+    const validated = validateWithSchema(ExecutionRecordPartialSchema, updates, "ExecutionRecord");
+    return this.autoFundingHistory.update(id, validated);
+  }
+
+  /**
+   * Put execution record with Zod validation (upsert)
+   * @param record - Execution record data to put
+   * @returns Promise with the record ID
+   * @throws Error if validation fails
+   */
+  async putExecutionRecord(record: unknown): Promise<string> {
+    const validated = validateWithSchema(ExecutionRecordSchema, record, "ExecutionRecord");
+    return this.autoFundingHistory.put(validated);
+  }
+
+  // ==================== END VALIDATION METHODS ====================
 
   // Enhanced bulk operations for all data types
   async bulkUpsertEnvelopes(envelopes: Envelope[]): Promise<void> {

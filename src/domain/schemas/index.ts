@@ -68,3 +68,6 @@ export * from "./component-props";
 
 // Sync Schemas & Types
 export * from "./sync";
+
+// Auto-Funding Schemas & Types
+export * from "./auto-funding";
