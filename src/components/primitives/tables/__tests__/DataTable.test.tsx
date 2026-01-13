@@ -119,7 +119,9 @@ describe("DataTable", () => {
         />
       );
 
-      const skeletons = screen.getAllByRole("generic").filter((el) => el.classList.contains("animate-pulse"));
+      const skeletons = screen
+        .getAllByRole("generic")
+        .filter((el) => el.classList.contains("animate-pulse"));
       expect(skeletons.length).toBeGreaterThan(0);
     });
 
@@ -140,9 +142,7 @@ describe("DataTable", () => {
 
   describe("Empty State", () => {
     it("should show empty state when data is empty", () => {
-      render(
-        <DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />
-      );
+      render(<DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />);
 
       expect(screen.getByText("No data available")).toBeInTheDocument();
     });
@@ -162,9 +162,7 @@ describe("DataTable", () => {
     });
 
     it("should not render headers in empty state", () => {
-      render(
-        <DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />
-      );
+      render(<DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />);
 
       expect(screen.queryByText("Name")).not.toBeInTheDocument();
     });
