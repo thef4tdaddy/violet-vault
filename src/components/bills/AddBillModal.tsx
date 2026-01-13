@@ -350,9 +350,9 @@ const AddBillModal = (props: AddBillModalProps) => {
         backdrop={true}
       >
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            handleSubmit();
+            await handleSubmit();
           }}
           className="pb-6"
         >
@@ -367,9 +367,9 @@ const AddBillModal = (props: AddBillModalProps) => {
     <FormModal
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        handleSubmit();
+        await handleSubmit();
       }}
       title={modalTitle}
       submitLabel={submitLabel}

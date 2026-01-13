@@ -1,5 +1,6 @@
 import React from "react";
 import BaseModal from "@/components/primitives/modals/BaseModal";
+import Button from "@/components/primitives/buttons/Button";
 import {
   formatAmountChange,
   formatDateChange,
@@ -100,20 +101,24 @@ const BulkUpdateConfirmModal: React.FC<BulkUpdateConfirmModalProps> = ({
           </div>
 
           <div className="flex gap-3 pt-4">
-            {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library */}
-            <button
+            <Button
               onClick={onClose}
-              className="flex-1 bg-gray-200/80 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
+              variant="secondary"
+              size="md"
+              fullWidth
+              className="font-bold"
             >
               Back to Edit
-            </button>
-            {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library */}
-            <button
+            </Button>
+            <Button
               onClick={onConfirm}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-black"
+              variant="primary"
+              size="md"
+              fullWidth
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-2 border-black font-black"
             >
               Apply Changes
-            </button>
+            </Button>
           </div>
         </div>
       </div>
