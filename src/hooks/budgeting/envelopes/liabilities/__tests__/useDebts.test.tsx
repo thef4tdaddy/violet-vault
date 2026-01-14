@@ -37,7 +37,7 @@ vi.mock("@/utils/common/budgetHistoryTracker", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
