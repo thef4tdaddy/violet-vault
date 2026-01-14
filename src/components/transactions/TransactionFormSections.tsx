@@ -2,7 +2,7 @@ import React from "react";
 import { Select, TextInput, Textarea, Checkbox, Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ReceiptButton from "../receipts/ReceiptButton";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";

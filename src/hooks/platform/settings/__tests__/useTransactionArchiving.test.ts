@@ -7,7 +7,7 @@ import {
 } from "../useTransactionArchiving";
 
 // Mock dependencies
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
   },

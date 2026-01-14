@@ -80,7 +80,7 @@ vi.mock("../../../db/budgetDb", () => {
 });
 
 // Mock logger
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

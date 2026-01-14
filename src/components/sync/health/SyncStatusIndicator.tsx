@@ -4,7 +4,7 @@ import {
   getStatusColor,
   getStatusBackgroundColor,
   getStatusText,
-} from "../../../utils/sync/syncHealthHelpers";
+} from "@/utils/sync/syncHealthHelpers";
 
 interface SyncStatus {
   status: string;

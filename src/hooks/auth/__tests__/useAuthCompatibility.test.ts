@@ -32,7 +32,7 @@ vi.mock("../useAuth", () => ({
   })),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     auth: vi.fn(),
     info: vi.fn(),

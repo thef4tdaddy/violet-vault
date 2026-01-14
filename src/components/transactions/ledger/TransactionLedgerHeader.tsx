@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
+import { formatLedgerSummary } from "@/utils/transactions/ledgerHelpers";
 
 interface TransactionLedgerHeaderProps {
   transactionCount: number;

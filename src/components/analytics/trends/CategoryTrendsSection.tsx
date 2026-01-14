@@ -1,6 +1,6 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { formatCurrency, getCategoryChartColor } from "../../../utils/analytics/trendHelpers";
+import { formatCurrency, getCategoryChartColor } from "@/utils/analytics/trendHelpers";
 
 import { CategoryTrend } from "@/types/analytics";
 

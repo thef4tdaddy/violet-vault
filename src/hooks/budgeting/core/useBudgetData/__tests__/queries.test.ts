@@ -14,7 +14,7 @@ vi.mock("../../../../../db/budgetDb", () => ({
   getBudgetMetadata: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),

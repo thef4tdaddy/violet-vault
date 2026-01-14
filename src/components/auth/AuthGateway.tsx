@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import { useLocalOnlyMode } from "../../hooks/platform/data/useLocalOnlyMode";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import UserSetup from "./UserSetup";
 import LocalOnlySetup from "./LocalOnlySetup";
 import type { AuthGatewayProps } from "@/types/auth";

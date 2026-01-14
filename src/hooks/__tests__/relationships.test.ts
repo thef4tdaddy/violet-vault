@@ -357,7 +357,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("../../utils/common/queryClient");
+      const { optimisticHelpers } = await import("@/utils/core/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),
@@ -744,7 +744,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("../../utils/common/queryClient");
+      const { optimisticHelpers } = await import("@/utils/core/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),

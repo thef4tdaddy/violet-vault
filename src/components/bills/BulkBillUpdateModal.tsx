@@ -3,7 +3,7 @@ import { useBulkBillUpdate } from "../../hooks/budgeting/transactions/scheduled/
 import {
   calculateUpdateSummary,
   transformBillsForUpdate,
-} from "../../utils/bills/billUpdateHelpers";
+} from "@/utils/bills/billUpdateHelpers";
 import BulkUpdateConfirmModal from "./modals/BulkUpdateConfirmModal";
 import BulkUpdateEditor from "./BulkUpdateEditor";
 import BulkUpdateModeSelector from "./BulkUpdateModeSelector";

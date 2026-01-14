@@ -4,7 +4,7 @@ import {
   formatCurrency,
   formatDisplayDate,
   getConfidenceDescription,
-} from "../../../utils/receipts/receiptHelpers";
+} from "@/utils/receipts/receiptHelpers";
 
 interface TransactionForm {
   description: string;

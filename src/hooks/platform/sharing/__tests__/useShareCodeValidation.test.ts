@@ -17,7 +17,7 @@ vi.mock("@/utils/core/common/toastHelpers", () => ({
   }),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -25,7 +25,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-vi.mock("../../../utils/validation", () => ({
+vi.mock("@/utils/validation", () => ({
   isValidShareCode: vi.fn((code) => typeof code === "string" && code.trim().length > 0),
 }));
 

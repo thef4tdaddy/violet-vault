@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
+import { getBillStatusIcon } from "@/utils/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/budgeting/transactions/scheduled/expenses/useBillDetail";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import { BillDetailHeader } from "./BillDetailHeader";

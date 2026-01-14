@@ -5,7 +5,7 @@ import {
   formatDateChange,
   hasChanges,
   type BillChange,
-} from "../../../utils/bills/billUpdateHelpers";
+} from "@/utils/bills/billUpdateHelpers";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Bill } from "@/types/bills";

@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
+import { formatCurrency } from "@/utils/receipts/receiptHelpers";
 
 interface Envelope {
   id: string;

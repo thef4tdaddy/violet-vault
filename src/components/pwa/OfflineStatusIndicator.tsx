@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import useUiStore, { type UiStore } from "../../stores/ui/uiStore";
-import backgroundSyncManager from "../../utils/pwa/backgroundSync";
-import logger from "../../utils/common/logger";
+import backgroundSyncManager from "@/utils/pwa/backgroundSync";
+import logger from "@/utils/common/logger";
 import { useConfirm } from "../../hooks/platform/ux/useConfirm";
 
 /**

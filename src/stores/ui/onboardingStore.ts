@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 interface OnboardingState {
   isOnboarded: boolean;

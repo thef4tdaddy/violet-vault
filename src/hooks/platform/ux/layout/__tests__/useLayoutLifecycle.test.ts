@@ -1,10 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { useLayoutLifecycle } from "../useLayoutLifecycle";
-import logger from "../../../../../utils/common/logger";
+import logger from "@/utils/common/logger";
 
 // Mock logger
-vi.mock("../../../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     warn: vi.fn(),
   },

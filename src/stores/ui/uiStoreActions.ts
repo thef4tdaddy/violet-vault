@@ -2,7 +2,7 @@
  * UI Store Actions - Helper functions to build store actions
  * Extracted from uiStore.ts to reduce function size
  */
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import type { UiStore } from "./uiStore";
 import type { Draft } from "immer";
 

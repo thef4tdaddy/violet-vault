@@ -2,17 +2,17 @@ import { renderHook, act } from "@testing-library/react";
 import { useExportData } from "../useExportData";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useAuth } from "../../../../hooks/auth/useAuth";
-import { useToastHelpers } from "../../../../utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/common/toastHelpers";
 import { budgetDb, getBudgetMetadata } from "../../../../db/budgetDb";
 import { constructExportObject, triggerDownload } from "../useExportDataHelpers";
-import { trackExport } from "../../../../utils/monitoring/performanceMonitor";
+import { trackExport } from "@/utils/monitoring/performanceMonitor";
 
 // Mock dependencies
 vi.mock("../../../../hooks/auth/useAuth", () => ({
   useAuth: vi.fn(),
 }));
 
-vi.mock("../../../../utils/common/toastHelpers", () => ({
+vi.mock("@/utils/common/toastHelpers", () => ({
   useToastHelpers: vi.fn(),
 }));
 
@@ -30,11 +30,11 @@ vi.mock("../useExportDataHelpers", () => ({
   triggerDownload: vi.fn(),
 }));
 
-vi.mock("../../../../utils/monitoring/performanceMonitor", () => ({
+vi.mock("@/utils/monitoring/performanceMonitor", () => ({
   trackExport: vi.fn(),
 }));
 
-vi.mock("../../../../utils/common/logger");
+vi.mock("@/utils/common/logger");
 
 describe("useExportData", () => {
   const mockShowSuccess = vi.fn();

@@ -10,7 +10,7 @@ vi.mock("../../../stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     warn: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-vi.mock("../../../utils/auth/shareCodeManager", () => ({
+vi.mock("@/utils/auth/shareCodeManager", () => ({
   shareCodeManager: {
     generateShareCode: vi.fn(() => "test-share-code"),
   },

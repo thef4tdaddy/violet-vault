@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { USER_COLORS } from "../../../utils/auth/userSetupHelpers";
+import { USER_COLORS } from "@/utils/auth/userSetupHelpers";
 
 interface ColorPickerProps {
   selectedColor: string;

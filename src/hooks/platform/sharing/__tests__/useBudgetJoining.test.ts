@@ -18,7 +18,7 @@ vi.mock("@/utils/core/common/toastHelpers", () => ({
   }),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),

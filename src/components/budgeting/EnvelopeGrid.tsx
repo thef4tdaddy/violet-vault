@@ -16,7 +16,7 @@ import type {
   EnvelopeData as BudgetEnvelopeData,
 } from "@/utils/domain/budgeting/envelopeCalculations";
 import EnvelopeGridView from "./envelope/EnvelopeGridView";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/common/logger";
 import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 

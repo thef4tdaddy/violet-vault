@@ -12,7 +12,7 @@ vi.mock("../useBillManager", () => ({
   })),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-vi.mock("../../../utils/bills/bulkUpdateValidation", () => ({
+vi.mock("@/utils/bills/bulkUpdateValidation", () => ({
   validateBulkUpdateData: vi.fn(),
   validateBulkOperation: vi.fn(),
 }));

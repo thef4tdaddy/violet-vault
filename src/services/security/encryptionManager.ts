@@ -1,6 +1,6 @@
-import logger from "../../utils/common/logger";
-import { optimizedSerialization } from "../../utils/security/optimizedSerialization";
-import { safeCryptoOperation, getRandomBytes } from "../../utils/security/cryptoCompat";
+import logger from "@/utils/common/logger";
+import { optimizedSerialization } from "@/utils/security/optimizedSerialization";
+import { safeCryptoOperation, getRandomBytes } from "@/utils/security/cryptoCompat";
 
 /**
  * EncryptionManager Service
@@ -175,7 +175,7 @@ export class EncryptionManager {
    * Generate a deterministic budget ID
    */
   public async generateBudgetId(password: string, shareCode: string): Promise<string> {
-    const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
+    const { shareCodeUtils } = await import("@/utils/platform/security/shareCodeUtils");
     const normalized = shareCodeUtils.normalizeShareCode(shareCode);
 
     if (!shareCodeUtils.validateShareCode(normalized)) {

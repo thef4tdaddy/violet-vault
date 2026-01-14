@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { getIcon } from "../../utils/icons";
+import { getIcon } from "@/utils/icons";
 
 type FilterControlType = "select" | "checkbox" | "text";
 

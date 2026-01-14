@@ -1,11 +1,11 @@
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { useReceiptScanner } from "../useReceiptScanner";
-import { processReceiptImage } from "../../../../utils/common/ocrProcessor";
+import { processReceiptImage } from "@/utils/common/ocrProcessor";
 
 // Mock the OCR processor
-vi.mock("../../../../utils/common/ocrProcessor");
-vi.mock("../../../../utils/common/logger");
+vi.mock("@/utils/common/ocrProcessor");
+vi.mock("@/utils/common/logger");
 
 describe("useReceiptScanner", () => {
   const mockOnReceiptProcessed = vi.fn();

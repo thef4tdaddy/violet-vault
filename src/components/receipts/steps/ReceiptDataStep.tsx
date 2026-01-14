@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
+import { formatCurrency } from "@/utils/receipts/receiptHelpers";
 
 interface ReceiptItem {
   description: string;

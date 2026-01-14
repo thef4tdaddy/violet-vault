@@ -28,7 +28,7 @@ vi.mock("@/utils/ui/notifications/permissionUtils", () => ({
   trackPermissionDenial: vi.fn(),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

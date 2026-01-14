@@ -10,7 +10,7 @@ import SavingsGoalCard from "./SavingsGoalCard";
 import AddEditGoalModal, { type Goal as LocalGoal } from "./AddEditGoalModal";
 import DistributeModal from "./DistributeModal";
 import useSavingsGoalsActions from "@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions";
-import { SAVINGS_PRIORITIES } from "../../utils/savings/savingsFormUtils";
+import { SAVINGS_PRIORITIES } from "@/utils/savings/savingsFormUtils";
 
 const SavingsGoals = ({
   savingsGoals = [],

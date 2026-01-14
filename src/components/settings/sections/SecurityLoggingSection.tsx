@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils/icons";
+import { getIcon } from "@/utils/icons";
 
 interface SecuritySettings {
   securityLoggingEnabled: boolean;

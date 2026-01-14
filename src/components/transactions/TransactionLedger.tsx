@@ -19,7 +19,7 @@ import {
   calculateTransactionTotals,
   getTransactionFilterConfigs,
   formatLedgerSummary,
-} from "../../utils/transactions/ledgerHelpers";
+} from "@/utils/transactions/ledgerHelpers";
 import {
   normalizeTransactions,
   normalizeEnvelopes,

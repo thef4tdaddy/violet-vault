@@ -28,7 +28,7 @@ vi.mock("../../../hooks/layout/usePaycheckOperations", () => ({
 }));
 
 // Mock logger
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),
@@ -88,7 +88,7 @@ vi.mock("../../../components/activity/ActivityFeed", () => ({
   default: () => <div data-testid="activity-view">Activity</div>,
 }));
 
-vi.mock("../../../utils/debts/debtDebugConfig", () => ({
+vi.mock("@/utils/debts/debtDebugConfig", () => ({
   isDebtFeatureEnabled: vi.fn(() => true),
 }));
 

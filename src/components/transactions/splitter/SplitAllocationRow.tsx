@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { Button } from "@/components/ui";
-import { getIcon } from "../../../utils/icons";
+import { getIcon } from "@/utils/icons";
 
 // Type definitions
 interface Split {

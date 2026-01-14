@@ -236,7 +236,7 @@ export const useUserSetup = (onSetupComplete: (payload: SetupPayload) => Promise
     setIsLoading(true);
     try {
       // Generate share code for Step 3 using centralized manager
-      const { shareCodeManager } = await import("../../utils/auth/shareCodeManager");
+      const { shareCodeManager } = await import("@/utils/platform/auth/shareCodeManager");
       const generatedShareCode = shareCodeManager.generateShareCode();
 
       setShareCode(generatedShareCode);
