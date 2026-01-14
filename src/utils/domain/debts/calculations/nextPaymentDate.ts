@@ -2,7 +2,7 @@
  * Next payment date calculations for debt management
  * Isolated to prevent temporal dead zone issues during minification
  */
-import { PAYMENT_FREQUENCIES } from "../../../constants/debts";
+import { PAYMENT_FREQUENCIES } from "@/constants/debts";
 
 interface PaymentHistoryEntry {
   date: string | Date;

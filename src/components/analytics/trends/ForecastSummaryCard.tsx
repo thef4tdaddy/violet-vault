@@ -4,7 +4,7 @@ import {
   formatCurrency,
   formatPercent,
   getTrendIconConfig,
-} from "@/utils/analytics/trendHelpers";
+} from "@/utils/features/analytics/trendHelpers";
 
 import { ForecastInsights } from "@/types/analytics";
 

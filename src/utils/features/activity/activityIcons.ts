@@ -3,7 +3,7 @@
  * Extracted from ActivityFeed.jsx for better maintainability and ESLint compliance
  */
 import React from "react";
-import { getIcon } from "../icons";
+import { getIcon } from "@/utils/ui/icons";
 import { ENTITY_TYPES } from "@/services/logging/activityLogger";
 
 export interface IconInfo {

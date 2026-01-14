@@ -1,6 +1,6 @@
-import logger from "@/utils/common/logger";
-import { optimizedSerialization } from "@/utils/security/optimizedSerialization";
-import { safeCryptoOperation, getRandomBytes } from "@/utils/security/cryptoCompat";
+import logger from "@/utils/core/common/logger";
+import { optimizedSerialization } from "@/utils/platform/security/optimizedSerialization";
+import { safeCryptoOperation, getRandomBytes } from "@/utils/platform/security/cryptoCompat";
 
 /**
  * EncryptionManager Service

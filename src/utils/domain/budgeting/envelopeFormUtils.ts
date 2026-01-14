@@ -8,7 +8,7 @@ import {
   ENVELOPE_TYPES,
   ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
-} from "../../constants/categories";
+} from "@/constants/categories";
 import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
 import { z } from "zod";
 
@@ -382,8 +382,11 @@ export const transformFormToEnvelope = (
 /**
  * Get field with default value
  */
+// eslint-disable-next-line no-redeclare
 function getFieldOrDefault(value: unknown, defaultValue: string): string;
+// eslint-disable-next-line no-redeclare
 function getFieldOrDefault(value: unknown, defaultValue: boolean): boolean;
+// eslint-disable-next-line no-redeclare
 function getFieldOrDefault(value: unknown, defaultValue: string | boolean): string | boolean {
   if (value === null || value === undefined) {
     return defaultValue;

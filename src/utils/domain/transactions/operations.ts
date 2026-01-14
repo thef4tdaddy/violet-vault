@@ -6,7 +6,7 @@
  * Now using Zod schemas for runtime validation (Issue #412)
  */
 import logger from "@/utils/core/common/logger";
-import { validateTransactionSafe } from "../../domain/schemas/transaction.ts";
+import { validateTransactionSafe } from "@/domain/schemas/transaction.ts";
 
 interface TransactionBase {
   id?: string;

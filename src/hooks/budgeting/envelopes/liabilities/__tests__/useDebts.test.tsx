@@ -9,7 +9,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useDebts } from "../useDebts";
 import { budgetDb } from "../../../../../db/budgetDb";
-import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
+import BudgetHistoryTracker from "@/utils/core/common/budgetHistoryTracker";
 import type { Debt } from "../../../../../db/types";
 
 // Mock dependencies

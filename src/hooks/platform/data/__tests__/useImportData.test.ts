@@ -1,12 +1,12 @@
 import { renderHook, act } from "@testing-library/react";
 import { useImportData } from "../useImportData";
 import { useAuth } from "../../../../hooks/auth/useAuth";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useConfirm } from "../../../../hooks/platform/ux/useConfirm";
-import { validateImportedData } from "@/utils/dataManagement/validationUtils";
+import { validateImportedData } from "@/utils/data/dataManagement/validationUtils";
 import { budgetDb } from "../../../../db/budgetDb";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
-import { trackImport } from "@/utils/monitoring/performanceMonitor";
+import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
 
 // Mock dependencies with explicit factories
 vi.mock("../../../../hooks/auth/useAuth", () => ({

@@ -1,6 +1,6 @@
 import logger from "@/utils/core/common/logger";
 import { checkForVersionUpdate } from "@/utils/core/common/version";
-import type { BeforeInstallPromptEvent } from "../../stores/ui/uiStoreActions";
+import type { BeforeInstallPromptEvent } from "@/stores/ui/uiStoreActions";
 
 /**
  * PWA Manager

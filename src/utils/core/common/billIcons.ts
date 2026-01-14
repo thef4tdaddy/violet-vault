@@ -15,7 +15,7 @@ export {
   getIconName,
   getIconNameForStorage,
   getBillIconOptions,
-} from "../billIcons/index.ts";
+} from "@/utils/ui/billIcons/index.ts";
 
 // Default export for backward compatibility
-export { default } from "../billIcons/index.ts";
+export { default } from "@/utils/ui/billIcons/index.ts";

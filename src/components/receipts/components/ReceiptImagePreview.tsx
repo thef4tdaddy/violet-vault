@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { formatFileSize } from "@/utils/receipts/receiptHelpers";
+import { formatFileSize } from "@/utils/features/receipts/receiptHelpers";
 
 interface UploadedImage {
   url: string;

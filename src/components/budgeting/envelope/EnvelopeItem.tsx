@@ -1,5 +1,5 @@
 import React from "react";
-import { getStatusStyle } from "@/utils/budgeting";
+import { getStatusStyle } from "@/utils/domain/budgeting";
 import { getButtonClasses } from "@/utils/ui/touchFeedback";
 import { useEnvelopeSwipeGestures } from "@/hooks/platform/mobile/useEnvelopeSwipeGestures";
 import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";

@@ -11,7 +11,7 @@
 import { budgetDb } from "../../db/budgetDb";
 import type { Envelope, SavingsGoal } from "../../db/types";
 import { ENVELOPE_TYPES } from "../../constants/categories";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { SupplementalAccountSchema } from "../../domain/schemas/envelope";
 import { z } from "zod";
 import { Table } from "dexie";

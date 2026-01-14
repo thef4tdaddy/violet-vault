@@ -2,7 +2,7 @@
  * Transaction pattern analysis utilities
  * Extracted from useSmartCategoryAnalysis.js to reduce complexity
  */
-import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
+import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "@/constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
 import type { Suggestion, TransactionForStats } from "./categoryHelpers";
 

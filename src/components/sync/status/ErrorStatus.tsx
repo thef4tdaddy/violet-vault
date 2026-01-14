@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../../../components/ui";
-import { renderIcon } from "@/utils/icons";
+import { renderIcon } from "@/utils/ui/icons";
 
 /**
  * Props for ErrorStatus component

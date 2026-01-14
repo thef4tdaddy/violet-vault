@@ -2,7 +2,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   AUTO_CLASSIFY_ENVELOPE_TYPE,
   EnvelopeType,
-} from "../../constants/categories";
+} from "@/constants/categories";
 
 interface EnvelopeWithType {
   envelopeType?: EnvelopeType;

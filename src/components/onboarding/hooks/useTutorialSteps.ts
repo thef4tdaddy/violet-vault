@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { TutorialStep, StepPosition } from "./useTutorialPositioning";
 
 export type { TutorialStep, StepPosition };

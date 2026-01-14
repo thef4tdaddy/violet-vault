@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { processEnvelopes, calculateEnvelopeStats, getRepairUpdates } from "../filtering";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "../../../constants/categories";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
 import { isValidEnvelopeType } from "../../validation/envelopeValidation";
 import logger from "../../common/logger";
 import { render, screen, waitFor } from "../../../test/test-utils";

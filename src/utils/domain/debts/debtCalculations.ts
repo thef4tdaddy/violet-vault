@@ -9,7 +9,7 @@ import type {
   PayoffProjection,
 } from "../../types/debt";
 
-import { DEBT_TYPES, DEBT_STATUS, PAYMENT_FREQUENCIES } from "../../constants/debts";
+import { DEBT_TYPES, DEBT_STATUS, PAYMENT_FREQUENCIES } from "@/constants/debts";
 
 import { Bill, Envelope, Transaction } from "@/db/types";
 

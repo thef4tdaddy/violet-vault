@@ -1,6 +1,6 @@
 import React from "react";
-import { getIcon } from "@/utils/icons";
-import { formatCurrency } from "@/utils/transactions/splitterHelpers";
+import { getIcon } from "@/utils/ui/icons";
+import { formatCurrency } from "@/utils/domain/transactions/splitterHelpers";
 
 interface SplitTotalsData {
   original: number;

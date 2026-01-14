@@ -1,8 +1,8 @@
 import { budgetDb } from "@/db/budgetDb";
 import type { BudgetTag, BudgetChange, Debt } from "@/db/types";
-import { encryptionUtils } from "../security/encryption";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
 import logger from "./logger";
-import { formatCurrency } from "../accounts/accountHelpers";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 /**
  * Utility for automatically tracking budget changes for family collaboration

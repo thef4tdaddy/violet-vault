@@ -3,7 +3,7 @@
  * Calculates remaining amounts needed for bill payments and funding progress
  */
 
-import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import { BIWEEKLY_MULTIPLIER } from "@/constants/frequency";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 type Bill = DbBill;

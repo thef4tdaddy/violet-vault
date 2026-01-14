@@ -9,7 +9,7 @@ import {
   formatPaycheckAmount,
   getPaycheckStatistics,
 } from "../paycheckUtils";
-import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { ENVELOPE_TYPES } from "@/constants/categories";
 
 // Type for test data
 type PaycheckRecord = { payerName: string; amount: number; processedAt?: string };

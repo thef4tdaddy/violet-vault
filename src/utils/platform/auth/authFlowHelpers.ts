@@ -12,7 +12,7 @@ interface LoginResult {
   suggestion?: string;
 }
 
-import type { UserData } from "../../hooks/auth/useAuth.types";
+import type { UserData } from "@/hooks/auth/useAuth.types";
 
 interface AuthError extends Error {
   code?: string;

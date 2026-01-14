@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Checkbox } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useFirebaseMessaging } from "@/hooks/platform/notifications/useFirebaseMessaging";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface PermissionStatus {
   granted: boolean;

@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { velocityTooltipFormatter, CHART_COLORS } from "@/utils/analytics/trendHelpers";
+import { velocityTooltipFormatter, CHART_COLORS } from "@/utils/features/analytics/trendHelpers";
 import { getIcon } from "../../../utils";
 import type { SpendingVelocity } from "@/types/analytics";
 

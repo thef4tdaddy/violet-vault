@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { storeRegistry } from "../stores/storeRegistry.ts";
+import { storeRegistry } from "@/utils/data/stores/storeRegistry";
 import { expect } from "vitest";
 
 // Generic type for Zustand store hooks

@@ -3,8 +3,8 @@
  * Handles paycheck calculations, allocations, and validation
  */
 
-import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "@/constants/frequency";
 import type { Envelope as DbEnvelope, Transaction as DbTransaction } from "@/db/types";
 
 /**

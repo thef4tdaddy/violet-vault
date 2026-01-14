@@ -4,7 +4,7 @@
  * Extracted from queryClient.js for Issue #154
  */
 import { budgetDb } from "@/db/budgetDb";
-import logger from "./logger";
+import logger from "../common/logger";
 import queryClient from "./queryClientConfig.ts";
 import { queryKeys } from "./queryKeys.ts";
 

@@ -1,5 +1,5 @@
 import { clearFirebaseData, forcePushToCloud } from "../firebaseUtils";
-import { syncOrchestrator } from "../../../services/sync/syncOrchestrator";
+import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import { vi } from "vitest";
 
 vi.mock("../../../services/sync/syncOrchestrator", () => ({

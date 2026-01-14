@@ -1,7 +1,7 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { formatBillAmount } from "@/utils/bills/billDetailUtils";
-import { getFrequencyDisplayText } from "@/utils/common/frequencyCalculations";
+import { formatBillAmount } from "@/utils/domain/bills/billDetailUtils";
+import { getFrequencyDisplayText } from "@/utils/core/common/frequencyCalculations";
 
 interface BillForStats {
   amount?: number;

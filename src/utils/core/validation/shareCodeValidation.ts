@@ -2,7 +2,7 @@
  * Share code validation using Zod schemas
  */
 import { z } from "zod";
-import logger from "./logger";
+import logger from "../common/logger";
 
 /**
  * Zod schema for share code validation

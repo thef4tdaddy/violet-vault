@@ -1,9 +1,9 @@
-import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
 import {
   BIWEEKLY_MULTIPLIER,
   FREQUENCY_MULTIPLIERS,
   type FrequencyType,
-} from "../../constants/frequency";
+} from "@/constants/frequency";
 import type { Envelope, Transaction, Bill } from "@/db/types";
 
 export type { Envelope, Transaction, Bill };

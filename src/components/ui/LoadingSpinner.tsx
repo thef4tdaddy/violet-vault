@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { renderIcon } from "@/utils/icons";
+import { renderIcon } from "@/utils/ui/icons";
 
 interface LoadingSpinnerProps {
   message?: string;

@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getIcon } from "../../../utils";
-import { formatCurrency, CHART_COLORS } from "@/utils/analytics/trendHelpers";
+import { formatCurrency, CHART_COLORS } from "@/utils/features/analytics/trendHelpers";
 
 import { SpendingTrend } from "@/types/analytics";
 

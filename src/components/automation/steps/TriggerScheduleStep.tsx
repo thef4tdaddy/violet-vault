@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { TRIGGER_TYPES } from "@/utils/budgeting/autofunding";
+import { TRIGGER_TYPES } from "@/utils/domain/budgeting/autofunding";
 
 interface RuleData {
   trigger: string;

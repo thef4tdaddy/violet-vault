@@ -2,8 +2,8 @@ import {
   AUTO_CLASSIFY_ENVELOPE_TYPE,
   BILL_CATEGORIES,
   ENVELOPE_TYPES,
-} from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
+} from "@/constants/categories";
+import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "@/constants/frequency";
 import logger from "@/utils/core/common/logger";
 import type { Envelope } from "@/db/types";
 import type { PaycheckHistory } from "@/db/types";

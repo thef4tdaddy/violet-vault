@@ -4,7 +4,7 @@
  * Provides consistent toast notifications across the application
  */
 
-import { useToastStore } from "../../stores/ui/toastStore";
+import { useToastStore } from "@/stores/ui/toastStore";
 
 /**
  * Hook wrapper for toast helpers using Zustand store

@@ -7,7 +7,7 @@ import {
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "@/utils/transactions/tableHelpers";
+} from "@/utils/domain/transactions/tableHelpers";
 import type { Transaction } from "@/types/finance";
 import type { VirtualItem } from "@tanstack/react-virtual";
 
