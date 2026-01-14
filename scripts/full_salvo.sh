@@ -117,9 +117,6 @@ run_check() {
   local command=$2
   local output_file="${ERROR_DIR}/${name//[^a-zA-Z0-9]/_}.txt"
   
-  # Mark that this check was attempted
-  ALL_CHECKS_RUN["$name"]=1
-  
   # Skip if not in the retry list (when in retry mode)
   if ! should_run_check "$name"; then
     return 0
