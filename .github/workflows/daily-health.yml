@@ -101,6 +101,14 @@ jobs:
           cat frontend-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
+          
+          # Extract coverage percentage if available
+          if [ -f "coverage/coverage-summary.json" ]; then
+            COVERAGE=$(node -e "try { const data=require('./coverage/coverage-summary.json'); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
 
       # 2. Go Backend
       - name: Go Tests
@@ -112,6 +120,17 @@ jobs:
           # Go 1.23 coverage
           go test ./... -coverprofile=coverage.out > ../go-test.txt 2>&1
           exit_code=$?
+          
+          # Extract coverage percentage
+          if [ -f "coverage.out" ]; then
+            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            # Generate HTML coverage report
+            go tool cover -html=coverage.out -o coverage.html
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+          
           cd ..
           cat go-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
@@ -125,9 +144,18 @@ jobs:
         run: |
           source .venv/bin/activate
           cd api
-          # Run pytest with coverage
-          pytest --cov=. --cov-report=term-missing > ../python-test.txt 2>&1
+          # Run pytest with coverage (add JSON report)
+          pytest --cov=. --cov-report=term-missing --cov-report=html --cov-report=json > ../python-test.txt 2>&1
           exit_code=$?
+          
+          # Extract coverage percentage
+          if [ -f "coverage.json" ]; then
+            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data['totals']['percent_covered'])" 2>/dev/null || echo "0")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+          
           cd ..
           cat python-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
@@ -149,6 +177,11 @@ jobs:
             const pyStatus = '${{ steps.test_python.outputs.status }}' || 'skipped';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
+            // Get coverage percentages
+            const frontendCoverage = parseFloat('${{ steps.test_frontend.outputs.coverage }}') || 0;
+            const pythonCoverage = parseFloat('${{ steps.test_python.outputs.coverage }}') || 0;
+            const goCoverage = parseFloat('${{ steps.test_go.outputs.coverage }}') || 0;
+
             const isHealthy = buildStatus === 'success' && 
                              (feStatus !== 'failure') && 
                              (goStatus !== 'failure') && 
@@ -161,6 +194,17 @@ jobs:
             body += `**Context**: ${contextName}\n`;
             body += `**Workflow Run**: [View Logs](${runUrl})\n\n`;
 
+            // Add Coverage Table if frontend coverage >= 80%
+            if (frontendCoverage >= 80) {
+              body += `## 📊 Test Coverage\n\n`;
+              body += `| Suite | Coverage | Status |\n`;
+              body += `|-------|----------|--------|\n`;
+              body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+              body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+              body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+              body += `\n**Coverage Reports**: [Download artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
+            }
+
             body += `### Status Breakdown\n`;
             body += `- **Build**: ${buildStatus === 'success' ? '✅ Pass' : '❌ FAIL'}\n`;
             body += `- **Frontend Tests**: ${feStatus === 'success' ? '✅ Pass' : (feStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
@@ -172,7 +216,7 @@ jobs:
                try {
                    const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
                    const total = coverage.total.lines.pct;
-                   body += `\n### Frontend Coverage\n`;
+                   body += `\n### Frontend Coverage Details\n`;
                    body += `- **Total**: ${total}%\n`;
                    
                    // Find worst offenders
@@ -221,12 +265,6 @@ jobs:
                }
             }
 
-            // TODO: Implement Granular Coverage Reporting for Go & Python
-            // Strategy: Once Frontend coverage > 80%, implement JSON parsing for:
-            // - Go: parse `coverage.out` (convert to summary format)
-            // - Python: parse `coverage.json` from pytest-cov
-            // Currently: Full artifacts are uploaded for manual inspection.
-
             body += `\n---\n*VioletVault Health Bot*`;
 
             await github.rest.issues.create({
@@ -248,4 +286,7 @@ jobs:
             go-test.txt
             python-test.txt
             api/coverage.out
+            api/coverage.html
+            api/htmlcov/
+            api/coverage.json
           retention-days: 7
