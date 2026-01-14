@@ -104,7 +104,7 @@ jobs:
           
           # Extract coverage percentage if available
           if [ -f "coverage/coverage-summary.json" ]; then
-            COVERAGE=$(node -e "const fs=require('fs'); try { const data=JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8')); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
+            COVERAGE=$(node -e "try { const data=require('./coverage/coverage-summary.json'); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
             echo "coverage=0" >> $GITHUB_OUTPUT
@@ -123,7 +123,7 @@ jobs:
           
           # Extract coverage percentage
           if [ -f "coverage.out" ]; then
-            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}' || echo '0')
+            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
             # Generate HTML coverage report
             go tool cover -html=coverage.out -o coverage.html
@@ -150,23 +150,7 @@ jobs:
           
           # Extract coverage percentage
           if [ -f "coverage.json" ]; then
-            COVERAGE=$(python - << 'EOF'
-import json
-import sys
-import traceback
-
-try:
-    with open("coverage.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    totals = data.get("totals", {})
-    percent = totals.get("percent_covered", 0)
-    print(percent)
-except Exception as e:
-    print("Failed to extract coverage from coverage.json:", e, file=sys.stderr)
-    traceback.print_exc()
-    print(0)
-EOF
-)
+            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data['totals']['percent_covered'])" 2>/dev/null || echo "0")
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
             echo "coverage=0" >> $GITHUB_OUTPUT
@@ -252,29 +236,32 @@ EOF
                            body += `- \`${item.file}\`: ${item.pct}%\n`;
                        }
 
-                       // Create Tasks for worst 3 only when frontend coverage >= 80%
-                       if (frontendCoverage >= 80) {
-                           const candidates = lowCovFiles.slice(0, 3);
-                           for (const item of candidates) {
-                               const parts = item.file.split('/');
-                               const basename = parts[parts.length - 1];
-                               const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-                               
-                               const existing = await github.rest.search.issuesAndPullRequests({
-                                   q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
+                       // Create Tasks for worst 3 frontend offenders
+                       // When frontend < 80%: Only create frontend issues (focus on core app)
+                       // When frontend >= 80%: Create frontend + backend issues (TODO: implement backend parsing)
+                       const candidates = lowCovFiles.slice(0, 3);
+                       for (const item of candidates) {
+                           const parts = item.file.split('/');
+                           const basename = parts[parts.length - 1];
+                           const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+                           
+                           const existing = await github.rest.search.issuesAndPullRequests({
+                               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
+                           });
+                           
+                           if (existing.data.total_count === 0) {
+                               await github.rest.issues.create({
+                                   owner: context.repo.owner,
+                                   repo: context.repo.repo,
+                                   title: issueTitle,
+                                   body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
+                                   labels: ['coverage-gap', 'help-wanted', 'automated']
                                });
-                               
-                               if (existing.data.total_count === 0) {
-                                   await github.rest.issues.create({
-                                       owner: context.repo.owner,
-                                       repo: context.repo.repo,
-                                       title: issueTitle,
-                                       body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
-                                       labels: ['coverage-gap', 'help-wanted', 'automated']
-                                   });
-                               }
                            }
                        }
+                       
+                       // TODO: When frontend >= 80%, also parse and create issues for backend worst offenders
+                       // This requires parsing Go coverage.out and Python coverage.json for file-level coverage
                    }
                } catch (e) {
                    console.error("Error parsing FE coverage", e);
