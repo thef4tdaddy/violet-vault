@@ -88,6 +88,7 @@ export default [
     rules: {
       "no-restricted-imports": "off", // Icon utility can import from react-icons and lucide-react
       "no-direct-icon-imports/no-direct-icon-imports": "off", // Icon utility needs to import from react-icons
+      "max-lines": "off", // Icon utility legitimately grows as more icons are added
     },
   },
   {

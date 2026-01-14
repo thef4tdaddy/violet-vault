@@ -32,6 +32,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Info,
+  HelpCircle,
   Eye,
   EyeOff,
   ThumbsUp,
@@ -161,6 +162,21 @@ import {
   Scale, // For Chapter 13
 } from "lucide-react";
 
+/**
+ * Common props for icon components
+ */
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
+  size?: number;
+  color?: string;
+  className?: string;
+  title?: string;
+}
+
+/**
+ * Type for icon components used in the application
+ */
+export type IconComponent = React.ComponentType<IconProps>;
+
 // Icon registry - maps string names to components
 export const ICON_REGISTRY = {
   // Navigation & UI
@@ -197,6 +213,9 @@ export const ICON_REGISTRY = {
   AlertTriangle: AlertTriangle, // PascalCase alias
   info: Info,
   Info: Info, // PascalCase alias
+  help: HelpCircle,
+  "help-circle": HelpCircle,
+  HelpCircle: HelpCircle,
   eye: Eye,
   "eye-off": EyeOff,
   "thumbs-up": ThumbsUp,
@@ -333,19 +352,26 @@ export const ICON_REGISTRY = {
   CreditCard: CreditCard, // For Credit Card debt type
 };
 
-// Get icon component by name
-export const getIcon = (
-  iconName: string | undefined | null,
-  fallback: React.ComponentType<{ className?: string; title?: string }> = FileText
-): React.ComponentType<{ className?: string; title?: string }> => {
-  if (!iconName) return fallback;
-  return ICON_REGISTRY[iconName as keyof typeof ICON_REGISTRY] || fallback;
+/**
+ * Get an icon component by its name
+ * Supports both dash-case and PascalCase
+ */
+export const getIcon = (name: string | null | undefined): IconComponent => {
+  if (!name) return HelpCircle;
+  return (ICON_REGISTRY[name as keyof typeof ICON_REGISTRY] as IconComponent) || HelpCircle;
 };
 
-// Get icon name from component (reverse lookup)
-export const getIconName = (iconComponent: React.ComponentType): string | null => {
-  const entry = Object.entries(ICON_REGISTRY).find(([_, component]) => component === iconComponent);
-  return entry ? entry[0] : null;
+/**
+ * Get icon name from component (reverse lookup)
+ */
+export const getIconName = (IconComponent: IconComponent | null | undefined): string | null => {
+  if (!IconComponent) return null;
+
+  for (const [name, component] of Object.entries(ICON_REGISTRY)) {
+    if (component === IconComponent) return name;
+  }
+
+  return null;
 };
 
 // Render icon with consistent props
@@ -859,13 +885,13 @@ export const DEFAULT_ICON_OPTIONS: BillIconOption[] = [
 /**
  * Get appropriate icon based on provider name, description, and category
  */
-export const getBillIcon = (provider = "", description = "", category = ""): React.ComponentType => {
+export const getBillIcon = (provider = "", description = "", category = ""): IconComponent => {
   const searchText = `${provider} ${description}`.toLowerCase().trim();
 
   // First, try exact provider matching
   for (const [providerKey, icon] of Object.entries(BILL_PROVIDER_ICONS)) {
     if (searchText.includes(providerKey)) {
-      return icon;
+      return icon as IconComponent;
     }
   }
 
@@ -873,7 +899,7 @@ export const getBillIcon = (provider = "", description = "", category = ""): Rea
   const normalizedCategory = category.toLowerCase().trim();
   const categoryIcon = CATEGORY_FALLBACK_ICONS[normalizedCategory];
 
-  return categoryIcon || FileText; // Default fallback
+  return (categoryIcon as IconComponent) || FileText; // Default fallback
 };
 
 /**
@@ -909,17 +935,17 @@ export const suggestBillCategoryAndIcon = (provider = "", description = "") => {
 /**
  * Get icon component from icon name string (bill icon version)
  */
-export const getIconByName = (iconName: string): React.ComponentType => {
+export const getIconByName = (iconName: string): IconComponent => {
   if (!iconName || typeof iconName !== "string") {
     return FileText; // Default fallback
   }
-  return ICON_REGISTRY[iconName as keyof typeof ICON_REGISTRY] || FileText;
+  return (ICON_REGISTRY[iconName as keyof typeof ICON_REGISTRY] as IconComponent) || FileText;
 };
 
 /**
  * Get icon name for storage (serialization)
  */
-export const getIconNameForStorage = (IconComponent: React.ComponentType): string => {
+export const getIconNameForStorage = (IconComponent: IconComponent): string => {
   if (!IconComponent) return "FileText";
   const displayName = (IconComponent as { displayName?: string }).displayName;
   return displayName || getIconName(IconComponent) || "FileText";
