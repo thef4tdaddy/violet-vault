@@ -66,18 +66,31 @@ const SummaryCards = () => {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        {metrics.map((metric) => (
-          <MetricCard
-            key={metric.key}
-            title={metric.label}
-            value={metric.value}
-            icon={metric.icon}
-            variant={metric.variant}
-            format="currency"
-            subtitle={metric.subtitle}
-            onClick={metric.onClick}
-          />
-        ))}
+        {metrics.map((metric) => {
+          const isNegativeUnassignedCash =
+            metric.key === "unassignedCash" &&
+            typeof metric.value === "number" &&
+            metric.value < 0;
+
+          const title = isNegativeUnassignedCash ? `⚠️ ${metric.label}` : metric.label;
+
+          return (
+            <div
+              key={metric.key}
+              className={isNegativeUnassignedCash ? "animate-pulse" : undefined}
+            >
+              <MetricCard
+                title={title}
+                value={metric.value}
+                icon={metric.icon}
+                variant={metric.variant}
+                format="currency"
+                subtitle={metric.subtitle}
+                onClick={metric.onClick}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <Suspense fallback={null}>
