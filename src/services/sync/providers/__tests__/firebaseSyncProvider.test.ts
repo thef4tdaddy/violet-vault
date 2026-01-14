@@ -481,9 +481,10 @@ describe("FirebaseSyncProvider", () => {
 
       const result = await provider.save(localData);
 
-      // When timestamps are equal, it should not sync (returns "none")
-      // But the implementation currently doesn't handle "none" case, so it would download
+      // When timestamps are equal, sync direction is "none"
+      // But the implementation currently doesn't handle "none" case, so it proceeds to upload by default
       expect(result.success).toBe(true);
+      expect(setDoc).toHaveBeenCalled();
     });
 
     it("should handle null local data and trigger download", async () => {
