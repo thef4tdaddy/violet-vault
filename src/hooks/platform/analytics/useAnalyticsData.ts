@@ -8,7 +8,7 @@ import {
   calculateEnvelopeSpending,
   calculateCategoryBreakdown,
   calculateWeeklyPatterns,
-} from "@/utils/analyticsDataUtils";
+} from "@/hooks/platform/analytics/utils/analyticsDataUtils";
 import {
   calculateEnvelopeHealth,
   calculateBudgetVsActual,
