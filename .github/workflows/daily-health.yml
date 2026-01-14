@@ -123,7 +123,7 @@ jobs:
           
           # Extract coverage percentage
           if [ -f "coverage.out" ]; then
-            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}' || echo '0')
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
             # Generate HTML coverage report
             go tool cover -html=coverage.out -o coverage.html
