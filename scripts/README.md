@@ -16,6 +16,7 @@ This directory contains utility scripts for VioletVault development and operatio
 
 ✨ **ESLint-Style Reporting** - Quiet execution with summary at the end
 🔧 **Auto-Fix Support** - Use `--fix` flag to automatically fix issues
+🔄 **Retry Failed Checks** - Re-run only failed checks with `--retry-failed` (within 5 minutes)
 📁 **Error Persistence** - Failed checks saved to `.salvo_errors/`
 🎯 **Multi-Language** - TypeScript, Go, Python support
 🚀 **CI-Ready** - Returns proper exit codes for CI/CD integration
@@ -28,6 +29,10 @@ This directory contains utility scripts for VioletVault development and operatio
 
 # Fix mode (auto-fix issues where possible)
 ./scripts/full_salvo.sh --fix
+
+# Retry failed mode (re-run only failed checks from last run)
+# Only works if last run was within 5 minutes
+./scripts/full_salvo.sh --retry-failed
 ```
 
 ### What It Checks
@@ -111,6 +116,9 @@ src/components/App.tsx
 💡 Tip: Run with --fix flag to auto-fix some issues:
    ./scripts/full_salvo.sh --fix
 
+💡 Tip: Re-run only failed checks (within 5 minutes):
+   ./scripts/full_salvo.sh --retry-failed
+
 📁 Error reports saved in: .salvo_errors/
 ```
 
@@ -124,8 +132,49 @@ src/components/App.tsx
 When checks fail, detailed error output is saved to `.salvo_errors/` directory:
 
 - Each failed check gets its own file
+- Failed checks list saved for retry functionality
+- Timestamp saved to enforce 5-minute retry window
 - Directory is automatically cleaned up when all checks pass
 - Directory is in `.gitignore` (not committed)
+
+### Retry Failed Checks
+
+The `--retry-failed` flag allows you to re-run only the checks that failed in the last run:
+
+**How it works:**
+1. Run `./scripts/full_salvo.sh` - some checks fail
+2. Fix the issues in your code
+3. Run `./scripts/full_salvo.sh --retry-failed` - only failed checks run again
+
+**Time limit:**
+- Retry is only allowed within 5 minutes of the last run
+- This ensures you're working with a recent baseline
+- After 5 minutes, you must run a full check again
+
+**Example:**
+```bash
+# First run - some checks fail
+$ ./scripts/full_salvo.sh
+Running TypeScript/JavaScript Checks...
+  ESLint... ✗
+  TypeScript... ✓
+  Prettier... ✗
+  
+✗ 2 Check(s) Failed
+💡 Tip: Re-run only failed checks (within 5 minutes):
+   ./scripts/full_salvo.sh --retry-failed
+
+# Fix the issues, then retry only failed checks
+$ ./scripts/full_salvo.sh --retry-failed
+🔄 Running in RETRY FAILED mode - re-running only failed checks
+Last run was 45s ago - proceeding with retry
+
+Running TypeScript/JavaScript Checks...
+  ESLint... ✓
+  Prettier... ✓
+  
+✓ All Checks Passed
+```
 
 ### CI/CD Integration
 

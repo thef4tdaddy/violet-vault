@@ -7,8 +7,12 @@ set +e
 
 # Parse command line arguments
 FIX_MODE=false
+RETRY_FAILED_MODE=false
+
 if [[ "$1" == "--fix" ]]; then
   FIX_MODE=true
+elif [[ "$1" == "--retry-failed" ]]; then
+  RETRY_FAILED_MODE=true
 fi
 
 # Colors for output
@@ -21,6 +25,8 @@ NC='\033[0m' # No Color
 
 # Error directory for persisting failure reports
 ERROR_DIR=".salvo_errors"
+FAILED_CHECKS_LIST_FILE="$ERROR_DIR/.failed_checks"
+LAST_RUN_TIMESTAMP_FILE="$ERROR_DIR/.last_run_timestamp"
 
 # Header
 echo ""
@@ -30,12 +36,61 @@ echo -e "${MAGENTA}=============================================================
 if [ "$FIX_MODE" = true ]; then
   echo -e "${YELLOW}🔧 Running in FIX mode - will auto-fix issues where possible${NC}"
 fi
+if [ "$RETRY_FAILED_MODE" = true ]; then
+  echo -e "${YELLOW}🔄 Running in RETRY FAILED mode - re-running only failed checks${NC}"
+fi
 echo ""
+
+# Check if retry-failed mode is requested
+if [ "$RETRY_FAILED_MODE" = true ]; then
+  # Check if the failed checks list exists
+  if [ ! -f "$FAILED_CHECKS_LIST_FILE" ] || [ ! -f "$LAST_RUN_TIMESTAMP_FILE" ]; then
+    echo -e "${RED}✗ No recent failed checks found${NC}"
+    echo -e "${YELLOW}Run './scripts/full_salvo.sh' first to establish a baseline${NC}"
+    echo ""
+    exit 1
+  fi
+  
+  # Check if the last run was within 5 minutes (300 seconds)
+  LAST_RUN=$(cat "$LAST_RUN_TIMESTAMP_FILE")
+  NOW=$(date +%s)
+  DIFF=$((NOW - LAST_RUN))
+  
+  if [ $DIFF -gt 300 ]; then
+    echo -e "${RED}✗ Last run was too long ago (${DIFF}s ago, limit is 300s)${NC}"
+    echo -e "${YELLOW}Run './scripts/full_salvo.sh' again to re-establish the baseline${NC}"
+    echo ""
+    exit 1
+  fi
+  
+  echo -e "${BLUE}Last run was ${DIFF}s ago - proceeding with retry${NC}"
+  echo ""
+fi
 
 # Track overall status
 OVERALL_STATUS=0
 # Track failed steps using associative array
 declare -A FAILED_CHECKS
+# Track all checks that were run
+declare -A ALL_CHECKS_RUN
+
+# Load failed checks list if in retry mode
+if [ "$RETRY_FAILED_MODE" = true ]; then
+  declare -A CHECKS_TO_RUN
+  while IFS= read -r check_name; do
+    CHECKS_TO_RUN["$check_name"]=1
+  done < "$FAILED_CHECKS_LIST_FILE"
+fi
+
+# Helper to determine if a check should be run
+should_run_check() {
+  local name=$1
+  if [ "$RETRY_FAILED_MODE" = true ]; then
+    [[ -n "${CHECKS_TO_RUN[$name]}" ]]
+  else
+    return 0
+  fi
+}
 
 # Helper function for running checks with ESLint-style reporting
 # Usage: run_check "Check Name" "command to run"
@@ -43,6 +98,14 @@ run_check() {
   local name=$1
   local command=$2
   local output_file="${ERROR_DIR}/${name//[^a-zA-Z0-9]/_}.txt"
+  
+  # Mark that this check was attempted
+  ALL_CHECKS_RUN["$name"]=1
+  
+  # Skip if not in the retry list (when in retry mode)
+  if ! should_run_check "$name"; then
+    return 0
+  fi
   
   # Ensure error directory exists
   mkdir -p "$ERROR_DIR"
@@ -237,8 +300,19 @@ else
         echo ""
     done
     
+    # Save failed checks list and timestamp for retry
+    mkdir -p "$ERROR_DIR"
+    date +%s > "$LAST_RUN_TIMESTAMP_FILE"
+    > "$FAILED_CHECKS_LIST_FILE"  # Clear file
+    for check_name in "${!FAILED_CHECKS[@]}"; do
+        echo "$check_name" >> "$FAILED_CHECKS_LIST_FILE"
+    done
+    
     echo -e "${YELLOW}💡 Tip: Run with --fix flag to auto-fix some issues:${NC}"
     echo -e "${YELLOW}   ./scripts/full_salvo.sh --fix${NC}"
+    echo ""
+    echo -e "${YELLOW}💡 Tip: Re-run only failed checks (within 5 minutes):${NC}"
+    echo -e "${YELLOW}   ./scripts/full_salvo.sh --retry-failed${NC}"
     echo ""
     echo -e "${YELLOW}📁 Error reports saved in: $ERROR_DIR/${NC}"
     echo ""
