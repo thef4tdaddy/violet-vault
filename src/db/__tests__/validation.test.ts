@@ -9,7 +9,6 @@ import { budgetDb } from "../budgetDb";
 
 // Mock logger to avoid console output during tests
 vi.mock("@/utils/common/logger", () => ({
-vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

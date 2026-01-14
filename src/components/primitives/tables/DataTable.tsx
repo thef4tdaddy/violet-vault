@@ -335,15 +335,6 @@ export const DataTable = <T,>({
     );
   }
 
-  // Empty state
-  if (data.length === 0) {
-    return (
-      <div className={`bg-white shadow-sm rounded-lg overflow-hidden ${className}`}>
-        <EmptyState message={emptyMessage} />
-      </div>
-    );
-  }
-
   return (
     <div
       ref={parentRef}
@@ -358,18 +349,22 @@ export const DataTable = <T,>({
           columns={columns}
         />
 
-        <TableBody
-          data={data}
-          columns={columns}
-          gridTemplate={gridTemplate}
-          selectedRowsSet={selectedRowsSet}
-          selectable={selectable}
-          onRowClick={onRowClick}
-          handleRowSelect={handleRowSelect}
-          getRowId={getRowId}
-          virtualized={virtualized}
-          rowVirtualizer={rowVirtualizer}
-        />
+        {data.length === 0 ? (
+          <EmptyState message={emptyMessage} />
+        ) : (
+          <TableBody
+            data={data}
+            columns={columns}
+            gridTemplate={gridTemplate}
+            selectedRowsSet={selectedRowsSet}
+            selectable={selectable}
+            onRowClick={onRowClick}
+            handleRowSelect={handleRowSelect}
+            getRowId={getRowId}
+            virtualized={virtualized}
+            rowVirtualizer={rowVirtualizer}
+          />
+        )}
       </div>
     </div>
   );

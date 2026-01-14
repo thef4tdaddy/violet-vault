@@ -20,7 +20,7 @@ interface MetricsGridProps {
 const MetricsGrid: React.FC<MetricsGridProps> = ({ performanceMetrics }) => {
   // Helper to determine variant based on score
   const getVariantForScore = (
-    score: number,
+    score: number
   ): "default" | "success" | "warning" | "danger" | "info" => {
     if (score >= 90) return "success";
     if (score >= 70) return "info";
