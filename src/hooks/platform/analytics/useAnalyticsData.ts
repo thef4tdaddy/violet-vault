@@ -8,12 +8,12 @@ import {
   calculateEnvelopeSpending,
   calculateCategoryBreakdown,
   calculateWeeklyPatterns,
-} from "./utils/analyticsDataUtils";
+} from "@/utils/analyticsDataUtils";
 import {
   calculateEnvelopeHealth,
   calculateBudgetVsActual,
   calculateFinancialMetrics,
-} from "./utils/envelopeAnalysisUtils";
+} from "@/utils/envelopeAnalysisUtils";
 
 import { Transaction as BaseTransaction } from "@/types/finance";
 

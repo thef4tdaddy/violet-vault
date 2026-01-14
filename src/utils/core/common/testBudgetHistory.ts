@@ -1,5 +1,5 @@
-import { budgetDb } from "../../db/budgetDb.ts";
-import type { BudgetChange } from "../../db/types.ts";
+import { budgetDb } from "@/db/budgetDb";
+import type { BudgetChange } from "@/db/types";
 import logger from "./logger.ts";
 
 /**
@@ -11,7 +11,7 @@ export const createTestBudgetHistory = async () => {
     logger.info("🧪 Creating test budget history commits...");
 
     // Create a test commit
-    const testCommit: import("../../db/types.ts").BudgetCommit = {
+    const testCommit: import("@/db/types").BudgetCommit = {
       hash: "test_commit_" + Date.now(),
       timestamp: Date.now(),
       message: "Test commit for family collaboration",

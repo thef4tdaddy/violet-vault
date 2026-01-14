@@ -1,5 +1,5 @@
-import logger from "../common/logger";
-import { checkForVersionUpdate } from "../common/version";
+import logger from "@/utils/core/common/logger";
+import { checkForVersionUpdate } from "./version";
 import type { BeforeInstallPromptEvent } from "../../stores/ui/uiStoreActions";
 
 /**

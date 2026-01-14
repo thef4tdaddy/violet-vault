@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import { optimizedSerialization } from "./optimizedSerialization";
 import { safeCryptoOperation, getRandomBytes } from "./cryptoCompat";
 type CompressionAnalysis = ReturnType<typeof optimizedSerialization.analyzeCompression>;

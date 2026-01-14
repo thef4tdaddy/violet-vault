@@ -6,7 +6,7 @@
 import { runImmediateSyncHealthCheck } from "./syncHealthChecker";
 import { validateAllSyncFlows } from "./syncFlowValidator";
 import { runSyncEdgeCaseTests } from "./syncEdgeCaseTester";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Type definitions
 interface TestResult {
@@ -507,7 +507,7 @@ export const getQuickSyncStatus = async () => {
 
     // Check 1: Database availability
     try {
-      const { budgetDb } = await import("../../db/budgetDb");
+      const { budgetDb } = await import("@/db/budgetDb");
       await budgetDb.envelopes.limit(1).toArray(); // Just check if DB is accessible
       checks.push({ name: "Database Access", status: "✅ PASSED" });
     } catch (error) {

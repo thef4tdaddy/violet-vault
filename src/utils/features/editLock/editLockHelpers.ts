@@ -3,7 +3,7 @@
  * Extracted from editLockService.js for better maintainability and ESLint compliance
  */
 import { serverTimestamp } from "firebase/firestore";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface User {
   id?: string;

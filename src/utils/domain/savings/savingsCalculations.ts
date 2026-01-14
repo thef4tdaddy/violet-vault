@@ -1,5 +1,5 @@
 // Savings Goal Calculations - Pure utility functions for savings goal math
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import type { SavingsGoal } from "@/db/types";
 
 export interface ProcessedSavingsGoal extends SavingsGoal {

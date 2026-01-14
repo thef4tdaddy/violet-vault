@@ -1,5 +1,5 @@
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator.ts";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Recursively remove undefined values from objects/arrays

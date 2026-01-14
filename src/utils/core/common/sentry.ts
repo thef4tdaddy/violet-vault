@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
-import logger from "../common/logger.ts";
-import { APP_VERSION, APP_NAME } from "../common/version.ts";
+import logger from "./logger";
+import { APP_VERSION, APP_NAME } from "./version";
 
 interface SentryConfig {
   dsn: string;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import logger from "../common/logger";
+import logger from "./logger";
 
 /**
  * Constants for balance validation

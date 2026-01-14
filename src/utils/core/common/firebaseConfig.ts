@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "./logger";
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-api-key",

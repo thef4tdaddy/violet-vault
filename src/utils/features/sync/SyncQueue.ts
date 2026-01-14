@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * SyncQueue - Debounce and batch sync operations to prevent rapid-fire saves

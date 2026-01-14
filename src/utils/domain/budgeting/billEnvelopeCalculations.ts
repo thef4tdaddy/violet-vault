@@ -4,7 +4,7 @@
  */
 
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
-import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 type Bill = DbBill;
 type Envelope = DbEnvelope;

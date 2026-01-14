@@ -2,8 +2,8 @@
  * Enhanced data detection helper for corruption recovery
  * Provides comprehensive checks and debugging for local data detection
  */
-import { budgetDb } from "../../db/budgetDb";
-import logger from "../common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "@/utils/core/common/logger";
 import type { DataDetectionResult, DataDetectionDetails } from "@/types/sync";
 
 // Re-export types for backward compatibility

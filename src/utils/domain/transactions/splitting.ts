@@ -4,7 +4,7 @@
  * Extracted from TransactionSplitter.jsx for Issue #508
  * Converted to TypeScript for Issue #409
  */
-import logger from "../common/logger.ts";
+import logger from "@/utils/core/common/logger";
 import type { Transaction, Envelope, SplitAllocation, SplitTotals } from "../../types/finance";
 
 /**

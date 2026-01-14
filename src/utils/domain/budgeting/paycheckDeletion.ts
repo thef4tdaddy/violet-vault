@@ -3,8 +3,8 @@
  * Extracted from paycheckMutations.js for better maintainability
  */
 
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
-import logger from "../common/logger";
+import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
+import logger from "@/utils/core/common/logger";
 
 // Paycheck history is now part of the unified Transaction schema
 

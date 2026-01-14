@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 export const readFileContent = (file: File): Promise<string | ArrayBuffer | null> => {
   return new Promise((resolve, reject) => {

@@ -3,8 +3,8 @@
  * Enhanced background sync utilities and network management
  * Extracted from queryClient.js for Issue #154
  */
-import { budgetDb } from "../../db/budgetDb.ts";
-import logger from "../common/logger.ts";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "./logger";
 import queryClient from "./queryClientConfig.ts";
 import { queryKeys } from "./queryKeys.ts";
 

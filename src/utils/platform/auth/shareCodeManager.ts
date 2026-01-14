@@ -1,5 +1,5 @@
 import { shareCodeUtils } from "../security/shareCodeUtils";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Share Code Manager - Centralized share code generation and management

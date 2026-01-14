@@ -2,7 +2,7 @@
 import { QueryClient, MutationCache, QueryCache, type Query } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
 // Import H safely to avoid circular dependency issues
-import logger from "../common/logger";
+import logger from "./logger";
 import { SPAN_STATUS } from "@/utils/platform/monitoring/performanceMonitor";
 
 interface ErrorWithStatus {

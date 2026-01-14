@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Type declarations for browser APIs
 type NotificationPermission = "default" | "denied" | "granted";

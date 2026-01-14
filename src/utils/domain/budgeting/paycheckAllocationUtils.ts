@@ -4,7 +4,7 @@ import {
   ENVELOPE_TYPES,
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Envelope } from "@/db/types";
 import type { PaycheckHistory } from "@/db/types";
 

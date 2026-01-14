@@ -9,7 +9,7 @@
  */
 import * as pako from "pako";
 import { encode, decode } from "@msgpack/msgpack";
-import logger from "../common/logger.ts";
+import logger from "@/utils/core/common/logger";
 
 export const optimizedSerialization = {
   /**

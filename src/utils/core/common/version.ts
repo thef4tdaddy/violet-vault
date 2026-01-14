@@ -1,6 +1,6 @@
 // src/utils/version.js
 import packageJson from "../../../package.json";
-import logger from "../common/logger";
+import logger from "./logger";
 
 export const APP_VERSION = packageJson.version;
 export const APP_NAME = packageJson.name;

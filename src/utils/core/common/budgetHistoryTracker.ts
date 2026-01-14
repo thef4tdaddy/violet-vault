@@ -1,7 +1,7 @@
-import { budgetDb } from "../../db/budgetDb";
-import type { BudgetTag, BudgetChange, Debt } from "../../db/types";
+import { budgetDb } from "@/db/budgetDb";
+import type { BudgetTag, BudgetChange, Debt } from "@/db/types";
 import { encryptionUtils } from "../security/encryption";
-import logger from "../common/logger";
+import logger from "./logger";
 import { formatCurrency } from "../accounts/accountHelpers";
 
 /**

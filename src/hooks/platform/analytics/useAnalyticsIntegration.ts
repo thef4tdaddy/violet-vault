@@ -10,8 +10,8 @@ import logger from "@/utils/core/common/logger";
 import {
   generateRecommendationsFromMetrics,
   calculatePerformanceMetrics,
-} from "./utils/integrationUtils";
-import { generateAnalyticsAlerts } from "./utils/analyticsAlertsUtils";
+} from "@/utils/integrationUtils";
+import { generateAnalyticsAlerts } from "@/utils/analyticsAlertsUtils";
 
 /**
  * Comprehensive analytics integration hook

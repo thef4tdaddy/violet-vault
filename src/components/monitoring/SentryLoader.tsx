@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Lazy loader component for Sentry monitoring

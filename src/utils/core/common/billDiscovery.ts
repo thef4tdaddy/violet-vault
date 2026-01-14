@@ -4,7 +4,7 @@
  */
 
 import { getBillIcon } from "./billIcons.ts";
-import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 type Envelope = DbEnvelope;
 type Bill = DbBill & {

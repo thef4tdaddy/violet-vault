@@ -15,8 +15,8 @@ import {
   getEmptyTransferForm,
   populateFormFromAccount,
   createTransferFormForAccount,
-} from "./utils/accountFormUtils";
-import { saveAccount, executeTransfer } from "./utils/accountOperationsUtils";
+} from "@/utils/accountFormUtils";
+import { saveAccount, executeTransfer } from "@/utils/accountOperationsUtils";
 import {
   handleAccountSaveSuccess,
   handleModalCloseWithLock,
@@ -24,7 +24,7 @@ import {
   handleTransferSuccess,
   startAccountEdit,
   startAccountTransfer,
-} from "./utils/accountHandlersUtils";
+} from "@/utils/accountHandlersUtils";
 
 interface Account {
   id: string;

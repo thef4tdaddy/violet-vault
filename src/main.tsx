@@ -3,10 +3,10 @@ import App from "./App.tsx";
 import "./index.css";
 // Sentry now loaded lazily via SentryLoader component
 import { QueryClientProvider } from "@tanstack/react-query";
-import queryClient from "./utils/common/queryClient";
+import queryClient from "@/utils/core/common/queryClient";
 import BugReportingService from "./services/logging/bugReportingService.ts";
-import logger from "./utils/common/logger.ts";
-import { initializeCrypto } from "./utils/security/cryptoCompat.ts";
+import logger from "@/utils/core/common/logger";
+import { initializeCrypto } from "@/utils/platform/security/cryptoCompat";
 
 // Extend Window interface for debug tools
 declare global {
@@ -71,10 +71,10 @@ if (typeof window !== "undefined") {
 }
 
 // Initialize PWA background sync for offline operations
-import "./utils/pwa/backgroundSync.js";
+import "@/utils/platform/pwa/backgroundSync";
 
 // Initialize touch feedback for mobile interactions
-import { initializeTouchFeedback } from "./utils/ui/touchFeedback.ts";
+import { initializeTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 // Initialize touch feedback after DOM is ready
 if (typeof window !== "undefined") {
@@ -91,13 +91,16 @@ if (typeof window !== "undefined") {
 }
 
 // Expose diagnostic tools for debugging
-import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.ts";
-import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.ts";
-import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.ts";
-import { runSyncEdgeCaseTests } from "@/utils/features/sync/syncEdgeCaseTester"; // Changed from default import
-import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.ts";
-import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.ts";
-import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.ts";
+import { runDataDiagnostic } from "@/utils/dev/debug/dataDiagnostic";
+import { runSyncDiagnostic } from "@/utils/dev/debug/syncDiagnostic";
+import { runImmediateSyncHealthCheck } from "@/utils/features/sync/syncHealthChecker";
+import { runSyncEdgeCaseTests } from "@/utils/features/sync/syncEdgeCaseTester";
+import { validateAllSyncFlows } from "@/utils/features/sync/syncFlowValidator";
+import {
+  runMasterSyncValidation,
+  getQuickSyncStatus,
+} from "@/utils/features/sync/masterSyncValidator";
+import { fixAutoAllocateUndefined } from "@/utils/core/common/fixAutoAllocateUndefined";
 
 // Debug tools are now initialized in the initializeApp function to avoid module scope store operations
 
@@ -120,7 +123,7 @@ const initializeSentryEarly = () => {
       // Flush queued errors to Sentry once it's ready
       const flushErrorQueue = () => {
         if (errorQueue.length === 0) return;
-        import("./utils/common/sentry.js")
+        import("@/utils/core/common/sentry")
           .then(({ captureError, initSentry }) => {
             // Ensure Sentry is initialized before capturing
             try {
@@ -171,7 +174,7 @@ const initializeSentryEarly = () => {
       window.addEventListener("unhandledrejection", rejectionHandler);
 
       // Now initialize Sentry and flush any queued errors
-      import("./utils/common/sentry.js")
+      import("@/utils/core/common/sentry")
         .then(({ initSentry }) => {
           initSentry();
           // Flush any errors that occurred during module loading
@@ -261,14 +264,15 @@ const initializeApp = () => {
 
       // Service Worker Diagnostics
       window.swDiagnostics = async () => {
-        const { default: swDiagnostics } = await import("./utils/pwa/serviceWorkerDiagnostics.js");
+        const { default: swDiagnostics } =
+          await import("@/utils/platform/pwa/serviceWorkerDiagnostics");
         return await swDiagnostics.getFullDiagnostics();
       };
 
       // Offline Data Validation
       window.offlineReadiness = async () => {
         const { default: offlineDataValidator } =
-          await import("./utils/pwa/offlineDataValidator.js");
+          await import("@/utils/platform/pwa/offlineDataValidator");
         const validator = offlineDataValidator as unknown as {
           getOfflineReadinessReport: () => Promise<unknown>;
         };

@@ -3,9 +3,9 @@
  * Consolidated for Data Unification v2.0
  */
 
-import logger from "../common/logger";
-import { budgetDb } from "../../db/budgetDb";
-import type { BudgetRecord } from "../../db/types";
+import logger from "@/utils/core/common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import type { BudgetRecord } from "@/db/types";
 import { validateEnvelopeSafe } from "@/domain/schemas/envelope";
 import { validateTransactionSafe } from "@/domain/schemas/transaction";
 import { trackBackup } from "@/utils/platform/monitoring/performanceMonitor";

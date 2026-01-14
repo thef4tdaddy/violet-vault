@@ -96,7 +96,7 @@ vi.mock("../../../db/budgetDb", () => ({
 
 // Import after mock setup
 import autoBackupService from "../autoBackupService";
-import { budgetDb } from "../../../db/budgetDb";
+import { budgetDb } from "@/db/budgetDb";
 
 describe("AutoBackupService (v2.0 data model)", () => {
   const mockTransactions = [

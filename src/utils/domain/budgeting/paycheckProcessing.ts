@@ -5,14 +5,14 @@
  */
 
 import { v4 as uuidv4 } from "uuid";
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
-import type { Transaction } from "../../db/types";
+import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
+import type { Transaction } from "@/db/types";
 import {
   calculatePaycheckBalances,
   validateBalances,
   type CurrentBalances,
 } from "../common/balanceCalculator";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import { createPaycheckTransactions } from "@/services/transactions/paycheckTransactionService";
 
 interface BalanceItem {

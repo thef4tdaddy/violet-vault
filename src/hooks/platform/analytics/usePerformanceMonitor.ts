@@ -5,8 +5,8 @@ import {
   calculateSavingsRate,
   calculateSpendingEfficiency,
   calculateBalanceStability,
-} from "./utils/performanceMetricsUtils";
-import { generateAlerts, generateRecommendations } from "./utils/alertsUtils";
+} from "@/utils/performanceMetricsUtils";
+import { generateAlerts, generateRecommendations } from "@/utils/alertsUtils";
 
 import { AnalyticsData, BalanceData, PerformanceEntry } from "@/types/analytics";
 

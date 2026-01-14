@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import { shouldRetryError } from "./retryPolicies";
 import { calculateRetryDelay } from "./retryUtils";
 import { createRetryMetrics, updateRetryMetrics, formatMetrics } from "./retryMetrics";

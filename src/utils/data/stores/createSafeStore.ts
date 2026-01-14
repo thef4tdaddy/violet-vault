@@ -2,7 +2,7 @@ import { create, StoreApi, StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools, PersistOptions } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import logger from "../common/logger.ts";
+import logger from "@/utils/core/common/logger";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 

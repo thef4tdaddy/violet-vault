@@ -1,4 +1,4 @@
-import logger from "../common/logger.ts";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Global store registry for development and debugging

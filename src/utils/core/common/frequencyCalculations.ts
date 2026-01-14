@@ -12,7 +12,7 @@
  * - Yearly: 1 year per year
  */
 
-import logger from "../common/logger";
+import logger from "./logger";
 
 // Define type for frequency keys
 type FrequencyKey = "weekly" | "biweekly" | "monthly" | "quarterly" | "yearly";

@@ -5,7 +5,7 @@
  */
 
 import * as Sentry from "@sentry/react";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   PERFORMANCE_THRESHOLDS,
   SPAN_STATUS,

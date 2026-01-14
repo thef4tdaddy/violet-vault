@@ -2,7 +2,7 @@
  * Authentication flow helper functions
  * Extracted from useAuthFlow for better maintainability and ESLint compliance
  */
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface LoginResult {
   success: boolean;

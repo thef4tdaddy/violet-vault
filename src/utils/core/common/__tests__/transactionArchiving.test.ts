@@ -10,7 +10,7 @@ import {
   type ArchiveResult,
   type ArchivingInfo,
 } from "../transactionArchiving";
-import { budgetDb } from "../../../db/budgetDb";
+import { budgetDb } from "@/db/budgetDb";
 import logger from "../logger";
 
 // Mock logger

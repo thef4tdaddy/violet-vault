@@ -10,7 +10,7 @@
  * - dueDate/date (both supported)
  * - Works with Transaction-based bills that have computed backward-compatible fields
  */
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface Bill {
   id: string;

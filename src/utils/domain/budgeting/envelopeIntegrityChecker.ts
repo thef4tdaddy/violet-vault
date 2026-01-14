@@ -1,5 +1,5 @@
-import { budgetDb } from "../../db/budgetDb";
-import logger from "../common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "@/utils/core/common/logger";
 
 type EnvelopeWithOptionalFields = {
   id: string | number;
@@ -191,7 +191,7 @@ export const repairCorruptedEnvelopes = async (
     if (repairedEnvelopes.length > 0) {
       // Cast to the database type since we've ensured all required fields are present
       await budgetDb.envelopes.bulkPut(
-        repairedEnvelopes as unknown as import("../../db/types").Envelope[]
+        repairedEnvelopes as unknown as import("@/db/types").Envelope[]
       );
 
       logger.production("Repaired corrupted envelopes", {

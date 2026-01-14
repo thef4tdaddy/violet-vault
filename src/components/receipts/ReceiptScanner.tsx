@@ -7,7 +7,7 @@ import ReceiptImagePreview from "./components/ReceiptImagePreview";
 import ReceiptExtractedData from "./components/ReceiptExtractedData";
 import ReceiptActionButtons from "./components/ReceiptActionButtons";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
-import { mapExtractedDataForDisplay } from "./utils/receiptHelpers";
+import { mapExtractedDataForDisplay } from "@/utils/receiptHelpers";
 
 /**
  * Internal interface matching the hook's UploadedImage type

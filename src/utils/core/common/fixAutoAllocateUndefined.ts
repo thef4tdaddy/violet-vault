@@ -1,5 +1,5 @@
-import { budgetDb } from "../../db/budgetDb";
-import logger from "../common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "./logger";
 
 type EnvelopeWithAutoAllocate = {
   id: string | number;

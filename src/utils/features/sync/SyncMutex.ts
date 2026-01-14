@@ -1,5 +1,5 @@
 import { BaseMutex } from "../common/BaseMutex";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface SyncMetrics {
   operationsCompleted: number;

@@ -7,7 +7,7 @@
  */
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Make Buffer available globally for BIP39
 globalThis.Buffer = Buffer;

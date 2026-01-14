@@ -6,7 +6,7 @@
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
 
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Check if Web Crypto API is available

@@ -3,10 +3,10 @@
  * Tests various failure scenarios and edge cases for sync reliability
  */
 
-import { budgetDb } from "../../db/budgetDb";
+import { budgetDb } from "@/db/budgetDb";
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
-import logger from "../common/logger";
-import type { Envelope, Transaction } from "../../db/types";
+import logger from "@/utils/core/common/logger";
+import type { Envelope, Transaction } from "@/db/types";
 
 export interface TestResult {
   test: string;

@@ -1,5 +1,5 @@
 import React, { lazy, ComponentType, ReactElement } from "react";
-import logger from "../common/logger";
+import logger from "./logger";
 
 interface ModuleWithDefault {
   default?: ComponentType<unknown> | unknown;

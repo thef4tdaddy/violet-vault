@@ -11,7 +11,7 @@ import type {
 
 import { DEBT_TYPES, DEBT_STATUS, PAYMENT_FREQUENCIES } from "../../constants/debts";
 
-import { Bill, Envelope, Transaction } from "../../db/types";
+import { Bill, Envelope, Transaction } from "@/db/types";
 
 // Import separated debt calculation functions
 import { calculateNextPaymentDate } from "./calculations/nextPaymentDate";

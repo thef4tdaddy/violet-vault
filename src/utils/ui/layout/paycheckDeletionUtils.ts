@@ -2,7 +2,7 @@
  * Paycheck deletion utilities
  * Extracted from usePaycheckOperations for better maintainability and ESLint compliance
  */
-import logger from "../common/logger";
+import logger from "@/utils/core/common/logger";
 
 import type { PaycheckHistory } from "@/db/types";
 

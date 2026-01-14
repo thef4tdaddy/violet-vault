@@ -5,8 +5,8 @@
  * This helps reduce storage requirements while maintaining historical insights.
  */
 
-import { budgetDb } from "../../db/budgetDb";
-import logger from "../common/logger";
+import { budgetDb } from "@/db/budgetDb";
+import logger from "./logger";
 
 // Type definitions for transaction archiving
 export interface ArchiveConfig {
