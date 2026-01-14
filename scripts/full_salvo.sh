@@ -93,44 +93,48 @@ fi
 
 # Track overall status
 OVERALL_STATUS=0
-# Track failed steps using associative array
-declare -A FAILED_CHECKS
 
-# Load failed checks list if in retry mode
-if [ "$RETRY_FAILED_MODE" = true ]; then
-  declare -A CHECKS_TO_RUN
-  while IFS= read -r check_name; do
-    CHECKS_TO_RUN["$check_name"]=1
-  done < "$FAILED_CHECKS_LIST_FILE"
+# Track overall status
+OVERALL_STATUS=0
 
-  # If the failed checks file exists but is empty, there is nothing to retry.
-  # Explicitly handle this case instead of silently running no checks.
-  if [ "${#CHECKS_TO_RUN[@]}" -eq 0 ]; then
-    echo -e "${YELLOW}No failed checks recorded to retry.${NC}"
-    echo -e "${YELLOW}Run './scripts/full_salvo.sh' without '--retry-failed' to run all checks.${NC}"
-    echo ""
-    exit 1
-  fi
+# Track failed checks and checks to run via files for Bash 3.2 compatibility
+# (Bash 3.2 on macOS doesn't support associative arrays 'declare -A')
+ERROR_DIR=".salvo_errors"
+FAILED_CHECKS_TRACKER_DIR="${ERROR_DIR}/steps"
+
+# Ensure directories exist and are absolute or relative to script root if needed
+# For now, relative to CWD is fine as long as we don't cd without returning.
+mkdir -p "$ERROR_DIR"
+mkdir -p "$FAILED_CHECKS_TRACKER_DIR"
+
+# Clean up any lingering step trackers from previous runs
+if [ "$RETRY_FAILED_MODE" = false ]; then
+  # Use a more robust cleanup
+  rm -f "$FAILED_CHECKS_TRACKER_DIR"/*.fail "$ERROR_DIR"/*.txt 2>/dev/null
 fi
 
 # Helper to determine if a check should be run
 should_run_check() {
   local name=$1
   if [ "$RETRY_FAILED_MODE" = true ]; then
-    [[ -n "${CHECKS_TO_RUN[$name]}" ]]
+    # In Bash 3, we just check if the name exists in the failed checks list file
+    if [ -f "$FAILED_CHECKS_LIST_FILE" ]; then
+      grep -q "^${name}$" "$FAILED_CHECKS_LIST_FILE" 2>/dev/null
+    else
+      return 1
+    fi
   else
     return 0
   fi
 }
 
 # Helper function for running checks with ESLint-style reporting
-# Usage: run_check "Check Name" "command to run"
-# Note: Uses eval to execute commands. Commands are defined within this script,
-# not from external user input. Check names are sanitized via ${name//[^a-zA-Z0-9]/_}
 run_check() {
   local name=$1
   local command=$2
-  local output_file="${ERROR_DIR}/${name//[^a-zA-Z0-9]/_}.txt"
+  local sanitized_name="${name//[^a-zA-Z0-9]/_}"
+  local output_file="${ERROR_DIR}/${sanitized_name}.txt"
+  local failure_marker="${FAILED_CHECKS_TRACKER_DIR}/${sanitized_name}.fail"
   
   # Skip if not in the retry list (when in retry mode)
   if ! should_run_check "$name"; then
@@ -140,8 +144,8 @@ run_check() {
     return 0
   fi
   
-  # Ensure error directory exists
-  mkdir -p "$ERROR_DIR"
+  # Ensure directories exist again just in case
+  mkdir -p "$FAILED_CHECKS_TRACKER_DIR"
   
   # Print check name without newline
   echo -n "  ${name}..."
@@ -149,11 +153,12 @@ run_check() {
   # Run command and capture output
   if eval "$command" > "$output_file" 2>&1; then
     echo -e " ${GREEN}✓${NC}"
-    rm -f "$output_file"  # Delete output file on success
+    rm -f "$output_file"      # Delete output file on success
+    rm -f "$failure_marker"   # Remove failure marker on success
     return 0
   else
     echo -e " ${RED}✗${NC}"
-    FAILED_CHECKS["$name"]="$output_file"
+    echo "$name" > "$failure_marker"   # Set failure marker with display name
     OVERALL_STATUS=1
     return 1
   fi
@@ -175,12 +180,8 @@ fi
 # TypeScript type checking
 run_check "TypeScript" "npm run typecheck"
 
-# Prettier
-if [ "$FIX_MODE" = true ]; then
-  run_check "Prettier" "npm run format"
-else
-  run_check "Prettier" "npm run format:check"
-fi
+# Prettier - Always auto-format by default as requested
+run_check "Prettier" "npm run format"
 
 # Vitest
 run_check "Vitest" "npm run test:run"
@@ -196,27 +197,27 @@ echo -e "${BLUE}Running Go Backend Checks...${NC}"
 
 if [ -d "api" ] && [ -f "api/go.mod" ]; then
     # Go fmt (always auto-fixes)
-    run_check "go fmt" "cd api && go fmt ./..."
+    run_check "go fmt" "(cd api && go fmt ./...)"
     
     # Go vet
-    run_check "go vet" "cd api && go vet ./..."
+    run_check "go vet" "(cd api && go vet ./...)"
     
     # Go build
-    run_check "go build" "cd api && go build ./..."
+    run_check "go build" "(cd api && go build ./...)"
     
     # golangci-lint (if available)
     if command -v golangci-lint &> /dev/null; then
         if [ "$FIX_MODE" = true ]; then
-            run_check "golangci-lint" "cd api && golangci-lint run --fix ./..."
+            run_check "golangci-lint" "(cd api && golangci-lint run --fix ./...)"
         else
-            run_check "golangci-lint" "cd api && golangci-lint run ./..."
+            run_check "golangci-lint" "(cd api && golangci-lint run ./...)"
         fi
     else
         echo -e "  ${YELLOW}golangci-lint (skipped - not installed)${NC}"
     fi
     
     # Go tests with coverage
-    run_check "go test" "cd api && go test ./... -coverprofile=coverage.out"
+    run_check "go test" "(cd api && go test ./... -coverprofile=coverage.out)"
     rm -f api/coverage.out
 else
     echo -e "  ${YELLOW}Go checks (skipped - no Go code found)${NC}"
@@ -319,31 +320,49 @@ if [ $OVERALL_STATUS -eq 0 ]; then
     touch .git/FULL_SALVO_SUCCESS
 else
     # Some checks failed
+    # Count failure markers instead of array keys
+    NUM_FAILED=0
+    # Enable nullglob to avoid literal *.fail if no matches
+    shopt -s nullglob 2>/dev/null || true
+    for f in "$FAILED_CHECKS_TRACKER_DIR"/*.fail; do
+        ((NUM_FAILED++))
+    done
+    
     echo -e "${RED}═══════════════════════════════════════${NC}"
-    echo -e "${RED}  ✗ ${#FAILED_CHECKS[@]} Check(s) Failed${NC}"
+    echo -e "${RED}  ✗ ${NUM_FAILED} Check(s) Failed${NC}"
     echo -e "${RED}═══════════════════════════════════════${NC}"
     echo ""
     
-    # Display detailed error output for each failed check
-    # Sort check names alphabetically for consistent output
-    for check_name in $(printf '%s\n' "${!FAILED_CHECKS[@]}" | sort); do
-        error_file="${FAILED_CHECKS[$check_name]}"
-        echo -e "${RED}▼ $check_name${NC}"
-        if [ -f "$error_file" ]; then
-            cat "$error_file"
-        fi
-        echo ""
-    done
-    
     # Save failed checks list and timestamp for retry
-    mkdir -p "$ERROR_DIR"
     date +%s > "$LAST_RUN_TIMESTAMP_FILE"
     > "$FAILED_CHECKS_LIST_FILE"  # Clear file
-    for check_name in "${!FAILED_CHECKS[@]}"; do
-        echo "$check_name" >> "$FAILED_CHECKS_LIST_FILE"
+    
+    # Report each failure by looking at the markers
+    for marker_file in "$FAILED_CHECKS_TRACKER_DIR"/*.fail; do
+        if [ -f "$marker_file" ]; then
+            check_name=$(cat "$marker_file")
+            sanitized_name=$(basename "$marker_file" .fail)
+            error_file="${ERROR_DIR}/${sanitized_name}.txt"
+            
+            echo -e "${RED}▼ $check_name${NC}"
+            if [ -f "$error_file" ]; then
+                LINE_COUNT=$(wc -l < "$error_file")
+                if [ "$LINE_COUNT" -gt 100 ]; then
+                    head -n 25 "$error_file"
+                    echo -e "${YELLOW}... [LOG TRUNCATED: showing first 25 and last 50 of $LINE_COUNT lines] ...${NC}"
+                    tail -n 50 "$error_file"
+                else
+                    cat "$error_file"
+                fi
+            fi
+            echo ""
+            
+            # Save for retry mode
+            echo "$check_name" >> "$FAILED_CHECKS_LIST_FILE"
+        fi
     done
     
-    echo -e "${YELLOW}💡 Tip: Run with --fix flag to auto-fix some issues:${NC}"
+    echo -e "${YELLOW}💡 Tip: Run with --fix flag to auto-fix some issues (ESLint/etc):${NC}"
     echo -e "${YELLOW}   ./scripts/full_salvo.sh --fix${NC}"
     echo ""
     echo -e "${YELLOW}💡 Tip: Re-run only failed checks (within 5 minutes):${NC}"
