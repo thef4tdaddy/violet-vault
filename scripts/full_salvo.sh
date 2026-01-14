@@ -62,7 +62,22 @@ if [ "$RETRY_FAILED_MODE" = true ]; then
   
   # Check if the last run was within 5 minutes (300 seconds)
   LAST_RUN=$(cat "$LAST_RUN_TIMESTAMP_FILE")
-  NOW=$(date +%s)
+
+  # Validate that LAST_RUN is a numeric timestamp
+  if ! [[ "$LAST_RUN" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}✗ Corrupted or invalid last run timestamp in '$LAST_RUN_TIMESTAMP_FILE'${NC}"
+    echo -e "${YELLOW}Delete the '${ERROR_DIR}' directory or re-run './scripts/full_salvo.sh' to reset state${NC}"
+    echo ""
+    exit 1
+  fi
+
+  # Get current time as Unix timestamp, handling environments without 'date +%s'
+  if ! NOW=$(date +%s 2>/dev/null); then
+    echo -e "${RED}✗ Failed to obtain current timestamp using 'date +%s'${NC}"
+    echo -e "${YELLOW}Ensure a compatible 'date' implementation (e.g., GNU coreutils) is installed and on your PATH${NC}"
+    echo ""
+    exit 1
+  fi
   DIFF=$((NOW - LAST_RUN))
   
   if [ $DIFF -gt 300 ]; then
