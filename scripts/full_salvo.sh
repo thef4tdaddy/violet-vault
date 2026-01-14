@@ -95,8 +95,6 @@ fi
 OVERALL_STATUS=0
 # Track failed steps using associative array
 declare -A FAILED_CHECKS
-# Track all checks that were run
-declare -A ALL_CHECKS_RUN
 
 # Load failed checks list if in retry mode
 if [ "$RETRY_FAILED_MODE" = true ]; then
@@ -127,6 +125,8 @@ should_run_check() {
 
 # Helper function for running checks with ESLint-style reporting
 # Usage: run_check "Check Name" "command to run"
+# Note: Uses eval to execute commands. Commands are defined within this script,
+# not from external user input. Check names are sanitized via ${name//[^a-zA-Z0-9]/_}
 run_check() {
   local name=$1
   local command=$2
@@ -325,7 +325,8 @@ else
     echo ""
     
     # Display detailed error output for each failed check
-    for check_name in "${!FAILED_CHECKS[@]}"; do
+    # Sort check names alphabetically for consistent output
+    for check_name in $(printf '%s\n' "${!FAILED_CHECKS[@]}" | sort); do
         error_file="${FAILED_CHECKS[$check_name]}"
         echo -e "${RED}▼ $check_name${NC}"
         if [ -f "$error_file" ]; then
