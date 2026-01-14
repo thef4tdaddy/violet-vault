@@ -134,6 +134,9 @@ run_check() {
   
   # Skip if not in the retry list (when in retry mode)
   if ! should_run_check "$name"; then
+    if [ "$RETRY_FAILED_MODE" = true ]; then
+      echo -e "  ${name}... ${YELLOW}skipped (retry mode)${NC}"
+    fi
     return 0
   fi
   
