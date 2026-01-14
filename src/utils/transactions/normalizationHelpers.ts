@@ -4,60 +4,61 @@
  */
 import type { Transaction, Envelope } from "@/types/finance";
 
+const normalizeDate = (rawDate: unknown): string | null => {
+  if (typeof rawDate === "string") {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}/;
+    return dateRegex.test(rawDate) ? rawDate : null;
+  }
+  if (rawDate instanceof Date) {
+    return rawDate.toISOString().split("T")[0];
+  }
+  return null;
+};
+
+const normalizeId = (id: unknown): string | number | null => {
+  if (id === undefined || id === null) return null;
+  return id as string | number;
+};
+
+const getSignedAmount = (amount: number, type: Transaction["type"]): number => {
+  if (type === "expense") return -Math.abs(amount);
+  if (type === "income") return Math.abs(amount);
+  return amount;
+};
+
+/**
+ * Normalize a raw transaction object to a valid Transaction type
+ * @param txn - Raw transaction data from API or database
+ * @returns Normalized Transaction or null if invalid
+ */
+const getTransactionType = (
+  record: Record<string, unknown>,
+  amountRaw: number
+): Transaction["type"] => {
+  if (record.type === "income" || record.type === "expense" || record.type === "transfer") {
+    return record.type;
+  }
+  return amountRaw >= 0 ? "income" : "expense";
+};
+
 /**
  * Normalize a raw transaction object to a valid Transaction type
  * @param txn - Raw transaction data from API or database
  * @returns Normalized Transaction or null if invalid
  */
 export const normalizeTransaction = (txn: unknown): Transaction | null => {
-  if (!txn || typeof txn !== "object") {
-    return null;
-  }
+  if (!txn || typeof txn !== "object") return null;
 
-  const record = txn as {
-    id?: string | number;
-    date?: string | Date;
-    description?: unknown;
-    amount?: unknown;
-    category?: unknown;
-    envelopeId?: unknown;
-    notes?: unknown;
-    type?: unknown;
-    lastModified?: unknown;
-    createdAt?: unknown;
-  };
+  const record = txn as Record<string, unknown>;
+  const date = normalizeDate(record.date);
+  const id = normalizeId(record.id);
 
-  // Normalize date
-  const rawDate = record.date;
-  let date: string | undefined;
+  if (!date || id === null) return null;
 
-  if (typeof rawDate === "string") {
-    // Validate date string format (basic ISO date check)
-    const dateRegex = /^\d{4}-\d{2}-\d{2}/;
-    if (dateRegex.test(rawDate)) {
-      date = rawDate;
-    }
-  } else if (rawDate instanceof Date) {
-    date = rawDate.toISOString().split("T")[0];
-  }
+  const amountRaw = Number(record.amount ?? 0);
+  if (Number.isNaN(amountRaw)) return null;
 
-  if (!date) {
-    return null;
-  }
-
-  // Validate ID
-  if (record.id === undefined || record.id === null) {
-    return null;
-  }
-
-  const validatedId = record.id as string | number;
-
-  // Normalize amount and metadata
-  const amountRaw =
-    record.amount === undefined || record.amount === null ? 0 : Number(record.amount);
-  if (Number.isNaN(amountRaw)) {
-    return null;
-  }
+  const type = getTransactionType(record, amountRaw);
   const description = typeof record.description === "string" ? record.description : "";
   const category =
     typeof record.category === "string" && record.category.trim().length > 0
@@ -67,33 +68,16 @@ export const normalizeTransaction = (txn: unknown): Transaction | null => {
     typeof record.envelopeId === "string" || typeof record.envelopeId === "number"
       ? String(record.envelopeId)
       : "unassigned";
-  const notes = typeof record.notes === "string" ? record.notes : undefined;
-
-  // Determine transaction type
-  let typeCandidate: Transaction["type"];
-  if (record.type === "income" || record.type === "expense" || record.type === "transfer") {
-    typeCandidate = record.type;
-  } else {
-    typeCandidate = amountRaw >= 0 ? "income" : "expense";
-  }
-
-  // Apply correct sign to amount based on type
-  const signedAmount =
-    typeCandidate === "expense"
-      ? -Math.abs(amountRaw)
-      : typeCandidate === "income"
-        ? Math.abs(amountRaw)
-        : amountRaw;
 
   return {
-    id: validatedId,
+    id,
     date,
     description,
-    amount: signedAmount,
+    amount: getSignedAmount(amountRaw, type),
     category,
     envelopeId,
-    notes,
-    type: typeCandidate,
+    notes: typeof record.notes === "string" ? record.notes : undefined,
+    type,
   } satisfies Transaction;
 };
 

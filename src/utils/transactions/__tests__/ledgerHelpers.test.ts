@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import {
   calculateTransactionTotals,
   getTransactionFilterConfigs,
@@ -227,7 +228,7 @@ describe("ledgerHelpers", () => {
 
     it("should handle single transaction", () => {
       const result = formatLedgerSummary(1, 100.25);
-      expect(result).toBe("1 transactions • Net: $100.25");
+      expect(result).toBe("1 transaction • Net: $100.25");
     });
 
     it("should handle zero transactions", () => {
