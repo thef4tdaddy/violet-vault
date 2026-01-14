@@ -890,7 +890,7 @@ export const suggestBillCategoryAndIcon = (provider = "", description = "") => {
         return {
           category,
           icon: CATEGORY_FALLBACK_ICONS[category] || FileText,
-          iconName: getIconName(CATEGORY_FALLBACK_ICONS[category] || FileText),
+          iconName: getIconName(CATEGORY_FALLBACK_ICONS[category] || FileText) || "FileText",
           confidence: 0.8, // High confidence for pattern match
         };
       }
