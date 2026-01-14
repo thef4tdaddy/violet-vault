@@ -84,7 +84,7 @@ export const useSummaryMetrics = (
         label: "Biweekly Remaining",
         value: biweeklyRemaining,
         variant: "warning",
-        subtitle: `Total allocation: ${biweeklyTotal.toFixed(2)}`,
+        subtitle: `Total allocation: $${biweeklyTotal.toFixed(2)}`,
       },
     ];
 
