@@ -65,29 +65,56 @@ const SummaryCards = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr gap-6 mb-6">
         {metrics.map((metric) => {
           const isNegativeUnassignedCash =
-            metric.key === "unassignedCash" &&
+            metric.key === "unassigned-cash" &&
             typeof metric.value === "number" &&
             metric.value < 0;
 
           const title = isNegativeUnassignedCash ? `⚠️ ${metric.label}` : metric.label;
 
+          // Compute subtitle with helpful guidance
+          let computedSubtitle = metric.subtitle;
+          if (isNegativeUnassignedCash) {
+            computedSubtitle = "⚠️ Overspending - click to address";
+          } else if (!computedSubtitle && metric.onClick) {
+            computedSubtitle = "Click to distribute";
+          }
+
+          const cardElement = (
+            <MetricCard
+              title={title}
+              value={metric.value}
+              icon={metric.icon}
+              variant={metric.variant}
+              format="currency"
+              subtitle={computedSubtitle}
+              onClick={metric.onClick}
+            />
+          );
+
+          // Wrap with div for animation and data attributes
           return (
             <div
               key={metric.key}
               className={isNegativeUnassignedCash ? "animate-pulse" : undefined}
+              data-tour={metric.dataTour}
+              aria-label={metric.ariaLabel}
+              role={metric.onClick ? "button" : undefined}
+              tabIndex={metric.onClick ? 0 : undefined}
+              onKeyDown={
+                metric.onClick
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        metric.onClick?.();
+                      }
+                    }
+                  : undefined
+              }
             >
-              <MetricCard
-                title={title}
-                value={metric.value}
-                icon={metric.icon}
-                variant={metric.variant}
-                format="currency"
-                subtitle={metric.subtitle}
-                onClick={metric.onClick}
-              />
+              {cardElement}
             </div>
           );
         })}

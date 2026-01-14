@@ -15,12 +15,17 @@ export interface SummaryMetric {
   variant: "default" | "success" | "warning" | "danger" | "info";
   subtitle?: string;
   onClick?: () => void;
-  clickable?: boolean;
+  ariaLabel?: string;
+  dataTour?: string;
 }
 
 /**
- * Custom hook to calculate and return summary metrics
+ * Custom hook to calculate and return summary metrics for the dashboard
  * Extracted from SummaryCards component for better separation of concerns
+ *
+ * @param onUnassignedCashClick - Callback function when unassigned cash card is clicked
+ * @param onTotalCashClick - Callback function when total cash card is clicked
+ * @returns Object containing metrics array and loading state
  */
 export const useSummaryMetrics = (
   onUnassignedCashClick: () => void,
@@ -49,8 +54,7 @@ export const useSummaryMetrics = (
     // Calculate biweekly needs using existing utility
     const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);
     const envelopeSummary = calculateEnvelopeTotals(processedEnvelopeData);
-    const biweeklyRemaining = envelopeSummary.totalBiweeklyNeed;
-    const biweeklyTotal = envelopeSummary.totalBiweeklyNeed;
+    const biweeklyNeed = envelopeSummary.totalBiweeklyNeed;
 
     const summaryMetrics: SummaryMetric[] = [
       {
@@ -60,7 +64,8 @@ export const useSummaryMetrics = (
         value: totalCash,
         variant: "default",
         onClick: onTotalCashClick,
-        clickable: true,
+        ariaLabel: "Set actual balance",
+        dataTour: "actual-balance",
       },
       {
         key: "unassigned-cash",
@@ -69,7 +74,7 @@ export const useSummaryMetrics = (
         value: unassignedCash,
         variant: unassignedCash < 0 ? "danger" : "success",
         onClick: onUnassignedCashClick,
-        clickable: true,
+        ariaLabel: "Distribute unassigned cash",
       },
       {
         key: "savings-total",
@@ -82,9 +87,9 @@ export const useSummaryMetrics = (
         key: "biweekly-remaining",
         icon: "DollarSign",
         label: "Biweekly Remaining",
-        value: biweeklyRemaining,
+        value: biweeklyNeed,
         variant: "warning",
-        subtitle: `Total allocation: $${biweeklyTotal.toFixed(2)}`,
+        subtitle: `Total allocation: $${biweeklyNeed.toFixed(2)}`,
       },
     ];
 
