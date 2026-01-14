@@ -86,7 +86,7 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
       />
 
       <BaseModal isOpen={isOpen} onClose={onClose} size="xl" ariaLabelledBy={titleId}>
-        <div className="p-6">
+        <div className="p-6 max-h-[90vh] overflow-y-auto">
           <div className="mb-6">
             <h3 id={titleId} className="text-lg font-black text-black">
               BULK UPDATE BILLS
