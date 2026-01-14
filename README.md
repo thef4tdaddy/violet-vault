@@ -247,6 +247,34 @@ Releases are triggered automatically:
 
 See [Release Please Workflow](.github/workflows/release-please.yml) for configuration details.
 
+## 📊 Performance & Bundle Size
+
+VioletVault monitors bundle size to ensure optimal performance:
+
+### Current Bundle Size (Baseline)
+
+- **Total Size**: ~11.07 MB (uncompressed)
+- **Gzipped Size**: ~1.56 MB (production delivery)
+- **Largest Chunk**: main-\*.js (~547 KB gzipped)
+- **Performance Budget**: < 250 KB gzipped for initial load
+
+### Bundle Size Monitoring
+
+The [Bundle Size Monitor workflow](.github/workflows/bundle-size.yml) automatically:
+
+- Measures bundle size on every PR to `main` or `nightly` branches
+- Compares against baseline and base branch
+- Fails CI if bundle grows >15% from baseline
+- Posts detailed size reports as PR comments
+- Tracks JS/CSS chunks and identifies largest files
+
+### Optimization Guidelines
+
+- Use dynamic imports for large components
+- Leverage code splitting for routes
+- Monitor bundle report in CI comments
+- Keep main bundle under 100 KB gzipped when possible
+
 ## 🏗️ Project Structure
 
 VioletVault is organized into a comprehensive modular architecture with **696 files** across major functional areas:
