@@ -119,7 +119,7 @@ describe("FirebaseSyncProvider", () => {
 
     // Setup budgetDb mocks
     vi.mocked(budgetDb.transaction).mockImplementation(
-      async (_mode: string, _stores: unknown[], callback: () => Promise<void>) => {
+      async (_: string, __: unknown[], callback: () => Promise<void>) => {
         await callback();
       }
     );
