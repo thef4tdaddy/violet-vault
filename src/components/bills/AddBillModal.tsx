@@ -97,7 +97,7 @@ interface BillModalState {
   formData: BillFormData;
   isSubmitting: boolean;
   categories: string[];
-  handleSubmit: () => Promise<void>;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
   updateField: (field: keyof BillFormData, value: string | boolean) => void;
   canEdit: boolean;
   isLocked: boolean;
@@ -351,8 +351,7 @@ const AddBillModal = (props: AddBillModalProps) => {
       >
         <form
           onSubmit={async (e) => {
-            e.preventDefault();
-            await handleSubmit();
+            await handleSubmit(e);
           }}
           className="pb-6"
         >
@@ -368,8 +367,7 @@ const AddBillModal = (props: AddBillModalProps) => {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={async (e) => {
-        e.preventDefault();
-        await handleSubmit();
+        await handleSubmit(e);
       }}
       title={modalTitle}
       submitLabel={submitLabel}

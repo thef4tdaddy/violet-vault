@@ -26,7 +26,7 @@ interface BulkUpdateConfirmModalProps {
 
 /**
  * BulkUpdateConfirmModal - Migrated to use BaseModal primitive (Issue #1598)
- * 
+ *
  * Shows detailed list of changes before bulk update confirmation
  */
 const BulkUpdateConfirmModal: React.FC<BulkUpdateConfirmModalProps> = ({
@@ -45,6 +45,7 @@ const BulkUpdateConfirmModal: React.FC<BulkUpdateConfirmModalProps> = ({
       onClose={onClose}
       size="lg"
       ariaLabelledBy={titleId}
+      showCloseButton={true}
     >
       <div className="p-6">
         <h3 id={titleId} className="text-lg font-black text-black mb-4">
@@ -101,13 +102,7 @@ const BulkUpdateConfirmModal: React.FC<BulkUpdateConfirmModalProps> = ({
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button
-              onClick={onClose}
-              variant="secondary"
-              size="md"
-              fullWidth
-              className="font-bold"
-            >
+            <Button onClick={onClose} variant="secondary" size="md" fullWidth className="font-bold">
               Back to Edit
             </Button>
             <Button

@@ -42,7 +42,7 @@ export const BillDetailHeader: React.FC<BillDetailHeaderProps> = ({
           })}
         </div>
         <div>
-          <h3 id={titleId} className="text-xl font-semibold text-gray-900">
+          <h3 {...(titleId ? { id: titleId } : {})} className="text-xl font-semibold text-gray-900">
             {bill.name}
           </h3>
           <p className="text-gray-600">

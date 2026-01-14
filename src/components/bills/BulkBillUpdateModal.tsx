@@ -21,7 +21,7 @@ interface BulkBillUpdateModalProps {
 
 /**
  * BulkBillUpdateModal - Migrated to use BaseModal primitive (Issue #1594)
- * 
+ *
  * Allows bulk editing of bill amounts and due dates
  */
 const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
@@ -85,7 +85,13 @@ const BulkBillUpdateModal: React.FC<BulkBillUpdateModalProps> = ({
         summary={summary}
       />
 
-      <BaseModal isOpen={isOpen} onClose={onClose} size="xl" ariaLabelledBy={titleId}>
+      <BaseModal
+        isOpen={isOpen}
+        onClose={onClose}
+        size="xl"
+        ariaLabelledBy={titleId}
+        showCloseButton={true}
+      >
         <div className="p-6 max-h-[90vh] overflow-y-auto">
           <div className="mb-6">
             <h3 id={titleId} className="text-lg font-black text-black">
