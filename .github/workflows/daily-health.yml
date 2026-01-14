@@ -150,7 +150,23 @@ jobs:
           
           # Extract coverage percentage
           if [ -f "coverage.json" ]; then
-            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data['totals']['percent_covered'])" 2>/dev/null || echo "0")
+            COVERAGE=$(python - << 'EOF'
+import json
+import sys
+import traceback
+
+try:
+    with open("coverage.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+    totals = data.get("totals", {})
+    percent = totals.get("percent_covered", 0)
+    print(percent)
+except Exception as e:
+    print("Failed to extract coverage from coverage.json:", e, file=sys.stderr)
+    traceback.print_exc()
+    print(0)
+EOF
+)
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
             echo "coverage=0" >> $GITHUB_OUTPUT
