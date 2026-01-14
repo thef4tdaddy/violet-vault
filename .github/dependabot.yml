@@ -1,13 +1,13 @@
 version: 2
 updates:
-  # NPM Dependencies - Regular updates to develop
+  # NPM Dependencies - Regular updates to dependabot branch
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "develop"
+    target-branch: "dependabot"
     pull-request-branch-name:
       separator: "/"
     assignees:
@@ -155,14 +155,14 @@ updates:
           - "pako"
           - "qrcode*"
 
-  # GitHub Actions - Regular updates to develop
+  # GitHub Actions - Regular updates to dependabot branch
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "develop"
+    target-branch: "dependabot"
     assignees:
       - "thef4tdaddy"
     labels:
