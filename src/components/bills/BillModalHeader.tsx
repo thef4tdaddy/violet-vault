@@ -1,6 +1,5 @@
 import React from "react";
-import { getIcon } from "../../utils";
-import { getIconByName } from "../../utils/common/billIcons";
+import { getIcon, getIconByName } from "@/utils/icons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import type { Bill, BillFormData } from "@/types/bills";
 
