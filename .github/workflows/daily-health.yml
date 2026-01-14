@@ -194,16 +194,14 @@ jobs:
             body += `**Context**: ${contextName}\n`;
             body += `**Workflow Run**: [View Logs](${runUrl})\n\n`;
 
-            // Add Coverage Table if frontend coverage >= 80%
-            if (frontendCoverage >= 80) {
-              body += `## 📊 Test Coverage\n\n`;
-              body += `| Suite | Coverage | Status |\n`;
-              body += `|-------|----------|--------|\n`;
-              body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-              body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-              body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-              body += `\n**Coverage Reports**: [Download artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
-            }
+            // Add Coverage Table (always show)
+            body += `## 📊 Test Coverage\n\n`;
+            body += `| Suite | Coverage | Status |\n`;
+            body += `|-------|----------|--------|\n`;
+            body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `\n**Coverage Reports**: [Download artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
 
             body += `### Status Breakdown\n`;
             body += `- **Build**: ${buildStatus === 'success' ? '✅ Pass' : '❌ FAIL'}\n`;
@@ -238,25 +236,27 @@ jobs:
                            body += `- \`${item.file}\`: ${item.pct}%\n`;
                        }
 
-                       // Create Tasks for worst 3
-                       const candidates = lowCovFiles.slice(0, 3);
-                       for (const item of candidates) {
-                           const parts = item.file.split('/');
-                           const basename = parts[parts.length - 1];
-                           const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-                           
-                           const existing = await github.rest.search.issuesAndPullRequests({
-                               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
-                           });
-                           
-                           if (existing.data.total_count === 0) {
-                               await github.rest.issues.create({
-                                   owner: context.repo.owner,
-                                   repo: context.repo.repo,
-                                   title: issueTitle,
-                                   body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
-                                   labels: ['coverage-gap', 'help-wanted', 'automated']
+                       // Create Tasks for worst 3 only when frontend coverage >= 80%
+                       if (frontendCoverage >= 80) {
+                           const candidates = lowCovFiles.slice(0, 3);
+                           for (const item of candidates) {
+                               const parts = item.file.split('/');
+                               const basename = parts[parts.length - 1];
+                               const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+                               
+                               const existing = await github.rest.search.issuesAndPullRequests({
+                                   q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
                                });
+                               
+                               if (existing.data.total_count === 0) {
+                                   await github.rest.issues.create({
+                                       owner: context.repo.owner,
+                                       repo: context.repo.repo,
+                                       title: issueTitle,
+                                       body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
+                                       labels: ['coverage-gap', 'help-wanted', 'automated']
+                                   });
+                               }
                            }
                        }
                    }
