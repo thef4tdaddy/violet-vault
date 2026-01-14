@@ -25,7 +25,7 @@ interface BulkUpdateConfirmModalProps {
 }
 
 /**
- * BulkUpdateConfirmModal - Migrated to use BaseModal primitive (Issue #1594)
+ * BulkUpdateConfirmModal - Migrated to use BaseModal primitive (Issue #1598)
  * 
  * Shows detailed list of changes before bulk update confirmation
  */
