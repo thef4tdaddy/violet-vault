@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, TextInput, Radio } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { useTouchFeedback } from "@/utils/ui/touchFeedback";
+import { useTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 // Type definitions for component props
 interface PayerStatsProps {
