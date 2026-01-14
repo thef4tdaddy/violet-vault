@@ -162,10 +162,10 @@ describe("DataTable", () => {
       expect(screen.getByText("No items found")).toBeInTheDocument();
     });
 
-    it("should not render headers in empty state", () => {
+    it("should render headers in empty state", () => {
       render(<DataTable data={[]} columns={mockColumns} getRowId={getRowId} virtualized={false} />);
 
-      expect(screen.queryByText("Name")).not.toBeInTheDocument();
+      expect(screen.getByText("Name")).toBeInTheDocument();
     });
   });
 
