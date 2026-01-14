@@ -2,8 +2,8 @@
 # full_salvo.sh - Multi-language verification script for v2.0 Polyglot Backend
 # Runs TypeScript, Go, and Python linters/type checkers
 
-set -e  # Exit on error (will be handled by run_check function)
-set +e  # But allow commands to fail within run_check
+# Allow commands to fail (errors handled by run_check function)
+set +e
 
 # Parse command line arguments
 FIX_MODE=false
@@ -120,7 +120,7 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
     fi
     
     # Go tests with coverage
-    run_check "go test" "cd api && go test ./... -coverprofile=coverage.out && rm -f coverage.out"
+    run_check "go test" "cd api && go test ./... -coverprofile=coverage.out; EXIT_CODE=\$?; rm -f coverage.out; exit \$EXIT_CODE"
 else
     echo -e "  ${YELLOW}Go checks (skipped - no Go code found)${NC}"
 fi
