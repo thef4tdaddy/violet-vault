@@ -457,7 +457,7 @@ describe("FirebaseSyncProvider", () => {
 
     it("should upload when timestamps are equal but local has data", async () => {
       const timestamp = Date.now();
-      const { getDoc, setDoc } = await import("firebase/firestore");
+      const { getDoc } = await import("firebase/firestore");
 
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
