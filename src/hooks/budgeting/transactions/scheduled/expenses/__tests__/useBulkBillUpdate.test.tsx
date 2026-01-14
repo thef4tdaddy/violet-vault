@@ -20,7 +20,7 @@ vi.mock("@/utils/core/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/bills/bulkUpdateValidation", () => ({
+vi.mock("@/utils/domain/bills/bulkUpdateValidation", () => ({
   validateBulkUpdateData: vi.fn(),
   validateBulkOperation: vi.fn(),
 }));
