@@ -89,6 +89,15 @@ if [ "$RETRY_FAILED_MODE" = true ]; then
   while IFS= read -r check_name; do
     CHECKS_TO_RUN["$check_name"]=1
   done < "$FAILED_CHECKS_LIST_FILE"
+
+  # If the failed checks file exists but is empty, there is nothing to retry.
+  # Explicitly handle this case instead of silently running no checks.
+  if [ "${#CHECKS_TO_RUN[@]}" -eq 0 ]; then
+    echo -e "${YELLOW}No failed checks recorded to retry.${NC}"
+    echo -e "${YELLOW}Run './scripts/full_salvo.sh' without '--retry-failed' to run all checks.${NC}"
+    echo ""
+    exit 1
+  fi
 fi
 
 # Helper to determine if a check should be run
