@@ -125,9 +125,9 @@ describe("FirebaseSyncProvider", () => {
     );
 
     vi.mocked(budgetDb.envelopes.clear).mockResolvedValue(undefined);
-    vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue([] as unknown as number);
+    vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue(1);
     vi.mocked(budgetDb.transactions.clear).mockResolvedValue(undefined);
-    vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue([] as unknown as number);
+    vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue(1);
     vi.mocked(budgetDb.budget.put).mockResolvedValue("metadata");
 
     // Initialize provider
@@ -505,7 +505,8 @@ describe("FirebaseSyncProvider", () => {
         actualBalance: 500,
       });
 
-      const result = await provider.save(null as never);
+      // Testing null data scenario - TypeScript allows this at runtime
+      const result = await provider.save(null as unknown as SafeUnknown);
 
       expect(result.success).toBe(true);
       expect(budgetDb.transaction).toHaveBeenCalled();
