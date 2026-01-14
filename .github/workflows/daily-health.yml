@@ -104,7 +104,7 @@ jobs:
           
           # Extract coverage percentage if available
           if [ -f "coverage/coverage-summary.json" ]; then
-            COVERAGE=$(node -e "try { const data=require('./coverage/coverage-summary.json'); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
+            COVERAGE=$(node -e "const fs=require('fs'); try { const data=JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8')); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
             echo "coverage=0" >> $GITHUB_OUTPUT
