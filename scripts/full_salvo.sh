@@ -183,7 +183,8 @@ if [ -d "api" ] && [ -f "api/go.mod" ]; then
     fi
     
     # Go tests with coverage
-    run_check "go test" "cd api && go test ./... -coverprofile=coverage.out; EXIT_CODE=\$?; rm -f coverage.out; exit \$EXIT_CODE"
+    run_check "go test" "cd api && go test ./... -coverprofile=coverage.out"
+    rm -f api/coverage.out
 else
     echo -e "  ${YELLOW}Go checks (skipped - no Go code found)${NC}"
 fi
