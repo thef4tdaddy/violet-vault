@@ -9,11 +9,20 @@ set +e
 FIX_MODE=false
 RETRY_FAILED_MODE=false
 
-if [[ "$1" == "--fix" ]]; then
-  FIX_MODE=true
-elif [[ "$1" == "--retry-failed" ]]; then
-  RETRY_FAILED_MODE=true
-fi
+for arg in "$@"; do
+  case "$arg" in
+    --fix)
+      FIX_MODE=true
+      ;;
+    --retry-failed)
+      RETRY_FAILED_MODE=true
+      ;;
+    *)
+      echo "Usage: $0 [--fix] [--retry-failed]"
+      exit 1
+      ;;
+  esac
+done
 
 # Colors for output
 RED='\033[0;31m'
