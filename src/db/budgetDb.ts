@@ -121,8 +121,9 @@ export class VioletVaultDB extends Dexie {
     });
 
     // Version 11: Data Unification - Unified Envelopes & Transactions
+    // v2.0 Baseline Schema - Fresh Start
+    // No migration from previous versions - users start with clean slate
     // Dropping legacy tables: bills, debts, savingsGoals, paycheckHistory
-    // Fresh Start Strategy: No data migration required
     this.version(11).stores({
       envelopes:
         "id, name, category, archived, lastModified, type, [category+archived], [category+name], [type+archived]",

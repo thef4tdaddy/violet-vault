@@ -3,112 +3,8 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "../../utils/common/logger.ts";
-import { budgetDb, setBudgetMetadata } from "../../db/budgetDb.ts";
-import type { Envelope, Transaction } from "../../db/types.ts";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
-
-/**
- * Transform old data format to new format
- */
-// eslint-disable-next-line complexity -- Complex data transformation with multiple nested conditions
-const transformOldData = (parsedOldData: { state?: Record<string, unknown> }) => ({
-  state: {
-    envelopes: (parsedOldData.state?.envelopes as unknown[]) || [],
-    bills: (parsedOldData.state?.bills as unknown[]) || [],
-    transactions: (parsedOldData.state?.transactions as unknown[]) || [],
-    allTransactions: (parsedOldData.state?.allTransactions as unknown[]) || [],
-    savingsGoals: (parsedOldData.state?.savingsGoals as unknown[]) || [],
-    supplementalAccounts: (parsedOldData.state?.supplementalAccounts as unknown[]) || [],
-    debts: (parsedOldData.state?.debts as unknown[]) || [],
-    unassignedCash: (parsedOldData.state?.unassignedCash as number) || 0,
-    biweeklyAllocation: (parsedOldData.state?.biweeklyAllocation as number) || 0,
-    paycheckHistory: (parsedOldData.state?.paycheckHistory as unknown[]) || [],
-    actualBalance: (parsedOldData.state?.actualBalance as number) || 0,
-  },
-  version: 0,
-});
-
-/**
- * Seed Dexie database with migrated data
- */
-const seedDexieWithMigratedData = async (transformedData: { state: Record<string, unknown> }) => {
-  const envelopes = (transformedData.state.envelopes as unknown[]) || [];
-  const bills = (transformedData.state.bills as unknown[]) || [];
-  const savingsGoals = (transformedData.state.savingsGoals as unknown[]) || [];
-  const debts = (transformedData.state.debts as unknown[]) || [];
-
-  // Combine legacy tables into unified envelopes
-  const unifiedEnvelopes = [
-    ...envelopes.map((e) => ({
-      ...(e as Record<string, unknown>),
-      type: (e as Record<string, unknown>).type || "standard",
-    })),
-    ...bills.map((b) => ({ ...(b as Record<string, unknown>), type: "liability" })),
-    ...savingsGoals.map((s) => ({ ...(s as Record<string, unknown>), type: "goal" })),
-    ...debts.map((d) => ({ ...(d as Record<string, unknown>), type: "liability" })),
-  ];
-
-  await budgetDb.bulkUpsertEnvelopes(unifiedEnvelopes as unknown as Envelope[]);
-
-  const transactions =
-    ((transformedData.state.allTransactions || transformedData.state.transactions) as unknown[]) ||
-    [];
-  const paycheckHistory = (transformedData.state.paycheckHistory as unknown[]) || [];
-
-  // Combine legacy transactions and paychecks
-  const unifiedTransactions = [
-    ...transactions.map((t) => ({ ...(t as Record<string, unknown>) })),
-    ...paycheckHistory.map((p) => ({
-      ...(p as Record<string, unknown>),
-      type: (p as Record<string, unknown>).type || "income",
-      isScheduled: (p as Record<string, unknown>).isScheduled || false,
-    })),
-  ];
-
-  await budgetDb.bulkUpsertTransactions(unifiedTransactions as unknown as Transaction[]);
-
-  await setBudgetMetadata({
-    unassignedCash: (transformedData.state.unassignedCash as number) || 0,
-    actualBalance: (transformedData.state.actualBalance as number) || 0,
-  });
-};
-
-/**
- * Migration function to handle old localStorage format
- */
-const migrateOldData = async () => {
-  try {
-    const oldData = localStorage.getItem("budget-store");
-    if (!oldData) return;
-
-    logger.info("Migrating data from old budget-store to violet-vault-store", {
-      source: "migrateOldData",
-    });
-
-    const parsedOldData = JSON.parse(oldData);
-    if (!parsedOldData?.state) return;
-
-    const transformedData = transformOldData(parsedOldData);
-    localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-
-    logger.info("Data migration completed successfully - replaced existing data", {
-      source: "migrateOldData",
-    });
-
-    await seedDexieWithMigratedData(transformedData);
-
-    localStorage.removeItem("budget-store");
-    logger.info("Cleaned up old budget-store data", {
-      source: "migrateOldData",
-    });
-  } catch (error) {
-    logger.warn("Failed to migrate old data", {
-      error: error instanceof Error ? error.message : String(error),
-      source: "migrateOldData",
-    });
-  }
-};
 
 import {
   createBasicActions,
@@ -173,7 +69,6 @@ export interface UiStore {
   loadPatchNotesForUpdate: (fromVersion: string, toVersion: string) => Promise<unknown>;
 
   // Other actions
-  runMigrationIfNeeded: () => Promise<void>;
   startBackgroundSync: () => Promise<void>;
   resetAllData: () => void;
   setDebts: () => void;
@@ -280,17 +175,6 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
         state.loadingPatchNotes = false;
       });
       return null;
-    }
-  },
-
-  // Run migration on first use
-  async runMigrationIfNeeded() {
-    try {
-      await migrateOldData();
-    } catch (error) {
-      logger.warn("Migration failed in store", {
-        error: error instanceof Error ? error.message : String(error),
-      });
     }
   },
 

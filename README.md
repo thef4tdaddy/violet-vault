@@ -104,6 +104,25 @@
 - **Multi-language tooling** - Go (golangci-lint), Python (ruff, mypy)
 - `full_salvo.sh` - Comprehensive multi-language verification script
 
+## ⚠️ v2.0 Breaking Changes
+
+**VioletVault v2.0** is a complete rewrite with a fresh data structure and unified architecture.
+
+### Migration Strategy
+
+**Not supported** - v2.0 starts with a clean slate. Users upgrading from v1.x will start fresh.
+
+### What's New in v2.0
+
+- **Unified Data Model**: Bills, debts, savings goals, and paycheck history are now unified into envelope and transaction tables
+- **Fresh Start**: No migration from previous versions - cleaner, simpler codebase
+- **Improved Performance**: Optimized database schema with better indexing
+- **Type Safety**: Enhanced TypeScript types with Zod validation
+
+### Backup Recommendation
+
+**Before upgrading to v2.0**, users should export their v1.x data if they need historical records. v2.0 does not migrate data from previous versions.
+
 ## 🚦 Getting Started
 
 ### Prerequisites
