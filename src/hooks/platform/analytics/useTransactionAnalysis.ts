@@ -3,11 +3,11 @@
  * Extracted from useSmartCategoryAnalysis.js to reduce complexity
  */
 import { useMemo } from "react";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 import {
   analyzeUncategorizedTransactions,
   analyzeUnusedCategories,
-} from "@/utils/analytics/transactionAnalyzer";
+} from "@/utils/features/analytics/transactionAnalyzer";
 
 interface AnalysisSettings {
   [key: string]: unknown;

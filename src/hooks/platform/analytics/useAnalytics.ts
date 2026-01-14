@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { useSpendingAnalyticsQuery } from "./queries/useSpendingAnalyticsQuery";
 import { useBalanceAnalyticsQuery } from "./queries/useBalanceAnalyticsQuery";
 import { usePaycheckTrendsQuery } from "./queries/usePaycheckTrendsQuery";

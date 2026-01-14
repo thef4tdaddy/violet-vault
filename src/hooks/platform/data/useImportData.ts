@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
-import { trackImport } from "@/utils/monitoring/performanceMonitor";
+import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
 import {
   validateImportedData,
   type ValidatedImportData,
-} from "@/utils/dataManagement/validationUtils";
+} from "@/utils/data/dataManagement/validationUtils";
 import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface ImportCounts {
   envelopes: number;

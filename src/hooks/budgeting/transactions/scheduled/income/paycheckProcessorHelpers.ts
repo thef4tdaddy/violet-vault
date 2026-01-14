@@ -59,7 +59,7 @@ export const calculateAllocationPreview = (
   };
 };
 
-import type { PaycheckPrediction } from "@/utils/budgeting/paycheckUtils";
+import type { PaycheckPrediction } from "@/utils/domain/budgeting/paycheckUtils";
 
 /**
  * Maps payer prediction to the format expected by the UI

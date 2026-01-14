@@ -3,14 +3,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useShareCodeValidation } from "../useShareCodeValidation";
 
 // Mock dependencies
-vi.mock("@/utils/security/shareCodeUtils", () => ({
+vi.mock("@/utils/platform/security/shareCodeUtils", () => ({
   shareCodeUtils: {
     validateShareCode: vi.fn((code) => code.split(" ").length === 4),
     normalizeShareCode: vi.fn((code) => code.trim().toLowerCase()),
   },
 }));
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: () => ({
     showSuccessToast: vi.fn(),
     showErrorToast: vi.fn(),
@@ -116,7 +116,7 @@ describe("useShareCodeValidation", () => {
   });
 
   it("should handle validation errors gracefully", async () => {
-    const { shareCodeUtils } = await import("@/utils/security/shareCodeUtils");
+    const { shareCodeUtils } = await import("@/utils/platform/security/shareCodeUtils");
     vi.mocked(shareCodeUtils.validateShareCode).mockImplementationOnce(() => {
       throw new Error("Validation error");
     });

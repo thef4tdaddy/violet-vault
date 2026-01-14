@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { budgetDb, clearData } from "@/db/budgetDb";
 import localStorageService from "@/services/storage/localStorageService";
 import type { UserData } from "@/types/auth";

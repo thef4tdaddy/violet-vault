@@ -7,7 +7,7 @@
 
 import { z } from "zod";
 import type { ValidationErrors, ValidationResult } from "./validationTypes";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Parses data against a Zod schema and returns structured errors

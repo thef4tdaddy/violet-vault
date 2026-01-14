@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "@/utils";
-import { formatPaycheckAmount } from "@/utils/budgeting/paycheckUtils";
+import { formatPaycheckAmount } from "@/utils/domain/budgeting/paycheckUtils";
 import { Button } from "@/components/ui";
 
 export interface PaycheckHistoryItem {

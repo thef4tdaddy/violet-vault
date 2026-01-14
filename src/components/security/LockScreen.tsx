@@ -4,7 +4,7 @@ import { getIcon } from "@/utils";
 import { useAuth } from "@/hooks/auth/useAuth";
 import shieldLogo from "@/assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 const LockScreen = () => {
   const auth = useAuth();

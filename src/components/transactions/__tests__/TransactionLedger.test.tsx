@@ -167,7 +167,7 @@ vi.mock("@/components/ui/StandardFilters", () => ({
   ),
 }));
 
-vi.mock("@/utils/transactions/ledgerHelpers", () => ({
+vi.mock("@/utils/domain/transactions/ledgerHelpers", () => ({
   calculateTransactionTotals: vi.fn(() => ({
     totalIncome: 3000,
     totalExpense: -500,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import BugReportService from "@/services/logging/bugReportingService.ts";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 
 /**
  * Screenshot state for bug reports V2

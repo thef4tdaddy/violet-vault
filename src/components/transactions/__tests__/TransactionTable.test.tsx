@@ -62,7 +62,7 @@ vi.mock("@/components/history/ObjectHistoryViewer", () => ({
   ),
 }));
 
-vi.mock("@/utils/transactions/tableHelpers", () => ({
+vi.mock("@/utils/domain/transactions/tableHelpers", () => ({
   MIN_TABLE_WIDTH: "80rem",
   findEnvelopeForTransaction: vi.fn(() => ({ id: "1", name: "Test Envelope", color: "#000000" })),
   formatTransactionAmount: vi.fn((amount) => ({

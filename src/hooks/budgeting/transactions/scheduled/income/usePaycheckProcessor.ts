@@ -6,9 +6,9 @@ import {
   getPayerPrediction,
   getPaycheckStatistics,
   type PaycheckTransaction,
-} from "@/utils/budgeting/paycheckUtils";
+} from "@/utils/domain/budgeting/paycheckUtils";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { PaycheckHistory, Envelope } from "@/db/types";
 import { calculateAllocationPreview, mapPayerPredictionForUI } from "./paycheckProcessorHelpers";
 

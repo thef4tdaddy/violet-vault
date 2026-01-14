@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { budgetDb } from "@/db/budgetDb";
-import { queryKeys } from "@/utils/common/queryClient";
-import logger from "@/utils/common/logger";
+import { queryKeys } from "@/utils/core/common/queryClient";
+import logger from "@/utils/core/common/logger";
 import {
   createDefaultRule,
   validateRule,
@@ -11,8 +11,11 @@ import {
   sortRulesByPriority,
   type AutoFundingRule as LegacyRule,
   type RuleSummary,
-} from "@/utils/budgeting/autofunding/rules";
-import { shouldRuleExecute, type ExecutionContext } from "@/utils/budgeting/autofunding/conditions";
+} from "@/utils/domain/budgeting/autofunding/rules";
+import {
+  shouldRuleExecute,
+  type ExecutionContext,
+} from "@/utils/domain/budgeting/autofunding/conditions";
 import { autoFundingPersistenceService } from "@/services/budget/autoFundingPersistenceService";
 import type { AutoFundingRule } from "@/db/types";
 
@@ -329,7 +332,7 @@ export const useAutoFundingRules = () => {
       try {
         return (rules as unknown as AutoFundingRule[]).filter((rule) =>
           shouldRuleExecute(
-            rule as unknown as import("@/utils/budgeting/autofunding/conditions.ts").Rule,
+            rule as unknown as import("@/utils/domain/budgeting/autofunding/conditions.ts").Rule,
             context
           )
         );

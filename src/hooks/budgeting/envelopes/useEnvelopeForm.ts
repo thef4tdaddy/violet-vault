@@ -6,9 +6,9 @@ import {
   transformFormToEnvelope,
   transformEnvelopeToForm,
   validateEnvelopeTypeChange,
-} from "@/utils/budgeting/envelopeFormUtils";
+} from "@/utils/domain/budgeting/envelopeFormUtils";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseEnvelopeFormProps {
   envelope?: Record<string, unknown> | null;

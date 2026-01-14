@@ -4,7 +4,7 @@ import { DataTable, type Column } from "@/components/primitives/tables/DataTable
 import { ConfirmModal } from "@/components/primitives/modals";
 import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";
 import type { Transaction, Envelope } from "@/types/finance";
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
 import {
   COLUMN_WIDTHS,
@@ -12,7 +12,7 @@ import {
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "@/utils/transactions/tableHelpers";
+} from "@/utils/domain/transactions/tableHelpers";
 import { getIcon } from "@/utils";
 
 interface TransactionTableProps {

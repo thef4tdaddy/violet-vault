@@ -70,7 +70,7 @@ vi.mock("@/utils", () => ({
   getIcon: vi.fn(() => "div"),
 }));
 
-vi.mock("@/utils/savings/savingsFormUtils", () => ({
+vi.mock("@/utils/domain/savings/savingsFormUtils", () => ({
   SAVINGS_PRIORITIES: ["High", "Medium", "Low"],
 }));
 

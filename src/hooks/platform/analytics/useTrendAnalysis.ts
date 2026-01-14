@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { SEASON_COLORS } from "@/utils/analytics/trendHelpers";
+import { SEASON_COLORS } from "@/utils/features/analytics/trendHelpers";
 import {
   AnalyticsData,
   SpendingTrend,

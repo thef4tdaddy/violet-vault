@@ -5,7 +5,7 @@ import PageHeader from "../PageHeader";
 import "@testing-library/jest-dom";
 
 // Mock getIcon utility
-vi.mock("@/utils/icons", () => ({
+vi.mock("@/utils/ui/icons", () => ({
   getIcon: vi.fn((iconName: string) => {
     const MockIcon = ({ className }: { className?: string }) => (
       <div className={className} data-testid={`icon-${iconName}`}>

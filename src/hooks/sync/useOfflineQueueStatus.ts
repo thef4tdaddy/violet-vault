@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { offlineRequestQueueService } from "@/services/sync/offlineRequestQueueService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 export interface QueueStatus {
   isOnline: boolean;

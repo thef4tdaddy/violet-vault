@@ -27,13 +27,13 @@ vi.mock("@/hooks/platform/sharing/useQRCodeProcessing", () => ({
   })),
 }));
 
-vi.mock("@/utils/security/shareCodeUtils", () => ({
+vi.mock("@/utils/platform/security/shareCodeUtils", () => ({
   shareCodeUtils: {
     validateShareCode: vi.fn(() => true),
   },
 }));
 
-vi.mock("@/utils/sharing/colorUtils", () => ({
+vi.mock("@/utils/features/sharing/colorUtils", () => ({
   generateRandomColor: vi.fn(() => "#ff0000"),
 }));
 

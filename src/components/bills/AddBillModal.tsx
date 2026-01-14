@@ -20,10 +20,10 @@ import SlideUpModal from "../mobile/SlideUpModal";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { BillIconOption } from "@/utils/ui/billIcons/iconOptions";
 import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 /**
  * Lock data structure for edit locking

@@ -2,8 +2,8 @@ import { renderHook, act } from "@testing-library/react";
 import { vi, beforeEach, describe, it, expect } from "vitest";
 import { usePaydayManager } from "../usePaydayManager";
 import { globalToast } from "@/stores/ui/toastStore";
-import { predictNextPayday } from "@/utils/budgeting/paydayPredictor";
-import logger from "@/utils/common/logger";
+import { predictNextPayday } from "@/utils/domain/budgeting/paydayPredictor";
+import logger from "@/utils/core/common/logger";
 import type { PaycheckHistoryItem } from "../types";
 
 // Mock dependencies
@@ -14,11 +14,11 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/utils/budgeting/paydayPredictor", () => ({
+vi.mock("@/utils/domain/budgeting/paydayPredictor", () => ({
   predictNextPayday: vi.fn(),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

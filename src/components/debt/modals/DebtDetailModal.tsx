@@ -10,7 +10,7 @@ import {
   ModalActions,
 } from "./DebtDetailModalComponents";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface DebtDetailModalProps {
   debt?: Record<string, unknown> & { id: string };

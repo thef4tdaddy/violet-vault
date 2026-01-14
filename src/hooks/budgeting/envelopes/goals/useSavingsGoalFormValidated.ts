@@ -11,7 +11,7 @@ import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { SavingsGoalFormSchema, type SavingsGoalFormData } from "@/domain/schemas/savingsGoal";
 import type { GoalEnvelope as SavingsGoal } from "@/db/types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseSavingsGoalFormValidatedOptions {
   goal?: SavingsGoal | null;

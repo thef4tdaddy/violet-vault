@@ -23,10 +23,10 @@ import {
 import {
   normalizeTransactions,
   normalizeEnvelopes,
-} from "@/utils/transactions/normalizationHelpers";
+} from "@/utils/domain/transactions/normalizationHelpers";
 import type { User, Transaction, Envelope } from "../../types/finance";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 import { getIcon } from "@/utils";
 
 // Types used in interface definitions

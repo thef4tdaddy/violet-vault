@@ -1,16 +1,16 @@
 import { useQuery, useMutation, useQueryClient, QueryClient } from "@tanstack/react-query";
 import type { UseQueryOptions } from "@tanstack/react-query";
 import { useMemo, useCallback, useEffect } from "react";
-import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient.ts";
+import { queryKeys, optimisticHelpers } from "@/utils/core/common/queryClient.ts";
 import { budgetDb, VioletVaultDB, getUnassignedCash, setUnassignedCash } from "@/db/budgetDb.ts";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories.ts";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 import {
   processEnvelopes,
   calculateEnvelopeStats,
   getRepairUpdates,
   type EnhancedEnvelope,
-} from "@/utils/budgeting/filtering.ts";
+} from "@/utils/domain/budgeting/filtering.ts";
 import type { Envelope as DbEnvelope, Envelope, Transaction } from "@/db/types.ts";
 import {
   validateEnvelopeSafe,

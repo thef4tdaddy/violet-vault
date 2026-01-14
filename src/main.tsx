@@ -94,7 +94,7 @@ if (typeof window !== "undefined") {
 import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.ts";
 import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.ts";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.ts";
-import { runSyncEdgeCaseTests } from "@/utils/sync/syncEdgeCaseTester"; // Changed from default import
+import { runSyncEdgeCaseTests } from "@/utils/features/sync/syncEdgeCaseTester"; // Changed from default import
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.ts";
 import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.ts";
 import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.ts";

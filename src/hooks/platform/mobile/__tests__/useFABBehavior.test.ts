@@ -25,7 +25,7 @@ vi.mock("@/stores/ui/fabStore", () => ({
 }));
 
 // Mock hapticFeedback
-vi.mock("@/utils/ui/touchFeedback", () => ({
+vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   hapticFeedback: vi.fn(),
 }));
 

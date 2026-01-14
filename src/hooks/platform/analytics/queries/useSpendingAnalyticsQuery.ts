@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { getDateRange } from "../utils/dateRangeUtils";

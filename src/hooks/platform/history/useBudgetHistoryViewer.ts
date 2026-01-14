@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { getIcon } from "@/utils";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { usePrompt } from "@/hooks/platform/ux/usePrompt";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Hook for managing Budget History Viewer UI state

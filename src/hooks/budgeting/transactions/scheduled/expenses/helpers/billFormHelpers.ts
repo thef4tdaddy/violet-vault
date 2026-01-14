@@ -3,10 +3,10 @@
  * Extracted to reduce complexity in useBillForm
  */
 import type { BillFormData, Bill, BillFrequency, CalculationFrequency } from "@/types/bills";
-import { toMonthly } from "@/utils/common/frequencyCalculations";
+import { toMonthly } from "@/utils/core/common/frequencyCalculations";
 import { convertToBiweekly } from "@/constants/frequency";
-import { getBillIcon, getIconNameForStorage } from "@/utils/common/billIcons";
-import logger from "@/utils/common/logger";
+import { getBillIcon, getIconNameForStorage } from "@/utils/core/common/billIcons";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Get the name for a bill from available fields

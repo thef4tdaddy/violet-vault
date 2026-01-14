@@ -5,7 +5,7 @@
  * @module services/api/client
  */
 
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // --- Types ---
 

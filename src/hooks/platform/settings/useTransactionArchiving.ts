@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import logger from "@/utils/common/logger";
-import { createArchiver, ARCHIVE_CONFIG } from "@/utils/common/transactionArchiving";
+import logger from "@/utils/core/common/logger";
+import { createArchiver, ARCHIVE_CONFIG } from "@/utils/core/common/transactionArchiving";
 
 /**
  * Hook for managing transaction archiving UI state and preview generation

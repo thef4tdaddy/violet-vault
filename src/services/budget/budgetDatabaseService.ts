@@ -1,7 +1,7 @@
 // Budget Database Service - Centralized database operations with optimized queries
 import { budgetDb } from "@/db/budgetDb";
 import { type Table, type Collection } from "dexie";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { type z } from "zod";
 import {
   EnvelopeSchema,

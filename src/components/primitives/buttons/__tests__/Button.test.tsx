@@ -5,7 +5,7 @@ import { Button } from "../Button";
 import "@testing-library/jest-dom";
 
 // Mock the icon utility
-vi.mock("@/utils/icons", () => ({
+vi.mock("@/utils/ui/icons", () => ({
   getIcon: vi.fn((iconName: string) => {
     // Return a mock component for any icon
     const MockIcon = ({ size, className }: { size?: number; className?: string }) => (

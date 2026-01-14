@@ -11,7 +11,7 @@ const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
-} from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
 
 interface SummaryCardProps {
   icon: React.ElementType;

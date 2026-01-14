@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useQRCodeProcessing } from "../useQRCodeProcessing";
 
 // Mock dependencies
-vi.mock("@/utils/security/shareCodeUtils", () => ({
+vi.mock("@/utils/platform/security/shareCodeUtils", () => ({
   shareCodeUtils: {
     parseQRData: vi.fn((data) => {
       try {
@@ -16,13 +16,13 @@ vi.mock("@/utils/security/shareCodeUtils", () => ({
   },
 }));
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: () => ({
     showErrorToast: vi.fn(),
   }),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     warn: vi.fn(),
   },

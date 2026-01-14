@@ -1,10 +1,10 @@
 // LocalStorage Service Tests
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { localStorageService } from "../localStorageService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { budgetDb } from "@/db/budgetDb";
 
 /**

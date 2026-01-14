@@ -3,7 +3,7 @@
  * Extracted to reduce complexity
  */
 import { v4 as uuidv4 } from "uuid";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Bill } from "@/types/bills";
 
 /**

@@ -18,7 +18,7 @@ vi.mock("@/services/sync/firebaseMessaging", () => ({
   },
 }));
 
-vi.mock("@/utils/notifications/permissionUtils", () => ({
+vi.mock("@/utils/ui/notifications/permissionUtils", () => ({
   getPermissionStatusForUI: vi.fn(() => ({
     isSupported: true,
     canShowPrompt: true,
@@ -92,7 +92,7 @@ describe("useFirebaseMessaging", () => {
   });
 
   it("should handle permission denial", async () => {
-    const permissionUtils = await import("@/utils/notifications/permissionUtils");
+    const permissionUtils = await import("@/utils/ui/notifications/permissionUtils");
     vi.mocked(permissionUtils.requestNotificationPermission).mockResolvedValueOnce({
       success: false,
       permission: "denied",

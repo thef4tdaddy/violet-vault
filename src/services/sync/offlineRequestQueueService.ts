@@ -1,6 +1,6 @@
 import { budgetDb } from "@/db/budgetDb";
 import type { OfflineRequestQueueEntry } from "@/db/types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Offline Request Queue Service

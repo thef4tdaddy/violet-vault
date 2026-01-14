@@ -10,14 +10,14 @@ import {
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,
-} from "@/utils/budgeting";
+} from "@/utils/domain/budgeting";
 import type {
   Envelope as BudgetEnvelope,
   EnvelopeData as BudgetEnvelopeData,
-} from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
 import EnvelopeGridView from "./envelope/EnvelopeGridView";
 import logger from "../../utils/common/logger";
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
 type Envelope = BudgetEnvelope;

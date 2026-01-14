@@ -13,7 +13,7 @@ import useEnvelopes from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";
 import * as debtManagementHelpers from "../helpers/debtManagementHelpers";
-import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
+import { getUpcomingPayments } from "@/utils/domain/debts/debtCalculations";
 
 // Mock all dependencies
 vi.mock("../useDebts");
@@ -22,7 +22,7 @@ vi.mock("@/hooks/budgeting/envelopes/useEnvelopes");
 vi.mock("@/hooks/budgeting/transactions/useTransactionQuery");
 vi.mock("@/hooks/budgeting/transactions/useTransactionOperations");
 vi.mock("../helpers/debtManagementHelpers");
-vi.mock("@/utils/debts/debtCalculations");
+vi.mock("@/utils/domain/debts/debtCalculations");
 vi.mock("@/constants/debts", () => ({
   DEBT_TYPES: {
     CREDIT_CARD: "credit_card",

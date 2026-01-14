@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
-import { createDefaultRule, validateRule } from "@/utils/budgeting/autofunding";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding";
+import { createDefaultRule, validateRule } from "@/utils/domain/budgeting/autofunding";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { Button } from "@/components/ui";
@@ -9,7 +9,7 @@ import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
 import RuleConfigurationStep from "./steps/RuleConfigurationStep";
 import ReviewStep from "./steps/ReviewStep";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 type EnvelopeOption = {
   id: string | number;

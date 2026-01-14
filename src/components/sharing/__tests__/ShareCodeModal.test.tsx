@@ -18,14 +18,14 @@ vi.mock("@/hooks/platform/ux/useConfirm", () => ({
   useConfirm: vi.fn(() => vi.fn()),
 }));
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: vi.fn(() => ({
     showSuccessToast: vi.fn(),
     showErrorToast: vi.fn(),
   })),
 }));
 
-vi.mock("@/utils/auth/shareCodeManager", () => ({
+vi.mock("@/utils/platform/auth/shareCodeManager", () => ({
   shareCodeManager: {
     formatForDisplay: vi.fn((code) => code),
     generateQRData: vi.fn(() => "qr-data"),
@@ -33,7 +33,7 @@ vi.mock("@/utils/auth/shareCodeManager", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -147,7 +147,7 @@ describe("ShareCodeModal", () => {
 
     it("should copy share code to clipboard when copy button is clicked", async () => {
       const { useAuth } = await import("@/hooks/auth/useAuth");
-      const { useToastHelpers } = await import("@/utils/common/toastHelpers");
+      const { useToastHelpers } = await import("@/utils/core/common/toastHelpers");
 
       const mockShowSuccessToast = vi.fn();
       vi.mocked(useAuth).mockReturnValue({
@@ -185,7 +185,7 @@ describe("ShareCodeModal", () => {
 
     it("should show success message after copying", async () => {
       const { useAuth } = await import("@/hooks/auth/useAuth");
-      const { useToastHelpers } = await import("@/utils/common/toastHelpers");
+      const { useToastHelpers } = await import("@/utils/core/common/toastHelpers");
 
       const mockShowSuccessToast = vi.fn();
       vi.mocked(useAuth).mockReturnValue({
@@ -215,7 +215,7 @@ describe("ShareCodeModal", () => {
   describe("Error Handling", () => {
     it("should show error when user is not authenticated", async () => {
       const { useAuth } = await import("@/hooks/auth/useAuth");
-      const { useToastHelpers } = await import("@/utils/common/toastHelpers");
+      const { useToastHelpers } = await import("@/utils/core/common/toastHelpers");
 
       const mockShowErrorToast = vi.fn();
       vi.mocked(useAuth).mockReturnValue({
@@ -243,7 +243,7 @@ describe("ShareCodeModal", () => {
 
     it("should handle errors when generating share code", async () => {
       const { useAuth } = await import("@/hooks/auth/useAuth");
-      const { useToastHelpers } = await import("@/utils/common/toastHelpers");
+      const { useToastHelpers } = await import("@/utils/core/common/toastHelpers");
 
       const mockShowErrorToast = vi.fn();
       vi.mocked(useAuth).mockReturnValue({

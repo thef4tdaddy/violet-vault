@@ -1,10 +1,10 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { usePaycheckAllocations } from "../usePaycheckAllocations";
-import * as paycheckUtils from "@/utils/budgeting/paycheckUtils";
+import * as paycheckUtils from "@/utils/domain/budgeting/paycheckUtils";
 
 // Mock the utils
-vi.mock("@/utils/budgeting/paycheckUtils", () => ({
+vi.mock("@/utils/domain/budgeting/paycheckUtils", () => ({
   calculateEnvelopeAllocations: vi.fn(),
   validatePaycheckForm: vi.fn(),
   validateAllocations: vi.fn(),

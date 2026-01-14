@@ -3,8 +3,8 @@
  * Extracted from useSmartCategoryAnalysis.js to reduce complexity
  */
 import { useMemo } from "react";
-import { getDateRanges } from "@/utils/analytics/categoryPatterns";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import { getDateRanges } from "@/utils/features/analytics/categoryPatterns";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 type DateRangeKey = keyof ReturnType<typeof getDateRanges>;
 

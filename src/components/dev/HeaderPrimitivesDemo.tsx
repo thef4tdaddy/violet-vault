@@ -1,7 +1,7 @@
 import React from "react";
 import { PageHeader, SectionHeader } from "@/components/primitives";
 import { Button } from "@/components/ui";
-import { getIcon } from "@/utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 
 /**
  * Demo page to showcase the header primitives

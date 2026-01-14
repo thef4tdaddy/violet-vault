@@ -5,7 +5,7 @@ import type {
   WebSocketServiceStatus,
   WebSocketSignalType,
 } from "@/types/sync";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * React hook for WebSocket signaling service

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { hapticFeedback } from "@/utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 /**
  * Custom hook for pull-to-refresh functionality

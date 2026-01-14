@@ -27,7 +27,7 @@ const localStorageMock = {
 Object.defineProperty(global, "localStorage", { value: localStorageMock });
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

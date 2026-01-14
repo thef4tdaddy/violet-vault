@@ -2,8 +2,8 @@
  * Helper functions for useAutoFunding
  * Extracted to reduce file size and complexity
  */
-import { TRIGGER_TYPES } from "@/utils/budgeting/autofunding/rules";
-import logger from "@/utils/common/logger";
+import { TRIGGER_TYPES } from "@/utils/domain/budgeting/autofunding/rules";
+import logger from "@/utils/core/common/logger";
 import type { Transaction } from "@/types/finance";
 import type {
   UseAutoFundingRulesReturn,

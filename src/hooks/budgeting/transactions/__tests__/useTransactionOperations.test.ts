@@ -29,7 +29,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     transactions: ["transactions"],
     envelopes: ["envelopes"],

@@ -6,10 +6,10 @@ import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
 import { useAutoFunding } from "@/hooks/budgeting/allocations";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 import type { Envelope } from "@/types/finance";
 
 interface AutoFundingDashboardProps {

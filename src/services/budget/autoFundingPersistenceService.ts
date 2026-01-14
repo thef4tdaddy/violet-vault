@@ -1,4 +1,4 @@
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 const LEGACY_STORAGE_KEY = "violet_vault_autofunding_data";
 const MIGRATION_COMPLETE_KEY = "violet_vault_autofunding_migrated";
