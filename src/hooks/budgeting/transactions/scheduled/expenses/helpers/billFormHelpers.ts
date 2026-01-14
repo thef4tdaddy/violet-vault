@@ -5,7 +5,7 @@
 import type { BillFormData, Bill, BillFrequency, CalculationFrequency } from "@/types/bills";
 import { toMonthly } from "@/utils/common/frequencyCalculations";
 import { convertToBiweekly } from "@/constants/frequency";
-import { getBillIcon, getIconNameForStorage } from "@/utils/common/billIcons";
+import { getBillIcon, getIconNameForStorage } from "@/utils/icons";
 import logger from "@/utils/common/logger";
 
 /**
