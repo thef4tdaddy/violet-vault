@@ -18,7 +18,7 @@ import {
 } from "../splitting";
 
 // Mock logger
-vi.mock("../../common/logger.js", () => ({
+vi.mock("../../../core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -71,7 +71,7 @@ describe("Transaction Splitting Utilities", () => {
     it("should handle empty inputs", () => {
       expect(findEnvelopeForCategory([], "Food")).toBeNull();
       expect(findEnvelopeForCategory(mockEnvelopes, "")).toBeNull();
-      expect(findEnvelopeForCategory(mockEnvelopes, null)).toBeNull();
+      expect(findEnvelopeForCategory(mockEnvelopes, null as any)).toBeNull();
     });
   });
 
@@ -326,7 +326,7 @@ describe("Transaction Splitting Utilities", () => {
     });
 
     it("should use defaults for new split", () => {
-      const currentSplits = [];
+      const currentSplits: any[] = [];
       const defaults = {
         description: "New Split",
         category: "Test Category",

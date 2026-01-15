@@ -24,7 +24,7 @@ vi.mock("../logger", () => ({
 }));
 
 // Mock budgetDb
-vi.mock("../../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     transactions: {
       where: vi.fn(),

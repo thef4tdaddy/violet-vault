@@ -3,7 +3,7 @@ import { renderHook, act } from "@testing-library/react";
 import { useKeyManagementUI, useKeyManagementOperations } from "../useKeyManagementUI";
 
 // Mock dependencies
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showError: vi.fn(),
   },
@@ -11,7 +11,7 @@ vi.mock("../../../stores/ui/toastStore", () => ({
 
 import { globalToast } from "@/stores/ui/toastStore";
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
   },

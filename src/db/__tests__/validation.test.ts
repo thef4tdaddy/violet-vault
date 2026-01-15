@@ -462,7 +462,7 @@ describe("Database Validation Layer", () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toContain("Invalid Envelope");
+        expect((error as any).message).toContain("Invalid Envelope");
       }
     });
   });

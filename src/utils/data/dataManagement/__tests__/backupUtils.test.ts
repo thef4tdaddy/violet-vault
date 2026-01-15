@@ -2,7 +2,7 @@ import { backupCurrentData, validateBackupStructure } from "../backupUtils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // Mock logger
-vi.mock("../../common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock("../../common/logger", () => ({
   },
 }));
 
-vi.mock("../../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       toArray: vi.fn(() =>

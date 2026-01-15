@@ -3,7 +3,7 @@
  * Handles data validation, formatting, and common calculations
  */
 import React from "react";
-import { getIcon } from "../index";
+import { getIcon } from "@/utils/ui/icons";
 
 // Define types
 interface ReceiptData {

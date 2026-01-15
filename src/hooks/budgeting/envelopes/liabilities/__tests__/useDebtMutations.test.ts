@@ -838,7 +838,7 @@ describe("Debt CRUD Validation Tests", () => {
 
   describe("Query Invalidation Patterns", () => {
     it("should define proper query keys for debt operations", async () => {
-      const { queryKeys } = await import("@/utils/core/common/queryClient");
+      const { queryKeys } = await import("../../../../../utils/core/common/queryClient");
       expect(queryKeys.debts).toBeDefined();
       expect(queryKeys.debtsList).toBeDefined();
       expect(queryKeys.dashboard).toBeDefined();

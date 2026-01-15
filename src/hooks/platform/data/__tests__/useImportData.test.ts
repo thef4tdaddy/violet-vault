@@ -14,7 +14,7 @@ vi.mock("../../../../hooks/auth/useAuth", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: vi.fn(),
 }));
 
@@ -22,11 +22,11 @@ vi.mock("../../../../hooks/platform/ux/useConfirm", () => ({
   useConfirm: vi.fn(),
 }));
 
-vi.mock("@/utils/dataManagement/validationUtils", () => ({
+vi.mock("@/utils/data/dataManagement/validationUtils", () => ({
   validateImportedData: vi.fn(),
 }));
 
-vi.mock("@/utils/monitoring/performanceMonitor", () => ({
+vi.mock("@/utils/platform/monitoring/performanceMonitor", () => ({
   trackImport: vi.fn(),
 }));
 

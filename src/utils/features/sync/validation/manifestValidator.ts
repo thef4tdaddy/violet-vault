@@ -1,4 +1,4 @@
-import logger from "../../common/logger";
+import logger from "@/utils/core/common/logger";
 import { VALIDATION_CONSTANTS } from "./constants";
 
 // Type definitions for manifest validation

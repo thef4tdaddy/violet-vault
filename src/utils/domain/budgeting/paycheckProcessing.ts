@@ -11,7 +11,7 @@ import {
   calculatePaycheckBalances,
   validateBalances,
   type CurrentBalances,
-} from "../common/balanceCalculator";
+} from "@/utils/core/common/balanceCalculator";
 import logger from "@/utils/core/common/logger";
 import { createPaycheckTransactions } from "@/services/transactions/paycheckTransactionService";
 

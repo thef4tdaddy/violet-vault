@@ -12,7 +12,11 @@ vi.mock("../../../../hooks/auth/useAuth", () => ({
   useAuth: vi.fn(),
 }));
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/data/dataManagement/validationUtils", () => ({
+  validateImportedData: vi.fn(),
+}));
+
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: vi.fn(),
 }));
 
@@ -30,11 +34,14 @@ vi.mock("../useExportDataHelpers", () => ({
   triggerDownload: vi.fn(),
 }));
 
-vi.mock("@/utils/monitoring/performanceMonitor", () => ({
+vi.mock("@/utils/platform/monitoring/performanceMonitor", () => ({
   trackExport: vi.fn(),
 }));
 
-vi.mock("@/utils/common/logger");
+vi.mock("@/utils/core/common/logger");
+
+vi.mock("@/utils/core/common/ocrProcessor");
+vi.mock("@/utils/core/common/logger");
 
 describe("useExportData", () => {
   const mockShowSuccess = vi.fn();

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { validateManifest } from "../manifestValidator";
 import { VALIDATION_CONSTANTS } from "../constants";
 
-vi.mock("../../../common/logger", () => {
+vi.mock("../../../../core/common/logger", () => {
   const mock = {
     error: vi.fn(),
     warn: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("../../../common/logger", () => {
   };
 });
 
-import { logger } from "../../../common/logger";
+import { logger } from "../../../../core/common/logger";
 
 // Type definition for valid validation result
 type ValidResult = {

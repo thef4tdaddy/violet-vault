@@ -5,7 +5,14 @@
  * Converted to TypeScript for Issue #409
  */
 import logger from "@/utils/core/common/logger";
-import type { Transaction, Envelope, SplitAllocation, SplitTotals } from "../../types/finance";
+import type {
+  Transaction,
+  Envelope,
+  SplitAllocation,
+  SplitTotals,
+  TransactionMetadata,
+  MetadataItem,
+} from "@/types/finance";
 
 /**
  * Find envelope by category name
@@ -28,6 +35,62 @@ export const findEnvelopeForCategory = (
 /**
  * Initialize split allocations from transaction
  */
+/**
+ * Helper to process itemized metadata into splits
+ */
+const getSplitsFromItems = (
+  items: MetadataItem[],
+  transaction: Transaction,
+  envelopes: Envelope[]
+): SplitAllocation[] => {
+  return items.map((item, index) => ({
+    id: Date.now() + index,
+    description: item.name || `Item ${index + 1}`,
+    amount: Math.abs(item.totalPrice || item.price || 0),
+    category: item.category?.name || transaction.category || "",
+    envelopeId:
+      findEnvelopeForCategory(envelopes, item.category?.name || transaction.category || "")?.id ||
+      "",
+    isOriginalItem: true,
+    originalItem: item,
+  }));
+};
+
+/**
+ * Helper to get extra items (shipping, tax) from metadata
+ */
+const getExtraItemsFromMetadata = (
+  metadata: TransactionMetadata | undefined
+): SplitAllocation[] => {
+  const extraItems: SplitAllocation[] = [];
+  if (!metadata) return extraItems;
+  if (metadata.shipping !== undefined && metadata.shipping > 0) {
+    extraItems.push({
+      id: Date.now() + 1000,
+      description: "Shipping & Handling",
+      amount: metadata.shipping,
+      category: "Shipping",
+      envelopeId: "",
+      isOriginalItem: false,
+    });
+  }
+
+  if (metadata.tax !== undefined && metadata.tax > 0) {
+    extraItems.push({
+      id: Date.now() + 2000,
+      description: "Sales Tax",
+      amount: metadata.tax,
+      category: "Tax",
+      envelopeId: "",
+      isOriginalItem: false,
+    });
+  }
+  return extraItems;
+};
+
+/**
+ * Initialize split allocations from transaction
+ */
 export const initializeSplitsFromTransaction = (
   transaction: Transaction,
   envelopes: Envelope[] = []
@@ -36,62 +99,29 @@ export const initializeSplitsFromTransaction = (
     if (!transaction) return [];
 
     // Check if transaction has itemized metadata (like Amazon orders)
-    if (transaction.metadata?.items && transaction.metadata.items.length > 1) {
+    const items = transaction.metadata?.items;
+    if (items && Array.isArray(items) && items.length > 1) {
       logger.debug("Initializing splits from itemized transaction", {
-        itemCount: transaction.metadata.items.length,
+        itemCount: items.length,
       });
 
-      // Initialize with individual items
-      const itemSplits = transaction.metadata.items.map((item, index) => ({
-        id: Date.now() + index,
-        description: item.name || `Item ${index + 1}`,
-        amount: Math.abs(item.totalPrice || item.price || 0),
-        category: item.category?.name || transaction.category || "",
-        envelopeId:
-          findEnvelopeForCategory(envelopes, item.category?.name || transaction.category || "")
-            ?.id || "",
-        isOriginalItem: true,
-        originalItem: item,
-      }));
-
-      // Add shipping/tax if present
-      const extraItems: SplitAllocation[] = [];
-      if (transaction.metadata.shipping !== undefined && transaction.metadata.shipping > 0) {
-        extraItems.push({
-          id: Date.now() + 1000,
-          description: "Shipping & Handling",
-          amount: transaction.metadata.shipping,
-          category: "Shipping",
-          envelopeId: "",
-          isOriginalItem: false,
-        });
-      }
-
-      if (transaction.metadata.tax !== undefined && transaction.metadata.tax > 0) {
-        extraItems.push({
-          id: Date.now() + 2000,
-          description: "Sales Tax",
-          amount: transaction.metadata.tax,
-          category: "Tax",
-          envelopeId: "",
-          isOriginalItem: false,
-        });
-      }
+      const itemSplits = getSplitsFromItems(items as MetadataItem[], transaction, envelopes);
+      const extraItems = getExtraItemsFromMetadata(transaction.metadata);
 
       return [...itemSplits, ...extraItems];
-    } else {
-      // Initialize with single split for the full amount
-      return [
-        {
-          id: Date.now(),
-          description: transaction.description || "Transaction Split",
-          amount: Math.abs(transaction.amount),
-          category: transaction.category || "",
-          envelopeId: transaction.envelopeId || "",
-          isOriginalItem: false,
-        },
-      ];
     }
+
+    // Default initialization with single split
+    return [
+      {
+        id: Date.now(),
+        description: transaction.description || "Transaction Split",
+        amount: Math.abs(transaction.amount),
+        category: transaction.category || "",
+        envelopeId: transaction.envelopeId || "",
+        isOriginalItem: false,
+      },
+    ];
   } catch (error) {
     logger.error("Error initializing splits from transaction", error);
     return [];

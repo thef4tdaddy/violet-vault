@@ -4,8 +4,8 @@ import { useReceiptScanner } from "../useReceiptScanner";
 import { processReceiptImage } from "@/utils/core/common/ocrProcessor";
 
 // Mock the OCR processor
-vi.mock("@/utils/common/ocrProcessor");
-vi.mock("@/utils/common/logger");
+vi.mock("@/utils/core/common/ocrProcessor");
+vi.mock("@/utils/core/common/logger");
 
 describe("useReceiptScanner", () => {
   const mockOnReceiptProcessed = vi.fn();

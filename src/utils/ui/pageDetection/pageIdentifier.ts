@@ -9,7 +9,7 @@ import {
   PageType,
 } from "./pagePatterns.js";
 import { detectFromActiveNavigation } from "./navigationDetector.js";
-import logger from "../common/logger.js";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Identify current page using multiple detection strategies

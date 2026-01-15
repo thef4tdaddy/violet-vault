@@ -4,13 +4,13 @@ import { useUserSetup } from "../useUserSetup";
 import { globalToast } from "@/stores/ui/toastStore";
 
 // Mock dependencies
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showError: vi.fn(),
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     warn: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/auth/shareCodeManager", () => ({
+vi.mock("@/utils/platform/auth/shareCodeManager", () => ({
   shareCodeManager: {
     generateShareCode: vi.fn(() => "test-share-code"),
   },

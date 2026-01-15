@@ -3,8 +3,8 @@ import { queryKeys } from "@/utils/core/common/queryClient";
 import { useSpendingAnalyticsQuery } from "./queries/useSpendingAnalyticsQuery";
 import { useBalanceAnalyticsQuery } from "./queries/useBalanceAnalyticsQuery";
 import { usePaycheckTrendsQuery } from "./queries/usePaycheckTrendsQuery";
-import { getChartData } from "@/utils/chartDataUtils";
-import { getDateRange } from "@/utils/dateRangeUtils";
+import { getChartData } from "./utils/chartDataUtils";
+import { getDateRange } from "./utils/dateRangeUtils";
 
 interface AnalyticsOptions {
   period?: string;

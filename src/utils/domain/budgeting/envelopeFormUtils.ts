@@ -9,7 +9,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
 } from "@/constants/categories";
-import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
+import { toBiweekly, getFrequencyOptions } from "@/utils/core/common/frequencyCalculations";
 import { z } from "zod";
 
 /**
@@ -382,7 +382,7 @@ export const transformFormToEnvelope = (
 /**
  * Get field with default value
  */
-// eslint-disable-next-line no-redeclare
+
 function getFieldOrDefault(value: unknown, defaultValue: string): string;
 // eslint-disable-next-line no-redeclare
 function getFieldOrDefault(value: unknown, defaultValue: boolean): boolean;

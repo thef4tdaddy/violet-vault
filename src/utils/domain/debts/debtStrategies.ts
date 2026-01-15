@@ -7,7 +7,7 @@ import type {
   DebtStrategyResult,
   StrategyComparison,
   StrategyMonth,
-} from "../../types/debt";
+} from "@/types/debt";
 
 /**
  * Calculate optimal debt payment strategies

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@/test/test-utils";
+import { render, screen, waitFor } from "../../../test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
 import TransactionLedger from "../TransactionLedger";
@@ -186,7 +186,7 @@ vi.mock("@/utils/domain/transactions/ledgerHelpers", () => ({
 // Test Suite
 // ============================================================================
 
-import { useTransactionLedger } from "@/hooks/budgeting/transactions/useTransactionLedger";
+import { useTransactionLedger } from "../../../hooks/budgeting/transactions/useTransactionLedger";
 
 describe("TransactionLedger (Surgical Reset)", () => {
   let queryClient: QueryClient;

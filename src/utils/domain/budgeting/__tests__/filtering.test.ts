@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { processEnvelopes, calculateEnvelopeStats, getRepairUpdates } from "../filtering";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "@/constants/categories";
-import { isValidEnvelopeType } from "../../validation/envelopeValidation";
-import logger from "../../common/logger";
-import { render, screen, waitFor } from "../../../test/test-utils";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE, ENVELOPE_TYPES } from "../../../../constants/categories";
+import { isValidEnvelopeType } from "../../../core/validation/envelopeValidation";
+import logger from "../../../core/common/logger";
+import { render, screen, waitFor } from "../../../../test/test-utils";
 import "@testing-library/jest-dom";
 
-vi.mock("../../../constants/categories", () => ({
+vi.mock("../../../../constants/categories", () => ({
   AUTO_CLASSIFY_ENVELOPE_TYPE: vi.fn((cat: string) => (cat === "Savings" ? "goal" : "standard")),
   ENVELOPE_TYPES: {
     BILL: "bill",
@@ -17,11 +17,11 @@ vi.mock("../../../constants/categories", () => ({
   },
 }));
 
-vi.mock("../../validation/envelopeValidation", () => ({
+vi.mock("../../../core/validation/envelopeValidation", () => ({
   isValidEnvelopeType: vi.fn((type: string) => ["goal", "standard", "bill"].includes(type)),
 }));
 
-vi.mock("../../common/logger", () => ({
+vi.mock("../../../core/common/logger", () => ({
   default: {
     warn: vi.fn(),
     info: vi.fn(),

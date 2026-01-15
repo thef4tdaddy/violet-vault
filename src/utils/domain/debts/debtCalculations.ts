@@ -7,7 +7,7 @@ import type {
   PaymentFrequency,
   DebtSpecialTerms,
   PayoffProjection,
-} from "../../types/debt";
+} from "@/types/debt";
 
 import { DEBT_TYPES, DEBT_STATUS, PAYMENT_FREQUENCIES } from "@/constants/debts";
 

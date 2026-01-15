@@ -1,13 +1,13 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { vi, beforeEach, describe, it, expect, afterEach } from "vitest";
 import { useReportExporter } from "../useReportExporter";
-import * as csvImageExportUtils from "@/utils/csvImageExportUtils";
-import * as exportHandlerUtils from "@/utils/exportHandlerUtils";
-import * as pdfGeneratorUtils from "@/utils/pdfGeneratorUtils";
-import logger from "@/utils/core/common/logger";
+import * as csvImageExportUtils from "../utils/csvImageExportUtils";
+import * as exportHandlerUtils from "../utils/exportHandlerUtils";
+import * as pdfGeneratorUtils from "../utils/pdfGeneratorUtils";
+import logger from "../../../../utils/core/common/logger";
 
 // Mock dependencies
-vi.mock("@/utils/core/common/logger");
+vi.mock("../../../../utils/core/common/logger");
 vi.mock("../utils/csvImageExportUtils");
 vi.mock("../utils/exportHandlerUtils");
 vi.mock("../utils/pdfGeneratorUtils");

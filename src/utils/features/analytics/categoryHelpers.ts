@@ -139,11 +139,13 @@ export const applySuggestionToData = async (
  * Format currency for display
  */
 export const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount == null || isNaN(amount)) return "$0.00";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Math.abs(amount));
+  if (amount == null || isNaN(amount)) return "$0";
+  const absAmount = Math.abs(amount);
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(absAmount);
+  return amount < 0 ? `$-${formatted}` : `$${formatted}`;
 };
 
 /**

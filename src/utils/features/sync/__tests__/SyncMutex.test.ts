@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SyncMutex } from "../SyncMutex";
 
 // Mock logger
-vi.mock("../../common/logger", () => ({
+vi.mock("../../../core/common/logger", () => ({
   default: {
     warn: vi.fn(),
     debug: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("../../common/logger", () => ({
 }));
 
 describe("SyncMutex", () => {
-  let syncMutex;
+  let syncMutex: any;
 
   beforeEach(() => {
     syncMutex = new SyncMutex("TestSyncMutex");
@@ -21,7 +21,7 @@ describe("SyncMutex", () => {
 
   describe("initialization", () => {
     it("should create sync mutex with default name", () => {
-      const defaultMutex = new SyncMutex();
+      const defaultMutex = new SyncMutex() as any;
       expect(defaultMutex.name).toBe("SyncMutex");
       expect(defaultMutex.syncMetrics).toEqual({
         operationsCompleted: 0,
@@ -88,7 +88,7 @@ describe("SyncMutex", () => {
 
   describe("slow operation warnings", () => {
     it("should warn on slow operations", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("../../../core/common/logger");
 
       // Mock a slow operation by manually setting lock start time
       await syncMutex.acquire("slow-operation");
@@ -106,7 +106,7 @@ describe("SyncMutex", () => {
     });
 
     it("should not warn on normal operations", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("../../../core/common/logger");
 
       await syncMutex.acquire("normal-operation");
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -143,7 +143,7 @@ describe("SyncMutex", () => {
 
   describe("force release", () => {
     it("should force release and clear queue", async () => {
-      const logger = await import("../../common/logger");
+      const logger = await import("../../../core/common/logger");
 
       await syncMutex.acquire("first-operation");
 

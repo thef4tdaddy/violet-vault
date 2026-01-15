@@ -1,11 +1,9 @@
+import { formatCurrency } from "./categoryHelpers";
+export { formatCurrency };
+
 /**
  * Utility functions for trend analysis formatting and calculations
  */
-
-/**
- * Format currency values for display
- */
-export const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
 
 /**
  * Format percentage values for display

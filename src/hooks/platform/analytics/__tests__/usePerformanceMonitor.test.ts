@@ -1,13 +1,13 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { usePerformanceMonitor } from "../usePerformanceMonitor";
-import logger from "@/utils/core/common/logger";
-import * as performanceMetricsUtils from "@/utils/performanceMetricsUtils";
-import * as alertsUtils from "@/utils/alertsUtils";
+import logger from "../../../../utils/core/common/logger";
+import * as performanceMetricsUtils from "../utils/performanceMetricsUtils";
+import * as alertsUtils from "../utils/alertsUtils";
 import type { AnalyticsData, BalanceData } from "@/types/analytics";
 
 // Mock the logger
-vi.mock("@/utils/core/common/logger", () => ({
+vi.mock("../../../../utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

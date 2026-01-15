@@ -1,7 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { formatPaydayPrediction, getDaysUntilPayday } from "@/utils/domain/budgeting/paydayPredictor";
+import {
+  formatPaydayPrediction,
+  getDaysUntilPayday,
+} from "@/utils/domain/budgeting/paydayPredictor";
 import type { PaydayPrediction as PaydayPredictionType } from "@/utils/domain/budgeting/paydayPredictor";
 
 type FormattedPrediction = ReturnType<typeof formatPaydayPrediction>;

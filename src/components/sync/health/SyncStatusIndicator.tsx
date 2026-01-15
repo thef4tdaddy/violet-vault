@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-// eslint-disable-next-line no-restricted-imports -- UI helper utilities for formatting sync status
+
 import {
   getStatusColor,
   getStatusBackgroundColor,

@@ -87,9 +87,8 @@ export const initializeReactErrorDetector = (): void => {
   let renderCount = 0;
   let lastRenderTime = Date.now();
 
-  // eslint-disable-next-line no-console
   const originalError = console.error;
-  // eslint-disable-next-line no-console
+
   console.error = (...args: unknown[]) => {
     const errorMessage = args[0];
 

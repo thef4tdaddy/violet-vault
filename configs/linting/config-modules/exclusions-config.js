@@ -23,8 +23,8 @@ export default [
       "src/utils/**/calculations/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/validation/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/formatting/**/*.{js,jsx,ts,tsx}",
-      "src/utils/accounts/accountValidation.ts", // Account validation - complex form validation logic
-      "src/utils/sync/**/*.{js,jsx,ts,tsx}", // Sync utilities - complex data coordination
+      "src/utils/domain/accounts/accountValidation.ts", // Account validation - complex form validation logic
+      "src/utils/features/sync/**/*.{js,jsx,ts,tsx}", // Sync utilities - complex data coordination
       "src/services/sync/**/*.{js,jsx,ts,tsx}",
       "src/services/auth/**/*.{js,jsx,ts,tsx}",
       "src/services/authService.ts", // Core authentication service - security-critical
@@ -240,8 +240,8 @@ export default [
     // These have complexity inherent to their problem domain, not design issues
     files: [
       // PWA/Service Worker - Browser API complexity
-      "src/utils/pwa/patchNotesManager.ts", // Version content parsing logic
-      "src/utils/pwa/serviceWorkerDiagnostics.ts", // Cache health check diagnostics
+      "src/utils/platform/pwa/patchNotesManager.ts", // Version content parsing logic
+      "src/utils/platform/pwa/serviceWorkerDiagnostics.ts", // Cache health check diagnostics
       "src/components/pwa/OfflineStatusIndicator.tsx", // Network status detection
       "src/components/pwa/PatchNotesModal.tsx", // Version content rendering
       "src/components/pwa/ShareTargetHandler.tsx", // PWA Share Target API handling
@@ -260,7 +260,7 @@ export default [
 
       // Security & Data Integrity
       "src/components/security/LockScreen.tsx", // Multi-mode security state machine (260 lines)
-      "src/utils/budgeting/envelopeIntegrityChecker.ts", // Comprehensive data validation
+      "src/utils/domain/budgeting/envelopeIntegrityChecker.ts", // Comprehensive data validation
       "src/hooks/bills/useBillManager.ts", // Bill orchestration hook coordinating queries and bulk operations
     ],
     rules: {
@@ -406,7 +406,7 @@ export default [
     // APPROVED: Complexity exclusion for event filtering logic
     // The filterSentryEvent function needs to check multiple conditions (level, message, exception, request)
     // to properly filter out non-error messages, CORS errors, and sensitive data
-    files: ["src/utils/common/sentry.ts"],
+    files: ["src/utils/core/common/sentry.ts"],
     rules: {
       complexity: "off", // Multiple filtering conditions needed for noise reduction
     },

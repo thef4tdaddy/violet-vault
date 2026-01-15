@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { offlineRequestQueueService } from "../offlineRequestQueueService";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDb } from "../../../db/budgetDb";
 
 describe("OfflineRequestQueueService", () => {
   beforeEach(async () => {
@@ -12,6 +12,9 @@ describe("OfflineRequestQueueService", () => {
       writable: true,
       value: true,
     });
+
+    // Mock processQueue to prevent automatic processing during tests
+    vi.spyOn(offlineRequestQueueService, "processQueue").mockImplementation(async () => {});
   });
 
   afterEach(() => {
@@ -180,7 +183,7 @@ describe("OfflineRequestQueueService", () => {
       });
 
       const requests = await budgetDb.offlineRequestQueue.toArray();
-      const failedRequest = requests.find((r) => r.requestId === "test-failed");
+      const failedRequest = requests.find((r: any) => r.requestId === "test-failed");
 
       if (failedRequest?.id) {
         await budgetDb.offlineRequestQueue.update(failedRequest.id, {

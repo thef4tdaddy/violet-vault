@@ -7,7 +7,16 @@ import { budgetDatabaseService } from "@/services/budget/budgetDatabaseService";
 import { queryKeys } from "../queryKeys";
 
 // Mock dependencies
-vi.mock("../../../db/budgetDb", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
+  default: {
+    error: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       get: vi.fn(),
@@ -29,9 +38,21 @@ vi.mock("../../../db/budgetDb", () => ({
   },
 }));
 
-vi.mock("../../../services/budget/budgetDatabaseService", () => ({
+vi.mock("@/services/budget/budgetDatabaseService", () => ({
   budgetDatabaseService: {
     saveBudgetMetadata: vi.fn(),
+  },
+}));
+
+vi.mock("@/utils/platform/auth/shareCodeManager", () => ({
+  shareCodeManager: {
+    generateShareCode: vi.fn(() => "test-share-code"),
+    isValidShareCode: vi.fn(() => true),
+    formatForDisplay: vi.fn((s) => s),
+    generateQRData: vi.fn(() => "qr-data"),
+  },
+  default: {
+    generateShareCode: vi.fn(() => "test-share-code"),
   },
 }));
 
@@ -502,7 +523,10 @@ describe("optimisticHelpers", () => {
     it("should handle onMutate correctly", async () => {
       const queryKey = ["envelopes", "list"];
       const previousData = [{ id: "env1" }];
-      const updateFn = (old, variables) => [...old, variables.newItem];
+      const updateQueryData = (old: any, variables: any) => {
+        if (!old) return old;
+        return old.map((t: any) => (t.id === variables.id ? { ...t, ...variables } : t));
+      };
 
       mockQueryClient.cancelQueries.mockResolvedValue(undefined);
       mockQueryClient.getQueryData.mockReturnValue(previousData);
@@ -510,7 +534,7 @@ describe("optimisticHelpers", () => {
       const config = optimisticHelpers.createOptimisticMutation(mockQueryClient as any, {
         mutationKey: ["test"],
         queryKey,
-        updateFn,
+        updateFn: updateQueryData,
         rollbackFn: vi.fn(),
       });
 

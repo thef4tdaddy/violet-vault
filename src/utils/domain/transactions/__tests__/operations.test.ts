@@ -15,7 +15,7 @@ import {
 } from "../operations.js";
 
 // Mock logger
-vi.mock("../../common/logger.js", () => ({
+vi.mock("../../../core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -184,7 +184,7 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should default to expense for null transaction", () => {
-      expect(determineTransactionType(null)).toBe("expense");
+      expect(determineTransactionType(null as any)).toBe("expense");
     });
   });
 
@@ -262,8 +262,8 @@ describe("Transaction Operations Utilities", () => {
       const categorized = categorizeTransaction(transaction, customRules);
 
       expect(categorized.category).toBe("Groceries");
-      expect(categorized.metadata.autoCategorized).toBe(true);
-      expect(categorized.metadata.categoryRule).toBe("Grocery Rule");
+      expect((categorized.metadata as any).autoCategorized).toBe(true);
+      expect((categorized.metadata as any).categoryRule).toBe("Grocery Rule");
     });
 
     it("should apply default categorization rules", () => {
@@ -272,8 +272,8 @@ describe("Transaction Operations Utilities", () => {
       const categorized = categorizeTransaction(transaction, []);
 
       expect(categorized.category).toBe("Transportation");
-      expect(categorized.metadata.autoCategorized).toBe(true);
-      expect(categorized.metadata.categoryRule).toBe("default");
+      expect((categorized.metadata as any).autoCategorized).toBe(true);
+      expect((categorized.metadata as any).categoryRule).toBe("default");
     });
 
     it("should not override existing category", () => {
@@ -338,8 +338,8 @@ describe("Transaction Operations Utilities", () => {
       });
 
       expect(merged).toHaveLength(2); // txn1 merged with txn2, txn3 kept
-      expect(merged[0].metadata.duplicates).toHaveLength(1);
-      expect(merged[0].metadata.duplicates[0].id).toBe("txn2");
+      expect((merged[0].metadata as any).duplicates).toHaveLength(1);
+      expect((merged[0].metadata as any).duplicates[0].id).toBe("txn2");
     });
 
     it("should respect time window", () => {

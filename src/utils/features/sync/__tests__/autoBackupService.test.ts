@@ -46,7 +46,7 @@ const { mockEnvelopes } = vi.hoisted(() => ({
 }));
 
 // Mock Dexie and database before importing the service
-vi.mock("../../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       get: vi.fn(async (id: string) => mockEnvelopes.find((e: any) => e.id === id)),
