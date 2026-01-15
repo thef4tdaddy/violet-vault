@@ -181,9 +181,9 @@ jobs:
             const goCoverage = parseFloat('${{ steps.test_go.outputs.coverage }}') || 0;
 
             const isHealthy = buildStatus === 'success' && 
-                             (feStatus !== 'failure') && 
-                             (goStatus !== 'failure') && 
-                             (pyStatus !== 'failure');
+                             (feStatus === 'success' || feStatus === 'skipped') && 
+                             (goStatus === 'success' || goStatus === 'skipped') && 
+                             (pyStatus === 'success' || pyStatus === 'skipped');
             const emoji = isHealthy ? '✅' : '❌';
             const dateStr = new Date().toISOString().split('T')[0];
             const title = `Daily Health: ${dateStr} - ${emoji}`;
