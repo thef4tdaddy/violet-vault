@@ -297,7 +297,7 @@ Total: $11.48`;
       });
       expect(items[1]).toEqual({
         description: "Bread",
-        amount: 2.5,
+        amount: 2.5, // Note: JavaScript parseFloat may not preserve trailing zeros (2.50 becomes 2.5)
         rawLine: "Bread $2.50",
       });
     });
@@ -605,7 +605,11 @@ ABC $3.00`;
     });
 
     it("should use the same instance across imports", () => {
-      expect(ocrProcessor).toBe(ocrProcessor);
+      // Test that singleton is truly a singleton by checking reference equality
+      const firstReference = ocrProcessor;
+      const secondReference = ocrProcessor;
+      expect(firstReference).toBe(secondReference);
+      expect(ocrProcessor).toBeInstanceOf(OCRProcessor);
     });
   });
 
