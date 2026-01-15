@@ -315,7 +315,7 @@ jobs:
             //        // Find worst offenders
             //        const pyLowCovFiles = [];
             //        for (const [filepath, metrics] of Object.entries(pyFiles)) {
-            //            if (filepath.includes('test_') || filepath.includes('__init__')) continue;
+            //            if (filepath.includes('test_') || filepath.includes('__init__.py')) continue;
             //            
             //            const coverage = metrics.summary?.percent_covered || 0;
             //            if (coverage < 80) {
