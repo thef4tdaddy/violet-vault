@@ -15,7 +15,7 @@ import {
   type ConnectedEnvelope,
   type DebtSubmissionData,
 } from "./useDebtForm";
-import { calculateDebtMetrics } from "@/utils/debts/debtFormValidation";
+import { calculateDebtMetrics } from "@/utils/domain/debts/debtFormValidation";
 import type { DebtAccount } from "@/types/debt";
 
 export const useDebtModalLogic = (

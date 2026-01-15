@@ -12,7 +12,7 @@ vi.mock("@/services/storage/localStorageService", () => ({
 }));
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),

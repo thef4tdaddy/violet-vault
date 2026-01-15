@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "@/utils/transactions/fileParser";
+import { parseCSV, parseOFX, autoDetectFieldMapping } from "@/utils/domain/transactions/fileParser";
 import { globalToast } from "@/stores/ui/toastStore";
 
 interface ImportData {

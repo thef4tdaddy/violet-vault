@@ -1,12 +1,12 @@
 import { useCallback } from "react";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   validatePaycheckDeletion,
   calculateReversedBalances,
   deletePaycheckRecord,
   invalidatePaycheckCaches,
   type BudgetDbTransactions,
-} from "@/utils/layout/paycheckDeletionUtils";
+} from "@/utils/ui/layout/paycheckDeletionUtils";
 
 import type { PaycheckHistory } from "@/db/types";
 
@@ -75,7 +75,7 @@ export const usePaycheckOperations = () => {
         );
 
         // Invalidate caches
-        const { queryClient, queryKeys } = await import("@/utils/common/queryClient");
+        const { queryClient, queryKeys } = await import("@/utils/core/common/queryClient");
         await invalidatePaycheckCaches(queryClient as QueryClient, queryKeys);
 
         logger.info("Paycheck deleted successfully with proper balance reversal", {

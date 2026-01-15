@@ -1,4 +1,4 @@
-import { renderConfidenceIndicator } from "@/utils/receipts/receiptHelpers";
+import { renderConfidenceIndicator } from "@/utils/features/receipts/receiptHelpers";
 
 interface ExtractedDataFieldProps {
   label: string;

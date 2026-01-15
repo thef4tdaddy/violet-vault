@@ -12,7 +12,7 @@ vi.mock("@/utils", () => ({
   )),
 }));
 
-vi.mock("@/utils/ui/touchFeedback", () => ({
+vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   useTouchFeedback: vi.fn(() => ({
     onClick: (handler: () => void) => handler,
     onTouchStart: vi.fn(),

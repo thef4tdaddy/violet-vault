@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi, Mock } from "vitest";
 import budgetHistoryService from "@/services/budget/budgetHistoryService";
 import { budgetDb } from "@/db/budgetDb";
-import { encryptionUtils } from "@/utils/security/encryption";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
 
 // Mock dependencies
 vi.mock("@/db/budgetDb", () => ({
@@ -79,7 +79,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/utils/security/encryption", () => ({
+vi.mock("@/utils/platform/security/encryption", () => ({
   encryptionUtils: {
     generateDeviceFingerprint: vi.fn(),
     generateHash: vi.fn(),

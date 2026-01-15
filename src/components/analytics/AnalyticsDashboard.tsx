@@ -15,7 +15,7 @@ import type {
   EnvelopeHealthEntry,
   BudgetVsActualEntry,
 } from "./tabs/EnvelopesTab";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { useAnalyticsData } from "@/hooks/platform/analytics/useAnalyticsData";

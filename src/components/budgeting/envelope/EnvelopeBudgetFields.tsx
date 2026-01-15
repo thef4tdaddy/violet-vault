@@ -2,7 +2,7 @@ import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
-import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
+import { getFrequencyOptions } from "@/utils/core/common/frequencyCalculations";
 
 // Get section title based on envelope type
 const getSectionTitle = (envelopeType: string) => {

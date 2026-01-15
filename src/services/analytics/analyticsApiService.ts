@@ -2,10 +2,10 @@
  * Analytics API Service - v2.0 Polyglot Backend Integration
  * Interfaces with Python analytics backend for financial intelligence
  */
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { ApiClient } from "@/services/api/client";
-import { predictNextPayday as localPredict } from "@/utils/budgeting/paydayPredictor";
-import type { PaycheckEntry as LocalPaycheckEntry } from "@/utils/budgeting/paydayPredictor";
+import { predictNextPayday as localPredict } from "@/utils/domain/budgeting/paydayPredictor";
+import type { PaycheckEntry as LocalPaycheckEntry } from "@/utils/domain/budgeting/paydayPredictor";
 
 // --- Types ---
 

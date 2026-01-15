@@ -8,7 +8,7 @@ vi.mock("../useBills", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/bills/billUpdateHelpers", () => ({
+vi.mock("@/utils/domain/bills/billUpdateHelpers", () => ({
   processBulkOperation: vi.fn(async (items, name, fn) => {
     let successCount = 0;
     let errorCount = 0;

@@ -7,9 +7,9 @@
  * Part of Epic #665: Migrate Auth from Zustand to React Context + TanStack Query
  */
 
-import { encryptionUtils } from "@/utils/security/encryption";
-import logger from "@/utils/common/logger";
-import { identifyUser } from "@/utils/common/sentry";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
+import logger from "@/utils/core/common/logger";
+import { identifyUser } from "@/utils/core/common/sentry";
 
 interface UserData {
   userName: string;

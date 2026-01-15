@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import logger from "@/utils/common/logger";
-import backgroundSyncManager from "@/utils/pwa/backgroundSync";
+import logger from "@/utils/core/common/logger";
+import backgroundSyncManager from "@/utils/platform/pwa/backgroundSync";
 
 /**
  * Hook for offline/online status and user feedback

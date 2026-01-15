@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTransactionFilters } from "./useTransactionFilters";
 import { useTransactionForm } from "./useTransactionForm";
-import { suggestEnvelope } from "@/utils/transactions/envelopeMatching";
+import { suggestEnvelope } from "@/utils/domain/transactions/envelopeMatching";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useTransactionOperations } from "@/hooks/budgeting/transactions/useTransactionOperations";

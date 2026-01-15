@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { syncHealthMonitor } from "@/utils/sync/syncHealthMonitor";
+import { syncHealthMonitor } from "@/utils/features/sync/syncHealthMonitor";
 
 interface HealthMetrics {
   totalAttempts: number;

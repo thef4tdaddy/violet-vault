@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Validation result

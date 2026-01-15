@@ -59,7 +59,7 @@ vi.mock("@/db/budgetDb", () => {
   };
 });
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     envelopes: ["envelopes"],
     transactions: ["transactions"],
@@ -76,7 +76,7 @@ vi.mock("@/utils/common/queryClient", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -359,7 +359,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("../../utils/common/queryClient");
+      const { optimisticHelpers } = await import("@/utils/core/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),
@@ -746,7 +746,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
 
       const { useMutation, useQueryClient } = await import("@tanstack/react-query");
       (useQueryClient as Mock).mockReturnValue(mockQueryClient);
-      const { optimisticHelpers } = await import("../../utils/common/queryClient");
+      const { optimisticHelpers } = await import("@/utils/core/common/queryClient");
 
       const mockMutation = {
         mutate: vi.fn(),

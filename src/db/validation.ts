@@ -5,7 +5,7 @@
  */
 
 import { z } from "zod";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Validate data with Zod schema and log errors

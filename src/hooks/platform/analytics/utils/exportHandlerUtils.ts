@@ -3,7 +3,7 @@
  * Extracted from useReportExporter hook to reduce complexity
  */
 
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
 
 interface ExportOptions {

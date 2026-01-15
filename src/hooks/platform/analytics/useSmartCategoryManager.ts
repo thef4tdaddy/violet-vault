@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import logger from "@/utils/common/logger";
-import type { Suggestion } from "@/utils/analytics/categoryHelpers";
+import logger from "@/utils/core/common/logger";
+import type { Suggestion } from "@/utils/features/analytics/categoryHelpers";
 
 type CategoryTabId = "suggestions" | "analysis" | "settings";
 

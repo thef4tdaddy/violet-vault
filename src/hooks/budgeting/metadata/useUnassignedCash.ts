@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import {
   getBudgetMetadata,
   setBudgetMetadata,
   setUnassignedCash as setUnassignedCashDb,
   getUnassignedCash,
 } from "@/db/budgetDb";
-import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
-import logger from "@/utils/common/logger";
+import BudgetHistoryTracker from "@/utils/core/common/budgetHistoryTracker";
+import logger from "@/utils/core/common/logger";
 
 interface SetUnassignedCashOptions {
   author?: string;

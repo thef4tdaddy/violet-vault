@@ -1,7 +1,7 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported, type Messaging } from "firebase/messaging";
-import { firebaseConfig } from "@/utils/common/firebaseConfig";
-import logger from "@/utils/common/logger";
+import { firebaseConfig } from "@/utils/core/common/firebaseConfig";
+import logger from "@/utils/core/common/logger";
 /// <reference types="../vite-env.d.ts" />
 
 // Type declarations for browser APIs

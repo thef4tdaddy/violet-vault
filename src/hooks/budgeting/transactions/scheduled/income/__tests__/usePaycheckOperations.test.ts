@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { usePaycheckOperations } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckOperations";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Mock paycheck deletion utils
-vi.mock("@/utils/layout/paycheckDeletionUtils", () => ({
+vi.mock("@/utils/ui/layout/paycheckDeletionUtils", () => ({
   validatePaycheckDeletion: vi.fn(),
   calculateReversedBalances: vi.fn(),
   deletePaycheckRecord: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock("@/db/budgetDb", () => ({
 }));
 
 // Mock queryClient
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryClient: {
     invalidateQueries: vi.fn(),
   },
@@ -66,9 +66,9 @@ describe("usePaycheckOperations", () => {
     vi.clearAllMocks();
 
     // Import mocked modules
-    const paycheckUtils = await import("@/utils/layout/paycheckDeletionUtils");
+    const paycheckUtils = await import("@/utils/ui/layout/paycheckDeletionUtils");
     const budgetDb = await import("@/db/budgetDb");
-    const queryClient = await import("@/utils/common/queryClient");
+    const queryClient = await import("@/utils/core/common/queryClient");
 
     mockValidatePaycheckDeletion = paycheckUtils.validatePaycheckDeletion as ReturnType<
       typeof vi.fn
@@ -107,7 +107,7 @@ describe("usePaycheckOperations", () => {
   it("should successfully delete a paycheck with proper balance reversal", async () => {
     const { result } = renderHook(() => usePaycheckOperations());
 
-    const queryClient = await import("@/utils/common/queryClient");
+    const queryClient = await import("@/utils/core/common/queryClient");
 
     await act(async () => {
       await result.current.handleDeletePaycheck("paycheck-1", mockPaycheckHistory);

@@ -30,7 +30,7 @@ vi.mock("@/services/sync/editLockService", () => ({
   initializeEditLocks: vi.fn(),
 }));
 
-vi.mock("@/utils/accounts/accountValidation", () => ({
+vi.mock("@/utils/domain/accounts/accountValidation", () => ({
   validateAccountForm: vi.fn(() => ({ isValid: true })),
   validateTransferForm: vi.fn(() => ({ isValid: true })),
   calculateAccountTotals: vi.fn(() => ({
@@ -39,7 +39,7 @@ vi.mock("@/utils/accounts/accountValidation", () => ({
   })),
 }));
 
-vi.mock("@/utils/accounts/accountHelpers", () => ({
+vi.mock("@/utils/domain/accounts/accountHelpers", () => ({
   getAccountTypeInfo: vi.fn(() => ({ label: "Checking", icon: "Bank" })),
 }));
 

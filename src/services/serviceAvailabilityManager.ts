@@ -5,7 +5,7 @@
  * @module services/serviceAvailabilityManager
  */
 
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { ApiClient } from "@/services/api/client";
 import { BudgetEngineService } from "@/services/api/budgetEngineService";
 import { ImportService } from "@/services/api/importService";

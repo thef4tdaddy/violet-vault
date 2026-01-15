@@ -1,5 +1,5 @@
 import React from "react";
-import type { BillIconOption } from "@/utils/icons";
+import type { BillIconOption } from "@/utils/ui/icons";
 import type { Transaction } from "@/db/types";
 
 /**

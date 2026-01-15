@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { processRecurringBill } from "@/utils/bills/recurringBillUtils";
+import { processRecurringBill } from "@/utils/domain/bills/recurringBillUtils";
 import {
   categorizeBills,
   calculateBillTotals,
   filterBills,
   processBillCalculations,
-} from "@/utils/bills/billCalculations";
+} from "@/utils/domain/bills/billCalculations";
 import type { Bill as DbBill, Transaction } from "@/db/types";
 import type { Bill as UiBill } from "@/types/bills";
 

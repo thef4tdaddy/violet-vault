@@ -2,7 +2,7 @@ import React from "react";
 import { useExportData } from "./useExportData";
 import { useImportData } from "./useImportData";
 import { useResetEncryption } from "./useResetEncryption";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Data management hook return type

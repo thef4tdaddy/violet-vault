@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useBudgetMetadataQuery } from "./useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface FormatBalanceOptions {
   showCurrency?: boolean;

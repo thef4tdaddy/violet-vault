@@ -2,8 +2,8 @@
  * Helper functions for useSavingsGoals hook
  * Extracted to reduce function length
  */
-import logger from "@/utils/common/logger";
-import type { ProcessedSavingsGoal } from "@/utils/savings/savingsCalculations";
+import logger from "@/utils/core/common/logger";
+import type { ProcessedSavingsGoal } from "@/utils/domain/savings/savingsCalculations";
 
 interface MutationHandler {
   mutateAsync: <T = unknown>(variables: T) => Promise<unknown>;

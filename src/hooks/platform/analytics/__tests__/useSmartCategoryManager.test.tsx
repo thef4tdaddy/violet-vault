@@ -3,7 +3,7 @@ import { useSmartCategoryManager } from "../useSmartCategoryManager";
 import { vi } from "vitest";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),

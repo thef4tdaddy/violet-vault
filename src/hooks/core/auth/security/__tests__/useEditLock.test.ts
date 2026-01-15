@@ -3,14 +3,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import useEditLock from "../useEditLock";
 import { editLockService } from "@/services/sync/editLockService";
 import useToast from "@/hooks/platform/ux/useToast";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import * as helpers from "../useEditLockHelpers";
 import type { LockDocument } from "@/types/editLock";
 
 // Mock dependencies
 vi.mock("@/services/sync/editLockService");
 vi.mock("@/hooks/platform/ux/useToast");
-vi.mock("@/utils/common/logger");
+vi.mock("@/utils/core/common/logger");
 vi.mock("../useEditLockHelpers");
 
 describe("useEditLock", () => {

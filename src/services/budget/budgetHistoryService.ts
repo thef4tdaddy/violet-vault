@@ -1,7 +1,7 @@
 // Budget History Service - Git-like history tracking for budget changes
 import { budgetDb } from "@/db/budgetDb";
-import { encryptionUtils } from "@/utils/security/encryption";
-import logger from "@/utils/common/logger";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
+import logger from "@/utils/core/common/logger";
 import type { BudgetCommit, BudgetChange, BudgetTag } from "@/db/types";
 
 // Define proper types for the service

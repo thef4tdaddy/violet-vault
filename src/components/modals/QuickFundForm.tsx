@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { getButtonClasses, withHapticFeedback } from "@/utils/ui/touchFeedback";
+import { getButtonClasses, withHapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 interface Envelope {
   name: string;

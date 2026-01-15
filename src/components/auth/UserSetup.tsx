@@ -14,7 +14,7 @@ import StepButtons from "./components/StepButtons";
 import ShareCodeDisplay from "./components/ShareCodeDisplay";
 import JoinBudgetSection from "./components/JoinBudgetSection";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * User Setup Component (Refactored)

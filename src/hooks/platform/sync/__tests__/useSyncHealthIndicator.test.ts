@@ -3,7 +3,7 @@ import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock dependencies
-vi.mock("@/utils/sync/masterSyncValidator", () => ({
+vi.mock("@/utils/features/sync/masterSyncValidator", () => ({
   getQuickSyncStatus: vi.fn(),
 }));
 
@@ -14,7 +14,7 @@ vi.mock("@/services/sync/syncOrchestrator", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),
@@ -26,7 +26,7 @@ describe("useSyncHealthIndicator", () => {
 
   beforeEach(async () => {
     // Import mocked module
-    const masterSyncValidator = await import("@/utils/sync/masterSyncValidator");
+    const masterSyncValidator = await import("@/utils/features/sync/masterSyncValidator");
     getQuickSyncStatus = masterSyncValidator.getQuickSyncStatus as ReturnType<typeof vi.fn>;
 
     vi.clearAllMocks();

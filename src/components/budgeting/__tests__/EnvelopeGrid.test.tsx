@@ -97,7 +97,7 @@ vi.mock("@/hooks/mobile/usePullToRefresh", () => ({
 }));
 
 // Utils
-vi.mock("@/utils/budgeting", () => ({
+vi.mock("@/utils/domain/budgeting", () => ({
   calculateEnvelopeData: vi.fn((envelopes) =>
     (envelopes || []).map((e: any) => ({ ...e, spent: 0, remaining: e.allocated || 0 }))
   ),
@@ -126,12 +126,12 @@ vi.mock("../envelope/EnvelopeGridView", () => ({
 }));
 
 // Mock Prop Validator
-vi.mock("@/utils/validation/propValidator", () => ({
+vi.mock("@/utils/core/validation/propValidator", () => ({
   validateComponentProps: vi.fn(),
 }));
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

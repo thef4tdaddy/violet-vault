@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useDebtDashboard } from "@/hooks/budgeting/envelopes/liabilities/useDebtDashboard";
-import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
+import { isDebtFeatureEnabled } from "@/utils/domain/debts/debtDebugConfig";
 import AddDebtModal from "./modals/AddDebtModal";
 import DebtDetailModal from "./modals/DebtDetailModal";
 import UpcomingPaymentsModal from "./modals/UpcomingPaymentsModal";

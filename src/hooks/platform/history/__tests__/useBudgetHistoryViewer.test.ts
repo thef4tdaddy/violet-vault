@@ -17,7 +17,7 @@ vi.mock("@/hooks/platform/ux/usePrompt", () => ({
   usePrompt: vi.fn(() => vi.fn()),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
   },
@@ -200,7 +200,7 @@ describe("useBudgetHistoryRestore", () => {
   });
 
   it("should handle restore errors", async () => {
-    const logger = await import("@/utils/common/logger");
+    const logger = await import("@/utils/core/common/logger");
 
     mockConfirm.mockResolvedValue(true);
     mockPrompt.mockResolvedValue("validpassword");

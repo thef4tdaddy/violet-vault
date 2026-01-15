@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useFABSelectors, useFABActions } from "@/stores/ui/fabStore";
 import { useFABLoadingStates } from "@/hooks/platform/mobile/useFABLoadingStates";
-import { hapticFeedback } from "@/utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 /**
  * FAB Action interface - matches the store's FABAction interface

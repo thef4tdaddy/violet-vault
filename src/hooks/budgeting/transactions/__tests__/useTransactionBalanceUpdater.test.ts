@@ -15,7 +15,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     debug: vi.fn(),

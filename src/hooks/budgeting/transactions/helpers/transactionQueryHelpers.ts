@@ -3,7 +3,7 @@
  * Extracted to reduce complexity in useTransactionQuery
  */
 import type { Transaction } from "@/db/types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface FilterOptions {
   envelopeId?: string;

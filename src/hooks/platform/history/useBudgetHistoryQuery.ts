@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import { encryptionUtils } from "@/utils/security/encryption";
-import logger from "@/utils/common/logger";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
+import logger from "@/utils/core/common/logger";
 
 /**
  * TanStack Query hooks for budget history following proper data flow:

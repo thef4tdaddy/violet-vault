@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import { useConfirm } from "../../../hooks/platform/ux/useConfirm";
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { DataDetectionResult } from "@/types/sync";
 
 // Extend window interface for custom debug functions

@@ -7,7 +7,7 @@
 
 import { useOfflineMutation } from "@/hooks/sync/useOfflineMutation";
 import type { Envelope } from "@/db/types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Example: Create Envelope with Offline Support

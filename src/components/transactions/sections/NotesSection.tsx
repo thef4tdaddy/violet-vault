@@ -2,7 +2,7 @@ import React from "react";
 import { Textarea, Checkbox } from "@/components/ui";
 import { FormSection } from "@/components/primitives/forms";
 import ReceiptButton from "@/components/receipts/ReceiptButton";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
 

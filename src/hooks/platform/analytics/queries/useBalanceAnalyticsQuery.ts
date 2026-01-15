@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import { useBudgetMetadata } from "@/hooks/budgeting/metadata/useBudgetMetadata";

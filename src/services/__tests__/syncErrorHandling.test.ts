@@ -20,7 +20,7 @@ vi.mock("firebase/auth", () => ({
   onAuthStateChanged: vi.fn(),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -121,7 +121,7 @@ describe("Sync Error Handling Tests", () => {
     });
 
     it("should log connection errors", async () => {
-      const loggerModule = await import("@/utils/common/logger");
+      const loggerModule = await import("@/utils/core/common/logger");
       const logger = loggerModule.default;
 
       const error = new Error("Connection failed");
@@ -392,7 +392,7 @@ describe("Sync Error Handling Tests", () => {
 
   describe("Error Logging", () => {
     it("should log detailed error information", async () => {
-      const loggerModule = await import("@/utils/common/logger");
+      const loggerModule = await import("@/utils/core/common/logger");
       const logger = loggerModule.default;
 
       const error = new Error("Sync failed");

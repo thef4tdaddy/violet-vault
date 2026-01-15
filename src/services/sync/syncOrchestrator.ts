@@ -1,7 +1,7 @@
 import { encryptionManager } from "../security/encryptionManager";
-import logger from "@/utils/common/logger";
-import { syncHealthMonitor } from "@/utils/sync/syncHealthMonitor";
-import { autoBackupService } from "@/utils/sync/autoBackupService";
+import logger from "@/utils/core/common/logger";
+import { syncHealthMonitor } from "@/utils/features/sync/syncHealthMonitor";
+import { autoBackupService } from "@/utils/features/sync/autoBackupService";
 import { offlineRequestQueueService } from "./offlineRequestQueueService";
 import { websocketSignalingService } from "./websocketSignalingService";
 import type { SafeUnknown, TypedResponse } from "@/types/firebase";

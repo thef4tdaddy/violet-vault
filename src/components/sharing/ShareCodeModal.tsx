@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "@/utils";
-import { shareCodeManager } from "@/utils/auth/shareCodeManager";
+import { shareCodeManager } from "@/utils/platform/auth/shareCodeManager";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
-import logger from "@/utils/common/logger";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
+import logger from "@/utils/core/common/logger";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 

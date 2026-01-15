@@ -3,8 +3,8 @@
  * Unified bug reporting with screenshot capture, system info, and multi-provider submission.
  * This file replaces the 12+ files in the previous bugReport/ directory.
  */
-import logger from "@/utils/common/logger";
-import { APP_VERSION } from "@/utils/common/version";
+import logger from "@/utils/core/common/logger";
+import { APP_VERSION } from "@/utils/core/common/version";
 import { ApiClient } from "@/services/api/client";
 
 // --- Types ---

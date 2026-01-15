@@ -1,4 +1,4 @@
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 import { EmptyRulesList, RuleCard, CreateRuleButton, ExecuteAllButton } from "./RulesTabComponents";
 
 interface RulesTabProps {

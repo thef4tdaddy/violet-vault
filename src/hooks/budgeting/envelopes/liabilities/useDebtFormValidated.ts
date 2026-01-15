@@ -11,7 +11,7 @@ import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { DebtFormSchema, type DebtFormData } from "@/domain/schemas/debt";
 import type { LiabilityEnvelope as Debt, Bill, Envelope } from "@/db/types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseDebtFormValidatedOptions {
   debt?: Debt | null;

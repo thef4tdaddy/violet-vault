@@ -5,7 +5,7 @@ import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
-} from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
 
 export interface SummaryMetric {
   key: string;

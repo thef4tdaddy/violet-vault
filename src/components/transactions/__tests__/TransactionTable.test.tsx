@@ -55,25 +55,47 @@ vi.mock("@/components/history/ObjectHistoryViewer", () => ({
   ),
 }));
 
+vi.mock("@/utils/domain/transactions/tableHelpers", () => ({
+  MIN_TABLE_WIDTH: "80rem",
+  findEnvelopeForTransaction: vi.fn(() => ({ id: "1", name: "Test Envelope", color: "#000000" })),
+  formatTransactionAmount: vi.fn((amount) => ({
+    formatted: `$${amount}`,
+    className: "text-gray-900",
+  })),
+  formatTransactionDate: vi.fn(() => "Jan 15, 2024"),
+  getEnvelopeDisplay: vi.fn(() => ({
+    name: "Test Envelope",
+    color: "#000000",
+    className: "bg-gray-100 text-gray-800",
+  })),
+  COLUMN_WIDTHS: {
+    date: "8rem",
+    description: "16rem",
+    category: "9rem",
+    envelope: "12rem",
+    amount: "8rem",
+    actions: "9rem",
+  },
+  COLUMN_STYLES: {
+    date: { width: "8rem", minWidth: "8rem", maxWidth: "8rem" },
+    description: { width: "16rem", minWidth: "16rem", maxWidth: "16rem" },
+    category: { width: "9rem", minWidth: "9rem", maxWidth: "9rem" },
+    envelope: { width: "12rem", minWidth: "12rem", maxWidth: "12rem" },
+    amount: { width: "8rem", minWidth: "8rem", maxWidth: "8rem" },
+    actions: { width: "9rem", minWidth: "9rem", maxWidth: "9rem" },
+  },
+}));
+
 // Mock MobileTransactionList to avoid duplicate IDs and text in JSDOM
 vi.mock("../TransactionTable", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
-  // We want to mock only the MobileTransactionList component if it's exported,
-  // but it's an internal component in TransactionTable.tsx.
-  // Wait, I can't easily mock internal components.
-  // But TransactionTable.tsx has:
-  // const MobileTransactionList: React.FC<MobileTransactionListProps> = ...
-  // It's not exported.
   return actual;
 });
 
-// Since I can't easily mock the internal component from outside without changing the file,
-// I will instead use more specific selectors in the test
-// OR I can mock the whole TransactionTable but that's what I'm testing.
-
 // Mock icons utility
-vi.mock("@/utils", () => ({
+vi.mock("@/utils/ui/icons", () => ({
   getIcon: vi.fn(() => () => <span data-testid="icon" />),
+  getIconByName: vi.fn(() => () => <span data-testid="icon" />),
 }));
 
 describe("TransactionTable", () => {
