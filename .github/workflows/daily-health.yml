@@ -213,6 +213,36 @@ jobs:
             body += `- **Go Tests**: ${goStatus === 'success' ? '✅ Pass' : (goStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
             body += `- **Python Tests**: ${pyStatus === 'success' ? '✅ Pass' : (pyStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
 
+            // Add failure details if any tests failed
+            if (feStatus === 'failure' || goStatus === 'failure' || pyStatus === 'failure') {
+                body += `\n## 🔍 Failure Details\n\n`;
+                
+                if (feStatus === 'failure' && fs.existsSync('frontend-test.txt')) {
+                    const feLog = fs.readFileSync('frontend-test.txt', 'utf8');
+                    // Extract last 30 lines or first error
+                    const lines = feLog.split('\n');
+                    const errorLines = lines.slice(-30).join('\n');
+                    body += `### Frontend Test Failures\n\n`;
+                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
+                }
+                
+                if (goStatus === 'failure' && fs.existsSync('go-test.txt')) {
+                    const goLog = fs.readFileSync('go-test.txt', 'utf8');
+                    const lines = goLog.split('\n');
+                    const errorLines = lines.slice(-30).join('\n');
+                    body += `### Go Test Failures\n\n`;
+                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
+                }
+                
+                if (pyStatus === 'failure' && fs.existsSync('python-test.txt')) {
+                    const pyLog = fs.readFileSync('python-test.txt', 'utf8');
+                    const lines = pyLog.split('\n');
+                    const errorLines = lines.slice(-30).join('\n');
+                    body += `### Python Test Failures\n\n`;
+                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
+                }
+            }
+
             // Frontend Coverage Parsing (JSON)
             if (fs.existsSync('coverage/coverage-summary.json')) {
                try {
@@ -271,6 +301,137 @@ jobs:
                    console.error("Error parsing FE coverage", e);
                }
             }
+
+            // TODO: Enable Python and Go coverage parsing when frontend >= 80%
+            // Python Coverage Parsing (JSON)
+            // if (frontendCoverage >= 80 && fs.existsSync('api/coverage.json')) {
+            //    try {
+            //        const pyCoverage = JSON.parse(fs.readFileSync('api/coverage.json', 'utf8'));
+            //        const pyFiles = pyCoverage.files || {};
+            //        
+            //        body += `\n### Python Coverage Details\n`;
+            //        body += `- **Total**: ${pythonCoverage.toFixed(1)}%\n`;
+            //        
+            //        // Find worst offenders
+            //        const pyLowCovFiles = [];
+            //        for (const [filepath, metrics] of Object.entries(pyFiles)) {
+            //            if (filepath.includes('test_') || filepath.includes('__init__')) continue;
+            //            
+            //            const coverage = metrics.summary?.percent_covered || 0;
+            //            if (coverage < 80) {
+            //                pyLowCovFiles.push({ file: filepath, pct: coverage });
+            //            }
+            //        }
+            //        
+            //        pyLowCovFiles.sort((a, b) => a.pct - b.pct);
+            //        
+            //        if (pyLowCovFiles.length > 0) {
+            //            body += `\n**Lowest Coverage Files:**\n`;
+            //            for (const item of pyLowCovFiles.slice(0, 5)) {
+            //                body += `- \`${item.file}\`: ${item.pct.toFixed(1)}%\n`;
+            //            }
+            //            
+            //            // Create issues for worst 3 offenders
+            //            const pyCandidates = pyLowCovFiles.slice(0, 3);
+            //            for (const item of pyCandidates) {
+            //                const parts = item.file.split('/');
+            //                const basename = parts[parts.length - 1];
+            //                const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+            //                
+            //                const existing = await github.rest.search.issuesAndPullRequests({
+            //                    q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
+            //                });
+            //                
+            //                if (existing.data.total_count === 0) {
+            //                    await github.rest.issues.create({
+            //                        owner: context.repo.owner,
+            //                        repo: context.repo.repo,
+            //                        title: issueTitle,
+            //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
+            //                        labels: ['coverage-gap', 'help-wanted', 'automated', 'python']
+            //                    });
+            //                }
+            //            }
+            //        }
+            //    } catch (e) {
+            //        console.error("Error parsing Python coverage", e);
+            //    }
+            // }
+
+            // TODO: Enable Go coverage parsing when frontend >= 80%
+            // Go Coverage Parsing (coverage.out)
+            // if (frontendCoverage >= 80 && fs.existsSync('api/coverage.out')) {
+            //    try {
+            //        const goCoverageRaw = fs.readFileSync('api/coverage.out', 'utf8');
+            //        const lines = goCoverageRaw.split('\n').filter(line => line.trim() && !line.startsWith('mode:'));
+            //        
+            //        body += `\n### Go Coverage Details\n`;
+            //        body += `- **Total**: ${goCoverage.toFixed(1)}%\n`;
+            //        
+            //        // Parse coverage.out format: filepath:startline.col,endline.col num_statements count
+            //        const fileCoverage = {};
+            //        for (const line of lines) {
+            //            const parts = line.split(':');
+            //            if (parts.length < 2) continue;
+            //            
+            //            const filepath = parts[0];
+            //            const rest = parts[1].split(' ');
+            //            if (rest.length < 3) continue;
+            //            
+            //            const statements = parseInt(rest[1]) || 0;
+            //            const covered = parseInt(rest[2]) || 0;
+            //            
+            //            if (!fileCoverage[filepath]) {
+            //                fileCoverage[filepath] = { total: 0, covered: 0 };
+            //            }
+            //            fileCoverage[filepath].total += statements;
+            //            fileCoverage[filepath].covered += (covered > 0 ? statements : 0);
+            //        }
+            //        
+            //        const goLowCovFiles = [];
+            //        for (const [filepath, stats] of Object.entries(fileCoverage)) {
+            //            if (filepath.includes('_test.go')) continue;
+            //            
+            //            const pct = stats.total > 0 ? (stats.covered / stats.total) * 100 : 0;
+            //            if (pct < 80) {
+            //                goLowCovFiles.push({ file: filepath, pct });
+            //            }
+            //        }
+            //        
+            //        goLowCovFiles.sort((a, b) => a.pct - b.pct);
+            //        
+            //        if (goLowCovFiles.length > 0) {
+            //            body += `\n**Lowest Coverage Files:**\n`;
+            //            for (const item of goLowCovFiles.slice(0, 5)) {
+            //                body += `- \`${item.file}\`: ${item.pct.toFixed(1)}%\n`;
+            //            }
+            //            
+            //            // Create issues for worst 3 offenders
+            //            const goCandidates = goLowCovFiles.slice(0, 3);
+            //            for (const item of goCandidates) {
+            //                const parts = item.file.split('/');
+            //                const basename = parts[parts.length - 1];
+            //                const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+            //                
+            //                const existing = await github.rest.search.issuesAndPullRequests({
+            //                    q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
+            //                });
+            //                
+            //                if (existing.data.total_count === 0) {
+            //                    await github.rest.issues.create({
+            //                        owner: context.repo.owner,
+            //                        repo: context.repo.repo,
+            //                        title: issueTitle,
+            //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
+            //                        labels: ['coverage-gap', 'help-wanted', 'automated', 'go']
+            //                    });
+            //                }
+            //            }
+            //        }
+            //    } catch (e) {
+            //        console.error("Error parsing Go coverage", e);
+            //    }
+            // }
 
             body += `\n---\n*VioletVault Health Bot*`;
 
