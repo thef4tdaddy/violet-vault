@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useDebtManagement } from "@/hooks/budgeting/envelopes/liabilities/useDebtManagement";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { DebtSubmissionData } from "./useDebtForm";
 import type { DebtAccount } from "@/types/debt";
 

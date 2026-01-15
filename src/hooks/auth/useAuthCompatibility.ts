@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAuth as useAuthHook } from "./useAuth";
-import logger from "@/utils/common/logger";
-import { encryptionUtils } from "@/utils/security/encryption";
+import logger from "@/utils/core/common/logger";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
 
 import type { UserData, UpdateProfileInput as UpdatedProfile } from "./useAuth.types";
 

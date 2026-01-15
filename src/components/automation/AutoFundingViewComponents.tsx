@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 import type { ExecutionRecord } from "@/db/types";
 
 interface ViewHeaderProps {

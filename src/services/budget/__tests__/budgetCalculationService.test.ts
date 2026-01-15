@@ -11,7 +11,7 @@ import type { Bill } from "@/domain/schemas/bill";
 
 // Mock dependencies
 vi.mock("@/services/api/budgetEngineService");
-vi.mock("@/utils/budgeting/envelopeCalculations", () => ({
+vi.mock("@/utils/domain/budgeting/envelopeCalculations", () => ({
   calculateEnvelopeData: vi.fn(() => []),
   calculateEnvelopeTotals: vi.fn(() => ({
     totalBiweeklyNeed: 1000,
@@ -23,7 +23,7 @@ vi.mock("@/utils/budgeting/envelopeCalculations", () => ({
     envelopeCount: 5,
   })),
 }));
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

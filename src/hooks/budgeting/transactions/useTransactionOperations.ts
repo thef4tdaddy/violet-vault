@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { budgetDb } from "@/db/budgetDb.ts";
-import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient.ts";
+import { queryKeys, optimisticHelpers } from "@/utils/core/common/queryClient.ts";
 import { useTransactionBalanceUpdater } from "./useTransactionBalanceUpdater.ts";
 import type { Transaction } from "@/db/types.ts";
 import {

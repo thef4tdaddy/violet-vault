@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { usePullToRefresh } from "../usePullToRefresh";
 
 // Mock hapticFeedback
-vi.mock("@/utils/ui/touchFeedback", () => ({
+vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   hapticFeedback: vi.fn(),
 }));
 

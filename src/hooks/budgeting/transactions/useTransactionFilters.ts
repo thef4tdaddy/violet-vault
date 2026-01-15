@@ -6,7 +6,7 @@ import {
   matchesEnvelopeFilter,
   matchesDateFilter,
   compareTransactions,
-} from "@/utils/validation";
+} from "@/utils/core/validation";
 import type { Transaction } from "@/types/finance";
 
 interface UseTransactionFiltersParams {

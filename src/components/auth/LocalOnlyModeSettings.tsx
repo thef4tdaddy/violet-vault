@@ -11,7 +11,7 @@ import LocalOnlyFooter from "./local-only/LocalOnlyFooter";
 import LoadingOverlay from "./local-only/LoadingOverlay";
 import ExitConfirmationModal from "./local-only/ExitConfirmationModal";
 import ClearDataConfirmationModal from "./local-only/ClearDataConfirmationModal";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface LocalOnlyModeSettingsProps {

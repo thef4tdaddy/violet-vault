@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BugReportService from "@/services/logging/bugReportingService.ts";
-import logger from "@/utils/common/logger.ts";
-import { validateBugReportSubmission } from "@/utils/validation";
+import logger from "@/utils/core/common/logger.ts";
+import { validateBugReportSubmission } from "@/utils/core/validation";
 import { useBugReportSentry } from "./useBugReportSentry";
 
 /// <reference types="../../../vite-env.d.ts" />

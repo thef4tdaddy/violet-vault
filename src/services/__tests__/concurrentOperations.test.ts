@@ -109,7 +109,7 @@ vi.mock("../../db/budgetDb", () => ({
 }));
 
 // Mock logger to avoid console output
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

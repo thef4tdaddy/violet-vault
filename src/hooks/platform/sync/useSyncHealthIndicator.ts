@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, type RefObject } from "react";
-import { getQuickSyncStatus } from "@/utils/sync/masterSyncValidator";
+import { getQuickSyncStatus } from "@/utils/features/sync/masterSyncValidator";
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Validation summary structure

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import logger from "@/utils/common/logger";
-import { executeBillUpdate } from "@/utils/bills/billUpdateHelpers";
+import logger from "@/utils/core/common/logger";
+import { executeBillUpdate } from "@/utils/domain/bills/billUpdateHelpers";
 import { globalToast } from "@/stores/ui/toastStore";
 import type { Bill, Envelope } from "@/types/bills";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";

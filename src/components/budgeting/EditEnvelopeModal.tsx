@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import useEnvelopeEdit from "@/hooks/budgeting/envelopes/useEnvelopeEdit";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";

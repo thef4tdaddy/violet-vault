@@ -7,7 +7,7 @@ import {
   useClipboardSecurity,
   type SecurityEventInput,
 } from "@/hooks/auth/useSecurityManagerUI";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { SecuritySettings } from "@/services/security/securityService";
 
 /**

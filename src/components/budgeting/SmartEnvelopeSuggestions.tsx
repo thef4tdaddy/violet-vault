@@ -6,7 +6,7 @@ import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
 import { globalToast } from "../../stores/ui/toastStore";
 import type { Envelope, Transaction } from "../../db/types";
-import type { Suggestion } from "@/utils/budgeting/suggestionUtils";
+import type { Suggestion } from "@/utils/domain/budgeting/suggestionUtils";
 
 interface IconBadgeProps {
   isCollapsed: boolean;

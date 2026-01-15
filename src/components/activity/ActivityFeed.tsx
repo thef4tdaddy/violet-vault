@@ -5,10 +5,10 @@ import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils";
 import useActivityLogger from "@/hooks/platform/common/useActivityLogger";
 import { ENTITY_TYPES } from "@/services/logging/activityLogger";
-import logger from "@/utils/common/logger";
-import { formatActivityDescription } from "@/utils/activity/activityFormatters";
-import { getActivityIconInfo } from "@/utils/activity/activityIcons";
-import { formatTimestamp } from "@/utils/activity/timeFormatters";
+import logger from "@/utils/core/common/logger";
+import { formatActivityDescription } from "@/utils/features/activity/activityFormatters";
+import { getActivityIconInfo } from "@/utils/features/activity/activityIcons";
+import { formatTimestamp } from "@/utils/features/activity/timeFormatters";
 import type { AuditLogEntry } from "@/db/types";
 
 /**

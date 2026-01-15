@@ -1,4 +1,4 @@
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { useTransactionImport } from "../useTransactionImport";
 
 interface UseLedgerImportProps {

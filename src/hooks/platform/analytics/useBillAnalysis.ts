@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import {
   analyzeBillCategorization,
   analyzeBillCategoryOptimization,
-} from "@/utils/analytics/billAnalyzer";
+} from "@/utils/features/analytics/billAnalyzer";
 import type { Bill } from "@/types/bills";
 
 interface AnalysisSettings {

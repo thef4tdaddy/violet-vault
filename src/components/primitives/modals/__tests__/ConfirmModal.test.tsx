@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import ConfirmModal from "../ConfirmModal";
 
 // Mock getIcon utility
-vi.mock("@/utils/icons", () => ({
+vi.mock("@/utils/ui/icons", () => ({
   getIcon: vi.fn((iconName: string) => {
     const MockIcon = ({ className }: { className?: string }) => (
       <svg data-testid={`icon-${iconName}`} className={className}>

@@ -1,8 +1,8 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules";
+import { RULE_TYPES, TRIGGER_TYPES } from "@/utils/domain/budgeting/autofunding/rules";
 import type { Envelope } from "../../../types/finance";
-import type { AutoFundingRule } from "../../../utils/budgeting/autofunding/rules";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 
 // Get display name for rule type
 const getRuleTypeLabel = (type: string): string => {

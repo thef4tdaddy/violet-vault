@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
+import { shareCodeUtils } from "@/utils/platform/security/shareCodeUtils";
 import { useShareCodeValidation } from "@/hooks/platform/sharing/useShareCodeValidation";
 import { useBudgetJoining } from "@/hooks/platform/sharing/useBudgetJoining";
 import { useQRCodeProcessing } from "@/hooks/platform/sharing/useQRCodeProcessing";
-import { generateRandomColor } from "@/utils/sharing/colorUtils";
+import { generateRandomColor } from "@/utils/features/sharing/colorUtils";
 import ShareCodeStep from "./steps/ShareCodeStep";
 import UserSetupStep from "./steps/UserSetupStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";

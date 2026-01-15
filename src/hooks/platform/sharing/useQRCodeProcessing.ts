@@ -1,6 +1,6 @@
-import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
-import logger from "@/utils/common/logger";
+import { shareCodeUtils } from "@/utils/platform/security/shareCodeUtils";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
+import logger from "@/utils/core/common/logger";
 
 interface CreatorInfo {
   userName: string;

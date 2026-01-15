@@ -7,14 +7,14 @@ import {
 } from "../useTransactionArchiving";
 
 // Mock dependencies
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
   },
 }));
 
-vi.mock("@/utils/common/transactionArchiving", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/utils/common/transactionArchiving")>();
+vi.mock("@/utils/core/common/transactionArchiving", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/utils/core/common/transactionArchiving")>();
 
   return {
     ...actual,

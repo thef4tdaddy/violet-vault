@@ -1,6 +1,6 @@
 import { type Transaction as FinanceTransaction } from "@/types/finance";
 import type { TransactionInput } from "../useTransactionOperations";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseTransactionHandlersProps {
   currentUser: unknown;

@@ -16,8 +16,8 @@ import {
   submitSplitHandler,
   calculateSplitComputedProperties,
 } from "./useTransactionSplitterHelpers";
-import { generateSplitId } from "@/utils/transactions/splitterHelpers";
-import logger from "@/utils/common/logger";
+import { generateSplitId } from "@/utils/domain/transactions/splitterHelpers";
+import logger from "@/utils/core/common/logger";
 
 interface UseTransactionSplitterOptions {
   transaction?: Transaction;

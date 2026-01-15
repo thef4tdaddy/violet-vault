@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 import { VioletVaultDB } from "../budgetDb";
 
 // Mock logger
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Hook for managing Settings Dashboard UI state and navigation
@@ -217,7 +217,7 @@ export const useSettingsSections = () => {
 export const useSettingsActions = () => {
   const handleCreateTestHistory = useCallback(async () => {
     try {
-      const { createTestBudgetHistory } = await import("@/utils/common/testBudgetHistory");
+      const { createTestBudgetHistory } = await import("@/utils/core/common/testBudgetHistory");
       await createTestBudgetHistory();
       globalToast.showSuccess(
         "✅ Test budget history created! Check console for details.",

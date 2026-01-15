@@ -1,6 +1,6 @@
 /* eslint-disable no-architecture-violations/no-architecture-violations */
 import { useState } from "react";
-import { validateBugReportForm } from "@/utils/validation";
+import { validateBugReportForm } from "@/utils/core/validation";
 
 /**
  * Form state for bug reports

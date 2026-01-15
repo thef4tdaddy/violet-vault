@@ -6,7 +6,7 @@ import {
   processSuggestions,
   Suggestion,
   TransactionForStats,
-} from "@/utils/analytics/categoryHelpers";
+} from "@/utils/features/analytics/categoryHelpers";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
 import CategoryNavigationTabs from "./CategoryNavigationTabs";

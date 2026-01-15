@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { getIcon } from "@/utils";
-import { useTouchFeedback } from "@/utils/ui/touchFeedback";
+import { useTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 interface ColorScheme {
   iconBg: string;

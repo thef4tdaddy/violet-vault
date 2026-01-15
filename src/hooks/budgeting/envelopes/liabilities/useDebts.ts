@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import BudgetHistoryTracker from "@/utils/common/budgetHistoryTracker";
-import logger from "@/utils/common/logger.ts";
+import BudgetHistoryTracker from "@/utils/core/common/budgetHistoryTracker";
+import logger from "@/utils/core/common/logger.ts";
 import { validateDebtSafe, validateDebtPartialSafe } from "@/domain/schemas/debt";
 import type { LiabilityEnvelope } from "@/db/types";
 

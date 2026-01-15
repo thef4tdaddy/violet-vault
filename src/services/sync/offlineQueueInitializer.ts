@@ -6,7 +6,7 @@
  */
 
 import { offlineRequestQueueService } from "@/services/sync/offlineRequestQueueService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Initialize the offline request queue system

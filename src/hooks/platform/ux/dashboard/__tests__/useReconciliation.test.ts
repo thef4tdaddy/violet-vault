@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { vi, beforeEach, describe, it, expect } from "vitest";
 import { useReconciliation } from "../useReconciliation";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
 import type { Envelope, SavingsGoal } from "../types";
 
@@ -14,7 +14,7 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { predictNextPayday, checkRecentPayday } from "@/utils/budgeting/paydayPredictor";
+import { predictNextPayday, checkRecentPayday } from "@/utils/domain/budgeting/paydayPredictor";
 import useToast from "@/hooks/platform/ux/useToast";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
 
 interface PaycheckHistoryItem {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Select } from "@/components/ui";
-import { getIcon, getIconByName, getBillIcon } from "@/utils/icons";
+import { getIcon, getIconByName, getBillIcon } from "@/utils/ui/icons";
 import { getConfidenceColor } from "./utils";
 import type { DiscoveredBill, Envelope } from "../BillDiscoveryModal";
 

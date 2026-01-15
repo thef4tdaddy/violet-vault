@@ -1,5 +1,5 @@
 import { getBudgetMetadata, setBudgetMetadata, budgetDb } from "@/db/budgetDb.ts";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 import type { Transaction } from "@/db/types.ts";
 
 type TransactionType = "income" | "expense" | "transfer";

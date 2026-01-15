@@ -1,11 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useCallback } from "react";
-import { queryKeys } from "@/utils/common/queryClient.ts";
+import { queryKeys } from "@/utils/core/common/queryClient.ts";
 import { budgetDb } from "@/db/budgetDb.ts";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 import type { Transaction } from "@/db/types.ts";
 import { seedDexieFromZustand } from "./helpers/transactionQueryHelpers.ts";
-import { processTransactions, calculateTransactionStats } from "@/utils/transactions/filtering";
+import {
+  processTransactions,
+  calculateTransactionStats,
+} from "@/utils/domain/transactions/filtering";
 
 /**
  * Filter and query options for transactions

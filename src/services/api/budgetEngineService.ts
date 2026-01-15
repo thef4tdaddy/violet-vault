@@ -6,7 +6,7 @@
  */
 
 import { ApiClient, type ApiResponse } from "@/services/api/client";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Envelope } from "@/domain/schemas/envelope";
 import type { Transaction } from "@/domain/schemas/transaction";
 import type { Bill } from "@/domain/schemas/bill";

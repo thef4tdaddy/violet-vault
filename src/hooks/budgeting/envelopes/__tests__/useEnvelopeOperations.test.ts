@@ -54,7 +54,7 @@ vi.mock("@/db/budgetDb", () => ({
   setUnassignedCash: vi.fn(),
 }));
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     envelopes: ["envelopes"],
     dashboard: ["dashboard"],
@@ -70,7 +70,7 @@ vi.mock("@/utils/common/queryClient", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),

@@ -1,5 +1,5 @@
 import React from "react";
-import { getIcon } from "../../utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 import { useSecuritySettingsLogic } from "@/hooks/platform/security/useSecuritySettingsLogic";
 import SecurityStatusSection from "./sections/SecurityStatusSection";
 import AutoLockSettingsSection from "./sections/AutoLockSettingsSection";

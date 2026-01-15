@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 import type { PaycheckHistory } from "@/db/types";
 

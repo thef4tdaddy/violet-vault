@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 import type { SavingsGoal } from "@/db/types";
 

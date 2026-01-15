@@ -4,7 +4,7 @@ import { FirebaseSyncProvider } from "../../sync/providers/firebaseSyncProvider"
 import { encryptionManager } from "../../security/encryptionManager";
 
 // Mock dependencies
-vi.mock("@/utils/sync/syncHealthMonitor", () => ({
+vi.mock("@/utils/features/sync/syncHealthMonitor", () => ({
   syncHealthMonitor: {
     recordSyncStart: vi.fn(() => "test-sync-id"),
     recordSyncSuccess: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("@/utils/sync/syncHealthMonitor", () => ({
   },
 }));
 
-vi.mock("@/utils/sync/autoBackupService", () => ({
+vi.mock("@/utils/features/sync/autoBackupService", () => ({
   autoBackupService: {
     createPreSyncBackup: vi.fn(() => Promise.resolve()),
   },
@@ -106,7 +106,7 @@ describe("SyncOrchestrator Integration Tests", () => {
     const result = await syncOrchestrator.forceSync();
     expect(result.success).toBe(false);
 
-    const { syncHealthMonitor } = await import("@/utils/sync/syncHealthMonitor");
+    const { syncHealthMonitor } = await import("@/utils/features/sync/syncHealthMonitor");
     expect(syncHealthMonitor.recordSyncFailure).toHaveBeenCalled();
 
     syncOrchestrator.stop();

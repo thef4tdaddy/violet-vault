@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
-import patchNotesManager from "@/utils/pwa/patchNotesManager";
-import { APP_VERSION } from "@/utils/common/version";
-import logger from "@/utils/common/logger";
+import patchNotesManager from "@/utils/platform/pwa/patchNotesManager";
+import { APP_VERSION } from "@/utils/core/common/version";
+import logger from "@/utils/core/common/logger";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 

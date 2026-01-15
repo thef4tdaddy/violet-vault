@@ -11,9 +11,9 @@ import {
   getBillIconOptions,
   getIconNameForStorage,
   type BillIconOption,
-} from "@/utils/icons";
+} from "@/utils/ui/icons";
 import { getBillCategories } from "@/constants/categories";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "@/types/bills";
 import {
   getInitialFormData,
@@ -23,7 +23,7 @@ import {
   normalizeDateFormatHelper,
   buildBillData,
 } from "./helpers/billFormHelpers";
-import { validateBillFormData } from "@/utils/validation/billFormValidation";
+import { validateBillFormData } from "@/utils/core/validation/billFormValidation";
 
 /**
  * Custom hook for bill form management

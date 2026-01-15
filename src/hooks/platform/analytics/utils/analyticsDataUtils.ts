@@ -3,8 +3,8 @@
  * Extracted from useAnalyticsData hook to reduce complexity
  */
 
-import logger from "@/utils/common/logger";
-import { isValidDate } from "@/utils/validation/dateValidation";
+import logger from "@/utils/core/common/logger";
+import { isValidDate } from "@/utils/core/validation/dateValidation";
 
 /**
  * Safe division helper

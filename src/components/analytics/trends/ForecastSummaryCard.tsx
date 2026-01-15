@@ -1,10 +1,7 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import {
-  formatCurrency,
-  formatPercent,
-  getTrendIconConfig,
-} from "../../../utils/analytics/trendHelpers";
+import { formatPercent, getTrendIconConfig } from "@/utils/features/analytics/trendHelpers";
+import { formatCurrency } from "@/utils/features/analytics/categoryHelpers";
 
 import { ForecastInsights } from "@/types/analytics";
 

@@ -39,7 +39,7 @@ vi.mock("@/hooks/budgeting/core/useBudgetData/mutationsHelpers", () => ({
   processTransactionDeletion: vi.fn(),
 }));
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     envelopes: ["envelopes"],
     envelopesList: () => ["envelopes", "list"],
@@ -61,7 +61,7 @@ vi.mock("@/utils/common/queryClient", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -238,7 +238,7 @@ describe("useBudgetMutations - Optimistic Update Rollback Tests", () => {
 
       // Simulate an error
       if (addConfig.onError) {
-        const { default: logger } = await import("@/utils/common/logger");
+        const { default: logger } = await import("@/utils/core/common/logger");
 
         act(() => {
           addConfig.onError!(new Error("Failed to add envelope"));

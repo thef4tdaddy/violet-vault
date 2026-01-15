@@ -6,7 +6,7 @@ import { VioletVaultDB } from "../budgetDb";
 import type { Envelope, Transaction, BudgetCommit, BudgetChange } from "../types";
 
 // Mock logger
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

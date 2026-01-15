@@ -1,6 +1,6 @@
 // src/services/logging/activityLogger.ts
 import { budgetDb } from "@/db/budgetDb.js";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { AuditLogEntry, Envelope, Transaction, Bill, PaycheckHistory, Debt } from "@/db/types";
 
 /**

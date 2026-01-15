@@ -7,8 +7,8 @@ import type {
   RuleStatistics,
   RuleSummary,
   RuleCondition,
-} from "@/utils/budgeting/autofunding/rules";
-import type { ExecutionContext } from "@/utils/budgeting/autofunding/conditions";
+} from "@/utils/domain/budgeting/autofunding/rules";
+import type { ExecutionContext } from "@/utils/domain/budgeting/autofunding/conditions";
 import type { Transaction, Envelope } from "@/types/finance";
 // type definition updates
 import type { AutoFundingRule } from "@/db/types";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../../utils";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding";
 
 interface Envelope {
   id: string | number;

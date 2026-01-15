@@ -142,16 +142,19 @@ When checks fail, detailed error output is saved to `.salvo_errors/` directory:
 The `--retry-failed` flag allows you to re-run only the checks that failed in the last run:
 
 **How it works:**
+
 1. Run `./scripts/full_salvo.sh` - some checks fail
 2. Fix the issues in your code
 3. Run `./scripts/full_salvo.sh --retry-failed` - only failed checks run again
 
 **Time limit:**
+
 - Retry is only allowed within 5 minutes of the last run
 - This ensures you're working with a recent baseline
 - After 5 minutes, you must run a full check again
 
 **Example:**
+
 ```bash
 # First run - some checks fail
 $ ./scripts/full_salvo.sh
@@ -159,7 +162,7 @@ Running TypeScript/JavaScript Checks...
   ESLint... ✗
   TypeScript... ✓
   Prettier... ✗
-  
+
 ✗ 2 Check(s) Failed
 💡 Tip: Re-run only failed checks (within 5 minutes):
    ./scripts/full_salvo.sh --retry-failed
@@ -172,7 +175,7 @@ Last run was 45s ago - proceeding with retry
 Running TypeScript/JavaScript Checks...
   ESLint... ✓
   Prettier... ✓
-  
+
 ✓ All Checks Passed
 ```
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import useToast from "@/hooks/platform/ux/useToast";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Hook for managing FAB action loading states and error handling

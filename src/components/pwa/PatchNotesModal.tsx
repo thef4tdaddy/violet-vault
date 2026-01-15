@@ -4,7 +4,7 @@ import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
-import { markVersionAsSeen } from "@/utils/common/version";
+import { markVersionAsSeen } from "@/utils/core/common/version";
 
 type ChangeType = "feature" | "fix" | "breaking" | "other";
 

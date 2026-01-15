@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
+import { isDebtFeatureEnabled } from "@/utils/domain/debts/debtDebugConfig";
 import DebtList from "./ui/DebtList";
 import { DebtStats, DebtAccount } from "../../types/debt";
 import DebtStrategies from "./DebtStrategies";
