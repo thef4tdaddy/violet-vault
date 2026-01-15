@@ -213,35 +213,35 @@ jobs:
             body += `- **Go Tests**: ${goStatus === 'success' ? '✅ Pass' : (goStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
             body += `- **Python Tests**: ${pyStatus === 'success' ? '✅ Pass' : (pyStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
 
+            // Helper to extract the last N lines from a log string
+            const extractLastLines = (logContent, lineCount = 30) => {
+                return logContent.split('\n').slice(-lineCount).join('\n');
+            };
+
             // Add failure details if any tests failed
             if (feStatus === 'failure' || goStatus === 'failure' || pyStatus === 'failure') {
                 body += `\n## 🔍 Failure Details\n\n`;
                 
                 if (feStatus === 'failure' && fs.existsSync('frontend-test.txt')) {
                     const feLog = fs.readFileSync('frontend-test.txt', 'utf8');
-                    // Extract last 30 lines or first error
-                    const lines = feLog.split('\n');
-                    const errorLines = lines.slice(-30).join('\n');
+                    const errorLines = extractLastLines(feLog);
                     body += `### Frontend Test Failures\n\n`;
                     body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
                 }
                 
                 if (goStatus === 'failure' && fs.existsSync('go-test.txt')) {
                     const goLog = fs.readFileSync('go-test.txt', 'utf8');
-                    const lines = goLog.split('\n');
-                    const errorLines = lines.slice(-30).join('\n');
+                    const errorLines = extractLastLines(goLog);
                     body += `### Go Test Failures\n\n`;
                     body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
                 }
                 
                 if (pyStatus === 'failure' && fs.existsSync('python-test.txt')) {
                     const pyLog = fs.readFileSync('python-test.txt', 'utf8');
-                    const lines = pyLog.split('\n');
-                    const errorLines = lines.slice(-30).join('\n');
+                    const errorLines = extractLastLines(pyLog);
                     body += `### Python Test Failures\n\n`;
                     body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
                 }
-            }
 
             // Frontend Coverage Parsing (JSON)
             if (fs.existsSync('coverage/coverage-summary.json')) {
