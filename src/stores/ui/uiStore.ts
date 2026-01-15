@@ -2,7 +2,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import logger from "../../utils/common/logger.ts";
+import logger from "@/utils/core/common/logger";
 import { budgetDb, setBudgetMetadata } from "../../db/budgetDb.ts";
 import type { Envelope, Transaction } from "../../db/types.ts";
 
@@ -252,7 +252,7 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
     });
 
     try {
-      const { default: patchNotesManager } = await import("../../utils/pwa/patchNotesManager");
+      const { default: patchNotesManager } = await import("@/utils/platform/pwa/patchNotesManager");
       const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
 
       set((state) => {

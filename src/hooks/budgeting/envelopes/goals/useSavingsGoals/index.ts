@@ -8,7 +8,7 @@ import {
   useAddContributionMutation,
   useDistributeFundsMutation,
 } from "./savingsMutations";
-import { calculateSavingsSummary } from "@/utils/savings/savingsCalculations";
+import { calculateSavingsSummary } from "@/utils/domain/savings/savingsCalculations";
 import { createSavingsGoalHelpers, getEmptySummary } from "./useSavingsGoalsHelpers";
 
 interface UseSavingsGoalsOptions {

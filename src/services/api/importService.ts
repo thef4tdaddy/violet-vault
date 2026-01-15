@@ -7,14 +7,14 @@
  */
 
 import { ApiClient, type ApiResponse } from "@/services/api/client";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Transaction } from "@/domain/schemas/transaction";
 import {
   parseCSV,
   readFileAsText,
   autoDetectFieldMapping as autoDetectCSVMapping,
-} from "@/utils/dataManagement/csvParser";
-import { mapRowsToTransactions } from "@/utils/dataManagement/transactionMapper";
+} from "@/utils/data/dataManagement/csvParser";
+import { mapRowsToTransactions } from "@/utils/data/dataManagement/transactionMapper";
 
 // --- Request/Response Types ---
 // These match the Go backend structs in /api/import.go

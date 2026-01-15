@@ -1,24 +1,24 @@
 import { useState, useCallback, useMemo } from "react";
-import { TRIGGER_TYPES, type AutoFundingRule } from "@/utils/budgeting/autofunding/rules.ts";
+import { TRIGGER_TYPES, type AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules.ts";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import {
   shouldRuleExecute,
   type ExecutionContext,
   type Envelope,
-} from "@/utils/budgeting/autofunding/conditions.ts";
+} from "@/utils/domain/budgeting/autofunding/conditions.ts";
 import {
   sortRulesByPriority,
   calculateFundingAmount,
-} from "@/utils/budgeting/autofunding/rules.ts";
+} from "@/utils/domain/budgeting/autofunding/rules.ts";
 import {
   planRuleTransfers,
   simulateRuleExecution,
   createExecutionPlan,
   validateTransfers,
   calculateTransferImpact,
-} from "@/utils/budgeting/autofunding/simulation.ts";
+} from "@/utils/domain/budgeting/autofunding/simulation.ts";
 import type { ExecutionResult, ExecutionDetails } from "./types";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface Transfer {
   fromEnvelopeId: string;
@@ -142,7 +142,7 @@ export const useAutoFundingExecution = () => {
 
         const executableRules = rules.filter((rule) =>
           shouldRuleExecute(
-            rule as unknown as import("@/utils/budgeting/autofunding/conditions.ts").Rule,
+            rule as unknown as import("@/utils/domain/budgeting/autofunding/conditions.ts").Rule,
             context
           )
         );
@@ -276,7 +276,7 @@ export const useAutoFundingExecution = () => {
 
       const executableRules = rules.filter((rule) =>
         shouldRuleExecute(
-          rule as unknown as import("@/utils/budgeting/autofunding/conditions.ts").Rule,
+          rule as unknown as import("@/utils/domain/budgeting/autofunding/conditions.ts").Rule,
           context
         )
       );

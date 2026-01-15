@@ -19,7 +19,7 @@ import {
   logValidationErrors,
   hasFormChanged,
 } from "./validationHookHelpers";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Custom hook for validated form management

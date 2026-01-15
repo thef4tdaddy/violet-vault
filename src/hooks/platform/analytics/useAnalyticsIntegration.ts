@@ -5,8 +5,8 @@ import {
   calculateTrends,
   prepareDataForExport,
   _filterTransactionsByDateRange,
-} from "@/utils/common/analyticsProcessor";
-import logger from "@/utils/common/logger";
+} from "@/utils/core/common/analyticsProcessor";
+import logger from "@/utils/core/common/logger";
 import {
   generateRecommendationsFromMetrics,
   calculatePerformanceMetrics,

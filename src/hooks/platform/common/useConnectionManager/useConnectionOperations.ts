@@ -3,7 +3,7 @@
  * Extracted for better maintainability and ESLint compliance
  */
 import useToast from "@/hooks/platform/ux/useToast";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Envelope, Bill, Debt } from "@/db/types";
 
 // Type for toast function

@@ -1,15 +1,15 @@
 // Savings Goals Query Functions - Data fetching and filtering logic
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   processSavingsGoal,
   sortSavingsGoals,
   filterSavingsGoals,
   type ProcessedSavingsGoal,
-} from "@/utils/savings/savingsCalculations";
+} from "@/utils/domain/savings/savingsCalculations";
 import { type GoalEnvelope } from "@/db/types";
 
 export interface SavingsGoalsQueryOptions {

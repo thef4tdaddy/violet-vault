@@ -5,7 +5,7 @@
  * Migrated from custom modal to FormModal primitive for consistency
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
 import useEditLock from "@/hooks/core/auth/security/useEditLock";
 import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
@@ -17,10 +17,10 @@ import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
 import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { BillIconOption } from "@/utils/ui/icons";
 import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 /**
  * Lock data structure for edit locking
@@ -117,7 +117,7 @@ interface BillModalState {
 const useBillModalState = ({
   isOpen,
   editingBill,
-  _forceMobileMode = false,
+
   onAddBill,
   onUpdateBill,
   onDeleteBill,

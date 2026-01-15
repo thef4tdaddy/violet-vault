@@ -1,8 +1,8 @@
 // Savings Goals Mutation Functions - CRUD operations and data modifications
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
+import { queryKeys, optimisticHelpers } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { GoalEnvelope } from "@/db/types";
 
 // Helper to trigger sync for savings goal changes

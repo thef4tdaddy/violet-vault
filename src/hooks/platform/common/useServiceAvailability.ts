@@ -5,7 +5,7 @@ import {
   type ServiceStatus,
   type AllServicesStatus,
 } from "@/services/serviceAvailabilityManager";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Hook for monitoring service availability

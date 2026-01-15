@@ -12,7 +12,7 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
   },

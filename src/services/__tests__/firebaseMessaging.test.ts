@@ -15,7 +15,7 @@ vi.mock("firebase/messaging", () => ({
   isSupported: vi.fn(),
 }));
 
-vi.mock("@/utils/common/firebaseConfig", () => ({
+vi.mock("@/utils/core/common/firebaseConfig", () => ({
   firebaseConfig: {
     apiKey: "test-api-key",
     authDomain: "test-domain",
@@ -26,7 +26,7 @@ vi.mock("@/utils/common/firebaseConfig", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -38,7 +38,7 @@ vi.mock("@/utils/common/logger", () => ({
 // Import after mocks are set up
 import firebaseMessagingService from "@/services/sync/firebaseMessaging";
 import { getToken, onMessage, isSupported } from "firebase/messaging";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 describe("FirebaseMessagingService", () => {
   let mockLocalStorage: Record<string, string> = {};

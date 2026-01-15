@@ -11,7 +11,7 @@ import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { UserProfileFormSchema, type UserProfileFormData } from "@/domain/schemas/auth";
 import type { UserData } from "@/types/auth";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseUserProfileFormValidatedOptions {
   currentUser?: UserData | null;

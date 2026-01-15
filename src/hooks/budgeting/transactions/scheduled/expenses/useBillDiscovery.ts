@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { generateBillSuggestions } from "@/utils/common/billDiscovery";
-import logger from "@/utils/common/logger";
+import { generateBillSuggestions } from "@/utils/core/common/billDiscovery";
+import logger from "@/utils/core/common/logger";
 import type { Bill, Transaction, Envelope } from "@/db/types";
 
 // Helper types until we fully migrate to shared types

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useSecurityManager } from "./useSecurityManager";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
-import { encryptionUtils } from "@/utils/security/encryption";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
 import {
   startBackgroundSyncAfterLogin,
   deriveLoginEncryptionKey,

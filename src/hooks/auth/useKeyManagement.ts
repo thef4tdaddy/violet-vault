@@ -1,13 +1,13 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { keyExportUtils } from "@/utils/security/keyExport";
-import logger from "@/utils/common/logger";
+import { keyExportUtils } from "@/utils/platform/security/keyExport";
+import logger from "@/utils/core/common/logger";
 
 import type {
   ExportedKeyData,
   ProtectedKeyFile,
   ImportedKeyData,
-} from "@/utils/security/keyExport";
+} from "@/utils/platform/security/keyExport";
 
 /**
  * Hook for managing encryption key export/import operations

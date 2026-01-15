@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { getUtilizationColor } from "@/utils/budgeting";
-import { getBillEnvelopeDisplayInfo } from "@/utils/budgeting/billEnvelopeCalculations";
-import type { BillEnvelopeResult } from "@/utils/budgeting/billEnvelopeCalculations";
+import { getUtilizationColor } from "@/utils/domain/budgeting";
+import { getBillEnvelopeDisplayInfo } from "@/utils/domain/budgeting/billEnvelopeCalculations";
+import type { BillEnvelopeResult } from "@/utils/domain/budgeting/billEnvelopeCalculations";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 type EnvelopeInput = DbEnvelope & {

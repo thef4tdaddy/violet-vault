@@ -5,7 +5,7 @@
 import { useCallback, useEffect } from "react";
 import { useValidatedForm } from "@/hooks/platform/common/validation";
 import { z } from "zod";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Standardized validation pattern for paycheck/income form management
 // Consolidated for Data Unification v2.0 - uses generic schema for now

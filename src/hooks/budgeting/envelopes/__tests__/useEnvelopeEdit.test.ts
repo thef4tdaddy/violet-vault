@@ -7,7 +7,7 @@ vi.mock("@/hooks/auth/useAuth");
 vi.mock("@/hooks/core/auth/security/useEditLock");
 vi.mock("@/services/sync/editLockService");
 vi.mock("../useEnvelopeForm");
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

@@ -1,12 +1,8 @@
-/**
- * Helper functions for bill form operations
- * Extracted to reduce complexity in useBillForm
- */
 import type { BillFormData, Bill, BillFrequency, CalculationFrequency } from "@/types/bills";
-import { toMonthly } from "@/utils/common/frequencyCalculations";
+import { toMonthly } from "@/utils/core/common/frequencyCalculations";
 import { convertToBiweekly } from "@/constants/frequency";
-import { getBillIcon, getIconNameForStorage } from "@/utils/common/billIcons";
-import logger from "@/utils/common/logger";
+import { getBillIcon, getIconNameForStorage } from "@/utils/ui/icons";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Get the name for a bill from available fields
@@ -15,9 +11,6 @@ const getBillName = (bill: Bill): string => {
   return bill.name || bill.provider || "";
 };
 
-/**
- * Resolve icon name for a bill
- */
 const resolveIconName = (bill: Bill): string => {
   if (bill.iconName) {
     return bill.iconName;
@@ -26,9 +19,14 @@ const resolveIconName = (bill: Bill): string => {
   const billName = getBillName(bill);
   const notes = bill.notes || "";
   const category = bill.category || "";
-  const icon = bill.icon || getBillIcon(billName, notes, category);
 
-  return getIconNameForStorage(icon);
+  // If bill.icon is a string, it's already an icon name
+  if (bill.icon && typeof bill.icon === "string") {
+    return bill.icon;
+  }
+
+  const iconComponent = getBillIcon(billName, notes, category);
+  return getIconNameForStorage(iconComponent);
 };
 
 /**

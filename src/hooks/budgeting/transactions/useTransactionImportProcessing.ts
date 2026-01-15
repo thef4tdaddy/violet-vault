@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { TransactionImportOrchestrator } from "@/services/transactions/transactionImportOrchestrator";
 import type { ProcessTransactionsResult } from "@/services/transactions/transactionImportOrchestrator";
 

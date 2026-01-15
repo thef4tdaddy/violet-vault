@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useSyncHealthMonitor } from "../useSyncHealthMonitor";
 
 // Mock syncHealthMonitor
-vi.mock("@/utils/sync/syncHealthMonitor", () => ({
+vi.mock("@/utils/features/sync/syncHealthMonitor", () => ({
   syncHealthMonitor: {
     getHealthStatus: vi.fn(),
   },
@@ -42,7 +42,7 @@ describe("useSyncHealthMonitor", () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
 
-    const syncHealthMonitor = await import("@/utils/sync/syncHealthMonitor");
+    const syncHealthMonitor = await import("@/utils/features/sync/syncHealthMonitor");
     mockGetHealthStatus = syncHealthMonitor.syncHealthMonitor.getHealthStatus as ReturnType<
       typeof vi.fn
     >;

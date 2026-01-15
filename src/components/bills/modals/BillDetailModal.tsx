@@ -1,7 +1,7 @@
 import React from "react";
 import BaseModal from "@/components/primitives/modals/BaseModal";
 import { getIcon } from "../../../utils";
-import { getBillStatusIcon } from "../../../utils/bills/billDetailUtils";
+import { getBillStatusIcon } from "@/utils/domain/bills/billDetailUtils";
 import { useBillDetail } from "../../../hooks/budgeting/transactions/scheduled/expenses/useBillDetail";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import { BillDetailHeader } from "./BillDetailHeader";
@@ -27,7 +27,7 @@ interface BillDetailModalProps {
 
 /**
  * BillDetailModal - Migrated to use BaseModal primitive (Issue #1594)
- * 
+ *
  * Pure UI component for viewing and managing individual bill details
  * Business logic extracted to useBillDetail hook following Issue #152 pattern
  */

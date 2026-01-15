@@ -11,7 +11,7 @@ import type { Bill } from "@/domain/schemas/bill";
 
 // Mock dependencies
 vi.mock("../client");
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

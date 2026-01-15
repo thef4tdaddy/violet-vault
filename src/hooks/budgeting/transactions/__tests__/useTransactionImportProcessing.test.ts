@@ -9,7 +9,7 @@ import { ImportService } from "@/services/api/importService";
 
 // Mock dependencies
 vi.mock("@/services/api/importService");
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),

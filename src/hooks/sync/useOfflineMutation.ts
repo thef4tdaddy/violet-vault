@@ -1,6 +1,6 @@
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { offlineRequestQueueService } from "@/services/sync/offlineRequestQueueService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Options for offline-aware mutations

@@ -5,8 +5,8 @@ import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "@/constants/categories";
 import { budgetDb } from "@/db/budgetDb";
-import { queryKeys } from "@/utils/common/queryClient";
-import logger from "@/utils/common/logger";
+import { queryKeys } from "@/utils/core/common/queryClient";
+import logger from "@/utils/core/common/logger";
 import type { Envelope as DbEnvelope } from "@/db/types";
 import {
   calculateTotalBudget,

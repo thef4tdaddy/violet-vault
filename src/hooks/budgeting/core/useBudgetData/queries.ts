@@ -3,7 +3,7 @@
  */
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { queryFunctions } from "./queryFunctions";
 
 const computeLoadingState = (queries: UseQueryResult[]): boolean => {

@@ -1,12 +1,12 @@
 import { renderHook, act } from "@testing-library/react";
 import { useImportData } from "../useImportData";
 import { useAuth } from "../../../../hooks/auth/useAuth";
-import { useToastHelpers } from "../../../../utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useConfirm } from "../../../../hooks/platform/ux/useConfirm";
-import { validateImportedData } from "../../../../utils/dataManagement/validationUtils";
+import { validateImportedData } from "@/utils/data/dataManagement/validationUtils";
 import { budgetDb } from "../../../../db/budgetDb";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
-import { trackImport } from "../../../../utils/monitoring/performanceMonitor";
+import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
 
 // Mock dependencies with explicit factories
 vi.mock("../../../../hooks/auth/useAuth", () => ({
@@ -14,7 +14,7 @@ vi.mock("../../../../hooks/auth/useAuth", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("../../../../utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: vi.fn(),
 }));
 
@@ -22,11 +22,11 @@ vi.mock("../../../../hooks/platform/ux/useConfirm", () => ({
   useConfirm: vi.fn(),
 }));
 
-vi.mock("../../../../utils/dataManagement/validationUtils", () => ({
+vi.mock("@/utils/data/dataManagement/validationUtils", () => ({
   validateImportedData: vi.fn(),
 }));
 
-vi.mock("../../../../utils/monitoring/performanceMonitor", () => ({
+vi.mock("@/utils/platform/monitoring/performanceMonitor", () => ({
   trackImport: vi.fn(),
 }));
 

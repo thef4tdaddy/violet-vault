@@ -1,9 +1,12 @@
 import { useCallback, useMemo } from "react";
 import { useSmartCategoryAnalysis } from "@/hooks/platform/analytics/useSmartCategoryAnalysis";
 import { MERCHANT_CATEGORY_PATTERNS } from "@/constants/categories";
-import { suggestBillCategoryAndIcon, getBillIconOptions } from "@/utils/common/billIcons";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import {
+  suggestBillCategoryAndIcon,
+  getBillIconOptions,
+  type BillIconOption,
+} from "@/utils/ui/icons";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 export interface TransactionCategorySuggestion {
   category: string;

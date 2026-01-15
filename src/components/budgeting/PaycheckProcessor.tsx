@@ -4,7 +4,7 @@ import { getIcon } from "../../utils";
 import { usePaycheckProcessor } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckProcessor";
 import { usePaycheckHistory } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckHistory";
 import type { Envelope, PaycheckHistory as PaycheckHistoryRecord } from "@/db/types";
-import { type PaycheckTransaction } from "@/utils/budgeting/paycheckUtils";
+import { type PaycheckTransaction } from "@/utils/domain/budgeting/paycheckUtils";
 import type { PaycheckHistoryItem } from "./paycheck/PaycheckHistoryComponents";
 import PaycheckAmountInput from "./paycheck/PaycheckAmountInput";
 import PaycheckPayerSelector from "./paycheck/PaycheckPayerSelector";

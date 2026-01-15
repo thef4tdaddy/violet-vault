@@ -1,12 +1,12 @@
 import React from "react";
 import BaseModal from "@/components/primitives/modals/BaseModal";
-import Button from "@/components/primitives/buttons/Button";
+import { Button } from "@/components/primitives/buttons/Button";
 import {
   formatAmountChange,
   formatDateChange,
   hasChanges,
   type BillChange,
-} from "../../../utils/bills/billUpdateHelpers";
+} from "@/utils/domain/bills/billUpdateHelpers";
 import type { Bill } from "@/types/bills";
 
 interface BulkUpdateSummary {

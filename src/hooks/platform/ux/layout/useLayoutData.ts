@@ -9,7 +9,7 @@ import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills
 import {
   calculateEnvelopeData,
   calculateEnvelopeTotals,
-} from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
 import type { Transaction as DbTransaction, Bill as DbBill } from "@/db/types";
 
 /**

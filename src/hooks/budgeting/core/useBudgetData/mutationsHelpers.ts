@@ -3,7 +3,7 @@
  * Extracted to reduce complexity and nesting depth
  */
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { PaycheckHistory, Transaction } from "@/db/types";
 
 // Extended interfaces for paycheck operations

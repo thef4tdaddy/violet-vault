@@ -1,6 +1,6 @@
 import { useState } from "react";
 import localStorageService from "@/services/storage/localStorageService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 const ACKNOWLEDGMENT_KEY = "localDataSecurityAcknowledged";
 const ACKNOWLEDGMENT_TIME_KEY = "localDataSecurityAcknowledgedAt";

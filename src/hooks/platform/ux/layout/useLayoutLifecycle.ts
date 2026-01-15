@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface UseLayoutLifecycleProps {
   isUnlocked: boolean;

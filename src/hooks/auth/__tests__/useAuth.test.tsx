@@ -6,7 +6,7 @@ import * as authHelpers from "@/hooks/auth/authHelpers";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useSecurityManager } from "../useSecurityManager";
 import localStorageService from "@/services/storage/localStorageService";
-import { encryptionUtils } from "@/utils/security/encryption";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
 import React from "react";
 
 // Mock dependencies
@@ -34,7 +34,7 @@ vi.mock("@/services/storage/localStorageService", () => ({
   },
 }));
 
-vi.mock("@/utils/security/encryption", () => ({
+vi.mock("@/utils/platform/security/encryption", () => ({
   encryptionUtils: {
     decrypt: vi.fn(),
     encrypt: vi.fn(),

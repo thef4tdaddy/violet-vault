@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   getStatusIcon,
   getStatusColor,

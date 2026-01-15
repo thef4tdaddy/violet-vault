@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { UseMutateFunction } from "@tanstack/react-query";
 import type {
   Envelope,

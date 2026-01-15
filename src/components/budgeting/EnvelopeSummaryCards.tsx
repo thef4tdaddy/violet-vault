@@ -1,5 +1,4 @@
-import { getIcon } from "@/utils";
-import PageSummaryCard from "../ui/PageSummaryCard";
+import { MetricCard } from "../primitives/cards/MetricCard";
 
 interface EnvelopeTotals {
   totalBalance: number;
@@ -12,8 +11,7 @@ interface EnvelopeTotals {
 }
 
 /**
- * Envelope summary cards using standardized PageSummaryCard component
- * Restored to original format matching user requirements
+ * Envelope summary cards using standardized MetricCard component
  */
 const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
   // Calculate balance after bills
@@ -22,50 +20,49 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
   const cards = [
     {
       key: "total-allocated",
-      icon: getIcon("Wallet"),
-      label: "Total Allocated",
-      value: `$${(totals.totalAllocated || 0).toFixed(2)}`,
-      color: "orange" as const,
-      subtext: `${totals.envelopeCount || 0} envelopes`,
+      icon: "Wallet",
+      title: "Total Allocated",
+      value: totals.totalAllocated || 0,
+      variant: "warning" as const, // orange mapped to warning
+      subtitle: `${totals.envelopeCount || 0} envelopes`,
     },
     {
       key: "balance-after-bills",
-      icon: getIcon("DollarSign"),
-      label: "Balance / After Bills",
-      value: `$${(totals.totalBalance || 0).toFixed(2)}`,
-      color: balanceAfterBills < 0 ? "red" : "emerald",
-      subtext: `$${balanceAfterBills.toFixed(2)} after bills`,
-      alert: balanceAfterBills < 0,
-    } as const,
+      icon: "DollarSign",
+      title: "Balance / After Bills",
+      value: totals.totalBalance || 0,
+      variant: (balanceAfterBills < 0 ? "danger" : "success") as "danger" | "success",
+      subtitle: `$${balanceAfterBills.toFixed(2)} after bills`,
+    },
     {
       key: "total-spent",
-      icon: getIcon("CreditCard"),
-      label: "Total Spent",
-      value: `$${(totals.totalSpent || 0).toFixed(2)}`,
-      color: "indigo" as const,
-      subtext: "All envelope spending",
+      icon: "CreditCard",
+      title: "Total Spent",
+      value: totals.totalSpent || 0,
+      variant: "info" as const, // indigo mapped to info
+      subtitle: "All envelope spending",
     },
     {
       key: "biweekly-need",
-      icon: getIcon("Calendar"),
-      label: "Biweekly Need",
-      value: `$${(totals.totalBiweeklyNeed || 0).toFixed(2)}`,
-      color: "amber" as const,
-      subtext: `${totals.billsDueCount || 0} bills due`,
+      icon: "Calendar",
+      title: "Biweekly Need",
+      value: totals.totalBiweeklyNeed || 0,
+      variant: "warning" as const, // amber mapped to warning
+      subtitle: `${totals.billsDueCount || 0} bills due`,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <PageSummaryCard
+        <MetricCard
           key={card.key}
           icon={card.icon}
-          label={card.label}
+          title={card.title}
           value={card.value}
-          subtext={card.subtext}
-          color={card.color}
-          alert={card.alert}
+          subtitle={card.subtitle}
+          variant={card.variant}
+          format="currency"
           onClick={undefined}
         />
       ))}

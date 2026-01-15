@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { getIcon } from "../../utils";
-import { getBillEnvelopeDisplayInfo } from "../../utils/budgeting/billEnvelopeCalculations";
-import type { BillEnvelopeResult } from "../../utils/budgeting/billEnvelopeCalculations";
+import { getBillEnvelopeDisplayInfo } from "@/utils/domain/budgeting/billEnvelopeCalculations";
+import type { BillEnvelopeResult } from "@/utils/domain/budgeting/billEnvelopeCalculations";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "../../db/types";
 
 // Helper to get progress bar color based on funding percentage

@@ -3,10 +3,10 @@ import {
   removeCorruptedEnvelopes,
   repairCorruptedEnvelopes,
   getEnvelopeIntegrityReport,
-} from "@/utils/budgeting/envelopeIntegrityChecker";
+} from "@/utils/domain/budgeting/envelopeIntegrityChecker";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import useToast from "@/hooks/platform/ux/useToast";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Envelope integrity report structure

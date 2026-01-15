@@ -26,7 +26,7 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/utils/bills/billUpdateHelpers", () => ({
+vi.mock("@/utils/domain/bills/billUpdateHelpers", () => ({
   executeBillUpdate: vi.fn(async (_, { updateBill }) => {
     if (updateBill) await updateBill({ id: "1", updates: {} });
   }),

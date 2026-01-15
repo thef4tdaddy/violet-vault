@@ -6,9 +6,14 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { getBillIcon, getBillIconOptions, getIconNameForStorage } from "@/utils/common/billIcons";
+import {
+  getBillIcon,
+  getBillIconOptions,
+  getIconNameForStorage,
+  type BillIconOption,
+} from "@/utils/ui/icons";
 import { getBillCategories } from "@/constants/categories";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Bill, BillFormData, BillFormOptions, BillFormHookReturn } from "@/types/bills";
 import {
   getInitialFormData,
@@ -18,8 +23,7 @@ import {
   normalizeDateFormatHelper,
   buildBillData,
 } from "./helpers/billFormHelpers";
-import { validateBillFormData } from "@/utils/validation/billFormValidation";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import { validateBillFormData } from "@/utils/core/validation/billFormValidation";
 
 /**
  * Custom hook for bill form management

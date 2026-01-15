@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 
 // Receipt type definition
 interface Receipt {

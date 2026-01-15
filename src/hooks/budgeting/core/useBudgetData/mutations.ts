@@ -3,9 +3,9 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, optimisticHelpers } from "@/utils/common/queryClient";
+import { queryKeys, optimisticHelpers } from "@/utils/core/common/queryClient";
 import { processTransactionDeletion } from "@/hooks/budgeting/core/useBudgetData/mutationsHelpers";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Envelope, Transaction } from "@/db/types";
 
 export const useBudgetMutations = () => {

@@ -17,7 +17,7 @@ vi.mock("@/services/sync/syncOrchestrator", () => ({
 }));
 
 // Mock queryKeys
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     envelopes: "envelopes",
     transactions: "transactions",
@@ -29,7 +29,7 @@ vi.mock("@/utils/common/queryClient", () => ({
 }));
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

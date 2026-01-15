@@ -4,7 +4,7 @@ import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills
 import { useTransactionQuery } from "@/hooks/budgeting/transactions/useTransactionQuery";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import useOnboardingStore from "@/stores/ui/onboardingStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Hook that automatically detects user actions and marks onboarding steps as complete

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOfflineQueueStatus } from "@/hooks/sync/useOfflineQueueStatus";
-import { WifiOff, Wifi, RefreshCw, AlertCircle, CheckCircle } from "@/utils/icons";
+import { WifiOff, Wifi, RefreshCw, AlertCircle, CheckCircle } from "@/utils/ui/icons";
 import { Button } from "@/components/ui";
 
 /**

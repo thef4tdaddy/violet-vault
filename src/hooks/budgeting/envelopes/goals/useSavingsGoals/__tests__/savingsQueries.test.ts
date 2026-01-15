@@ -13,7 +13,7 @@ vi.mock("@/db/budgetDb", () => ({
   budgetDb: null, // Will be set in beforeEach
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/savings/savingsCalculations", () => ({
+vi.mock("@/utils/domain/savings/savingsCalculations", () => ({
   processSavingsGoal: (goal: Record<string, unknown>) => goal,
   sortSavingsGoals: (goals: unknown[], sortBy: string, sortOrder: string) => {
     if (sortBy === "targetDate" && sortOrder === "asc") {

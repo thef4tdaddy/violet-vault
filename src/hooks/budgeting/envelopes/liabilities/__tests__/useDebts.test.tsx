@@ -9,7 +9,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useDebts } from "../useDebts";
 import { budgetDb } from "@/db/budgetDb";
-import BudgetHistoryTracker from "../../../../../utils/common/budgetHistoryTracker";
+import BudgetHistoryTracker from "@/utils/core/common/budgetHistoryTracker";
 import type { Debt } from "../../../../../db/types";
 
 // Mock dependencies
@@ -32,13 +32,13 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("../../../../../utils/common/budgetHistoryTracker", () => ({
+vi.mock("@/utils/core/common/budgetHistoryTracker", () => ({
   default: {
     trackDebtChange: vi.fn(),
   },
 }));
 
-vi.mock("../../../../../utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),

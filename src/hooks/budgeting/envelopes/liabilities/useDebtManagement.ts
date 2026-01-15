@@ -15,8 +15,8 @@ import {
   COMPOUND_FREQUENCIES,
   calculateDebtStats,
 } from "@/constants/debts";
-import { getUpcomingPayments } from "@/utils/debts/debtCalculations";
-import { makeRecordCompatible, transformBillFromDB } from "@/utils/common/typeTransforms";
+import { getUpcomingPayments } from "@/utils/domain/debts/debtCalculations";
+import { makeRecordCompatible, transformBillFromDB } from "@/utils/core/common/typeTransforms";
 import {
   enrichDebtsWithRelations,
   createDebtOperation,

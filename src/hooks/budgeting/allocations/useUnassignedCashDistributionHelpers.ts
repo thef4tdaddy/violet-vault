@@ -3,7 +3,7 @@ import { BIWEEKLY_MULTIPLIER } from "@/constants/frequency";
 import {
   calculateBillEnvelopePriority,
   getRecommendedBillFunding,
-} from "@/utils/budgeting/billEnvelopeCalculations";
+} from "@/utils/domain/budgeting/billEnvelopeCalculations";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 export type EnvelopeRecord = DbEnvelope & {

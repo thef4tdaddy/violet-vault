@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import { predictNextPayday, type PaycheckEntry } from "@/utils/budgeting/paydayPredictor";
-import logger from "@/utils/common/logger";
+import { predictNextPayday, type PaycheckEntry } from "@/utils/domain/budgeting/paydayPredictor";
+import logger from "@/utils/core/common/logger";
 import type { PaycheckHistoryItem } from "./types";
 
 /**

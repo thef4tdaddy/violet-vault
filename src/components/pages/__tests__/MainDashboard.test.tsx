@@ -127,7 +127,7 @@ vi.mock("@/components/mobile/PullToRefreshIndicator", () => ({
 }));
 
 // 3. Utility Mocks
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),
@@ -139,7 +139,7 @@ vi.mock("@/utils/common/logger", () => ({
   },
 }));
 
-vi.mock("@/utils/common/validation", () => ({
+vi.mock("@/utils/core/common/validation", () => ({
   validateComponentProps: vi.fn(),
 }));
 

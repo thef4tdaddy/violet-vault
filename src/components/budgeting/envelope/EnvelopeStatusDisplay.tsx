@@ -1,9 +1,9 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
+import { getBillEnvelopeDisplayInfo } from "@/utils/domain/budgeting/billEnvelopeCalculations";
 import type { Bill } from "@/db/types";
 
-import type { EnvelopeData } from "../../../utils/budgeting/envelopeCalculations";
+import type { EnvelopeData } from "@/utils/domain/budgeting/envelopeCalculations";
 // Use EnvelopeData directly or extend via intersection if needed for UI-only props
 type EnvelopeWithStatus = EnvelopeData & {
   envelopeName?: string; // Legacy support

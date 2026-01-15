@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { hapticFeedback } from "@/utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 /**
  * Props for BottomNavItem component

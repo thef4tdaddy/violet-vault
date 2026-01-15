@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import type { Mock } from "vitest";
 
 // Mock dependencies
-vi.mock("@/utils/validation", () => ({
+vi.mock("@/utils/core/validation", () => ({
   isValidTransaction: vi.fn(),
   matchesSearchTerm: vi.fn(),
   matchesTypeFilter: vi.fn(),
@@ -60,7 +60,7 @@ describe("useTransactionFilters", () => {
 
   beforeEach(async () => {
     // Import mocked functions
-    const validation = await import("@/utils/validation");
+    const validation = await import("@/utils/core/validation");
     isValidTransaction = validation.isValidTransaction as Mock;
     matchesSearchTerm = validation.matchesSearchTerm as Mock;
     matchesTypeFilter = validation.matchesTypeFilter as Mock;

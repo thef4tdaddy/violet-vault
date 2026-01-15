@@ -1,5 +1,5 @@
 import React from "react";
-import { formatCurrency } from "../../../utils/analytics/trendHelpers";
+import { formatCurrency } from "@/utils/features/analytics/categoryHelpers";
 
 import { SeasonalPattern } from "@/types/analytics";
 

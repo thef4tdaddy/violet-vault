@@ -18,7 +18,7 @@ vi.mock("@/stores/ui/uiStore", () => ({
 }));
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock("@/utils/common/logger", () => ({
 const mockShowSuccessToast = vi.fn();
 const mockShowErrorToast = vi.fn();
 
-vi.mock("@/utils/common/toastHelpers", () => ({
+vi.mock("@/utils/core/common/toastHelpers", () => ({
   useToastHelpers: () => ({
     showSuccessToast: mockShowSuccessToast,
     showErrorToast: mockShowErrorToast,
