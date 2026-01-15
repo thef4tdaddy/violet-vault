@@ -1,13 +1,13 @@
 version: 2
 updates:
-  # NPM Dependencies - Regular updates to develop
+  # NPM Dependencies - Regular updates to dependabot branch
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "develop"
+    target-branch: "dependabot"
     pull-request-branch-name:
       separator: "/"
     assignees:
@@ -15,6 +15,7 @@ updates:
     labels:
       - "dependencies"
       - "dependabot"
+      - "🟡 Medium" # Default priority for dependency updates
     open-pull-requests-limit: 5
     allow:
       - dependency-type: "all"
@@ -25,6 +26,17 @@ updates:
     pull-request-branch-name:
       separator: "/"
     groups:
+      # Security-critical dependencies - prioritize security patches
+      security:
+        patterns:
+          - "firebase"
+          - "@firebase/*"
+          - "crypto-*"
+          - "bcrypt"
+          - "jsonwebtoken"
+        update-types:
+          - "security" # Security patches only for this group
+
       # React ecosystem - block major versions during migration
       react:
         patterns:
@@ -145,20 +157,21 @@ updates:
           - "pako"
           - "qrcode*"
 
-  # GitHub Actions - Regular updates to develop
+  # GitHub Actions - Regular updates to dependabot branch
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    target-branch: "develop"
+    target-branch: "dependabot"
     assignees:
       - "thef4tdaddy"
     labels:
       - "dependencies"
       - "ci"
       - "dependabot"
+      - "⚪ Low" # Lower priority for GH Actions updates
     open-pull-requests-limit: 3
     commit-message:
       prefix: "ci"

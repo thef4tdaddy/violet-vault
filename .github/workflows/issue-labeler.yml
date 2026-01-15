@@ -73,40 +73,39 @@ jobs:
               }
             }
 
-            // Define label keywords with improved context
+            // Define label keywords with improved context - REDUCED for precision
             const labelKeywords = {
-              'bug': ['bug', 'error', 'broken', 'crash', 'issue', 'problem', 'failing', 'fail', 'exception', 'doesn\'t work', 'not working', 'broken', 'defect'],
-              'enhancement': ['enhancement', 'feature request', 'feature', 'improve', 'improvement', 'add support', 'would be nice', 'could add', 'suggest'],
-              'documentation': ['docs', 'documentation', 'readme', 'guide', 'tutorial', 'how to', 'instructions'],
-              'testing': ['test', 'tests', 'testing', 'coverage', 'qa', 'test case', 'unit test'],
-              'performance': ['performance', 'slow', 'optimize', 'speed', 'lag', 'memory', 'bottleneck', 'takes too long'],
-              'security': ['security', 'vulnerability', 'cve', 'exploit', 'secure', 'encryption', 'privacy'],
-              'accessibility': ['a11y', 'accessibility', 'wcag', 'keyboard', 'screen reader', 'aria'],
-              'question': ['question', 'how do i', 'how to', 'help', '?', 'wondering', 'confused about']
-              // Removed 'good first issue' - too broad, apply manually
+              'bug': ['typeerror', 'referenceerror', 'syntaxerror', 'fails to', 'throws error', 'crashes', 'exception thrown'],
+              'enhancement': ['feature request', 'add support for', 'would be great if', 'could we add', 'suggestion:'],
+              'documentation': ['docs:', 'documentation:', 'readme update', 'update guide', 'document how to'],
+              'testing': ['test fails', 'test case', 'unit test', 'e2e test', 'coverage'],
+              'performance': ['performance issue', 'very slow', 'takes too long', 'memory leak', 'high cpu'],
+              'security': ['security vulnerability', 'cve-', 'exploit', 'xss', 'sql injection', 'csrf'],
+              'accessibility': ['accessibility issue', 'wcag', 'screen reader', 'aria-'],
+              'question': ['how do i', 'how can i', 'is there a way to']
             };
 
-            // Component-based labels
+            // Component-based labels - MORE SPECIFIC
             const componentKeywords = {
-              'auth': ['auth', 'login', 'password', 'user account', 'sign up', 'sign in'],
-              'sync': ['sync', 'synchronization', 'firebase', 'offline'],
-              'budget': ['budget', 'envelope', 'allocation'],
-              'debt': ['debt', 'loan', 'payment'],
-              'bills': ['bill', 'invoice', 'recurring'],
-              'transactions': ['transaction', 'ledger', 'split'],
-              'analytics': ['analytics', 'chart', 'report', 'dashboard'],
-              'notifications': ['notification', 'alert', 'remind'],
-              'UI': ['ui', 'ux', 'button', 'modal', 'form', 'component'],
-              'PWA': ['pwa', 'offline', 'install', 'web app'],
-              'Electron': ['electron', 'desktop']
+              'auth': ['authentication', 'login page', 'sign in', 'sign up form', 'password reset'],
+              'sync': ['firebase sync', 'synchronization', 'offline sync', 'sync conflict'],
+              'budget': ['budget calculation', 'envelope allocation', 'budget overview'],
+              'debt': ['debt payment', 'debt tracking', 'loan management'],
+              'bills': ['bill payment', 'invoice', 'recurring payment'],
+              'transactions': ['transaction ledger', 'split transaction', 'transaction import'],
+              'analytics': ['analytics dashboard', 'spending report', 'chart display'],
+              'notifications': ['push notification', 'notification settings', 'alert system'],
+              'UI': ['user interface', 'ui component', 'modal dialog', 'form validation'],
+              'PWA': ['pwa installation', 'service worker', 'offline mode'],
+              'Electron': ['electron app', 'desktop application']
             };
 
-            // Priority detection
+            // Priority detection - STRICTER
             const priorityKeywords = {
-              '🔴 Critical': ['critical', 'urgent', 'blocking', 'broken', 'down'],
-              '🟠 High': ['high priority', 'important', 'asap'],
-              '🟡 Medium': ['medium priority'],
-              '⚪ Low': ['low priority', 'nice to have']
+              '🔴 Critical': ['critical bug', 'urgent fix', 'production down', 'data loss', 'security breach'],
+              '🟠 High': ['high priority', 'important bug', 'blocks release', 'asap'],
+              '🟡 Medium': ['medium priority', 'moderate importance'],
+              '⚪ Low': ['low priority', 'nice to have', 'minor issue']
             };
 
             const toLabel = [];
@@ -194,16 +193,23 @@ jobs:
               }
             }
 
-            // Apply labels
+            // Apply labels (limit to 4 labels max to avoid over-tagging)
             if (toLabel.length > 0) {
               const uniqueLabels = [...new Set(toLabel)];
+              // Limit to 4 labels maximum
+              const labelsToApply = uniqueLabels.slice(0, 4);
+              
               await github.rest.issues.addLabels({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                labels: uniqueLabels
+                labels: labelsToApply
               });
-              console.log(`Applied labels: ${uniqueLabels.join(', ')}`);
+              console.log(`Applied labels (max 4): ${labelsToApply.join(', ')}`);
+              
+              if (uniqueLabels.length > 4) {
+                console.log(`⚠️ Skipped ${uniqueLabels.length - 4} labels to avoid over-tagging: ${uniqueLabels.slice(4).join(', ')}`);
+              }
             }
 
             // Log missing labels (don't spam with comments)
