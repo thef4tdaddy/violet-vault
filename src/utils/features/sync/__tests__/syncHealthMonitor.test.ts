@@ -613,9 +613,10 @@ describe("SyncHealthMonitor", () => {
 
       syncHealthMonitor.resetMetrics();
 
-      // Try to update progress, should be ignored
+      // Try to update progress, should be ignored since currentSync is cleared
+      vi.clearAllMocks(); // Clear previous mock calls
       syncHealthMonitor.updateSyncProgress(syncId, "should-not-work");
-      expect(logger.debug).toHaveBeenCalledTimes(2); // Only the start and reset calls
+      expect(logger.debug).not.toHaveBeenCalled();
     });
 
     it("should log reset action", () => {
@@ -626,13 +627,14 @@ describe("SyncHealthMonitor", () => {
   });
 
   describe("edge cases and boundary conditions", () => {
-    it("should handle metadata as null in recordSyncSuccess", () => {
+    it("should handle metadata as undefined in recordSyncSuccess", () => {
       const syncId = syncHealthMonitor.recordSyncStart("test");
-      // Pass null explicitly (though it defaults to {})
-      syncHealthMonitor.recordSyncSuccess(syncId, null as unknown as Record<string, unknown>);
+      // Pass undefined explicitly to test null/undefined branch
+      syncHealthMonitor.recordSyncSuccess(syncId, undefined);
 
       const health = syncHealthMonitor.getHealthStatus();
       expect(health.recentSyncs[0]).toBeDefined();
+      expect(health.recentSyncs[0].metadata).toEqual({});
     });
 
     it("should handle metadata without direction property", () => {
@@ -664,10 +666,9 @@ describe("SyncHealthMonitor", () => {
         syncHealthMonitor.recordSyncSuccess(syncId);
       }
 
-      // Access private recentSyncs through reflection or by checking internal state
-      // The public API only returns 10, but we can verify the limit by checking health status
+      // The internal limit is 50 syncs, but getHealthStatus returns only the last 10
       const health = syncHealthMonitor.getHealthStatus();
-      expect(health.recentSyncs).toHaveLength(10); // Public API returns 10
+      expect(health.recentSyncs).toHaveLength(10); // Public API returns last 10
     });
 
     it("should handle zero-duration syncs", () => {
