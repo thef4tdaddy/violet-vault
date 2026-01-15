@@ -5,8 +5,8 @@ import {
   requestNotificationPermission,
   trackPermissionDenial,
   type PermissionStatusForUI,
-} from "@/utils/notifications/permissionUtils";
-import logger from "@/utils/common/logger";
+} from "@/utils/ui/notifications/permissionUtils";
+import logger from "@/utils/core/common/logger";
 
 interface PermissionResult {
   success: boolean;

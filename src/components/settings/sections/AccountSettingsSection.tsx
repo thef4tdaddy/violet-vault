@@ -5,7 +5,7 @@ import ShareCodeModal from "../../sharing/ShareCodeModal";
 import JoinBudgetModal from "../../sharing/JoinBudgetModal";
 import ProfileSettings from "../../auth/ProfileSettings";
 import { useAuth } from "@/hooks/auth/useAuth";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface CurrentUser {
   userName?: string;

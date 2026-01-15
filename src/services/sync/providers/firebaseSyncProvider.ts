@@ -10,10 +10,10 @@ import {
   where,
 } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { firebaseConfig } from "@/utils/common/firebaseConfig";
+import { firebaseConfig } from "@/utils/core/common/firebaseConfig";
 import { initializeApp, FirebaseApp } from "firebase/app";
 import { encryptionManager } from "../../security/encryptionManager";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { SyncProvider } from "../syncOrchestrator";
 import { TypedResponse, SafeUnknown, categorizeFirebaseError } from "@/types/firebase";
 

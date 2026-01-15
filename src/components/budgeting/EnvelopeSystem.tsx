@@ -3,10 +3,10 @@ import { useEffect, useCallback, useRef } from "react";
 import { useEnvelopes } from "../../hooks/budgeting/envelopes/useEnvelopes";
 import useBills from "../../hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useUnassignedCash } from "../../hooks/budgeting/metadata/useUnassignedCash";
-import { calculateBiweeklyNeeds } from "../../utils/budgeting";
-import { calculateBiweeklyAllocations } from "../../utils/budgeting/allocationCalculations";
-import logger from "../../utils/common/logger";
-import type { Bill } from "../../utils/budgeting/envelopeCalculations";
+import { calculateBiweeklyNeeds } from "@/utils/domain/budgeting";
+import { calculateBiweeklyAllocations } from "@/utils/domain/budgeting/allocationCalculations";
+import logger from "@/utils/core/common/logger";
+import type { Bill } from "@/utils/domain/budgeting/envelopeCalculations";
 import type { Envelope } from "../../db/types";
 
 // Define types for our functions

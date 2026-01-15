@@ -5,8 +5,8 @@
 
 import { useState, useEffect } from "react";
 import { DEBT_TYPES, PAYMENT_FREQUENCIES } from "@/constants/debts";
-import logger from "@/utils/common/logger";
-import { validateDebtFormFields } from "@/utils/debts/debtFormValidation";
+import logger from "@/utils/core/common/logger";
+import { validateDebtFormFields } from "@/utils/domain/debts/debtFormValidation";
 import type {
   DebtAccount,
   DebtType,

@@ -9,7 +9,7 @@ import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,
   SAVINGS_COLORS,
-} from "@/utils/savings/savingsFormUtils";
+} from "@/utils/domain/savings/savingsFormUtils";
 
 // Define types
 interface FormData {

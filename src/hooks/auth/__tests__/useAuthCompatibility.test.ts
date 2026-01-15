@@ -32,7 +32,7 @@ vi.mock("../useAuth", () => ({
   })),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     auth: vi.fn(),
     info: vi.fn(),
@@ -42,7 +42,7 @@ vi.mock("../../../utils/common/logger", () => ({
 
 // Import mocked dependencies
 import { useAuth as useAuthHook } from "../useAuth";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 describe("useAuthCompatibility", () => {
   beforeEach(() => {

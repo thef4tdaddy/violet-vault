@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useRef } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./utils/common/queryClient";
+import { queryClient } from "@/utils/core/common/queryClient";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
 import { syncOrchestrator } from "./services/sync/syncOrchestrator";
@@ -12,10 +12,10 @@ import UpdateAvailableModal from "./components/pwa/UpdateAvailableModal";
 import InstallPromptModal from "./components/pwa/InstallPromptModal";
 import PatchNotesModal from "./components/pwa/PatchNotesModal";
 // import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator"; // Removed per UX cleanup
-import pwaManager, { type PWAManagerUiStore } from "./utils/pwa/pwaManager";
+import pwaManager, { type PWAManagerUiStore } from "@/utils/platform/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
-import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
-import { initializeStoreRegistry } from "./utils/stores/storeRegistry";
+import { initializeTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
+import { initializeStoreRegistry } from "@/utils/data/stores/storeRegistry";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 // Lazy load monitoring to reduce main bundle size

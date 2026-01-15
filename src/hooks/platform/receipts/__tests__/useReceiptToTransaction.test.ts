@@ -29,7 +29,7 @@ vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   }),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
   },

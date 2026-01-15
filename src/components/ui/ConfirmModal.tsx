@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, ComponentType } from "react";
 import { getIcon } from "@/utils";
-import { useTouchFeedback } from "@/utils/ui/touchFeedback";
+import { useTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 

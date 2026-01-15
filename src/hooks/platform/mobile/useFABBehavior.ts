@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect } from "react";
 import { useFABSelectors, useFABActions } from "@/stores/ui/fabStore";
-import { hapticFeedback } from "@/utils/ui/touchFeedback";
+import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 /**
  * Custom hook for long-press detection

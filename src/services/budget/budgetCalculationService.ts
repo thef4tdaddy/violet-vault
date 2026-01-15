@@ -6,7 +6,7 @@
  * @module services/budget/budgetCalculationService
  */
 
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { BudgetEngineService } from "@/services/api/budgetEngineService";
 import type { Envelope } from "@/domain/schemas/envelope";
 import type { Transaction } from "@/domain/schemas/transaction";
@@ -17,8 +17,8 @@ import {
   type Transaction as ClientTransaction,
   type Bill as ClientBill,
   type Envelope as ClientEnvelope,
-} from "@/utils/budgeting/envelopeCalculations";
-import type { EnvelopeData as ClientEnvelopeData } from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
+import type { EnvelopeData as ClientEnvelopeData } from "@/utils/domain/budgeting/envelopeCalculations";
 
 // --- Types ---
 

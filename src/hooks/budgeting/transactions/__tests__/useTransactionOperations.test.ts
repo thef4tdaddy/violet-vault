@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTransactionOperations } from "../useTransactionOperations";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDb } from "../../../../db/budgetDb";
 import { useTransactionBalanceUpdater } from "../useTransactionBalanceUpdater";
 
 // Mock dependencies
@@ -32,7 +32,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/utils/common/queryClient", () => ({
+vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
     transactions: ["transactions"],
     envelopes: ["envelopes"],

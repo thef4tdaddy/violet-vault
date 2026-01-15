@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import ConfirmModal from "../ui/ConfirmModal";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import useDataManagement from "../../hooks/platform/data/useDataManagement";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Type definitions for props
 interface CorruptionRecoveryModalProps {

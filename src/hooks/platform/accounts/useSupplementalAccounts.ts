@@ -7,8 +7,8 @@ import {
   validateAccountForm,
   validateTransferForm,
   calculateAccountTotals,
-} from "@/utils/accounts/accountValidation";
-import { getAccountTypeInfo } from "@/utils/accounts/accountHelpers";
+} from "@/utils/domain/accounts/accountValidation";
+import { getAccountTypeInfo } from "@/utils/domain/accounts/accountHelpers";
 import { globalToast } from "@/stores/ui/toastStore";
 import {
   getEmptyAccountForm,

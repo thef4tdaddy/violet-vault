@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   DEFAULT_ANALYSIS_SETTINGS,
   generateAllSuggestions,
-} from "@/utils/budgeting/suggestionUtils";
+} from "@/utils/domain/budgeting/suggestionUtils";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import localStorageService from "@/services/storage/localStorageService";
 import type { Transaction, Envelope } from "@/db/types";
 import { useSuggestionActions } from "./useSuggestionActions";

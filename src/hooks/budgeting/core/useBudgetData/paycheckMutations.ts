@@ -5,10 +5,10 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
-import { processPaycheck } from "@/utils/budgeting/paycheckProcessing";
-import { deletePaycheck } from "@/utils/budgeting/paycheckDeletion";
-import logger from "@/utils/common/logger.ts";
+import { queryKeys } from "@/utils/core/common/queryClient";
+import { processPaycheck } from "@/utils/domain/budgeting/paycheckProcessing";
+import { deletePaycheck } from "@/utils/domain/budgeting/paycheckDeletion";
+import logger from "@/utils/core/common/logger.ts";
 
 interface PaycheckData {
   amount: number;

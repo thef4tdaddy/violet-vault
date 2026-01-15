@@ -2,8 +2,11 @@ import { useMemo } from "react";
 import { useTransactionFiltering } from "./useTransactionFiltering";
 import { useTransactionAnalysis } from "./useTransactionAnalysis";
 import { useBillAnalysis } from "./useBillAnalysis";
-import { extractMerchantName, suggestBillCategory } from "@/utils/analytics/categoryPatterns";
-import type { Suggestion, TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import {
+  extractMerchantName,
+  suggestBillCategory,
+} from "@/utils/features/analytics/categoryPatterns";
+import type { Suggestion, TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 interface AnalysisSettingsInput {
   minTransactionCount: number;

@@ -22,7 +22,7 @@ vi.mock("@/stores/ui/toastStore", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),
@@ -48,7 +48,7 @@ vi.mock("@/contexts/AuthContext", () => ({
   })),
 }));
 
-vi.mock("@/utils/common/testBudgetHistory", () => ({
+vi.mock("@/utils/core/common/testBudgetHistory", () => ({
   createTestBudgetHistory: vi.fn(),
 }));
 
@@ -56,7 +56,7 @@ vi.mock("@/utils/common/testBudgetHistory", () => ({
 import { useBudgetStore } from "@/stores/ui/uiStore";
 import { globalToast } from "@/stores/ui/toastStore";
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
-import { createTestBudgetHistory } from "@/utils/common/testBudgetHistory";
+import { createTestBudgetHistory } from "@/utils/core/common/testBudgetHistory";
 
 describe("useSettingsDashboardUI", () => {
   it("should initialize with default state", () => {

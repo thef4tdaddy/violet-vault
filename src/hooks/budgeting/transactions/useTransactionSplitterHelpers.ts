@@ -2,7 +2,7 @@
  * Helper functions for useTransactionSplitter hook
  * Extracted to reduce function complexity (Issue #761 - Batch 5)
  */
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { Transaction, Envelope, SplitAllocation } from "@/types/finance";
 import {
   initializeSplitsFromTransaction,
@@ -15,8 +15,8 @@ import {
   removeSplit,
   autoBalanceSplits,
   splitEvenly,
-} from "@/utils/transactions/splitting";
-import { hasUnsavedChanges as compareSplitSets } from "@/utils/transactions/splitterHelpers";
+} from "@/utils/domain/transactions/splitting";
+import { hasUnsavedChanges as compareSplitSets } from "@/utils/domain/transactions/splitterHelpers";
 
 /**
  * Initialize splits from a transaction

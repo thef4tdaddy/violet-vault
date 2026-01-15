@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { shareCodeUtils } from "@/utils/security/shareCodeUtils";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
-import logger from "@/utils/common/logger";
-import { isValidShareCode } from "@/utils/validation";
+import { shareCodeUtils } from "@/utils/platform/security/shareCodeUtils";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
+import logger from "@/utils/core/common/logger";
+import { isValidShareCode } from "@/utils/core/validation";
 
 interface ShareInfo {
   createdBy: string;

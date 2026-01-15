@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import type { MutableRefObject } from "react";
 import { securityService } from "@/services/security/securityService";
 import type { SecuritySettings, SecurityEvent } from "@/services/security/securityService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 export type SecurityEventInput = Partial<SecurityEvent> & {
   type: string;

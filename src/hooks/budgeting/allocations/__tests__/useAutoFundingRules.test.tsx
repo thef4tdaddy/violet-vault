@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAutoFundingRules } from "../useAutoFundingRules";
 import { budgetDb } from "@/db/budgetDb";
-import { RULE_TYPES, TRIGGER_TYPES } from "@/utils/budgeting/autofunding/rules";
+import { RULE_TYPES, TRIGGER_TYPES } from "@/utils/domain/budgeting/autofunding/rules";
 import React from "react";
 
 // Mock dependencies
@@ -29,7 +29,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),

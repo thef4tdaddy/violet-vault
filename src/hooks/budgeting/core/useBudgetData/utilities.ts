@@ -3,9 +3,9 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, optimisticHelpers, prefetchHelpers } from "@/utils/common/queryClient";
+import { queryKeys, optimisticHelpers, prefetchHelpers } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger.ts";
+import logger from "@/utils/core/common/logger.ts";
 import localStorageService from "@/services/storage/localStorageService";
 import type { Transaction } from "@/db/types";
 

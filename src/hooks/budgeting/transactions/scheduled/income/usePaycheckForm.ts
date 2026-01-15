@@ -4,7 +4,7 @@ import {
   validateAllocations,
   getUniquePayers,
   type AllocationItem,
-} from "@/utils/budgeting/paycheckUtils";
+} from "@/utils/domain/budgeting/paycheckUtils";
 
 import type { PaycheckHistory } from "@/db/types";
 

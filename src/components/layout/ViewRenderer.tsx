@@ -12,7 +12,7 @@ const BillManager = lazy(() => import("../bills/BillManager"));
 const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
 const AnalyticsDashboard = lazy(() => import("../analytics/AnalyticsDashboard"));
 const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
-import { isDebtFeatureEnabled } from "@/utils/debts/debtDebugConfig";
+import { isDebtFeatureEnabled } from "@/utils/domain/debts/debtDebugConfig";
 const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -22,7 +22,7 @@ import { usePaycheckOperations } from "@/hooks/budgeting/transactions/scheduled/
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { ENVELOPE_TYPES } from "@/constants/categories";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { globalToast } from "@/stores/ui/toastStore";
 import type {
   Transaction as DbTransaction,

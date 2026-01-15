@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import { useShallow } from "zustand/react/shallow";
 

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { calculateEnvelopeAllocations } from "@/utils/budgeting/paycheckUtils";
+import { calculateEnvelopeAllocations } from "@/utils/domain/budgeting/paycheckUtils";
 
 interface AllocationItem {
   envelopeId: string;

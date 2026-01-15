@@ -1,6 +1,6 @@
 import React from "react";
 import BaseModal from "./BaseModal";
-import { getIcon } from "@/utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 
 export type ConfirmModalVariant = "danger" | "warning" | "info" | "success";
 

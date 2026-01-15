@@ -9,7 +9,7 @@ import {
   handleIncomeDetection,
   checkScheduledRules,
 } from "./useAutoFundingHelpers";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 
 // Extended store interface for legacy budget property
@@ -67,7 +67,7 @@ export const useAutoFunding = () => {
     const checkRules = () => {
       const executeWrapper = async (trigger: string, data: Record<string, unknown> = {}) => {
         return executionHook.executeRules(
-          rulesHook.rules as unknown as import("@/utils/budgeting/autofunding/rules").AutoFundingRule[],
+          rulesHook.rules as unknown as import("@/utils/domain/budgeting/autofunding/rules").AutoFundingRule[],
           trigger,
           data
         );
@@ -75,7 +75,7 @@ export const useAutoFunding = () => {
 
       const budgetContext: BudgetContext = {
         envelopes:
-          (budget.envelopes as unknown as import("@/utils/budgeting/autofunding/conditions").Envelope[]) ||
+          (budget.envelopes as unknown as import("@/utils/domain/budgeting/autofunding/conditions").Envelope[]) ||
           [],
         unassignedCash: budget.unassignedCash || 0,
         allTransactions:

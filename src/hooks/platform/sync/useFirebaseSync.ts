@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
-import logger from "@/utils/common/logger";
-import { useToastHelpers } from "@/utils/common/toastHelpers";
+import logger from "@/utils/core/common/logger";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 
 interface FirebaseSyncService {
   start: (config: unknown) => void;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getIcon } from "@/utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 
 export interface PageHeaderProps {
   /** Main page title */

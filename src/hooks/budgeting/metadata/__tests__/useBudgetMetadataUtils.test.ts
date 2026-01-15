@@ -7,7 +7,7 @@ import { useBudgetMetadataMutation } from "../useBudgetMetadataMutation";
 // Mock the dependencies
 vi.mock("../useBudgetMetadataQuery");
 vi.mock("../useBudgetMetadataMutation");
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     warn: vi.fn(),
     error: vi.fn(),

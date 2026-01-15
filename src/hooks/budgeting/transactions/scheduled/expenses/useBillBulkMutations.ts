@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import logger from "@/utils/common/logger";
-import { executeBillUpdate, processBulkOperation } from "@/utils/bills/billUpdateHelpers";
+import logger from "@/utils/core/common/logger";
+import { executeBillUpdate, processBulkOperation } from "@/utils/domain/bills/billUpdateHelpers";
 import type { Bill } from "@/types/bills";
 import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 

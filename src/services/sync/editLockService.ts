@@ -12,15 +12,15 @@ import {
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { firebaseConfig } from "@/utils/common/firebaseConfig";
-import logger from "@/utils/common/logger";
+import { firebaseConfig } from "@/utils/core/common/firebaseConfig";
+import logger from "@/utils/core/common/logger";
 import {
   validateLockPrerequisites,
   createLockDocument,
   handleExistingLock,
   createExtendedLock,
   handleLockError,
-} from "@/utils/services/editLockHelpers";
+} from "@/utils/features/editLock/editLockHelpers";
 import type { Auth } from "firebase/auth";
 
 // Type definitions for lock service

@@ -2,7 +2,7 @@ import type React from "react";
 import { useTransactionFileUpload } from "./useTransactionFileUpload";
 import { useTransactionImportProcessing } from "./useTransactionImportProcessing";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface FieldMapping {
   date?: string;

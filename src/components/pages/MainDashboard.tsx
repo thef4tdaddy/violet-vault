@@ -1,6 +1,6 @@
 // components/Dashboard.jsx
 import React from "react";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import AccountBalanceOverview from "../dashboard/AccountBalanceOverview";
 import RecentTransactionsWidget from "../dashboard/RecentTransactionsWidget";
@@ -20,7 +20,7 @@ import {
   useDashboardHelpers,
 } from "@/hooks/platform/ux/dashboard";
 
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { MainDashboardPropsSchema } from "@/domain/schemas/component-props";
 
 interface DashboardProps {

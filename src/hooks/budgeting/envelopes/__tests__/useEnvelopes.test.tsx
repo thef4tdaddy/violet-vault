@@ -17,7 +17,7 @@ vi.mock("@/db/budgetDb", () => ({
   VioletVaultDB: vi.fn(),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     info: vi.fn(),

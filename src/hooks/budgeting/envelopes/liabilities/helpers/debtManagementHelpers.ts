@@ -2,12 +2,12 @@
  * Helper functions for debt management operations
  * Extracted to reduce complexity in useDebtManagement
  */
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   convertPaymentFrequency,
   calculateInterestPortion,
   enrichDebt,
-} from "@/utils/debts/debtCalculations";
+} from "@/utils/domain/debts/debtCalculations";
 import { DEBT_STATUS } from "@/constants/debts";
 import type { PaymentFrequency, DebtAccount } from "@/types/debt";
 

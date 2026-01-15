@@ -35,11 +35,11 @@ vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({
   })),
 }));
 
-vi.mock("@/utils/budgeting", () => ({
+vi.mock("@/utils/domain/budgeting", () => ({
   calculateBiweeklyNeeds: vi.fn(() => 0),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),

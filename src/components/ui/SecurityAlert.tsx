@@ -1,5 +1,5 @@
 import { createElement, ComponentType } from "react";
-import { getIcon as getIconFromRegistry } from "@/utils/icons";
+import { getIcon as getIconFromRegistry } from "@/utils/ui/icons";
 
 type IconComponentType = ComponentType<{ className?: string }>;
 

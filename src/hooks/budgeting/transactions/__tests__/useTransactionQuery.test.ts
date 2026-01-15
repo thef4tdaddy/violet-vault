@@ -19,7 +19,7 @@ vi.mock("@/db/budgetDb", () => ({
   },
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),

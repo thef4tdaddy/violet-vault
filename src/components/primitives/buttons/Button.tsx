@@ -1,5 +1,5 @@
 import React from "react";
-import { getIcon } from "@/utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 // eslint-disable-next-line no-direct-icon-imports/no-direct-icon-imports -- Loader2 is for loading state only
 import { Loader2 } from "lucide-react";
 

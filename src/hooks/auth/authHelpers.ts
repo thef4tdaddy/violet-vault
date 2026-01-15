@@ -1,6 +1,6 @@
-import { encryptionUtils } from "@/utils/security/encryption";
-import logger from "@/utils/common/logger";
-import { identifyUser } from "@/utils/common/sentry";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
+import logger from "@/utils/core/common/logger";
+import { identifyUser } from "@/utils/core/common/sentry";
 import localStorageService from "@/services/storage/localStorageService";
 import type { UserData, LoginResult } from "./useAuth.types";
 

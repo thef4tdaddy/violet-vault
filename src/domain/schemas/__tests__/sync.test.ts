@@ -20,7 +20,7 @@ import {
 import { z } from "zod";
 
 // Mock logger to avoid side effects in tests
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     warn: vi.fn(),
     info: vi.fn(),

@@ -46,7 +46,7 @@ vi.mock("@/components/ui", () => ({
   ),
 }));
 
-vi.mock("@/utils/ui/touchFeedback", () => ({
+vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   getButtonClasses: vi.fn((classes: string) => classes),
   withHapticFeedback: vi.fn((fn: () => void) => fn),
 }));

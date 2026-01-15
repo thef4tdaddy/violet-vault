@@ -1,8 +1,11 @@
 import { ImportService } from "@/services/api/importService";
 import { validateAndNormalizeTransaction } from "@/domain/schemas/transaction";
 import type { Transaction } from "@/domain/schemas/transaction";
-import { parseContentToRows, processTransactionRow } from "@/utils/transactions/importHelpers";
-import logger from "@/utils/common/logger";
+import {
+  parseContentToRows,
+  processTransactionRow,
+} from "@/utils/domain/transactions/importHelpers";
+import logger from "@/utils/core/common/logger";
 
 export interface ProcessTransactionsResult {
   valid: Transaction[];
