@@ -1,6 +1,5 @@
 // components/savings/SavingsSummaryCard.tsx
-import { getIcon } from "@/utils";
-import PageSummaryCard from "@/components/ui/PageSummaryCard";
+import { MetricCard } from "../primitives/cards/MetricCard";
 import type { SavingsGoal } from "@/db/types";
 
 interface SavingsSummaryCardProps {
@@ -32,39 +31,42 @@ const SavingsSummaryCard = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {/* Total Saved */}
-      <PageSummaryCard
-        icon={getIcon("DollarSign")}
-        label="Total Saved"
-        value={`$${totalSaved.toFixed(2)}`}
-        color="green"
-        subtext={`Target: $${totalTargets.toFixed(2)}`}
+      <MetricCard
+        icon="DollarSign"
+        title="Total Saved"
+        value={totalSaved}
+        variant="success"
+        format="currency"
+        subtitle={`Target: $${totalTargets.toFixed(2)}`}
       />
 
       {/* Overall Progress */}
-      <PageSummaryCard
-        icon={getIcon("TrendingUp")}
-        label="Overall Progress"
-        value={`${overallProgress.toFixed(1)}%`}
-        color="blue"
-        subtext={`$${(totalTargets - totalSaved).toFixed(2)} remaining`}
+      <MetricCard
+        icon="TrendingUp"
+        title="Overall Progress"
+        value={overallProgress}
+        variant="info"
+        format="percentage"
+        subtitle={`$${(totalTargets - totalSaved).toFixed(2)} remaining`}
       />
 
       {/* Total Goals */}
-      <PageSummaryCard
-        icon={getIcon("Target")}
-        label="Goals"
+      <MetricCard
+        icon="Target"
+        title="Goals"
         value={savingsGoals.length}
-        color="pink"
-        subtext={`${completedGoals.length} completed, ${activeGoals.length} active`}
+        variant="success" // pink mapped to success for 'completion' vibes
+        subtitle={`${completedGoals.length} completed, ${activeGoals.length} active`}
       />
 
       {/* Target Amount */}
-      <PageSummaryCard
-        icon={getIcon("Crosshair")}
-        label="Target Amount"
-        value={`$${totalTargets.toFixed(2)}`}
-        color="cyan"
-        subtext={`Across ${savingsGoals.length} ${savingsGoals.length === 1 ? "goal" : "goals"}`}
+      <MetricCard
+        icon="Crosshair"
+        title="Target Amount"
+        value={totalTargets}
+        variant="info" // cyan mapped to info
+        format="currency"
+        subtitle={`Across ${savingsGoals.length} ${savingsGoals.length === 1 ? "goal" : "goals"}`}
       />
     </div>
   );
