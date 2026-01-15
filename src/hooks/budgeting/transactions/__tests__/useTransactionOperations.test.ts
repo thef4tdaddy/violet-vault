@@ -26,6 +26,9 @@ vi.mock("@/db/budgetDb", () => ({
       get: vi.fn(),
       delete: vi.fn(),
     },
+    addTransaction: vi.fn(),
+    updateTransaction: vi.fn(),
+    putTransaction: vi.fn(),
   },
 }));
 
@@ -91,7 +94,7 @@ describe("useTransactionOperations", () => {
         await result.current.addTransaction(data);
       });
 
-      expect(budgetDb.transactions.put).toHaveBeenCalled();
+      expect(budgetDb.putTransaction).toHaveBeenCalled();
       expect(mockUpdateBalances).toHaveBeenCalled();
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey: ["transactions"],
@@ -119,7 +122,7 @@ describe("useTransactionOperations", () => {
         await result.current.updateTransaction("1", updates);
       });
 
-      expect(budgetDb.transactions.update).toHaveBeenCalledWith(
+      expect(budgetDb.updateTransaction).toHaveBeenCalledWith(
         "1",
         expect.objectContaining({ description: "Updated" })
       );
@@ -161,7 +164,7 @@ describe("useTransactionOperations", () => {
 
       expect(budgetDb.transactions.delete).toHaveBeenCalledWith("1");
       expect(mockUpdateBalances).toHaveBeenCalledTimes(3); // 1 delete + 2 creates
-      expect(budgetDb.transactions.put).toHaveBeenCalledTimes(2);
+      expect(budgetDb.putTransaction).toHaveBeenCalledTimes(2);
       expect(mockTriggerSync).toHaveBeenCalledWith("transaction_split");
     });
   });

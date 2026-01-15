@@ -137,7 +137,10 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
   onImport,
   onFileUpload,
 }) => (
-  <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+  <div
+    data-testid="ledger-header"
+    className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6"
+  >
     {/* Page Header with Actions */}
     <PageHeader
       title="Transaction Ledger"

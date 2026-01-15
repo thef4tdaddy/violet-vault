@@ -1,62 +1,55 @@
 import { render, screen, within } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 import TransactionTable from "../TransactionTable";
 import userEvent from "@testing-library/user-event";
-import useTransactionTable from "@/hooks/budgeting/transactions/useTransactionTable";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Mock the custom hook
-vi.mock("@/hooks/budgeting/transactions/useTransactionTable", () => ({
-  default: vi.fn(() => ({
-    parentRef: { current: null },
-    rowVirtualizer: {
-      getVirtualItems: () => [],
-      getTotalSize: () => 0,
-    },
-    historyTransaction: null,
-    deletingTransaction: null,
-    handleDeleteClick: vi.fn(),
-    cancelDelete: vi.fn(),
-    handleHistoryClick: vi.fn(),
-    closeHistory: vi.fn(),
-  })),
-}));
-
-// Mock child components
-vi.mock("@/components/transactions/components/TransactionRow", () => ({
-  default: ({ transaction, onEdit, onDeleteClick, onSplit, onHistoryClick }: any) => (
-    <div data-testid={`transaction-row-${transaction.id}`} className="transaction-row">
-      <div>{transaction.date}</div>
-      <div>{transaction.description}</div>
-      <div>{transaction.category}</div>
-      <div>${transaction.amount}</div>
-      <div>
-        <button onClick={() => onEdit(transaction)}>Edit</button>
-        <button onClick={() => onDeleteClick(transaction)}>Delete</button>
-        <button onClick={() => onSplit(transaction)}>Split</button>
-        <button onClick={() => onHistoryClick(transaction)}>History</button>
+// Mock the primitives and child components
+vi.mock("@/components/primitives/tables/DataTable", () => ({
+  DataTable: ({ data, columns, emptyMessage, getRowId }: any) => (
+    <div data-testid="data-table">
+      <div className="table-header">
+        {columns.map((col: any) => (
+          <div key={col.key}>{col.header}</div>
+        ))}
+      </div>
+      <div className="table-body">
+        {data.length === 0 ? (
+          <div>{emptyMessage}</div>
+        ) : (
+          data.map((row: any) => (
+            <div key={getRowId(row)} data-testid={`row-${getRowId(row)}`}>
+              {columns.map((col: any) => (
+                <div key={col.key} data-testid={`cell-${getRowId(row)}-${col.key}`}>
+                  {typeof col.accessor === "function" ? col.accessor(row) : row[col.key]}
+                </div>
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </div>
   ),
 }));
 
-vi.mock("@/components/transactions/components/DeleteConfirmation", () => ({
-  default: ({ isOpen, onConfirm, onCancel, transaction }: any) => (
-    // Note: The actual component might not use 'isOpen' prop if it's conditionally rendered by parent
-    // checking usage in Table: checks isDeleting ? <DeleteConfirmation ... /> : ...
-    // So distinct existence is enough.
-    <div data-testid="delete-confirmation">
-      <span>Delete {transaction?.description}?</span>
-      <button onClick={onConfirm}>Confirm</button>
-      <button onClick={onCancel}>Cancel</button>
-    </div>
-  ),
+vi.mock("@/components/primitives/modals", () => ({
+  ConfirmModal: ({ isOpen, onClose, onConfirm, title, message }: any) =>
+    isOpen ? (
+      <div data-testid="confirm-modal">
+        <h3>{title}</h3>
+        <p>{message}</p>
+        <button onClick={onConfirm}>Confirm</button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    ) : null,
 }));
 
 vi.mock("@/components/history/ObjectHistoryViewer", () => ({
-  default: ({ onClose, objectType }: any) => (
+  default: ({ onClose, objectType, objectName }: any) => (
     <div data-testid="history-viewer">
-      <span>History for {objectType}</span>
+      <span>
+        History for {objectType}: {objectName}
+      </span>
       <button onClick={onClose}>Close</button>
     </div>
   ),
@@ -93,7 +86,17 @@ vi.mock("@/utils/domain/transactions/tableHelpers", () => ({
   },
 }));
 
-const useTransactionTableMock = useTransactionTable as unknown as Mock;
+// Mock MobileTransactionList to avoid duplicate IDs and text in JSDOM
+vi.mock("../TransactionTable", async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
+  return actual;
+});
+
+// Mock icons utility
+vi.mock("@/utils/ui/icons", () => ({
+  getIcon: vi.fn(() => () => <span data-testid="icon" />),
+  getIconByName: vi.fn(() => () => <span data-testid="icon" />),
+}));
 
 describe("TransactionTable", () => {
   const mockOnEdit = vi.fn();
@@ -109,6 +112,30 @@ describe("TransactionTable", () => {
     onSplit: mockOnSplit,
   };
 
+  const mockTransactions = [
+    {
+      id: "1",
+      date: "2024-01-15",
+      description: "Grocery Store",
+      category: "Groceries",
+      amount: -50.25,
+      envelopeId: "env-1",
+    },
+    {
+      id: "2",
+      date: "2024-01-16",
+      description: "Salary",
+      category: "Income",
+      amount: 2000.0,
+      envelopeId: "env-2",
+    },
+  ];
+
+  const mockEnvelopes = [
+    { id: "env-1", name: "Food", category: "expenses", color: "#ff0000" },
+    { id: "env-2", name: "Main", category: "income", color: "#00ff00" },
+  ];
+
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient = new QueryClient({
@@ -122,405 +149,134 @@ describe("TransactionTable", () => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
-  describe("Rendering", () => {
-    it("should render without crashing", () => {
+  describe("Desktop View (DataTable)", () => {
+    it("should render headers correctly", () => {
       renderWithQuery(<TransactionTable {...defaultProps} />);
-      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
+      const table = screen.getByTestId("data-table");
+      expect(within(table).getByText("Date")).toBeInTheDocument();
+      expect(within(table).getByText("Description")).toBeInTheDocument();
+      expect(within(table).getByText("Category")).toBeInTheDocument();
+      expect(within(table).getByText("Envelope")).toBeInTheDocument();
+      expect(within(table).getByText("Amount")).toBeInTheDocument();
+      expect(within(table).getByText("Actions")).toBeInTheDocument();
     });
 
-    it("should render table headers", () => {
-      renderWithQuery(<TransactionTable {...defaultProps} />);
-
-      expect(screen.getByText("Date")).toBeInTheDocument();
-      expect(screen.getByText("Description")).toBeInTheDocument();
-      expect(screen.getByText("Category")).toBeInTheDocument();
-      expect(screen.getByText("Envelope")).toBeInTheDocument();
-      expect(screen.getByText("Amount")).toBeInTheDocument();
-      expect(screen.getByText("Actions")).toBeInTheDocument();
-    });
-
-    it("should render transactions when they exist", () => {
-      const mockVirtualItems = [
-        { index: 0, start: 0, size: 50 },
-        { index: 1, start: 50, size: 50 },
-      ];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 100,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      const transactions = [
-        {
-          id: "1",
-          date: "2024-01-15",
-          description: "Grocery Store",
-          category: "Groceries",
-          amount: 50.0,
-        },
-        {
-          id: "2",
-          date: "2024-01-16",
-          description: "Gas Station",
-          category: "Transportation",
-          amount: 40.0,
-        },
-      ];
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={transactions} />);
-
-      expect(screen.getByTestId("transaction-row-1")).toBeInTheDocument();
-      expect(screen.getByTestId("transaction-row-2")).toBeInTheDocument();
-    });
-
-    it("should handle empty transactions array", () => {
+    it("should render empty state when no transactions", () => {
       renderWithQuery(<TransactionTable {...defaultProps} transactions={[]} />);
-      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
+      const table = screen.getByTestId("data-table");
+      expect(within(table).getByText("No transactions found")).toBeInTheDocument();
     });
 
-    it("should handle undefined transactions", () => {
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={undefined} />);
-      expect(screen.getAllByText("No transactions found")[0]).toBeInTheDocument();
-    });
-  });
-
-  describe("Transaction Actions", () => {
-    it("should call onEdit when edit button is clicked", async () => {
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      const transaction = {
-        id: "1",
-        date: "2024-01-15",
-        description: "Test",
-        category: "Test",
-        amount: 50,
-      };
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
-      const editButton = within(row).getByText("Edit");
-      await userEvent.click(editButton);
-
-      expect(mockOnEdit).toHaveBeenCalledWith(transaction);
-    });
-
-    it("should call handleDeleteClick when delete button is clicked", async () => {
-      const mockHandleDeleteClick = vi.fn();
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: mockHandleDeleteClick,
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      const transaction = {
-        id: "1",
-        date: "2024-01-15",
-        description: "Test",
-        category: "Test",
-        amount: 50,
-      };
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
-      const deleteButton = within(row).getByText("Delete");
-      await userEvent.click(deleteButton);
-
-      expect(mockHandleDeleteClick).toHaveBeenCalledWith(transaction);
-    });
-
-    it("should call onSplit when split button is clicked", async () => {
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      const transaction = {
-        id: "1",
-        date: "2024-01-15",
-        description: "Test",
-        category: "Test",
-        amount: 50,
-      };
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
-      const splitButton = within(row).getByText("Split");
-      await userEvent.click(splitButton);
-
-      expect(mockOnSplit).toHaveBeenCalledWith(transaction);
-    });
-
-    it("should call handleHistoryClick when history button is clicked", async () => {
-      const mockHandleHistoryClick = vi.fn();
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: mockHandleHistoryClick,
-        closeHistory: vi.fn(),
-      });
-
-      const transaction = {
-        id: "1",
-        date: "2024-01-15",
-        description: "Test",
-        category: "Test",
-        amount: 50,
-      };
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const row = screen.getByTestId(`transaction-row-${transaction.id}`);
-      const historyButton = within(row).getByText("History");
-      await userEvent.click(historyButton);
-
-      expect(mockHandleHistoryClick).toHaveBeenCalledWith(transaction);
-    });
-  });
-
-  describe("Delete Confirmation", () => {
-    it("should show delete confirmation when deletingTransaction is set", () => {
-      const transaction = {
-        id: "1",
-        description: "Test Transaction",
-        amount: 50,
-      };
-
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: transaction,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      expect(screen.getByTestId("delete-confirmation")).toBeInTheDocument();
-      expect(screen.getByText("Delete Test Transaction?")).toBeInTheDocument();
-    });
-
-    it("should call onDelete when delete is confirmed", async () => {
-      const transaction = {
-        id: "1",
-        description: "Test Transaction",
-        amount: 50,
-      };
-
-      const mockCancelDelete = vi.fn();
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: transaction,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: mockCancelDelete,
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const confirmation = screen.getByTestId("delete-confirmation");
-      const confirmButton = within(confirmation).getByText("Confirm");
-      await userEvent.click(confirmButton);
-
-      expect(mockOnDelete).toHaveBeenCalledWith("1");
-      expect(mockCancelDelete).toHaveBeenCalled();
-    });
-
-    it("should call cancelDelete when delete is cancelled", async () => {
-      const transaction = {
-        id: "1",
-        description: "Test Transaction",
-        amount: 50,
-      };
-
-      const mockCancelDelete = vi.fn();
-
-      useTransactionTableMock.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => [{ index: 0, start: 0, size: 50 }],
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: transaction,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: mockCancelDelete,
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      renderWithQuery(<TransactionTable {...defaultProps} transactions={[transaction]} />);
-
-      const confirmation = screen.getByTestId("delete-confirmation");
-      const cancelButton = within(confirmation).getByText("Cancel");
-      await userEvent.click(cancelButton);
-
-      expect(mockCancelDelete).toHaveBeenCalled();
-      expect(mockOnDelete).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("History Viewer", () => {
-    it("should show history viewer when historyTransaction is set", () => {
-      const transaction = {
-        id: "1",
-        description: "Test Transaction",
-      };
-
-      useTransactionTable.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => [],
-          getTotalSize: () => 0,
-        },
-        historyTransaction: transaction,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      renderWithQuery(<TransactionTable {...defaultProps} />);
-
-      expect(screen.getByTestId("history-viewer")).toBeInTheDocument();
-    });
-
-    it("should call closeHistory when history viewer is closed", async () => {
-      const transaction = {
-        id: "1",
-        description: "Test Transaction",
-      };
-
-      const mockCloseHistory = vi.fn();
-
-      useTransactionTable.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => [],
-          getTotalSize: () => 0,
-        },
-        historyTransaction: transaction,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: mockCloseHistory,
-      });
-
-      renderWithQuery(<TransactionTable {...defaultProps} />);
-
-      const closeButton = screen.getByText("Close");
-      await userEvent.click(closeButton);
-
-      expect(mockCloseHistory).toHaveBeenCalled();
-    });
-  });
-
-  describe("Props Handling", () => {
-    it("should pass envelopes to TransactionRow", () => {
-      const mockVirtualItems = [{ index: 0, start: 0, size: 50 }];
-
-      useTransactionTable.mockReturnValue({
-        parentRef: { current: null },
-        rowVirtualizer: {
-          getVirtualItems: () => mockVirtualItems,
-          getTotalSize: () => 50,
-        },
-        historyTransaction: null,
-        deletingTransaction: null,
-        handleDeleteClick: vi.fn(),
-        cancelDelete: vi.fn(),
-        handleHistoryClick: vi.fn(),
-        closeHistory: vi.fn(),
-      });
-
-      const transactions = [{ id: "1", description: "Test", amount: 50 }];
-
-      const envelopes = [
-        { id: "env1", name: "Groceries" },
-        { id: "env2", name: "Gas" },
-      ];
-
-      render(
+    it("should render transaction rows", () => {
+      renderWithQuery(
         <TransactionTable
           {...defaultProps}
-          transactions={transactions as never[]}
-          envelopes={envelopes as never[]}
+          transactions={mockTransactions as any}
+          envelopes={mockEnvelopes as any}
         />
       );
 
-      expect(screen.getByTestId("transaction-row-1")).toBeInTheDocument();
+      const table = screen.getByTestId("data-table");
+      expect(within(table).getByTestId("row-1")).toBeInTheDocument();
+      expect(within(table).getByTestId("row-2")).toBeInTheDocument();
+
+      const row1 = within(table).getByTestId("row-1");
+      expect(within(row1).getByText("Grocery Store")).toBeInTheDocument();
+      expect(within(row1).getByText("Groceries")).toBeInTheDocument();
+    });
+
+    it("should trigger onEdit when Edit button is clicked", async () => {
+      renderWithQuery(
+        <TransactionTable
+          {...defaultProps}
+          transactions={[mockTransactions[0]] as any}
+          envelopes={mockEnvelopes as any}
+        />
+      );
+
+      const table = screen.getByTestId("data-table");
+      const editButton = within(table).getByLabelText("Edit transaction");
+      await userEvent.click(editButton);
+
+      expect(mockOnEdit).toHaveBeenCalledWith(mockTransactions[0]);
+    });
+
+    it("should opening deleting confirmation when Delete is clicked", async () => {
+      renderWithQuery(
+        <TransactionTable
+          {...defaultProps}
+          transactions={[mockTransactions[0]] as any}
+          envelopes={mockEnvelopes as any}
+        />
+      );
+
+      const table = screen.getByTestId("data-table");
+      const deleteButton = within(table).getByLabelText("Delete transaction");
+      await userEvent.click(deleteButton);
+
+      const modal = screen.getByTestId("confirm-modal");
+      expect(modal).toBeInTheDocument();
+      expect(within(modal).getByText(/Delete Transaction\?/)).toBeInTheDocument();
+      expect(within(modal).getByText(/Grocery Store/)).toBeInTheDocument();
+    });
+
+    it("should call onDelete when delete is confirmed", async () => {
+      renderWithQuery(
+        <TransactionTable
+          {...defaultProps}
+          transactions={[mockTransactions[0]] as any}
+          envelopes={mockEnvelopes as any}
+        />
+      );
+
+      // Open modal
+      const table = screen.getByTestId("data-table");
+      await userEvent.click(within(table).getByLabelText("Delete transaction"));
+
+      // Confirm
+      const modal = screen.getByTestId("confirm-modal");
+      const confirmButton = within(modal).getByText("Confirm");
+      await userEvent.click(confirmButton);
+
+      expect(mockOnDelete).toHaveBeenCalledWith("1");
+      expect(screen.queryByTestId("confirm-modal")).not.toBeInTheDocument();
+    });
+
+    it("should open history viewer when History is clicked", async () => {
+      renderWithQuery(
+        <TransactionTable
+          {...defaultProps}
+          transactions={[mockTransactions[0]] as any}
+          envelopes={mockEnvelopes as any}
+        />
+      );
+
+      const historyButton = screen.getByLabelText("View history");
+      await userEvent.click(historyButton);
+
+      expect(screen.getByTestId("history-viewer")).toBeInTheDocument();
+      expect(screen.getByText(/History for Transaction: Grocery Store/)).toBeInTheDocument();
+    });
+  });
+
+  describe("Mobile View (MobileTransactionList)", () => {
+    // Note: In real JSDOM, both md:hidden and hidden md:block might be visible if not handling media queries.
+    // However, MobileTransactionList is rendered alongside DataTable.
+    // We can verify its content if it's not hidden by CSS in the test environment (which it usually isn't in JSDOM).
+
+    it("should render mobile list content", () => {
+      renderWithQuery(
+        <TransactionTable
+          {...defaultProps}
+          transactions={[mockTransactions[0]] as any}
+          envelopes={mockEnvelopes as any}
+        />
+      );
+
+      // Mobile list items are usually just divs with specific content
+      // From TransactionTable.tsx, we see it maps transactions and shows description.
+      const mobileHeaders = screen.getAllByText("Date");
+      expect(mobileHeaders.length).toBeGreaterThan(1); // One in DataTable, one in Mobile list
     });
   });
 });

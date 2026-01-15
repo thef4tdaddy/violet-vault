@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { getIconByName } from "@/utils/core/common/billIcons";
+import { getIconByName } from "@/utils/ui/icons";
 
 const URGENCY_COLORS = {
   overdue: "text-red-600 bg-red-50",

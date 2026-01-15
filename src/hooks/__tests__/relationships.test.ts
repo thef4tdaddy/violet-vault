@@ -20,42 +20,44 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   };
 });
 
-vi.mock("@/db/budgetDb", () => ({
-  budgetDb: {
-    envelopes: {
-      get: vi.fn(),
-      add: vi.fn().mockResolvedValue("new-id"),
-      put: vi.fn().mockResolvedValue("new-id"),
-      update: vi.fn().mockResolvedValue(1),
-      delete: vi.fn().mockResolvedValue(undefined),
-      where: vi.fn(() => ({
-        equals: vi.fn(() => ({
-          filter: vi.fn(() => ({
-            toArray: vi.fn().mockResolvedValue([]),
-          })),
+vi.mock("@/db/budgetDb", () => {
+  const mockTable = () => ({
+    get: vi.fn(),
+    add: vi.fn().mockResolvedValue("new-id"),
+    put: vi.fn().mockResolvedValue("new-id"),
+    update: vi.fn().mockResolvedValue(1),
+    delete: vi.fn().mockResolvedValue(undefined),
+    where: vi.fn(() => ({
+      equals: vi.fn(() => ({
+        filter: vi.fn(() => ({
           toArray: vi.fn().mockResolvedValue([]),
         })),
+        toArray: vi.fn().mockResolvedValue([]),
       })),
-    },
-    transactions: {
-      get: vi.fn(),
-      add: vi.fn().mockResolvedValue("new-txn-id"),
-      put: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      where: vi.fn(() => ({
-        equals: vi.fn(() => ({
-          filter: vi.fn(() => ({
-            toArray: vi.fn().mockResolvedValue([]),
-          })),
-          toArray: vi.fn().mockResolvedValue([]),
-        })),
-      })),
-    },
-  },
-  getUnassignedCash: vi.fn().mockResolvedValue(1000),
-  setUnassignedCash: vi.fn().mockResolvedValue(undefined),
-}));
+    })),
+    toArray: vi.fn().mockResolvedValue([]),
+  });
+
+  const mockDb = {
+    envelopes: mockTable(),
+    transactions: mockTable(),
+    addTransaction: vi.fn().mockResolvedValue("new-txn-id"),
+    updateTransaction: vi.fn().mockResolvedValue(1),
+    putTransaction: vi.fn().mockResolvedValue("new-txn-id"),
+    deleteTransaction: vi.fn().mockResolvedValue(undefined),
+    addEnvelope: vi.fn().mockResolvedValue("new-id"),
+    updateEnvelope: vi.fn().mockResolvedValue(1),
+    putEnvelope: vi.fn().mockResolvedValue("new-id"),
+  };
+
+  return {
+    budgetDb: mockDb,
+    getBudgetMetadata: vi.fn().mockResolvedValue({}),
+    setBudgetMetadata: vi.fn().mockResolvedValue(undefined),
+    getUnassignedCash: vi.fn().mockResolvedValue(1000),
+    setUnassignedCash: vi.fn().mockResolvedValue(undefined),
+  };
+});
 
 vi.mock("@/utils/core/common/queryClient", () => ({
   queryKeys: {
@@ -224,7 +226,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         });
       });
 
-      expect(budgetDb.transactions.put).toHaveBeenCalledWith(
+      expect(budgetDb.putTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1",
         })
@@ -324,7 +326,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         expect(result.envelopeId).toBe("env-1");
       });
 
-      expect(budgetDb.transactions.add).toHaveBeenCalledWith(
+      expect(budgetDb.addTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1",
           isScheduled: true,
@@ -379,13 +381,13 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Bills should be disconnected (envelopeId set to undefined), not deleted
-      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-1", {
+      expect(budgetDb.updateTransaction).toHaveBeenCalledWith("bill-1", {
         envelopeId: undefined,
       });
-      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-2", {
+      expect(budgetDb.updateTransaction).toHaveBeenCalledWith("bill-2", {
         envelopeId: undefined,
       });
-      expect(budgetDb.transactions.delete).not.toHaveBeenCalled();
+      expect(budgetDb.deleteTransaction).not.toHaveBeenCalled();
       expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(mockQueryClient, "bill-1", {
         envelopeId: undefined,
       });
@@ -593,7 +595,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Bill should be updated with debtId
-      expect(budgetDb.transactions.update).toHaveBeenCalledWith(
+      expect(budgetDb.updateTransaction).toHaveBeenCalledWith(
         "bill-1",
         expect.objectContaining({
           debtId: "debt-1",
@@ -714,7 +716,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
         });
       });
 
-      expect(budgetDb.transactions.put).toHaveBeenCalledWith(
+      expect(budgetDb.putTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1", // All transactions must have envelope
         })
@@ -771,7 +773,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       expect(setUnassignedCash).toHaveBeenCalled();
 
       // 2. Bills disconnected (envelopeId cleared)
-      expect(budgetDb.transactions.update).toHaveBeenCalledWith("bill-1", {
+      expect(budgetDb.updateTransaction).toHaveBeenCalledWith("bill-1", {
         envelopeId: undefined,
       });
       expect(optimisticHelpers.updateTransaction).toHaveBeenCalled();
@@ -841,7 +843,7 @@ describe("CRUD Relationships - Envelopes, Transactions, Bills, Debts", () => {
       });
 
       // Transaction created with envelope (envelopes are source of truth)
-      expect(budgetDb.transactions.put).toHaveBeenCalledWith(
+      expect(budgetDb.putTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           envelopeId: "env-1",
         })

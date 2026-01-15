@@ -68,13 +68,14 @@ vi.mock("@/hooks/budgeting/transactions/useTransactionLedger", () => ({
 }));
 
 // 2. Component Mocks (Use @/ aliases)
-vi.mock("../TransactionSummaryCards", () => ({
+// 2. Component Mocks (Use @/ aliases)
+vi.mock("@/components/transactions/TransactionSummaryCards", () => ({
   default: ({ transactions }: any) => (
     <div data-testid="transaction-summary">Transactions: {transactions.length}</div>
   ),
 }));
 
-vi.mock("../TransactionTable", () => ({
+vi.mock("@/components/transactions/TransactionTable", () => ({
   default: ({ transactions, onEdit, onDelete, onSplit, onPayBill }: any) => (
     <div data-testid="transaction-table">
       {transactions.map((t: any) => (
@@ -90,7 +91,7 @@ vi.mock("../TransactionTable", () => ({
   ),
 }));
 
-vi.mock("../TransactionForm", () => ({
+vi.mock("@/components/transactions/TransactionForm", () => ({
   default: ({ isOpen, onClose, onSubmit }: any) =>
     isOpen ? (
       <div data-testid="transaction-form">
@@ -100,7 +101,7 @@ vi.mock("../TransactionForm", () => ({
     ) : null,
 }));
 
-vi.mock("../import/ImportModal", () => ({
+vi.mock("@/components/transactions/import/ImportModal", () => ({
   default: ({ isOpen, onClose }: any) =>
     isOpen ? (
       <div data-testid="import-modal">
@@ -109,7 +110,7 @@ vi.mock("../import/ImportModal", () => ({
     ) : null,
 }));
 
-vi.mock("../TransactionSplitter", () => ({
+vi.mock("@/components/transactions/TransactionSplitter", () => ({
   default: ({ isOpen, transaction, onClose, onComplete }: any) =>
     isOpen && transaction ? (
       <div data-testid="transaction-splitter">
@@ -130,7 +131,7 @@ vi.mock("@/components/primitives/headers", () => ({
   ),
 }));
 
-vi.mock("../ledger/TransactionPagination", () => ({
+vi.mock("@/components/transactions/ledger/TransactionPagination", () => ({
   default: ({ currentPage, totalPages, onPageChange }: any) => (
     <div data-testid="pagination">
       <span>
@@ -146,7 +147,7 @@ vi.mock("../ledger/TransactionPagination", () => ({
   ),
 }));
 
-vi.mock("../ledger/TransactionLedgerLoading", () => ({
+vi.mock("@/components/transactions/ledger/TransactionLedgerLoading", () => ({
   default: () => <div data-testid="loading-spinner">Loading transactions...</div>,
 }));
 
@@ -178,6 +179,7 @@ vi.mock("@/utils/domain/transactions/ledgerHelpers", () => ({
     { key: "envelope", label: "Envelope" },
     { key: "date", label: "Date" },
   ]),
+  formatLedgerSummary: vi.fn(() => "Summary"),
 }));
 
 // ============================================================================

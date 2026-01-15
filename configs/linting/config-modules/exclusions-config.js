@@ -84,10 +84,11 @@ export default [
   },
   {
     // Allow direct icon imports only in the icon utility file
-    files: ["**/iconImport.{js,ts}", "src/utils/icons/index.ts"],
+    files: ["**/iconImport.{js,ts}", "src/utils/ui/icons/index.ts"],
     rules: {
       "no-restricted-imports": "off", // Icon utility can import from react-icons and lucide-react
       "no-direct-icon-imports/no-direct-icon-imports": "off", // Icon utility needs to import from react-icons
+      "max-lines": "off", // Icon utility legitimately grows as more icons are added
     },
   },
   {
@@ -202,8 +203,8 @@ export default [
       "**/debtDebugConfig.{js,ts}", // Debt debugging configuration
       "**/masterSyncValidator.{js,ts}", // Sync validation testing utility
       "**/highlight.{js,ts}", // Error monitoring utility
-      "src/utils/common/logger.ts", // Logger utility can use console patterns
-      "src/utils/debug/**/*.{js,jsx,ts,tsx}", // All debug utilities
+      "src/utils/core/common/logger.ts", // Logger utility can use console patterns
+      "src/utils/dev/debug/**/*.{js,jsx,ts,tsx}", // All debug utilities
     ],
     rules: {
       "no-console": "off", // These utilities legitimately use console for debugging
@@ -385,7 +386,10 @@ export default [
   },
   {
     // Deep archival utilities handle multi-step workflows that are inherently complex
-    files: ["src/utils/common/transactionArchiving.ts", "src/utils/security/keyExport.ts"],
+    files: [
+      "src/utils/core/common/transactionArchiving.ts",
+      "src/utils/platform/security/keyExport.ts",
+    ],
     rules: {
       complexity: "off",
     },

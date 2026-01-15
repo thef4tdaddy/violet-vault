@@ -45,6 +45,10 @@ vi.mock("@/db/budgetDb", () => ({
       delete: vi.fn(),
       update: vi.fn(),
     },
+    addEnvelope: vi.fn(),
+    updateEnvelope: vi.fn(),
+    putEnvelope: vi.fn(),
+    putTransaction: vi.fn(),
   },
   getUnassignedCash: vi.fn(),
   setUnassignedCash: vi.fn(),
@@ -130,7 +134,7 @@ describe("useEnvelopeOperations", () => {
         await result.current.addEnvelopeAsync(data);
       });
 
-      expect(budgetDb.envelopes.put).toHaveBeenCalled();
+      expect(budgetDb.putEnvelope).toHaveBeenCalled();
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ["envelopes"] });
       expect(mockTriggerSync).toHaveBeenCalledWith("envelope_created");
     });
@@ -145,7 +149,7 @@ describe("useEnvelopeOperations", () => {
         await result.current.updateEnvelopeAsync("1", updates);
       });
 
-      expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
         "1",
         expect.objectContaining({ name: "Updated" })
       );
@@ -189,15 +193,15 @@ describe("useEnvelopeOperations", () => {
         });
       });
 
-      expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
         "from",
         expect.objectContaining({ currentBalance: 150 })
       );
-      expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
         "to",
         expect.objectContaining({ currentBalance: 50 })
       );
-      expect(budgetDb.transactions.put).toHaveBeenCalledWith(
+      expect(budgetDb.putTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           amount: 50,
           category: "transfer",

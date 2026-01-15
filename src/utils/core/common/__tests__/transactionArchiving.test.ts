@@ -778,7 +778,7 @@ describe("transactionArchiving", () => {
         },
       ];
 
-      await archiver.createTransactionArchives(transactions as never);
+      await archiver.createTransactionArchives(transactions as any);
 
       expect(archiver.stats.archived).toBe(1);
     });

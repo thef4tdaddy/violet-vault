@@ -1,5 +1,5 @@
 import React from "react";
-import { getIconByName } from "@/utils/core/common/billIcons";
+import { getIconByName } from "@/utils/ui/icons";
 import { getFrequencyDisplayText } from "@/utils/core/common/frequencyCalculations";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import type { Bill } from "@/types/bills";

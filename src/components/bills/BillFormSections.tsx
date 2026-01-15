@@ -1,9 +1,7 @@
 import React from "react";
 import { Select, TextInput, Button } from "@/components/ui";
-import { getIcon } from "@/utils";
-import { getIconByName } from "@/utils/core/common/billIcons";
+import { getIcon, getIconByName, type BillIconOption } from "@/utils/ui/icons";
 import { getFrequencyOptions } from "@/utils/core/common/frequencyCalculations";
-import type { BillIconOption } from "@/utils/ui/billIcons/iconOptions";
 import type { BillFormData, Bill } from "@/types/bills";
 import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 

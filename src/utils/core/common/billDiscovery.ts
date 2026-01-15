@@ -3,7 +3,7 @@
  * Analyzes transactions to automatically suggest new recurring bills
  */
 
-import { getBillIcon } from "./billIcons.ts";
+import { getBillIcon } from "@/utils/ui/icons";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 type Envelope = DbEnvelope;

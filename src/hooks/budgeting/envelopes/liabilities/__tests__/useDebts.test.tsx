@@ -8,12 +8,12 @@ import type { Mock } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useDebts } from "../useDebts";
-import { budgetDb } from "../../../../../db/budgetDb";
+import { budgetDb } from "@/db/budgetDb";
 import BudgetHistoryTracker from "@/utils/core/common/budgetHistoryTracker";
 import type { Debt } from "../../../../../db/types";
 
 // Mock dependencies
-vi.mock("../../../../../db/budgetDb", () => ({
+vi.mock("@/db/budgetDb", () => ({
   budgetDb: {
     envelopes: {
       toArray: vi.fn(),
@@ -26,12 +26,13 @@ vi.mock("../../../../../db/budgetDb", () => ({
         toArray: vi.fn(),
       }),
     },
-    // Keep debts as null for v2 compatibility check if needed,
-    // but the hook uses envelopes.
+    addEnvelope: vi.fn(),
+    updateEnvelope: vi.fn(),
+    putEnvelope: vi.fn(),
   },
 }));
 
-vi.mock("@/utils/common/budgetHistoryTracker", () => ({
+vi.mock("@/utils/core/common/budgetHistoryTracker", () => ({
   default: {
     trackDebtChange: vi.fn(),
   },
@@ -87,8 +88,8 @@ describe("useDebts - CRUD Operations", () => {
     };
     (budgetDb.envelopes.where as Mock).mockReturnValue(mockWhere);
     (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
-    (budgetDb.envelopes.put as Mock).mockResolvedValue(undefined);
-    (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
+    (budgetDb.putEnvelope as Mock).mockResolvedValue(undefined);
+    (budgetDb.updateEnvelope as Mock).mockResolvedValue(1);
     (budgetDb.envelopes.delete as Mock).mockResolvedValue(undefined);
     (BudgetHistoryTracker.trackDebtChange as Mock).mockResolvedValue(undefined);
   });
@@ -178,7 +179,7 @@ describe("useDebts - CRUD Operations", () => {
         expect(result.current.debts).toEqual([debtWithStatus]);
       });
 
-      expect(budgetDb.envelopes.update).toHaveBeenCalledWith("debt-1", { status: "active" });
+      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith("debt-1", { status: "active" });
     });
   });
 
@@ -234,7 +235,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.addDebtAsync(newDebtData);
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.put).toHaveBeenCalled();
+        expect(budgetDb.putEnvelope).toHaveBeenCalled();
         expect(BudgetHistoryTracker.trackDebtChange).toHaveBeenCalledWith(
           expect.objectContaining({
             changeType: "add",
@@ -266,7 +267,7 @@ describe("useDebts - CRUD Operations", () => {
       await result.current.addDebtAsync(newDebtData);
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.put).toHaveBeenCalledWith(
+        expect(budgetDb.putEnvelope).toHaveBeenCalledWith(
           expect.objectContaining({
             id: "custom-id",
             status: "active",
@@ -332,7 +333,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+        expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             ...updates,
@@ -371,7 +372,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        const updateCall = (budgetDb.envelopes.update as Mock).mock.calls[0];
+        const updateCall = (budgetDb.updateEnvelope as Mock).mock.calls[0];
         expect(updateCall[1].lastModified).toBeGreaterThanOrEqual(beforeUpdate);
       });
     });
@@ -513,7 +514,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+        expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 4800, // 5000 - 200
@@ -551,7 +552,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+        expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 0, // Should be clamped to 0
@@ -586,7 +587,7 @@ describe("useDebts - CRUD Operations", () => {
       // Query invalidation happens in onSuccess callback
       // We verify the mutation completed successfully
       await waitFor(() => {
-        expect(budgetDb.envelopes.put).toHaveBeenCalled();
+        expect(budgetDb.putEnvelope).toHaveBeenCalled();
       });
     });
   });
@@ -594,7 +595,7 @@ describe("useDebts - CRUD Operations", () => {
   describe("Validation Error Handling", () => {
     it("should handle database error when adding debt", async () => {
       const dbError = new Error("Database write failed");
-      (budgetDb.envelopes.put as Mock).mockRejectedValue(dbError);
+      (budgetDb.putEnvelope as Mock).mockRejectedValue(dbError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -622,7 +623,7 @@ describe("useDebts - CRUD Operations", () => {
     it("should handle database error when updating debt", async () => {
       const dbError = new Error("Database update failed");
       (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
-      (budgetDb.envelopes.update as Mock).mockRejectedValue(dbError);
+      (budgetDb.updateEnvelope as Mock).mockRejectedValue(dbError);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -758,7 +759,7 @@ describe("useDebts - CRUD Operations", () => {
       ]);
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.update).toHaveBeenCalledTimes(2);
+        expect(budgetDb.updateEnvelope).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -808,7 +809,7 @@ describe("useDebts - CRUD Operations", () => {
       });
 
       await waitFor(() => {
-        expect(budgetDb.envelopes.update).toHaveBeenCalled();
+        expect(budgetDb.updateEnvelope).toHaveBeenCalled();
       });
     });
 
@@ -834,7 +835,7 @@ describe("useDebts - CRUD Operations", () => {
 
       await waitFor(() => {
         // Balance should be clamped to 0
-        expect(budgetDb.envelopes.update).toHaveBeenCalledWith(
+        expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
           "debt-1",
           expect.objectContaining({
             currentBalance: 0,
