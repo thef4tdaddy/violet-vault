@@ -28,7 +28,7 @@ const ReturningUserActions: React.FC<ReturningUserActionsProps> = ({
         type="submit"
         onClick={onSubmit}
         disabled={!canSubmit || isLoading}
-        className="w-full btn btn-primary py-4 text-lg font-black rounded-lg border-2 border-black uppercase tracking-wider"
+        className="w-full py-4 text-lg font-black rounded-lg border-2 border-black uppercase tracking-wider"
       >
         {isLoading ? (
           <StylizedButtonText firstLetterClassName="text-xl">UNLOCKING...</StylizedButtonText>
