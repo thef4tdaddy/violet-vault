@@ -55,21 +55,33 @@ vi.mock("@/services/sync/editLockService", () => ({
 
 // Mock child components
 vi.mock("../ui/EditLockIndicator", () => ({
-  default: ({ isLocked }) =>
+  default: ({ isLocked }: { isLocked: boolean }) =>
     isLocked ? <div data-testid="edit-lock-indicator">Locked</div> : null,
 }));
 
-vi.mock("../BillModalHeader", () => ({
-  default: ({ editingBill, onClose }) => (
-    <div data-testid="bill-modal-header">
-      <h2>{editingBill ? "Edit Bill" : "Add Bill"}</h2>
-      <button onClick={onClose}>Close</button>
-    </div>
-  ),
+vi.mock("@/components/primitives/modals/FormModal", () => ({
+  default: ({
+    isOpen,
+    onClose,
+    children,
+    title,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    title: string;
+  }) =>
+    isOpen ? (
+      <div data-testid="form-modal">
+        <h2>{title}</h2>
+        <button onClick={onClose}>Close</button>
+        {children}
+      </div>
+    ) : null,
 }));
 
 vi.mock("../BillFormFields", () => ({
-  default: ({ formData, updateField }) => (
+  default: ({ formData, updateField }: { formData: any; updateField: any }) => (
     <div data-testid="bill-form-fields">
       <input
         data-testid="bill-name-input"
@@ -86,7 +98,17 @@ vi.mock("../BillFormFields", () => ({
 }));
 
 vi.mock("../mobile/SlideUpModal", () => ({
-  default: ({ isOpen, onClose, children, title }) =>
+  default: ({
+    isOpen,
+    onClose,
+    children,
+    title,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    title: string;
+  }) =>
     isOpen ? (
       <div data-testid="slide-up-modal">
         <h3>{title}</h3>
@@ -130,12 +152,12 @@ describe("AddBillModal", () => {
   describe("Rendering", () => {
     it("should not render when isOpen is false", () => {
       renderWithQuery(<AddBillModal {...defaultProps} isOpen={false} />);
-      expect(screen.queryByTestId("bill-modal-header")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("form-modal")).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
       renderWithQuery(<AddBillModal {...defaultProps} />);
-      expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
+      expect(screen.getByTestId("form-modal")).toBeInTheDocument();
     });
 
     it("should display Add Bill title for new bills", () => {
@@ -162,7 +184,7 @@ describe("AddBillModal", () => {
 
     it("should render modal header", () => {
       renderWithQuery(<AddBillModal {...defaultProps} />);
-      expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
+      expect(screen.getByTestId("form-modal")).toBeInTheDocument();
     });
   });
 

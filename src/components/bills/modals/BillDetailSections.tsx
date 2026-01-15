@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, TextInput } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import type { Bill } from "@/types/bills";
 
@@ -97,13 +97,13 @@ export const BillDetailQuickPayment: React.FC<BillDetailQuickPaymentProps> = ({
         <form onSubmit={handleMarkPaid} className="bg-green-50 rounded-xl p-4">
           <h4 className="font-medium text-green-900 mb-3">Mark as Paid</h4>
           <div className="flex gap-3">
-            <input
+            <TextInput
               type="number"
               step="0.01"
               min="0"
               value={paymentAmount}
               onChange={(e) => handlePaymentAmountChange(e.target.value)}
-              className="flex-1 px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="flex-1"
               placeholder="Payment amount"
               required
             />
