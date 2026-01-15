@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, memo } from "react";
+import { lazy, Suspense, memo } from "react";
 import { useBudgetStore, type UiStore } from "@/stores/ui/uiStore";
 import { usePrompt } from "@/hooks/platform/ux/usePrompt";
 import { useActualBalance } from "@/hooks/budgeting/metadata/useBudgetMetadata";
