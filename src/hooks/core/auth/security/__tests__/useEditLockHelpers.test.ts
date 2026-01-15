@@ -7,11 +7,11 @@ import {
   calculateTimeRemaining,
   logLockStateChange,
 } from "../useEditLockHelpers";
-import logger from "@/utils/common/logger";
-import type { LockDocument } from "@/types/editLock";
+import logger from "../../../../../utils/core/common/logger";
+import type { LockDocument } from "../../../../../types/editLock";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../../../utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -167,18 +167,18 @@ describe("useEditLockHelpers", () => {
     });
 
     it("should return true for expired lock with string date", () => {
-      const lockDoc: LockDocument = {
+      const lockDoc = {
         userId: "user-123",
         expiresAt: "2024-01-15T11:00:00Z",
-      };
+      } as unknown as LockDocument;
       expect(isLockExpired(lockDoc)).toBe(true);
     });
 
     it("should return false for non-expired lock with string date", () => {
-      const lockDoc: LockDocument = {
+      const lockDoc = {
         userId: "user-123",
         expiresAt: "2024-01-15T13:00:00Z",
-      };
+      } as unknown as LockDocument;
       expect(isLockExpired(lockDoc)).toBe(false);
     });
 

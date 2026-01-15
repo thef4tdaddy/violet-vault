@@ -284,6 +284,11 @@ export const createMockDexie = () => {
     getEnvelopesByCategory: vi.fn(async (category: string) => {
       return mockData.envelopes.filter((e) => e.category === category);
     }),
+    getPaycheckHistory: vi.fn(async (limit: number = 50) => {
+      return mockData.transactions
+        .filter((t: any) => t.type === "income" && !!t.allocations)
+        .slice(0, limit);
+    }),
     _mockData: mockData, // Exposed for test assertions
     _resetMockData: () => {
       mockData.transactions = [];

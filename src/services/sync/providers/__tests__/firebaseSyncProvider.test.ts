@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { SafeUnknown } from "@/types/firebase";
+import type { SafeUnknown } from "../../../../types/firebase";
+import type { User } from "firebase/auth";
 
 // Mock logger
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("../../../../utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     error: vi.fn(),
@@ -12,7 +13,7 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 // Mock firebaseConfig
-vi.mock("@/utils/common/firebaseConfig", () => ({
+vi.mock("../../../../utils/core/common/firebaseConfig", () => ({
   firebaseConfig: {
     apiKey: "test-api-key",
     authDomain: "test.firebaseapp.com",
@@ -24,7 +25,7 @@ vi.mock("@/utils/common/firebaseConfig", () => ({
 }));
 
 // Mock encryption manager
-vi.mock("@/services/security/encryptionManager", () => ({
+vi.mock("../../../security/encryptionManager", () => ({
   encryptionManager: {
     encrypt: vi.fn(),
     decrypt: vi.fn(),
@@ -34,7 +35,7 @@ vi.mock("@/services/security/encryptionManager", () => ({
 }));
 
 // Mock budgetDb
-vi.mock("@/db/budgetDb", () => ({
+vi.mock("../../../../db/budgetDb", () => ({
   budgetDb: {
     transaction: vi.fn(),
     envelopes: {
@@ -53,9 +54,9 @@ vi.mock("@/db/budgetDb", () => ({
 
 // Import after mocks
 import { FirebaseSyncProvider } from "../firebaseSyncProvider";
-import { encryptionManager } from "@/services/security/encryptionManager";
-import { budgetDb } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import { encryptionManager } from "../../../security/encryptionManager";
+import { budgetDb } from "../../../../db/budgetDb";
+import logger from "../../../../utils/core/common/logger";
 
 describe("FirebaseSyncProvider", () => {
   let provider: FirebaseSyncProvider;
@@ -71,7 +72,9 @@ describe("FirebaseSyncProvider", () => {
     // Setup default mock behavior for Firebase
     vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
       // Immediately call callback with authenticated user
-      setTimeout(() => callback({ uid: "test-user" } as never), 0);
+      if (typeof callback === "function") {
+        setTimeout(() => callback({ uid: "test-user" } as User), 0);
+      }
       return vi.fn(); // unsubscribe function
     });
 
@@ -118,16 +121,18 @@ describe("FirebaseSyncProvider", () => {
     });
 
     // Setup budgetDb mocks
-    vi.mocked(budgetDb.transaction).mockImplementation(
-      async (_: string, __: unknown[], callback: () => Promise<void>) => {
-        await callback();
+    vi.mocked(budgetDb.transaction).mockImplementation((...args: unknown[]) => {
+      const callback = args[args.length - 1] as () => Promise<void>;
+      if (typeof callback === "function") {
+        return callback() as any;
       }
-    );
+      return Promise.resolve() as any;
+    });
 
     vi.mocked(budgetDb.envelopes.clear).mockResolvedValue(undefined);
-    vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue(1);
+    vi.mocked(budgetDb.envelopes.bulkAdd).mockResolvedValue("last-key");
     vi.mocked(budgetDb.transactions.clear).mockResolvedValue(undefined);
-    vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue(1);
+    vi.mocked(budgetDb.transactions.bulkAdd).mockResolvedValue("last-key");
     vi.mocked(budgetDb.budget.put).mockResolvedValue("metadata");
 
     // Initialize provider
@@ -163,7 +168,9 @@ describe("FirebaseSyncProvider", () => {
       const { onAuthStateChanged, signInAnonymously } = await import("firebase/auth");
 
       vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
-        setTimeout(() => callback(null), 0);
+        if (typeof callback === "function") {
+          setTimeout(() => callback(null), 0);
+        }
         return vi.fn();
       });
 
@@ -181,7 +188,9 @@ describe("FirebaseSyncProvider", () => {
       const testProvider = new FirebaseSyncProvider();
 
       vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
-        setTimeout(() => callback(null), 0);
+        if (typeof callback === "function") {
+          setTimeout(() => callback(null), 0);
+        }
         return vi.fn();
       });
 
@@ -457,7 +466,7 @@ describe("FirebaseSyncProvider", () => {
 
     it("should upload when timestamps are equal but local has data", async () => {
       const timestamp = Date.now();
-      const { getDoc } = await import("firebase/firestore");
+      const { getDoc, setDoc } = await import("firebase/firestore");
 
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
