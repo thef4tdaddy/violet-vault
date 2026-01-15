@@ -242,6 +242,90 @@ jobs:
                     body += `### Python Test Failures\n\n`;
                     body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
                 }
+            }
+
+            // Helper to extract failing test files from logs
+            const extractFailingTests = (logContent, testPattern) => {
+                const lines = logContent.split('\n');
+                const failingTests = new Set();
+                for (const line of lines) {
+                    const match = line.match(testPattern);
+                    if (match) {
+                        failingTests.add(match[1]);
+                    }
+                }
+                return Array.from(failingTests);
+            };
+
+            // Create issues for failing test files
+            if (feStatus === 'failure' && fs.existsSync('frontend-test.txt')) {
+                const feLog = fs.readFileSync('frontend-test.txt', 'utf8');
+                const failingTests = extractFailingTests(feLog, /FAIL\s+(.+\.test\.(?:ts|tsx|js|jsx))/);
+                for (const testFile of failingTests) {
+                    const basename = testFile.split('/').pop();
+                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
+                    
+                    const existing = await github.rest.search.issuesAndPullRequests({
+                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
+                    });
+                    
+                    if (existing.data.total_count === 0) {
+                        await github.rest.issues.create({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            title: issueTitle,
+                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
+                            labels: ['test-failure', 'automated']
+                        });
+                    }
+                }
+            }
+            
+            if (goStatus === 'failure' && fs.existsSync('go-test.txt')) {
+                const goLog = fs.readFileSync('go-test.txt', 'utf8');
+                const failingTests = extractFailingTests(goLog, /FAIL\s+(.+_test\.go)/);
+                for (const testFile of failingTests) {
+                    const basename = testFile.split('/').pop();
+                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
+                    
+                    const existing = await github.rest.search.issuesAndPullRequests({
+                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
+                    });
+                    
+                    if (existing.data.total_count === 0) {
+                        await github.rest.issues.create({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            title: issueTitle,
+                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
+                            labels: ['test-failure', 'automated', 'go']
+                        });
+                    }
+                }
+            }
+            
+            if (pyStatus === 'failure' && fs.existsSync('python-test.txt')) {
+                const pyLog = fs.readFileSync('python-test.txt', 'utf8');
+                const failingTests = extractFailingTests(pyLog, /FAILED\s+(.+\.py)/);
+                for (const testFile of failingTests) {
+                    const basename = testFile.split('/').pop();
+                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
+                    
+                    const existing = await github.rest.search.issuesAndPullRequests({
+                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
+                    });
+                    
+                    if (existing.data.total_count === 0) {
+                        await github.rest.issues.create({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            title: issueTitle,
+                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
+                            labels: ['test-failure', 'automated', 'python']
+                        });
+                    }
+                }
+            }
 
             // Frontend Coverage Parsing (JSON)
             if (fs.existsSync('coverage/coverage-summary.json')) {
@@ -289,7 +373,7 @@ jobs:
                                    repo: context.repo.repo,
                                    title: issueTitle,
                                    body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
-                                   labels: ['coverage-gap', 'help-wanted', 'automated']
+                                   labels: ['coverage-gap', 'automated']
                                });
                            }
                        }
@@ -348,7 +432,7 @@ jobs:
             //                        repo: context.repo.repo,
             //                        title: issueTitle,
             //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
-            //                        labels: ['coverage-gap', 'help-wanted', 'automated', 'python']
+            //                        labels: ['coverage-gap', 'automated', 'python']
             //                    });
             //                }
             //            }
@@ -368,7 +452,8 @@ jobs:
             //        body += `\n### Go Coverage Details\n`;
             //        body += `- **Total**: ${goCoverage.toFixed(1)}%\n`;
             //        
-            //        // Parse coverage.out format: filepath:startline.col,endline.col num_statements count
+            //        // Parse coverage.out format: filepath:startline.col,endline.col num_statements execution_count
+            //        // Each line represents a code block. If execution_count > 0, all statements in that block are covered.
             //        const fileCoverage = {};
             //        for (const line of lines) {
             //            const parts = line.split(':');
@@ -379,20 +464,23 @@ jobs:
             //            if (rest.length < 3) continue;
             //            
             //            const statements = parseInt(rest[1]) || 0;
-            //            const covered = parseInt(rest[2]) || 0;
+            //            const executionCount = parseInt(rest[2]) || 0;
             //            
             //            if (!fileCoverage[filepath]) {
-            //                fileCoverage[filepath] = { total: 0, covered: 0 };
+            //                fileCoverage[filepath] = { totalStatements: 0, coveredStatements: 0 };
             //            }
-            //            fileCoverage[filepath].total += statements;
-            //            fileCoverage[filepath].covered += (covered > 0 ? statements : 0);
+            //            fileCoverage[filepath].totalStatements += statements;
+            //            // If the block was executed at least once, all statements in it are covered
+            //            if (executionCount > 0) {
+            //                fileCoverage[filepath].coveredStatements += statements;
+            //            }
             //        }
             //        
             //        const goLowCovFiles = [];
             //        for (const [filepath, stats] of Object.entries(fileCoverage)) {
             //            if (filepath.includes('_test.go')) continue;
             //            
-            //            const pct = stats.total > 0 ? (stats.covered / stats.total) * 100 : 0;
+            //            const pct = stats.totalStatements > 0 ? (stats.coveredStatements / stats.totalStatements) * 100 : 0;
             //            if (pct < 80) {
             //                goLowCovFiles.push({ file: filepath, pct });
             //            }
@@ -423,7 +511,7 @@ jobs:
             //                        repo: context.repo.repo,
             //                        title: issueTitle,
             //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
-            //                        labels: ['coverage-gap', 'help-wanted', 'automated', 'go']
+            //                        labels: ['coverage-gap', 'automated', 'go']
             //                    });
             //                }
             //            }
