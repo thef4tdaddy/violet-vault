@@ -297,7 +297,7 @@ Total: $11.48`;
       });
       expect(items[1]).toEqual({
         description: "Bread",
-        amount: 2.5, // Note: JavaScript parseFloat may not preserve trailing zeros (2.50 becomes 2.5)
+        amount: 2.5, // Note: JavaScript numeric representation / toString() don't preserve trailing zeros (2.50 becomes 2.5)
         rawLine: "Bread $2.50",
       });
     });
