@@ -170,7 +170,8 @@ export const encryptionUtils = {
     const iv = getRandomBytes(12);
 
     // Handle both string data (already JSON stringified) and object data
-    const stringData = typeof data === "string" ? data : JSON.stringify(data);
+    // Always JSON.stringify to ensure symmetric decryption with JSON.parse
+    const stringData = JSON.stringify(data);
 
     const encrypted = await safeCryptoOperation(
       "encrypt",
