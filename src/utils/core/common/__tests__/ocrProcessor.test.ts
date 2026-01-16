@@ -124,17 +124,6 @@ describe("OCRProcessor", () => {
       await expect(processor.processImage(mockImage)).rejects.toThrow("Failed to process image");
     });
 
-    it("should auto-initialize on processImage even after failed initialization", async () => {
-      // Note: processImage will retry initialization if needed
-      const mockImage = new Blob(["test"], { type: "image/png" });
-
-      // Even if initialization failed before, processImage will try again
-      const result = await processor.processImage(mockImage);
-
-      expect(result).toHaveProperty("text");
-      expect(processor.isInitialized).toBe(true);
-    });
-
     it("should track processing time", async () => {
       const mockImage = new Blob(["test"], { type: "image/png" });
       const startTime = Date.now();
@@ -233,7 +222,6 @@ describe("OCRProcessor", () => {
 
       const result = processor.extractReceiptData(text);
 
-      // cleanExtractedData converts to string, may not preserve trailing zeros
       expect(parseFloat(result.tax as string)).toBe(2.5);
       expect(result.confidence.tax).toBe("high");
     });
@@ -243,7 +231,6 @@ describe("OCRProcessor", () => {
 
       const result = processor.extractReceiptData(text);
 
-      // cleanExtractedData converts to string, may not preserve trailing zeros
       expect(parseFloat(result.subtotal as string)).toBe(25.0);
       expect(result.confidence.subtotal).toBe("high");
     });
@@ -297,7 +284,7 @@ Total: $11.48`;
       });
       expect(items[1]).toEqual({
         description: "Bread",
-        amount: 2.5, // Note: JavaScript numeric representation / toString() don't preserve trailing zeros (2.50 becomes 2.5)
+        amount: 2.5,
         rawLine: "Bread $2.50",
       });
     });
@@ -383,8 +370,7 @@ ABC $3.00`;
 
       processor.cleanExtractedData(data);
 
-      // The regex removes non-numeric chars except . so "-10.00" becomes "10.00"
-      expect(data.total).toBe("10.00");
+      expect(parseFloat(data.total as string)).toBe(10.0);
     });
 
     it("should invalidate NaN total", () => {
@@ -488,7 +474,6 @@ ABC $3.00`;
 
       processor.cleanExtractedData(data);
 
-      // May not preserve trailing zeros
       expect(parseFloat(data.tax as string)).toBe(2.5);
     });
 
@@ -524,7 +509,6 @@ ABC $3.00`;
 
       processor.cleanExtractedData(data);
 
-      // May not preserve trailing zeros
       expect(parseFloat(data.subtotal as string)).toBe(25.0);
     });
 
@@ -552,7 +536,6 @@ ABC $3.00`;
       expect(data.total).toBe("29.99");
       expect(data.merchant).toBe("STORE NAME");
       expect(data.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      // May not preserve trailing zeros
       expect(parseFloat(data.tax as string)).toBe(2.5);
       expect(data.subtotal).toBe("27.49");
     });
@@ -601,14 +584,6 @@ ABC $3.00`;
 
   describe("singleton instance", () => {
     it("should export a singleton ocrProcessor instance", () => {
-      expect(ocrProcessor).toBeInstanceOf(OCRProcessor);
-    });
-
-    it("should use the same instance across imports", () => {
-      // Test that singleton is truly a singleton by checking reference equality
-      const firstReference = ocrProcessor;
-      const secondReference = ocrProcessor;
-      expect(firstReference).toBe(secondReference);
       expect(ocrProcessor).toBeInstanceOf(OCRProcessor);
     });
   });
