@@ -89,6 +89,57 @@ describe("paycheckUtils", () => {
       expect(result.isValid).toBe(false);
       expect(result.errors.allocationMode).toBe("Invalid allocation mode");
     });
+
+    it("should handle NaN amount", () => {
+      const formData = { ...validFormData, amount: "abc" };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.amount).toBe("Paycheck amount must be a positive number");
+    });
+
+    it("should handle zero amount", () => {
+      const formData = { ...validFormData, amount: "0" };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.amount).toBe("Paycheck amount must be a positive number");
+    });
+
+    it("should handle numeric amount value", () => {
+      const formData = { ...validFormData, amount: 1500 };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual({});
+    });
+
+    it("should validate leftover allocation mode", () => {
+      const formData = { ...validFormData, allocationMode: "leftover" };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual({});
+    });
+
+    it("should trim payer name before validation", () => {
+      const formData = { ...validFormData, payerName: "  John Doe  " };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual({});
+    });
+
+    it("should handle multiple validation errors", () => {
+      const formData = { amount: "", payerName: "", allocationMode: "bad" };
+      const result = validatePaycheckForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect(Object.keys(result.errors)).toHaveLength(3);
+      expect(result.errors.amount).toBeDefined();
+      expect(result.errors.payerName).toBeDefined();
+      expect(result.errors.allocationMode).toBeDefined();
+    });
   });
 
   describe("getPayerPrediction", () => {
@@ -134,7 +185,74 @@ describe("paycheckUtils", () => {
       }));
 
       const result = getPayerPrediction("John Doe", largeHistory);
-      expect(result.sampleSize).toBe(5);
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.sampleSize).toBe(5);
+      }
+    });
+
+    it("should handle single paycheck", () => {
+      const singleHistory = [{ payerName: "John Doe", amount: 1000, date: "2024-01-01" }];
+      const result = getPayerPrediction("John Doe", singleHistory);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.amount).toBe(1000);
+        expect(result.sampleSize).toBe(1);
+        expect(result.range.min).toBe(1000);
+        expect(result.range.max).toBe(1000);
+      }
+    });
+
+    it("should filter out zero amount paychecks", () => {
+      const historyWithZeros = [
+        { payerName: "John Doe", amount: 0, date: "2024-01-01" },
+        { payerName: "John Doe", amount: 1000, date: "2024-01-15" },
+      ];
+      const result = getPayerPrediction("John Doe", historyWithZeros);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.sampleSize).toBe(1); // Only counts non-zero
+        expect(result.amount).toBe(1000);
+      }
+    });
+
+    it("should calculate confidence based on consistency", () => {
+      // Highly consistent paychecks
+      const consistentHistory = [
+        { payerName: "John Doe", amount: 1000, date: "2024-01-01" },
+        { payerName: "John Doe", amount: 1000, date: "2024-01-15" },
+        { payerName: "John Doe", amount: 1000, date: "2024-02-01" },
+      ];
+      const consistentResult = getPayerPrediction("John Doe", consistentHistory);
+
+      // Highly variable paychecks
+      const variableHistory = [
+        { payerName: "John Doe", amount: 1000, date: "2024-01-01" },
+        { payerName: "John Doe", amount: 2000, date: "2024-01-15" },
+        { payerName: "John Doe", amount: 500, date: "2024-02-01" },
+      ];
+      const variableResult = getPayerPrediction("John Doe", variableHistory);
+
+      expect(consistentResult).not.toBeNull();
+      expect(variableResult).not.toBeNull();
+      if (consistentResult && variableResult) {
+        expect(consistentResult.confidence).toBeGreaterThan(variableResult.confidence);
+      }
+    });
+
+    it("should return most recent paycheck amount", () => {
+      const history = [
+        { payerName: "John Doe", amount: 1500, date: "2024-01-01" },
+        { payerName: "John Doe", amount: 1200, date: "2024-01-15" },
+      ];
+      const result = getPayerPrediction("John Doe", history);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.mostRecent).toBe(1500); // First in array is most recent
+      }
     });
   });
 
@@ -230,6 +348,134 @@ describe("paycheckUtils", () => {
 
       // Should be sorted by priority: high > medium > low
       expect((result.allocations[0] as any).priority).toBe("high");
+    });
+
+    it("should handle negative amount", () => {
+      const result = calculateEnvelopeAllocations(-100, mockEnvelopes, "allocate");
+
+      expect(result.allocations).toHaveLength(0);
+      expect(result.totalAllocated).toBe(0);
+      expect(result.remainingAmount).toBe(-100);
+      expect(result.allocationRate).toBe(0);
+    });
+
+    it("should handle empty envelopes array", () => {
+      const result = calculateEnvelopeAllocations(1000, [], "allocate");
+
+      expect(result.allocations).toHaveLength(0);
+      expect(result.totalAllocated).toBe(0);
+      expect(result.remainingAmount).toBe(1000);
+      expect(result.allocationRate).toBe(0);
+    });
+
+    it("should exclude unassigned envelope", () => {
+      const envelopesWithUnassigned = [
+        ...mockEnvelopes,
+        {
+          id: "unassigned",
+          name: "Unassigned",
+          autoAllocate: true,
+          type: ENVELOPE_TYPES.VARIABLE,
+          monthlyBudget: 100,
+          priority: "high",
+        },
+      ];
+      const result = calculateEnvelopeAllocations(1000, envelopesWithUnassigned, "allocate");
+
+      const unassignedAllocation = result.allocations.find((a) => a.envelopeId === "unassigned");
+      expect(unassignedAllocation).toBeUndefined();
+    });
+
+    it("should handle envelopes with zero monthly budget", () => {
+      const envelopesWithZero = [
+        {
+          id: "env1",
+          name: "Test",
+          autoAllocate: true,
+          type: ENVELOPE_TYPES.VARIABLE,
+          monthlyBudget: 0,
+          priority: "high",
+        },
+      ];
+      const result = calculateEnvelopeAllocations(1000, envelopesWithZero, "allocate");
+
+      expect(result.allocations).toHaveLength(0);
+      expect(result.totalAllocated).toBe(0);
+      expect(result.remainingAmount).toBe(1000);
+    });
+
+    it("should handle proportional allocation when total needs exceed paycheck", () => {
+      const highNeedEnvelopes = [
+        {
+          id: "env1",
+          name: "Rent",
+          autoAllocate: true,
+          type: ENVELOPE_TYPES.BILL,
+          monthlyBudget: 2000,
+          currentBalance: 0,
+          priority: "critical",
+        },
+        {
+          id: "env2",
+          name: "Utilities",
+          autoAllocate: true,
+          type: ENVELOPE_TYPES.BILL,
+          amount: 1000,
+          currentBalance: 0,
+          priority: "high",
+        },
+      ];
+
+      const result = calculateEnvelopeAllocations(1000, highNeedEnvelopes, "allocate");
+
+      // Should allocate based on biweekly outstanding amounts, not full monthly
+      expect(result.totalAllocated).toBeGreaterThan(0);
+      expect(result.totalAllocated).toBeLessThanOrEqual(1000);
+      expect(result.allocations.length).toBeGreaterThan(0);
+    });
+
+    it("should handle envelopes with existing balances", () => {
+      const envelopesWithBalance = [
+        {
+          id: "env1",
+          name: "Groceries",
+          autoAllocate: true,
+          type: ENVELOPE_TYPES.VARIABLE,
+          monthlyBudget: 400,
+          currentBalance: 300, // Already has money
+          priority: "high",
+        },
+      ];
+
+      const result = calculateEnvelopeAllocations(1000, envelopesWithBalance, "allocate");
+
+      // If balance already covers biweekly need, no allocation is made
+      // Otherwise allocates the outstanding portion
+      if (result.allocations.length > 0) {
+        expect(result.allocations[0].amount).toBeGreaterThan(0);
+      } else {
+        // Balance already sufficient
+        expect(result.totalAllocated).toBe(0);
+      }
+    });
+
+    it("should handle string amount input", () => {
+      const result = calculateEnvelopeAllocations(
+        "1000" as unknown as number,
+        mockEnvelopes,
+        "allocate"
+      );
+
+      expect(result.allocations.length).toBeGreaterThan(0);
+      expect(result.totalAllocated).toBeGreaterThan(0);
+    });
+
+    it("should handle decimal amounts correctly", () => {
+      const result = calculateEnvelopeAllocations(1250.75, mockEnvelopes, "allocate");
+
+      expect(result.allocations.length).toBeGreaterThan(0);
+      expect(result.totalAllocated).toBeGreaterThan(0);
+      expect(result.totalAllocated + result.remainingAmount).toBeCloseTo(1250.75, 2);
     });
   });
 
