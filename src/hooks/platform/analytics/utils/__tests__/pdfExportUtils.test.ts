@@ -209,14 +209,14 @@ describe("pdfExportUtils", () => {
       expect(mockPdf.text).toHaveBeenCalledWith("$500", margin + 50, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$300", margin + 75, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$200", margin + 100, yPosition + 18);
-      expect(mockPdf.text).toHaveBeenCalledWith("0.6%", margin + 125, yPosition + 18);
+      expect(mockPdf.text).toHaveBeenCalledWith("60%", margin + 125, yPosition + 18);
 
       // Check second envelope row
       expect(mockPdf.text).toHaveBeenCalledWith("Gas", margin, yPosition + 24);
       expect(mockPdf.text).toHaveBeenCalledWith("$200", margin + 50, yPosition + 24);
       expect(mockPdf.text).toHaveBeenCalledWith("$150", margin + 75, yPosition + 24);
       expect(mockPdf.text).toHaveBeenCalledWith("$50", margin + 100, yPosition + 24);
-      expect(mockPdf.text).toHaveBeenCalledWith("0.8%", margin + 125, yPosition + 24);
+      expect(mockPdf.text).toHaveBeenCalledWith("75%", margin + 125, yPosition + 24);
     });
 
     it("should truncate long envelope names", () => {
