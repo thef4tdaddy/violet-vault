@@ -691,7 +691,6 @@ Total: $100.00`;
       variations.forEach((taxLine) => {
         const text = `Store\n${taxLine}\nTotal: $55.00`;
         const result = processor.extractReceiptData(text);
-        // May not preserve trailing zeros
         expect(parseFloat(result.tax as string)).toBe(5.0);
       });
     });
