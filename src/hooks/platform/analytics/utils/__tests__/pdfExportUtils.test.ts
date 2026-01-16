@@ -411,8 +411,8 @@ describe("pdfExportUtils", () => {
       expect(mockPdf.text).toHaveBeenCalledWith("$123", margin + 50, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$79", margin + 75, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$45", margin + 100, yPosition + 18);
-      // Utilization rate should be 1 decimal
-      expect(mockPdf.text).toHaveBeenCalledWith("0.6%", margin + 125, yPosition + 18);
+      // Utilization rate should be 1 decimal and represent ~64% for 0.6397
+      expect(mockPdf.text).toHaveBeenCalledWith("64.0%", margin + 125, yPosition + 18);
     });
 
     it("should use correct font styles for headers and data", () => {
