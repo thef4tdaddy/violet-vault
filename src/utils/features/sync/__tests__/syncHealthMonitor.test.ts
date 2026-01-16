@@ -88,7 +88,7 @@ describe("SyncHealthMonitor", () => {
     });
 
     it("should default to 'unknown' type when not specified", () => {
-      const syncId = syncHealthMonitor.recordSyncStart();
+      syncHealthMonitor.recordSyncStart();
 
       expect(logger.debug).toHaveBeenCalledWith(
         "📊 Sync health: Started tracking",
