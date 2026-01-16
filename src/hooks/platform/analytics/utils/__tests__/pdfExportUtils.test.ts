@@ -263,7 +263,7 @@ describe("pdfExportUtils", () => {
       expect(mockPdf.text).toHaveBeenCalledWith("$0", margin + 50, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$0", margin + 75, yPosition + 18);
       expect(mockPdf.text).toHaveBeenCalledWith("$0", margin + 100, yPosition + 18);
-      expect(mockPdf.text).toHaveBeenCalledWith("0.0%", margin + 125, yPosition + 18);
+      expect(mockPdf.text).toHaveBeenCalledWith("0%", margin + 125, yPosition + 18);
     });
 
     it("should limit envelopes to maximum of 15", () => {
