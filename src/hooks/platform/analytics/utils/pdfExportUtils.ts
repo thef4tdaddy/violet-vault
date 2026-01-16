@@ -99,7 +99,7 @@ export const addEnvelopeAnalysisToPDF = (
         `$${(envelope.monthlyBudget || 0).toFixed(0)}`,
         `$${(envelope.spent || 0).toFixed(0)}`,
         `$${(envelope.currentBalance || 0).toFixed(0)}`,
-        `${(envelope.utilizationRate || 0).toFixed(1)}%`,
+        `${((envelope.utilizationRate || 0) * 100).toFixed(1)}%`,
       ];
 
       rowData.forEach((data, index) => {
