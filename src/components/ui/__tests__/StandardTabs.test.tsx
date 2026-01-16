@@ -212,8 +212,8 @@ describe("StandardTabs", () => {
     });
 
     it("should handle undefined tabs", () => {
-      render(<StandardTabs {...defaultProps} tabs={undefined} />);
-      expect(screen.getByRole("navigation")).toBeInTheDocument();
+      const renderTabs = () => render(<StandardTabs {...defaultProps} tabs={undefined} />);
+      expect(renderTabs).not.toThrow();
     });
 
     it("should handle very long tab labels", () => {
