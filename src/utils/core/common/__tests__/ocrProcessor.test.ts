@@ -384,7 +384,7 @@ ABC $3.00`;
       processor.cleanExtractedData(data);
 
       // The regex removes non-numeric chars except . so "-10.00" becomes "10.00"
-      expect(parseFloat(data.total as string)).toBe(10.0);
+      expect(data.total).toBe("10.00");
     });
 
     it("should invalidate NaN total", () => {
