@@ -276,6 +276,15 @@ jobs:
               labels: ['daily-health']
             });
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.out,./api/coverage.json
+          flags: daily-health
+          name: daily-health-check
+          fail_ci_if_error: false
+
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
