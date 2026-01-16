@@ -210,7 +210,7 @@ describe("SyncHealthMonitor", () => {
       );
     });
 
-    it("should log warning for slow syncs without sending to Sentry", () => {
+    it("should log warning for slow syncs and track as error span", () => {
       const syncId = syncHealthMonitor.recordSyncStart("test-sync");
 
       vi.advanceTimersByTime(12000); // 12 seconds (slow)
