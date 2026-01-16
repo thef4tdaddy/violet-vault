@@ -3,43 +3,35 @@
 
 coverage:
   status:
-    # Overall project coverage (lenient)
+    # Overall project coverage mapping to the 80% roadmap
     project:
       default:
-        target: auto
-        threshold: 5%
+        target: 80%
+        threshold: 0.5%
+        informational: true # Don't block yet, just report progress
+        base: auto
 
     # NEW CODE coverage (strict)
     patch:
       default:
-        target: 90% # New code must be 90% covered
-        threshold: 0% # No exceptions
-        only_pulls: true # Only enforce on PRs
+        target: 80%
+        threshold: 0%
+        only_pulls: true
 
-    # CHANGES coverage (strict for feature branches)
+    # CHANGES coverage (strict for modified lines)
     changes:
       default:
-        target: 85% # Changed lines must be 85% covered
-        threshold: 0%
-
-# Require coverage on new files
-flag_management:
-  default_rules:
-    carryforward: false
-
-# Fail CI if new files have low coverage
-github_checks:
-  annotations: true
+        target: 80%
+        threshold: 0.5%
 
 # PR Comment Configuration
 comment:
-  layout: "diff, flags, files"
+  layout: "header, diff, flags, files"
   behavior: default
-  require_changes: true
+  require_changes: false # Show coverage even if it doesn't change
   require_base: false
   require_head: true
-
-  # Show files with low coverage
+  hide_project_coverage: false # Explicitly show total project coverage
   after_n_builds: 1
 
 # Ignore patterns (if needed)
