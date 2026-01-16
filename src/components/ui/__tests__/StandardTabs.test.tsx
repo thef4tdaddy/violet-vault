@@ -65,7 +65,8 @@ describe("StandardTabs", () => {
       const tabsWithNullCount = [{ id: "tab1", label: "Tab 1", count: null }];
       render(<StandardTabs {...defaultProps} tabs={tabsWithNullCount} />);
       const badge = screen.queryByText("0");
-      // Count of 0 may still render depending on implementation
+      // Count of 0 may still render depending on implementation, but null should not render a badge
+      expect(badge).not.toBeInTheDocument();
       expect(screen.getByText("Tab 1")).toBeInTheDocument();
     });
   });
