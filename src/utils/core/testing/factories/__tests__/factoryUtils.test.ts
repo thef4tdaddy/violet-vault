@@ -100,8 +100,8 @@ describe("Factory Utils", () => {
 
   describe("generateFutureDate", () => {
     it("should generate date in the future", () => {
-      const date = generateFutureDate();
       const now = new Date();
+      const date = generateFutureDate();
 
       expect(date).toBeInstanceOf(Date);
       expect(date.getTime()).toBeGreaterThanOrEqual(now.getTime());

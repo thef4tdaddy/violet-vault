@@ -155,7 +155,7 @@ export const calculateSplitTotals = (
       original: originalAmount,
       allocated: allocated,
       remaining: remaining,
-      isValid: Math.abs(remaining) < 0.01, // Allow for small rounding differences
+      isValid: Math.abs(remaining) < 0.011, // Allow for 1-cent rounding differences + float errors
       isOverAllocated: remaining < -0.01,
       isUnderAllocated: remaining > 0.01,
     };
