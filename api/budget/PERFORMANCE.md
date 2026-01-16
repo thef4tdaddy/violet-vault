@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document contains performance benchmarks for the Budget Calculation API. All benchmarks were conducted on a cloud server with Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz.
+This document contains performance benchmarks for the Budget Calculation API for the 2026.03 release. All benchmarks were conducted on a cloud server with Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz (2021-generation); results on newer hardware may differ.
 
 ## Benchmark Results
 

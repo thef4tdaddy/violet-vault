@@ -210,9 +210,65 @@ Run the full salvo script to verify all languages:
 
 ## Deployment
 
-### Vercel
+### Vercel Auto-Deployment
 
-The API functions are deployed as Vercel serverless functions.
+The API functions are automatically deployed as Vercel serverless functions when code is pushed to the repository.
 
-- `api/*.go` -> Go Runtime
-- `api/**/*.py` -> Python Runtime (configured in `vercel.json`)
+**Runtime Configuration** (in `vercel.json`):
+
+- `api/**/*.go` → Go Runtime (`go1.x`)
+- `api/**/*.py` → Python Runtime (`python3.12`)
+
+**Deployment Flow:**
+
+1. Push code to repository
+2. Vercel automatically detects changes
+3. Functions are built and deployed based on runtime configuration
+4. No manual deployment steps required
+
+### Environment Variables Setup
+
+Configure the following environment variables in your Vercel project settings:
+
+**Required for Bug Report Endpoint:**
+
+```bash
+GITHUB_TOKEN=ghp_your_personal_access_token_here
+BUG_REPORT_ALLOWED_ORIGINS=https://your-production-domain.vercel.app,https://your-preview-domain.vercel.app
+```
+
+**How to Set Environment Variables in Vercel:**
+
+1. Go to your Vercel project dashboard
+2. Navigate to Settings → Environment Variables
+3. Add each variable with appropriate scope:
+   - **Production**: For main branch deployments
+   - **Preview**: For preview deployments (develop, feature branches)
+   - **Development**: For local development (optional)
+
+**GitHub Token Setup:**
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Generate new token (classic) with `repo` scope
+3. Copy the token and add it to Vercel environment variables
+4. **Never commit the token to the repository**
+
+### API Endpoints
+
+Once deployed, your endpoints will be available at:
+
+- **Bug Report**: `POST https://your-domain.vercel.app/api/bug-report`
+- **Analytics Prediction**: `POST https://your-domain.vercel.app/api/analytics/prediction`
+- **Health Check**: `GET https://your-domain.vercel.app/api/health`
+
+### Testing Deployment
+
+After deployment, verify endpoints are working:
+
+```bash
+# Test health endpoint
+curl https://your-domain.vercel.app/api/health
+
+# Expected response:
+# {"status":"healthy","version":"2.0.0-beta","timestamp":"...","service":"VioletVault Backend"}
+```
