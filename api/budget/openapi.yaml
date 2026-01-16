@@ -26,7 +26,7 @@ info:
     url: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 servers:
-  - url: https://violet-vault.vercel.app
+  - url: https://thef4tdaddy.github.io/violet-vault
     description: Production server
   - url: http://localhost:3000
     description: Local development server
