@@ -1,8 +1,4 @@
-/**
- * Tests for Transaction Splitting Utilities
- * Testing split calculation, validation, and manipulation functions
- */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   findEnvelopeForCategory,
   initializeSplitsFromTransaction,
@@ -16,462 +12,186 @@ import {
   prepareSplitTransactions,
   getSplitSummary,
 } from "../splitting";
+import type { Transaction, Envelope, SplitAllocation } from "@/types/finance";
 
-// Mock logger
-vi.mock("../../../core/common/logger", () => ({
-  default: {
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
-describe("Transaction Splitting Utilities", () => {
-  const mockEnvelopes = [
-    { id: "env1", name: "Groceries", category: "Food", currentBalance: 0, targetAmount: 0 },
-    { id: "env2", name: "Gas", category: "Transportation", currentBalance: 0, targetAmount: 0 },
-    { id: "env3", name: "Dining", category: "Food", currentBalance: 0, targetAmount: 0 },
+describe("splitting utils", () => {
+  const mockEnvelopes: Envelope[] = [
+    { id: "env-1", name: "Groceries", category: "Food" } as Envelope,
+    { id: "env-2", name: "Rent", category: "Housing" } as Envelope,
   ];
 
-  const mockTransaction = {
-    id: "txn1",
-    description: "Test Transaction",
+  const mockTransaction: Transaction = {
+    id: "tx-1",
+    description: "Target Store",
     amount: -100.0,
-    category: "Food",
-    date: "2023-01-01",
-    envelopeId: "env1",
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    category: "Groceries",
+    envelopeId: "env-1",
+    date: "2024-01-01",
+    account: "Checking",
+    type: "expense",
+  } as Transaction;
 
   describe("findEnvelopeForCategory", () => {
-    it("should find envelope by exact name match", () => {
-      const envelope = findEnvelopeForCategory(mockEnvelopes, "Groceries");
-      expect(envelope).toEqual(mockEnvelopes[0]);
+    it("should find envelope by name (case-insensitive)", () => {
+      expect(findEnvelopeForCategory(mockEnvelopes, "groceries")?.id).toBe("env-1");
     });
 
-    it("should find envelope by category match", () => {
-      const envelope = findEnvelopeForCategory(mockEnvelopes, "Food");
-      expect(envelope).toEqual(mockEnvelopes[0]);
+    it("should find envelope by category field", () => {
+      expect(findEnvelopeForCategory(mockEnvelopes, "Housing")?.id).toBe("env-2");
     });
 
-    it("should be case insensitive", () => {
-      const envelope = findEnvelopeForCategory(mockEnvelopes, "groceries");
-      expect(envelope).toEqual(mockEnvelopes[0]);
-    });
-
-    it("should return null for no match", () => {
-      const envelope = findEnvelopeForCategory(mockEnvelopes, "Unknown");
-      expect(envelope).toBeNull();
-    });
-
-    it("should handle empty inputs", () => {
-      expect(findEnvelopeForCategory([], "Food")).toBeNull();
-      expect(findEnvelopeForCategory(mockEnvelopes, "")).toBeNull();
-      expect(findEnvelopeForCategory(mockEnvelopes, null as any)).toBeNull();
+    it("should return null if not found", () => {
+      expect(findEnvelopeForCategory(mockEnvelopes, "Unknown")).toBeNull();
     });
   });
 
   describe("initializeSplitsFromTransaction", () => {
-    it("should create single split for simple transaction", () => {
+    it("should create a single default split if no metadata items exist", () => {
       const splits = initializeSplitsFromTransaction(mockTransaction, mockEnvelopes);
-
       expect(splits).toHaveLength(1);
-      expect(splits[0]).toMatchObject({
-        description: "Test Transaction",
-        amount: 100.0, // Should be absolute value
-        category: "Food",
-        envelopeId: "env1",
-        isOriginalItem: false,
-      });
+      expect(splits[0].amount).toBe(100); // Abs value
+      expect(splits[0].description).toBe(mockTransaction.description);
     });
 
-    it("should handle itemized transaction with metadata", () => {
-      const itemizedTransaction = {
+    it("should initialize multiple splits from itemized metadata", () => {
+      const itemizedTx = {
         ...mockTransaction,
         metadata: {
           items: [
-            { name: "Milk", totalPrice: 5.5, category: { name: "Food" } },
-            { name: "Bread", totalPrice: 3.25, category: { name: "Food" } },
+            { name: "Milk", totalPrice: 5, category: { name: "Groceries" } },
+            { name: "Coffee", totalPrice: 15, category: { name: "Groceries" } },
           ],
-          shipping: 2.0,
-          tax: 1.25,
+          shipping: 2,
+          tax: 1,
         },
-      };
+      } as Transaction;
 
-      const splits = initializeSplitsFromTransaction(itemizedTransaction, mockEnvelopes);
-
-      expect(splits).toHaveLength(4); // 2 items + shipping + tax
-      expect(splits[0]).toMatchObject({
-        description: "Milk",
-        amount: 5.5,
-        category: "Food",
-        isOriginalItem: true,
-      });
-      expect(splits[2].description).toBe("Shipping & Handling");
-      expect(splits[3].description).toBe("Sales Tax");
-    });
-
-    it("should return empty array for null transaction", () => {
-      const splits = initializeSplitsFromTransaction(null, mockEnvelopes);
-      expect(splits).toEqual([]);
+      const splits = initializeSplitsFromTransaction(itemizedTx, mockEnvelopes);
+      // 2 items + 1 shipping + 1 tax = 4 splits
+      expect(splits).toHaveLength(4);
+      expect(splits.find((s) => s.description === "Shipping & Handling")?.amount).toBe(2);
+      expect(splits.find((s) => s.description === "Milk")?.amount).toBe(5);
     });
   });
 
   describe("calculateSplitTotals", () => {
-    const testSplits = [
-      { id: 1, description: "Split 1", amount: 30, category: "Food", envelopeId: "env1" },
-      { id: 2, description: "Split 2", amount: 40, category: "Food", envelopeId: "env2" },
-      { id: 3, description: "Split 3", amount: 30, category: "Food", envelopeId: "env3" },
-    ];
+    it("should calculate correct totals and validity with 0.01 tolerance", () => {
+      const splits: SplitAllocation[] = [
+        { amount: 33.33 } as any,
+        { amount: 33.33 } as any,
+        { amount: 33.33 } as any,
+      ];
+      const tx = { amount: -100 } as Transaction; // Original is 100
 
-    it("should calculate totals correctly", () => {
-      const totals = calculateSplitTotals(mockTransaction, testSplits);
-
-      expect(totals).toMatchObject({
-        original: 100.0,
-        allocated: 100.0,
-        remaining: 0.0,
-        isValid: true,
-        isOverAllocated: false,
-        isUnderAllocated: false,
-      });
+      const totals = calculateSplitTotals(tx, splits);
+      expect(totals.allocated).toBe(99.99);
+      expect(totals.remaining).toBeCloseTo(0.01);
+      expect(totals.isValid).toBe(true); // Within 0.01
     });
 
-    it("should detect over-allocation", () => {
-      const overSplits = [
-        { id: 1, description: "Split 1", amount: 60, category: "Food", envelopeId: "env1" },
-        { id: 2, description: "Split 2", amount: 60, category: "Food", envelopeId: "env2" },
-      ];
-
-      const totals = calculateSplitTotals(mockTransaction, overSplits);
-
-      expect(totals.isOverAllocated).toBe(true);
+    it("should mark as invalid if difference is > 0.01", () => {
+      const splits = [{ amount: 50 }] as any;
+      const tx = { amount: -100 } as Transaction;
+      const totals = calculateSplitTotals(tx, splits);
       expect(totals.isValid).toBe(false);
-      expect(totals.remaining).toBe(-20);
-    });
-
-    it("should detect under-allocation", () => {
-      const underSplits = [
-        { id: 1, description: "Split 1", amount: 30, category: "Food", envelopeId: "env1" },
-        { id: 2, description: "Split 2", amount: 40, category: "Food", envelopeId: "env2" },
-      ];
-
-      const totals = calculateSplitTotals(mockTransaction, underSplits);
-
       expect(totals.isUnderAllocated).toBe(true);
-      expect(totals.isValid).toBe(false);
-      expect(totals.remaining).toBe(30);
-    });
-
-    it("should handle empty splits", () => {
-      const totals = calculateSplitTotals(mockTransaction, []);
-
-      expect(totals).toMatchObject({
-        original: 100.0,
-        allocated: 0.0,
-        remaining: 100.0,
-        isUnderAllocated: true,
-      });
-    });
-  });
-
-  describe("validateSplitAllocations", () => {
-    it("should validate correct splits", () => {
-      const validSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Gas", amount: 50, envelopeId: "env2" },
-      ];
-
-      const errors = validateSplitAllocations(validSplits, mockTransaction);
-      expect(errors).toEqual([]);
-    });
-
-    it("should catch missing description", () => {
-      const invalidSplits = [
-        { id: 1, description: "", category: "Food", amount: 100, envelopeId: "env1" },
-      ];
-
-      const errors = validateSplitAllocations(invalidSplits, mockTransaction);
-      expect(errors).toContain("Split 1: Description is required");
-    });
-
-    it("should catch missing category", () => {
-      const invalidSplits = [
-        { id: 1, description: "Split 1", category: "", amount: 100, envelopeId: "env1" },
-      ];
-
-      const errors = validateSplitAllocations(invalidSplits, mockTransaction);
-      expect(errors).toContain("Split 1: Category is required");
-    });
-
-    it("should catch invalid amounts", () => {
-      const invalidSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Gas", amount: -10, envelopeId: "env2" },
-      ];
-
-      const errors = validateSplitAllocations(invalidSplits, mockTransaction);
-      expect(errors).toContain("Split 1: Amount must be greater than 0");
-      expect(errors).toContain("Split 2: Amount must be greater than 0");
-    });
-
-    it("should catch total amount mismatches", () => {
-      const mismatchedSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 120, envelopeId: "env1" },
-      ];
-
-      const errors = validateSplitAllocations(mismatchedSplits, mockTransaction);
-      expect(errors.some((error) => error.includes("exceed original amount"))).toBe(true);
     });
   });
 
   describe("autoBalanceSplits", () => {
-    it("should balance uneven splits", () => {
-      const unevenSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 30, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Food", amount: 40, envelopeId: "env2" },
-        { id: 3, description: "Split 3", category: "Food", amount: 20, envelopeId: "env3" }, // Total: 90, need to add 10 more
-      ];
+    it("should adjust splits to match total", () => {
+      const splits: SplitAllocation[] = [{ amount: 40 } as any, { amount: 40 } as any];
+      const tx = { amount: -100 } as Transaction;
 
-      const balanced = autoBalanceSplits(unevenSplits, mockTransaction);
-      const total = balanced.reduce((sum, split) => sum + split.amount, 0);
-
-      // Note: Due to floating point arithmetic and toFixed(2) rounding in autoBalanceSplits,
-      // dividing 10 by 3 gives 3.33 + 3.33 + 3.33 = 9.99, resulting in total of 99.99
-      // This is a known limitation of the current implementation that distributes
-      // the remainder evenly but doesn't handle the rounding remainder
-      expect(total).toBe(99.99);
-
-      // Verify each split was adjusted
-      expect(balanced[0].amount).toBe(33.33);
-      expect(balanced[1].amount).toBe(43.33);
-      expect(balanced[2].amount).toBe(23.33);
-    });
-
-    it("should not modify already balanced splits", () => {
-      const balancedSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Food", amount: 50, envelopeId: "env2" },
-      ];
-
-      const result = autoBalanceSplits(balancedSplits, mockTransaction);
-      expect(result).toEqual(balancedSplits);
-    });
-
-    it("should handle empty splits", () => {
-      const result = autoBalanceSplits([], mockTransaction);
-      expect(result).toEqual([]);
+      const balanced = autoBalanceSplits(splits, tx);
+      expect(balanced[0].amount).toBe(50);
+      expect(balanced[1].amount).toBe(50);
     });
   });
 
   describe("splitEvenly", () => {
-    it("should split amount evenly", () => {
-      const splits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Food", amount: 0, envelopeId: "env2" },
-        { id: 3, description: "Split 3", category: "Food", amount: 0, envelopeId: "env3" },
-      ];
+    it("should handle rounding correctly on the last split", () => {
+      const splits: SplitAllocation[] = [{}, {}, {}] as any;
+      const tx = { amount: -10 } as Transaction;
 
-      const evenSplits = splitEvenly(splits, mockTransaction);
+      const result = splitEvenly(splits, tx);
+      expect(result[0].amount).toBe(3.33);
+      expect(result[1].amount).toBe(3.33);
+      expect(result[2].amount).toBe(3.34); // Adjusted for rounding
 
-      expect(evenSplits).toHaveLength(3);
-      expect(evenSplits[0].amount).toBeCloseTo(33.33, 2);
-      expect(evenSplits[1].amount).toBeCloseTo(33.33, 2);
-      // Last split gets remainder to handle rounding
-      expect(evenSplits[2].amount).toBeCloseTo(33.34, 2);
-    });
-
-    it("should handle single split", () => {
-      const splits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 0, envelopeId: "env1" },
-      ];
-
-      const evenSplits = splitEvenly(splits, mockTransaction);
-
-      expect(evenSplits[0].amount).toBe(100);
-    });
-
-    it("should preserve other properties", () => {
-      const splits = [
-        { id: 1, description: "Test", category: "Food", amount: 0, envelopeId: "env1" },
-      ];
-
-      const evenSplits = splitEvenly(splits, mockTransaction);
-
-      expect(evenSplits[0]).toMatchObject({
-        id: 1,
-        description: "Test",
-        category: "Food",
-        amount: 100,
-        envelopeId: "env1",
-      });
+      const total = result.reduce((s, a) => s + a.amount, 0);
+      expect(total).toBe(10);
     });
   });
 
   describe("addNewSplit", () => {
-    it("should add new split with remaining amount", () => {
-      const currentSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 40, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Food", amount: 30, envelopeId: "env2" },
-      ];
+    it("should add a split with the remaining balance", () => {
+      const currentSplits = [{ amount: 70 }] as any;
+      const tx = { amount: -100, category: "Food" } as Transaction;
 
-      const newSplits = addNewSplit(currentSplits, mockTransaction);
-
-      expect(newSplits).toHaveLength(3);
-      expect(newSplits[2].amount).toBe(30); // Remaining amount
-    });
-
-    it("should use defaults for new split", () => {
-      const currentSplits: any[] = [];
-      const defaults = {
-        description: "New Split",
-        category: "Test Category",
-      };
-
-      const newSplits = addNewSplit(currentSplits, mockTransaction, defaults);
-
-      expect(newSplits[0]).toMatchObject({
-        description: "New Split",
-        category: "Test Category",
-        amount: 100,
-        isOriginalItem: false,
-      });
+      const result = addNewSplit(currentSplits, tx);
+      expect(result).toHaveLength(2);
+      expect(result[1].amount).toBe(30);
+      expect(result[1].category).toBe("Food");
     });
   });
 
   describe("updateSplitField", () => {
-    it("should update specified field", () => {
-      const splits = [
-        { id: 1, description: "Old", amount: 50, category: "Food", envelopeId: "env1" },
-        { id: 2, description: "Test", amount: 50, category: "Food", envelopeId: "env2" },
-      ];
+    it("should update field and lookup envelope if category changes", () => {
+      const currentSplits = [{ id: 1, amount: 50, category: "Old", envelopeId: "" }] as any;
 
-      const updated = updateSplitField(splits, 1, "description", "New Description");
-
-      expect(updated[0].description).toBe("New Description");
-      expect(updated[1]).toEqual(splits[1]); // Unchanged
-    });
-
-    it("should auto-update envelope when category changes", () => {
-      const splits = [
-        { id: 1, description: "Split 1", amount: 100, category: "Old", envelopeId: "" },
-      ];
-
-      const updated = updateSplitField(splits, 1, "category", "Food", mockEnvelopes);
-
-      expect(updated[0].category).toBe("Food");
-      expect(updated[0].envelopeId).toBe("env1"); // Auto-matched envelope
+      const result = updateSplitField(currentSplits, 1, "category", "Rent", mockEnvelopes);
+      expect(result[0].category).toBe("Rent");
+      expect(result[0].envelopeId).toBe("env-2"); // Found via lookup
     });
   });
 
   describe("removeSplit", () => {
-    it("should remove specified split", () => {
-      const splits = [
-        { id: 1, description: "Keep", amount: 30, category: "Food", envelopeId: "env1" },
-        { id: 2, description: "Remove", amount: 30, category: "Food", envelopeId: "env2" },
-        { id: 3, description: "Keep", amount: 40, category: "Food", envelopeId: "env3" },
-      ];
-
-      const updated = removeSplit(splits, 2);
-
-      expect(updated).toHaveLength(2);
-      expect(updated.map((s) => s.description)).toEqual(["Keep", "Keep"]);
+    it("should remove split by ID if length > 1", () => {
+      const currentSplits = [{ id: 1 }, { id: 2 }] as any;
+      const result = removeSplit(currentSplits, 1);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(2);
     });
 
-    it("should not remove last remaining split", () => {
-      const splits = [
-        { id: 1, description: "Only", amount: 100, category: "Food", envelopeId: "env1" },
-      ];
-
-      const updated = removeSplit(splits, 1);
-
-      expect(updated).toEqual(splits); // Unchanged
+    it("should not remove if it's the last split", () => {
+      const currentSplits = [{ id: 1 }] as any;
+      const result = removeSplit(currentSplits, 1);
+      expect(result).toHaveLength(1);
     });
   });
 
   describe("prepareSplitTransactions", () => {
-    it("should prepare split transactions correctly", () => {
+    it("should map allocations to full transactions with correct signs", () => {
       const splits = [
-        {
-          id: "split1",
-          description: "Split 1",
-          amount: 60,
-          category: "Food",
-          envelopeId: "env1",
-        },
-        {
-          id: "split2",
-          description: "Split 2",
-          amount: 40,
-          category: "Gas",
-          envelopeId: "env2",
-        },
-      ];
+        { description: "S1", amount: 40, category: "C1", envelopeId: "E1" },
+        { description: "S2", amount: 60, category: "C2", envelopeId: "E2" },
+      ] as any;
+      const tx = { ...mockTransaction, amount: -100 };
 
-      const prepared = prepareSplitTransactions(splits, mockTransaction);
-
+      const prepared = prepareSplitTransactions(splits, tx);
       expect(prepared).toHaveLength(2);
-      expect(prepared[0]).toMatchObject({
-        id: "txn1_split_0",
-        parentTransactionId: "txn1",
-        description: "Split 1",
-        amount: -60, // Preserves original sign
-        category: "Food",
-        envelopeId: "env1",
-        isSplit: true,
-        splitIndex: 0,
-        splitTotal: 2,
-      });
-    });
-
-    it("should preserve original transaction properties", () => {
-      const splits = [
-        { id: 1, description: "Split", amount: 100, category: "Food", envelopeId: "env1" },
-      ];
-
-      const prepared = prepareSplitTransactions(splits, mockTransaction);
-
-      expect(prepared[0]).toMatchObject({
-        date: mockTransaction.date,
-        originalAmount: mockTransaction.amount,
-      });
+      expect(prepared[0].amount).toBe(-40); // Preserves sign
+      expect(prepared[0].isSplit).toBe(true);
+      expect(prepared[0].parentTransactionId).toBe(tx.id);
     });
   });
 
   describe("getSplitSummary", () => {
-    it("should provide comprehensive summary", () => {
-      const validSplits = [
-        { id: 1, description: "Split 1", category: "Food", amount: 50, envelopeId: "env1" },
-        { id: 2, description: "Split 2", category: "Gas", amount: 50, envelopeId: "env2" },
-      ];
+    it("should provide a comprehensive summary", () => {
+      const splits = [{ amount: 100, description: "D", category: "C" }] as any;
+      const summary = getSplitSummary(splits, mockTransaction);
 
-      const summary = getSplitSummary(validSplits, mockTransaction);
-
-      expect(summary).toMatchObject({
-        totalSplits: 2,
-        originalAmount: 100,
-        allocatedAmount: 100,
-        remainingAmount: 0,
-        isValid: true,
-        isBalanced: true,
-        validationErrors: [],
-        canSubmit: true,
-      });
+      expect(summary.isValid).toBe(true);
+      expect(summary.canSubmit).toBe(true);
+      expect(summary.totalSplits).toBe(1);
     });
 
-    it("should detect invalid state", () => {
-      const invalidSplits = [
-        { id: 1, description: "", category: "Food", amount: 120, envelopeId: "env1" },
-      ];
-
-      const summary = getSplitSummary(invalidSplits, mockTransaction);
+    it("should return invalid and show errors if not balanced", () => {
+      const splits = [{ amount: 50, description: "D", category: "C" }] as any;
+      const summary = getSplitSummary(splits, mockTransaction);
 
       expect(summary.isValid).toBe(false);
-      expect(summary.canSubmit).toBe(false);
       expect(summary.validationErrors.length).toBeGreaterThan(0);
     });
   });

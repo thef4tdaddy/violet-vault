@@ -354,10 +354,17 @@ export const login = async (password: string, userData: UserData | null = null) 
     } catch (error) {
       const err = error as Error;
       logger.error("Login failed.", error);
+
+      // Keep security-sensitive errors generic
       if (err.name === "OperationError" || err.message.toLowerCase().includes("decrypt")) {
         return { success: false, error: "Invalid password." };
       }
-      return { success: false, error: "Invalid password or corrupted data." };
+
+      // Propagate business logic errors (like missing share code)
+      return {
+        success: false,
+        error: err.message || "Invalid password or corrupted data.",
+      };
     }
   })();
 

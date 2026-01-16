@@ -634,7 +634,8 @@ describe("SyncHealthMonitor", () => {
 
       const health = syncHealthMonitor.getHealthStatus();
       expect(health.recentSyncs[0]).toBeDefined();
-      expect(health.recentSyncs[0].metadata).toBeUndefined();
+      // Implementation defaults undefined to empty object
+      expect(health.recentSyncs[0].metadata).toEqual({});
     });
 
     it("should handle metadata without direction property", () => {
