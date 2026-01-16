@@ -82,16 +82,13 @@ describe("TrendLineChart", () => {
     });
 
     it("should fallback to line for invalid chart type", () => {
-      const { getByTestId, unmount } = render(
-        <TrendLineChart data={mockData} chartType="line" />
-      );
+      const { getByTestId, unmount } = render(<TrendLineChart data={mockData} chartType="line" />);
       const lineChartContent = getByTestId("composed-financial-chart").innerHTML;
       unmount();
 
       render(<TrendLineChart data={mockData} chartType="invalid" />);
-      expect(screen.getByTestId("composed-financial-chart").innerHTML).toBe(
-        lineChartContent
-      );
+      // Invalid chart type should fallback to line type, resulting in same rendering as line chart
+      expect(screen.getByTestId("composed-financial-chart").innerHTML).toBe(lineChartContent);
       expect(screen.getByTestId("chart-series-length")).toHaveTextContent("3");
     });
   });

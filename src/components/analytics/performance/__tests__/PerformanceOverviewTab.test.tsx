@@ -4,7 +4,9 @@ import PerformanceOverviewTab from "../PerformanceOverviewTab";
 
 // Mock getIcon
 vi.mock("../../../../utils", () => ({
-  getIcon: () => (props: { className?: string }) => <svg className={props.className} data-testid="mock-icon" />,
+  getIcon: () => (props: { className?: string }) => (
+    <svg className={props.className} data-testid="mock-icon" />
+  ),
 }));
 
 describe("PerformanceOverviewTab", () => {
@@ -23,7 +25,9 @@ describe("PerformanceOverviewTab", () => {
     });
 
     it("should render bars for each performance entry", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const bars = container.querySelectorAll(".bg-purple-500");
       expect(bars.length).toBe(5);
     });
@@ -50,7 +54,9 @@ describe("PerformanceOverviewTab", () => {
   describe("Empty State", () => {
     it("should render empty state when no history", () => {
       render(<PerformanceOverviewTab performanceHistory={[]} />);
-      expect(screen.getByText("Performance history will appear here over time")).toBeInTheDocument();
+      expect(
+        screen.getByText("Performance history will appear here over time")
+      ).toBeInTheDocument();
     });
 
     it("should render clock icon in empty state", () => {
@@ -67,9 +73,11 @@ describe("PerformanceOverviewTab", () => {
 
   describe("Score Visualization", () => {
     it("should render bar heights proportional to scores", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const bars = container.querySelectorAll(".bg-purple-500");
-      
+
       bars.forEach((bar, index) => {
         const entry = mockPerformanceHistory[index];
         const expectedHeight = `${(entry.score / 100) * 100}%`;
@@ -101,9 +109,11 @@ describe("PerformanceOverviewTab", () => {
 
   describe("Tooltips", () => {
     it("should set title attributes with score and time", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const bars = container.querySelectorAll(".bg-purple-500");
-      
+
       bars.forEach((bar, index) => {
         const entry = mockPerformanceHistory[index];
         const title = bar.getAttribute("title");
@@ -160,7 +170,9 @@ describe("PerformanceOverviewTab", () => {
 
   describe("Styling", () => {
     it("should apply hover opacity transition", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const bars = container.querySelectorAll(".bg-purple-500");
       bars.forEach((bar) => {
         expect(bar).toHaveClass("opacity-60", "hover:opacity-100", "transition-opacity");
@@ -168,13 +180,17 @@ describe("PerformanceOverviewTab", () => {
     });
 
     it("should have correct container styling", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const chartContainer = container.querySelector(".bg-white\\/60");
       expect(chartContainer).toHaveClass("rounded-lg", "p-4", "border", "border-white/20");
     });
 
     it("should have correct height for bar chart", () => {
-      const { container } = render(<PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />);
+      const { container } = render(
+        <PerformanceOverviewTab performanceHistory={mockPerformanceHistory} />
+      );
       const barContainer = container.querySelector(".h-20");
       expect(barContainer).toHaveClass("flex", "items-end", "gap-1");
     });

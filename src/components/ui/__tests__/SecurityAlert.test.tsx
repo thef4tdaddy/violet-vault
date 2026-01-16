@@ -92,7 +92,8 @@ describe("SecurityAlert", () => {
     it("should apply standard variant styling by default", () => {
       const { container } = render(<SecurityAlert {...defaultProps} type="error" />);
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass("text-red-800", "bg-red-50");
+      // Note: Component includes border-2 border-black which overrides border-red-200 from color scheme
+      expect(alert).toHaveClass("text-red-800", "bg-red-50", "border-2", "border-black");
     });
   });
 

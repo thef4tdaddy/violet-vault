@@ -86,7 +86,11 @@ describe("ChartContainer", () => {
 
     it("should render custom empty message", () => {
       render(
-        <ChartContainer {...defaultProps} children={undefined} emptyMessage="Custom empty message" />
+        <ChartContainer
+          {...defaultProps}
+          children={undefined}
+          emptyMessage="Custom empty message"
+        />
       );
       expect(screen.getByText("Custom empty message")).toBeInTheDocument();
     });

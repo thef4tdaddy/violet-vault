@@ -170,9 +170,7 @@ describe("CategoryBarChart", () => {
     });
 
     it("should handle custom bars configuration", () => {
-      const customBars = [
-        { dataKey: "total", name: "Total", fill: "#8884d8" },
-      ];
+      const customBars = [{ dataKey: "total", name: "Total", fill: "#8884d8" }];
       render(<CategoryBarChart data={mockData} bars={customBars} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });
@@ -217,41 +215,31 @@ describe("CategoryBarChart", () => {
 
   describe("Edge Cases", () => {
     it("should handle data with zero values", () => {
-      const zeroData = [
-        { name: "Food", income: 0, expenses: 0 },
-      ];
+      const zeroData = [{ name: "Food", income: 0, expenses: 0 }];
       render(<CategoryBarChart data={zeroData} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });
 
     it("should handle data with negative values", () => {
-      const negativeData = [
-        { name: "Food", income: -100, expenses: -50 },
-      ];
+      const negativeData = [{ name: "Food", income: -100, expenses: -50 }];
       render(<CategoryBarChart data={negativeData} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });
 
     it("should handle very long category names", () => {
-      const longNameData = [
-        { name: "A".repeat(100), income: 1000, expenses: 800 },
-      ];
+      const longNameData = [{ name: "A".repeat(100), income: 1000, expenses: 800 }];
       render(<CategoryBarChart data={longNameData} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });
 
     it("should handle special characters in category names", () => {
-      const specialData = [
-        { name: "Food & Drinks (€)", income: 1000, expenses: 800 },
-      ];
+      const specialData = [{ name: "Food & Drinks (€)", income: 1000, expenses: 800 }];
       render(<CategoryBarChart data={specialData} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });
 
     it("should handle very large values", () => {
-      const largeValueData = [
-        { name: "Investment", income: 999999999, expenses: 500000000 },
-      ];
+      const largeValueData = [{ name: "Investment", income: 999999999, expenses: 500000000 }];
       render(<CategoryBarChart data={largeValueData} />);
       expect(screen.getByTestId("category-bar-chart")).toBeInTheDocument();
     });

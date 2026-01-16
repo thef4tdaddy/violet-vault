@@ -68,10 +68,16 @@ describe("MetricsGrid", () => {
 
     it("should render correct descriptions", () => {
       render(<MetricsGrid performanceMetrics={defaultMetrics} />);
-      expect(screen.getByText("How well you're sticking to your planned spending")).toBeInTheDocument();
+      expect(
+        screen.getByText("How well you're sticking to your planned spending")
+      ).toBeInTheDocument();
       expect(screen.getByText("Your ability to save and build wealth")).toBeInTheDocument();
-      expect(screen.getByText("How balanced your spending is across categories")).toBeInTheDocument();
-      expect(screen.getByText("Accuracy between your actual and virtual balances")).toBeInTheDocument();
+      expect(
+        screen.getByText("How balanced your spending is across categories")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Accuracy between your actual and virtual balances")
+      ).toBeInTheDocument();
     });
   });
 
@@ -135,9 +141,9 @@ describe("MetricsGrid", () => {
     it("should assign correct variants for mixed scores", () => {
       const mixedMetrics = {
         budgetAdherence: 95, // success
-        savingsRate: 45,     // danger
+        savingsRate: 45, // danger
         spendingEfficiency: 75, // info
-        balanceStability: 60,   // warning
+        balanceStability: 60, // warning
       };
       render(<MetricsGrid performanceMetrics={mixedMetrics} />);
       const variants = screen.getAllByTestId("variant");
@@ -226,7 +232,14 @@ describe("MetricsGrid", () => {
     it("should apply correct grid classes", () => {
       const { container } = render(<MetricsGrid performanceMetrics={defaultMetrics} />);
       const grid = container.firstChild as HTMLElement;
-      expect(grid).toHaveClass("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-4", "gap-4", "mb-8");
+      expect(grid).toHaveClass(
+        "grid",
+        "grid-cols-1",
+        "md:grid-cols-2",
+        "lg:grid-cols-4",
+        "gap-4",
+        "mb-8"
+      );
     });
 
     it("should render in a single grid", () => {
