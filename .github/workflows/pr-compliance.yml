@@ -115,3 +115,63 @@ jobs:
                 labels: Array.from(labels)
               });
             }
+
+  # 4. Coverage - Run tests and upload coverage
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          if [ -d "api" ] && [ -f "api/go.mod" ]; then
+            cd api && go mod download && cd ..
+          fi
+          if [ -f "api/requirements.txt" ]; then
+            pip install -r api/requirements.txt
+            pip install pytest pytest-cov
+          fi
+
+      - name: Frontend Coverage
+        run: npm run test:ci
+
+      - name: Go Backend Coverage
+        if: hashFiles('api/**/*.go') != ''
+        run: |
+          cd api
+          go test ./... -coverprofile=coverage.txt -covermode=atomic
+          cd ..
+
+      - name: Python Backend Coverage
+        if: hashFiles('api/**/*.py') != ''
+        run: |
+          pytest --cov=api --cov-report=xml api/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.txt,./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
