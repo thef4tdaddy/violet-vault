@@ -4,7 +4,6 @@ import AddBillModal from "../AddBillModal";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
-import useEditLock from "@/hooks/core/auth/security/useEditLock";
 
 // Mock all hooks with default exports where needed
 vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBillForm", () => ({
