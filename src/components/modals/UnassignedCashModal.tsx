@@ -256,7 +256,7 @@ const EnvelopeItem = memo(
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="flex items-center flex-1">
               <div
-                className="w-4 h-4 rounded-full mr-3 flex-shrink-0"
+                className="w-4 h-4 rounded-full mr-3 shrink-0"
                 style={{ backgroundColor: envelope.color }}
               />
               <div className="shrink-0">
@@ -305,17 +305,30 @@ const EnvelopeItem = memo(
   }
 );
 
-const UnassignedCashModal = () => {
+interface UnassignedCashModalProps {
+  isOpen?: boolean;
+  closeUnassignedCashModal?: () => void;
+  unassignedCash?: number;
+}
+
+const UnassignedCashModal = ({
+  isOpen: overrideIsOpen,
+  closeUnassignedCashModal: overrideClose,
+  unassignedCash: overrideUnassignedCash,
+}: UnassignedCashModalProps) => {
   /* eslint-disable @typescript-eslint/ban-ts-comment */
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
-  const isUnassignedCashModalOpen: boolean = useBudgetStore(
+  const storeIsOpen: boolean = useBudgetStore(
     (state: { isUnassignedCashModalOpen?: boolean }) => state.isUnassignedCashModalOpen
   );
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
-  const closeUnassignedCashModal: () => void = useBudgetStore(
+  const storeClose: () => void = useBudgetStore(
     (state: { closeUnassignedCashModal?: () => void }) => state.closeUnassignedCashModal
   );
   /* eslint-enable @typescript-eslint/ban-ts-comment */
+
+  const finalIsOpen = overrideIsOpen !== undefined ? overrideIsOpen : storeIsOpen;
+  const finalClose = overrideClose !== undefined ? overrideClose : storeClose;
   const {
     distributions,
     isProcessing,
@@ -334,23 +347,26 @@ const UnassignedCashModal = () => {
     getDistributionPreview,
   } = useUnassignedCashDistribution();
 
-  const modalRef = useModalAutoScroll(isUnassignedCashModalOpen);
+  const finalUnassignedCash =
+    overrideUnassignedCash !== undefined ? overrideUnassignedCash : unassignedCash;
 
-  if (!isUnassignedCashModalOpen) return null;
+  const modalRef = useModalAutoScroll(finalIsOpen);
+
+  if (!finalIsOpen) return null;
 
   const distributionEnvelopes = Array.isArray(envelopes) ? envelopes : [];
   const typedBills = Array.isArray(bills) ? (bills as BillRecord[]) : [];
 
   const preview = getDistributionPreview();
   const hasDistributions = Number(totalDistributed) > 0;
-  const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
+  const isOverDistributed = Number(totalDistributed) > Number(finalUnassignedCash);
 
   return (
     <UnassignedCashModalContent
       modalRef={modalRef}
-      unassignedCash={Number(unassignedCash)}
+      unassignedCash={Number(finalUnassignedCash)}
       isProcessing={isProcessing}
-      closeUnassignedCashModal={closeUnassignedCashModal}
+      closeUnassignedCashModal={finalClose}
       totalDistributed={Number(totalDistributed)}
       remainingCash={Number(remainingCash)}
       isOverDistributed={isOverDistributed}

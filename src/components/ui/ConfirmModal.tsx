@@ -183,8 +183,8 @@ interface ConfirmModalProps {
   destructive?: boolean;
   isLoading?: boolean;
   icon?: React.ComponentType<{ className?: string }> | null;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
   children?: React.ReactNode;
 }
 
@@ -224,8 +224,8 @@ const ConfirmModal = ({
   useKeyboardHandling({
     isOpen,
     isLoading,
-    onCancel,
-    onConfirm,
+    onCancel: onCancel || (() => {}),
+    onConfirm: onConfirm || (() => {}),
     cancelButtonRef,
     confirmButtonRef,
   });
@@ -234,7 +234,7 @@ const ConfirmModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] overflow-y-auto"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-10000 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
@@ -250,7 +250,7 @@ const ConfirmModal = ({
             <div className="flex-1">
               <ModalHeader icon={icon} destructive={destructive} title={title} />
             </div>
-            <ModalCloseButton onClick={onCancel} />
+            <ModalCloseButton onClick={onCancel || (() => {})} />
           </div>
 
           {/* Content */}
@@ -269,8 +269,8 @@ const ConfirmModal = ({
             confirmLabel={confirmLabel}
             destructive={destructive}
             isLoading={isLoading}
-            onCancel={onCancel}
-            onConfirm={onConfirm}
+            onCancel={onCancel || (() => {})}
+            onConfirm={onConfirm || (() => {})}
           />
         </div>
       </div>

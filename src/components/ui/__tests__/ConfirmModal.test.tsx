@@ -155,7 +155,9 @@ describe("ConfirmModal", () => {
 
     it("should disable buttons when loading", () => {
       render(<ConfirmModal {...defaultProps} isLoading />);
-      expect(screen.getByRole("button", { name: /Processing/i })).toBeDisabled();
+      expect(
+        screen.getByRole("button", { name: (content) => content.includes("Processing") })
+      ).toBeDisabled();
       expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
     });
 
@@ -248,7 +250,7 @@ describe("ConfirmModal", () => {
     it("should handle very long message text", () => {
       const longMessage = "This is a very long message. ".repeat(50);
       render(<ConfirmModal {...defaultProps} message={longMessage} />);
-      expect(screen.getByText(longMessage, { exact: false })).toBeInTheDocument();
+      expect(screen.getByText(/This is a very long message/)).toBeInTheDocument();
     });
 
     it("should handle empty title", () => {

@@ -37,7 +37,7 @@ describe("StandardTabs", () => {
 
     it("should highlight active tab", () => {
       render(<StandardTabs {...defaultProps} activeTab="tab2" />);
-      const activeTab = screen.getByText("Tab 2").closest("button");
+      const activeTab = screen.getByRole("tab", { name: /Tab 2/i });
       expect(activeTab).toHaveClass("text-blue-700");
     });
 
@@ -105,21 +105,21 @@ describe("StandardTabs", () => {
       expect(screen.getByRole("navigation")).toBeInTheDocument();
     });
 
-    it("should have role='button' for each tab", () => {
+    it("should have role='tab' for each tab", () => {
       render(<StandardTabs {...defaultProps} />);
-      const tabs = screen.getAllByRole("button");
+      const tabs = screen.getAllByRole("tab");
       expect(tabs.length).toBeGreaterThanOrEqual(3);
     });
 
     it("should have aria-selected='true' for active tab", () => {
       render(<StandardTabs {...defaultProps} activeTab="tab2" />);
-      const tab2 = screen.getByText("Tab 2").closest("button");
+      const tab2 = screen.getByRole("tab", { name: /Tab 2/i });
       expect(tab2).toHaveAttribute("aria-selected", "true");
     });
 
     it("should have aria-selected='false' for inactive tabs", () => {
       render(<StandardTabs {...defaultProps} activeTab="tab2" />);
-      const tab1 = screen.getByText("Tab 1").closest("button");
+      const tab1 = screen.getByRole("tab", { name: /Tab 1/i });
       expect(tab1).toHaveAttribute("aria-selected", "false");
     });
 
@@ -129,7 +129,7 @@ describe("StandardTabs", () => {
         { id: "tab2", label: "Tab 2", disabled: true },
       ];
       render(<StandardTabs {...defaultProps} tabs={tabsWithDisabled} />);
-      const tab2 = screen.getByText("Tab 2").closest("button");
+      const tab2 = screen.getByRole("tab", { name: /Tab 2/i });
       expect(tab2).toHaveAttribute("aria-disabled", "true");
     });
 
@@ -137,8 +137,8 @@ describe("StandardTabs", () => {
       const onTabChange = vi.fn();
       render(<StandardTabs {...defaultProps} onTabChange={onTabChange} />);
 
-      const firstTab = screen.getByText("Tab 1").closest("button");
-      firstTab?.focus();
+      const firstTab = screen.getByRole("tab", { name: /Tab 1/i });
+      firstTab.focus();
       expect(firstTab).toHaveFocus();
     });
   });
@@ -242,7 +242,7 @@ describe("StandardTabs", () => {
         label: `Tab ${i}`,
       }));
       render(<StandardTabs {...defaultProps} tabs={manyTabs} />);
-      expect(screen.getAllByRole("button")).toHaveLength(20);
+      expect(screen.getAllByRole("tab")).toHaveLength(20);
     });
 
     it("should handle custom className", () => {

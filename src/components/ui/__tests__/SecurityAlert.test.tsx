@@ -149,7 +149,7 @@ describe("SecurityAlert", () => {
     it("should render standard variant by default", () => {
       const { container } = render(<SecurityAlert {...defaultProps} />);
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass("border");
+      expect(alert).toHaveClass("border-2");
     });
 
     it("should render fullscreen variant", () => {
@@ -209,7 +209,7 @@ describe("SecurityAlert", () => {
     it("should handle undefined variant gracefully", () => {
       const { container } = render(<SecurityAlert {...defaultProps} variant={undefined} />);
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass("border");
+      expect(alert).toHaveClass("border-2");
     });
 
     it("should combine multiple CSS classes correctly", () => {

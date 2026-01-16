@@ -6,15 +6,18 @@ import TrendLineChart from "../TrendLineChart";
 vi.mock("../ComposedFinancialChart", () => ({
   default: ({
     title,
+    subtitle,
     data,
     series,
   }: {
-    title?: string;
+    title?: React.ReactNode;
+    subtitle?: React.ReactNode;
     data?: Array<Record<string, unknown>>;
     series?: Array<Record<string, unknown>>;
   }) => (
     <div data-testid="composed-financial-chart">
       <div>{title}</div>
+      {subtitle && <div>{subtitle}</div>}
       <div data-testid="chart-data-length">{data?.length || 0}</div>
       <div data-testid="chart-series-length">{series?.length || 0}</div>
     </div>

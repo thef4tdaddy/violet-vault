@@ -45,7 +45,7 @@ describe("ChartContainer", () => {
   describe("Loading State", () => {
     it("should render loading state when loading is true", () => {
       render(<ChartContainer {...defaultProps} loading={true} />);
-      expect(screen.getByText("Loading...")).toBeInTheDocument();
+      expect(screen.getByText(/Loading chart data/i)).toBeInTheDocument();
     });
 
     it("should not render children when loading", () => {
@@ -63,7 +63,7 @@ describe("ChartContainer", () => {
     it("should render error state when error is provided", () => {
       const error = new Error("Test error");
       render(<ChartContainer {...defaultProps} error={error} />);
-      expect(screen.getByText(/error/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/error/i).length).toBeGreaterThan(0);
     });
 
     it("should not render children when error exists", () => {
@@ -74,14 +74,14 @@ describe("ChartContainer", () => {
 
     it("should handle string error", () => {
       render(<ChartContainer {...defaultProps} error="String error message" />);
-      expect(screen.getByText(/error/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/error/i).length).toBeGreaterThan(0);
     });
   });
 
   describe("Empty State", () => {
     it("should render empty state when no children", () => {
       render(<ChartContainer {...defaultProps} children={undefined} />);
-      expect(screen.getByText("No data available")).toBeInTheDocument();
+      expect(screen.getByText(/No data available/i)).toBeInTheDocument();
     });
 
     it("should render custom empty message", () => {

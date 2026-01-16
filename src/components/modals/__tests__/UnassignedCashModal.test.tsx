@@ -1,8 +1,10 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import UnassignedCashModal from "../UnassignedCashModal";
+import useUnassignedCashDistribution from "../../../hooks/budgeting/allocations/useUnassignedCashDistribution";
 
 // Mock dependencies
 vi.mock("@/utils", () => ({
@@ -25,17 +27,22 @@ vi.mock("@/stores/ui/uiStore", () => ({
 
 vi.mock("@/hooks/budgeting/allocations/useUnassignedCashDistribution", () => ({
   default: vi.fn(() => ({
-    previewDistributions: [],
-    totalDistributed: 0,
-    remainingUnassigned: 0,
-    isOverDistributed: false,
-    hasDistributions: false,
+    distributions: {},
     isProcessing: false,
+    totalDistributed: 0,
+    remainingCash: 0,
+    isValidDistribution: false,
     updateDistribution: vi.fn(),
+    clearDistributions: vi.fn(),
     distributeEqually: vi.fn(),
-    distributeToBills: vi.fn(),
+    distributeProportionally: vi.fn(),
+    distributeBillPriority: vi.fn(),
     applyDistribution: vi.fn(),
     resetDistributions: vi.fn(),
+    envelopes: [],
+    bills: [],
+    unassignedCash: 0,
+    getDistributionPreview: vi.fn(() => []),
   })),
 }));
 
@@ -54,6 +61,8 @@ vi.mock("@/hooks/platform/ux/useModalAutoScroll", () => ({
 vi.mock("../budgeting/BillEnvelopeFundingInfo", () => ({
   default: () => <div data-testid="bill-envelope-funding-info">Bill Funding Info</div>,
 }));
+
+const useUnassignedCashDistributionMock = vi.mocked(useUnassignedCashDistribution);
 
 describe("UnassignedCashModal", () => {
   let queryClient: QueryClient;
@@ -134,7 +143,7 @@ describe("UnassignedCashModal", () => {
   describe("Edge Cases", () => {
     it("should handle zero unassigned cash", () => {
       renderWithQuery(<UnassignedCashModal {...defaultProps} unassignedCash={0} />);
-      expect(screen.getByText(/\$0\.00/)).toBeInTheDocument();
+      expect(screen.getAllByText(/\$0\.00/)[0]).toBeInTheDocument();
     });
 
     it("should handle very large amounts", () => {

@@ -60,8 +60,8 @@ const ChartContainer = ({
     );
   }
 
-  // Check if children indicates empty data
-  const hasData = React.Children.count(children) > 0;
+  // Check if children indicates empty data (filtering out booleans, null, etc.)
+  const hasData = React.Children.toArray(children).filter(Boolean).length > 0;
 
   return (
     <div

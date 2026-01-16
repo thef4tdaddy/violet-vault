@@ -118,7 +118,7 @@ describe("PromptModal", () => {
 
       const input = screen.getByRole("textbox");
       await userEvent.type(input, "test value");
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(onConfirm).toHaveBeenCalledWith("test value");
     });
@@ -144,7 +144,7 @@ describe("PromptModal", () => {
     it("should show error for required empty field", async () => {
       render(<PromptModal {...defaultProps} isRequired={true} />);
 
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
     });
 
@@ -152,7 +152,7 @@ describe("PromptModal", () => {
       const onConfirm = vi.fn();
       render(<PromptModal {...defaultProps} isRequired={false} onConfirm={onConfirm} />);
 
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
       expect(onConfirm).toHaveBeenCalledWith("");
     });
 
@@ -162,7 +162,7 @@ describe("PromptModal", () => {
 
       const input = screen.getByRole("textbox");
       await userEvent.type(input, "test");
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(validation).toHaveBeenCalledWith("test");
       expect(screen.getByText("Custom error message")).toBeInTheDocument();
@@ -175,7 +175,7 @@ describe("PromptModal", () => {
 
       const input = screen.getByRole("textbox");
       await userEvent.type(input, "valid input");
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(validation).toHaveBeenCalledWith("valid input");
       expect(onConfirm).toHaveBeenCalledWith("valid input");
@@ -185,7 +185,7 @@ describe("PromptModal", () => {
   describe("Loading State", () => {
     it("should disable buttons when loading", () => {
       render(<PromptModal {...defaultProps} isLoading={true} />);
-      expect(screen.getByRole("button", { name: /Confirm/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Processing/i })).toBeDisabled();
       expect(screen.getByRole("button", { name: /Cancel/i })).toBeDisabled();
     });
 
@@ -216,7 +216,7 @@ describe("PromptModal", () => {
       const longValue = "A".repeat(500);
       const input = screen.getByRole("textbox");
       await userEvent.type(input, longValue);
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(onConfirm).toHaveBeenCalledWith(longValue);
     });
@@ -228,7 +228,7 @@ describe("PromptModal", () => {
       const specialChars = "<>&'\"";
       const input = screen.getByRole("textbox");
       await userEvent.type(input, specialChars);
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(onConfirm).toHaveBeenCalledWith(specialChars);
     });
@@ -255,7 +255,7 @@ describe("PromptModal", () => {
     it("should clear validation error when input changes", async () => {
       render(<PromptModal {...defaultProps} isRequired={true} />);
 
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
 
       const input = screen.getByRole("textbox");
@@ -271,7 +271,7 @@ describe("PromptModal", () => {
 
       const input = screen.getByRole("textbox");
       await userEvent.type(input, "   ");
-      await userEvent.click(screen.getByRole("button", { name: /Confirm/i }));
+      await userEvent.click(screen.getByRole("button", { name: /Confirm|Processing/i }));
 
       expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
     });

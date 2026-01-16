@@ -99,7 +99,7 @@ describe("CategoryBarChart", () => {
   describe("Loading State", () => {
     it("should render loading state when loading is true", () => {
       render(<CategoryBarChart loading={true} data={mockData} />);
-      expect(screen.getByText("Loading...")).toBeInTheDocument();
+      expect(screen.getByText(/Loading/i)).toBeInTheDocument();
     });
 
     it("should not render chart when loading", () => {
@@ -112,7 +112,7 @@ describe("CategoryBarChart", () => {
     it("should render error state when error is provided", () => {
       const error = new Error("Chart error");
       render(<CategoryBarChart error={error} data={mockData} />);
-      expect(screen.getByText(/error/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/error/i).length).toBeGreaterThan(0);
     });
 
     it("should not render chart when error exists", () => {

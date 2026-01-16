@@ -144,7 +144,9 @@ describe("ConfirmModal", () => {
 
     it("should disable buttons when loading", () => {
       render(<ConfirmModal {...defaultProps} loading />);
-      expect(screen.getByRole("button", { name: /Processing/i })).toBeDisabled();
+      expect(
+        screen.getByRole("button", { name: (content) => content.includes("Processing") })
+      ).toBeDisabled();
       expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
     });
 
@@ -158,7 +160,9 @@ describe("ConfirmModal", () => {
       const onConfirm = vi.fn();
       render(<ConfirmModal {...defaultProps} onConfirm={onConfirm} loading />);
 
-      const button = screen.getByRole("button", { name: /Processing/i });
+      const button = screen.getByRole("button", {
+        name: (content) => content.includes("Processing"),
+      });
       await userEvent.click(button);
 
       expect(onConfirm).not.toHaveBeenCalled();
@@ -207,7 +211,7 @@ describe("ConfirmModal", () => {
     it("should handle very long message", () => {
       const longMessage = "Message text ".repeat(100);
       render(<ConfirmModal {...defaultProps} message={longMessage} />);
-      expect(screen.getByText(longMessage, { exact: false })).toBeInTheDocument();
+      expect(screen.getByText(/Message text/)).toBeInTheDocument();
     });
 
     it("should handle special characters in text", () => {

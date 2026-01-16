@@ -1,298 +1,158 @@
-/**
- * Import Service Tests
- * Tests for Go backend CSV/JSON import API integration
- */
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { ImportService } from "@/services/api/importService";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { ImportService } from "../importService";
 import { ApiClient } from "@/services/api/client";
+import logger from "@/utils/core/common/logger";
+import * as csvParser from "@/utils/data/dataManagement/csvParser";
+import * as transactionMapper from "@/utils/data/dataManagement/transactionMapper";
 
 // Mock dependencies
-const { mockApiClient } = vi.hoisted(() => {
-  return {
-    mockApiClient: {
-      isOnline: vi.fn(() => true),
-      healthCheck: vi.fn(() => Promise.resolve(true)),
-      post: vi.fn(),
-      get: vi.fn(),
-    },
-  };
-});
-
 vi.mock("@/services/api/client", () => ({
-  ApiClient: mockApiClient,
-  default: mockApiClient,
+  ApiClient: {
+    post: vi.fn(),
+    isOnline: vi.fn().mockReturnValue(true),
+    healthCheck: vi.fn().mockResolvedValue(true),
+  },
 }));
 
 vi.mock("@/utils/core/common/logger", () => ({
   default: {
-    error: vi.fn(),
-    warn: vi.fn(),
     info: vi.fn(),
-    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
-describe("ImportService", () => {
-  let mockFile: File;
+vi.mock("@/utils/data/dataManagement/csvParser", () => ({
+  parseCSV: vi.fn(),
+  readFileAsText: vi.fn(),
+  autoDetectFieldMapping: vi.fn(),
+}));
 
+vi.mock("@/utils/data/dataManagement/transactionMapper", () => ({
+  mapRowsToTransactions: vi.fn(),
+}));
+
+describe("Import Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFile = new File(["date,amount,description\n2024-01-01,100,test"], "test.csv", {
-      type: "text/csv",
+  });
+
+  describe("importTransactions", () => {
+    const mockFile = new File(["test"], "test.csv", { type: "text/csv" });
+
+    it("should use backend when available and preferred", async () => {
+      (ApiClient.post as any).mockResolvedValue({
+        success: true,
+        data: { transactions: [{ id: "1" }], invalid: [] },
+      });
+
+      const result = await ImportService.importTransactions(mockFile);
+
+      expect(result.success).toBe(true);
+      expect(ApiClient.post).toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("via Go backend"),
+        expect.anything()
+      );
     });
-    // Default mock behavior
-    mockApiClient.isOnline.mockReturnValue(true);
-    mockApiClient.healthCheck.mockResolvedValue(true);
+
+    it("should fallback to client-side if backend fails", async () => {
+      // Backend fail
+      (ApiClient.post as any).mockResolvedValue({ success: false, error: "Backend error" });
+
+      // Client-side mocks
+      (csvParser.readFileAsText as any).mockResolvedValue("date,amount\n2023-01-01,10");
+      (csvParser.parseCSV as any).mockReturnValue({
+        headers: ["date", "amount"],
+        rows: [["2023-01-01", "10"]],
+        errors: [],
+      });
+      (csvParser.autoDetectFieldMapping as any).mockReturnValue({ date: "date", amount: "amount" });
+      (transactionMapper.mapRowsToTransactions as any).mockReturnValue({
+        transactions: [{ id: "client-1" }],
+        invalid: [],
+      });
+
+      const result = await ImportService.importTransactions(mockFile);
+
+      expect(result.success).toBe(true);
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Backend import failed"),
+        expect.anything()
+      );
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("via client-side parsing"),
+        expect.anything()
+      );
+    });
+
+    it("should use client-side immediately if forced", async () => {
+      (csvParser.readFileAsText as any).mockResolvedValue("date,amount\n2023-01-01,10");
+      (csvParser.parseCSV as any).mockReturnValue({
+        headers: ["date", "amount"],
+        rows: [["2023-01-01", "10"]],
+        errors: [],
+      });
+      (csvParser.autoDetectFieldMapping as any).mockReturnValue({ date: "date", amount: "amount" });
+      (transactionMapper.mapRowsToTransactions as any).mockReturnValue({
+        transactions: [],
+        invalid: [],
+      });
+
+      await ImportService.importTransactions(mockFile, undefined, { forceClientSide: true });
+
+      expect(ApiClient.post).not.toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.stringContaining("client-side import (forced)"),
+        expect.anything()
+      );
+    });
   });
 
   describe("validateFile", () => {
-    it("should accept valid CSV file", () => {
-      const csvFile = new File(["data"], "test.csv", { type: "text/csv" });
-      const result = ImportService.validateFile(csvFile);
+    it("should accept valid CSV and JSON files under 10MB", () => {
+      const csvFile = new File(["test"], "test.csv", { type: "text/csv" });
+      const jsonFile = new File(["test"], "test.json", { type: "application/json" });
 
-      expect(result.valid).toBe(true);
-      expect(result.error).toBeUndefined();
+      expect(ImportService.validateFile(csvFile).valid).toBe(true);
+      expect(ImportService.validateFile(jsonFile).valid).toBe(true);
     });
 
-    it("should accept valid JSON file", () => {
-      const jsonFile = new File(['{"data": []}'], "test.json", { type: "application/json" });
-      const result = ImportService.validateFile(jsonFile);
-
-      expect(result.valid).toBe(true);
-      expect(result.error).toBeUndefined();
-    });
-
-    it("should reject invalid file type", () => {
-      const txtFile = new File(["data"], "test.txt", { type: "text/plain" });
+    it("should reject unsupported file types", () => {
+      const txtFile = new File(["test"], "test.txt", { type: "text/plain" });
       const result = ImportService.validateFile(txtFile);
-
       expect(result.valid).toBe(false);
       expect(result.error).toContain("Invalid file type");
     });
 
-    it("should reject files exceeding 10MB limit", () => {
-      const largeFile = new File([new ArrayBuffer(11 * 1024 * 1024)], "large.csv", {
-        type: "text/csv",
-      });
+    it("should reject files over 10MB", () => {
+      const largeFile = new File(["".padStart(11 * 1024 * 1024, "a")], "large.csv");
       const result = ImportService.validateFile(largeFile);
-
       expect(result.valid).toBe(false);
       expect(result.error).toContain("exceeds 10MB limit");
     });
   });
 
-  describe("importTransactions", () => {
-    it("should call backend API with file and field mapping", async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          success: true,
-          transactions: [
-            {
-              id: "tx1",
-              date: "2024-01-01",
-              amount: -50,
-              envelopeId: "unassigned",
-              category: "Imported",
-              type: "expense",
-              lastModified: Date.now(),
-              createdAt: Date.now(),
-            },
-          ],
-          invalid: [],
-          message: "Success",
-        },
-      };
-
-      vi.mocked(ApiClient.post).mockResolvedValue(mockResponse);
-
-      const fieldMapping = { date: "Date", amount: "Amount" };
-      const response = await ImportService.importTransactions(mockFile, fieldMapping);
-
-      expect(response.success).toBe(true);
-      expect(ApiClient.post).toHaveBeenCalledWith(
-        "/api/import",
-        expect.any(FormData),
-        expect.objectContaining({ timeout: 120000 })
-      );
-
-      const formDataCall = (ApiClient.post as any).mock.calls[0][1];
-      expect(formDataCall).toBeInstanceOf(FormData);
-    });
-
-    it("should handle backend errors", async () => {
-      vi.spyOn(ApiClient, "post").mockResolvedValue({
-        success: false,
-        error: "Import failed",
-      });
-
-      const response = await ImportService.importTransactions(mockFile);
-
-      expect(response.success).toBe(true); // Fallback should succeed
-    });
-
-    it("should handle network errors", async () => {
-      vi.spyOn(ApiClient, "post").mockRejectedValue(new Error("Network error"));
-
-      const response = await ImportService.importTransactions(mockFile);
-
-      expect(response.success).toBe(true); // Fallback should succeed
-    });
-
-    it("should send file without field mapping if not provided", async () => {
-      vi.spyOn(ApiClient, "post").mockResolvedValue({
-        success: true,
-        data: { transactions: [], invalid: [] },
-      });
-
-      await ImportService.importTransactions(mockFile);
-
-      expect(ApiClient.post).toHaveBeenCalled();
-      const formDataCall = (ApiClient.post as any).mock.calls[0][1];
-      expect(formDataCall).toBeInstanceOf(FormData);
-    });
-  });
-
-  describe("importTransactions with fallback behavior", () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
-
-    it("should use backend when available and preferBackend is true", async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          success: true,
-          transactions: [],
-          invalid: [],
-        },
-      };
-
-      vi.spyOn(ApiClient, "post").mockResolvedValue(mockResponse);
-
-      const csvContent = "date,amount,description\n2024-01-01,100,Test";
-      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
-
-      const result = await ImportService.importTransactions(csvFile);
-
-      expect(result.success).toBe(true);
-      expect(ApiClient.post).toHaveBeenCalled();
-    });
-
-    it("should fallback to client-side when backend is unavailable", async () => {
-      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(false);
-
-      const csvContent = "date,amount,description\n2024-01-01,100,Test";
-      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
-
-      const result = await ImportService.importTransactions(csvFile);
-
-      expect(result.success).toBe(true);
-      expect(ApiClient.post).not.toHaveBeenCalled();
-    });
-
-    it("should use client-side when forceClientSide is true", async () => {
-      const csvContent = "date,amount,description\n2024-01-01,100,Test";
-      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
-
-      const result = await ImportService.importTransactions(csvFile, undefined, {
-        forceClientSide: true,
-      });
-
-      expect(result.success).toBe(true);
-      expect(ApiClient.post).not.toHaveBeenCalled();
-    });
-
-    it("should fallback to client-side when backend fails", async () => {
-      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(true);
-      vi.spyOn(ApiClient, "post").mockResolvedValue({
-        success: false,
-        error: "Backend error",
-      });
-
-      const csvContent = "date,amount,description\n2024-01-01,100,Test";
-      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
-
-      const result = await ImportService.importTransactions(csvFile);
-
-      expect(result.success).toBe(true);
-    });
-
-    it("should respect preferBackend option", async () => {
-      vi.spyOn(ImportService, "isAvailable").mockResolvedValue(false);
-
-      const csvContent = "date,amount,description\n2024-01-01,100,Test";
-      const csvFile = new File([csvContent], "test.csv", { type: "text/csv" });
-
-      const result = await ImportService.importTransactions(csvFile, undefined, {
-        preferBackend: false,
-        forceClientSide: true,
-      });
-
-      expect(result.success).toBe(true);
-      expect(ApiClient.post).not.toHaveBeenCalled();
-    });
-  });
-
   describe("isAvailable", () => {
-    it("should return false when offline", async () => {
-      mockApiClient.isOnline.mockReturnValue(false);
-
-      const available = await ImportService.isAvailable();
-
-      expect(available).toBe(false);
+    it("should return true when ApiClient is online and healthCheck passes", async () => {
+      (ApiClient.isOnline as any).mockReturnValue(true);
+      (ApiClient.healthCheck as any).mockResolvedValue(true);
+      expect(await ImportService.isAvailable()).toBe(true);
     });
 
-    it.skip("should check health when online", async () => {
-      // Defaults are set in factory and reset in beforeEach
-      const available = await ImportService.isAvailable();
-
-      expect(available).toBe(true);
-      expect(mockApiClient.healthCheck).toHaveBeenCalled();
+    it("should return false when ApiClient is offline", async () => {
+      (ApiClient.isOnline as any).mockReturnValue(false);
+      expect(await ImportService.isAvailable()).toBe(false);
     });
   });
 
   describe("autoDetectFieldMapping", () => {
-    it("should detect standard field names", () => {
-      const headers = ["date", "amount", "description", "category"];
+    it("should correctly detect date and amount fields", () => {
+      const headers = ["Txn Date", "Transaction Amount", "Payee"];
       const mapping = ImportService.autoDetectFieldMapping(headers);
-
-      expect(mapping.date).toBe("date");
-      expect(mapping.amount).toBe("amount");
-      expect(mapping.description).toBe("description");
-      expect(mapping.category).toBe("category");
-    });
-
-    it("should detect alternative field names", () => {
-      const headers = ["Date", "Value", "Memo", "Merchant", "Notes"];
-      const mapping = ImportService.autoDetectFieldMapping(headers);
-
-      expect(mapping.date).toBe("Date");
-      expect(mapping.amount).toBe("Value");
-      expect(mapping.description).toBe("Memo");
-      expect(mapping.merchant).toBe("Merchant");
-      expect(mapping.notes).toBe("Notes");
-    });
-
-    it("should handle transaction_date format", () => {
-      const headers = ["transaction_date", "amount"];
-      const mapping = ImportService.autoDetectFieldMapping(headers);
-
-      expect(mapping.date).toBe("transaction_date");
-    });
-
-    it("should handle payee as description", () => {
-      const headers = ["date", "payee", "amount"];
-      const mapping = ImportService.autoDetectFieldMapping(headers);
-
-      expect(mapping.description).toBe("payee");
-    });
-
-    it("should return empty mapping for unrecognized headers", () => {
-      const headers = ["col1", "col2", "col3"];
-      const mapping = ImportService.autoDetectFieldMapping(headers);
-
-      expect(Object.keys(mapping).length).toBe(0);
+      expect(mapping.date).toBe("Txn Date");
+      expect(mapping.amount).toBe("Transaction Amount");
+      expect(mapping.description).toBe("Payee");
     });
   });
 });

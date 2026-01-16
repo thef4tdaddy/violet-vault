@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 class ResizeObserverMock {
@@ -103,14 +104,14 @@ describe("AnalyticsDashboard", () => {
   it("renders analytics tabs", () => {
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /spending analysis/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /trends & forecasting/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /spending analysis/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /trends & forecasting/i })).toBeInTheDocument();
   });
 
   it("shows loading state while analytics query resolves", async () => {
     useAnalyticsMock.mockReturnValueOnce({
-      analytics: null,
+      analytics: null as any,
       isLoading: true,
       isError: false,
       error: null,
@@ -123,10 +124,10 @@ describe("AnalyticsDashboard", () => {
 
   it("shows error feedback when analytics query fails", async () => {
     useAnalyticsMock.mockReturnValueOnce({
-      analytics: null,
+      analytics: null as any,
       isLoading: false,
       isError: true,
-      error: new Error("Failed to load data"),
+      error: new Error("Failed to load data") as any,
     });
 
     render(<AnalyticsDashboard />);
@@ -138,7 +139,7 @@ describe("AnalyticsDashboard", () => {
     render(<AnalyticsDashboard />);
 
     expect(screen.getByText(/Comprehensive financial insights and reporting/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("handles empty analytics data gracefully", () => {
@@ -154,7 +155,7 @@ describe("AnalyticsDashboard", () => {
         envelopeBreakdown: {},
         transactions: [],
         topCategories: [],
-        velocity: null,
+        velocity: null as any,
         weeklyPatterns: [],
         budgetVsActual: [],
         healthScore: 0,
@@ -166,7 +167,7 @@ describe("AnalyticsDashboard", () => {
 
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("displays health score when available", () => {
@@ -188,7 +189,7 @@ describe("AnalyticsDashboard", () => {
         envelopeBreakdown: {},
         transactions: [],
         topCategories: [],
-        velocity: null,
+        velocity: null as any,
         weeklyPatterns: [],
         budgetVsActual: [],
         healthScore: 76,
@@ -200,7 +201,7 @@ describe("AnalyticsDashboard", () => {
 
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("handles large transaction count", () => {
@@ -235,7 +236,7 @@ describe("AnalyticsDashboard", () => {
 
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("handles negative net amount", () => {
@@ -270,7 +271,7 @@ describe("AnalyticsDashboard", () => {
 
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("displays all tab options", () => {
@@ -278,7 +279,7 @@ describe("AnalyticsDashboard", () => {
 
     const tabs = [/overview/i, /spending analysis/i, /trends & forecasting/i];
     tabs.forEach((tabName) => {
-      expect(screen.getByRole("button", { name: tabName })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: tabName })).toBeInTheDocument();
     });
   });
 
@@ -302,7 +303,7 @@ describe("AnalyticsDashboard", () => {
         envelopeBreakdown: {},
         transactions: [],
         topCategories: [],
-        velocity: null,
+        velocity: null as any,
         weeklyPatterns: [],
         budgetVsActual: [],
         healthScore: 0,
@@ -314,7 +315,7 @@ describe("AnalyticsDashboard", () => {
 
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /overview/i })).toBeInTheDocument();
   });
 
   it("handles perfect health score", () => {

@@ -163,7 +163,7 @@ describe("MetricsGrid", () => {
         balanceStability: 0,
       };
       render(<MetricsGrid performanceMetrics={zeroMetrics} />);
-      expect(screen.getByText("0/100")).toBeInTheDocument();
+      expect(screen.getAllByText("0/100")).toHaveLength(4);
     });
 
     it("should handle perfect scores (100)", () => {

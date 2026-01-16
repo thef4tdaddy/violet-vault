@@ -1,13 +1,14 @@
 import React from "react";
 import BaseModal from "./BaseModal";
-import { getIcon } from "@/utils/ui/icons";
+import { getIcon, logger } from "@/utils";
+import { Button } from "../buttons/Button";
 
 export type ConfirmModalVariant = "danger" | "warning" | "info" | "success";
 
 export interface ConfirmModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void | Promise<void>;
+  onClose?: () => void;
+  onConfirm?: () => void | Promise<void>;
   title: string;
   message: string;
   confirmLabel?: string;
@@ -60,19 +61,6 @@ const VARIANT_STYLES = {
  *
  * Part of Phase 1.1: Component Library Standardization
  * Issue #1526 - Modal Primitives
- *
- * @example
- * ```tsx
- * <ConfirmModal
- *   isOpen={showDelete}
- *   onClose={() => setShowDelete(false)}
- *   onConfirm={handleDelete}
- *   title="Delete Item?"
- *   message="This action cannot be undone. Are you sure?"
- *   variant="danger"
- *   confirmLabel="Delete"
- * />
- * ```
  */
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
@@ -90,13 +78,17 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   const handleConfirm = async () => {
     if (loading) return;
-    await onConfirm();
+    try {
+      await onConfirm?.();
+    } catch (err) {
+      logger.error("ConfirmModal onConfirm error:", err);
+    }
   };
 
   return (
     <BaseModal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onClose || (() => {})}
       size="md"
       closeOnEscape={!loading}
       ariaLabelledBy={titleId}
@@ -105,53 +97,50 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         {/* Icon and Title */}
         <div className="flex items-start mb-4">
           <div
-            className={`w-12 h-12 ${variantStyle.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}
+            className={`w-12 h-12 ${variantStyle.iconBg} rounded-full flex items-center justify-center shrink-0`}
           >
-            {React.createElement(getIcon(variantStyle.iconName), {
-              className: `h-6 w-6 ${variantStyle.iconColor}`,
-            })}
+            {React.createElement(
+              getIcon(variantStyle.iconName) as React.ComponentType<{ className?: string }>,
+              {
+                className: `h-6 w-6 ${variantStyle.iconColor}`,
+              }
+            )}
           </div>
-          <div className="ml-4 flex-1">
-            <h3 id={titleId} className="text-xl font-semibold text-gray-900">
+          <div className="ml-4">
+            <h3 id={titleId} className="text-lg font-semibold text-gray-900">
               {title}
             </h3>
+            <p className="mt-1 text-sm text-gray-500">{message}</p>
           </div>
         </div>
 
-        {/* Message */}
-        <div className="mb-6">
-          <p className="text-sm text-gray-600">{message}</p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 justify-end">
-          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library */}
-          <button
+        {/* Actions */}
+        <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+          <Button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-gray-700 border-2 border-black rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {cancelLabel}
-          </button>
-          {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library */}
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleConfirm}
             disabled={loading}
-            className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed ${
+            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed transition-colors ${
               loading ? variantStyle.confirmBtnDisabled : variantStyle.confirmBtn
             }`}
           >
             {loading ? (
-              <div className="flex items-center">
+              <div className="flex items-center justify-center">
                 <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
                 Processing...
               </div>
             ) : (
               confirmLabel
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </BaseModal>
