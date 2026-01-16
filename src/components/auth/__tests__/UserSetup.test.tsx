@@ -245,4 +245,88 @@ describe("UserSetup", () => {
     const backgroundPattern = document.querySelector('[style*="radial-gradient"]');
     expect(backgroundPattern).toBeInTheDocument();
   });
+
+  describe("Edge Cases", () => {
+    it("should handle step 0", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        step: 0,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Step 0");
+    });
+
+    it("should handle very long username", () => {
+      const longName = "A".repeat(100);
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        userName: longName,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent(`User: ${longName}`);
+    });
+
+    it("should handle special characters in username", () => {
+      const specialName = "John Doe & Co.";
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        userName: specialName,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent(`User: ${specialName}`);
+    });
+
+    it("should handle non-returning user", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        isReturningUser: false,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Returning: false");
+      expect(screen.queryByTestId("returning-user-actions")).not.toBeInTheDocument();
+    });
+
+    it("should handle returning user", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        isReturningUser: true,
+        userName: "John",
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Returning: true");
+      expect(screen.getByTestId("returning-user-actions")).toBeInTheDocument();
+    });
+
+    it("should handle empty password", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        password: "",
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("password-input")).toHaveValue("");
+    });
+
+    it("should handle missing onSetupComplete callback", () => {
+      render(<UserSetup onSetupComplete={undefined as any} />);
+      expect(screen.getByTestId("header")).toBeInTheDocument();
+    });
+
+    it("should render step buttons correctly", () => {
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("step-buttons")).toBeInTheDocument();
+    });
+
+    it("should handle password changes", () => {
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      const passwordInput = screen.getByTestId("password-input");
+      expect(passwordInput).toBeInTheDocument();
+      expect(passwordInput).toHaveAttribute("type", "password");
+    });
+  });
 });

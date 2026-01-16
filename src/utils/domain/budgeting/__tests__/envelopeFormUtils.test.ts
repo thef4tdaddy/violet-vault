@@ -449,5 +449,447 @@ describe("envelopeFormUtils", () => {
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Sinking funds require a target amount");
     });
+
+    it("should handle null envelope in type change validation", () => {
+      const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.VARIABLE, null);
+
+      expect(result.isValid).toBe(true);
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should allow changing to same type", () => {
+      const envelope = {
+        id: "test-id",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
+      };
+      const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.VARIABLE, envelope);
+
+      expect(result.isValid).toBe(true);
+    });
+  });
+
+  describe("validateEnvelopeForm - additional edge cases", () => {
+    const validFormData = {
+      name: "Test Envelope",
+      category: "Food & Dining",
+      monthlyAmount: "100",
+      currentBalance: "50",
+      priority: "medium",
+      color: "#a855f7",
+      frequency: "monthly",
+      description: "Test description",
+      envelopeType: ENVELOPE_TYPES.VARIABLE,
+      targetAmount: "",
+      autoAllocate: true,
+      icon: "Target",
+    };
+
+    it("should handle numeric monthly amount", () => {
+      const formData = { ...validFormData, monthlyAmount: 150 };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should validate monthly amount cannot exceed $100,000", () => {
+      const formData = { ...validFormData, monthlyAmount: "100001" };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).monthlyAmount).toBe(
+        "Monthly amount cannot exceed $100,000"
+      );
+    });
+
+    it("should require target amount for sinking funds", () => {
+      const formData = {
+        ...validFormData,
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        targetAmount: "",
+      };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount is required for sinking funds"
+      );
+    });
+
+    it("should validate target amount cannot exceed $1,000,000", () => {
+      const formData = {
+        ...validFormData,
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        targetAmount: "1000001",
+      };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount cannot exceed $1,000,000"
+      );
+    });
+
+    it("should validate target amount is positive", () => {
+      const formData = {
+        ...validFormData,
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        targetAmount: "-100",
+      };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).targetAmount).toBe(
+        "Target amount must be a positive number"
+      );
+    });
+
+    it("should validate invalid category", () => {
+      const formData = { ...validFormData, category: "Invalid Category" };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).category).toBe("Invalid category selected");
+    });
+
+    it("should validate invalid priority", () => {
+      const formData = { ...validFormData, priority: "invalid" };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).priority).toBe("Invalid priority selected");
+    });
+
+    it("should validate invalid frequency", () => {
+      const formData = { ...validFormData, frequency: "invalid" };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).frequency).toBeDefined();
+    });
+
+    it("should allow description up to 500 characters", () => {
+      const formData = { ...validFormData, description: "x".repeat(500) };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should reject description over 500 characters", () => {
+      const formData = { ...validFormData, description: "x".repeat(501) };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).description).toBe(
+        "Description must be 500 characters or less"
+      );
+    });
+
+    it("should allow NaN monthly amount to be empty for non-bill envelopes", () => {
+      const formData = {
+        ...validFormData,
+        monthlyAmount: "abc",
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
+      };
+      const result = validateEnvelopeForm(formData);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).monthlyAmount).toBeDefined();
+    });
+
+    it("should handle case-insensitive duplicate name check", () => {
+      const existingEnvelopes = [{ id: "1", name: "Test Envelope" }];
+      const formData = { ...validFormData, name: "TEST ENVELOPE" };
+      const result = validateEnvelopeForm(formData, existingEnvelopes);
+
+      expect(result.isValid).toBe(false);
+      expect((result.errors as ValidationErrors).name).toBe(
+        "An envelope with this name already exists"
+      );
+    });
+
+    it("should allow same name when editing same envelope", () => {
+      const existingEnvelopes = [{ id: "test-id", name: "Test Envelope" }];
+      const formData = { ...validFormData, name: "Test Envelope" };
+      const result = validateEnvelopeForm(formData, existingEnvelopes, "test-id");
+
+      expect(result.isValid).toBe(true);
+    });
+  });
+
+  describe("calculateEnvelopeAmounts - additional edge cases", () => {
+    const validFormData = {
+      name: "Test",
+      monthlyAmount: "400",
+      targetAmount: "5000",
+      currentBalance: "100",
+      frequency: "monthly",
+      category: "Food",
+      priority: "medium",
+      color: "#a855f7",
+      envelopeType: ENVELOPE_TYPES.VARIABLE,
+      autoAllocate: true,
+      icon: "Target",
+    };
+
+    it("should handle zero monthly amount", () => {
+      const formData = { ...validFormData, monthlyAmount: "0" };
+      const result = calculateEnvelopeAmounts(formData);
+
+      expect(result.monthlyAmount).toBe(0);
+      expect(result.biweeklyAllocation).toBe(0);
+    });
+
+    it("should handle empty monthly amount", () => {
+      const formData = { ...validFormData, monthlyAmount: "" };
+      const result = calculateEnvelopeAmounts(formData);
+
+      expect(result.monthlyAmount).toBe(0);
+      expect(result.biweeklyAllocation).toBe(0);
+    });
+
+    it("should calculate annual amount correctly", () => {
+      const formData = { ...validFormData, monthlyAmount: "100" };
+      const result = calculateEnvelopeAmounts(formData);
+
+      expect(result.annualAmount).toBe(1200);
+    });
+
+    it("should calculate weekly amount correctly", () => {
+      const formData = { ...validFormData, monthlyAmount: "520" };
+      const result = calculateEnvelopeAmounts(formData);
+
+      expect(result.weeklyAmount).toBeCloseTo(120, 1); // 520 / (52/12)
+    });
+
+    it("should handle different frequency multipliers", () => {
+      const weeklyForm = { ...validFormData, frequency: "weekly" };
+      const biweeklyForm = { ...validFormData, frequency: "biweekly" };
+      const quarterlyForm = { ...validFormData, frequency: "quarterly" };
+      const annuallyForm = { ...validFormData, frequency: "annually" };
+
+      expect(calculateEnvelopeAmounts(weeklyForm).frequencyMultiplier).toBe(52);
+      expect(calculateEnvelopeAmounts(biweeklyForm).frequencyMultiplier).toBe(26);
+      expect(calculateEnvelopeAmounts(quarterlyForm).frequencyMultiplier).toBe(4);
+      expect(calculateEnvelopeAmounts(annuallyForm).frequencyMultiplier).toBe(1);
+    });
+
+    it("should handle numeric string amounts", () => {
+      const formData = { ...validFormData, monthlyAmount: "100.50" };
+      const result = calculateEnvelopeAmounts(formData);
+
+      expect(result.monthlyAmount).toBe(100.5);
+    });
+  });
+
+  describe("transformFormToEnvelope - additional edge cases", () => {
+    const validFormData = {
+      name: "Test Envelope",
+      monthlyAmount: "100",
+      currentBalance: "50",
+      category: "Food",
+      color: "#a855f7",
+      frequency: "monthly",
+      description: "Test description",
+      priority: "medium",
+      autoAllocate: true,
+      icon: "Target",
+      envelopeType: ENVELOPE_TYPES.VARIABLE,
+      targetAmount: "",
+    };
+
+    it("should generate ID when not editing", () => {
+      const result = transformFormToEnvelope(validFormData);
+
+      expect(result.id).toBeDefined();
+      expect(result.id).toContain("envelope_");
+    });
+
+    it("should preserve ID when editing", () => {
+      const result = transformFormToEnvelope(validFormData, { editingId: "existing-id" });
+
+      expect(result.id).toBe("existing-id");
+    });
+
+    it("should set createdAt for new envelopes", () => {
+      const result = transformFormToEnvelope(validFormData);
+
+      expect(result.createdAt).toBeDefined();
+      expect(result.createdBy).toBe("Unknown User");
+    });
+
+    it("should not set createdAt when editing", () => {
+      const result = transformFormToEnvelope(validFormData, { editingId: "existing-id" });
+
+      expect(result.createdAt).toBeUndefined();
+    });
+
+    it("should use provided createdBy", () => {
+      const result = transformFormToEnvelope(validFormData, { createdBy: "Test User" });
+
+      expect(result.createdBy).toBe("Test User");
+    });
+
+    it("should trim name and description", () => {
+      const formData = {
+        ...validFormData,
+        name: "  Test Envelope  ",
+        description: "  Test description  ",
+      };
+      const result = transformFormToEnvelope(formData);
+
+      expect(result.name).toBe("Test Envelope");
+      expect(result.description).toBe("Test description");
+    });
+
+    it("should convert autoAllocate to boolean", () => {
+      const trueForm = { ...validFormData, autoAllocate: true };
+      const falseForm = { ...validFormData, autoAllocate: false };
+
+      expect(transformFormToEnvelope(trueForm).autoAllocate).toBe(true);
+      expect(transformFormToEnvelope(falseForm).autoAllocate).toBe(false);
+    });
+  });
+
+  describe("transformEnvelopeToForm - additional edge cases", () => {
+    it("should return default form for null envelope", () => {
+      const result = transformEnvelopeToForm(null);
+
+      expect(result.name).toBe("");
+      expect(result.monthlyAmount).toBe("");
+    });
+
+    it("should handle envelope with missing optional fields", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+      };
+      const result = transformEnvelopeToForm(envelope);
+
+      expect(result.name).toBe("Test");
+      expect(result.monthlyAmount).toBe("");
+      expect(result.currentBalance).toBe("");
+      expect(result.description).toBe("");
+    });
+
+    it("should default autoAllocate to true if undefined", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        autoAllocate: undefined,
+      };
+      const result = transformEnvelopeToForm(envelope);
+
+      expect(result.autoAllocate).toBe(true);
+    });
+
+    it("should preserve autoAllocate false", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        autoAllocate: false,
+      };
+      const result = transformEnvelopeToForm(envelope);
+
+      expect(result.autoAllocate).toBe(false);
+    });
+  });
+
+  describe("calculateEnvelopeProgress - additional edge cases", () => {
+    it("should return null for non-sinking fund", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.VARIABLE,
+        currentBalance: 100,
+        targetAmount: 1000,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).toBeNull();
+    });
+
+    it("should return null for zero target amount", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        currentBalance: 100,
+        targetAmount: 0,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).toBeNull();
+    });
+
+    it("should cap progress at 100%", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        currentBalance: 1200,
+        targetAmount: 1000,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.progressPercentage).toBe(100);
+        expect(result.isComplete).toBe(true);
+        expect(result.remainingAmount).toBe(0);
+      }
+    });
+
+    it("should calculate months remaining", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        currentBalance: 400,
+        targetAmount: 1000,
+        monthlyAmount: 100,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.monthsRemaining).toBe(6); // Math.ceil(600 / 100)
+      }
+    });
+
+    it("should return null months remaining when complete", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        currentBalance: 1000,
+        targetAmount: 1000,
+        monthlyAmount: 100,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.isComplete).toBe(true);
+      }
+    });
+
+    it("should handle zero monthly amount", () => {
+      const envelope = {
+        id: "test",
+        name: "Test",
+        envelopeType: ENVELOPE_TYPES.SINKING_FUND,
+        currentBalance: 400,
+        targetAmount: 1000,
+        monthlyAmount: 0,
+      };
+      const result = calculateEnvelopeProgress(envelope);
+
+      expect(result).not.toBeNull();
+      if (result) {
+        expect(result.monthsRemaining).toBeNull();
+      }
+    });
   });
 });

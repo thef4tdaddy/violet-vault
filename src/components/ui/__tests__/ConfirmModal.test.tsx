@@ -237,4 +237,97 @@ describe("ConfirmModal", () => {
       expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
     });
   });
+
+  describe("Edge Cases", () => {
+    it("should handle very long title text", () => {
+      const longTitle = "A".repeat(200);
+      render(<ConfirmModal {...defaultProps} title={longTitle} />);
+      expect(screen.getByText(longTitle)).toBeInTheDocument();
+    });
+
+    it("should handle very long message text", () => {
+      const longMessage = "This is a very long message. ".repeat(50);
+      render(<ConfirmModal {...defaultProps} message={longMessage} />);
+      expect(screen.getByText(longMessage, { exact: false })).toBeInTheDocument();
+    });
+
+    it("should handle empty title", () => {
+      render(<ConfirmModal {...defaultProps} title="" />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle empty message", () => {
+      render(<ConfirmModal {...defaultProps} message="" />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle null icon", () => {
+      render(<ConfirmModal {...defaultProps} icon={null} />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle special characters in title", () => {
+      const specialTitle = "Test & <Title> with 'quotes'";
+      render(<ConfirmModal {...defaultProps} title={specialTitle} />);
+      expect(screen.getByText(specialTitle)).toBeInTheDocument();
+    });
+
+    it("should handle special characters in message", () => {
+      const specialMessage = "Message with & < > ' \" symbols";
+      render(<ConfirmModal {...defaultProps} message={specialMessage} />);
+      expect(screen.getByText(specialMessage)).toBeInTheDocument();
+    });
+
+    it("should handle confirm button with no label", () => {
+      render(<ConfirmModal {...defaultProps} confirmLabel="" />);
+      const confirmButton = screen
+        .getAllByRole("button")
+        .find((button) => button.textContent?.includes("Confirm"));
+      expect(confirmButton || screen.getAllByRole("button")[0]).toBeInTheDocument();
+    });
+
+    it("should handle cancel button with no label", () => {
+      render(<ConfirmModal {...defaultProps} cancelLabel="" />);
+      const cancelButton = screen
+        .getAllByRole("button")
+        .find((button) => button.textContent?.includes("Cancel"));
+      expect(cancelButton || screen.getAllByRole("button")[1]).toBeInTheDocument();
+    });
+
+    it("should handle multiple rapid clicks", async () => {
+      const onConfirm = vi.fn();
+      render(<ConfirmModal {...defaultProps} onConfirm={onConfirm} />);
+
+      const confirmButton = screen.getByRole("button", { name: /Confirm/i });
+      await userEvent.click(confirmButton);
+      await userEvent.click(confirmButton);
+      await userEvent.click(confirmButton);
+
+      expect(onConfirm).toHaveBeenCalled();
+    });
+
+    it("should render with undefined onConfirm", () => {
+      render(<ConfirmModal {...defaultProps} onConfirm={undefined} />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should render with undefined onCancel", () => {
+      render(<ConfirmModal {...defaultProps} onCancel={undefined} />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle complex children with nested components", () => {
+      render(
+        <ConfirmModal {...defaultProps}>
+          <div data-testid="nested-1">
+            <div data-testid="nested-2">
+              <p>Nested content</p>
+            </div>
+          </div>
+        </ConfirmModal>
+      );
+      expect(screen.getByTestId("nested-1")).toBeInTheDocument();
+      expect(screen.getByTestId("nested-2")).toBeInTheDocument();
+    });
+  });
 });

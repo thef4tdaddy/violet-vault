@@ -212,5 +212,105 @@ describe("EnvelopeGrid (Surgical Reset)", () => {
       expect(useTransactions).toHaveBeenCalled();
       expect(useBills).toHaveBeenCalled();
     });
+
+    it("should handle create envelope button click", async () => {
+      renderEnvelopeGrid();
+      const createButton = screen.getByText("Create Envelope");
+      await userEvent.click(createButton);
+      // Baseline: No crash
+    });
+
+    it("should render with custom unassigned cash", () => {
+      renderEnvelopeGrid({ unassignedCash: 1000 });
+      expect(screen.getByTestId("envelope-grid-view")).toBeInTheDocument();
+    });
+
+    it("should handle missing transactions", () => {
+      vi.mocked(useTransactions).mockReturnValue({
+        ...MOCK_TRANSACTIONS_DATA,
+        transactions: [],
+      });
+
+      renderEnvelopeGrid();
+      expect(screen.getByTestId("envelope-grid-view")).toBeInTheDocument();
+    });
+
+    it("should handle missing bills", () => {
+      vi.mocked(useBills).mockReturnValue({
+        ...MOCK_BILLS_DATA,
+        bills: [],
+      });
+
+      renderEnvelopeGrid();
+      expect(screen.getByTestId("envelope-grid-view")).toBeInTheDocument();
+    });
+
+    it("should handle multiple envelopes", () => {
+      const manyEnvelopes = Array.from({ length: 10 }, (_, i) => ({
+        id: `env-${i}`,
+        name: `Envelope ${i}`,
+        balance: 100 * i,
+        allocated: 150 * i,
+      }));
+
+      vi.mocked(useEnvelopes).mockReturnValue({
+        ...MOCK_ENVELOPES_DATA,
+        envelopes: manyEnvelopes,
+      });
+
+      renderEnvelopeGrid();
+      expect(screen.getAllByText(/Edit/)).toHaveLength(10);
+    });
+
+    it("should handle loading state for transactions", () => {
+      vi.mocked(useTransactions).mockReturnValue({
+        ...MOCK_TRANSACTIONS_DATA,
+        isLoading: true,
+      });
+
+      renderEnvelopeGrid();
+      const spinner = document.querySelector(".animate-spin");
+      expect(spinner).toBeInTheDocument();
+    });
+
+    it("should handle loading state for bills", () => {
+      vi.mocked(useBills).mockReturnValue({
+        ...MOCK_BILLS_DATA,
+        isLoading: true,
+      });
+
+      renderEnvelopeGrid();
+      const spinner = document.querySelector(".animate-spin");
+      expect(spinner).toBeInTheDocument();
+    });
+
+    it("should handle zero unassigned cash", () => {
+      renderEnvelopeGrid({ unassignedCash: 0 });
+      expect(screen.getByTestId("envelope-grid-view")).toBeInTheDocument();
+    });
+
+    it("should handle negative unassigned cash", () => {
+      renderEnvelopeGrid({ unassignedCash: -100 });
+      expect(screen.getByTestId("envelope-grid-view")).toBeInTheDocument();
+    });
+
+    it("should render with envelopes prop override", () => {
+      const customEnvelopes = [
+        { id: "custom-1", name: "Custom Envelope", balance: 500, allocated: 600 },
+      ];
+
+      renderEnvelopeGrid({ envelopes: customEnvelopes });
+      expect(screen.getByTestId("envelope-name-custom-1")).toHaveTextContent("Custom Envelope");
+    });
+
+    it("should handle all edit buttons for multiple envelopes", async () => {
+      renderEnvelopeGrid();
+      const editButtons = screen.getAllByText("Edit");
+
+      for (const button of editButtons) {
+        await userEvent.click(button);
+      }
+      // Baseline: No crash with multiple clicks
+    });
   });
 });
