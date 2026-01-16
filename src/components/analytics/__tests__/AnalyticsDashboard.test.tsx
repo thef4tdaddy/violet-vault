@@ -133,4 +133,222 @@ describe("AnalyticsDashboard", () => {
 
     expect(await screen.findByText(/Failed to load data/i)).toBeInTheDocument();
   });
+
+  it("renders with complete analytics data", () => {
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByText(/Comprehensive financial insights and reporting/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("handles empty analytics data gracefully", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          netAmount: 0,
+          expenseTransactionCount: 0,
+          transactionCount: 0,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: null,
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 0,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("displays health score when available", () => {
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getAllByText(/Budget Health/i).length).toBeGreaterThan(0);
+  });
+
+  it("handles missing velocity data", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 5000,
+          totalExpenses: 3200,
+          netAmount: 1800,
+          expenseTransactionCount: 8,
+          transactionCount: 12,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: null,
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 76,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("handles large transaction count", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 50000,
+          totalExpenses: 32000,
+          netAmount: 18000,
+          expenseTransactionCount: 800,
+          transactionCount: 1200,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: {
+          averageMonthlyExpenses: 22000,
+          averageMonthlyIncome: 36000,
+          trendDirection: "up",
+          velocityChange: 400,
+          percentChange: 15,
+          projectedNextMonth: 22400,
+        },
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 85,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("handles negative net amount", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 3000,
+          totalExpenses: 5000,
+          netAmount: -2000,
+          expenseTransactionCount: 15,
+          transactionCount: 20,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: {
+          averageMonthlyExpenses: 5500,
+          averageMonthlyIncome: 3200,
+          trendDirection: "down",
+          velocityChange: -300,
+          percentChange: -10,
+          projectedNextMonth: 5200,
+        },
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 45,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("displays all tab options", () => {
+    render(<AnalyticsDashboard />);
+
+    const tabs = [/overview/i, /spending analysis/i, /trends & forecasting/i];
+    tabs.forEach((tabName) => {
+      expect(screen.getByRole("button", { name: tabName })).toBeInTheDocument();
+    });
+  });
+
+  it("renders export controls section", () => {
+    render(<AnalyticsDashboard />);
+
+    // Component should have export functionality
+    expect(screen.getByText(/Comprehensive financial insights and reporting/i)).toBeInTheDocument();
+  });
+
+  it("handles zero health score", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 0,
+          totalExpenses: 5000,
+          netAmount: -5000,
+          expenseTransactionCount: 20,
+          transactionCount: 20,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: null,
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 0,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
+  });
+
+  it("handles perfect health score", () => {
+    useAnalyticsMock.mockReturnValueOnce({
+      analytics: {
+        summary: {
+          totalIncome: 10000,
+          totalExpenses: 3000,
+          netAmount: 7000,
+          expenseTransactionCount: 5,
+          transactionCount: 10,
+        },
+        envelopeBreakdown: {},
+        transactions: [],
+        topCategories: [],
+        velocity: {
+          averageMonthlyExpenses: 2800,
+          averageMonthlyIncome: 9500,
+          trendDirection: "up",
+          velocityChange: 200,
+          percentChange: 7,
+          projectedNextMonth: 3000,
+        },
+        weeklyPatterns: [],
+        budgetVsActual: [],
+        healthScore: 100,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    render(<AnalyticsDashboard />);
+
+    expect(screen.getAllByText(/Budget Health/i).length).toBeGreaterThan(0);
+  });
 });

@@ -248,4 +248,100 @@ describe("MainLayout (Full Alias Standardization)", () => {
     renderLayout();
     expect(await screen.findByTestId("lock-screen")).toBeInTheDocument();
   });
+
+  it("should render bottom navigation bar", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("bottom-nav")).toBeInTheDocument();
+  });
+
+  it("should render sync indicators", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("sync-indicators")).toBeInTheDocument();
+  });
+
+  it("should render toast container", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("toast-container")).toBeInTheDocument();
+  });
+
+  it("should render onboarding tutorial", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("onboarding-tutorial")).toBeInTheDocument();
+  });
+
+  it("should not show auth gateway when authenticated and unlocked", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: true,
+      shouldShowAuthGateway: () => false,
+    } as any);
+
+    renderLayout();
+    expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
+  });
+
+  it("should show auth gateway when not authenticated", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: false,
+      isUnlocked: true,
+      shouldShowAuthGateway: () => true,
+    } as any);
+
+    renderLayout();
+    expect(await screen.findByTestId("auth-gateway")).toBeInTheDocument();
+    expect(screen.queryByTestId("header")).not.toBeInTheDocument();
+  });
+
+  it("should handle firebase sync service correctly", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
+
+    const customSync = {
+      start: vi.fn(),
+      forceSync: vi.fn(),
+      isRunning: true,
+    };
+
+    render(<MainLayout firebaseSync={customSync} />, { queryClient });
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
+  });
+
+  it("should render with authenticated user data", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: true,
+      user: { userName: "John Doe", userColor: "#ff0000" },
+    } as any);
+
+    renderLayout();
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
+  });
+
+  it("should render onboarding progress when tutorial not completed", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
+    renderLayout();
+    expect(await screen.findByTestId("onboarding-progress")).toBeInTheDocument();
+  });
+
+  it("should render summary cards when authenticated", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
+    renderLayout();
+    expect(await screen.findByTestId("summary-cards")).toBeInTheDocument();
+  });
+
+  it("should prioritize lock screen over auth gateway", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: false,
+      shouldShowAuthGateway: () => false,
+    } as any);
+
+    renderLayout();
+    expect(await screen.findByTestId("lock-screen")).toBeInTheDocument();
+    expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
+  });
 });
