@@ -173,5 +173,77 @@ describe("ConfirmModal", () => {
       await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
       expect(onConfirm).toHaveBeenCalledTimes(1);
     });
+
+    it("should handle rejected async onConfirm", async () => {
+      const onConfirm = vi.fn().mockRejectedValue(new Error("Test error"));
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      render(<ConfirmModal {...defaultProps} onConfirm={onConfirm} />);
+
+      await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle empty title", () => {
+      render(<ConfirmModal {...defaultProps} title="" />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle empty message", () => {
+      render(<ConfirmModal {...defaultProps} message="" />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle very long title", () => {
+      const longTitle = "A".repeat(150);
+      render(<ConfirmModal {...defaultProps} title={longTitle} />);
+      expect(screen.getByText(longTitle)).toBeInTheDocument();
+    });
+
+    it("should handle very long message", () => {
+      const longMessage = "Message text ".repeat(100);
+      render(<ConfirmModal {...defaultProps} message={longMessage} />);
+      expect(screen.getByText(longMessage, { exact: false })).toBeInTheDocument();
+    });
+
+    it("should handle special characters in text", () => {
+      const specialTitle = "Test & <Title> with 'quotes'";
+      const specialMessage = "Message with & < > symbols";
+      render(<ConfirmModal {...defaultProps} title={specialTitle} message={specialMessage} />);
+      expect(screen.getByText(specialTitle)).toBeInTheDocument();
+      expect(screen.getByText(specialMessage)).toBeInTheDocument();
+    });
+
+    it("should handle undefined callbacks", async () => {
+      render(<ConfirmModal {...defaultProps} onConfirm={undefined} onClose={undefined} />);
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("should handle rapid button clicks", async () => {
+      const onConfirm = vi.fn();
+      render(<ConfirmModal {...defaultProps} onConfirm={onConfirm} />);
+
+      const button = screen.getByRole("button", { name: "Confirm" });
+      await userEvent.click(button);
+      await userEvent.click(button);
+
+      expect(onConfirm).toHaveBeenCalled();
+    });
+
+    it("should handle both buttons being clicked", async () => {
+      const onConfirm = vi.fn();
+      const onClose = vi.fn();
+      render(<ConfirmModal {...defaultProps} onConfirm={onConfirm} onClose={onClose} />);
+
+      await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+
+      await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
   });
 });
