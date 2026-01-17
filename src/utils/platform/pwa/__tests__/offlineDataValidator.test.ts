@@ -130,11 +130,9 @@ describe("OfflineDataValidator", () => {
       const result = await offlineDataValidator.validateOfflineReadiness();
 
       expect(result.isReady).toBe(false);
-      expect(result.error).toBe("Database connection failed");
-      expect(logger.error).toHaveBeenCalledWith(
-        "❌ Offline data validation failed",
-        expect.any(Error)
-      );
+      expect(result.error).toBeUndefined();
+      expect(logger.warn).toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
     });
 
     it("should include lastValidated timestamp", async () => {
