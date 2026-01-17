@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import pwaManager from "../pwaManager";
 import logger from "@/utils/core/common/logger";
-import * as versionModule from "@/utils/core/common/version";
+import { checkForVersionUpdate } from "@/utils/core/common/version";
 import type { BeforeInstallPromptEvent } from "@/stores/ui/uiStoreActions";
 
 // Mock dependencies
@@ -103,18 +103,12 @@ describe("PWAManager", () => {
     vi.clearAllMocks();
     localStorageMock.clear();
 
-    // Restore service worker mock if it was deleted
-    if (!navigator.serviceWorker) {
-      Object.defineProperty(navigator, "serviceWorker", {
-        value: createMockServiceWorker(),
-        configurable: true,
-        writable: true,
-      });
-    } else {
-      // Reset the mock functions
-      (navigator.serviceWorker as unknown as ReturnType<typeof createMockServiceWorker>) =
-        createMockServiceWorker() as unknown as ServiceWorkerContainer;
-    }
+    // Ensure service worker mock exists and is fresh
+    Object.defineProperty(navigator, "serviceWorker", {
+      value: createMockServiceWorker(),
+      configurable: true,
+      writable: true,
+    });
 
     mockUiStore = {
       setUpdateAvailable: vi.fn(),
@@ -538,7 +532,7 @@ describe("PWAManager", () => {
 
   describe("checkForVersionUpdate", () => {
     it("should not show patch notes when no update", () => {
-      vi.mocked(versionModule.checkForVersionUpdate).mockReturnValue({
+      vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: false,
         isFirstTime: false,
         currentVersion: "2.0.0",
@@ -553,7 +547,7 @@ describe("PWAManager", () => {
     });
 
     it("should show patch notes on version update", async () => {
-      vi.mocked(versionModule.checkForVersionUpdate).mockReturnValue({
+      vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: true,
         isFirstTime: false,
         currentVersion: "2.1.0",
@@ -573,7 +567,7 @@ describe("PWAManager", () => {
     });
 
     it("should not show patch notes for first-time users", () => {
-      vi.mocked(versionModule.checkForVersionUpdate).mockReturnValue({
+      vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: false,
         isFirstTime: true,
         currentVersion: "2.0.0",
@@ -588,7 +582,7 @@ describe("PWAManager", () => {
     });
 
     it("should handle version check errors", () => {
-      vi.mocked(versionModule.checkForVersionUpdate).mockImplementation(() => {
+      vi.mocked(checkForVersionUpdate).mockImplementation(() => {
         throw new Error("Version check failed");
       });
 
