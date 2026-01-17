@@ -384,9 +384,9 @@ describe("inputSanitization", () => {
 
     it("should reject non-numeric strings", () => {
       expect(validateNumericInput("abc")).toBeNull();
-      // Note: parseFloat("12abc") returns 12 (partial parsing is allowed by parseFloat)
-      // This is the actual behavior of the implementation using parseFloat
-      expect(validateNumericInput("12abc")).toBe(12);
+      // Ensure that partially numeric strings are rejected, even though
+      // parseFloat("12abc") would return 12 (partial parsing).
+      expect(validateNumericInput("12abc")).toBeNull();
     });
 
     it("should reject NaN", () => {
