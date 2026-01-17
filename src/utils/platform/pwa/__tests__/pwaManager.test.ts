@@ -297,43 +297,55 @@ describe("PWAManager", () => {
     });
 
     it("should prevent default on beforeinstallprompt", () => {
-      pwaManager.uiStore = mockUiStore;
-      pwaManager.setupInstallPrompt();
+      vi.useFakeTimers();
+      try {
+        pwaManager.uiStore = mockUiStore;
+        pwaManager.setupInstallPrompt();
 
-      const mockEvent = {
-        preventDefault: vi.fn(),
-      };
+        const mockEvent = {
+          preventDefault: vi.fn(),
+        };
 
-      const handler = vi
-        .mocked(window.addEventListener)
-        .mock.calls.find(([event]) => event === "beforeinstallprompt")?.[1] as EventListener;
+        const handler = vi
+          .mocked(window.addEventListener)
+          .mock.calls.find(([event]) => event === "beforeinstallprompt")?.[1] as EventListener;
 
-      handler(mockEvent as Event);
+        handler(mockEvent as Event);
+        vi.runAllTimers();
 
-      expect(mockEvent.preventDefault).toHaveBeenCalled();
-      expect(logger.info).toHaveBeenCalledWith("📱 PWA install prompt available");
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(logger.info).toHaveBeenCalledWith("📱 PWA install prompt available");
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("should respect install prompt cooldown", () => {
-      const yesterday = Date.now() - 23 * 60 * 60 * 1000; // 23 hours ago
-      localStorage.setItem("pwa_install_last_dismissed", yesterday.toString());
+      vi.useFakeTimers();
+      try {
+        const yesterday = Date.now() - 23 * 60 * 60 * 1000; // 23 hours ago
+        localStorage.setItem("pwa_install_last_dismissed", yesterday.toString());
 
-      pwaManager.uiStore = mockUiStore;
-      pwaManager.setupInstallPrompt();
+        pwaManager.uiStore = mockUiStore;
+        pwaManager.setupInstallPrompt();
 
-      const mockEvent = {
-        preventDefault: vi.fn(),
-      };
+        const mockEvent = {
+          preventDefault: vi.fn(),
+        };
 
-      const handler = vi
-        .mocked(window.addEventListener)
-        .mock.calls.find(([event]) => event === "beforeinstallprompt")?.[1] as EventListener;
+        const handler = vi
+          .mocked(window.addEventListener)
+          .mock.calls.find(([event]) => event === "beforeinstallprompt")?.[1] as EventListener;
 
-      handler(mockEvent as Event);
+        handler(mockEvent as Event);
+        vi.runAllTimers();
 
-      expect(logger.info).toHaveBeenCalledWith(
-        "Install prompt dismissed recently, skipping automatic prompt"
-      );
+        expect(logger.info).toHaveBeenCalledWith(
+          "Install prompt dismissed recently, skipping automatic prompt"
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("should handle appinstalled event", () => {
