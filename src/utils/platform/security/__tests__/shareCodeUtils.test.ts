@@ -26,12 +26,14 @@ describe("shareCodeUtils", () => {
       expect(shareCode).toMatch(/^[a-z]+ [a-z]+ [a-z]+ [a-z]+$/);
     });
 
-    it("should generate different codes on subsequent calls", () => {
-      const code1 = shareCodeUtils.generateShareCode();
-      const code2 = shareCodeUtils.generateShareCode();
+    it("should generate unique codes across multiple calls", () => {
+      const numberOfCodes = 50;
+      const codes = Array.from({ length: numberOfCodes }, () =>
+        shareCodeUtils.generateShareCode()
+      );
+      const uniqueCodes = new Set(codes);
 
-      // Very unlikely to be the same (probability is extremely low)
-      expect(code1).not.toBe(code2);
+      expect(uniqueCodes.size).toBe(numberOfCodes);
     });
 
     it("should generate valid BIP39 words", () => {
