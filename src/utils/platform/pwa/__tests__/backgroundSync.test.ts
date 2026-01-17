@@ -332,32 +332,41 @@ describe("BackgroundSyncManager", () => {
 
   describe("online/offline event handling", () => {
     it("should handle online event and trigger sync", async () => {
-      vi.mocked(fetch).mockResolvedValue({
-        ok: true,
-        json: async () => ({ success: true }),
-      } as Response);
+      vi.useFakeTimers();
+      try {
+        vi.mocked(fetch).mockResolvedValue({
+          ok: true,
+          json: async () => ({ success: true }),
+        } as Response);
 
-      // Queue an operation while "offline"
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-      });
+        // Queue an operation while "offline"
+        Object.defineProperty(backgroundSyncManager, "isOnline", {
+          value: false,
+          writable: true,
+        });
 
-      await backgroundSyncManager.queueOperation({
-        type: "transaction",
-        method: "POST",
-        url: "/api/transactions",
-      });
+        await backgroundSyncManager.queueOperation({
+          type: "transaction",
+          method: "POST",
+          url: "/api/transactions",
+        });
 
-      // Simulate coming online
-      await backgroundSyncManager.handleOnline();
+        // Simulate coming online
+        const onlinePromise = backgroundSyncManager.handleOnline();
 
-      expect(logger.info).toHaveBeenCalledWith(
-        "🌐 Background Sync: Device came online",
-        expect.objectContaining({
-          pendingOperations: 1,
-        })
-      );
+        // Advance timers to trigger the delayed sync (1000ms)
+        await vi.advanceTimersByTimeAsync(1000);
+        await onlinePromise;
+
+        expect(logger.info).toHaveBeenCalledWith(
+          "🌐 Background Sync: Device came online",
+          expect.objectContaining({
+            pendingOperations: 1,
+          })
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("should handle offline event", () => {
