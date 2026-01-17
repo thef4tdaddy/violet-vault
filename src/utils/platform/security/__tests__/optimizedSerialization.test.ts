@@ -302,7 +302,7 @@ describe("optimizedSerialization", () => {
 
       expect(result.success).toBe(true);
       // Time can be 0 in fast environments, just check it's defined
-      expect(typeof result.totalTime).toBe("number");
+      expect(result.totalTime).toBeGreaterThanOrEqual(0);
       expect(result.base64Size).toBeGreaterThan(0);
       expect(result.analysis).not.toBeNull();
       expect(result.verified).toContain("✅");
