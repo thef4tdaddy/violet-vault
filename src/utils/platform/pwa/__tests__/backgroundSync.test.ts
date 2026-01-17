@@ -41,24 +41,29 @@ Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
+// Helper function to control online state
+const setOnlineState = (isOnline: boolean) => {
+  Object.defineProperty(backgroundSyncManager, "isOnline", {
+    value: isOnline,
+    writable: true,
+    configurable: true,
+  });
+};
+
 describe("BackgroundSyncManager", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(fetch).mockReset();
+    vi.mocked(fetch).mockRestore();
     localStorageMock.clear();
     // Reset the manager's state
     backgroundSyncManager.clearPendingOperations();
     // Reset online state to true for most tests
-    Object.defineProperty(backgroundSyncManager, "isOnline", {
-      value: true,
-      writable: true,
-      configurable: true,
-    });
+    setOnlineState(true);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-    vi.mocked(fetch).mockReset();
+    vi.mocked(fetch).mockRestore();
   });
 
   describe("queueOperation", () => {
@@ -91,11 +96,7 @@ describe("BackgroundSyncManager", () => {
 
     it("should assign default values to queued operations", async () => {
       // Set offline to prevent immediate sync
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(false);
 
       const operation = {
         type: "envelope",
@@ -114,11 +115,7 @@ describe("BackgroundSyncManager", () => {
       expect(queuedOp.timestamp).toBeDefined();
 
       // Restore online state
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: true,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(true);
     });
 
     it("should attempt sync immediately when online", async () => {
@@ -167,10 +164,7 @@ describe("BackgroundSyncManager", () => {
 
     it("should not sync when offline", async () => {
       // Simulate offline state
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-      });
+      setOnlineState(false);
 
       await backgroundSyncManager.queueOperation({
         type: "transaction",
@@ -372,10 +366,7 @@ describe("BackgroundSyncManager", () => {
         } as Response);
 
         // Queue an operation while "offline"
-        Object.defineProperty(backgroundSyncManager, "isOnline", {
-          value: false,
-          writable: true,
-        });
+        setOnlineState(false);
 
         await backgroundSyncManager.queueOperation({
           type: "transaction",
@@ -415,11 +406,7 @@ describe("BackgroundSyncManager", () => {
   describe("persistence", () => {
     it("should save pending operations to localStorage", async () => {
       // Set offline to prevent immediate sync
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(false);
 
       await backgroundSyncManager.queueOperation({
         type: "transaction",
@@ -435,11 +422,7 @@ describe("BackgroundSyncManager", () => {
       expect(parsed[0].type).toBe("transaction");
 
       // Restore online state
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: true,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(true);
     });
 
     it("should load pending operations from localStorage", () => {
@@ -483,11 +466,7 @@ describe("BackgroundSyncManager", () => {
   describe("getSyncStatus", () => {
     it("should return comprehensive sync status", async () => {
       // Set offline to prevent immediate sync
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(false);
 
       await backgroundSyncManager.queueOperation({
         type: "transaction",
@@ -507,11 +486,7 @@ describe("BackgroundSyncManager", () => {
       expect(status.pendingOperations[0]).toHaveProperty("retryCount");
 
       // Restore online state
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: true,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(true);
     });
 
     it("should differentiate ready and waiting operations", async () => {
@@ -587,11 +562,7 @@ describe("BackgroundSyncManager", () => {
 
     it("should cap retry delay at 30 seconds", async () => {
       // Set offline to prevent immediate sync
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: false,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(false);
 
       const operation = {
         type: "transaction",
@@ -607,11 +578,7 @@ describe("BackgroundSyncManager", () => {
       backgroundSyncManager.pendingOperations[0].retryCount = 10;
 
       // Go back online
-      Object.defineProperty(backgroundSyncManager, "isOnline", {
-        value: true,
-        writable: true,
-        configurable: true,
-      });
+      setOnlineState(true);
 
       await backgroundSyncManager.syncPendingOperations();
 
