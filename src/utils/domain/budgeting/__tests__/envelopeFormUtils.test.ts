@@ -9,6 +9,8 @@ import {
   getPriorityOptions,
   getColorOptions,
   validateEnvelopeTypeChange,
+  transformBillToEnvelopeForm,
+  calculateQuickFundUpdate,
 } from "../envelopeFormUtils";
 import { ENVELOPE_TYPES } from "@/constants/categories";
 
@@ -890,6 +892,199 @@ describe("envelopeFormUtils", () => {
       if (result) {
         expect(result.monthsRemaining).toBeNull();
       }
+    });
+  });
+
+  describe("transformBillToEnvelopeForm", () => {
+    const currentFormData = createDefaultEnvelopeForm();
+
+    it("should transform bill data to envelope form data", () => {
+      const bill = {
+        id: "bill123",
+        name: "Electric Bill",
+        provider: "Power Company",
+        category: "Utilities",
+        color: "#3b82f6",
+        frequency: "monthly",
+        amount: 150.5,
+      };
+
+      const result = transformBillToEnvelopeForm(bill, currentFormData);
+
+      expect(result).toEqual({
+        name: "Electric Bill",
+        category: "Utilities",
+        color: "#3b82f6",
+        frequency: "monthly",
+        monthlyAmount: "150.5",
+        description: "Bill envelope for Electric Bill",
+        envelopeType: ENVELOPE_TYPES.BILL,
+      });
+    });
+
+    it("should use provider name if name is not available", () => {
+      const bill = {
+        id: "bill123",
+        provider: "Water Company",
+        category: "Utilities",
+        amount: 75,
+      };
+
+      const result = transformBillToEnvelopeForm(bill, currentFormData);
+
+      expect(result.name).toBe("Water Company");
+      expect(result.description).toBe("Bill envelope for Water Company");
+    });
+
+    it("should preserve current form data for missing fields", () => {
+      const customFormData = {
+        ...currentFormData,
+        color: "#custom",
+        frequency: "weekly",
+      };
+
+      const bill = {
+        id: "bill123",
+        name: "Internet Bill",
+        amount: 60,
+      };
+
+      const result = transformBillToEnvelopeForm(bill, customFormData);
+
+      expect(result.color).toBe("#custom");
+      expect(result.frequency).toBe("weekly");
+    });
+
+    it("should handle missing amount", () => {
+      const bill = {
+        id: "bill123",
+        name: "Phone Bill",
+        category: "Utilities",
+      };
+
+      const result = transformBillToEnvelopeForm(bill, currentFormData);
+
+      expect(result.monthlyAmount).toBe("");
+    });
+  });
+
+  describe("calculateQuickFundUpdate", () => {
+    it("should calculate update for variable envelope (default)", () => {
+      const envelope = {
+        id: "env1",
+        type: "variable",
+        allocated: 100,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 50);
+
+      expect(result).toEqual({
+        updateField: "monthlyBudget",
+        newAmount: 150,
+        currentAmount: 100,
+        addedAmount: 50,
+      });
+    });
+
+    it("should calculate update for goal envelope", () => {
+      const envelope = {
+        id: "env2",
+        type: "goal",
+        allocated: 200,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 100);
+
+      expect(result).toEqual({
+        updateField: "monthlyContribution",
+        newAmount: 300,
+        currentAmount: 200,
+        addedAmount: 100,
+      });
+    });
+
+    it("should calculate update for savings envelope", () => {
+      const envelope = {
+        id: "env3",
+        type: ENVELOPE_TYPES.SAVINGS,
+        allocated: 500,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 250);
+
+      expect(result).toEqual({
+        updateField: "monthlyContribution",
+        newAmount: 750,
+        currentAmount: 500,
+        addedAmount: 250,
+      });
+    });
+
+    it("should calculate update for liability envelope", () => {
+      const envelope = {
+        id: "env4",
+        type: "liability",
+        allocated: 300,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 50);
+
+      expect(result).toEqual({
+        updateField: "biweeklyAllocation",
+        newAmount: 350,
+        currentAmount: 300,
+        addedAmount: 50,
+      });
+    });
+
+    it("should calculate update for bill envelope", () => {
+      const envelope = {
+        id: "env5",
+        type: ENVELOPE_TYPES.BILL,
+        allocated: 150,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 25);
+
+      expect(result).toEqual({
+        updateField: "biweeklyAllocation",
+        newAmount: 175,
+        currentAmount: 150,
+        addedAmount: 25,
+      });
+    });
+
+    it("should handle envelope with no allocated amount", () => {
+      const envelope = {
+        id: "env6",
+        type: "variable",
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 100);
+
+      expect(result).toEqual({
+        updateField: "monthlyBudget",
+        newAmount: 100,
+        currentAmount: 0,
+        addedAmount: 100,
+      });
+    });
+
+    it("should handle envelope with unknown type", () => {
+      const envelope = {
+        id: "env7",
+        type: "unknown-type",
+        allocated: 50,
+      };
+
+      const result = calculateQuickFundUpdate(envelope, 30);
+
+      expect(result).toEqual({
+        updateField: "monthlyBudget",
+        newAmount: 80,
+        currentAmount: 50,
+        addedAmount: 30,
+      });
     });
   });
 });

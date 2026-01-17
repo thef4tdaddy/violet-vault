@@ -215,9 +215,7 @@ describe("PWAManager", () => {
         await vi.advanceTimersByTimeAsync(1000);
         await registerPromise;
 
-        expect(logger.info).toHaveBeenCalledWith(
-          "⏳ Waiting for service worker registration..."
-        );
+        expect(logger.info).toHaveBeenCalledWith("⏳ Waiting for service worker registration...");
       } finally {
         vi.useRealTimers();
       }

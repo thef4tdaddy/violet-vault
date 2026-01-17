@@ -1,4 +1,3 @@
-// src/components/budgeting/EnvelopeGrid.tsx - Refactored with separated logic
 import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "react";
 import useUiStoreRaw from "@/stores/ui/uiStore";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
@@ -11,6 +10,7 @@ import {
   filterEnvelopes,
   calculateEnvelopeTotals,
 } from "@/utils/domain/budgeting";
+import { calculateQuickFundUpdate } from "@/utils/domain/budgeting/envelopeFormUtils";
 import type {
   Envelope as BudgetEnvelope,
   EnvelopeData as BudgetEnvelopeData,
@@ -200,12 +200,8 @@ const useEnvelopeUIState = (
       const envelope = envelopeData.find((env: EnvelopeData) => env.id === envelopeId);
       if (!envelope) return;
 
-      const currentAmount = envelope.allocated || 0;
-      const newAmount = currentAmount + amount;
-
-      let updateField = "monthlyBudget"; // Default to valid standard field
-      if (envelope.type === "goal") updateField = "monthlyContribution";
-      else if (envelope.type === "liability") updateField = "biweeklyAllocation"; // Best guess for liability
+      // Use utility function to calculate the update
+      const { updateField, newAmount } = calculateQuickFundUpdate(envelope, amount);
 
       // Construct update object with type assertion as key is dynamic but safe per type check
       const updates = { [updateField]: newAmount };
