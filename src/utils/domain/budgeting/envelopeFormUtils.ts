@@ -523,3 +523,90 @@ export const validateEnvelopeTypeChange = (newType: string, envelope: Envelope |
     errors,
   };
 };
+
+/**
+ * Interface for bill data (flexible to accept various bill structures)
+ */
+interface BillData {
+  id: string;
+  name?: string;
+  provider?: string;
+  category?: string;
+  color?: string;
+  frequency?: string;
+  amount?: number;
+}
+
+/**
+ * Transforms bill data to envelope form data
+ * @param {Object} bill - Bill object
+ * @param {Object} currentFormData - Current form data for preserving unrelated fields
+ * @returns {Object} Envelope form data populated from bill
+ */
+export const transformBillToEnvelopeForm = (
+  bill: BillData | Record<string, unknown>,
+  currentFormData: EnvelopeFormData
+): Partial<EnvelopeFormData> => {
+  const billData = bill as BillData;
+  return {
+    name: billData.name ?? billData.provider ?? "",
+    category: billData.category ?? "",
+    color: billData.color ?? currentFormData.color,
+    frequency: billData.frequency ?? currentFormData.frequency,
+    monthlyAmount: billData.amount?.toString() ?? "",
+    description: `Bill envelope for ${billData.name ?? billData.provider}`,
+    envelopeType: ENVELOPE_TYPES.BILL,
+  };
+};
+
+/**
+ * Interface for envelope data with allocated amount
+ */
+interface EnvelopeWithAllocation {
+  id: string;
+  type?: string;
+  allocated?: number;
+  monthlyBudget?: number;
+  monthlyContribution?: number;
+  biweeklyAllocation?: number;
+  [key: string]: unknown;
+}
+
+/**
+ * Result of quick fund calculation
+ */
+interface QuickFundUpdateResult {
+  updateField: string;
+  newAmount: number;
+  currentAmount: number;
+  addedAmount: number;
+}
+
+/**
+ * Calculates the field and amount to update for quick funding an envelope
+ * @param {Object} envelope - Envelope object with type and current allocation
+ * @param {number} amountToAdd - Amount to add to the envelope
+ * @returns {Object} Update field name and calculated amounts
+ */
+export const calculateQuickFundUpdate = (
+  envelope: EnvelopeWithAllocation,
+  amountToAdd: number
+): QuickFundUpdateResult => {
+  const currentAmount = envelope.allocated || 0;
+  const newAmount = currentAmount + amountToAdd;
+
+  // Determine the correct field to update based on envelope type
+  let updateField = "monthlyBudget"; // Default for variable envelopes
+  if (envelope.type === "goal" || envelope.type === ENVELOPE_TYPES.SAVINGS) {
+    updateField = "monthlyContribution";
+  } else if (envelope.type === "liability" || envelope.type === ENVELOPE_TYPES.BILL) {
+    updateField = "biweeklyAllocation";
+  }
+
+  return {
+    updateField,
+    newAmount,
+    currentAmount,
+    addedAmount: amountToAdd,
+  };
+};
