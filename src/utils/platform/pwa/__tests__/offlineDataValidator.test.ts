@@ -339,16 +339,19 @@ describe("OfflineDataValidator", () => {
       }));
 
       vi.mocked(budgetDb.envelopes.toArray).mockResolvedValue(mockEnvelopes);
-      const mockLimit = vi.fn().mockResolvedValue(mockTransactions);
+      const mockLimit = vi.fn(() => ({
+        toArray: vi.fn().mockResolvedValue(mockTransactions),
+      }));
       const mockReverse = vi.fn(() => ({ limit: mockLimit }));
-      const mockOrderBy = vi.fn(() => ({ reverse: mockReverse }));
       vi.mocked(budgetDb.transactions.orderBy).mockReturnValue({
         reverse: mockReverse,
       } as never);
 
-      await offlineDataValidator.preCacheCriticalData();
+      const result = await offlineDataValidator.preCacheCriticalData();
 
       expect(budgetDb.transactions.orderBy).toHaveBeenCalledWith("date");
+      expect(mockLimit).toHaveBeenCalledWith(100);
+      expect(result.success).toBe(true);
     });
 
     it("should measure and log cache time", async () => {
