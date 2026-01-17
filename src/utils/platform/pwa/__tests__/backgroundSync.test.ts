@@ -245,12 +245,17 @@ describe("BackgroundSyncManager", () => {
 
       await backgroundSyncManager.syncPendingOperations();
 
-      expect(logger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Operation failed, will retry"),
+      // 409 conflicts are treated as permanent failures (not retryable)
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("Operation failed permanently"),
         expect.objectContaining({
           error: expect.stringContaining("Conflict"),
         })
       );
+      expect(logger.warn).not.toHaveBeenCalled();
+
+      const status = backgroundSyncManager.getSyncStatus();
+      expect(status.pendingCount).toBe(0);
     });
   });
 
