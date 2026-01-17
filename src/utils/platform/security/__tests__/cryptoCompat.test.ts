@@ -153,7 +153,7 @@ describe("cryptoCompat", () => {
     it("should log errors when operations fail", async () => {
       // Mock subtle to throw error
       const originalSubtle = crypto.subtle;
-      // @ts-ignore
+      // @ts-expect-error - Testing error case with mocked crypto.subtle
       crypto.subtle = {
         digest: vi.fn().mockRejectedValue(new Error("Operation failed")),
       };
@@ -254,7 +254,7 @@ describe("cryptoCompat", () => {
 
     it("should return true in non-browser environments", () => {
       const originalWindow = global.window;
-      // @ts-ignore
+      // @ts-expect-error - Testing non-browser environment
       global.window = undefined;
 
       const result = isSecureContext();
