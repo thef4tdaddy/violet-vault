@@ -254,6 +254,12 @@ describe("receiptHelpers", () => {
       expect(result).toBe("invalid-date");
     });
 
+    it("should handle truly malformed date inputs", () => {
+      // These will create Invalid Date objects that throw when formatted
+      expect(formatDisplayDate("not-a-date-at-all")).toBe("not-a-date-at-all");
+      expect(formatDisplayDate("2024-13-45")).toBe("2024-13-45");
+    });
+
     it("should format different months correctly", () => {
       expect(formatDisplayDate("2024-12-25")).toBe("Dec 25, 2024");
       expect(formatDisplayDate("2024-06-01")).toBe("Jun 1, 2024");
@@ -284,6 +290,7 @@ describe("receiptHelpers", () => {
     it("should return Very Low for confidence < 0.4", () => {
       expect(getConfidenceDescription(0.3)).toBe("Very Low");
       expect(getConfidenceDescription(0.1)).toBe("Very Low");
+      expect(getConfidenceDescription(0)).toBe("Very Low");
     });
 
     it("should handle invalid inputs", () => {
@@ -307,6 +314,7 @@ describe("receiptHelpers", () => {
     it("should return red for confidence < 0.6", () => {
       expect(getConfidenceColor(0.5)).toBe("red");
       expect(getConfidenceColor(0.1)).toBe("red");
+      expect(getConfidenceColor(0)).toBe("red");
     });
 
     it("should return gray for invalid inputs", () => {

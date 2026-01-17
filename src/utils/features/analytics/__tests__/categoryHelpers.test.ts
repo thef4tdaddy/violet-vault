@@ -430,7 +430,17 @@ describe("categoryHelpers", () => {
 
       const impact = calculateSuggestionImpact(suggestion);
 
-      expect(impact).toBe(Math.round(impact * 10) / 10);
+      // Verify the result has at most 1 decimal place
+      const impactString = impact.toString();
+      const decimalIndex = impactString.indexOf(".");
+      if (decimalIndex !== -1) {
+        const decimalPlaces = impactString.length - decimalIndex - 1;
+        expect(decimalPlaces).toBeLessThanOrEqual(1);
+      }
+
+      // Also verify it matches the expected calculation
+      const expectedImpact = (123 * 0.1 + 7 * 0.5) * 2;
+      expect(impact).toBe(Math.round(expectedImpact * 10) / 10);
     });
   });
 

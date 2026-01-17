@@ -130,12 +130,12 @@ describe("timeFormatters", () => {
       expect(formatTimestamp(oneDay)).toBe("Yesterday");
     });
 
-    it("should handle future timestamps gracefully", () => {
+    it("should handle future timestamps by returning 'Just now'", () => {
       const futureTimestamp = new Date("2024-01-16T12:00:00.000Z");
       const result = formatTimestamp(futureTimestamp);
 
-      // Future dates should return "Just now" or handle gracefully
-      expect(result).toBeTruthy();
+      // Future dates have negative diffMs, which is < 1000 * 60, so returns "Just now"
+      expect(result).toBe("Just now");
     });
   });
 });

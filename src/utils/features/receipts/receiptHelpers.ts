@@ -111,7 +111,7 @@ export const formatDisplayDate = (dateString: string) => {
  * Calculate confidence level description
  */
 export const getConfidenceDescription = (confidence: number) => {
-  if (!confidence || isNaN(confidence)) return "Unknown";
+  if (confidence == null || isNaN(confidence)) return "Unknown";
 
   if (confidence >= 0.9) return "Very High";
   if (confidence >= 0.8) return "High";
@@ -124,7 +124,7 @@ export const getConfidenceDescription = (confidence: number) => {
  * Get confidence level color for UI
  */
 export const getConfidenceColor = (confidence: number) => {
-  if (!confidence || isNaN(confidence)) return "gray";
+  if (confidence == null || isNaN(confidence)) return "gray";
 
   if (confidence >= 0.8) return "green";
   if (confidence >= 0.6) return "yellow";
