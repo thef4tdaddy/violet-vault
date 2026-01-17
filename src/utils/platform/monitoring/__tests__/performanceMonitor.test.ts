@@ -475,29 +475,43 @@ describe("PerformanceMonitor", () => {
 
   describe("createTimer", () => {
     it("should create a timer that returns duration", () => {
-      const timer = createTimer();
+      const nowSpy = vi.spyOn(performance, "now");
 
-      expect(timer).toHaveProperty("end");
-      expect(typeof timer.end).toBe("function");
+      try {
+        // Simulate a 500ms elapsed duration between timer start and end
+        nowSpy.mockReturnValueOnce(1000).mockReturnValueOnce(1500);
 
-      // Wait a bit
-      const startTime = performance.now();
-      const duration = timer.end();
-      const actualDuration = performance.now() - startTime;
+        const timer = createTimer();
 
-      expect(duration).toBeGreaterThanOrEqual(0);
-      expect(duration).toBeLessThanOrEqual(actualDuration + 10); // Allow small margin
+        expect(timer).toHaveProperty("end");
+        expect(typeof timer.end).toBe("function");
+
+        const duration = timer.end();
+
+        expect(duration).toBe(500);
+      } finally {
+        nowSpy.mockRestore();
+      }
     });
 
     it("should measure elapsed time accurately", async () => {
-      const timer = createTimer();
+      const nowSpy = vi.spyOn(performance, "now");
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      try {
+        // Simulate 50ms elapsed between timer start and end
+        nowSpy.mockReturnValueOnce(2000).mockReturnValueOnce(2050);
 
-      const duration = timer.end();
+        const timer = createTimer();
 
-      expect(duration).toBeGreaterThanOrEqual(45); // Account for timer precision
-      expect(duration).toBeLessThan(100);
+        // Preserve async behavior without relying on real timers
+        await Promise.resolve();
+
+        const duration = timer.end();
+
+        expect(duration).toBe(50);
+      } finally {
+        nowSpy.mockRestore();
+      }
     });
   });
 
