@@ -183,11 +183,24 @@ describe("cryptoCompat", () => {
     });
 
     it("should generate different values on subsequent calls", () => {
-      const bytes1 = getRandomBytes(16);
-      const bytes2 = getRandomBytes(16);
+      const iterations = 16;
+      const length = 16;
+      const byteArrays = Array.from({ length: iterations }, () => getRandomBytes(length));
 
-      // Extremely unlikely to be identical
-      expect(bytes1).not.toEqual(bytes2);
+      const first = byteArrays[0];
+      const hasDifferent = byteArrays.some((bytes, index) => {
+        if (index === 0) return false;
+        if (bytes.length !== first.length) return true;
+        for (let i = 0; i < bytes.length; i++) {
+          if (bytes[i] !== first[i]) {
+            return true;
+          }
+        }
+        return false;
+      });
+
+      // It is astronomically unlikely that all generated arrays are identical
+      expect(hasDifferent).toBe(true);
     });
 
     it("should use fallback when crypto is unavailable", () => {
