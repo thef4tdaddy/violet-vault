@@ -160,6 +160,48 @@ describe("useKeyManagement", () => {
     });
   });
 
+  describe("downloadProtectedKeyFile", () => {
+    it("should download protected key file successfully", async () => {
+      const mockProtectedFile = { data: "encrypted-data", salt: "abc" };
+      (keyExportUtils.exportKeyData as any).mockResolvedValue(mockKeyData);
+      (keyExportUtils.createProtectedKeyFile as any).mockResolvedValue(mockProtectedFile);
+      (keyExportUtils.downloadKeyFile as any).mockImplementation(() => {});
+
+      const { result } = renderHook(() => useKeyManagement());
+      const password = "secure-password123";
+      const filename = "my-backup";
+
+      let downloadResult;
+      await act(async () => {
+        downloadResult = await result.current.downloadProtectedKeyFile(password, filename);
+      });
+
+      expect(downloadResult).toEqual({ success: true, filename: "my-backup.vaultkey" });
+      expect(keyExportUtils.downloadKeyFile).toHaveBeenCalledWith(
+        mockProtectedFile,
+        filename,
+        true
+      );
+    });
+
+    it("should handle download failure", async () => {
+      (keyExportUtils.exportKeyData as any).mockRejectedValue(new Error("Export error"));
+
+      const { result } = renderHook(() => useKeyManagement());
+
+      await act(async () => {
+        try {
+          await result.current.downloadProtectedKeyFile("password123");
+        } catch (e) {
+          // Expected
+        }
+      });
+
+      expect(result.current.error).toContain("Failed to download protected key file");
+      expect(logger.error).toHaveBeenCalled();
+    });
+  });
+
   describe("generateQRCode", () => {
     it("should generate QR code and update state", async () => {
       const mockQrUrl = "data:image/png;base64,mock-qr";
@@ -174,6 +216,24 @@ describe("useKeyManagement", () => {
 
       expect(result.current.qrCodeUrl).toBe(mockQrUrl);
       expect(keyExportUtils.generateQRCode).toHaveBeenCalledWith(mockKeyData);
+    });
+
+    it("should handle QR code generation failure", async () => {
+      (keyExportUtils.exportKeyData as any).mockResolvedValue(mockKeyData);
+      (keyExportUtils.generateQRCode as any).mockRejectedValue(new Error("QR gen failed"));
+
+      const { result } = renderHook(() => useKeyManagement());
+
+      await act(async () => {
+        try {
+          await result.current.generateQRCode();
+        } catch (e) {
+          // Expected
+        }
+      });
+
+      expect(result.current.error).toContain("Failed to generate QR code");
+      expect(logger.error).toHaveBeenCalled();
     });
   });
 
