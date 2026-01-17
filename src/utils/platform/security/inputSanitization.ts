@@ -216,6 +216,13 @@ const parseNumericInput = (input: unknown): number | null => {
   if (typeof input === "string") {
     // Remove currency symbols and commas
     const cleaned = input.replace(/[$,]/g, "");
+
+    // Validate that the cleaned string is a valid number format
+    // This prevents parseFloat from accepting partial numbers like "12abc" -> 12
+    if (!/^-?\d+\.?\d*$/.test(cleaned)) {
+      return null;
+    }
+
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? null : parsed;
   }
