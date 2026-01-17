@@ -28,9 +28,7 @@ describe("shareCodeUtils", () => {
 
     it("should generate unique codes across multiple calls", () => {
       const numberOfCodes = 50;
-      const codes = Array.from({ length: numberOfCodes }, () =>
-        shareCodeUtils.generateShareCode()
-      );
+      const codes = Array.from({ length: numberOfCodes }, () => shareCodeUtils.generateShareCode());
       const uniqueCodes = new Set(codes);
 
       expect(uniqueCodes.size).toBe(numberOfCodes);
