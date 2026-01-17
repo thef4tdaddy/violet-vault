@@ -347,5 +347,41 @@ describe("cryptoCompat", () => {
       // The fallback logic is tested in individual function tests
       expect(true).toBe(true);
     });
+
+    it("should use Math.random fallback when getRandomValues fails", () => {
+      const originalGetRandomValues = global.crypto.getRandomValues;
+
+      try {
+        // @ts-expect-error - Testing error path
+        global.crypto.getRandomValues = undefined;
+
+        const bytes = getRandomBytes(16);
+        expect(bytes).toBeInstanceOf(Uint8Array);
+        expect(bytes.length).toBe(16);
+        expect(logger.warn).toHaveBeenCalledWith("Using fallback random generation - less secure");
+      } finally {
+        global.crypto.getRandomValues = originalGetRandomValues;
+      }
+    });
+
+    it("should handle errors during random bytes generation", () => {
+      const originalGetRandomValues = global.crypto.getRandomValues;
+
+      try {
+        global.crypto.getRandomValues = (() => {
+          throw new Error("Test error");
+        }) as any;
+
+        const bytes = getRandomBytes(16);
+        expect(bytes).toBeInstanceOf(Uint8Array);
+        expect(bytes.length).toBe(16);
+        expect(logger.error).toHaveBeenCalledWith(
+          "Random bytes generation failed:",
+          expect.any(Error)
+        );
+      } finally {
+        global.crypto.getRandomValues = originalGetRandomValues;
+      }
+    });
   });
 });
