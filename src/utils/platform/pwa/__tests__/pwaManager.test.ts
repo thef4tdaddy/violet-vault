@@ -208,9 +208,19 @@ describe("PWAManager", () => {
         .mockResolvedValueOnce(undefined)
         .mockResolvedValueOnce(mockServiceWorkerRegistration as ServiceWorkerRegistration);
 
-      await pwaManager.registerServiceWorker();
+      vi.useFakeTimers();
+      try {
+        const registerPromise = pwaManager.registerServiceWorker();
 
-      expect(logger.info).toHaveBeenCalledWith("⏳ Waiting for service worker registration...");
+        await vi.advanceTimersByTimeAsync(1000);
+        await registerPromise;
+
+        expect(logger.info).toHaveBeenCalledWith(
+          "⏳ Waiting for service worker registration..."
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
