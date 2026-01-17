@@ -219,6 +219,7 @@ const parseNumericInput = (input: unknown): number | null => {
 
     // Validate that the cleaned string is a valid number format
     // This prevents parseFloat from accepting partial numbers like "12abc" -> 12
+    // Note: This regex requires at least one digit before the decimal point (e.g., "0.5" not ".5")
     if (!/^-?\d+\.?\d*$/.test(cleaned)) {
       return null;
     }
