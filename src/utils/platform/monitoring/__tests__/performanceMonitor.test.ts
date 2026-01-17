@@ -183,7 +183,7 @@ describe("PerformanceMonitor", () => {
       const slowQueryFn = vi.fn().mockImplementation(
         () =>
           new Promise((resolve) => {
-            setTimeout(() => resolve([]), 50);
+            setTimeout(() => resolve([]), 1100);
           })
       );
 
