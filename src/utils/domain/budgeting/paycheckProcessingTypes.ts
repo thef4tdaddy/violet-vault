@@ -67,7 +67,7 @@ export interface CurrentBalances {
 
 export interface PaycheckInput {
   amount: number;
-  mode: string;
+  mode: "allocate" | "leftover";
   envelopeAllocations?: EnvelopeAllocation[];
   notes?: string;
   payerName?: string;
