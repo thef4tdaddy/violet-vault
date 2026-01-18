@@ -478,9 +478,6 @@ describe("BackgroundSyncManager", () => {
       expect(status.pendingOperations[0]).toHaveProperty("id");
       expect(status.pendingOperations[0]).toHaveProperty("type");
       expect(status.pendingOperations[0]).toHaveProperty("retryCount");
-
-      // Restore online state
-      setOnlineState(true);
     });
 
     it("should differentiate ready and waiting operations", async () => {
