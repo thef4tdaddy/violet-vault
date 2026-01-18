@@ -1,227 +1,130 @@
 # VioletVault Production Deployment Guide
 
-## Overview
+**Last Updated:** January 18, 2026
+**Version:** 2.0.0-beta.1 (v2.0 Architecture)
 
-This document outlines the production-ready development and deployment workflow for VioletVault, designed to ensure stability for production users while allowing safe development.
+This document outlines the production-ready development and deployment workflow for VioletVault, established during the v2.0 migration.
 
-## Branch Strategy
+## 🌿 Branch Strategy
 
-### Branch Structure
+The project follows a tiered branch strategy to ensure production stability.
 
+```mermaid
+graph LR
+    Feature[feature/*] --> Milestone[milestone-X.Y]
+    Milestone --> Develop[develop]
+    Develop --> Main[main]
+
+    Hotfix[hotfix/*] --> Main
+    Hotfix --> Develop
 ```
-main        → Production-ready code (your wife uses this)
-develop     → Integration branch for testing features
-feature/*   → Individual feature development
-bugfix/*    → Bug fixes from develop
-hotfix/*    → Emergency production fixes (from main)
-```
 
-### Branch Rules
+### 📋 Branch Rules
 
-- **main**: Only production-ready, thoroughly tested code
-- **develop**: All new features merge here first
-- **feature/**: Branch from develop, merge back to develop
-- **hotfix/**: Branch from main for emergency fixes, merge to both main and develop
+1.  **main**: Production-ready code only. No direct commits (except `fix/docs/CI/revert`). All releases happen from here.
+2.  **develop**: Integration branch for completed milestones.
+3.  **milestone-X.Y**: Intermediate target for new features and enhancements.
+4.  **feature/\***: Individual work branches. Must branch from `milestone-X.Y` (or `develop` if no active milestone).
 
-## Environment Configuration
+---
 
-### Environment Files
+## 🛠️ Development Workflow
 
-- `.env.development` - Development settings with debug enabled
-- `.env.staging` - Pre-production testing environment
-- `.env.production` - Production settings with optimizations
-
-### Key Environment Variables
+### 1. Initialize Feature
 
 ```bash
-VITE_APP_ENV=production|staging|development
-VITE_HIGHLIGHT_PROJECT_ID=your-project-id
-VITE_DEBUG_MODE=true|false
-VITE_VERBOSE_LOGGING=true|false
+git checkout milestone-X.Y
+git checkout -b feature/your-feature-name
 ```
 
-## Development Workflow
+### 2. Verify Changes
 
-### 1. Starting New Feature
-
-```bash
-git checkout develop
-git pull origin develop
-git checkout -b feature/feature-name
-```
-
-### 2. Development Process
+Before committing, you **MUST** run the full audit suite:
 
 ```bash
-# Work on feature
-npm run dev  # Runs in development mode
-
-# Test thoroughly
-npm run lint
 npm run format
-npm run build:dev
+npm run lint
+npm run typecheck
+npm run test:run
 ```
 
-### 3. Integration to Develop
+> [!IMPORTANT]
+> **Mandatory Coverage**: All new/modified code must have **80%+ test coverage** (`npm run test:coverage`).
+
+### 3. Commit Strategy
+
+We use **Conventional Commits**:
+
+- `feat:` New features
+- `fix:` Bug fixes
+- `refactor:` Code changes that neither fix a bug nor add a feature
+- `style:` Changes that do not affect the meaning of the code
+- `perf:` performance improvements
+
+---
+
+## 🚀 Deployment Process
+
+### 1. Build & Preview
+
+Always verify the production build locally before deploying:
 
 ```bash
-git add .
-git commit -m "feat: your feature description"
-git push origin feature/feature-name
-
-# Create PR: feature/feature-name → develop
-# After review and approval, merge to develop
+npm run build
+npm run preview
 ```
 
-### 4. Testing on Develop
+### 2. Staging Deployment
+
+Staging uses the `staging` mode for configuration:
 
 ```bash
-git checkout develop
-git pull origin develop
-npm run dev:staging  # Test in staging mode
-npm run build:staging
+npm run deploy:staging
 ```
 
-### 5. Production Release
+### 3. Production Deployment
+
+Production deployment is triggered after merging `develop` to `main`:
 
 ```bash
-# Only when develop is stable and tested
-# Create PR: develop → main
-# After thorough review, merge to main
-git checkout main
-git pull origin main
-npm run build  # Production build
+npm run deploy:production
 ```
 
-## Deployment Commands
+---
 
-### Development
+## 🧪 Deployment Checklist
 
-```bash
-npm run dev                # Development server
-npm run build:dev          # Development build
-```
+### Code Quality Quality Gates
 
-### Staging
+- [ ] `npm run audit:full` passes with zero critical warnings.
+- [ ] `npm run typecheck:strict` passes.
+- [ ] Test coverage exceeds 80% for the feature area.
 
-```bash
-npm run dev:staging        # Staging server
-npm run build:staging      # Staging build
-npm run deploy:staging     # Deploy to staging
-```
+### Visual & Functional Checks
 
-### Production
+- [ ] Glassmorphic UI remains consistent (v4 theme).
+- [ ] Firebase sync chunking logic verified for large budgets.
+- [ ] Encryption/Decryption verified with rotating keys.
+- [ ] Service worker / PWA status is "Ready for Offline".
 
-```bash
-npm run build              # Production build
-npm run deploy:production  # Deploy to production
-```
+---
 
-## Testing Checklist
+## 🏗️ Environment Configuration
 
-### Before Merging to Develop
+| Variable               | Development   | Staging   | Production   |
+| :--------------------- | :------------ | :-------- | :----------- |
+| `VITE_APP_ENV`         | `development` | `staging` | `production` |
+| `VITE_DEBUG_MODE`      | `true`        | `false`   | `false`      |
+| `VITE_VERBOSE_LOGGING` | `true`        | `true`    | `false`      |
 
-- [ ] Feature works in development mode
-- [ ] No console errors or warnings
-- [ ] ESLint passes (npm run lint)
-- [ ] Code formatted (npm run format)
-- [ ] Manual testing of core functionality
+---
 
-### Before Merging to Main
+## 🆘 Critical Support (Hotfixes)
 
-- [ ] Feature tested on develop branch
-- [ ] Staging build successful
-- [ ] Manual testing on staging environment
-- [ ] All critical user flows tested
-- [ ] Performance acceptable
-- [ ] No data corruption issues
-- [ ] Error monitoring shows no new critical errors
+If a bug is found on `main`:
 
-## Deployment Safety
-
-### Data Backup
-
-- Automatic backup before deployments
-- Local storage backup via `npm run backup:data`
-- Manual export functionality available to users
-
-### Rollback Procedure
-
-1. Keep previous working build
-2. Monitor error rates after deployment
-3. Quick rollback if issues detected
-4. Document any rollback reasons
-
-### Monitoring
-
-- Highlight.io/Sentry for error tracking
-- Performance monitoring
-- User feedback channels
-
-## Emergency Procedures
-
-### Hotfix Process
-
-```bash
-git checkout main
-git checkout -b hotfix/critical-fix
-# Make minimal fix
-git commit -m "hotfix: critical issue description"
-git push origin hotfix/critical-fix
-
-# Create PR to main for immediate deploy
-# After deploy, merge hotfix to develop as well
-```
-
-### Production Issues
-
-1. Assess severity
-2. If critical: deploy hotfix immediately
-3. If non-critical: fix in develop, schedule next release
-4. Always communicate with production users
-
-## Communication
-
-### Release Notes
-
-- Document all changes
-- Highlight breaking changes
-- Provide migration steps if needed
-
-### User Communication
-
-- Notify before major updates
-- Provide maintenance windows for significant changes
-- Document known issues and workarounds
-
-## Scripts and Automation
-
-### Available Scripts
-
-```json
-{
-  "dev": "Development server",
-  "dev:staging": "Staging development server",
-  "build": "Production build",
-  "build:staging": "Staging build",
-  "deploy:staging": "Deploy to staging",
-  "deploy:production": "Deploy to production",
-  "backup:data": "Backup user data",
-  "test:manual": "Manual testing checklist"
-}
-```
-
-## File Structure
-
-```
-violet-vault/
-├── docs/                    # All documentation
-├── scripts/                 # Deployment and utility scripts
-├── .env.development         # Development environment
-├── .env.staging            # Staging environment
-├── .env.production         # Production environment
-└── src/                    # Application source
-```
-
-Last Updated: 2025-08-01
-Version: 1.0.0
+1.  Create a `hotfix/*` branch from `main`.
+2.  Apply the minimal fix.
+3.  Run `npm run test:ci`.
+4.  Merge to `main` and immediately merge to `develop` to prevent regression.
+5.  Create a GH issue labeled `bug` if the fix is delayed.

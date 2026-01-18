@@ -2,7 +2,7 @@
 
 **A comprehensive cash management system** with advanced envelope budgeting, intelligent automation, and professional-grade infrastructure. Bringing the traditional cash envelope method into the digital age with end-to-end encryption, smart distribution, and real-time collaboration.
 
-🎯 **Current Status:** v1.10.0 Code Architecture & Refactoring milestone 90% complete - Major UI stabilization across all pages, performance optimizations, centralized icon system, and enhanced security warnings.
+🎯 **Current Status:** v2.0.0 Baseline Complete - Full TypeScript conversion, Unified Data Model (Envelopes + Transactions), React 19, and modern glassmorphic UI. Now targeting v2.1 Intelligent Automation (March 2026).
 
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
@@ -78,9 +78,12 @@
 
 **Frontend:**
 
-- React 18 with Zustand for state management
-- Vite for fast development and building
-- Tailwind CSS for responsive styling
+- React 19 with TypeScript (strict mode)
+- Zustand for UI state management
+- React Context for authentication state
+- TanStack Query v5 for server state
+- Vite 7 for fast development and building
+- Tailwind CSS 4 for responsive styling
 - Recharts for data visualization
 - Lucide React for icons
 
@@ -90,7 +93,7 @@
   - Go for bug report GitHub API proxy (secrets handling)
   - Python for financial intelligence (payday prediction, merchant analysis, integrity audits)
 - Firebase for cloud storage and real-time sync
-
+- Dexie (IndexedDB) for local-first data persistence
 - Web Crypto API for client-side encryption
 - Local Storage for offline functionality and intelligent caching
 
@@ -296,9 +299,9 @@ The [Bundle Size Monitor workflow](.github/workflows/bundle-size.yml) automatica
 
 ## 🏗️ Project Structure
 
-VioletVault is organized into a comprehensive modular architecture with **696 files** across major functional areas:
+VioletVault v2.0 is organized into a comprehensive modular TypeScript architecture:
 
-```
+```text
 violet-vault/
 ├── api/                  # v2.0 Polyglot Backend (Go + Python)
 │   ├── bug-report.go        # Go: Bug report GitHub API proxy
@@ -306,29 +309,32 @@ violet-vault/
 │   ├── go.mod              # Go module dependencies
 │   └── README.md           # Backend API documentation
 ├── src/
-│   ├── components/           # React components (27 major categories)
+│   ├── components/           # React components (TypeScript)
 │   │   ├── analytics/           # Financial analytics & reporting
 │   │   ├── automation/          # Auto-funding and smart rules
 │   │   ├── budgeting/           # Envelope management system
 │   │   ├── bills/              # Bill tracking and management
 │   │   ├── auth/               # Authentication and security
 │   │   ├── settings/           # Configuration and preferences
-│   │   └── [22 more categories]
-│   ├── hooks/               # Custom React hooks
-│   ├── stores/              # Zustand state management
+│   │   └── shared/             # Shared UI components
+│   ├── hooks/               # Custom React hooks (TypeScript)
+│   ├── stores/              # Zustand state management (TypeScript)
 │   ├── services/            # Business logic and API services
+│   │   ├── sync/               # Firebase sync providers
 │   │   ├── analytics/          # Analytics API integration (Python)
 │   │   ├── logging/            # Bug reporting service (Go)
-│   │   └── [other services]
+│   │   └── types/              # Type-safe service interfaces
 │   ├── utils/               # Utility functions and helpers
-│   └── App.jsx              # Main application entry point
+│   ├── domain/              # Pure domain logic (decoupled)
+│   ├── db/                  # Dexie database schemas
+│   └── App.tsx              # Main application entry point
 ├── scripts/
 │   └── full_salvo.sh        # Multi-language verification script
 ├── pyproject.toml          # Python tooling configuration
 └── vercel.json             # Vercel serverless deployment config
 ```
 
-📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/Source-Code-Directory.md)
+📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/architecture/Source-Code-Directory.md)
 
 ## 🔐 Security
 
@@ -348,32 +354,28 @@ For a complete overview of all documentation in the repository, see the **[Docum
 ### Core Documentation
 
 - **[📋 Documentation Index](docs/DOCUMENTATION_INDEX.md)** - Complete listing of all documentation
-- **[📋 Roadmap](docs/ROADMAP.md)** - See what's coming next and help shape VioletVault's future
-- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute to the project
-- **[📝 Changelog](docs/CHANGELOG.md)** - Complete version history and changes
+- **[🏗️ Milestones](docs/guides/MILESTONES.md)** - Release planning and 2026 roadmap
+- **[🤝 Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[📝 Changelog](CHANGELOG.md)** - Complete version history and changes
 - **[🔄 v2.0 Migration Guide](docs/migration/v2.0-migration-guide.md)** - Guide for migrating to v2.0
 
 ### Technical Documentation
 
-- **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
-- **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
-- **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
-- **[🔄 WebSocket Real-Time Signaling](docs/WEBSOCKET_SIGNALING.md)** - Privacy-preserving real-time sync notifications
-- **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
-- **[📝 Zod Integration Guide](docs/ZOD-INTEGRATION-GUIDE.md)** - Comprehensive guide for Zod validation patterns and form hooks
-- **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
-- **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
-- **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
-- **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
-- **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
-- **[❓ Troubleshooting FAQ](docs/Troubleshooting-FAQ.md)** - Common issues and solutions
+- **[🎨 Shared UI Components](docs/shared-ui/index.md)** - Standardized components and design patterns
+- **[🏗️ Source Code Directory](docs/architecture/Source-Code-Directory.md)** - Complete codebase map
+- **[� Firebase Services](docs/architecture/TypedFirebaseServices.md)** - Type-safe sync architecture
+- **[🧠 Client State Management](docs/architecture/Client-State-Management.md)** - Zustand & Context patterns
+- **[� Data Model](docs/architecture/DATA_MODEL_SIMPLIFICATION.md)** - Unified Envelope/Transaction model
+- **[🔌 API Development Guide](docs/api/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
+- **[� Production Deployment](docs/guides/Production-Deployment-Guide.md)** - Branch strategy and release cycle
+- **[❓ Troubleshooting FAQ](docs/guides/Troubleshooting-FAQ.md)** - Common issues and solutions
 
 ### API Documentation
 
 VioletVault provides comprehensive API documentation with OpenAPI 3.0 specification:
 
 - **[📖 Interactive API Docs](/api-docs)** - Swagger UI with live API testing (available when running the app)
-- **[📋 API Development Guide](docs/API-Development-Guide.md)** - Complete developer guide with examples
+- **[📋 API Development Guide](docs/api/API-Development-Guide.md)** - Complete developer guide with examples
 - **[📄 OpenAPI Spec](/openapi.json)** - Download the OpenAPI specification
 
 #### Key API Endpoints
@@ -423,6 +425,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
    We use [Conventional Commits](https://www.conventionalcommits.org/) format.
 
 4. **Push and create a PR**
+
    ```bash
    git push origin your-branch
    ```
