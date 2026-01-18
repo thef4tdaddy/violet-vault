@@ -133,7 +133,7 @@ const CategorySuggestionsTab = ({
                   <span className="ml-2 font-bold">
                     {typeof suggestion.data.totalAmount === "number"
                       ? formatCurrency(suggestion.data.totalAmount)
-                      : "$0.00"}
+                      : formatCurrency(0)}
                   </span>
                 )}
               </div>
