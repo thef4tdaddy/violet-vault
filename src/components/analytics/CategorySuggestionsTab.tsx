@@ -1,7 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import type { Suggestion } from "@/utils/features/analytics/categoryHelpers";
+import {
+  formatCurrency,
+  formatNumber,
+  type Suggestion,
+} from "@/utils/features/analytics/categoryHelpers";
 
 interface CategorySuggestionsTabProps {
   suggestions: Suggestion[];
@@ -113,7 +117,7 @@ const CategorySuggestionsTab = ({
               <span className="text-purple-700 font-medium">
                 Impact:{" "}
                 <span className="font-bold">
-                  {typeof suggestion.impact === "number" ? suggestion.impact.toFixed(1) : "0"}
+                  {typeof suggestion.impact === "number" ? formatNumber(suggestion.impact, 1) : "0"}
                 </span>
               </span>
               <span className="text-purple-700 font-medium">
@@ -128,8 +132,8 @@ const CategorySuggestionsTab = ({
                 {suggestion.data.totalAmount && (
                   <span className="ml-2 font-bold">
                     {typeof suggestion.data.totalAmount === "number"
-                      ? suggestion.data.totalAmount.toFixed(2)
-                      : "0.00"}
+                      ? formatCurrency(suggestion.data.totalAmount)
+                      : formatCurrency(0)}
                   </span>
                 )}
               </div>
