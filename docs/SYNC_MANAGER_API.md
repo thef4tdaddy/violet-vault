@@ -61,6 +61,16 @@ await syncManager.executeSync(
   'direct-sync',
   { skipQueue: true }
 );
+
+// Custom timeout (for long-running operations)
+await syncManager.executeSync(
+  async () => {
+    // Long-running sync operation
+    return result;
+  },
+  'long-sync',
+  { timeout: 120000 } // 2 minutes
+);
 ```
 
 **Parameters:**
@@ -69,7 +79,7 @@ await syncManager.executeSync(
 - `options?`: `SyncOperationOptions`
   - `priority`: `'normal' | 'high'` - Priority level (default: 'normal')
   - `skipQueue`: `boolean` - Skip debouncing queue (default: false)
-  - `timeout`: `number` - Timeout in milliseconds (default: 60000)
+  - `timeout`: `number` - Mutex acquisition timeout in milliseconds (default: 60000). If the mutex cannot be acquired within this time, the operation will fail with a timeout error.
 
 **Returns:** `Promise<T>` - Result from the operation
 
@@ -142,13 +152,15 @@ const result = await syncManager.forceSync(
     // Critical sync operation
     return data;
   },
-  'critical-sync'
+  'critical-sync',
+  30000 // Optional: custom timeout in ms
 );
 ```
 
 **Parameters:**
 - `operation`: `() => Promise<T>` - The async function to execute
-- `operationType`: `string` - Name/identifier for the operation
+- `operationType`: `string` - Name/identifier for the operation (default: "force-sync")
+- `timeout`: `number` - Timeout in milliseconds (default: 60000)
 
 **Returns:** `Promise<T>` - Result from the operation
 

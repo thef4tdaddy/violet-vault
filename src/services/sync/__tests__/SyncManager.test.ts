@@ -71,6 +71,19 @@ describe("SyncManager", () => {
       expect(mockOperation).toHaveBeenCalledTimes(1);
     });
 
+    it("should respect custom timeout option", async () => {
+      const mockOperation = vi.fn().mockResolvedValue("custom-timeout");
+      
+      const result = await syncManager.executeSync(
+        mockOperation,
+        "test-sync",
+        { timeout: 30000, skipQueue: true }
+      );
+      
+      expect(result).toBe("custom-timeout");
+      expect(mockOperation).toHaveBeenCalledTimes(1);
+    });
+
     it("should handle sync operation errors", async () => {
       const mockError = new Error("Sync failed");
       const mockOperation = vi.fn().mockRejectedValue(mockError);
@@ -146,6 +159,19 @@ describe("SyncManager", () => {
       // Queue should be flushed
       const status = syncManager.getStatus();
       expect(status.queue.currentQueueSize).toBe(0);
+    });
+
+    it("should respect custom timeout", async () => {
+      const mockOperation = vi.fn().mockResolvedValue("forced-with-timeout");
+      
+      const result = await syncManager.forceSync(
+        mockOperation,
+        "force-sync",
+        30000
+      );
+      
+      expect(result).toBe("forced-with-timeout");
+      expect(mockOperation).toHaveBeenCalledTimes(1);
     });
   });
 

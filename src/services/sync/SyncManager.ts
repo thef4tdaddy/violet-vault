@@ -167,9 +167,7 @@ export class SyncManager {
 
     // If high priority or skip queue, execute immediately with mutex
     if (skipQueue || priority === "high") {
-      return await this.mutex.execute(async () => {
-        return await operation();
-      }, operationType);
+      return await this.executeWithMutex(operation, operationType, timeout);
     }
 
     // Otherwise, queue the operation with debouncing
@@ -177,15 +175,30 @@ export class SyncManager {
       operationType,
       async () => {
         // Execute with mutex protection
-        return await this.mutex.execute(async () => {
-          return await operation();
-        }, operationType);
+        return await this.executeWithMutex(operation, operationType, timeout);
       }
     );
     
     // Type assertion is safe here because we control the operation's return type
     // The queue returns unknown for flexibility, but our operation returns T
     return result as T;
+  }
+
+  /**
+   * Execute operation with mutex protection and timeout
+   * @private
+   */
+  private async executeWithMutex<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    timeoutMs: number
+  ): Promise<T> {
+    await this.mutex.acquire(operationName, timeoutMs);
+    try {
+      return await operation();
+    } finally {
+      this.mutex.release();
+    }
   }
 
   /**
@@ -272,17 +285,16 @@ export class SyncManager {
    */
   public async forceSync<T>(
     operation: () => Promise<T>,
-    operationType: string = "force-sync"
+    operationType: string = "force-sync",
+    timeout: number = 60000
   ): Promise<T> {
     logger.info(`🎯 SyncManager: Force syncing ${operationType}`);
 
     // Flush any pending queue operations first
     await this.queue.flush();
 
-    // Execute immediately with mutex protection
-    return await this.mutex.execute(async () => {
-      return await operation();
-    }, operationType);
+    // Execute immediately with mutex protection and timeout
+    return await this.executeWithMutex(operation, operationType, timeout);
   }
 
   /**
