@@ -180,26 +180,38 @@ describe("PerformanceMonitor", () => {
     });
 
     it("should log slow queries with performance logger", async () => {
-      const slowQueryFn = vi.fn().mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            setTimeout(
-              () => resolve([]),
-              PERFORMANCE_THRESHOLDS.SLOW_QUERY + 100
-            );
+      vi.useFakeTimers();
+      const nowSpy = vi.spyOn(performance, "now");
+
+      try {
+        // Mock performance.now to simulate slow query duration
+        const startTime = 1000;
+        const endTime = startTime + PERFORMANCE_THRESHOLDS.SLOW_QUERY + 100;
+        nowSpy.mockReturnValueOnce(startTime).mockReturnValueOnce(endTime);
+
+        const slowQueryFn = vi.fn().mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              setTimeout(() => resolve([]), 0);
+            })
+        );
+
+        const queryPromise = trackQuery("slowQuery", slowQueryFn);
+        await vi.advanceTimersByTimeAsync(0);
+        await queryPromise;
+
+        expect(logger.performance).toHaveBeenCalledWith(
+          "Slow query: slowQuery",
+          expect.any(Number),
+          expect.objectContaining({
+            queryName: "slowQuery",
+            threshold: PERFORMANCE_THRESHOLDS.SLOW_QUERY,
           })
-      );
-
-      await trackQuery("slowQuery", slowQueryFn);
-
-      expect(logger.performance).toHaveBeenCalledWith(
-        "Slow query: slowQuery",
-        expect.any(Number),
-        expect.objectContaining({
-          queryName: "slowQuery",
-          threshold: PERFORMANCE_THRESHOLDS.SLOW_QUERY,
-        })
-      );
+        );
+      } finally {
+        nowSpy.mockRestore();
+        vi.useRealTimers();
+      }
     });
 
     it("should use SLOW_QUERY threshold", async () => {
