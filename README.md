@@ -35,6 +35,7 @@
 
 - **Multi-User Support** - Share budgets with family members or partners
 - **Real-Time Sync** - See changes instantly across all devices
+- **Privacy-Preserving WebSocket Signaling** - Optional real-time sync notifications (signals only, no data transmission)
 - **Conflict Resolution** - Smart handling of simultaneous edits
 - **Activity Tracking** - Monitor who made what changes and when
 
@@ -59,6 +60,11 @@
 
 ### ⚡ Advanced Technical Features
 
+- **Progressive Enhancement** - Automatic fallback to client-side logic when backend unavailable
+  - Client-side CSV/JSON parser as fallback for import service
+  - Local budget calculations when Go engine unreachable
+  - Service availability tracking with health checks
+  - Real-time service status indicators in UI
 - **Offline Support** - Works without internet, syncs when reconnected
 - **Performance Optimized** - Virtual scrolling and intelligent caching for large datasets
 - **Smart Caching System** - 7-day localStorage cache with automatic invalidation
@@ -80,9 +86,11 @@
 
 **Backend & Infrastructure:**
 
+- **Polyglot Backend (v2.0)** - Go + Python serverless functions on Vercel
+  - Go for bug report GitHub API proxy (secrets handling)
+  - Python for financial intelligence (payday prediction, merchant analysis, integrity audits)
 - Firebase for cloud storage and real-time sync
-- Cloudflare Workers for bug reporting and API services
-- Cloudflare R2 for secure screenshot storage with cost protection
+
 - Web Crypto API for client-side encryption
 - Local Storage for offline functionality and intelligent caching
 
@@ -93,6 +101,27 @@
 - Vitest for unit and integration testing
 - Husky + Commitlint for git hooks
 - Release Please for automated releases
+- **Multi-language tooling** - Go (golangci-lint), Python (ruff, mypy)
+- `full_salvo.sh` - Comprehensive multi-language verification script
+
+## ⚠️ v2.0 Breaking Changes
+
+**VioletVault v2.0** is a complete rewrite with a fresh data structure and unified architecture.
+
+### Migration Strategy
+
+**Not supported** - v2.0 starts with a clean slate. Users upgrading from v1.x will start fresh.
+
+### What's New in v2.0
+
+- **Unified Data Model**: Bills, debts, savings goals, and paycheck history are now unified into envelope and transaction tables
+- **Fresh Start**: No migration from previous versions - cleaner, simpler codebase
+- **Improved Performance**: Optimized database schema with better indexing
+- **Type Safety**: Enhanced TypeScript types with Zod validation
+
+### Backup Recommendation
+
+**Before upgrading to v2.0**, users should export their v1.x data if they need historical records. v2.0 does not migrate data from previous versions.
 
 ## 🚦 Getting Started
 
@@ -100,6 +129,10 @@
 
 - Node.js 18+
 - npm or yarn
+- **Optional (for backend development):**
+  - Go 1.22+ (for bug report API)
+  - Python 3.12+ (for analytics API)
+  - ruff, mypy (Python tooling: `pip install ruff mypy`)
 
 ### Installation
 
@@ -120,17 +153,60 @@
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
    - Copy your config to `src/utils/firebaseConfig.js`
 
-4. **Start development server**
+4. **Configure WebSocket Real-Time Signaling** (optional)
+
+   VioletVault supports privacy-preserving real-time sync notifications via WebSocket:
+   - Copy `.env.example` to `.env`
+   - Set `VITE_WEBSOCKET_ENABLED=true`
+   - Set `VITE_WEBSOCKET_URL` to your WebSocket server URL
+
+   **Privacy Note:** WebSocket signaling transmits only metadata signals (e.g., "data changed") - never decrypted data or encrypted blobs. This maintains end-to-end encryption while enabling real-time notifications.
+
+5. **Start development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open your browser** to `http://localhost:5173`
+6. **Open your browser** to `http://localhost:5173`
+
+### Python Analytics Service (Optional)
+
+For advanced analytics features like envelope integrity audits:
+
+1. **Navigate to the api directory**
+
+   ```bash
+   cd api
+   ```
+
+2. **Create and activate virtual environment**
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Start the analytics service**
+
+   ```bash
+   uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+5. **Access API documentation** at `http://localhost:8000/docs`
+
+See [api/README.md](api/README.md) for more details.
 
 ## 📝 Available Scripts
 
 ```bash
+# Frontend Development
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
@@ -138,27 +214,118 @@ npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint issues
 npm run format       # Format code with Prettier
 npm run format:check # Check code formatting
+npm run typecheck    # Run TypeScript type checking
+
+# Backend Development (v2.0 Polyglot)
+cd api && go build ./...        # Build Go serverless functions
+cd api && go test ./...         # Test Go code
+ruff check api/                 # Lint Python code
+mypy api/                       # Type check Python code
+
+# Multi-Language Verification
+./scripts/full_salvo.sh         # Run all linters/tests (TS/Go/Python)
 ```
+
+## 📦 Versioning & Release Strategy
+
+VioletVault uses [Release Please](https://github.com/googleapis/release-please) for automated semantic versioning and releases.
+
+### Version Format
+
+- **Feature branches** (`feat/*`): `2.0.0-alpha.N` (incremental alpha releases)
+- **Develop branch**: `2.0.0-prerelease.N` (pre-release builds every 10 commits)
+- **Main branch**: `2.0.0`, `2.1.0`, etc. (stable releases)
+
+### Release Types
+
+- **Patch releases** (e.g., `2.0.1`): Bug fixes only - automatically deployed
+- **Minor releases** (e.g., `2.1.0`): New features - manual deployment approval required
+- **Major releases** (e.g., `3.0.0`): Breaking changes - manual deployment approval required
+
+### Automatic Releases
+
+Release Please analyzes commit messages following [Conventional Commits](https://www.conventionalcommits.org/) to determine version bumps:
+
+- `fix:` → Patch version bump (2.0.0 → 2.0.1)
+- `feat:` → Minor version bump (2.0.0 → 2.1.0)
+- `feat!:` or `BREAKING CHANGE:` → Major version bump (2.0.0 → 3.0.0)
+
+### Pre-release Versioning
+
+- **Develop branch**: Pre-releases are created every 10 commits with format `2.0.0-prerelease.N`
+- **Feature branches**: Alpha releases use format `2.0.0-alpha.N` for testing
+- Pre-releases are automatically tagged but not published to production
+
+### Triggering a Release
+
+Releases are triggered automatically:
+
+- **Main branch**: On every push with conventional commits
+- **Develop branch**: Every 10 commits or manual workflow dispatch
+- **Manual trigger**: Use GitHub Actions workflow dispatch for immediate release
+
+See [Release Please Workflow](.github/workflows/release-please.yml) for configuration details.
+
+## 📊 Performance & Bundle Size
+
+VioletVault monitors bundle size to ensure optimal performance:
+
+### Current Bundle Size (Baseline)
+
+- **Total Size**: ~11.07 MB (uncompressed)
+- **Gzipped Size**: ~1.56 MB (production delivery)
+- **Largest Chunk**: main-\*.js (~547 KB gzipped)
+- **Performance Budget**: < 250 KB gzipped for initial load
+
+### Bundle Size Monitoring
+
+The [Bundle Size Monitor workflow](.github/workflows/bundle-size.yml) automatically:
+
+- Measures bundle size on every PR to `main` or `nightly` branches
+- Compares against baseline and base branch
+- Fails CI if bundle grows >15% from baseline
+- Posts detailed size reports as PR comments
+- Tracks JS/CSS chunks and identifies largest files
+
+### Optimization Guidelines
+
+- Use dynamic imports for large components
+- Leverage code splitting for routes
+- Monitor bundle report in CI comments
+- Keep main bundle under 100 KB gzipped when possible
 
 ## 🏗️ Project Structure
 
 VioletVault is organized into a comprehensive modular architecture with **696 files** across major functional areas:
 
 ```
-src/
-├── components/           # React components (27 major categories)
-│   ├── analytics/           # Financial analytics & reporting
-│   ├── automation/          # Auto-funding and smart rules
-│   ├── budgeting/           # Envelope management system
-│   ├── bills/              # Bill tracking and management
-│   ├── auth/               # Authentication and security
-│   ├── settings/           # Configuration and preferences
-│   └── [22 more categories]
-├── hooks/               # Custom React hooks
-├── stores/              # Zustand state management
-├── services/            # Business logic and API services
-├── utils/               # Utility functions and helpers
-└── App.jsx              # Main application entry point
+violet-vault/
+├── api/                  # v2.0 Polyglot Backend (Go + Python)
+│   ├── bug-report.go        # Go: Bug report GitHub API proxy
+│   ├── analytics.py         # Python: Financial intelligence engine
+│   ├── go.mod              # Go module dependencies
+│   └── README.md           # Backend API documentation
+├── src/
+│   ├── components/           # React components (27 major categories)
+│   │   ├── analytics/           # Financial analytics & reporting
+│   │   ├── automation/          # Auto-funding and smart rules
+│   │   ├── budgeting/           # Envelope management system
+│   │   ├── bills/              # Bill tracking and management
+│   │   ├── auth/               # Authentication and security
+│   │   ├── settings/           # Configuration and preferences
+│   │   └── [22 more categories]
+│   ├── hooks/               # Custom React hooks
+│   ├── stores/              # Zustand state management
+│   ├── services/            # Business logic and API services
+│   │   ├── analytics/          # Analytics API integration (Python)
+│   │   ├── logging/            # Bug reporting service (Go)
+│   │   └── [other services]
+│   ├── utils/               # Utility functions and helpers
+│   └── App.jsx              # Main application entry point
+├── scripts/
+│   └── full_salvo.sh        # Multi-language verification script
+├── pyproject.toml          # Python tooling configuration
+└── vercel.json             # Vercel serverless deployment config
 ```
 
 📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/Source-Code-Directory.md)
@@ -191,6 +358,7 @@ For a complete overview of all documentation in the repository, see the **[Docum
 - **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[📘 TypeScript Patterns Guide](docs/TypeScript-Patterns-Guide.md)** - JSDoc typing patterns for props, hooks, and Dexie queries
 - **[🔌 API Development Guide](docs/API-Development-Guide.md)** - Complete API documentation with OpenAPI specification
+- **[🔄 WebSocket Real-Time Signaling](docs/WEBSOCKET_SIGNALING.md)** - Privacy-preserving real-time sync notifications
 - **[✅ Component Props Validation](docs/Component-Props-Validation-Guide.md)** - Runtime prop validation with Zod schemas
 - **[📝 Zod Integration Guide](docs/ZOD-INTEGRATION-GUIDE.md)** - Comprehensive guide for Zod validation patterns and form hooks
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
@@ -210,11 +378,12 @@ VioletVault provides comprehensive API documentation with OpenAPI 3.0 specificat
 
 #### Key API Endpoints
 
+- **AutoFunding Simulation API** (`/api/autofunding`): Python-based serverless function for smart funding simulations
 - **Bug Report Worker**: Submit bug reports with screenshots
 - **Cloud Sync**: Encrypted data synchronization with Firebase
 - **Budget Data**: Local database operations for envelopes, transactions, and bills
 
-See the [API Development Guide](docs/API-Development-Guide.md) for detailed usage examples and authentication information.
+See the [API Development Guide](docs/API-Development-Guide.md) and [Python API README](api/README.md) for detailed usage examples and authentication information.
 
 ## 🗺️ Roadmap
 
@@ -262,7 +431,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
 
-### 🎯 What This Means:
+### 🎯 What This Means
 
 **✅ You CAN:**
 

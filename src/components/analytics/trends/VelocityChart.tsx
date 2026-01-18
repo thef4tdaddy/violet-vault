@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { velocityTooltipFormatter, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
+import { velocityTooltipFormatter, CHART_COLORS } from "@/utils/features/analytics/trendHelpers";
 import { getIcon } from "../../../utils";
 import type { SpendingVelocity } from "@/types/analytics";
 
@@ -32,7 +32,11 @@ const VelocityChart = ({ spendingVelocity = [] }: VelocityChartProps) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={velocityTooltipFormatter} />
+              <Tooltip
+                formatter={(value: number | undefined, name: string | undefined) =>
+                  velocityTooltipFormatter(Number(value || 0), String(name || ""))
+                }
+              />
               <Area
                 type="monotone"
                 dataKey="percentChange"

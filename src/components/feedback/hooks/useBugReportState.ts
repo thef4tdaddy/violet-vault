@@ -1,6 +1,6 @@
-import useBugReport from "../../../hooks/common/useBugReport";
-import useToast from "../../../hooks/common/useToast";
-import logger from "../../../utils/common/logger";
+import useBugReport from "../../../hooks/platform/ux/useBugReport";
+import useToast from "../../../hooks/platform/ux/useToast";
+import logger from "@/utils/core/common/logger";
 
 interface BugReportHookReturn {
   isModalOpen: boolean;

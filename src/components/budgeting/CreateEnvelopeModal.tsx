@@ -1,9 +1,10 @@
 import { createPortal } from "react-dom";
-import useEnvelopeForm from "@/hooks/budgeting/useEnvelopeForm";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
+import useEnvelopeForm from "@/hooks/budgeting/envelopes/useEnvelopeForm";
+import { transformBillToEnvelopeForm } from "@/utils/domain/budgeting/envelopeFormUtils";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
 import SlideUpModal from "@/components/mobile/SlideUpModal";
 import { ModalContent, DesktopModalHeader } from "./CreateEnvelopeModalComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface Bill {
   id: string;
@@ -69,18 +70,10 @@ const CreateEnvelopeModal = ({
     const selectedBill = allBills.find((bill: Bill) => bill.id === billId);
     if (!selectedBill) return;
 
-    // Auto-populate envelope fields from the selected bill
-    const billData = {
-      name: selectedBill.name ?? selectedBill.provider ?? "",
-      category: selectedBill.category ?? "",
-      color: selectedBill.color ?? formData.color,
-      frequency: selectedBill.frequency ?? formData.frequency,
-      monthlyAmount: selectedBill.amount?.toString() ?? "",
-      description: `Bill envelope for ${selectedBill.name ?? selectedBill.provider}`,
-      envelopeType: "BILL", // Set to bill type when bill is selected
-    };
+    // Use utility function to transform bill to envelope form data
+    const billFormData = transformBillToEnvelopeForm(selectedBill, formData);
 
-    updateFormData(billData);
+    updateFormData(billFormData);
   };
 
   if (!isOpen) return null;

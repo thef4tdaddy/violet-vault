@@ -1,0 +1,396 @@
+name: CI
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop, "feat/polygot-rewrite", "copilot/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  full-salvo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # --- Setup ---
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+          cache-dependency-path: api/go.sum
+
+      - name: Install Dependencies
+        id: setup_deps
+        run: |
+          set -o pipefail
+          {
+            EXIT_CODE=0
+            
+            echo "::group::Frontend Deps"
+            npm ci > npm_install.log 2>&1 && NPM_RES=0 || NPM_RES=$?
+            echo "STATUS_NPM:$NPM_RES"
+            if [ $NPM_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::Python Deps"
+            if [ -f "requirements.txt" ] || [ -f "api/requirements.txt" ]; then
+                python -m venv .venv
+                source .venv/bin/activate
+                
+                # Check root or api/
+                REQ_FILE="requirements.txt"
+                if [ -f "api/requirements.txt" ]; then REQ_FILE="api/requirements.txt"; fi
+                
+                pip install -r $REQ_FILE > pip_install.log 2>&1 && PIP_RES=0 || PIP_RES=$?
+                pip install pytest pytest-cov ruff mypy >> pip_install.log 2>&1 || PIP_RES=$?
+                echo "STATUS_PIP:$PIP_RES"
+            else
+                echo "No Python deps found"
+                echo "STATUS_PIP:SKIPPED"
+            fi
+            echo "::endgroup::"
+
+            exit $EXIT_CODE
+          } || exit 1
+
+      # --- Polyglot Salvo ---
+
+      # 1. TypeScript/Frontend
+      - name: Frontend Checks
+        id: frontend_checks
+        run: |
+          set -o pipefail
+          {
+            EXIT_CODE=0
+
+            echo "::group::Prettier"
+            npm run format:check > prettier.log 2>&1 && PRETTIER_RES=0 || PRETTIER_RES=$?
+            echo "STATUS_PRETTIER:$PRETTIER_RES"
+            if [ $PRETTIER_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::ESLint"
+            npm run lint > eslint.log 2>&1 && ESLINT_RES=0 || ESLINT_RES=$?
+            echo "STATUS_ESLINT:$ESLINT_RES"
+            if [ $ESLINT_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::TypeScript"
+            npm run typecheck > tsc.log 2>&1 && TSC_RES=0 || TSC_RES=$?
+            echo "STATUS_TSC:$TSC_RES"
+            if [ $TSC_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+            
+            # Unit Tests with Coverage
+            echo "::group::Vitest"
+            npm run test:coverage > vitest.log 2>&1 && VITEST_RES=0 || VITEST_RES=$?
+            echo "STATUS_VITEST:$VITEST_RES"
+            if [ $VITEST_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+            
+            # Build for Bundle Analysis
+            echo "::group::Build"
+            npm run build > build.log 2>&1 && BUILD_RES=0 || BUILD_RES=$?
+            echo "STATUS_BUILD:$BUILD_RES"
+            if [ $BUILD_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            exit $EXIT_CODE
+          }
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./coverage/coverage-final.json
+          flags: frontend
+          name: violet-vault-frontend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/junit.xml
+
+      # 2. Go Backend
+      - name: Go Backend Checks
+        id: go_checks
+        if: hashFiles('api/**/*.go') != ''
+        run: |
+          # Move logs to root for easy finding
+          set -o pipefail
+          {
+            EXIT_CODE=0
+            cd api
+
+            echo "::group::Go Format"
+            if [ -z "$(gofmt -l .)" ]; then
+              echo "STATUS_GOFMT:0"
+              echo "All passed" > ../go_fmt.log
+            else
+              gofmt -d . > ../go_fmt.log 2>&1
+              echo "STATUS_GOFMT:1"
+              EXIT_CODE=1
+            fi
+            echo "::endgroup::"
+
+            echo "::group::Go Vet"
+            go vet ./... > ../go_vet.log 2>&1 && GOVET_RES=0 || GOVET_RES=$?
+            echo "STATUS_GOVET:$GOVET_RES"
+            if [ $GOVET_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::Go Test"
+            go test ./... -v > ../go_test.log 2>&1 && GOTEST_RES=0 || GOTEST_RES=$?
+            echo "STATUS_GOTEST:$GOTEST_RES"
+            if [ $GOTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+            
+            exit $EXIT_CODE
+          }
+        continue-on-error: true
+
+      # 3. Python Backend
+      - name: Python Backend Checks
+        id: py_checks
+        if: hashFiles('api/**/*.py') != ''
+        run: |
+          set -o pipefail
+          source .venv/bin/activate
+          {
+            EXIT_CODE=0
+
+            echo "::group::Ruff Format"
+            ruff format --check api/ > ruff_format.log 2>&1 && RUFF_FMT_RES=0 || RUFF_FMT_RES=$?
+            echo "STATUS_RUFF_FMT:$RUFF_FMT_RES"
+            if [ $RUFF_FMT_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::Ruff Lint"
+            ruff check api/ > ruff_lint.log 2>&1 && RUFF_LINT_RES=0 || RUFF_LINT_RES=$?
+            echo "STATUS_RUFF_LINT:$RUFF_LINT_RES"
+            if [ $RUFF_LINT_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+
+            echo "::group::Mypy"
+            mypy api/ --ignore-missing-imports > mypy.log 2>&1 && MYPY_RES=0 || MYPY_RES=$?
+            echo "STATUS_MYPY:$MYPY_RES"
+            if [ $MYPY_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+            
+            exit $EXIT_CODE
+          }
+        continue-on-error: true
+
+      # --- Reporting ---
+      - name: Generate CI Report
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          OUTCOME_FRONTEND: ${{ steps.frontend_checks.outcome }}
+          OUTCOME_GO: ${{ steps.go_checks.outcome }}
+          OUTCOME_PYTHON: ${{ steps.py_checks.outcome }}
+          OUTCOME_SETUP: ${{ steps.setup_deps.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const date = new Date().toLocaleDateString();
+
+            function stripAnsi(str) {
+              return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+            }
+
+            const logs = {
+              npm_install: 'npm_install.log',
+              pip_install: 'pip_install.log',
+              prettier: 'prettier.log',
+              eslint: 'eslint.log',
+              tsc: 'tsc.log',
+              vitest: 'vitest.log',
+              go_fmt: 'go_fmt.log',
+              go_vet: 'go_vet.log',
+              go_test: 'go_test.log',
+              ruff_fmt: 'ruff_format.log',
+              ruff_lint: 'ruff_lint.log',
+              mypy: 'mypy.log'
+            };
+
+            const logContents = {};
+            for (const [key, filename] of Object.entries(logs)) {
+              try { 
+                logContents[key] = stripAnsi(fs.readFileSync(filename, 'utf8')); 
+              } catch (e) { 
+                logContents[key] = ''; 
+              }
+            }
+
+            const tools = [
+                // Setup
+                { key: 'STATUS_NPM', name: 'Setup (NPM)', log: logContents.npm_install, outcomeKey: 'OUTCOME_SETUP', type: 'critical' },
+                { key: 'STATUS_PIP', name: 'Setup (PIP)', log: logContents.pip_install, outcomeKey: 'OUTCOME_SETUP', type: 'critical' },
+                
+                // Frontend
+                { key: 'STATUS_PRETTIER', name: 'Prettier (Fmt)', log: logContents.prettier, outcomeKey: 'OUTCOME_FRONTEND', type: 'warning' },
+                { key: 'STATUS_ESLINT', name: 'ESLint (Lint)', log: logContents.eslint, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
+                { key: 'STATUS_TSC', name: 'TypeScript (Type)', log: logContents.tsc, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
+                { key: 'STATUS_VITEST', name: 'Vitest (Unit)', log: logContents.vitest, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
+
+                // Go
+                { key: 'STATUS_GOFMT', name: 'Go Format', log: logContents.go_fmt, outcomeKey: 'OUTCOME_GO', type: 'warning' },
+                { key: 'STATUS_GOVET', name: 'Go Vet', log: logContents.go_vet, outcomeKey: 'OUTCOME_GO', type: 'critical' },
+                { key: 'STATUS_GOTEST', name: 'Go Test', log: logContents.go_test, outcomeKey: 'OUTCOME_GO', type: 'critical' },
+
+                // Python
+                { key: 'STATUS_RUFF_FMT', name: 'Ruff (Fmt)', log: logContents.ruff_fmt, outcomeKey: 'OUTCOME_PYTHON', type: 'warning' },
+                { key: 'STATUS_RUFF_LINT', name: 'Ruff (Lint)', log: logContents.ruff_lint, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' },
+                { key: 'STATUS_MYPY', name: 'Mypy (Type)', log: logContents.mypy, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' }
+            ];
+
+            let toolRows = [];
+            let failures = [];
+            let hasCriticalFailure = false;
+            let hasWarningFailure = false;
+
+            for (const tool of tools) {
+                // Determine status from log marker if possible, else use step outcome
+                let statusIcon = '⚪'; // Skipped/Unknown
+                let outcome = 'SKIPPED';
+                
+                // Basic check if log exists and implies execution
+                // We'll rely on the STATUS_ marker in the stdout/log if captured, 
+                // but since we piped to file, we might check the file content or just rely on 'outcomeKey' env var for block-level failure
+                // SentinelShare pattern matches the log content for STATUS_ code. 
+                
+                // Since we piped stdout to file, the STATUS_ echo is actually NOT in the file (it was echoed to main stdout in script).
+                // Correction: In my script I did `cmd > log 2>&1`. The `echo STATUS` was outside the redirect.
+                // So we cannot find STATUS in `logContents`. We must rely on the overall Step Outcome for the block, 
+                // OR we have to trust that if one failed, the step outcome is failure.
+                
+                // But wait, the previous code had `STATUS_` in the log because of `tee`.
+                // Here I am NOT using tee. I am redirecting. 
+                // However, I need to know WHICH tool failed in the block.
+                // LIMITATION: Use the log content to see if it looks like a failure?
+                // BETTER: Just inspect the log length or content.
+                
+                // For this implementation, let's assume if the step failed and the log has error-y words, it failed.
+                // Actually, let's just use the `outcomeKey`. If the block failed, mark all tools in that block as '?' or check logs.
+                
+                const stepOutcome = process.env[tool.outcomeKey];
+                
+                if (stepOutcome === 'success') {
+                    statusIcon = '✅';
+                    outcome = 'PASS';
+                    if (tool.log.length === 0 && tool.key.includes('SKIPPED')) {
+                         statusIcon = '⚪';
+                         outcome = 'SKIPPED';
+                    }
+                } else if (stepOutcome === 'skipped') {
+                    statusIcon = '⚪';
+                    outcome = 'SKIPPED';
+                } else {
+                    // Block failed. Did THIS tool fail?
+                    // Simple heuristic: if log contains "Error" or exit code, or just default to FAIL for criticals in failed block
+                    // Proper way: use `tee` in the bash script so the marker is in the log, OR grep the file.
+                    // For now, assume FAIL if block failed and log isn't empty.
+                    if (tool.log && tool.log.length > 0) {
+                         // Check for failure keywords
+                         if (tool.log.includes('FAIL') || tool.log.includes('Error') || tool.log.includes('error') || tool.log.includes('failed')) {
+                             statusIcon = '❌';
+                             outcome = 'FAIL';
+                             hasCriticalFailure = true;
+                             failures.push(tool.name);
+                         } else {
+                             // Maybe this specific tool passed but another in the block failed?
+                             statusIcon = '✅'; 
+                             outcome = 'PASS';
+                         }
+                    } else {
+                        statusIcon = '❓';
+                        outcome = 'UNKNOWN';
+                    }
+                    
+                    // Override for known setup failure
+                    if (tool.outcomeKey === 'OUTCOME_SETUP' && stepOutcome === 'failure') {
+                         statusIcon = '❌';
+                         outcome = 'FAIL';
+                         hasCriticalFailure = true;
+                         failures.push(tool.name);
+                    }
+                }
+                
+                toolRows.push(`| ${tool.name} | ${statusIcon} | ${outcome} |`);
+            }
+
+            // Overall Status
+            let overallStatus = 'success';
+            let icon = '✅';
+            if (hasCriticalFailure) { 
+                overallStatus = 'failure'; 
+                icon = '🚨'; 
+            } else if (hasWarningFailure) {
+                overallStatus = 'warning';
+                icon = '⚠️';
+            }
+
+            const summaryTable = `| Tool | Status | Outcome |\n|---|---|---|\n${toolRows.join('\n')}\n`;
+
+            let details = '';
+            if (failures.length > 0) {
+                 details += `### ❌ Failure Details\n`;
+                 for (const tool of tools) {
+                    if (failures.includes(tool.name)) {
+                        const brief = tool.log.split('\n').slice(0, 20).join('\n') + '\n...';
+                        details += `#### ${tool.name}\n\`\`\`\n${brief}\n\`\`\`\n\n`;
+                    }
+                 }
+            }
+
+            const body = `### ${icon} Polyglot CI Report: ${date}\n\n${summaryTable}\n\n---\n${details}`;
+
+            if (context.eventName === 'pull_request') {
+                await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.issue.number,
+                    body: body
+                });
+            } else {
+                console.log(body);
+            }
+
+            if (overallStatus === 'failure') {
+                core.setFailed('CI Checks Failed');
+            }

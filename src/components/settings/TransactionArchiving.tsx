@@ -1,11 +1,11 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import useTransactionArchiving from "../../hooks/common/useTransactionArchiving";
+import useTransactionArchiving from "../../hooks/platform/data/useTransactionArchiving";
 import {
   useTransactionArchivingUI,
   useTransactionArchivingProcess,
   useArchivingUIHelpers,
-} from "../../hooks/settings/useTransactionArchiving";
+} from "@/hooks/platform/settings/useTransactionArchiving";
 import ArchivingHeader from "./archiving/ArchivingHeader";
 import ArchivingStatusOverview from "./archiving/ArchivingStatusOverview";
 import ArchivingConfiguration from "./archiving/ArchivingConfiguration";

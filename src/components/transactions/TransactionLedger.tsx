@@ -6,21 +6,28 @@ import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
 import TransactionSplitter from "./TransactionSplitter";
+import { Button } from "@/components/ui";
+import { PageHeader } from "@/components/primitives/headers";
 
-import TransactionLedgerHeader from "./ledger/TransactionLedgerHeader";
 import TransactionPagination from "./ledger/TransactionPagination";
 import TransactionLedgerLoading from "./ledger/TransactionLedgerLoading";
 
-import { useTransactionLedger } from "../../hooks/transactions/useTransactionLedger";
-import { useLayoutData } from "../../hooks/layout/useLayoutData";
+import { useTransactionLedger } from "../../hooks/budgeting/transactions/useTransactionLedger";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import {
   calculateTransactionTotals,
   getTransactionFilterConfigs,
-} from "../../utils/transactions/ledgerHelpers";
+  formatLedgerSummary,
+} from "@/utils/domain/transactions/ledgerHelpers";
+import {
+  normalizeTransactions,
+  normalizeEnvelopes,
+} from "@/utils/domain/transactions/normalizationHelpers";
 import type { User, Transaction, Envelope } from "../../types/finance";
-import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
+import { getIcon } from "@/utils";
 
 // Types used in interface definitions
 
@@ -130,12 +137,36 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
   onImport,
   onFileUpload,
 }) => (
-  <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
-    <TransactionLedgerHeader
-      transactionCount={transactions.length}
-      netCashFlow={netCashFlow}
-      onAddTransaction={onAddTransaction}
-      onImportTransactions={onImportTransactions}
+  <div
+    data-testid="ledger-header"
+    className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6"
+  >
+    {/* Page Header with Actions */}
+    <PageHeader
+      title="Transaction Ledger"
+      subtitle={formatLedgerSummary(transactions.length, netCashFlow)}
+      icon="BookOpen"
+      actions={
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:justify-end">
+          <Button
+            onClick={onImportTransactions}
+            className="flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg border-2 border-black shadow-lg transition-colors"
+          >
+            {React.createElement(getIcon("Upload"), {
+              className: "h-4 w-4 mr-2",
+            })}
+            Import File
+          </Button>
+          <Button
+            onClick={onAddTransaction}
+            className="btn btn-primary border-2 border-black flex items-center justify-center shadow-lg"
+            data-tour="add-transaction"
+          >
+            {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
+            Add Transaction
+          </Button>
+        </div>
+      }
     />
 
     <TransactionSummaryCards transactions={transactions.map((txn) => ({ amount: txn.amount }))} />
@@ -257,131 +288,11 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     handleFilterChange,
   } = ledger;
 
-  const normalizeTransaction = (txn: unknown): Transaction | null => {
-    if (!txn || typeof txn !== "object") {
-      return null;
-    }
-
-    const record = txn as {
-      id?: string | number;
-      date?: string | Date;
-      description?: unknown;
-      amount?: unknown;
-      category?: unknown;
-      envelopeId?: unknown;
-      notes?: unknown;
-      type?: unknown;
-      lastModified?: unknown;
-      createdAt?: unknown;
-    };
-
-    const rawDate = record.date;
-    const date =
-      typeof rawDate === "string"
-        ? rawDate
-        : rawDate instanceof Date
-          ? rawDate.toISOString().split("T")[0]
-          : undefined;
-
-    if (!date) {
-      return null;
-    }
-
-    if (record.id === undefined || record.id === null) {
-      return null;
-    }
-
-    const amountRaw = Number(record.amount ?? 0);
-    const description = typeof record.description === "string" ? record.description : "";
-    const category =
-      typeof record.category === "string" && record.category.trim().length > 0
-        ? record.category
-        : "uncategorized";
-    const envelopeId =
-      typeof record.envelopeId === "string" || typeof record.envelopeId === "number"
-        ? String(record.envelopeId)
-        : "unassigned";
-    const notes = typeof record.notes === "string" ? record.notes : undefined;
-    let typeCandidate: Transaction["type"];
-    if (record.type === "income" || record.type === "expense" || record.type === "transfer") {
-      typeCandidate = record.type;
-    } else {
-      typeCandidate = amountRaw >= 0 ? "income" : "expense";
-    }
-
-    const signedAmount =
-      typeCandidate === "expense"
-        ? -Math.abs(amountRaw)
-        : typeCandidate === "income"
-          ? Math.abs(amountRaw)
-          : amountRaw;
-
-    return {
-      id: record.id as string | number,
-      date,
-      description,
-      amount: signedAmount,
-      category,
-      envelopeId,
-      notes,
-      type: typeCandidate,
-    } satisfies Transaction;
-  };
-
-  const normalizeEnvelope = (env: unknown): Envelope | null => {
-    if (!env || typeof env !== "object") {
-      return null;
-    }
-
-    const record = env as {
-      id?: string | number;
-      name?: unknown;
-      category?: unknown;
-      currentBalance?: unknown;
-      targetAmount?: unknown;
-      color?: unknown;
-      icon?: unknown;
-      description?: unknown;
-      archived?: unknown;
-      lastModified?: unknown;
-      createdAt?: unknown;
-    };
-
-    if (record.id === undefined || typeof record.name !== "string") {
-      return null;
-    }
-
-    return {
-      id: String(record.id),
-      name: record.name,
-      category:
-        typeof record.category === "string" && record.category.trim().length > 0
-          ? record.category
-          : "uncategorized",
-      currentBalance: Number(record.currentBalance ?? 0),
-      targetAmount: Number(record.targetAmount ?? 0),
-      color: typeof record.color === "string" ? record.color : undefined,
-      icon: typeof record.icon === "string" ? record.icon : undefined,
-      description: typeof record.description === "string" ? record.description : undefined,
-      isArchived: Boolean(record.archived),
-    };
-  };
-
-  const transactionsList = (ledgerTransactions as unknown[])
-    .map(normalizeTransaction)
-    .filter((txn): txn is Transaction => txn !== null);
-
-  const paginatedList = (ledgerPaginatedTransactions as unknown[])
-    .map(normalizeTransaction)
-    .filter((txn): txn is Transaction => txn !== null);
-
-  const envelopesList = (ledgerEnvelopes as unknown[])
-    .map(normalizeEnvelope)
-    .filter((env): env is Envelope => env !== null);
-
-  const layoutTransactionsNormalized = (layoutTransactions as unknown[])
-    .map(normalizeTransaction)
-    .filter((txn): txn is Transaction => txn !== null);
+  // Normalize data using utility functions
+  const transactionsList = normalizeTransactions(ledgerTransactions as unknown[]);
+  const paginatedList = normalizeTransactions(ledgerPaginatedTransactions as unknown[]);
+  const envelopesList = normalizeEnvelopes(ledgerEnvelopes as unknown[]);
+  const layoutTransactionsNormalized = normalizeTransactions(layoutTransactions as unknown[]);
 
   const transactionsForSuggestionsSource =
     layoutTransactionsNormalized.length > 0 ? layoutTransactionsNormalized : transactionsList;

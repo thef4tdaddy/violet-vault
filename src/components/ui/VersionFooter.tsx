@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "@/utils/common/version";
-import logger from "@/utils/common/logger";
+import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "@/utils/core/common/version";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Version footer component with branch differentiation

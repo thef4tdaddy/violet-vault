@@ -1,25 +1,38 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test/test-utils";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import UserSetup from "../UserSetup";
 import { useUserSetup as useUserSetupOriginal } from "../../../hooks/auth/useUserSetup";
 
 // Mock the custom hook
-vi.mock("../../../hooks/auth/useUserSetup");
+vi.mock("@/hooks/auth/useUserSetup");
+vi.mock("@/hooks/auth/useAuthManager", () => ({
+  useAuthManager: vi.fn(() => ({
+    joinBudget: vi.fn(async () => ({ success: true })),
+  })),
+}));
 
 // Type cast the mocked hook
 const useUserSetup = useUserSetupOriginal as unknown as Mock;
 
 // Mock child components
-vi.mock("../components/UserSetupHeader", () => ({
-  default: ({ step, isReturningUser, userName }) => (
+vi.mock("@/components/auth/components/UserSetupHeader", () => ({
+  default: ({
+    step,
+    isReturningUser,
+    userName,
+  }: {
+    step: number;
+    isReturningUser: boolean;
+    userName: string;
+  }) => (
     <div data-testid="header">
       Header: Step {step}, Returning: {isReturningUser.toString()}, User: {userName}
     </div>
   ),
 }));
 
-vi.mock("../components/PasswordInput", () => ({
-  default: ({ value, onChange }) => (
+vi.mock("@/components/auth/components/PasswordInput", () => ({
+  default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input
       data-testid="password-input"
       value={value}
@@ -29,14 +42,20 @@ vi.mock("../components/PasswordInput", () => ({
   ),
 }));
 
-vi.mock("../components/UserNameInput", () => ({
-  default: ({ value, onChange }) => (
+vi.mock("@/components/auth/components/UserNameInput", () => ({
+  default: ({ value, onChange }: { value: string; onChange: (val: string) => void }) => (
     <input data-testid="username-input" value={value} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
 
-vi.mock("../components/ColorPicker", () => ({
-  default: ({ selectedColor, onColorChange }) => (
+vi.mock("@/components/auth/components/ColorPicker", () => ({
+  default: ({
+    selectedColor,
+    onColorChange,
+  }: {
+    selectedColor: string;
+    onColorChange: (val: string) => void;
+  }) => (
     <div data-testid="color-picker">
       Color: {selectedColor}
       <button onClick={() => onColorChange("#test")}>Change Color</button>
@@ -44,8 +63,16 @@ vi.mock("../components/ColorPicker", () => ({
   ),
 }));
 
-vi.mock("../components/ReturningUserActions", () => ({
-  default: ({ onSubmit, onChangeProfile, onStartFresh }) => (
+vi.mock("@/components/auth/components/ReturningUserActions", () => ({
+  default: ({
+    onSubmit,
+    onChangeProfile,
+    onStartFresh,
+  }: {
+    onSubmit: () => void;
+    onChangeProfile: () => void;
+    onStartFresh: () => void;
+  }) => (
     <div data-testid="returning-user-actions">
       <button onClick={onSubmit}>Login</button>
       <button onClick={onChangeProfile}>Change Profile</button>
@@ -54,8 +81,18 @@ vi.mock("../components/ReturningUserActions", () => ({
   ),
 }));
 
-vi.mock("../components/StepButtons", () => ({
-  default: ({ step, onContinue, onBack, onStartTracking }) => (
+vi.mock("@/components/auth/components/StepButtons", () => ({
+  default: ({
+    step,
+    onContinue,
+    onBack,
+    onStartTracking,
+  }: {
+    step: number;
+    onContinue: () => void;
+    onBack: () => void;
+    onStartTracking: () => void;
+  }) => (
     <div data-testid="step-buttons">
       Step {step} buttons
       {onContinue && <button onClick={onContinue}>Continue</button>}
@@ -65,15 +102,20 @@ vi.mock("../components/StepButtons", () => ({
   ),
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    auth: vi.fn(),
+    budgetSync: vi.fn(),
   },
 }));
 
 describe("UserSetup", () => {
-  let mockOnSetupComplete;
-  let mockHookReturn;
+  let mockOnSetupComplete: Mock;
+  let mockHookReturn: any;
 
   beforeEach(() => {
     mockOnSetupComplete = vi.fn();
@@ -161,7 +203,7 @@ describe("UserSetup", () => {
   it("should pass correct props to useUserSetup hook", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
 
-    expect(useUserSetup).toHaveBeenCalledWith(mockOnSetupComplete);
+    expect(useUserSetup).toHaveBeenCalledWith(expect.any(Function));
   });
 
   it("should pass correct props to header component", () => {
@@ -202,5 +244,89 @@ describe("UserSetup", () => {
 
     const backgroundPattern = document.querySelector('[style*="radial-gradient"]');
     expect(backgroundPattern).toBeInTheDocument();
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle step 0", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        step: 0,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Step 0");
+    });
+
+    it("should handle very long username", () => {
+      const longName = "A".repeat(100);
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        userName: longName,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent(`User: ${longName}`);
+    });
+
+    it("should handle special characters in username", () => {
+      const specialName = "John Doe & Co.";
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        userName: specialName,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent(`User: ${specialName}`);
+    });
+
+    it("should handle non-returning user", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        isReturningUser: false,
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Returning: false");
+      expect(screen.queryByTestId("returning-user-actions")).not.toBeInTheDocument();
+    });
+
+    it("should handle returning user", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        isReturningUser: true,
+        userName: "John",
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("header")).toHaveTextContent("Returning: true");
+      expect(screen.getByTestId("returning-user-actions")).toBeInTheDocument();
+    });
+
+    it("should handle empty password", () => {
+      useUserSetup.mockReturnValue({
+        ...mockHookReturn,
+        password: "",
+      });
+
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("password-input")).toHaveValue("");
+    });
+
+    it("should handle missing onSetupComplete callback", () => {
+      render(<UserSetup onSetupComplete={undefined as any} />);
+      expect(screen.getByTestId("header")).toBeInTheDocument();
+    });
+
+    it("should render step buttons correctly", () => {
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      expect(screen.getByTestId("step-buttons")).toBeInTheDocument();
+    });
+
+    it("should handle password changes", () => {
+      render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
+      const passwordInput = screen.getByTestId("password-input");
+      expect(passwordInput).toBeInTheDocument();
+      expect(passwordInput).toHaveAttribute("type", "password");
+    });
   });
 });

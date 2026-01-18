@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import SavingsGoals from "../SavingsGoals";
 import userEvent from "@testing-library/user-event";
-import useSavingsGoalsActionsOriginal from "../../../hooks/savings/useSavingsGoalsActions";
+import useSavingsGoalsActionsOriginal from "@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions";
 
 // Mock the custom hook
-vi.mock("../../../hooks/savings/useSavingsGoalsActions", () => ({
+vi.mock("@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions", () => ({
   default: vi.fn(() => ({
     showDistributeModal: false,
     editingGoal: null,
@@ -66,11 +66,11 @@ vi.mock("@/components/ui", () => ({
   ),
 }));
 
-vi.mock("../../../utils", () => ({
+vi.mock("@/utils", () => ({
   getIcon: vi.fn(() => "div"),
 }));
 
-vi.mock("../../../utils/savings/savingsFormUtils", () => ({
+vi.mock("@/utils/domain/savings/savingsFormUtils", () => ({
   SAVINGS_PRIORITIES: ["High", "Medium", "Low"],
 }));
 
@@ -128,7 +128,7 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
-      expect(screen.getByText(/Distribute Cash/i)).toBeInTheDocument();
+      expect(screen.getByText(/Distribute/i)).toBeInTheDocument();
     });
 
     it("should not display distribute button when no unassigned cash", () => {
@@ -136,13 +136,13 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={0} />);
 
-      expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Distribute/i)).not.toBeInTheDocument();
     });
 
     it("should not display distribute button when no goals exist", () => {
       render(<SavingsGoals {...defaultProps} savingsGoals={[]} unassignedCash={100} />);
 
-      expect(screen.queryByText(/Distribute Cash/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Distribute/i)).not.toBeInTheDocument();
     });
 
     it("should display summary card with goal count", () => {
@@ -202,7 +202,7 @@ describe("SavingsGoals", () => {
 
       render(<SavingsGoals {...defaultProps} savingsGoals={goals} unassignedCash={100} />);
 
-      const distributeButton = screen.getByText(/Distribute Cash/i);
+      const distributeButton = screen.getByText(/Distribute/i);
       await userEvent.click(distributeButton);
 
       expect(mockOpenDistributeModal).toHaveBeenCalled();

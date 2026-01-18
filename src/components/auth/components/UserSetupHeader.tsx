@@ -1,5 +1,5 @@
 import logoOnly from "../../../assets/icon-512x512.png";
-import { getStepTitle, getStepSubtitle } from "../../../utils/auth/userSetupHelpers.tsx";
+import { getStepTitle, getStepSubtitle } from "@/utils/platform/auth/userSetupHelpers.tsx";
 
 interface UserSetupHeaderProps {
   step: number;

@@ -1,0 +1,240 @@
+import { renderHook, act } from "@testing-library/react";
+import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+
+// Mock dependencies
+vi.mock("@/utils/features/sync/masterSyncValidator", () => ({
+  getQuickSyncStatus: vi.fn(),
+}));
+
+// Mock dependencies
+vi.mock("@/services/sync/SyncManager", () => ({
+  syncManager: {
+    checkHealth: vi.fn(),
+    validateSync: vi.fn(),
+  },
+}));
+
+vi.mock("@/services/sync/syncOrchestrator", () => ({
+  syncOrchestrator: {
+    isRunning: false,
+    isSyncInProgress: false,
+  },
+}));
+
+vi.mock("@/utils/core/common/logger", () => ({
+  default: {
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+  },
+}));
+
+describe("useSyncHealthIndicator", () => {
+  let syncManagerMock: any;
+  let getQuickSyncStatus: any;
+
+  beforeEach(async () => {
+    // Import mocked modules
+    const { syncManager } = (await import("@/services/sync/SyncManager")) as any;
+    const masterSyncValidator = (await import("@/utils/features/sync/masterSyncValidator")) as any;
+
+    syncManagerMock = syncManager;
+    getQuickSyncStatus = masterSyncValidator.getQuickSyncStatus;
+
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  it("should initialize with loading state", () => {
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    expect(result.current.syncStatus).toEqual({
+      isHealthy: null,
+      status: "CHECKING",
+      lastChecked: null,
+      isLoading: true,
+    });
+    expect(result.current.showDetails).toBe(false);
+    expect(result.current.isBackgroundSyncing).toBe(false);
+    expect(result.current.isRecovering).toBe(false);
+    expect(result.current.recoveryResult).toBe(null);
+  });
+
+  it("should check sync health on mount", async () => {
+    const mockHealthData = {
+      isHealthy: true,
+      status: "HEALTHY",
+      lastChecked: "2023-09-05T12:00:00.000Z",
+    };
+
+    syncManagerMock.checkHealth.mockResolvedValue(mockHealthData);
+
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    await vi.waitFor(() => {
+      expect(result.current.syncStatus.isLoading).toBe(false);
+    });
+
+    expect(result.current.syncStatus).toEqual({
+      ...mockHealthData,
+      isLoading: false,
+    });
+  });
+
+  it("should handle sync health check errors", async () => {
+    const mockError = new Error("Sync check failed");
+    syncManagerMock.checkHealth.mockRejectedValue(mockError);
+
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    await vi.waitFor(() => {
+      expect(result.current.syncStatus.isLoading).toBe(false);
+    });
+
+    expect(result.current.syncStatus.status).toBe("ERROR");
+    expect(result.current.syncStatus.isHealthy).toBe(false);
+    expect(result.current.syncStatus.error).toBe("Sync check failed");
+  });
+
+  it("should toggle details visibility", () => {
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    act(() => {
+      result.current.setShowDetails(true);
+    });
+
+    expect(result.current.showDetails).toBe(true);
+
+    act(() => {
+      result.current.setShowDetails(false);
+    });
+
+    expect(result.current.showDetails).toBe(false);
+  });
+
+  it("should monitor background sync activity", async () => {
+    const { syncOrchestrator } = (await import("@/services/sync/syncOrchestrator")) as any;
+
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    // Initially not syncing
+    expect(result.current.isBackgroundSyncing).toBe(false);
+
+    // Simulate sync starting
+    act(() => {
+      (syncOrchestrator as any).isSyncInProgress = true;
+    });
+
+    // Fast-forward the interval
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(result.current.isBackgroundSyncing).toBe(true);
+
+    // Simulate sync ending
+    act(() => {
+      (syncOrchestrator as any).isSyncInProgress = false;
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(result.current.isBackgroundSyncing).toBe(false);
+  });
+
+  it("should run full validation when available", async () => {
+    const mockResults = {
+      summary: {
+        overallStatus: "ALL_SYSTEMS_GO",
+        totalFailed: 0,
+      },
+    };
+
+    syncManagerMock.validateSync.mockResolvedValue(mockResults);
+
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    await act(async () => {
+      await result.current.runFullValidation();
+    });
+
+    expect(syncManagerMock.validateSync).toHaveBeenCalled();
+    expect(result.current.syncStatus.status).toBe("HEALTHY");
+    expect(result.current.syncStatus.isHealthy).toBe(true);
+    expect(result.current.syncStatus.failedTests).toBe(0);
+
+    // Cleanup
+    delete (global.window as any).runMasterSyncValidation;
+  });
+
+  it("should handle cloud data reset", async () => {
+    const mockResult = {
+      success: true,
+      message: "Cloud data reset successfully",
+    };
+
+    (global.window as any).forceCloudDataReset = vi.fn().mockResolvedValue(mockResult);
+    getQuickSyncStatus.mockResolvedValue({
+      isHealthy: true,
+      status: "HEALTHY",
+    });
+
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    await act(async () => {
+      await result.current.resetCloudData();
+    });
+
+    expect(result.current.isRecovering).toBe(false);
+    expect(result.current.recoveryResult).toEqual(mockResult);
+    expect((global.window as any).forceCloudDataReset).toHaveBeenCalled();
+
+    // Should refresh health status after reset
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    await vi.waitFor(() => {
+      expect(syncManagerMock.checkHealth).toHaveBeenCalledTimes(2); // Once on mount, once after reset
+    });
+
+    // Cleanup
+    delete (global.window as any).forceCloudDataReset;
+  });
+
+  it("should set up periodic health checks", () => {
+    syncManagerMock.checkHealth.mockResolvedValue({
+      isHealthy: true,
+      status: "HEALTHY",
+    });
+
+    renderHook(() => useSyncHealthIndicator());
+
+    // Should check immediately on mount
+    expect(syncManagerMock.checkHealth).toHaveBeenCalledTimes(1);
+
+    // Fast-forward 2 minutes (120000ms)
+    act(() => {
+      vi.advanceTimersByTime(120000);
+    });
+
+    // Should check again after interval
+    expect(syncManagerMock.checkHealth).toHaveBeenCalledTimes(2);
+  });
+
+  it("should provide dropdown ref for outside click handling", () => {
+    const { result } = renderHook(() => useSyncHealthIndicator());
+
+    expect(result.current.dropdownRef).toBeDefined();
+    expect(result.current.dropdownRef.current).toBe(null); // Initially null
+  });
+});

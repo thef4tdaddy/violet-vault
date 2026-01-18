@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { Button } from "@/components/ui";
 import { useUserSetup } from "@/hooks/auth/useUserSetup";
 import type { UserSetupPayload } from "@/hooks/auth/useUserSetup";
-import type { UserSetupProps as UserSetupPropsType } from "@/types/auth";
 import UserSetupLayout from "./components/UserSetupLayout";
+import { useAuth } from "@/hooks/auth/useAuth";
+import type { JoinBudgetVariables } from "@/hooks/auth/useAuth.types";
+import type { UserSetupProps as UserSetupPropsType } from "@/types/auth";
 import UserSetupHeader from "./components/UserSetupHeader";
 import PasswordInput from "./components/PasswordInput";
 import UserNameInput from "./components/UserNameInput";
@@ -11,22 +12,20 @@ import ColorPicker from "./components/ColorPicker";
 import ReturningUserActions from "./components/ReturningUserActions";
 import StepButtons from "./components/StepButtons";
 import ShareCodeDisplay from "./components/ShareCodeDisplay";
+import JoinBudgetSection from "./components/JoinBudgetSection";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { renderIcon } from "@/utils";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * User Setup Component (Refactored)
  * Multi-step user onboarding and authentication flow
- * Reduced from 435 lines to ~120 lines with full UI/logic separation
  */
 type UserSetupProps = Partial<UserSetupPropsType>;
 
 const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const authManager = useAuthManager();
-  const joinBudget = authManager.joinBudget as (data: unknown) => Promise<{ success: boolean }>;
+  const auth = useAuth();
+  const { joinBudget } = auth;
   const handleSetupComplete = useCallback(
     async (payload: UserSetupPayload) => {
       if (!onSetupComplete) {
@@ -39,8 +38,6 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     },
     [onSetupComplete]
   );
-
-  // Removed noisy debug log - component renders on every prop change/keystroke
 
   const {
     // State
@@ -72,7 +69,8 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     async (_joinData?: unknown) => {
       logger.info("Join budget successful, setting up auth", _joinData as Record<string, unknown>);
       try {
-        const result = await joinBudget(_joinData || {});
+        const joinInfo = _joinData as JoinBudgetVariables;
+        const result = await joinBudget(joinInfo);
         if (result.success) logger.auth("Shared budget join completed - auth state already set");
       } catch (error) {
         logger.error("Failed to complete join budget setup", error);
@@ -163,24 +161,11 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
         )}
       </form>
 
-      {/* Join Budget Option - Always visible */}
-      {step === 1 && !isReturningUser && (
-        <div className="mt-6 pt-6 border-t border-white/20">
-          <div className="text-center">
-            <p className="text-sm text-purple-900 mb-3">Already have a shared budget?</p>
-            <Button
-              type="button"
-              onClick={() => setShowJoinModal(true)}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black flex items-center justify-center gap-2"
-            >
-              {renderIcon("UserPlus", { className: "h-4 w-4" })}
-              JOIN SHARED BUDGET
-            </Button>
-          </div>
-        </div>
-      )}
+      <JoinBudgetSection
+        isVisible={step === 1 && !isReturningUser}
+        onJoinClick={() => setShowJoinModal(true)}
+      />
 
-      {/* Join Budget Modal */}
       <JoinBudgetModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}

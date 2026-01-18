@@ -1,0 +1,13 @@
+# Python Analytics Service Dependencies
+# For Envelope Integrity Audit and future analytics endpoints
+
+fastapi==0.115.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.0
+python-multipart==0.0.18
+
+# Dev Dependencies
+ruff==0.1.0
+mypy==1.0.0
+pytest==8.0.0
+pytest-cov==4.1.0

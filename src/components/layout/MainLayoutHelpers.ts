@@ -1,55 +1,76 @@
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
+import type { useAuth } from "@/hooks/auth/useAuth";
+import type { UserData } from "@/types/auth";
+
 /**
  * Helper functions for MainLayout component
  * Extracted to reduce complexity
  */
 
+type AuthHookType = ReturnType<typeof useAuth>;
+type ExtractUserType = AuthHookType["user"];
+
+/**
+ * Interface for user data used in sync services
+ */
+export interface SyncUser {
+  uid: string;
+  email?: string;
+  userName?: string;
+  userColor?: string;
+  joinedVia?: string;
+  sharedBy?: string;
+  shareCode?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Interface that matches the actual structure of UserData with potential extra fields
+ */
+interface ExtendedUserData extends UserData {
+  uid?: string;
+  email?: string;
+  joinedVia?: "shareCode" | "link" | "standard" | null;
+}
+
 /**
  * Extract user information for Firebase sync
  */
-export const getUserForSync = (currentUser: unknown) => {
+export const getUserForSync = (currentUser: ExtractUserType): SyncUser | null => {
   if (!currentUser) return null;
 
-  const userRecord = currentUser as Record<string, unknown>;
+  const user = currentUser as ExtendedUserData;
+
   return {
-    uid: (userRecord?.uid as string) || "unknown",
-    email: (userRecord?.email as string) || undefined,
-    // Include shared budget fields for sync service detection
-    joinedVia: userRecord?.joinedVia as string | undefined,
-    sharedBy: userRecord?.sharedBy as string | undefined,
-    shareCode: userRecord?.shareCode as string | undefined,
-    userName: userRecord?.userName as string | undefined,
+    uid: user.uid || "unknown",
+    email: user.email || undefined,
+    userName: user.userName,
+    userColor: user.userColor,
+    joinedVia: user.joinedVia ?? undefined,
+    sharedBy: user.sharedBy,
+    shareCode: user.shareCode,
   };
 };
 
 /**
  * Extract layout data fields
  */
-export const extractLayoutData = (layoutData: unknown) => {
+export const extractLayoutData = (layoutData: ReturnType<typeof useLayoutData>) => {
   return {
-    budget: (layoutData as Record<string, unknown>)?.budget,
-    totalBiweeklyNeed: (layoutData as Record<string, unknown>)?.totalBiweeklyNeed,
-    paycheckHistory: (layoutData as Record<string, unknown>)?.paycheckHistory,
+    budget: layoutData?.budget,
+    totalBiweeklyNeed: layoutData?.totalBiweeklyNeed,
+    paycheckHistory: layoutData?.paycheckHistory,
   };
 };
 
 /**
  * Extract auth-related data
  */
-export const extractAuthData = (auth: unknown) => {
-  const authRecord = auth as Record<string, unknown>;
+export const extractAuthData = (auth: ReturnType<typeof useAuth>) => {
   return {
-    securityContext: authRecord?.securityContext,
-    isUnlocked: authRecord?.isUnlocked as boolean,
+    securityContext: auth?.securityContext,
+    isUnlocked: auth?.isUnlocked as boolean,
   };
-};
-
-/**
- * Extract onboarding state
- */
-export const extractOnboardingState = (state: unknown) => {
-  const stateRecord = state as Record<string, unknown>;
-  const isOnboarded = stateRecord?.isOnboarded;
-  return typeof isOnboarded === "boolean" ? isOnboarded : false;
 };
 
 /**

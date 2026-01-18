@@ -1,21 +1,19 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui";
-import useTransactionTable from "@/hooks/transactions/useTransactionTable";
-import TransactionRow from "@/components/transactions/components/TransactionRow";
-import DeleteConfirmation from "@/components/transactions/components/DeleteConfirmation";
+import { DataTable, type Column } from "@/components/primitives/tables/DataTable";
+import { ConfirmModal } from "@/components/primitives/modals";
 import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";
 import type { Transaction, Envelope } from "@/types/finance";
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { TransactionTablePropsSchema } from "@/domain/schemas/component-props";
 import {
-  COLUMN_STYLES,
   COLUMN_WIDTHS,
-  MIN_TABLE_WIDTH,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "@/utils/transactions/tableHelpers";
+} from "@/utils/domain/transactions/tableHelpers";
+import { getIcon } from "@/utils";
 
 interface TransactionTableProps {
   transactions?: Transaction[];
@@ -25,143 +23,188 @@ interface TransactionTableProps {
   onSplit: (transaction: Transaction) => void;
 }
 
-type TransactionTableState = ReturnType<typeof useTransactionTable>;
-
+/**
+ * Desktop transaction table using DataTable primitive
+ */
 interface DesktopTransactionTableProps {
   transactions: Transaction[];
   envelopes: Envelope[];
-  gridTemplate: string;
-  minTableWidth: string;
-  parentRef: TransactionTableState["parentRef"];
-  rowVirtualizer: TransactionTableState["rowVirtualizer"];
-  deletingTransaction: Transaction | null;
-  confirmDelete: () => void;
-  cancelDelete: () => void;
-  handleDeleteClick: (transaction: Transaction) => void;
-  handleHistoryClick: (transaction: Transaction) => void;
   onEdit: (transaction: Transaction) => void;
+  onDeleteClick: (transaction: Transaction) => void;
+  onHistoryClick: (transaction: Transaction) => void;
   onSplit: (transaction: Transaction) => void;
 }
 
-const DesktopTransactionTable = ({
+const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
   transactions,
   envelopes,
-  gridTemplate,
-  minTableWidth,
-  parentRef,
-  rowVirtualizer,
-  deletingTransaction,
-  confirmDelete,
-  cancelDelete,
-  handleDeleteClick,
-  handleHistoryClick,
   onEdit,
+  onDeleteClick,
+  onHistoryClick,
   onSplit,
-}: DesktopTransactionTableProps) => {
-  return (
-    <div className="hidden md:block">
-      <div ref={parentRef} className="overflow-auto" style={{ maxHeight: "70vh" }}>
-        <div style={{ minWidth: minTableWidth }}>
-          <div
-            className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm grid"
-            style={{ gridTemplateColumns: gridTemplate }}
-          >
+}) => {
+  // Define columns for DataTable
+  const columns = useMemo<Column<Transaction>[]>(() => {
+    return [
+      {
+        key: "date",
+        header: "Date",
+        accessor: (txn) => <span className="truncate">{formatTransactionDate(txn.date)}</span>,
+        width: COLUMN_WIDTHS.date,
+      },
+      {
+        key: "description",
+        header: "Description",
+        accessor: (txn) => (
+          <div className="flex flex-col gap-1 overflow-hidden">
             <div
-              style={COLUMN_STYLES.date}
-              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              className="font-medium text-gray-900 overflow-x-auto whitespace-nowrap pr-2"
+              title={txn.description}
             >
-              Date
+              {txn.description}
             </div>
-            <div
-              style={COLUMN_STYLES.description}
-              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Description
-            </div>
-            <div
-              style={COLUMN_STYLES.category}
-              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Category
-            </div>
-            <div
-              style={COLUMN_STYLES.envelope}
-              className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Envelope
-            </div>
-            <div
-              style={COLUMN_STYLES.amount}
-              className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Amount
-            </div>
-            <div
-              style={COLUMN_STYLES.actions}
-              className="px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Actions
-            </div>
-          </div>
-
-          <div
-            className="divide-y divide-gray-200"
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}
-          >
-            {transactions.length === 0 ? (
-              <div className="px-4 py-8 text-center text-gray-500">No transactions found</div>
-            ) : (
-              rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const transaction = transactions[virtualRow.index];
-                const isDeleting = deletingTransaction?.id === transaction.id;
-
-                return isDeleting ? (
-                  <DeleteConfirmation
-                    key={`delete-${transaction.id}`}
-                    transaction={transaction}
-                    onConfirm={confirmDelete}
-                    onCancel={cancelDelete}
-                    virtualRow={virtualRow}
-                    gridTemplate={gridTemplate}
-                  />
-                ) : (
-                  <TransactionRow
-                    key={transaction.id}
-                    transaction={transaction}
-                    envelopes={envelopes}
-                    virtualRow={virtualRow}
-                    columnStyles={COLUMN_STYLES}
-                    onEdit={onEdit}
-                    onSplit={onSplit}
-                    onDeleteClick={handleDeleteClick}
-                    onHistoryClick={handleHistoryClick}
-                    gridTemplate={gridTemplate}
-                  />
-                );
-              })
+            {txn.notes && (
+              <div className="text-xs text-gray-500 overflow-y-auto max-h-16 pr-2 mt-1 whitespace-pre-wrap break-words">
+                {txn.notes}
+              </div>
             )}
           </div>
-        </div>
-      </div>
+        ),
+        width: COLUMN_WIDTHS.description,
+      },
+      {
+        key: "category",
+        header: "Category",
+        accessor: (txn) => (
+          <span className="text-gray-500 truncate">{txn.category || "Uncategorized"}</span>
+        ),
+        width: COLUMN_WIDTHS.category,
+      },
+      {
+        key: "envelope",
+        header: "Envelope",
+        accessor: (txn) => {
+          const envelope = findEnvelopeForTransaction(txn, envelopes);
+          const { name, color, className } = getEnvelopeDisplay(envelope);
+          return (
+            <div className="flex items-center min-w-0">
+              <div
+                className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                style={{ backgroundColor: color }}
+              />
+              <span className={`${className} truncate`}>{name}</span>
+            </div>
+          );
+        },
+        width: COLUMN_WIDTHS.envelope,
+      },
+      {
+        key: "amount",
+        header: "Amount",
+        accessor: (txn) => {
+          const { formatted, className } = formatTransactionAmount(txn.amount);
+          return (
+            <div className="text-right">
+              <span className={`${className} font-semibold`}>{formatted}</span>
+            </div>
+          );
+        },
+        width: COLUMN_WIDTHS.amount,
+      },
+      {
+        key: "actions",
+        header: "Actions",
+        accessor: (txn) => (
+          <div className="flex items-center justify-end gap-2 flex-nowrap">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSplit(txn);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              title="Split transaction"
+              aria-label="Split transaction"
+            >
+              {React.createElement(getIcon("SplitSquareHorizontal"), {
+                className: "h-4 w-4 flex-shrink-0",
+              })}
+              <span className="hidden xl:inline font-semibold">Split</span>
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onHistoryClick(txn);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              title="View history"
+              aria-label="View history"
+            >
+              {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4 flex-shrink-0" })}
+              <span className="hidden xl:inline font-semibold">History</span>
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(txn);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              title="Edit transaction"
+              aria-label="Edit transaction"
+            >
+              {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4 flex-shrink-0" })}
+              <span className="hidden xl:inline font-semibold">Edit</span>
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteClick(txn);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              title="Delete transaction"
+              aria-label="Delete transaction"
+            >
+              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 flex-shrink-0" })}
+              <span className="hidden xl:inline font-semibold">Delete</span>
+            </Button>
+          </div>
+        ),
+        width: COLUMN_WIDTHS.actions,
+      },
+    ];
+  }, [envelopes, onEdit, onSplit, onDeleteClick, onHistoryClick]);
+
+  return (
+    <div className="hidden md:block">
+      <DataTable
+        data={transactions}
+        columns={columns}
+        getRowId={(txn) => String(txn.id)}
+        virtualized={true}
+        emptyMessage="No transactions found"
+        className="glassmorphism border border-white/20"
+      />
     </div>
   );
 };
 
-interface MobileTransactionListProps
-  extends Pick<TransactionTableProps, "transactions" | "envelopes" | "onEdit" | "onSplit"> {
+/**
+ * Mobile transaction list component
+ */
+interface MobileTransactionListProps {
+  transactions: Transaction[];
+  envelopes: Envelope[];
   deletingTransaction: Transaction | null;
   handleDeleteClick: (transaction: Transaction) => void;
   handleHistoryClick: (transaction: Transaction) => void;
   confirmDelete: () => void;
   cancelDelete: () => void;
+  onEdit: (transaction: Transaction) => void;
+  onSplit: (transaction: Transaction) => void;
 }
 
-const MobileTransactionList = ({
-  transactions = [],
-  envelopes = [],
+const MobileTransactionList: React.FC<MobileTransactionListProps> = ({
+  transactions,
+  envelopes,
   deletingTransaction,
   handleDeleteClick,
   handleHistoryClick,
@@ -169,10 +212,12 @@ const MobileTransactionList = ({
   cancelDelete,
   onEdit,
   onSplit,
-}: MobileTransactionListProps) => {
+}) => {
   if (transactions.length === 0) {
     return (
-      <div className="px-4 py-10 text-center text-sm text-gray-500">No transactions found</div>
+      <div className="md:hidden px-4 py-10 text-center text-sm text-gray-500">
+        No transactions found
+      </div>
     );
   }
 
@@ -290,6 +335,10 @@ const MobileTransactionList = ({
   );
 };
 
+/**
+ * TransactionTable - Main component
+ * Uses DataTable primitive for desktop view and custom mobile view
+ */
 const TransactionTable: React.FC<TransactionTableProps> = ({
   transactions = [],
   envelopes = [],
@@ -310,52 +359,47 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     TransactionTablePropsSchema
   );
 
-  const {
-    parentRef,
-    rowVirtualizer,
-    historyTransaction,
-    deletingTransaction,
-    handleDeleteClick,
-    cancelDelete,
-    handleHistoryClick,
-    closeHistory,
-  } = useTransactionTable(transactions);
+  // State management
+  const [historyTransaction, setHistoryTransaction] = useState<Transaction | null>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null);
+
+  // Handlers
+  const handleDeleteClick = (transaction: Transaction) => {
+    setDeletingTransaction(transaction);
+  };
+
+  const cancelDelete = () => {
+    setDeletingTransaction(null);
+  };
 
   const confirmDelete = () => {
     if (deletingTransaction) {
       onDelete(deletingTransaction.id);
-      cancelDelete();
+      setDeletingTransaction(null);
     }
   };
 
-  const gridTemplate = [
-    COLUMN_WIDTHS.date,
-    COLUMN_WIDTHS.description,
-    COLUMN_WIDTHS.category,
-    COLUMN_WIDTHS.envelope,
-    COLUMN_WIDTHS.amount,
-    COLUMN_WIDTHS.actions,
-  ].join(" ");
+  const handleHistoryClick = (transaction: Transaction) => {
+    setHistoryTransaction(transaction);
+  };
 
-  const minTableWidth = MIN_TABLE_WIDTH;
+  const closeHistory = () => {
+    setHistoryTransaction(null);
+  };
 
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
+      {/* Desktop Table */}
       <DesktopTransactionTable
         transactions={transactions}
         envelopes={envelopes}
-        gridTemplate={gridTemplate}
-        minTableWidth={minTableWidth}
-        parentRef={parentRef}
-        rowVirtualizer={rowVirtualizer}
-        deletingTransaction={deletingTransaction}
-        confirmDelete={confirmDelete}
-        cancelDelete={cancelDelete}
-        handleDeleteClick={handleDeleteClick}
-        handleHistoryClick={handleHistoryClick}
         onEdit={onEdit}
+        onDeleteClick={handleDeleteClick}
+        onHistoryClick={handleHistoryClick}
         onSplit={onSplit}
       />
+
+      {/* Mobile List */}
       <MobileTransactionList
         transactions={transactions}
         envelopes={envelopes}
@@ -367,6 +411,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         onEdit={onEdit}
         onSplit={onSplit}
       />
+
+      {/* Delete Confirmation Modal (Desktop) */}
+      {deletingTransaction && (
+        <div className="hidden md:block">
+          <ConfirmModal
+            isOpen={!!deletingTransaction}
+            onClose={cancelDelete}
+            onConfirm={confirmDelete}
+            title="Delete Transaction?"
+            message={`Are you sure you want to delete "${deletingTransaction.description}"? This action cannot be undone.`}
+            variant="danger"
+            confirmLabel="Delete"
+          />
+        </div>
+      )}
 
       {/* Transaction History Modal */}
       {historyTransaction && (

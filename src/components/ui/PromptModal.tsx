@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface ValidationResult {
   valid: boolean;

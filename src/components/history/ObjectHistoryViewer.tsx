@@ -1,5 +1,5 @@
 import { useState, useMemo, createElement } from "react";
-import { useBudgetCommits } from "@/hooks/budgeting/useBudgetHistoryQuery";
+import { useBudgetCommits } from "@/hooks/platform/history/useBudgetHistoryQuery";
 import { getIcon } from "@/utils";
 import { BudgetCommit } from "@/domain/schemas";
 import {
@@ -8,7 +8,7 @@ import {
   EmptyHistoryState,
   LoadingState,
 } from "./ObjectHistoryViewerHelpers";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface ObjectHistoryViewerProps {
   objectId: string;
@@ -38,9 +38,9 @@ const ObjectHistoryViewer = ({
       // This could be optimized later by adding object-specific tracking
       return Boolean(
         commit.message &&
-          (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
-            commit.message.includes(objectId) ||
-            commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
+        (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
+          commit.message.includes(objectId) ||
+          commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
       );
     });
 

@@ -1,11 +1,9 @@
 import React from "react";
 import { Select, TextInput, Button } from "@/components/ui";
-import { getIcon } from "@/utils";
-import { getIconByName } from "@/utils/common/billIcons";
-import { getFrequencyOptions } from "@/utils/common/frequencyCalculations";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import { getIcon, getIconByName, type BillIconOption } from "@/utils/ui/icons";
+import { getFrequencyOptions } from "@/utils/core/common/frequencyCalculations";
 import type { BillFormData, Bill } from "@/types/bills";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 /**
  * Bill entity type - flexible to accept any bill-like structure
@@ -147,7 +145,11 @@ export const BillBasicFields: React.FC<BillBasicFieldsProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
         <input
           type="date"
-          value={formData.dueDate}
+          value={
+            formData.dueDate instanceof Date
+              ? formData.dueDate.toISOString().split("T")[0]
+              : formData.dueDate
+          }
           onChange={(e) => updateField("dueDate", e.target.value)}
           disabled={isReadOnly}
           className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
@@ -275,72 +277,6 @@ export const BillIconSelector: React.FC<BillIconSelectorProps> = ({
             </Button>
           );
         })}
-      </div>
-    </div>
-  );
-};
-
-/**
- * Props for BillFormActions component
- */
-interface BillFormActionsProps {
-  formData: BillFormData;
-  editingBill: BillEntity | null | undefined;
-  canEdit: boolean;
-  isSubmitting: boolean;
-  onClose: () => void;
-  calculateBiweeklyAmount: () => string | number;
-  calculateMonthlyAmount: () => string | number;
-  getNextDueDate: () => string;
-}
-
-/**
- * Form action buttons for BillFormFields
- * Extracted to reduce complexity
- */
-export const BillFormActions: React.FC<BillFormActionsProps> = ({
-  formData,
-  editingBill,
-  canEdit,
-  isSubmitting,
-  onClose,
-  calculateBiweeklyAmount,
-  calculateMonthlyAmount,
-  getNextDueDate,
-}) => {
-  const isReadOnly = Boolean(editingBill && !canEdit);
-
-  return (
-    <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-      <div className="text-sm text-gray-600">
-        {formData.frequency === "biweekly" && formData.amount && (
-          <div>Monthly equivalent: ~${calculateMonthlyAmount()}</div>
-        )}
-        {formData.frequency === "monthly" && formData.amount && (
-          <div>Biweekly equivalent: ~${calculateBiweeklyAmount()}</div>
-        )}
-        {formData.dueDate && <div>Next due: {getNextDueDate()}</div>}
-      </div>
-
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          onClick={onClose}
-          disabled={isSubmitting}
-          className="px-4 py-2 border-2 border-black rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isSubmitting || isReadOnly}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black disabled:opacity-50 flex items-center"
-        >
-          {React.createElement(getIcon("Save"), {
-            className: "h-4 w-4 mr-2",
-          })}
-          {isSubmitting ? "Saving..." : editingBill ? "Update Bill" : "Add Bill"}
-        </Button>
       </div>
     </div>
   );

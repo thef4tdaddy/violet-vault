@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import useEnvelopeSystem from "../EnvelopeSystem";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 
 // Mock dependencies
 vi.mock("@/stores/ui/uiStore", () => ({
@@ -15,7 +18,7 @@ vi.mock("@/stores/ui/uiStore", () => ({
   }),
 }));
 
-vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
   useEnvelopes: vi.fn(() => ({
     envelopes: [],
     addEnvelope: vi.fn(),
@@ -25,18 +28,18 @@ vi.mock("@/hooks/budgeting/useEnvelopes", () => ({
   })),
 }));
 
-vi.mock("@/hooks/bills/useBills", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBills", () => ({
   default: vi.fn(() => ({
     bills: [],
     isLoading: false,
   })),
 }));
 
-vi.mock("@/utils/budgeting", () => ({
+vi.mock("@/utils/domain/budgeting", () => ({
   calculateBiweeklyNeeds: vi.fn(() => 0),
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -46,13 +49,28 @@ vi.mock("@/utils/common/logger", () => ({
 }));
 
 describe("useEnvelopeSystem", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const createWrapper = () => {
+    return ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
 
   describe("Hook Initialization", () => {
     it("should initialize with default values", () => {
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), {
+        wrapper: createWrapper(),
+      });
 
       expect(result.current.envelopes).toEqual([]);
       expect(result.current.bills).toEqual([]);
@@ -61,7 +79,7 @@ describe("useEnvelopeSystem", () => {
     });
 
     it("should provide envelope operations", () => {
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       expect(typeof result.current.createEnvelope).toBe("function");
       expect(typeof result.current.updateEnvelope).toBe("function");
@@ -69,7 +87,7 @@ describe("useEnvelopeSystem", () => {
     });
 
     it("should provide utility functions", () => {
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       expect(typeof result.current.updateBiweeklyAllocations).toBe("function");
       expect(typeof result.current.setUnassignedCash).toBe("function");
@@ -79,7 +97,7 @@ describe("useEnvelopeSystem", () => {
   describe("Envelope Operations", () => {
     it("should create envelope successfully", async () => {
       const mockAddEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: mockAddEnvelope,
@@ -88,7 +106,7 @@ describe("useEnvelopeSystem", () => {
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       const envelopeData = { name: "Test", monthlyAmount: 100 };
       const response = await result.current.createEnvelope(envelopeData);
@@ -99,7 +117,7 @@ describe("useEnvelopeSystem", () => {
 
     it("should handle create envelope error", async () => {
       const mockAddEnvelope = vi.fn().mockRejectedValue(new Error("Create failed"));
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: mockAddEnvelope,
@@ -108,7 +126,7 @@ describe("useEnvelopeSystem", () => {
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       const envelopeData = { name: "Test", monthlyAmount: 100 };
       const response = await result.current.createEnvelope(envelopeData);
@@ -119,7 +137,7 @@ describe("useEnvelopeSystem", () => {
 
     it("should update envelope successfully", async () => {
       const mockUpdateEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),
@@ -128,17 +146,17 @@ describe("useEnvelopeSystem", () => {
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       const response = await result.current.updateEnvelope("env1", { name: "Updated" });
 
       expect(response.success).toBe(true);
-      expect(mockUpdateEnvelope).toHaveBeenCalledWith({ id: "env1", updates: { name: "Updated" } });
+      expect(mockUpdateEnvelope).toHaveBeenCalledWith("env1", { name: "Updated" });
     });
 
     it("should delete envelope successfully", async () => {
       const mockDeleteEnvelope = vi.fn().mockResolvedValue(undefined);
-      const { useEnvelopes } = await import("@/hooks/budgeting/useEnvelopes");
+      const { useEnvelopes } = await import("@/hooks/budgeting/envelopes/useEnvelopes");
       (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),
@@ -147,12 +165,15 @@ describe("useEnvelopeSystem", () => {
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       const response = await result.current.deleteEnvelope("env1", false);
 
       expect(response.success).toBe(true);
-      expect(mockDeleteEnvelope).toHaveBeenCalledWith("env1", false);
+      expect(mockDeleteEnvelope).toHaveBeenCalledWith({
+        envelopeId: "env1",
+        deleteBillsToo: false,
+      });
     });
   });
 
@@ -163,8 +184,7 @@ describe("useEnvelopeSystem", () => {
         { id: "2", name: "Gas", balance: 200 },
       ];
 
-      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
-      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useEnvelopes).mockReturnValue({
         envelopes: mockEnvelopes,
         addEnvelope: vi.fn(),
         updateEnvelope: vi.fn(),
@@ -172,7 +192,7 @@ describe("useEnvelopeSystem", () => {
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       expect(result.current.envelopes).toEqual(mockEnvelopes);
     });
@@ -183,20 +203,18 @@ describe("useEnvelopeSystem", () => {
         { id: "2", name: "Electric", amount: 100 },
       ];
 
-      const useBills = require("@/hooks/bills/useBills").default;
-      (useBills as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useBills).mockReturnValue({
         bills: mockBills,
         isLoading: false,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       expect(result.current.bills).toEqual(mockBills);
     });
 
     it("should report loading state correctly", () => {
-      const { useEnvelopes } = require("@/hooks/budgeting/useEnvelopes");
-      (useEnvelopes as ReturnType<typeof vi.fn>).mockReturnValue({
+      vi.mocked(useEnvelopes).mockReturnValue({
         envelopes: [],
         addEnvelope: vi.fn(),
         updateEnvelope: vi.fn(),
@@ -204,7 +222,7 @@ describe("useEnvelopeSystem", () => {
         isLoading: true,
       });
 
-      const { result } = renderHook(() => useEnvelopeSystem());
+      const { result } = renderHook(() => useEnvelopeSystem(), { wrapper: createWrapper() });
 
       expect(result.current.isLoading).toBe(true);
     });

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import logger from "@/utils/common/logger";
-import { useAuth } from "@/contexts/AuthContext";
+import logger from "@/utils/core/common/logger";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { UserData } from "@/types/auth";
 
 /**

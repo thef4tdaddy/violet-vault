@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import { useLocalOnlyMode } from "@/hooks/common/useLocalOnlyMode";
+import { useLocalOnlyMode } from "@/hooks/platform/data/useLocalOnlyMode";
 import UnsupportedBrowserView from "./setup/UnsupportedBrowserView";
 import SetupHeader from "./setup/SetupHeader";
 import WelcomeStep from "./setup/WelcomeStep";
 import CustomizeStep from "./setup/CustomizeStep";
 import ImportStep from "./setup/ImportStep";
 import ErrorDisplay from "./local-only/ErrorDisplay";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface LocalOnlySetupProps {
   onModeSelected: (mode: string) => void;

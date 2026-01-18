@@ -1,23 +1,23 @@
-// src/components/budgeting/EnvelopeGrid.tsx - Refactored with separated logic
 import { useState, useMemo, lazy, Suspense, Dispatch, SetStateAction } from "react";
 import useUiStoreRaw from "@/stores/ui/uiStore";
-import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import { useTransactions } from "@/hooks/common/useTransactions";
-import useBills from "../../hooks/bills/useBills";
+import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import { useTransactionQuery as useTransactions } from "@/hooks/budgeting/transactions/useTransactionQuery";
+import useBills from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,
-} from "@/utils/budgeting";
+} from "@/utils/domain/budgeting";
+import { calculateQuickFundUpdate } from "@/utils/domain/budgeting/envelopeFormUtils";
 import type {
   Envelope as BudgetEnvelope,
   EnvelopeData as BudgetEnvelopeData,
-} from "@/utils/budgeting/envelopeCalculations";
+} from "@/utils/domain/budgeting/envelopeCalculations";
 import EnvelopeGridView from "./envelope/EnvelopeGridView";
-import logger from "../../utils/common/logger";
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import logger from "@/utils/core/common/logger";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { EnvelopeGridPropsSchema } from "@/domain/schemas/component-props";
 
 type Envelope = BudgetEnvelope;
@@ -197,11 +197,18 @@ const useEnvelopeUIState = (
 
   const handleQuickFundConfirm = async (envelopeId: string, amount: number) => {
     try {
-      const currentAllocated =
-        envelopeData.find((env: EnvelopeData) => env.id === envelopeId)?.allocated || 0;
+      const envelope = envelopeData.find((env: EnvelopeData) => env.id === envelopeId);
+      if (!envelope) return;
+
+      // Use utility function to calculate the update
+      const { updateField, newAmount } = calculateQuickFundUpdate(envelope, amount);
+
+      // Construct update object with type assertion as key is dynamic but safe per type check
+      const updates = { [updateField]: newAmount };
+
       await updateEnvelope({
         id: envelopeId,
-        updates: { allocated: currentAllocated + amount },
+        updates: updates as Partial<Envelope>,
       });
       logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
     } catch (error) {
@@ -358,8 +365,9 @@ const useResolvedData = (
     },
     isLoading,
     addEnvelope,
-    updateEnvelope: updateEnvelopeAsync,
-    deleteEnvelope,
+    updateEnvelope: (params: { id: string; updates: Partial<Envelope> }) =>
+      updateEnvelopeAsync(params.id, params.updates),
+    deleteEnvelope: (id: string) => deleteEnvelope({ envelopeId: id }),
     updateBill,
   };
 };

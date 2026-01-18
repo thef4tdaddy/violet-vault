@@ -3,9 +3,6 @@
 
 @import "tailwindcss";
 
-/* Import your custom styles after Tailwind */
-@import "./styles.css";
-
 /* Tailwind v4 CSS-first configuration */
 @theme {
   /* Use your existing CSS custom properties for colors */

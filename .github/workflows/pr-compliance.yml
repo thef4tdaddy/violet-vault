@@ -1,0 +1,177 @@
+name: PR Compliance & Triage
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  # 1. Formatting - Enforce/Fix PR Title conventions
+  format-pr-title:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Auto-format PR title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const currentTitle = pr.title;
+            const conventionalPattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+?\))?!?:\s.+/;
+
+            if (conventionalPattern.test(currentTitle)) {
+              console.log('✅ PR title follows convention');
+              return;
+            }
+
+            // Simple Keyword Mapper
+            const titleLower = currentTitle.toLowerCase();
+            let type = 'feat';
+            if (titleLower.match(/\b(fix|bug|error|broken|patch)\b/)) type = 'fix';
+            else if (titleLower.match(/\b(doc|readme)\b/)) type = 'docs';
+            else if (titleLower.match(/\b(refactor|cleanup)\b/)) type = 'refactor';
+            else if (titleLower.match(/\b(perf|fast)\b/)) type = 'perf';
+            else if (titleLower.match(/\b(style|formatting)\b/)) type = 'style';
+            else if (titleLower.match(/\b(test|spec)\b/)) type = 'test';
+            else if (titleLower.match(/\b(build|dep|bump)\b/)) type = 'build';
+            else if (titleLower.match(/\b(ci|action)\b/)) type = 'ci';
+            else if (titleLower.match(/\b(chore|maint)\b/)) type = 'chore';
+
+            let description = currentTitle.replace(/^\[?WIP\]?\s*/i, '').replace(/^(fix|feat|chore|docs):\s*/i, '').trim();
+            description = description.charAt(0).toLowerCase() + description.slice(1);
+
+            const newTitle = `${type}: ${description}`;
+
+            if (newTitle !== currentTitle) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                title: newTitle
+              });
+              
+              await github.rest.issues.createComment({
+                issue_number: pr.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `🤖 **Auto-formatted title** to: \`${newTitle}\`\n_(Conventional Commits)_`
+              });
+            }
+
+  # 2. Enforcement - Check Commit Messages
+  check-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Commits
+        run: |
+          if [[ "${{ github.actor }}" == *"bot"* ]]; then exit 0; fi
+
+          # If PR, check PR commits. If Push, check HEAD.
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Fast check: just ensure title is valid (since we auto-formatted it above)
+            # But let's check actual commits for rigorousness if strict mode is desired.
+            # For now, let's just log.
+            echo "Checking PR commits..."
+            git log --format=%s origin/${{ github.base_ref }}..HEAD
+          fi
+
+  # 3. Labeling - Auto-label based on changes/types
+  label-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Label based on title/files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const labels = new Set();
+
+            if (title.startsWith('feat')) labels.add('Feature');
+            if (title.startsWith('fix')) labels.add('bug');
+            if (title.startsWith('docs')) labels.add('documentation');
+            if (title.startsWith('chore')) labels.add('metrics'); // or chore
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                issue_number: pr.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: Array.from(labels)
+              });
+            }
+
+  # 4. Coverage - Run tests and upload coverage
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          if [ -d "api" ] && [ -f "api/go.mod" ]; then
+            cd api && go mod download && cd ..
+          fi
+          if [ -f "api/requirements.txt" ]; then
+            pip install -r api/requirements.txt
+            pip install pytest pytest-cov
+          fi
+
+      - name: Frontend Coverage
+        run: npm run test:ci
+
+      - name: Go Backend Coverage
+        if: hashFiles('api/**/*.go') != ''
+        run: |
+          cd api
+          go test ./... -coverprofile=coverage.txt -covermode=atomic
+          cd ..
+
+      - name: Python Backend Coverage
+        if: hashFiles('api/**/*.py') != ''
+        run: |
+          pytest --cov=api --cov-report=xml api/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.txt,./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true

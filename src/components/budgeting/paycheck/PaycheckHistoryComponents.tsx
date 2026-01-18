@@ -1,14 +1,14 @@
 import React from "react";
 import { getIcon } from "@/utils";
-import { formatPaycheckAmount } from "@/utils/budgeting/paycheckUtils";
+import { formatPaycheckAmount } from "@/utils/domain/budgeting/paycheckUtils";
 import { Button } from "@/components/ui";
 
-interface PaycheckHistoryItem {
+export interface PaycheckHistoryItem {
   id: string | number;
   payerName?: string;
   allocationMode?: string;
   amount?: number;
-  processedAt?: string;
+  processedAt?: string | Date;
   processedBy?: string;
   totalAllocated?: number;
   remainingAmount?: number;
@@ -89,10 +89,11 @@ interface PaycheckHistoryItemProps {
 /**
  * Helper functions for paycheck formatting
  */
-const formatDate = (dateString?: string) => {
-  if (!dateString) return "Invalid Date";
+const formatDate = (date: string | Date | null | undefined) => {
+  if (!date) return "Invalid Date";
   try {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

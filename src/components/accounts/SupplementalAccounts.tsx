@@ -1,5 +1,5 @@
 import React from "react";
-import useSupplementalAccounts from "@/hooks/accounts/useSupplementalAccounts";
+import useSupplementalAccounts from "@/hooks/platform/accounts/useSupplementalAccounts";
 import AccountsHeader from "./AccountsHeader";
 import AccountsSummaryCards from "./AccountsSummaryCards";
 import ExpirationAlert from "./ExpirationAlert";
@@ -7,7 +7,7 @@ import AccountsGrid from "./AccountsGrid";
 import AccountFormModal from "./AccountFormModal";
 import TransferModal from "./TransferModal";
 import { getIcon } from "@/utils";
-import type { LockDocument as ServiceLockDocument } from "@/services/editLockService";
+import type { LockDocument as ServiceLockDocument } from "@/types/editLock";
 
 interface Account {
   id: string | number;

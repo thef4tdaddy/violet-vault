@@ -34,7 +34,7 @@ const StepButtons: React.FC<StepButtonsProps> = ({
         type="submit"
         onClick={onContinue}
         disabled={!canContinue || isLoading}
-        className="w-full btn btn-primary py-4 text-lg font-black rounded-lg border-2 border-black uppercase tracking-wider"
+        className="w-full py-4 text-lg font-black rounded-lg border-2 border-black uppercase tracking-wider"
       >
         {isLoading ? "Creating..." : "Continue"}
       </Button>
@@ -49,7 +49,8 @@ const StepButtons: React.FC<StepButtonsProps> = ({
           <Button
             type="button"
             onClick={onBack}
-            className="flex-1 btn btn-secondary py-3 rounded-lg border-2 border-black font-black uppercase tracking-wider"
+            variant="secondary"
+            className="flex-1 py-3 rounded-lg border-2 border-black font-black uppercase tracking-wider"
             disabled={isLoading}
           >
             Back
@@ -59,7 +60,7 @@ const StepButtons: React.FC<StepButtonsProps> = ({
           type="button"
           onClick={onStartTracking}
           disabled={!canStartTracking || isLoading}
-          className="flex-1 btn btn-primary py-3 rounded-lg border-2 border-black font-black uppercase tracking-wider"
+          className="flex-1 py-3 rounded-lg border-2 border-black font-black uppercase tracking-wider"
         >
           {isLoading ? "Setting up..." : "Start Tracking"}
         </Button>

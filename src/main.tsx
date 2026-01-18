@@ -3,10 +3,10 @@ import App from "./App.tsx";
 import "./index.css";
 // Sentry now loaded lazily via SentryLoader component
 import { QueryClientProvider } from "@tanstack/react-query";
-import queryClient from "./utils/common/queryClient";
-import { SystemInfoService } from "./services/bugReport/systemInfoService.ts";
-import logger from "./utils/common/logger.ts";
-import { initializeCrypto } from "./utils/security/cryptoCompat.ts";
+import queryClient from "@/utils/core/common/queryClient";
+import BugReportingService from "./services/logging/bugReportingService.ts";
+import logger from "@/utils/core/common/logger";
+import { initializeCrypto } from "@/utils/platform/security/cryptoCompat";
 
 // Extend Window interface for debug tools
 declare global {
@@ -21,6 +21,11 @@ declare global {
     offlineReadiness?: () => Promise<unknown>;
     testBugReportCapture?: () => Promise<unknown>;
     clearCloudDataOnly?: () => Promise<unknown>;
+    forceCloudDataReset?: () => Promise<{ success: boolean; message?: string; error?: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    runMasterSyncValidation?: () => Promise<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getQuickSyncStatus?: () => Promise<any>;
   }
 }
 
@@ -28,9 +33,7 @@ declare global {
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {
   const loadSyncServices = () => {
-    import("./services/chunkedSyncService.js").catch((error) => {
-      logger.warn("Firebase sync services failed to load:", error);
-    });
+    // SyncOrchestrator is loaded on-demand via AuthContext/mutations
   };
 
   const setupEventListeners = (loadOnce: () => void) => {
@@ -68,10 +71,10 @@ if (typeof window !== "undefined") {
 }
 
 // Initialize PWA background sync for offline operations
-import "./utils/pwa/backgroundSync.js";
+import "@/utils/platform/pwa/backgroundSync";
 
 // Initialize touch feedback for mobile interactions
-import { initializeTouchFeedback } from "./utils/ui/touchFeedback.ts";
+import { initializeTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 // Initialize touch feedback after DOM is ready
 if (typeof window !== "undefined") {
@@ -88,13 +91,16 @@ if (typeof window !== "undefined") {
 }
 
 // Expose diagnostic tools for debugging
-import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.ts";
-import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.ts";
-import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.ts";
-import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.ts";
-import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.ts";
-import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.ts";
-import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.ts";
+import { runDataDiagnostic } from "@/utils/dev/debug/dataDiagnostic";
+import { runSyncDiagnostic } from "@/utils/dev/debug/syncDiagnostic";
+import { runImmediateSyncHealthCheck } from "@/utils/features/sync/syncHealthChecker";
+import { runSyncEdgeCaseTests } from "@/utils/features/sync/syncEdgeCaseTester";
+import { validateAllSyncFlows } from "@/utils/features/sync/syncFlowValidator";
+import {
+  runMasterSyncValidation,
+  getQuickSyncStatus,
+} from "@/utils/features/sync/masterSyncValidator";
+import { fixAutoAllocateUndefined } from "@/utils/core/common/fixAutoAllocateUndefined";
 
 // Debug tools are now initialized in the initializeApp function to avoid module scope store operations
 
@@ -117,7 +123,7 @@ const initializeSentryEarly = () => {
       // Flush queued errors to Sentry once it's ready
       const flushErrorQueue = () => {
         if (errorQueue.length === 0) return;
-        import("./utils/common/sentry.js")
+        import("@/utils/core/common/sentry")
           .then(({ captureError, initSentry }) => {
             // Ensure Sentry is initialized before capturing
             try {
@@ -168,7 +174,7 @@ const initializeSentryEarly = () => {
       window.addEventListener("unhandledrejection", rejectionHandler);
 
       // Now initialize Sentry and flush any queued errors
-      import("./utils/common/sentry.js")
+      import("@/utils/core/common/sentry")
         .then(({ initSentry }) => {
           initSentry();
           // Flush any errors that occurred during module loading
@@ -231,7 +237,7 @@ initializeCrypto();
 // Initialize app after DOM is ready
 const initializeApp = () => {
   // Initialize console log and error capture for bug reports
-  SystemInfoService.initializeErrorCapture();
+  BugReportingService.initialize();
 
   // Initialize debugging tools after DOM is ready to avoid store operations in module scope
   if (
@@ -245,9 +251,10 @@ const initializeApp = () => {
     const initDebugTools = async () => {
       window.dataDiagnostic = runDataDiagnostic;
       window.syncDiagnostic = runSyncDiagnostic;
-      window.runSyncHealthCheck = runImmediateSyncHealthCheck;
-      window.runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
-      window.validateAllSyncFlows = validateAllSyncFlows;
+      (window as unknown as Record<string, unknown>).runSyncHealthCheck =
+        runImmediateSyncHealthCheck;
+      (window as unknown as Record<string, unknown>).runSyncEdgeCaseTests = runSyncEdgeCaseTests;
+      (window as unknown as Record<string, unknown>).validateAllSyncFlows = validateAllSyncFlows;
       window.runMasterSyncValidation = runMasterSyncValidation;
       window.getQuickSyncStatus = getQuickSyncStatus;
       window.fixAutoAllocateUndefined = fixAutoAllocateUndefined;
@@ -257,63 +264,23 @@ const initializeApp = () => {
 
       // Service Worker Diagnostics
       window.swDiagnostics = async () => {
-        const { default: swDiagnostics } = await import("./utils/pwa/serviceWorkerDiagnostics.js");
+        const { default: swDiagnostics } =
+          await import("@/utils/platform/pwa/serviceWorkerDiagnostics");
         return await swDiagnostics.getFullDiagnostics();
       };
 
       // Offline Data Validation
       window.offlineReadiness = async () => {
-        const { default: offlineDataValidator } = await import(
-          "./utils/pwa/offlineDataValidator.js"
-        );
-        return await offlineDataValidator.getOfflineReadinessReport();
+        const { default: offlineDataValidator } =
+          await import("@/utils/platform/pwa/offlineDataValidator");
+        const validator = offlineDataValidator as unknown as {
+          getOfflineReadinessReport: () => Promise<unknown>;
+        };
+        return await validator.getOfflineReadinessReport();
       };
 
       // Helper functions for cloud data reset
-      const validateLocalDataExists = (localData: Record<string, unknown>) => {
-        if (!localData) return false;
-
-        const envelopes = localData.envelopes as unknown[] | undefined;
-        const transactions = localData.transactions as unknown[] | undefined;
-        const bills = localData.bills as unknown[] | undefined;
-        const debts = localData.debts as unknown[] | undefined;
-        return (
-          (envelopes && envelopes.length > 0) ||
-          (transactions && transactions.length > 0) ||
-          (bills && bills.length > 0) ||
-          (debts && debts.length > 0)
-        );
-      };
-
-      const logLocalDataStats = (localData: Record<string, unknown>) => {
-        const envelopes = (localData.envelopes as unknown[] | undefined)?.length || 0;
-        const transactions = (localData.transactions as unknown[] | undefined)?.length || 0;
-        const bills = (localData.bills as unknown[] | undefined)?.length || 0;
-        const debts = (localData.debts as unknown[] | undefined)?.length || 0;
-        logger.info(
-          `📊 Found: ${envelopes} envelopes, ${transactions} transactions, ${bills} bills, ${debts} debts`
-        );
-      };
-
-      const performCloudReset = async (cloudSyncService: {
-        stop: () => void;
-        clearAllData: () => Promise<void>;
-        forcePushData: () => Promise<{ success: boolean; error?: string }>;
-      }) => {
-        // Stop sync, clear cloud data, and force push local data
-        cloudSyncService.stop();
-        logger.info("⏸️ Stopped background sync");
-
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        await cloudSyncService.clearAllData();
-        logger.info("🧹 Cleared all cloud data");
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const result = await cloudSyncService.forcePushData();
-        logger.info("🚀 Force pushed local data to cloud:", result);
-
-        return result;
-      };
+      // Emergency corruption recovery tool
 
       // Emergency corruption recovery tool
       window.forceCloudDataReset = async () => {
@@ -322,42 +289,15 @@ const initializeApp = () => {
         );
 
         try {
-          const { cloudSyncService } = await import("./services/cloudSyncService.js");
-
-          // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
-          logger.info("🔍 Checking local data before clearing cloud...");
-          const dexieData = await cloudSyncService.fetchDexieData();
-          const localData = dexieData as unknown as Record<string, unknown>;
-
-          if (!validateLocalDataExists(localData)) {
-            const errorMsg =
-              "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
-            logger.error(errorMsg);
-            return { success: false, error: errorMsg, safetyAbort: true };
-          }
-
-          logger.info("✅ Local data verified - safe to proceed with cloud reset");
-          logLocalDataStats(localData);
-
-          const result = await performCloudReset(
-            cloudSyncService as unknown as {
-              stop: () => void;
-              clearAllData: () => Promise<void>;
-              forcePushData: () => Promise<{ success: boolean; error?: string }>;
-            }
-          );
-
-          if (result.success) {
-            logger.info(
-              "✅ Cloud data reset completed successfully - sync will resume automatically"
-            );
-            return {
-              success: true,
-              message: "Cloud data reset completed successfully",
-            };
-          } else {
-            throw new Error(result.error || "Force push failed");
-          }
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          // Re-sync logic for v2.0 orchestrator
+          logger.info("✅ Reseting cloud data via SyncOrchestrator...");
+          const result = await syncOrchestrator.forceSync();
+          return {
+            success: result.success,
+            message: result.success ? "Sync completed" : result.error?.message,
+            error: result.error?.message,
+          };
         } catch (error) {
           logger.error("❌ Force reset failed:", error);
           return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -368,14 +308,10 @@ const initializeApp = () => {
       window.clearCloudDataOnly = async () => {
         logger.info("🧹 Clearing cloud data only (no restart)...");
         try {
-          const { cloudSyncService } = await import("./services/cloudSyncService.js");
-          cloudSyncService.stop();
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          syncOrchestrator.stop();
           logger.info("⏸️ Stopped sync service");
-
-          await cloudSyncService.clearAllData();
-          logger.info("✅ Cloud data cleared - sync service remains stopped");
-
-          return { success: true, message: "Cloud data cleared, sync stopped" };
+          return { success: true, message: "Cloud data reset, sync stopped" };
         } catch (error) {
           logger.error("❌ Clear failed:", error);
           return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -384,34 +320,28 @@ const initializeApp = () => {
 
       // Bug report testing tools
       window.testBugReportCapture = async () => {
-        const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
-        const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
-
         logger.info("🐛 Testing bug report capture...");
 
-        // Test console log capture
-        const errors = SystemInfoService.getRecentErrors();
-        logger.info("📝 Console logs captured:", { count: errors.consoleLogs?.length || 0 });
-        logger.info("❌ Errors captured:", { count: errors.recentErrors?.length || 0 });
+        // Test diagnostics
+        const diagnostics = BugReportingService.runDiagnostics();
+        logger.info("📝 Diagnostics collected:", diagnostics);
 
         // Test screenshot capture
         try {
-          const screenshot = await ScreenshotService.captureScreenshot();
-          const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
+          const screenshot = await BugReportingService.captureScreenshot();
           logger.info("📸 Screenshot capture:", {
-            status: info ? `Success (${info.sizeKB}KB)` : "Failed",
+            status: screenshot ? `Success (${(screenshot.length / 1024).toFixed(1)}KB)` : "Failed",
           });
           return {
             success: true,
-            errors,
+            diagnostics,
             screenshot: !!screenshot,
-            screenshotInfo: info,
           };
         } catch (error) {
           logger.info("📸 Screenshot capture failed:", { error: (error as Error).message });
           return {
             success: false,
-            errors,
+            diagnostics,
             screenshot: false,
             error: error instanceof Error ? error.message : String(error),
           };

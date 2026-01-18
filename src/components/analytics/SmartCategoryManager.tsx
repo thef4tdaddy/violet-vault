@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { useSmartCategoryAnalysis } from "@/hooks/analytics/useSmartCategoryAnalysis";
-import { useSmartCategoryManager } from "@/hooks/analytics/useSmartCategoryManager";
+import { useSmartCategoryAnalysis } from "@/hooks/platform/analytics/useSmartCategoryAnalysis";
+import { useSmartCategoryManager } from "@/hooks/platform/analytics/useSmartCategoryManager";
 import {
   calculateCategoryStats,
   processSuggestions,
   Suggestion,
   TransactionForStats,
-} from "@/utils/analytics/categoryHelpers";
+} from "@/utils/features/analytics/categoryHelpers";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
 import CategoryNavigationTabs from "./CategoryNavigationTabs";

@@ -2,6 +2,8 @@
  * Mock implementations for testing TanStack Query hooks
  * Provides mocks for Firebase, Dexie, and other external dependencies
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines-per-function */
 import { vi } from "vitest";
 import type { Transaction, Envelope } from "../types/finance";
 import type { Bill } from "../types/bills";
@@ -20,10 +22,31 @@ type EventListenerOrEventListenerObject =
 export const createMockDexie = () => {
   const mockData = {
     transactions: [] as Transaction[],
-    bills: [] as Bill[],
-    envelopes: [] as Envelope[],
+    envelopes: [] as (Envelope & { type?: string })[],
     accounts: [] as Record<string, unknown>[],
-    savingsGoals: [] as Record<string, unknown>[],
+    // Legacy maps for test convenience
+    get bills() {
+      return this.envelopes.filter((e) => e.type === "bill");
+    },
+    set bills(vals: any[]) {
+      this.envelopes = this.envelopes.filter((e) => e.type !== "bill").concat(vals);
+    },
+    get savingsGoals() {
+      return this.envelopes.filter((e) => e.type === "goal" || e.type === "savings");
+    },
+    set savingsGoals(vals: any[]) {
+      this.envelopes = this.envelopes
+        .filter((e) => e.type !== "goal" && e.type !== "savings")
+        .concat(vals);
+    },
+    get debts() {
+      return this.envelopes.filter((e) => e.type === "liability" || e.type === "bill");
+    },
+    set debts(vals: any[]) {
+      this.envelopes = this.envelopes
+        .filter((e) => e.type !== "liability" && e.type !== "bill")
+        .concat(vals);
+    },
   };
 
   return {
@@ -31,7 +54,57 @@ export const createMockDexie = () => {
       toArray: vi.fn(async () => mockData.transactions),
       orderBy: vi.fn(() => ({
         reverse: vi.fn(() => ({
+          limit: vi.fn((n: number) => ({
+            toArray: vi.fn(async () => mockData.transactions.slice(0, n)),
+          })),
           toArray: vi.fn(async () => mockData.transactions),
+        })),
+      })),
+      where: vi.fn().mockImplementation((key: string) => ({
+        equals: vi.fn().mockImplementation((val: any) => {
+          // Shared predicate for this key/value pair, used by both toArray and filter
+          const baseFilter = (t: any): boolean => {
+            if (key === "isScheduled") {
+              // Handle both boolean and numeric (0/1) from Dexie
+              const isScheduled = t.isScheduled === true || t.isScheduled === 1;
+              const matchValue = val === true || val === 1;
+              return isScheduled === matchValue;
+            }
+            if (key === "type") {
+              return t.type === val;
+            }
+            return (t as any)[key] === val;
+          };
+
+          return {
+            toArray: vi.fn(async () => {
+              return mockData.transactions.filter(baseFilter);
+            }),
+            filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+              toArray: vi.fn(async () => {
+                // Apply both the equals predicate and the additional filter predicate
+                return mockData.transactions.filter((t: any) => baseFilter(t) && fn(t));
+              }),
+            })),
+          };
+        }),
+        aboveOrEqual: vi.fn().mockImplementation((val: any) => ({
+          filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+            toArray: vi.fn(async () => {
+              if (key === "date") {
+                return mockData.transactions.filter((t) => {
+                  return new Date(t.date) >= new Date(val) && fn(t);
+                });
+              }
+              return mockData.transactions.filter(fn);
+            }),
+          })),
+          toArray: vi.fn(async () => {
+            if (key === "date") {
+              return mockData.transactions.filter((t) => new Date(t.date) >= new Date(val));
+            }
+            return mockData.transactions;
+          }),
         })),
       })),
       add: vi.fn(async (item: Transaction) => {
@@ -61,41 +134,49 @@ export const createMockDexie = () => {
           mockData.transactions.splice(index, 1);
         }
       }),
+      filter: vi.fn().mockImplementation((fn: (t: any) => boolean) => ({
+        toArray: vi.fn(async () => mockData.transactions.filter(fn)),
+      })),
       get: vi.fn(async (id: string) => {
         return mockData.transactions.find((t) => t.id === id);
       }),
     },
     bills: {
       toArray: vi.fn(async () => mockData.bills),
-      add: vi.fn(async (item: Bill) => {
-        mockData.bills.push(item);
+      add: vi.fn(async (item: any) => {
+        const newItem = { ...item, type: "bill" };
+        mockData.envelopes.push(newItem);
         return item.id;
       }),
-      put: vi.fn(async (item: Bill) => {
-        const index = mockData.bills.findIndex((b) => b.id === item.id);
+      put: vi.fn(async (item: any) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === item.id);
+        const newItem = { ...item, type: "bill" };
         if (index >= 0) {
-          mockData.bills[index] = item;
+          mockData.envelopes[index] = newItem;
         } else {
-          mockData.bills.push(item);
+          mockData.envelopes.push(newItem);
         }
         return item.id;
       }),
-      update: vi.fn(async (id: string, updates: Partial<Bill>) => {
-        const index = mockData.bills.findIndex((b) => b.id === id);
+      update: vi.fn(async (id: string, updates: any) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === id);
         if (index >= 0) {
-          mockData.bills[index] = { ...mockData.bills[index], ...updates };
+          mockData.envelopes[index] = { ...mockData.envelopes[index], ...updates };
           return 1;
         }
         return 0;
       }),
       delete: vi.fn(async (id: string) => {
-        const index = mockData.bills.findIndex((b) => b.id === id);
+        const index = mockData.envelopes.findIndex((e) => e.id === id);
         if (index >= 0) {
-          mockData.bills.splice(index, 1);
+          mockData.envelopes.splice(index, 1);
         }
       }),
       get: vi.fn(async (id: string) => {
-        return mockData.bills.find((b) => b.id === id);
+        return mockData.envelopes.find((e) => e.id === id && e.type === "bill");
+      }),
+      clear: vi.fn(async () => {
+        mockData.envelopes = mockData.envelopes.filter((e) => e.type !== "bill");
       }),
     },
     envelopes: {
@@ -127,6 +208,28 @@ export const createMockDexie = () => {
           mockData.envelopes.splice(index, 1);
         }
       }),
+      where: vi.fn().mockImplementation((key: string) => ({
+        equals: vi.fn().mockImplementation((val: any) => ({
+          toArray: vi.fn(async () => {
+            if (key === "type") {
+              return mockData.envelopes.filter((e: any) => {
+                if (val === "liability") return e.type === "liability" || e.type === "bill";
+                if (val === "goal") return e.type === "goal" || e.type === "savings";
+                return e.type === val;
+              });
+            }
+            if (key === "archived") {
+              const numericVal = val === true ? 1 : val === false ? 0 : val;
+              return mockData.envelopes.filter((e: any) => {
+                const eArchived = e.archived === true || e.archived === 1 ? 1 : 0;
+                return eArchived === numericVal;
+              });
+            }
+            return mockData.envelopes;
+          }),
+        })),
+        toArray: vi.fn(async () => mockData.envelopes),
+      })),
       get: vi.fn(async (id: string) => {
         return mockData.envelopes.find((e) => e.id === id);
       }),
@@ -136,18 +239,109 @@ export const createMockDexie = () => {
     },
     savingsGoals: {
       toArray: vi.fn(async () => mockData.savingsGoals),
+      add: vi.fn(async (item: any) => {
+        const newItem = { ...item, type: "goal" };
+        mockData.envelopes.push(newItem);
+        return item.id;
+      }),
+      put: vi.fn(async (item: any) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === item.id);
+        const newItem = { ...item, type: "goal" };
+        if (index >= 0) {
+          mockData.envelopes[index] = newItem;
+        } else {
+          mockData.envelopes.push(newItem);
+        }
+        return item.id;
+      }),
+      clear: vi.fn(async () => {
+        mockData.envelopes = mockData.envelopes.filter((e) => e.type !== "goal");
+      }),
+    },
+    debts: {
+      toArray: vi.fn(async () => mockData.debts),
+      add: vi.fn(async (item: any) => {
+        const newItem = { ...item, type: "liability" };
+        mockData.envelopes.push(newItem);
+        return item.id;
+      }),
+      put: vi.fn(async (item: any) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === item.id);
+        const newItem = { ...item, type: "liability" };
+        if (index >= 0) {
+          mockData.envelopes[index] = newItem;
+        } else {
+          mockData.envelopes.push(newItem);
+        }
+        return item.id;
+      }),
+      clear: vi.fn(async () => {
+        mockData.envelopes = mockData.envelopes.filter(
+          (e) => e.type !== "liability" && e.type !== "bill"
+        );
+      }),
     },
     getEnvelopesByCategory: vi.fn(async (category: string) => {
       return mockData.envelopes.filter((e) => e.category === category);
     }),
+    getPaycheckHistory: vi.fn(async (limit: number = 50) => {
+      return mockData.transactions
+        .filter((t: any) => t.type === "income" && !!t.allocations)
+        .slice(0, limit);
+    }),
     _mockData: mockData, // Exposed for test assertions
     _resetMockData: () => {
       mockData.transactions = [];
-      mockData.bills = [];
       mockData.envelopes = [];
       mockData.accounts = [];
-      mockData.savingsGoals = [];
     },
+    bulkUpsertEnvelopes: vi.fn(async (envelopes: any[]) => {
+      envelopes.forEach((env) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === env.id);
+        if (index >= 0) {
+          mockData.envelopes[index] = env;
+        } else {
+          mockData.envelopes.push(env);
+        }
+      });
+    }),
+    bulkUpsertTransactions: vi.fn(async (transactions: any[]) => {
+      transactions.forEach((tx) => {
+        const index = mockData.transactions.findIndex((t) => t.id === tx.id);
+        if (index >= 0) {
+          mockData.transactions[index] = tx;
+        } else {
+          mockData.transactions.push(tx);
+        }
+      });
+    }),
+    bulkUpsertBills: vi.fn(async (bills: any[]) => {
+      bills.forEach((bill) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === bill.id);
+        const newItem = { ...bill, type: "bill" };
+        if (index >= 0) {
+          mockData.envelopes[index] = newItem;
+        } else {
+          mockData.envelopes.push(newItem);
+        }
+      });
+    }),
+    bulkUpsertSavingsGoals: vi.fn(async (goals: any[]) => {
+      goals.forEach((goal) => {
+        const index = mockData.envelopes.findIndex((e) => e.id === goal.id);
+        const newItem = { ...goal, type: "goal" };
+        if (index >= 0) {
+          mockData.envelopes[index] = newItem;
+        } else {
+          mockData.envelopes.push(newItem);
+        }
+      });
+    }),
+    clearData: vi.fn(async () => {
+      mockData.transactions = [];
+      mockData.envelopes = [];
+      mockData.accounts = [];
+    }),
   };
 };
 
@@ -278,16 +472,29 @@ export const mockDataGenerators = {
     ...overrides,
   }),
 
-  bill: (overrides = {}) => ({
+  bill: (
+    overrides: Partial<Bill & { isPaid?: boolean; paidDate?: string; paidAmount?: number }> = {}
+  ) => ({
     id: `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: "Test Bill",
-    provider: "Test Provider",
-    amount: 50,
-    dueDate: new Date().toISOString().split("T")[0],
+    // Phase 2 Migration: Bills are now scheduled expense transactions
+    description: overrides.name || "Test Bill", // name maps to description
+    date: overrides.dueDate || new Date().toISOString().split("T")[0], // dueDate maps to date
+    // Ensure amount is always negative for expenses - normalize if positive passed
+    amount: -Math.abs((overrides.amount as number) || 50), // Negative for expense
+    envelopeId: overrides.envelopeId || "unassigned",
     category: "Bills & Utilities",
-    isPaid: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    type: "expense" as const,
+    isScheduled: true, // Bills are scheduled transactions
+    recurrenceRule: overrides.recurrenceRule || undefined,
+    lastModified: Date.now(),
+    createdAt: Date.now(),
+    notes: overrides.notes || undefined,
+    // Computed fields for backward compatibility
+    name: overrides.name || "Test Bill",
+    dueDate: overrides.dueDate || new Date().toISOString().split("T")[0],
+    isPaid: overrides.isPaid || false,
+    paidDate: overrides.paidDate || undefined,
+    paidAmount: overrides.paidAmount || undefined,
     ...overrides,
   }),
 
@@ -298,6 +505,7 @@ export const mockDataGenerators = {
     currentBalance: 1000,
     targetAmount: 1500,
     archived: false,
+    type: "standard",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,
@@ -310,6 +518,7 @@ export const mockDataGenerators = {
     currentAmount: 1000,
     targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     isActive: true,
+    type: "goal",
     createdAt: new Date().toISOString(),
     ...overrides,
   }),

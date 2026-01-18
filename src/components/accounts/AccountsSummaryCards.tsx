@@ -1,5 +1,4 @@
-import { getIcon } from "@/utils";
-import PageSummaryCard from "../ui/PageSummaryCard";
+import { MetricCard } from "../primitives/cards/MetricCard";
 
 interface SupplementalAccount {
   id: string | number;
@@ -47,39 +46,43 @@ const AccountsSummaryCards = ({ accounts = [] }: AccountsSummaryCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {/* Total Accounts */}
-      <PageSummaryCard
-        icon={getIcon("CreditCard")}
-        label="Total Accounts"
+      <MetricCard
+        icon="CreditCard"
+        title="Total Accounts"
         value={accounts.length}
-        color="cyan"
-        subtext={`${activeAccounts} with funds`}
+        variant="info"
+        subtitle={`${activeAccounts} with funds`}
       />
 
       {/* Total Value */}
-      <PageSummaryCard
-        icon={getIcon("DollarSign")}
-        label="Total Value"
-        value={`$${totalValue.toFixed(2)}`}
-        color="green"
-        subtext="Combined balance"
+      <MetricCard
+        icon="DollarSign"
+        title="Total Value"
+        value={totalValue}
+        variant="success"
+        format="currency"
+        subtitle="Combined balance"
       />
 
       {/* 30-Day Spending */}
-      <PageSummaryCard
-        icon={getIcon("TrendingDown")}
-        label="Last 30 Days"
-        value={`$${last30DaysSpending.toFixed(2)}`}
-        color="amber"
-        subtext="Total spending"
+      <MetricCard
+        icon="TrendingDown"
+        title="Last 30 Days"
+        value={last30DaysSpending}
+        variant="warning"
+        format="currency"
+        subtitle="Total spending"
       />
 
       {/* Depletion Estimate */}
-      <PageSummaryCard
-        icon={getIcon("Clock")}
-        label="Depletion Est."
+      <MetricCard
+        icon="Clock"
+        title="Depletion Est."
         value={depletionEstimate}
-        color="cyan"
-        subtext="At current rate"
+        variant="info"
+        format="custom"
+        customFormatter={(val) => String(val)}
+        subtitle="At current rate"
       />
     </div>
   );

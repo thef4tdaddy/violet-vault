@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "@/utils";
-import { calculateDaysUntilExpiration } from "@/utils/accounts";
+import { calculateDaysUntilExpiration } from "@/utils/domain/accounts";
 
 interface Account {
   id: string | number;

@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
-import { useAutoFunding } from "@/hooks/budgeting/autofunding";
-import { useEnvelopesQuery } from "@/hooks/budgeting/useEnvelopesQuery";
+import { useAutoFunding } from "@/hooks/budgeting/allocations";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { globalToast } from "@/stores/ui/toastStore";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { ViewHeader, ViewTabs, ViewContent } from "./AutoFundingViewComponents";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { useAutoFundingHandlers } from "./useAutoFundingHandlers";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 
 function AutoFundingView() {
   const navigate = useNavigate();
-  const { envelopes } = useEnvelopesQuery();
+  const { envelopes } = useEnvelopes();
   const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
     useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);

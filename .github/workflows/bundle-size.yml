@@ -12,6 +12,10 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
+  # Bundle size baseline (measured 2026-01-14)
+  BUNDLE_SIZE_BASELINE_BYTES: 11608674 # ~11.07 MB total
+  BUNDLE_SIZE_GZIP_BASELINE_BYTES: 1634434 # ~1.56 MB gzipped
+  MAX_INCREASE_PCT: 15 # Fail if bundle grows >15%
 
 permissions:
   contents: read
@@ -36,7 +40,9 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Build PR bundle
-        run: npm run build:nightly
+        run: npm run build:staging
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Analyze PR bundle
         id: pr_bundle
@@ -96,7 +102,9 @@ jobs:
 
       - name: Build base bundle
         if: github.event_name == 'pull_request'
-        run: npm run build:nightly
+        run: npm run build:staging
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Analyze base bundle
         if: github.event_name == 'pull_request'
@@ -143,18 +151,41 @@ jobs:
           TOTAL_PCT=$(echo "scale=2; ($TOTAL_DIFF / $BASE_TOTAL) * 100" | bc)
           GZIP_PCT=$(echo "scale=2; ($GZIP_DIFF / $BASE_GZIP) * 100" | bc)
 
+          # Check against baseline (convert KB to bytes for comparison)
+          PR_TOTAL_BYTES=$(echo "scale=0; $PR_TOTAL * 1024" | bc)
+          PR_GZIP_BYTES=$(echo "scale=0; $PR_GZIP * 1024" | bc)
+          BASELINE_TOTAL=${{ env.BUNDLE_SIZE_BASELINE_BYTES }}
+          BASELINE_GZIP=${{ env.BUNDLE_SIZE_GZIP_BASELINE_BYTES }}
+
+          BASELINE_TOTAL_PCT=$(echo "scale=2; (($PR_TOTAL_BYTES - $BASELINE_TOTAL) / $BASELINE_TOTAL) * 100" | bc)
+          BASELINE_GZIP_PCT=$(echo "scale=2; (($PR_GZIP_BYTES - $BASELINE_GZIP) / $BASELINE_GZIP) * 100" | bc)
+
           echo "total_diff=$TOTAL_DIFF" >> $GITHUB_OUTPUT
           echo "gzip_diff=$GZIP_DIFF" >> $GITHUB_OUTPUT
           echo "total_pct=$TOTAL_PCT" >> $GITHUB_OUTPUT
           echo "gzip_pct=$GZIP_PCT" >> $GITHUB_OUTPUT
+          echo "baseline_total_pct=$BASELINE_TOTAL_PCT" >> $GITHUB_OUTPUT
+          echo "baseline_gzip_pct=$BASELINE_GZIP_PCT" >> $GITHUB_OUTPUT
 
-          # Check if exceeds budget
+          # Check if exceeds budget (250KB gzipped initial load)
           BUDGET_EXCEEDED=false
           if (( $(echo "$PR_GZIP > 250" | bc -l) )); then
             BUDGET_EXCEEDED=true
           fi
 
+          # Check if exceeds baseline by more than allowed percentage
+          BASELINE_EXCEEDED=false
+          MAX_INCREASE=${{ env.MAX_INCREASE_PCT }}
+          if (( $(echo "$BASELINE_TOTAL_PCT > $MAX_INCREASE" | bc -l) )) || (( $(echo "$BASELINE_GZIP_PCT > $MAX_INCREASE" | bc -l) )); then
+            BASELINE_EXCEEDED=true
+          fi
+
           echo "budget_exceeded=$BUDGET_EXCEEDED" >> $GITHUB_OUTPUT
+          echo "baseline_exceeded=$BASELINE_EXCEEDED" >> $GITHUB_OUTPUT
+
+          echo "📊 Comparison Results:"
+          echo "  vs Base: Total ${TOTAL_PCT}%, Gzip ${GZIP_PCT}%"
+          echo "  vs Baseline: Total ${BASELINE_TOTAL_PCT}%, Gzip ${BASELINE_GZIP_PCT}%"
 
       - name: Comment PR with bundle analysis
         if: github.event_name == 'pull_request'
@@ -191,9 +222,24 @@ jobs:
               return '🟢 **Bundle size within budget**';
             };
 
+            const getBaselineStatus = () => {
+              const baselineTotalPct = parseFloat('${{ steps.compare.outputs.baseline_total_pct }}' || '0');
+              const baselineGzipPct = parseFloat('${{ steps.compare.outputs.baseline_gzip_pct }}' || '0');
+              const maxIncrease = ${{ env.MAX_INCREASE_PCT }};
+              
+              if (baselineTotalPct > maxIncrease || baselineGzipPct > maxIncrease) {
+                return `🔴 **Exceeds baseline** by ${Math.max(baselineTotalPct, baselineGzipPct).toFixed(2)}% (max: ${maxIncrease}%)`;
+              }
+              if (baselineTotalPct > maxIncrease * 0.7 || baselineGzipPct > maxIncrease * 0.7) {
+                return `🟡 **Approaching baseline limit** (${Math.max(baselineTotalPct, baselineGzipPct).toFixed(2)}% of ${maxIncrease}%)`;
+              }
+              return `🟢 **Within baseline** (+${Math.max(baselineTotalPct, baselineGzipPct).toFixed(2)}% of ${maxIncrease}% allowed)`;
+            };
+
             const comment = `## 📦 Bundle Size Report
 
             ${getBudgetStatus()}
+            ${getBaselineStatus()}
 
             ### Bundle Sizes
 
@@ -214,6 +260,12 @@ jobs:
             |----------|--------|---------|--------|
             | Main bundle (gzipped) | < 100KB | ${Math.min(largestJsKb, prGzip).toFixed(2)}KB | ${largestJsKb < 100 ? '✅' : '❌'} |
             | Total initial load (gzipped) | < 250KB | ${prGzip.toFixed(2)}KB | ${prGzip < 250 ? '✅' : '❌'} |
+
+            ### Baseline Comparison
+
+            - **Baseline Total**: ${(${{ env.BUNDLE_SIZE_BASELINE_BYTES }} / 1024 / 1024).toFixed(2)}MB
+            - **Baseline Gzipped**: ${(${{ env.BUNDLE_SIZE_GZIP_BASELINE_BYTES }} / 1024 / 1024).toFixed(2)}MB
+            - **Max Allowed Growth**: ${{ env.MAX_INCREASE_PCT }}%
 
             ${budgetExceeded ? '\n⚠️ **Action Required**: Bundle size exceeds the configured budget. Consider code splitting or removing unused dependencies.\n' : ''}
 
@@ -249,11 +301,20 @@ jobs:
             }
 
       - name: Fail if budget exceeded
-        if: steps.compare.outputs.budget_exceeded == 'true'
+        if: steps.compare.outputs.budget_exceeded == 'true' || steps.compare.outputs.baseline_exceeded == 'true'
         run: |
-          echo "❌ Bundle size exceeds the configured budget!"
-          echo "Current gzipped size: ${{ steps.pr_bundle.outputs.gzip_size }}KB"
-          echo "Budget: 250KB"
+          if [ "${{ steps.compare.outputs.budget_exceeded }}" == "true" ]; then
+            echo "❌ Bundle size exceeds the configured budget!"
+            echo "Current gzipped size: ${{ steps.pr_bundle.outputs.gzip_size }}KB"
+            echo "Budget: 250KB"
+          fi
+
+          if [ "${{ steps.compare.outputs.baseline_exceeded }}" == "true" ]; then
+            echo "❌ Bundle size exceeds baseline by more than ${{ env.MAX_INCREASE_PCT }}%!"
+            echo "Baseline total growth: ${{ steps.compare.outputs.baseline_total_pct }}%"
+            echo "Baseline gzip growth: ${{ steps.compare.outputs.baseline_gzip_pct }}%"
+          fi
+
           echo "Please optimize the bundle size before merging."
           exit 1
 

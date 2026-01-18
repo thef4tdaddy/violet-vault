@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { globalToast } from "@/stores/ui/toastStore";
-import useEditLock from "@/hooks/common/useEditLock";
-import { initializeEditLocks } from "@/services/editLockService";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
+import { useEditLockInit } from "@/hooks/core/auth/security/useEditLockInit";
+import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
+import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {
@@ -41,6 +41,7 @@ interface TransactionFormProps {
   smartCategorySuggestion?: (description: string) => TransactionCategorySuggestion | null;
 }
 
+/* eslint-disable complexity */
 const TransactionForm: React.FC<TransactionFormProps> = ({
   isOpen,
   onClose,
@@ -56,17 +57,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   smartCategorySuggestion,
 }) => {
   // Get auth context for edit locking
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
 
   // Initialize edit lock service when modal opens
-  useEffect(() => {
-    if (isOpen && budgetId && currentUser) {
-      initializeEditLocks(budgetId, currentUser);
-    }
-  }, [isOpen, budgetId, currentUser]);
+  // Using hook to avoid direct service import
+  useEditLockInit(isOpen ? budgetId : null, isOpen ? currentUser : null);
 
   // Edit locking for the transaction (only when editing existing transaction)
   const editLock = useEditLock("transaction", editingTransaction?.id?.toString() || "", {

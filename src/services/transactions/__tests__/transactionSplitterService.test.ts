@@ -419,9 +419,9 @@ describe("TransactionSplitterService", () => {
       expect(result[0].date).toBe(mockTransaction.date);
 
       // Check metadata
-      expect(result[0].metadata?.parentTransactionId).toBe(mockTransaction.id);
-      expect(result[0].metadata?.splitIndex).toBe(0);
-      expect(result[0].metadata?.totalSplits).toBe(2);
+      expect(result[0].metadata?.splitData?.originalTransactionId).toBe(mockTransaction.id);
+      expect(result[0].metadata?.splitData?.splitIndex).toBe(0);
+      expect(result[0].metadata?.splitData?.totalSplits).toBe(2);
     });
 
     it("should preserve transaction sign for negative amounts", () => {

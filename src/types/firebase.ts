@@ -119,22 +119,28 @@ export interface IFirebaseSyncService {
 
   initialize(budgetId: string, encryptionKey: string): void;
   ensureAuthenticated(): Promise<boolean>;
-  saveToCloud(data: unknown, metadata?: Partial<SyncMetadata>): Promise<boolean>;
-  loadFromCloud(): Promise<unknown>;
-  setupRealTimeSync(callback: (data: unknown) => void): void;
+  saveToCloud<T extends SafeUnknown>(
+    data: T,
+    metadata?: Partial<SyncMetadata>
+  ): Promise<TypedResponse<boolean>>;
+  loadFromCloud<T extends SafeUnknown>(): Promise<TypedResponse<T | null>>;
+  setupRealTimeSync<T extends SafeUnknown>(callback: (data: TypedResponse<T | null>) => void): void;
   stopRealTimeSync(): void;
   getStatus(): FirebaseServiceStatus;
   cleanup(): void;
 
   // Event listeners
-  addSyncListener(callback: (event: string, data: unknown) => void): void;
-  removeSyncListener(callback: (event: string, data: unknown) => void): void;
+  addSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void;
+  removeSyncListener(callback: (event: string, data: TypedResponse<SafeUnknown>) => void): void;
 }
 
 export interface IChunkedSyncService {
   initialize(budgetId: string, encryptionKey: string): Promise<void>;
-  saveToCloud(data: unknown, currentUser: CloudSyncConfig["currentUser"]): Promise<boolean>;
-  loadFromCloud(): Promise<unknown>;
+  saveToCloud<T extends SafeUnknown>(
+    data: T,
+    currentUser: CloudSyncConfig["currentUser"]
+  ): Promise<TypedResponse<boolean>>;
+  loadFromCloud<T extends SafeUnknown>(): Promise<TypedResponse<T | null>>;
   getStats(): ChunkedSyncStats;
 
   // Chunk management

@@ -1,14 +1,18 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { keyExportUtils } from "@/utils/security/keyExport";
-import logger from "@/utils/common/logger";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { keyExportUtils } from "@/utils/platform/security/keyExport";
+import logger from "@/utils/core/common/logger";
+import {
+  withAsyncOperation,
+  validateEncryptionContext,
+  validateExportPassword,
+} from "@/utils/platform/security/asyncOperationHelpers";
 
 import type {
   ExportedKeyData,
   ProtectedKeyFile,
   ImportedKeyData,
-} from "@/utils/security/keyExport";
+} from "@/utils/platform/security/keyExport";
 
 /**
  * Hook for managing encryption key export/import operations
@@ -21,11 +25,9 @@ export const useKeyManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  // Use AuthContext for state + useAuthManager for operations
-  const authContext = useAuth();
-  const authManager = useAuthManager();
-  const { encryptionKey, salt, budgetId } = authContext;
-  const { login } = authManager;
+  // Use unified useAuth hook for both state and operations
+  const auth = useAuth();
+  const { encryptionKey, salt, budgetId, login } = auth;
 
   // Clear error state
   const clearError = useCallback(() => {
@@ -38,65 +40,70 @@ export const useKeyManagement = () => {
   }, []);
 
   /**
+   * Core export logic without async operation wrapper
+   * Used internally by other export methods to avoid nested wrappers
+   */
+  const _exportKeyInternal = useCallback(async (): Promise<ExportedKeyData> => {
+    const {
+      encryptionKey: key,
+      salt: s,
+      budgetId: id,
+    } = validateEncryptionContext(encryptionKey, salt, budgetId);
+    const keyData = await keyExportUtils.exportKeyData(key, s, id);
+    logger.debug("Key exported successfully", {
+      fingerprint: keyData.fingerprint.substring(0, 8),
+      budgetId: keyData.budgetId,
+    });
+    return keyData;
+  }, [encryptionKey, salt, budgetId]);
+
+  /**
    * Export current encryption key as unprotected JSON
    */
   const exportKey = useCallback(async (): Promise<ExportedKeyData> => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      if (!encryptionKey || !salt || !budgetId) {
-        throw new Error("No encryption key available - please login first");
-      }
-
-      const keyData = await keyExportUtils.exportKeyData(encryptionKey, salt, budgetId);
-      logger.debug("Key exported successfully", {
-        fingerprint: keyData.fingerprint.substring(0, 8),
-        budgetId: keyData.budgetId,
-      });
-
-      return keyData;
-    } catch (err) {
-      const errorMessage = `Failed to export key: ${err instanceof Error ? err.message : String(err)}`;
-      setError(errorMessage);
-      logger.error("Key export failed", err);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [encryptionKey, salt, budgetId]);
+    return withAsyncOperation(_exportKeyInternal, { setLoading, setError }, "Failed to export key");
+  }, [_exportKeyInternal]);
 
   /**
    * Export key as password-protected file
    */
   const exportProtectedKey = useCallback(
     async (exportPassword: string): Promise<ProtectedKeyFile> => {
-      try {
-        setLoading(true);
-        setError(null);
+      return withAsyncOperation(
+        async () => {
+          validateExportPassword(exportPassword);
 
-        if (!exportPassword || exportPassword.length < 8) {
-          throw new Error("Export password must be at least 8 characters long");
-        }
+          const keyData = await _exportKeyInternal();
+          const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(
+            keyData,
+            exportPassword
+          );
 
-        const keyData = await exportKey();
-        const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(
-          keyData,
-          exportPassword
-        );
-
-        logger.debug("Protected key file created successfully");
-        return protectedKeyFile;
-      } catch (err) {
-        const errorMessage = `Failed to create protected key file: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Protected key export failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          logger.debug("Protected key file created successfully");
+          return protectedKeyFile;
+        },
+        { setLoading, setError },
+        "Failed to create protected key file"
+      );
     },
-    [exportKey]
+    [_exportKeyInternal]
+  );
+
+  /**
+   * Internal method to create protected key file without async wrapper
+   * Used by downloadProtectedKeyFile to avoid nested wrappers
+   */
+  const _createProtectedKeyInternal = useCallback(
+    async (exportPassword: string): Promise<ProtectedKeyFile> => {
+      validateExportPassword(exportPassword);
+
+      const keyData = await _exportKeyInternal();
+      const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(keyData, exportPassword);
+
+      logger.debug("Protected key file created successfully");
+      return protectedKeyFile;
+    },
+    [_exportKeyInternal]
   );
 
   /**
@@ -106,33 +113,27 @@ export const useKeyManagement = () => {
     async (
       clearAfterSeconds = 30
     ): Promise<{ success: boolean; clearAfterSeconds: number; fingerprint: string }> => {
-      try {
-        setLoading(true);
-        setError(null);
+      return withAsyncOperation(
+        async () => {
+          const keyData = await _exportKeyInternal();
+          await keyExportUtils.exportToClipboard(keyData, clearAfterSeconds * 1000);
 
-        const keyData = await exportKey();
-        await keyExportUtils.exportToClipboard(keyData, clearAfterSeconds * 1000);
+          logger.debug("Key copied to clipboard", {
+            clearAfterSeconds,
+            fingerprint: keyData.fingerprint.substring(0, 8),
+          });
 
-        logger.debug("Key copied to clipboard", {
-          clearAfterSeconds,
-          fingerprint: keyData.fingerprint.substring(0, 8),
-        });
-
-        return {
-          success: true,
-          clearAfterSeconds,
-          fingerprint: keyData.fingerprint,
-        };
-      } catch (err) {
-        const errorMessage = `Failed to copy key to clipboard: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Clipboard copy failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          return {
+            success: true,
+            clearAfterSeconds,
+            fingerprint: keyData.fingerprint,
+          };
+        },
+        { setLoading, setError },
+        "Failed to copy key to clipboard"
+      );
     },
-    [exportKey]
+    [_exportKeyInternal]
   );
 
   /**
@@ -140,29 +141,23 @@ export const useKeyManagement = () => {
    */
   const downloadKeyFile = useCallback(
     async (filename = "violet-vault-backup"): Promise<{ success: boolean; filename: string }> => {
-      try {
-        setLoading(true);
-        setError(null);
+      return withAsyncOperation(
+        async () => {
+          const keyData = await _exportKeyInternal();
+          keyExportUtils.downloadKeyFile(keyData, filename, false);
 
-        const keyData = await exportKey();
-        keyExportUtils.downloadKeyFile(keyData, filename, false);
+          logger.debug("Key file downloaded", {
+            filename,
+            fingerprint: keyData.fingerprint.substring(0, 8),
+          });
 
-        logger.debug("Key file downloaded", {
-          filename,
-          fingerprint: keyData.fingerprint.substring(0, 8),
-        });
-
-        return { success: true, filename: `${filename}.json` };
-      } catch (err) {
-        const errorMessage = `Failed to download key file: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Key file download failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          return { success: true, filename: `${filename}.json` };
+        },
+        { setLoading, setError },
+        "Failed to download key file"
+      );
     },
-    [exportKey]
+    [_exportKeyInternal]
   );
 
   /**
@@ -173,53 +168,41 @@ export const useKeyManagement = () => {
       exportPassword: string,
       filename = "violet-vault-backup"
     ): Promise<{ success: boolean; filename: string }> => {
-      try {
-        setLoading(true);
-        setError(null);
+      return withAsyncOperation(
+        async () => {
+          const protectedKeyFile = await _createProtectedKeyInternal(exportPassword);
+          keyExportUtils.downloadKeyFile(protectedKeyFile, filename, true);
 
-        const protectedKeyFile = await exportProtectedKey(exportPassword);
-        keyExportUtils.downloadKeyFile(protectedKeyFile, filename, true);
-
-        logger.debug("Protected key file downloaded", { filename });
-        return { success: true, filename: `${filename}.vaultkey` };
-      } catch (err) {
-        const errorMessage = `Failed to download protected key file: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Protected key file download failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          logger.debug("Protected key file downloaded", { filename });
+          return { success: true, filename: `${filename}.vaultkey` };
+        },
+        { setLoading, setError },
+        "Failed to download protected key file"
+      );
     },
-    [exportProtectedKey]
+    [_createProtectedKeyInternal]
   );
 
   /**
    * Generate QR code for key
    */
   const generateQRCode = useCallback(async (): Promise<{ success: boolean; qrUrl: string }> => {
-    try {
-      setLoading(true);
-      setError(null);
+    return withAsyncOperation(
+      async () => {
+        const keyData = await _exportKeyInternal();
+        const qrUrl = await keyExportUtils.generateQRCode(keyData);
+        setQrCodeUrl(qrUrl);
 
-      const keyData = await exportKey();
-      const qrUrl = await keyExportUtils.generateQRCode(keyData);
-      setQrCodeUrl(qrUrl);
+        logger.debug("QR code generated", {
+          fingerprint: keyData.fingerprint.substring(0, 8),
+        });
 
-      logger.debug("QR code generated", {
-        fingerprint: keyData.fingerprint.substring(0, 8),
-      });
-
-      return { success: true, qrUrl };
-    } catch (err) {
-      const errorMessage = `Failed to generate QR code: ${err instanceof Error ? err.message : String(err)}`;
-      setError(errorMessage);
-      logger.error("QR code generation failed", err);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [exportKey]);
+        return { success: true, qrUrl };
+      },
+      { setLoading, setError },
+      "Failed to generate QR code"
+    );
+  }, [_exportKeyInternal]);
 
   /**
    * Import key from file data
@@ -236,52 +219,46 @@ export const useKeyManagement = () => {
       deviceFingerprint: string;
       importedKeyData: ImportedKeyData;
     }> => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Validate the key file
-        const validation = keyExportUtils.validateKeyFile(keyFileData);
-        if (!validation.valid) {
-          throw new Error(validation.error || "Invalid key file");
-        }
-
-        let importedKeyData: ImportedKeyData;
-
-        if (validation.type === "protected") {
-          if (!importPassword) {
-            throw new Error("Password required to import protected key file");
+      return withAsyncOperation(
+        async () => {
+          // Validate the key file
+          const validation = keyExportUtils.validateKeyFile(keyFileData);
+          if (!validation.valid) {
+            throw new Error(validation.error || "Invalid key file");
           }
-          importedKeyData = await keyExportUtils.importProtectedKeyFile(
-            keyFileData,
-            importPassword
-          );
-        } else {
-          importedKeyData = await keyExportUtils.importKeyData(keyFileData);
-        }
 
-        logger.debug("Key imported successfully", {
-          budgetId: importedKeyData.budgetId,
-          fingerprint: importedKeyData.fingerprint.substring(0, 8),
-          type: validation.type,
-        });
+          let importedKeyData: ImportedKeyData;
 
-        return {
-          success: true,
-          budgetId: importedKeyData.budgetId,
-          fingerprint: importedKeyData.fingerprint,
-          exportedAt: importedKeyData.exportedAt,
-          deviceFingerprint: importedKeyData.deviceFingerprint,
-          importedKeyData,
-        };
-      } catch (err) {
-        const errorMessage = `Failed to import key: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Key import failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          if (validation.type === "protected") {
+            if (!importPassword) {
+              throw new Error("Password required to import protected key file");
+            }
+            importedKeyData = await keyExportUtils.importProtectedKeyFile(
+              keyFileData,
+              importPassword
+            );
+          } else {
+            importedKeyData = await keyExportUtils.importKeyData(keyFileData);
+          }
+
+          logger.debug("Key imported successfully", {
+            budgetId: importedKeyData.budgetId,
+            fingerprint: importedKeyData.fingerprint.substring(0, 8),
+            type: validation.type,
+          });
+
+          return {
+            success: true,
+            budgetId: importedKeyData.budgetId,
+            fingerprint: importedKeyData.fingerprint,
+            exportedAt: importedKeyData.exportedAt,
+            deviceFingerprint: importedKeyData.deviceFingerprint,
+            importedKeyData,
+          };
+        },
+        { setLoading, setError },
+        "Failed to import key"
+      );
     },
     []
   );
@@ -306,45 +283,40 @@ export const useKeyManagement = () => {
       };
       loginResult: { success: boolean };
     }> => {
-      try {
-        setLoading(true);
-        setError(null);
+      return withAsyncOperation(
+        async () => {
+          if (!vaultPassword) {
+            throw new Error("Vault password required to login after import");
+          }
 
-        if (!vaultPassword) {
-          throw new Error("Vault password required to login after import");
-        }
+          const importResult = await importKey(keyFileData, importPassword);
 
-        const importResult = await importKey(keyFileData, importPassword);
+          // Attempt to login with the imported key data
+          // We need to reconstruct the login process with the imported salt and budgetId
+          const loginResult = await login({
+            password: vaultPassword,
+            overrideSalt: Array.from(importResult.importedKeyData.salt),
+            overrideBudgetId: importResult.budgetId,
+          });
 
-        // Attempt to login with the imported key data
-        // We need to reconstruct the login process with the imported salt and budgetId
-        const loginResult = await login(vaultPassword, {
-          budgetId: importResult.budgetId,
-          importedSalt: importResult.importedKeyData.salt,
-        });
+          if (!loginResult.success) {
+            throw new Error("Failed to login with imported key - password may be incorrect");
+          }
 
-        if (!loginResult.success) {
-          throw new Error("Failed to login with imported key - password may be incorrect");
-        }
+          logger.debug("Import and login successful", {
+            budgetId: importResult.budgetId,
+            fingerprint: importResult.fingerprint.substring(0, 8),
+          });
 
-        logger.debug("Import and login successful", {
-          budgetId: importResult.budgetId,
-          fingerprint: importResult.fingerprint.substring(0, 8),
-        });
-
-        return {
-          success: true,
-          importResult,
-          loginResult,
-        };
-      } catch (err) {
-        const errorMessage = `Failed to import and login: ${err instanceof Error ? err.message : String(err)}`;
-        setError(errorMessage);
-        logger.error("Import and login failed", err);
-        throw new Error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+          return {
+            success: true,
+            importResult,
+            loginResult,
+          };
+        },
+        { setLoading, setError },
+        "Failed to import and login"
+      );
     },
     [importKey, login]
   );

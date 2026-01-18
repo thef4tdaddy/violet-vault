@@ -10,7 +10,7 @@ import {
   type XAxisProps,
 } from "recharts";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/common/useChartConfig";
+import { useChartConfig } from "../../hooks/platform/ux/useChartConfig";
 
 /**
  * Reusable category bar chart component

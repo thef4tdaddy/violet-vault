@@ -1,25 +1,16 @@
-import { useAuthManager } from "./useAuthManager";
-import logger from "../../utils/common/logger";
-import { encryptionUtils } from "../../utils/security/encryption";
+import { useMemo } from "react";
+import { useAuth as useAuthHook } from "./useAuth";
+import logger from "@/utils/core/common/logger";
+import { encryptionUtils } from "@/utils/platform/security/encryption";
+
+import type { UserData, UpdateProfileInput as UpdatedProfile } from "./useAuth.types";
 
 interface JoinData {
   budgetId: string;
   password: string;
-  userInfo: {
-    userName?: string;
-    email?: string;
-    userColor?: string;
-    [key: string]: unknown;
-  };
+  userInfo: UserData;
   sharedBy: string;
   shareCode?: string;
-}
-
-interface UpdatedProfile {
-  userName?: string;
-  userColor?: string;
-  email?: string;
-  displayName?: string;
 }
 
 /**
@@ -33,76 +24,82 @@ interface UpdatedProfile {
  * @deprecated Use useAuthManager() directly for new components
  */
 export const useAuthCompatibility = () => {
-  const authManager = useAuthManager();
+  const auth = useAuthHook();
 
   // Legacy interface that matches the old authStore API
-  const legacyAuth = {
-    // State properties (matching old authStore)
-    isUnlocked: authManager.isUnlocked,
-    currentUser: authManager.user,
-    budgetId: authManager.budgetId,
-    encryptionKey: authManager.encryptionKey,
-    salt: authManager.salt,
-    lastActivity: authManager.lastActivity,
+  const legacyAuth = useMemo(
+    () => ({
+      // State properties (matching old authStore)
+      isUnlocked: auth.isUnlocked,
+      currentUser: auth.user,
+      budgetId: auth.budgetId,
+      encryptionKey: auth.encryptionKey,
+      salt: auth.salt,
+      lastActivity: auth.lastActivity,
 
-    // Action methods (matching old authStore)
-    login: async (password: string, userData: unknown = null) => {
-      const result = await authManager.login(password, userData as Record<string, unknown> | null);
-      return result;
-    },
+      // Action methods (matching old authStore)
+      login: async (password: string, userData: UserData | null = null) => {
+        const result = await auth.login({
+          password,
+          userData: userData || undefined,
+        });
+        return result;
+      },
 
-    joinBudgetWithShareCode: async (joinData: unknown) => {
-      const result = await authManager.joinBudget(joinData as JoinData);
-      return result;
-    },
+      joinBudgetWithShareCode: async (joinData: unknown) => {
+        const result = await auth.joinBudget(joinData as JoinData);
+        return result;
+      },
 
-    logout: () => {
-      authManager.logout();
-    },
+      logout: () => {
+        auth.logout();
+      },
 
-    updateUser: (updatedUser: unknown) => {
-      authManager.updateUser(updatedUser as Partial<UpdatedProfile>);
-    },
+      updateUser: (updatedUser: unknown) => {
+        auth.updateUser(updatedUser as Partial<UpdatedProfile>);
+      },
 
-    changePassword: async (oldPassword: string, newPassword: string) => {
-      const result = await authManager.changePassword(oldPassword, newPassword);
-      return result;
-    },
+      changePassword: async (oldPassword: string, newPassword: string) => {
+        const result = await auth.changePassword({ oldPassword, newPassword });
+        return result;
+      },
 
-    updateProfile: async (updatedProfile: unknown) => {
-      const result = await authManager.updateProfile(updatedProfile as UpdatedProfile);
-      return result;
-    },
+      updateProfile: async (updatedProfile: unknown) => {
+        const result = await auth.updateProfile(updatedProfile as UpdatedProfile);
+        return result;
+      },
 
-    setLastActivity: (_timestamp: number) => {
-      authManager.updateActivity();
-    },
+      setLastActivity: (_timestamp: number) => {
+        auth.updateActivity();
+      },
 
-    validatePassword: async (password: string) => {
-      // Compatibility method - validates password
-      try {
-        // Simple validation - attempt to derive key
-        await encryptionUtils.deriveKey(password);
-        return true;
-      } catch {
-        return false;
-      }
-    },
+      validatePassword: async (password: string) => {
+        // Compatibility method - validates password
+        try {
+          // Simple validation - attempt to derive key
+          await encryptionUtils.deriveKey(password);
+          return true;
+        } catch {
+          return false;
+        }
+      },
 
-    // Additional methods that some components might use
-    setEncryption: ({ key: _key, salt: _salt }: { key: unknown; salt: unknown }) => {
-      logger.warn("setEncryption called via compatibility layer - this should be migrated");
-      // This would need to be handled through the new auth context
-      // For now, log a warning since this should be rare
-    },
+      // Additional methods that some components might use
+      setEncryption: ({ key: _key, salt: _salt }: { key: unknown; salt: unknown }) => {
+        logger.warn("setEncryption called via compatibility layer - this should be migrated");
+        // This would need to be handled through the new auth context
+        // For now, log a warning since this should be rare
+      },
 
-    startBackgroundSyncAfterLogin: async (_isNewUser = false) => {
-      logger.info("startBackgroundSyncAfterLogin called via compatibility layer");
-      // This is now handled automatically in the login mutations
-      // So we can just return success
-      return Promise.resolve();
-    },
-  };
+      startBackgroundSyncAfterLogin: async (_isNewUser = false) => {
+        logger.info("startBackgroundSyncAfterLogin called via compatibility layer");
+        // This is now handled automatically in the login mutations
+        // So we can just return success
+        return { success: true };
+      },
+    }),
+    [auth]
+  );
 
   // Log usage for migration tracking
   if (import.meta?.env?.MODE === "development") {
@@ -119,12 +116,12 @@ export const useAuthCompatibility = () => {
  *
  * Components can change:
  * ```
- * import { useAuth } from "../../stores/auth/authStore";
+ * import { useAuth } from "@/stores/auth/authStore";
  * ```
  *
  * To:
  * ```
- * import { useAuth } from "../../hooks/auth/useAuthCompatibility";
+ * import { useAuth } from "@/hooks/auth/useAuthCompatibility";
  * ```
  *
  * And everything should work the same way.

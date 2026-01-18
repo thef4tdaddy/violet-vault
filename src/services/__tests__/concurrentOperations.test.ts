@@ -11,70 +11,105 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from "vitest";
-import { budgetDatabaseService } from "@/services/budgetDatabaseService";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDatabaseService } from "../budget/budgetDatabaseService";
+import { budgetDb } from "../../db/budgetDb";
 
 // Mock the database
 vi.mock("../../db/budgetDb", () => ({
   budgetDb: {
-    open: vi.fn(),
-    close: vi.fn(),
-    isOpen: vi.fn(),
-    getDatabaseStats: vi.fn(),
-    getActiveEnvelopes: vi.fn(),
-    getEnvelopesByCategory: vi.fn(),
-    bulkUpsertEnvelopes: vi.fn(),
-    getTransactionsByDateRange: vi.fn(),
-    getTransactionsByEnvelope: vi.fn(),
-    getTransactionsByCategory: vi.fn(),
-    getTransactionsByType: vi.fn(),
-    bulkUpsertTransactions: vi.fn(),
-    getBillsByCategory: vi.fn(),
-    getPaidBills: vi.fn(),
-    getUpcomingBills: vi.fn(),
-    getOverdueBills: vi.fn(),
-    bills: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-    },
-    bulkUpsertBills: vi.fn(),
-    getSavingsGoalsByCategory: vi.fn(),
-    getSavingsGoalsByPriority: vi.fn(),
-    getCompletedSavingsGoals: vi.fn(),
-    getActiveSavingsGoals: vi.fn(),
-    savingsGoals: { toArray: vi.fn(), clear: vi.fn() },
-    bulkUpsertSavingsGoals: vi.fn(),
-    getPaychecksBySource: vi.fn(),
-    getPaychecksByDateRange: vi.fn(),
-    getPaycheckHistory: vi.fn(),
-    bulkUpsertPaychecks: vi.fn(),
-    debts: {
-      toArray: vi.fn(),
-      clear: vi.fn(),
-    },
-    bulkUpsertDebts: vi.fn(),
-    budget: {
+    open: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
+    isOpen: vi.fn().mockReturnValue(true),
+    getActiveEnvelopes: vi.fn().mockResolvedValue([]),
+    getEnvelopesByCategory: vi.fn().mockResolvedValue([]),
+    bulkUpsertEnvelopes: vi.fn().mockResolvedValue(undefined),
+    getTransactionsByDateRange: vi.fn().mockResolvedValue([]),
+    getTransactionsByEnvelope: vi.fn().mockResolvedValue([]),
+    getTransactionsByCategory: vi.fn().mockResolvedValue([]),
+    getTransactionsByType: vi.fn().mockResolvedValue([]),
+    bulkUpsertTransactions: vi.fn().mockResolvedValue(undefined),
+    envelopes: {
+      clear: vi.fn().mockResolvedValue(undefined),
+      bulkPut: vi.fn().mockResolvedValue(undefined),
       get: vi.fn(),
-      put: vi.fn(),
-      clear: vi.fn(),
+      add: vi.fn().mockResolvedValue("new-id"),
+      put: vi.fn().mockResolvedValue("new-id"),
+      update: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
+      where: vi.fn().mockImplementation(() => ({
+        equals: vi.fn().mockImplementation(() => ({
+          toArray: vi.fn().mockResolvedValue([]),
+        })),
+        toArray: vi.fn().mockResolvedValue([]),
+      })),
+      toArray: vi.fn().mockResolvedValue([]),
     },
-    envelopes: { clear: vi.fn() },
-    transactions: { clear: vi.fn() },
-    paycheckHistory: { clear: vi.fn() },
-    cache: { clear: vi.fn() },
-    auditLog: { clear: vi.fn() },
-    transaction: vi.fn(),
-    getCachedValue: vi.fn(),
-    setCachedValue: vi.fn(),
-    clearCacheCategory: vi.fn(),
-    getAnalyticsData: vi.fn(),
-    batchUpdate: vi.fn(),
-    optimizeDatabase: vi.fn(),
+    bills: {
+      toArray: vi.fn().mockResolvedValue([]),
+      bulkPut: vi.fn().mockResolvedValue(undefined),
+      add: vi.fn().mockResolvedValue("new-id"),
+      put: vi.fn().mockResolvedValue("new-id"),
+      get: vi.fn(),
+      update: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
+      where: vi.fn().mockImplementation(() => ({
+        equals: vi.fn().mockImplementation(() => ({
+          toArray: vi.fn().mockResolvedValue([]),
+        })),
+        below: vi.fn().mockImplementation(() => ({
+          toArray: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+      orderBy: vi.fn().mockImplementation(() => ({
+        toArray: vi.fn().mockResolvedValue([]),
+      })),
+      count: vi.fn().mockResolvedValue(0),
+    },
+    transactions: {
+      clear: vi.fn().mockResolvedValue(undefined),
+      bulkPut: vi.fn().mockResolvedValue(undefined),
+      get: vi.fn(),
+      update: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
+      where: vi.fn().mockImplementation(() => ({
+        equals: vi.fn().mockImplementation(() => ({
+          toArray: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+      orderBy: vi.fn().mockImplementation(() => ({
+        reverse: vi.fn().mockImplementation(() => ({
+          limit: vi.fn().mockImplementation(() => ({
+            toArray: vi.fn().mockResolvedValue([]),
+          })),
+        })),
+      })),
+      toArray: vi.fn().mockResolvedValue([]),
+    },
+    budget: {
+      get: vi.fn().mockResolvedValue({ unassignedCash: 0 }),
+      put: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined),
+    },
+    cache: { clear: vi.fn().mockResolvedValue(undefined) },
+    getCachedValue: vi.fn().mockResolvedValue(null),
+    setCachedValue: vi.fn().mockResolvedValue(undefined),
+    clearCacheCategory: vi.fn().mockResolvedValue(undefined),
+    deleteCachedValue: vi.fn().mockResolvedValue(undefined),
+    auditLog: { clear: vi.fn().mockResolvedValue(undefined) },
+    autoFundingRules: { clear: vi.fn().mockResolvedValue(undefined) },
+    autoFundingHistory: { clear: vi.fn().mockResolvedValue(undefined) },
+    offlineRequestQueue: { clear: vi.fn().mockResolvedValue(undefined) },
+    transaction: vi.fn().mockImplementation((_mode, _tables, fn) => fn()),
+    getAnalyticsData: vi.fn().mockResolvedValue({}),
+    batchUpdate: vi.fn().mockResolvedValue(undefined),
+    clearData: vi.fn().mockResolvedValue(undefined),
+    initialize: vi.fn().mockResolvedValue(true),
+    getPaycheckHistory: vi.fn().mockResolvedValue([]),
   },
 }));
 
 // Mock logger to avoid console output
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -98,6 +133,7 @@ describe("Concurrent Operation Tests", () => {
       id,
       name: `Envelope ${id}`,
       category: "expenses",
+      type: "standard" as const,
       archived: false,
       lastModified: Date.now(),
       currentBalance: balance,
@@ -378,8 +414,8 @@ describe("Concurrent Operation Tests", () => {
         ],
         [
           {
-            collection: "bills",
-            type: "bill" as const,
+            collection: "envelopes",
+            type: "envelope" as const,
             operation: "upsert" as const,
             data: { id: "bill-1" },
           },
@@ -405,17 +441,23 @@ describe("Concurrent Operation Tests", () => {
       const collectionRequests = [
         Promise.all([
           budgetDatabaseService.getEnvelopes(),
-          budgetDatabaseService.getBills({}),
           budgetDatabaseService.getBudgetMetadata(),
         ]),
         Promise.all([
           budgetDatabaseService.getEnvelopes(),
-          budgetDatabaseService.getBills({}),
           budgetDatabaseService.getBudgetMetadata(),
         ]),
       ];
 
       const results = await Promise.allSettled(collectionRequests);
+
+      const rejected = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[];
+      if (rejected.length > 0) {
+        console.error(
+          "DEBUG: Collection requests failed:",
+          rejected.map((r) => r.reason?.message || r.reason)
+        );
+      }
 
       expect(results.every((r) => r.status === "fulfilled")).toBe(true);
     });
@@ -423,7 +465,6 @@ describe("Concurrent Operation Tests", () => {
     it("should handle concurrent save operations during backup restore", async () => {
       (budgetDb.bulkUpsertEnvelopes as Mock).mockResolvedValue(true);
       (budgetDb.bulkUpsertTransactions as Mock).mockResolvedValue(true);
-      (budgetDb.bulkUpsertBills as Mock).mockResolvedValue(true);
       (budgetDb.clearCacheCategory as Mock).mockResolvedValue(true);
 
       const mockEnvelopes = [
@@ -431,6 +472,7 @@ describe("Concurrent Operation Tests", () => {
           id: "env-1",
           name: "Test",
           category: "expenses",
+          type: "standard" as const,
           archived: false,
           lastModified: Date.now(),
         },
@@ -454,6 +496,7 @@ describe("Concurrent Operation Tests", () => {
           dueDate: new Date(),
           amount: 1000,
           category: "housing",
+          type: "bill" as const,
           isPaid: false,
           isRecurring: true,
           lastModified: Date.now(),
@@ -464,7 +507,6 @@ describe("Concurrent Operation Tests", () => {
       const restoreOps = [
         budgetDatabaseService.saveEnvelopes(mockEnvelopes),
         budgetDatabaseService.saveTransactions(mockTransactions),
-        budgetDatabaseService.saveBills(mockBills),
       ];
 
       const results = await Promise.allSettled(restoreOps);
@@ -523,6 +565,7 @@ describe("Concurrent Operation Tests", () => {
               id: "env-1",
               name: "Test",
               category: "expenses",
+              type: "standard" as const,
               archived: false,
               lastModified: Date.now(),
               currentBalance: 100 * (i + 2),
@@ -554,6 +597,7 @@ describe("Concurrent Operation Tests", () => {
             id: "env-1",
             name: `Version ${i}`,
             category: "expenses",
+            type: "standard" as const,
             archived: false,
             lastModified: Date.now() + i,
           },
@@ -575,6 +619,7 @@ describe("Concurrent Operation Tests", () => {
           id: "env-1",
           name: "Cached",
           category: "expenses",
+          type: "standard" as const,
           archived: false,
           lastModified: Date.now(),
         },
@@ -616,10 +661,6 @@ describe("Concurrent Operation Tests", () => {
       (budgetDb.budget.clear as Mock).mockResolvedValue(undefined);
       (budgetDb.envelopes.clear as Mock).mockResolvedValue(undefined);
       (budgetDb.transactions.clear as Mock).mockResolvedValue(undefined);
-      (budgetDb.bills.clear as Mock).mockResolvedValue(undefined);
-      (budgetDb.savingsGoals.clear as Mock).mockResolvedValue(undefined);
-      (budgetDb.paycheckHistory.clear as Mock).mockResolvedValue(undefined);
-      (budgetDb.debts.clear as Mock).mockResolvedValue(undefined);
       (budgetDb.cache.clear as Mock).mockResolvedValue(undefined);
       (budgetDb.auditLog.clear as Mock).mockResolvedValue(undefined);
       (budgetDb.bulkUpsertEnvelopes as Mock).mockResolvedValue(true);
@@ -633,6 +674,7 @@ describe("Concurrent Operation Tests", () => {
             id: "env-1",
             name: "Test",
             category: "expenses",
+            type: "standard" as const,
             archived: false,
             lastModified: Date.now(),
           },
@@ -640,6 +682,14 @@ describe("Concurrent Operation Tests", () => {
       ];
 
       const results = await Promise.allSettled(operations);
+
+      const rejected = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[];
+      if (rejected.length > 0) {
+        console.error(
+          "DEBUG: Clear and write operations failed:",
+          rejected.map((r) => r.reason?.message || r.reason)
+        );
+      }
 
       // Both operations should complete (order may vary)
       expect(results.every((r) => r.status === "fulfilled")).toBe(true);
@@ -666,6 +716,7 @@ describe("Concurrent Operation Tests", () => {
                 id: `env-${i}`,
                 name: `Envelope ${i}`,
                 category: "expenses",
+                type: "standard" as const,
                 archived: false,
                 lastModified: Date.now(),
               },

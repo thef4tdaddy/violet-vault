@@ -59,5 +59,18 @@
     "package.json": "package-lock.json, package.json.bak, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml",
     ".gitignore": ".gitattributes, .gitmodules, .gitmessage, .mailmap, .git-blame*",
     "readme*": "authors, backers*, changelog*, citation*, code_of_conduct*, codeowners, contributing*, contributors, copying, credits, governance.md, history.md, license*, maintainers, readme*, security.md, sponsors*"
-  }
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": ["api"],
+  "python.analysis.extraPaths": ["${workspaceFolder}/api"],
+  "go.testFlags": ["-v"],
+  "go.testTimeout": "30s",
+  "go.lintOnSave": "package",
+  "go.toolsManagement.autoUpdate": true,
+  "vitest.commandLine": "npm run test",
+  "vitest.enable": true,
+  "vitest.exclude": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
 }

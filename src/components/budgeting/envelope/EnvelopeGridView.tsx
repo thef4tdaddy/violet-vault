@@ -5,7 +5,7 @@ import EnvelopeSummary from "./EnvelopeSummary";
 import EnvelopeItem from "./EnvelopeItem";
 import UnassignedCashEnvelope from "./UnassignedCashEnvelope";
 import EmptyStateHints from "../../onboarding/EmptyStateHints";
-import { useEnvelopeGridVirtualization } from "@/hooks/budgeting/useEnvelopeGridVirtualization";
+import { useEnvelopeGridVirtualization } from "@/hooks/budgeting/envelopes/useEnvelopeGridVirtualization";
 
 // Empty state component
 const EmptyStateView = ({

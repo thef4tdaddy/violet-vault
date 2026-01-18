@@ -40,7 +40,8 @@ const ArchivingActionButtons: React.FC<ArchivingActionButtonsProps> = ({
             <Button
               onClick={handlePreview}
               disabled={isArchiving}
-              className="btn btn-secondary flex items-center space-x-2"
+              variant="secondary"
+              className="flex items-center space-x-2"
             >
               {React.createElement(getIcon("BarChart3"), {
                 className: "h-4 w-4",
@@ -50,14 +51,15 @@ const ArchivingActionButtons: React.FC<ArchivingActionButtonsProps> = ({
           )}
 
           {confirmArchiving && (
-            <Button onClick={toggleConfirmArchiving} className="btn btn-secondary">
+            <Button onClick={toggleConfirmArchiving} variant="secondary">
               Cancel
             </Button>
           )}
 
           <Button
             onClick={onArchiveClick}
-            className={`btn ${confirmArchiving ? "btn-danger" : "btn-primary"} flex items-center space-x-2`}
+            className={`flex items-center space-x-2`}
+            variant={confirmArchiving ? "destructive" : "primary"}
             disabled={isArchiving}
           >
             {React.createElement(getIcon("Archive"), { className: "h-4 w-4" })}

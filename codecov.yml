@@ -1,0 +1,44 @@
+# Codecov Configuration
+# Enforces high coverage for new files in feature branches
+
+coverage:
+  status:
+    # Overall project coverage mapping to the 80% roadmap
+    project:
+      default:
+        target: 80%
+        threshold: 0.5%
+        informational: true # Don't block yet, just report progress
+        base: auto
+
+    # NEW CODE coverage (strict)
+    patch:
+      default:
+        target: 80%
+        threshold: 0%
+        only_pulls: true
+
+# PR Comment Configuration
+comment:
+  layout: "header, diff, flags, files"
+  behavior: default
+  require_changes: false # Show coverage even if it doesn't change
+  require_base: false
+  require_head: true
+  hide_project_coverage: false # Explicitly show total project coverage
+  after_n_builds: 1
+
+# Ignore patterns (if needed)
+ignore:
+  - "**/__tests__/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/test_*.py"
+  - "**/*.spec.ts"
+  - "**/vitest.config.ts"
+  - "**/setup.ts"
+
+# Strict mode for feature branches
+parsers:
+  javascript:
+    enable_partials: false

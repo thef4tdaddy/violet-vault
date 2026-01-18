@@ -1,12 +1,12 @@
 import React from "react";
 import { getIcon } from "../../utils";
 import { Button } from "@/components/ui";
-import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
+import useEnvelopeSuggestions from "../../hooks/platform/analytics/useEnvelopeSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";
 import { globalToast } from "../../stores/ui/toastStore";
 import type { Envelope, Transaction } from "../../db/types";
-import type { Suggestion } from "@/utils/budgeting/suggestionUtils";
+import type { Suggestion } from "@/utils/domain/budgeting/suggestionUtils";
 
 interface IconBadgeProps {
   isCollapsed: boolean;
@@ -224,7 +224,7 @@ const SmartEnvelopeSuggestions = ({
     refreshSuggestions,
     toggleSettings,
     hasSuggestions,
-  } = useSmartSuggestions({
+  } = useEnvelopeSuggestions({
     transactions,
     envelopes,
     onCreateEnvelope: (data: unknown) => onCreateEnvelope(data as Partial<Envelope>),

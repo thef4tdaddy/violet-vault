@@ -9,60 +9,81 @@ import { z } from "zod";
 /**
  * Transaction type enum
  */
+/**
+ * Transaction type enum
+ */
 export const TransactionTypeSchema = z.enum(["income", "expense", "transfer"]);
 export type TransactionType = z.infer<typeof TransactionTypeSchema>;
 
 /**
+ * Base transaction object schema (without refinements)
+ * Used as the base for both full and partial schemas
+ */
+const TransactionBaseSchema = z.object({
+  id: z.string().min(1, "Transaction ID is required"),
+  date: z.union([z.date(), z.string()]),
+  amount: z.number(), // Can be positive (income) or negative (expense)
+  envelopeId: z.string().min(1, "Envelope ID is required"),
+  category: z.string().min(1, "Category is required"),
+  type: TransactionTypeSchema.default("expense"),
+  lastModified: z.number().int().positive("Last modified must be a positive number"),
+  createdAt: z.number().int().positive().optional(),
+  description: z
+    .string()
+    .max(500, "Description must be 500 characters or less")
+    .nullable()
+    .optional(),
+  merchant: z.string().max(200, "Merchant must be 200 characters or less").nullable().optional(),
+  receiptUrl: z.string().url("Receipt URL must be a valid URL").nullable().optional(),
+
+  // Scheduled Transaction support (Unified Bills)
+  isScheduled: z.boolean().default(false),
+  recurrenceRule: z.string().nullable().optional(), // iCal RRule string
+
+  // Paycheck support (Unified Paychecks)
+  allocations: z.record(z.string(), z.number()).nullable().optional(), // Mapping of envelopeId to amount
+  unassignedCashBefore: z.number().nullable().optional(),
+  unassignedCashAfter: z.number().nullable().optional(),
+  actualBalanceBefore: z.number().nullable().optional(),
+  actualBalanceAfter: z.number().nullable().optional(),
+
+  // Connection properties
+  isInternalTransfer: z.boolean().nullable().optional(),
+  paycheckId: z.string().nullable().optional(),
+  payerName: z.string().nullable().optional(),
+  mode: z.enum(["allocate", "leftover"]).nullable().optional(),
+  notes: z.string().nullable().optional(), // Alias for description in some contexts
+
+  // Transaction IDs for audit trail (Issue #1340)
+  incomeTransactionId: z.string().nullable().optional(),
+  transferTransactionIds: z.array(z.string()).nullable().optional(),
+
+  // Transfer-specific fields
+  fromEnvelopeId: z.string().nullable().optional(),
+  toEnvelopeId: z.string().nullable().optional(),
+});
+
+/**
  * Zod schema for Transaction validation
  * Represents financial transactions (income, expenses, transfers)
- *
- * CRITICAL CONVENTION:
- * - Positive amounts = Income/deposits
- * - Negative amounts = Expenses/withdrawals
- * This allows analytics calculations to work without checking the 'type' field
- *
- * The schema enforces this convention with refinement rules:
- * - type='expense' MUST have negative amount
- * - type='income' MUST have positive amount
- * - type='transfer' can be either (depending on direction)
  */
-export const TransactionSchema = z
-  .object({
-    id: z.string().min(1, "Transaction ID is required"),
-    date: z.union([z.date(), z.string()]),
-    amount: z.number(), // Can be positive (income) or negative (expense)
-    envelopeId: z.string().min(1, "Envelope ID is required"),
-    category: z.string().min(1, "Category is required"),
-    type: TransactionTypeSchema.default("expense"),
-    lastModified: z.number().int().positive("Last modified must be a positive number"),
-    createdAt: z.number().int().positive().optional(),
-    description: z.string().max(500, "Description must be 500 characters or less").optional(),
-    merchant: z.string().max(200, "Merchant must be 200 characters or less").optional(),
-    receiptUrl: z.string().url("Receipt URL must be a valid URL").optional(),
-    // Paycheck-related metadata for internal transfers
-    isInternalTransfer: z.boolean().optional(),
-    paycheckId: z.string().optional(),
-    // Transfer-specific fields
-    fromEnvelopeId: z.string().optional(),
-    toEnvelopeId: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Enforce sign convention based on transaction type
-      if (data.type === "expense" && data.amount > 0) {
-        return false; // Expenses MUST be negative
-      }
-      if (data.type === "income" && data.amount < 0) {
-        return false; // Income MUST be positive
-      }
-      return true;
-    },
-    {
-      message:
-        "Transaction amount sign must match type: expenses must be negative, income must be positive",
-      path: ["amount"],
+export const TransactionSchema = TransactionBaseSchema.refine(
+  (data) => {
+    // Enforce sign convention based on transaction type
+    if (data.type === "expense" && data.amount > 0) {
+      return false; // Expenses MUST be negative
     }
-  );
+    if (data.type === "income" && data.amount < 0) {
+      return false; // Income MUST be positive
+    }
+    return true;
+  },
+  {
+    message:
+      "Transaction amount sign must match type: expenses must be negative, income must be positive",
+    path: ["amount"],
+  }
+);
 
 /**
  * Type inference from schema
@@ -72,7 +93,27 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 /**
  * Partial transaction schema for updates
  */
-export const TransactionPartialSchema = TransactionSchema.partial();
+export const TransactionPartialSchema = TransactionBaseSchema.partial().refine(
+  (data) => {
+    // Only enforce sign convention when both type and amount are provided
+    if (data.type === undefined || data.amount === undefined) {
+      return true;
+    }
+    if (data.type === "expense" && data.amount > 0) {
+      return false; // Expenses MUST be negative
+    }
+    if (data.type === "income" && data.amount < 0) {
+      return false; // Income MUST be positive
+    }
+    return true;
+  },
+  {
+    message:
+      "Transaction amount sign must match type: expenses must be negative, income must be positive",
+    path: ["amount"],
+  }
+);
+
 export type TransactionPartial = z.infer<typeof TransactionPartialSchema>;
 
 /**

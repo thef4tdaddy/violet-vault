@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { useConnectionManager } from "../../hooks/common/useConnectionManager";
+import { useConnectionManager } from "../../hooks/platform/common/useConnectionManager";
 
 type ThemeName = "purple" | "green" | "yellow" | "red";
 

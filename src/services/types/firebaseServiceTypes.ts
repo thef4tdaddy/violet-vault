@@ -12,7 +12,7 @@ import type {
   ErrorCategory,
   TypedResponse,
   SafeUnknown,
-} from "../../types/firebase";
+} from "@/types/firebase";
 
 // Enhanced sync service interface with type safety
 // Note: Does not extend IFirebaseSyncService due to incompatible return types

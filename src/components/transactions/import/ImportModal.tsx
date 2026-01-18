@@ -1,6 +1,6 @@
 import React from "react";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
