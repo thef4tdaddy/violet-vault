@@ -107,13 +107,13 @@ rules:
   # Testing
   - name: "Testing Standards"
     rules:
-      - "Use Vitest for unit tests"
-      - "Test files: `component/__tests__/Component.test.tsx`"
-      - "Test files: `service/__tests__/serviceName.test.ts`"
+      - "Use Vitest for unit tests (Frontend) and pytest/go test (Backend)"
+      - "Test files: `component/__tests__/Component.test.tsx` or `module.test.ts` / `file_test.go`"
       - "Mock Firebase calls using vi.mock() in tests"
       - "Use Mock type from vitest for proper typing: `vi.fn() as Mock<...>`"
       - "Test files should have zero 'any' types"
-      - "Aim for >80% code coverage on critical paths"
+      - "CRITICAL: All new code (Frontend & Backend) must have >80% code coverage"
+      - "Every new file created MUST be accompanied by a corresponding test file"
       - "Run tests: `npm run test` or `npm run test:run` for CI"
       - "Focus on error handling and edge cases, not just happy paths"
       - "Test critical operations: import/export, backup/restore, cloud sync, CRUD mutations"
@@ -327,6 +327,7 @@ command_patterns:
 prohibited:
   - "🚫 NO 'any' types - EVER - use proper types or Zod schemas"
   - "🚫 NO relative imports - ALWAYS use '@' path aliases"
+  - "🚫 NO PRs without >80% test coverage for new files (Frontend & Backend)"
   - "🚫 NO inline eslint-disable comments - ALL disables must be in configs/linting/config-modules/exclusions-config.js with approval and explanation"
   - "No console.log() - use logger utility"
   - "No business logic in components"
