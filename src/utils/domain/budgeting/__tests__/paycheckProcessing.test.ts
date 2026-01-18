@@ -310,8 +310,6 @@ describe("paycheckProcessing", () => {
         transferTransactionIds: ["transfer-tx-1", "transfer-tx-2"],
       };
 
-      vi.mocked(budgetDb.transactions.add).mockResolvedValue("paycheck_123");
-
       const record = await createPaycheckRecord(
         paycheckData,
         currentBalances,
@@ -328,7 +326,8 @@ describe("paycheckProcessing", () => {
       expect(record.transferTransactionIds).toEqual(["transfer-tx-1", "transfer-tx-2"]);
       expect(record.unassignedCashBefore).toBe(500);
       expect(record.unassignedCashAfter).toBe(700);
-      expect(budgetDb.transactions.add).toHaveBeenCalled();
+      // Note: createPaycheckRecord is now a deprecated stub that returns a record
+      // but doesn't save it to database - that's handled by executePaycheckPlan
     });
 
     it("should create paycheck record without transaction IDs", async () => {
