@@ -29,7 +29,6 @@ import {
   runMasterSyncValidation 
 } from "@/utils/features/sync/masterSyncValidator";
 import logger from "@/utils/core/common/logger";
-import type { TypedResponse } from "@/types/firebase";
 
 /**
  * Health check result
