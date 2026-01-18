@@ -108,7 +108,10 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
       const health = await syncManager.checkHealth();
       logger.info("✅ Sync Health: Health check completed", health);
       setSyncStatus({
-        ...health,
+        isHealthy: health.isHealthy,
+        status: health.status,
+        failedTests: health.failedTests,
+        lastChecked: health.lastChecked,
         isLoading: false,
       });
     } catch (error) {

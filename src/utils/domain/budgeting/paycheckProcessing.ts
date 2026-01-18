@@ -21,7 +21,7 @@ import {
   executePaycheckPlan,
   enrichAllocationsWithNames,
 } from "@/services/budgeting/paycheckService";
-import type { CurrentBalances } from "./paycheckProcessingTypes";
+import type { CurrentBalances as _CurrentBalances } from "./paycheckProcessingTypes";
 
 interface BalanceCollection {
   data?: Array<{

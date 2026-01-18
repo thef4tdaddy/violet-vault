@@ -77,14 +77,14 @@ export const createPaycheckExecutionPlan = (
   };
 
   // Create paycheck record plan
-  const paycheckRecord = createPaycheckRecordPlan(
+  const paycheckRecord = createPaycheckRecordPlan({
     paycheckId,
     paycheckData,
     currentBalances,
     newBalances,
     allocations,
-    timestamp
-  );
+    timestamp,
+  });
 
   return {
     paycheckId,
@@ -102,14 +102,21 @@ export const createPaycheckExecutionPlan = (
  *
  * @param timestamp - Optional timestamp for record creation (defaults used in service layer if not provided)
  */
-const createPaycheckRecordPlan = (
-  paycheckId: string,
-  paycheckData: PaycheckInput,
-  currentBalances: CurrentBalances,
-  newBalances: { actualBalance: number; unassignedCash: number },
-  allocations: EnvelopeAllocation[],
-  timestamp?: number
-): Omit<PaycheckRecordPlan, "incomeTransactionId" | "transferTransactionIds"> => {
+/**
+ * Create a paycheck record plan
+ * @param options - Configuration object with all required parameters
+ * @returns Paycheck record plan (without transaction IDs)
+ */
+const createPaycheckRecordPlan = (options: {
+  paycheckId: string;
+  paycheckData: PaycheckInput;
+  currentBalances: CurrentBalances;
+  newBalances: { actualBalance: number; unassignedCash: number };
+  allocations: EnvelopeAllocation[];
+  timestamp?: number;
+}): Omit<PaycheckRecordPlan, "incomeTransactionId" | "transferTransactionIds"> => {
+  const { paycheckId, paycheckData, currentBalances, newBalances, allocations, timestamp } = options;
+  
   // Create allocations map
   const allocationsMap: Record<string, number> = {};
   allocations.forEach((a) => {
