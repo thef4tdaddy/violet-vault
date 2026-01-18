@@ -28,9 +28,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # TODO (v2.0 Beta): Update 'alpha' to target 'develop' once the hybrid rewrite reaches beta stability.
-          # TODO (v2.0 Live): Revert to 'github.ref' or explicit 'main' once v2.0 is fully merged to production.
-          ref: ${{ (inputs.context || 'alpha') == 'alpha' && 'feat/polygot-rewrite' || (inputs.context == 'beta' && 'develop' || github.ref) }}
+          # TODO: Alpha now targets develop post-v2.0 merge.
+          ref: ${{ (inputs.context || 'alpha') == 'alpha' && 'develop' || (inputs.context == 'beta' && 'develop' || github.ref) }}
 
       # --- Setup Environments ---
       - name: Setup Node.js
@@ -93,10 +92,8 @@ jobs:
         id: test_frontend
         continue-on-error: true
         run: |
-          set +e  # Disable exit on error for this step
           npm run test:coverage -- --coverage.reporter=text --coverage.reporter=json-summary > frontend-test.txt 2>&1
           exit_code=$?
-          set -e  # Re-enable exit on error
           cat frontend-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
@@ -117,10 +114,8 @@ jobs:
         run: |
           cd api
           # Go 1.23 coverage
-          set +e  # Disable exit on error for this step
           go test ./... -coverprofile=coverage.out > ../go-test.txt 2>&1
           exit_code=$?
-          set -e  # Re-enable exit on error
 
           # Extract coverage percentage
           if [ -f "coverage.out" ]; then
@@ -147,10 +142,8 @@ jobs:
           cd api
           # Run pytest with coverage (add JSON report)
           # Use python -m pytest to ensure it uses the venv's interpreter
-          set +e  # Disable exit on error for this step
           python -m pytest --cov=. --cov-report=term-missing --cov-report=html --cov-report=json > ../python-test.txt 2>&1
           exit_code=$?
-          set -e  # Re-enable exit on error
 
           # Extract coverage percentage
           if [ -f "coverage.json" ]; then
@@ -187,9 +180,9 @@ jobs:
             const goCoverage = parseFloat('${{ steps.test_go.outputs.coverage }}') || 0;
 
             const isHealthy = buildStatus === 'success' && 
-                             (feStatus === 'success' || feStatus === 'skipped') && 
-                             (goStatus === 'success' || goStatus === 'skipped') && 
-                             (pyStatus === 'success' || pyStatus === 'skipped');
+                             (feStatus !== 'failure') && 
+                             (goStatus !== 'failure') && 
+                             (pyStatus !== 'failure');
             const emoji = isHealthy ? '✅' : '❌';
             const dateStr = new Date().toISOString().split('T')[0];
             const title = `Daily Health: ${dateStr} - ${emoji}`;
@@ -212,120 +205,6 @@ jobs:
             body += `- **Frontend Tests**: ${feStatus === 'success' ? '✅ Pass' : (feStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
             body += `- **Go Tests**: ${goStatus === 'success' ? '✅ Pass' : (goStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
             body += `- **Python Tests**: ${pyStatus === 'success' ? '✅ Pass' : (pyStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
-
-            // Helper to extract the last N lines from a log string
-            const extractLastLines = (logContent, lineCount = 30) => {
-                return logContent.split('\n').slice(-lineCount).join('\n');
-            };
-
-            // Add failure details if any tests failed
-            if (feStatus === 'failure' || goStatus === 'failure' || pyStatus === 'failure') {
-                body += `\n## 🔍 Failure Details\n\n`;
-                
-                if (feStatus === 'failure' && fs.existsSync('frontend-test.txt')) {
-                    const feLog = fs.readFileSync('frontend-test.txt', 'utf8');
-                    const errorLines = extractLastLines(feLog);
-                    body += `### Frontend Test Failures\n\n`;
-                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
-                }
-                
-                if (goStatus === 'failure' && fs.existsSync('go-test.txt')) {
-                    const goLog = fs.readFileSync('go-test.txt', 'utf8');
-                    const errorLines = extractLastLines(goLog);
-                    body += `### Go Test Failures\n\n`;
-                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
-                }
-                
-                if (pyStatus === 'failure' && fs.existsSync('python-test.txt')) {
-                    const pyLog = fs.readFileSync('python-test.txt', 'utf8');
-                    const errorLines = extractLastLines(pyLog);
-                    body += `### Python Test Failures\n\n`;
-                    body += `<details>\n<summary>View failure logs (last 30 lines)</summary>\n\n\`\`\`\n${errorLines}\n\`\`\`\n\n</details>\n\n`;
-                }
-            }
-
-            // Helper to extract failing test files from logs
-            const extractFailingTests = (logContent, testPattern) => {
-                const lines = logContent.split('\n');
-                const failingTests = new Set();
-                for (const line of lines) {
-                    const match = line.match(testPattern);
-                    if (match) {
-                        failingTests.add(match[1]);
-                    }
-                }
-                return Array.from(failingTests);
-            };
-
-            // Create issues for failing test files
-            if (feStatus === 'failure' && fs.existsSync('frontend-test.txt')) {
-                const feLog = fs.readFileSync('frontend-test.txt', 'utf8');
-                const failingTests = extractFailingTests(feLog, /FAIL\s+(.+\.test\.(?:ts|tsx|js|jsx))/);
-                for (const testFile of failingTests) {
-                    const basename = testFile.split('/').pop();
-                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
-                    
-                    const existing = await github.rest.search.issuesAndPullRequests({
-                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
-                    });
-                    
-                    if (existing.data.total_count === 0) {
-                        await github.rest.issues.create({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            title: issueTitle,
-                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
-                            labels: ['test-failure', 'automated']
-                        });
-                    }
-                }
-            }
-            
-            if (goStatus === 'failure' && fs.existsSync('go-test.txt')) {
-                const goLog = fs.readFileSync('go-test.txt', 'utf8');
-                const failingTests = extractFailingTests(goLog, /FAIL\s+(.+_test\.go)/);
-                for (const testFile of failingTests) {
-                    const basename = testFile.split('/').pop();
-                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
-                    
-                    const existing = await github.rest.search.issuesAndPullRequests({
-                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
-                    });
-                    
-                    if (existing.data.total_count === 0) {
-                        await github.rest.issues.create({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            title: issueTitle,
-                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
-                            labels: ['test-failure', 'automated', 'go']
-                        });
-                    }
-                }
-            }
-            
-            if (pyStatus === 'failure' && fs.existsSync('python-test.txt')) {
-                const pyLog = fs.readFileSync('python-test.txt', 'utf8');
-                const failingTests = extractFailingTests(pyLog, /FAILED\s+(.+\.py)/);
-                for (const testFile of failingTests) {
-                    const basename = testFile.split('/').pop();
-                    const issueTitle = `test(${basename}): Fix failing test in ${basename}`;
-                    
-                    const existing = await github.rest.search.issuesAndPullRequests({
-                        q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Fix failing test in ${basename}"`
-                    });
-                    
-                    if (existing.data.total_count === 0) {
-                        await github.rest.issues.create({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            title: issueTitle,
-                            body: `Automated Test Failure Task\n\nFile: \`${testFile}\`\n\nThis test is currently failing. Please investigate and fix.\n\n[View failure logs](${runUrl})`,
-                            labels: ['test-failure', 'automated', 'python']
-                        });
-                    }
-                }
-            }
 
             // Frontend Coverage Parsing (JSON)
             if (fs.existsSync('coverage/coverage-summary.json')) {
@@ -373,7 +252,7 @@ jobs:
                                    repo: context.repo.repo,
                                    title: issueTitle,
                                    body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
-                                   labels: ['coverage-gap', 'automated']
+                                   labels: ['coverage-gap', 'help-wanted', 'automated']
                                });
                            }
                        }
@@ -386,141 +265,6 @@ jobs:
                }
             }
 
-            // TODO: Enable Python and Go coverage parsing when frontend >= 80%
-            // Python Coverage Parsing (JSON)
-            // if (frontendCoverage >= 80 && fs.existsSync('api/coverage.json')) {
-            //    try {
-            //        const pyCoverage = JSON.parse(fs.readFileSync('api/coverage.json', 'utf8'));
-            //        const pyFiles = pyCoverage.files || {};
-            //        
-            //        body += `\n### Python Coverage Details\n`;
-            //        body += `- **Total**: ${pythonCoverage.toFixed(1)}%\n`;
-            //        
-            //        // Find worst offenders
-            //        const pyLowCovFiles = [];
-            //        for (const [filepath, metrics] of Object.entries(pyFiles)) {
-            //            if (filepath.includes('test_') || filepath.includes('__init__.py')) continue;
-            //            
-            //            const coverage = metrics.totals?.percent_covered ?? metrics.summary?.percent_covered ?? 0;
-            //            if (coverage < 80) {
-            //                pyLowCovFiles.push({ file: filepath, pct: coverage });
-            //            }
-            //        }
-            //        
-            //        pyLowCovFiles.sort((a, b) => a.pct - b.pct);
-            //        
-            //        if (pyLowCovFiles.length > 0) {
-            //            body += `\n**Lowest Coverage Files:**\n`;
-            //            for (const item of pyLowCovFiles.slice(0, 5)) {
-            //                body += `- \`${item.file}\`: ${item.pct.toFixed(1)}%\n`;
-            //            }
-            //            
-            //            // Create issues for worst 3 offenders
-            //            const pyCandidates = pyLowCovFiles.slice(0, 3);
-            //            for (const item of pyCandidates) {
-            //                const parts = item.file.split('/');
-            //                const basename = parts[parts.length - 1];
-            //                const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-            //                
-            //                const existing = await github.rest.search.issuesAndPullRequests({
-            //                    q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
-            //                });
-            //                
-            //                if (existing.data.total_count === 0) {
-            //                    await github.rest.issues.create({
-            //                        owner: context.repo.owner,
-            //                        repo: context.repo.repo,
-            //                        title: issueTitle,
-            //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
-            //                        labels: ['coverage-gap', 'automated', 'python']
-            //                    });
-            //                }
-            //            }
-            //        }
-            //    } catch (e) {
-            //        console.error("Error parsing Python coverage", e);
-            //    }
-            // }
-
-            // TODO: Enable Go coverage parsing when frontend >= 80%
-            // Go Coverage Parsing (coverage.out)
-            // if (frontendCoverage >= 80 && fs.existsSync('api/coverage.out')) {
-            //    try {
-            //        const goCoverageRaw = fs.readFileSync('api/coverage.out', 'utf8');
-            //        const lines = goCoverageRaw.split('\n').filter(line => line.trim() && !line.startsWith('mode:'));
-            //        
-            //        body += `\n### Go Coverage Details\n`;
-            //        body += `- **Total**: ${goCoverage.toFixed(1)}%\n`;
-            //        
-            //        // Parse coverage.out format: filepath:startline.col,endline.col num_statements execution_count
-            //        // Each line represents a code block. If execution_count > 0, all statements in that block are covered.
-            //        const fileCoverage = {};
-            //        for (const line of lines) {
-            //            const parts = line.split(':');
-            //            if (parts.length < 2) continue;
-            //            
-            //            const filepath = parts[0];
-            //            const rest = parts[1].split(' ');
-            //            if (rest.length < 3) continue;
-            //            
-            //            const statements = parseInt(rest[1]) || 0;
-            //            const executionCount = parseInt(rest[2]) || 0;
-            //            
-            //            if (!fileCoverage[filepath]) {
-            //                fileCoverage[filepath] = { totalStatements: 0, coveredStatements: 0 };
-            //            }
-            //            fileCoverage[filepath].totalStatements += statements;
-            //            // If the block was executed at least once, all statements in it are covered
-            //            if (executionCount > 0) {
-            //                fileCoverage[filepath].coveredStatements += statements;
-            //            }
-            //        }
-            //        
-            //        const goLowCovFiles = [];
-            //        for (const [filepath, stats] of Object.entries(fileCoverage)) {
-            //            if (filepath.includes('_test.go')) continue;
-            //            
-            //            const pct = stats.totalStatements > 0 ? (stats.coveredStatements / stats.totalStatements) * 100 : 0;
-            //            if (pct < 80) {
-            //                goLowCovFiles.push({ file: filepath, pct });
-            //            }
-            //        }
-            //        
-            //        goLowCovFiles.sort((a, b) => a.pct - b.pct);
-            //        
-            //        if (goLowCovFiles.length > 0) {
-            //            body += `\n**Lowest Coverage Files:**\n`;
-            //            for (const item of goLowCovFiles.slice(0, 5)) {
-            //                body += `- \`${item.file}\`: ${item.pct.toFixed(1)}%\n`;
-            //            }
-            //            
-            //            // Create issues for worst 3 offenders
-            //            const goCandidates = goLowCovFiles.slice(0, 3);
-            //            for (const item of goCandidates) {
-            //                const parts = item.file.split('/');
-            //                const basename = parts[parts.length - 1];
-            //                const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-            //                
-            //                const existing = await github.rest.search.issuesAndPullRequests({
-            //                    q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
-            //                });
-            //                
-            //                if (existing.data.total_count === 0) {
-            //                    await github.rest.issues.create({
-            //                        owner: context.repo.owner,
-            //                        repo: context.repo.repo,
-            //                        title: issueTitle,
-            //                        body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct.toFixed(1)}%**\n\nPlease add tests.`,
-            //                        labels: ['coverage-gap', 'automated', 'go']
-            //                    });
-            //                }
-            //            }
-            //        }
-            //    } catch (e) {
-            //        console.error("Error parsing Go coverage", e);
-            //    }
-            // }
-
             body += `\n---\n*VioletVault Health Bot*`;
 
             await github.rest.issues.create({
@@ -530,6 +274,15 @@ jobs:
               body: body,
               labels: ['daily-health']
             });
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.out,./api/coverage.json
+          flags: daily-health
+          name: daily-health-check
+          fail_ci_if_error: false
 
       - name: Upload Artifacts
         if: always()

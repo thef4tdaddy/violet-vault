@@ -17,9 +17,7 @@ const getGitInfo = () => {
     }).trim();
 
     // Get commit hash (short)
-    const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" })
-      .trim()
-      .substring(0, 7);
+    const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim().substring(0, 7);
 
     // Get commit author date (alternative format)
     const authorDate = execSync("git log -1 --format=%aI", {
@@ -60,13 +58,14 @@ const getGitInfo = () => {
 export default defineConfig(() => {
   const gitInfo = getGitInfo();
 
-  // Enable debug mode for develop branch deployments
-  const isDevelopBranch = gitInfo.branch === "develop";
+  // Mode detection
   const isProduction = process.env.NODE_ENV === "production";
-  const viteNodeEnv = process.env.VITE_NODE_ENV;
-  const enableDebugBuild =
-    (isDevelopBranch && isProduction) || viteNodeEnv === "development";
-  const isDevelopmentMode = viteNodeEnv === "development" || !isProduction;
+  const viteNodeEnv = process.env.VITE_NODE_ENV || (isProduction ? "production" : "development");
+  const isDevelopmentMode = viteNodeEnv === "development";
+
+  // Enable debug mode for staging branches
+  const isStagedBranch = ["develop", "feat/polygot-rewrite"].includes(gitInfo.branch);
+  const enableDebugBuild = isStagedBranch && isProduction;
 
   return {
     plugins: [react(), tailwindcss()],
@@ -89,21 +88,11 @@ export default defineConfig(() => {
       global: "globalThis",
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
-      "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
-        gitInfo.commitDate,
-      ),
-      "import.meta.env.VITE_GIT_AUTHOR_DATE": JSON.stringify(
-        gitInfo.authorDate,
-      ),
-      "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(
-        gitInfo.commitHash,
-      ),
-      "import.meta.env.VITE_GIT_COMMIT_MESSAGE": JSON.stringify(
-        gitInfo.commitMessage,
-      ),
-      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(
-        new Date().toISOString(),
-      ),
+      "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(gitInfo.commitDate),
+      "import.meta.env.VITE_GIT_AUTHOR_DATE": JSON.stringify(gitInfo.authorDate),
+      "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitInfo.commitHash),
+      "import.meta.env.VITE_GIT_COMMIT_MESSAGE": JSON.stringify(gitInfo.commitMessage),
+      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(new Date().toISOString()),
     },
     build: {
       chunkSizeWarningLimit: 1000, // Reset to default for better monitoring
@@ -111,8 +100,8 @@ export default defineConfig(() => {
       // Development mode: No minification for fast builds and readable errors
       // Production mode: Ultra-conservative terser minification to prevent temporal dead zone errors
       minify: isDevelopmentMode ? false : "terser",
-      // Enable sourcemaps for development and debug builds
-      sourcemap: enableDebugBuild || isDevelopmentMode,
+      // Use external maps for staging to keep JS small, inline for dev for speed
+      sourcemap: enableDebugBuild ? true : isDevelopmentMode ? "inline" : false,
       // Manual chunk splitting for optimal bundle sizes
       rollupOptions: {
         output: {
@@ -120,19 +109,11 @@ export default defineConfig(() => {
             // Vendor chunk for React ecosystem
             "react-vendor": ["react", "react-dom", "react-router-dom"],
             // Firebase chunk (lazy loaded)
-            "firebase-vendor": [
-              "firebase/app",
-              "firebase/firestore",
-              "firebase/auth",
-            ],
+            "firebase-vendor": ["firebase/app", "firebase/firestore", "firebase/auth"],
             // Data libraries chunk
             "data-vendor": ["@tanstack/react-query", "dexie", "zustand"],
             // UI/Utils chunk
-            "ui-vendor": [
-              "lucide-react",
-              "tailwindcss",
-              "@tanstack/react-virtual",
-            ],
+            "ui-vendor": ["lucide-react", "tailwindcss", "@tanstack/react-virtual"],
             // Crypto/Security chunk
             "crypto-vendor": ["bip39", "@msgpack/msgpack", "pako"],
             // PDF/QR chunk (lazy loaded)
@@ -188,11 +169,7 @@ export default defineConfig(() => {
     esbuild: {
       // Development mode: Keep everything for debugging
       // Production mode: Only drop debugger statements (but not in develop branch debug builds)
-      drop: isDevelopmentMode
-        ? []
-        : isProduction && !enableDebugBuild
-          ? ["debugger"]
-          : [],
+      drop: isDevelopmentMode ? [] : isProduction && !enableDebugBuild ? ["debugger"] : [],
     },
   };
 });
