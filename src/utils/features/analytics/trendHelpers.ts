@@ -44,6 +44,26 @@ export const getGrowthRateColor = (growthRate: number) => {
 };
 
 /**
+ * Get trend icon emoji based on direction
+ */
+export const getTrendIcon = (direction: string) => {
+  const icons = {
+    increasing: "📈",
+    decreasing: "📉",
+    stable: "➡️",
+  };
+  return icons[direction as keyof typeof icons] || icons.stable;
+};
+
+/**
+ * Get CSS color class based on trend direction (uses getTrendIconConfig for consistency)
+ */
+export const getTrendColor = (direction: string) => {
+  const config = getTrendIconConfig(direction);
+  return config.iconColor;
+};
+
+/**
  * Generate dynamic category chart colors
  */
 export const getCategoryChartColor = (index: number) => {
@@ -92,30 +112,6 @@ export const SEASON_COLORS = {
   Spring: "#10B981",
   Summer: "#F59E0B",
   Fall: "#EF4444",
-};
-
-/**
- * Get trend icon emoji based on direction
- */
-export const getTrendIcon = (direction: string) => {
-  const icons = {
-    increasing: "📈",
-    decreasing: "📉",
-    stable: "➡️",
-  };
-  return icons[direction as keyof typeof icons] || icons.stable;
-};
-
-/**
- * Get CSS color class based on trend direction
- */
-export const getTrendColor = (direction: string) => {
-  const colors = {
-    increasing: "text-red-600",
-    decreasing: "text-green-600",
-    stable: "text-gray-600",
-  };
-  return colors[direction as keyof typeof colors] || colors.stable;
 };
 
 /**
