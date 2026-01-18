@@ -4,6 +4,7 @@ import { syncHealthMonitor } from "@/utils/features/sync/syncHealthMonitor";
 import { autoBackupService } from "@/utils/features/sync/autoBackupService";
 import { offlineRequestQueueService } from "./offlineRequestQueueService";
 import { websocketSignalingService } from "./websocketSignalingService";
+import { syncManager } from "./SyncManager";
 import type { SafeUnknown, TypedResponse } from "@/types/firebase";
 import type { WebSocketSignalMessage } from "@/types/sync";
 
@@ -50,8 +51,6 @@ export class SyncOrchestrator {
   private budgetId: string | null = null;
   public isRunning: boolean = false;
   public isSyncInProgress: boolean = false;
-  private syncQueue: Promise<void> = Promise.resolve();
-  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private wsUnsubscribe: (() => void) | null = null;
 
   private constructor() {}
@@ -111,8 +110,6 @@ export class SyncOrchestrator {
    * Stop the sync service
    */
   public stop(): void {
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
-
     // Cleanup WebSocket signaling
     if (this.wsUnsubscribe) {
       this.wsUnsubscribe();
@@ -128,27 +125,42 @@ export class SyncOrchestrator {
     // Stop offline queue processing
     offlineRequestQueueService.stopProcessingInterval();
 
+    // Clear sync manager queue
+    syncManager.clearQueue();
+
     logger.production("SyncOrchestrator: Stopped");
   }
 
   /**
    * Schedule a sync operation with debouncing
+   * Now delegates to SyncManager for unified queue management
    */
   public scheduleSync(priority: "normal" | "high" = "normal"): void {
     if (!this.isRunning) return;
 
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
-
-    const delay = priority === "high" ? 1000 : 10000;
-    this.debounceTimer = setTimeout(() => {
-      this.syncQueue = this.syncQueue.then(async () => {
-        await this.forceSync();
+    logger.debug(`SyncOrchestrator: Scheduling sync with priority: ${priority}`);
+    
+    // Use SyncManager to handle queueing and debouncing
+    // Fire-and-forget pattern - errors are logged within syncManager
+    syncManager
+      .executeSync(
+        async () => {
+          return await this.performSync();
+        },
+        "scheduled-sync",
+        { priority, skipQueue: priority === "high" }
+      )
+      .catch((error) => {
+        logger.error("SyncOrchestrator: Scheduled sync failed", {
+          error: error instanceof Error ? error.message : String(error),
+          priority,
+        });
       });
-    }, delay);
   }
 
   /**
    * Force an immediate sync
+   * Now delegates to SyncManager for unified execution
    */
   public async forceSync(): Promise<TypedResponse<boolean>> {
     if (!this.isRunning || !this.provider) {
@@ -158,6 +170,36 @@ export class SyncOrchestrator {
         error: {
           code: "NOT_RUNNING",
           message: "Sync not running",
+          category: "unknown",
+          timestamp: Date.now(),
+        },
+      };
+    }
+
+    logger.info("SyncOrchestrator: Force sync requested");
+
+    // Use SyncManager to force immediate sync with mutex protection
+    return await syncManager.forceSync(
+      async () => {
+        return await this.performSync();
+      },
+      "force-sync"
+    );
+  }
+
+  /**
+   * Internal method to perform the actual sync operation
+   * Extracted to be used by both scheduleSync and forceSync
+   * @private
+   */
+  private async performSync(): Promise<TypedResponse<boolean>> {
+    if (!this.provider) {
+      return {
+        success: false,
+        timestamp: Date.now(),
+        error: {
+          code: "NO_PROVIDER",
+          message: "No sync provider configured",
           category: "unknown",
           timestamp: Date.now(),
         },
@@ -176,13 +218,11 @@ export class SyncOrchestrator {
       // 1. Pre-sync backup
       await autoBackupService.createPreSyncBackup("sync_orchestrator");
 
-      // 2. Fetch local data from Dexie (via bridge or direct import - choosing bridge for now)
+      // 2. Fetch local data from Dexie
       const { budgetDb } = await import("@/db/budgetDb");
       const localData = await this.fetchLocalData(budgetDb);
 
-      // 3. Perform Sync (Provider handles directionality/chunking logic internally for now)
-      // v2.0 Improvement: Orchestrator should probably decide direction, but provider knows transport limits.
-      // For now, we delegate the "how" to the provider.
+      // 3. Perform Sync
       const result = await this.provider.save(localData);
 
       if (result.success) {
