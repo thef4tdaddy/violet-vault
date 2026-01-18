@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Radio } from "@/components/ui";
 import { getIcon } from "../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import type { Envelope } from "@/types/finance";
 import type { Bill } from "@/types/bills";
 

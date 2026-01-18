@@ -1,7 +1,7 @@
 import React from "react";
-import { getStatusStyle } from "../../../utils/budgeting";
-import { getButtonClasses } from "../../../utils/ui/touchFeedback";
-import { useEnvelopeSwipeGestures } from "../../../hooks/useEnvelopeSwipeGestures";
+import { getStatusStyle } from "@/utils/domain/budgeting";
+import { getButtonClasses } from "@/utils/ui/feedback/touchFeedback";
+import { useEnvelopeSwipeGestures } from "@/hooks/platform/mobile/useEnvelopeSwipeGestures";
 import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";
 import EnvelopeActivitySummary from "./EnvelopeActivitySummary";
 import { useEnvelopeDisplayData } from "./hooks/useEnvelopeDisplayData";

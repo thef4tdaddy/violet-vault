@@ -1,20 +1,24 @@
 /**
  * BillManager Component - Refactored for Issue #152 & #835
+ * Migrated to use PageHeader primitive (Issue #1594)
  *
  * UI-only component using useBillManager hook for business logic
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
 import React, { useMemo } from "react";
-import { useBillManager } from "../../hooks/bills/useBillManager";
-import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
-import useEditLock from "../../hooks/common/useEditLock";
-import { useAuthManager } from "../../hooks/auth/useAuthManager";
-import BillManagerHeader from "./BillManagerHeader";
+import PageHeader from "@/components/primitives/headers/PageHeader";
+import { Button } from "@/components/ui";
+import { getIcon } from "../../utils";
+import { useBillManager } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManager";
+import { useBillManagerUI } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillManagerUI";
+import useEditLock from "../../hooks/core/auth/security/useEditLock";
+import { useAuth } from "@/hooks/auth/useAuth";
 import BillSummaryCards from "./BillSummaryCards";
 import BillViewTabs from "./BillViewTabs";
 import BillTable from "./BillTable";
 import BillManagerModals from "./BillManagerModals";
 import type { Bill } from "@/types/bills";
+import type { BillRecord } from "../../hooks/budgeting/transactions/scheduled/expenses/useBillCalculations";
 
 interface Transaction {
   id: string;
@@ -51,8 +55,6 @@ const BillManagerLoading: React.FC<{ className?: string }> = ({ className = "" }
 );
 
 const BillManager: React.FC<BillManagerProps> = ({
-  transactions: propTransactions = [],
-  envelopes: propEnvelopes = [],
   onUpdateBill,
   onCreateRecurringBill,
   onSearchNewBills,
@@ -102,8 +104,6 @@ const BillManager: React.FC<BillManagerProps> = ({
     updateBill,
     deleteBill,
   } = useBillManager({
-    propTransactions,
-    propEnvelopes,
     onUpdateBill,
     onCreateRecurringBill,
     onSearchNewBills,
@@ -146,10 +146,7 @@ const BillManager: React.FC<BillManagerProps> = ({
   });
 
   // Edit lock for collaborative editing
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
   const { isLocked: isEditLocked, lockedBy } = useEditLock(
     `bills-${budgetId}`,
     currentUser?.userName || "User"
@@ -167,12 +164,41 @@ const BillManager: React.FC<BillManagerProps> = ({
       className={`rounded-lg p-6 space-y-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm ${className}`}
     >
       {/* Header with Actions */}
-      <BillManagerHeader
-        isEditLocked={isEditLocked}
-        currentEditor={currentEditor ?? ""}
-        isSearching={isSearching}
-        searchNewBills={searchNewBills}
-        handleAddNewBill={handleAddNewBill}
+      <PageHeader
+        title="Bill Manager"
+        subtitle="Track and manage your recurring bills and payments"
+        icon="FileText"
+        actions={
+          <div className="flex items-center gap-2">
+            {isEditLocked && (
+              <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg flex items-center gap-2">
+                {React.createElement(getIcon("Clock"), { className: "h-4 w-4" })}
+                Editing: {currentEditor}
+              </div>
+            )}
+
+            <Button
+              onClick={searchNewBills}
+              disabled={isSearching}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2 border-2 border-black"
+            >
+              {isSearching
+                ? React.createElement(getIcon("RefreshCw"), {
+                    className: "h-4 w-4 animate-spin",
+                  })
+                : React.createElement(getIcon("Search"), { className: "h-4 w-4" })}
+              Discover Bills
+            </Button>
+
+            <Button
+              onClick={handleAddNewBill}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 border-2 border-black"
+            >
+              {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
+              Add Bill
+            </Button>
+          </div>
+        }
       />
 
       {/* Summary Cards */}
@@ -236,7 +262,7 @@ const BillManager: React.FC<BillManagerProps> = ({
         updateBill={updateBill as never}
         deleteBill={deleteBill as never}
         handleBulkUpdate={(entities) => handleBulkUpdate(entities as never)}
-        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as never)}
+        handleAddDiscoveredBills={(entities) => handleAddDiscoveredBills(entities as BillRecord[])}
         billOperations={billOperations}
         onError={onError ?? (() => {})}
       />

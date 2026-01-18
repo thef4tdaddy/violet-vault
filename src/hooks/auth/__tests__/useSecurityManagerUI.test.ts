@@ -29,7 +29,7 @@ vi.mock("../../../services/security/securityService", () => ({
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     debug: vi.fn(),
     error: vi.fn(),

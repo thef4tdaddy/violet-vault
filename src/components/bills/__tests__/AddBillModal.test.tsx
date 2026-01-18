@@ -2,9 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import AddBillModal from "../AddBillModal";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
 
 // Mock all hooks with default exports where needed
-vi.mock("@/hooks/bills/useBillForm", () => ({
+vi.mock("@/hooks/budgeting/transactions/scheduled/expenses/useBillForm", () => ({
   useBillForm: vi.fn(() => ({
     formData: {
       name: "",
@@ -27,7 +29,7 @@ vi.mock("@/hooks/bills/useBillForm", () => ({
   })),
 }));
 
-vi.mock("@/hooks/common/useEditLock", () => ({
+vi.mock("@/hooks/core/auth/security/useEditLock", () => ({
   default: vi.fn(() => ({
     isLocked: false,
     isOwnLock: false,
@@ -37,39 +39,50 @@ vi.mock("@/hooks/common/useEditLock", () => ({
   })),
 }));
 
-vi.mock("@/hooks/ui/useMobileDetection", () => ({
+vi.mock("@/hooks/platform/common/useMobileDetection", () => ({
   useMobileDetection: vi.fn(() => false),
 }));
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
-    securityContext: { budgetId: "test-budget" },
+vi.mock("@/hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => ({
+    budgetId: "test-budget",
     user: { id: "test-user", name: "Test User" },
   })),
 }));
 
-vi.mock("@/services/editLockService", () => ({
+vi.mock("@/services/sync/editLockService", () => ({
   initializeEditLocks: vi.fn(),
 }));
 
 // Mock child components
 vi.mock("../ui/EditLockIndicator", () => ({
-  default: ({ isLocked }) =>
+  default: ({ isLocked }: { isLocked: boolean }) =>
     isLocked ? <div data-testid="edit-lock-indicator">Locked</div> : null,
 }));
 
-vi.mock("../BillModalHeader", () => ({
-  default: ({ title, onClose, onSubmit }) => (
-    <div data-testid="bill-modal-header">
-      <h2>{title}</h2>
-      <button onClick={onClose}>Close</button>
-      <button onClick={onSubmit}>Submit</button>
-    </div>
-  ),
+vi.mock("@/components/primitives/modals/FormModal", () => ({
+  default: ({
+    isOpen,
+    onClose,
+    children,
+    title,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    title: string;
+  }) =>
+    isOpen ? (
+      <div data-testid="form-modal">
+        <h2>{title}</h2>
+        <button onClick={onClose}>Close</button>
+        {children}
+      </div>
+    ) : null,
 }));
 
 vi.mock("../BillFormFields", () => ({
-  default: ({ formData, updateField }) => (
+  default: ({ formData, updateField }: { formData: any; updateField: any }) => (
     <div data-testid="bill-form-fields">
       <input
         data-testid="bill-name-input"
@@ -86,7 +99,17 @@ vi.mock("../BillFormFields", () => ({
 }));
 
 vi.mock("../mobile/SlideUpModal", () => ({
-  default: ({ isOpen, onClose, children, title }) =>
+  default: ({
+    isOpen,
+    onClose,
+    children,
+    title,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    title: string;
+  }) =>
     isOpen ? (
       <div data-testid="slide-up-modal">
         <h3>{title}</h3>
@@ -102,6 +125,7 @@ describe("AddBillModal", () => {
   const mockOnUpdateBill = vi.fn();
   const mockOnDeleteBill = vi.fn();
   const mockOnError = vi.fn();
+  let queryClient: QueryClient;
 
   const defaultProps = {
     isOpen: true,
@@ -115,21 +139,30 @@ describe("AddBillModal", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const renderWithQuery = (component: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+  };
 
   describe("Rendering", () => {
     it("should not render when isOpen is false", () => {
-      render(<AddBillModal {...defaultProps} isOpen={false} />);
-      expect(screen.queryByTestId("bill-modal-header")).not.toBeInTheDocument();
+      renderWithQuery(<AddBillModal {...defaultProps} isOpen={false} />);
+      expect(screen.queryByTestId("form-modal")).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
-      render(<AddBillModal {...defaultProps} />);
-      expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("form-modal")).toBeInTheDocument();
     });
 
     it("should display Add Bill title for new bills", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByText("Add Bill")).toBeInTheDocument();
     });
 
@@ -141,24 +174,24 @@ describe("AddBillModal", () => {
         dueDate: "2024-01-15",
       };
 
-      render(<AddBillModal {...defaultProps} editingBill={editingBill} />);
+      renderWithQuery(<AddBillModal {...defaultProps} editingBill={editingBill} />);
       expect(screen.getByText("Edit Bill")).toBeInTheDocument();
     });
 
     it("should render form fields", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
       expect(screen.getByTestId("bill-form-fields")).toBeInTheDocument();
     });
 
     it("should render modal header", () => {
-      render(<AddBillModal {...defaultProps} />);
-      expect(screen.getByTestId("bill-modal-header")).toBeInTheDocument();
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("form-modal")).toBeInTheDocument();
     });
   });
 
   describe("User Interactions", () => {
     it("should call onClose when close button is clicked", async () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
 
       const closeButton = screen.getByText("Close");
       await userEvent.click(closeButton);
@@ -169,10 +202,252 @@ describe("AddBillModal", () => {
 
   describe("Form Fields", () => {
     it("should render name and amount inputs", () => {
-      render(<AddBillModal {...defaultProps} />);
+      renderWithQuery(<AddBillModal {...defaultProps} />);
 
       expect(screen.getByTestId("bill-name-input")).toBeInTheDocument();
       expect(screen.getByTestId("bill-amount-input")).toBeInTheDocument();
+    });
+
+    it("should update name field when user types", async () => {
+      const mockUpdateField = vi.fn();
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "",
+          amount: "",
+          dueDate: "",
+          frequency: "monthly",
+          category: "",
+          iconName: "",
+        },
+        isSubmitting: false,
+        suggestedIconName: "DollarSign",
+        iconSuggestions: [],
+        categories: ["Utilities"],
+        handleSubmit: vi.fn(),
+        updateField: mockUpdateField,
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+
+      const nameInput = screen.getByTestId("bill-name-input");
+      await userEvent.type(nameInput, "Electric Bill");
+
+      expect(mockUpdateField).toHaveBeenCalled();
+    });
+
+    it("should update amount field when user types", async () => {
+      const mockUpdateField = vi.fn();
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "",
+          amount: "",
+          dueDate: "",
+          frequency: "monthly",
+          category: "",
+          iconName: "",
+        },
+        isSubmitting: false,
+        suggestedIconName: "DollarSign",
+        iconSuggestions: [],
+        categories: ["Utilities"],
+        handleSubmit: vi.fn(),
+        updateField: mockUpdateField,
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+
+      const amountInput = screen.getByTestId("bill-amount-input");
+      await userEvent.type(amountInput, "150.50");
+
+      expect(mockUpdateField).toHaveBeenCalled();
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle null editingBill", () => {
+      renderWithQuery(<AddBillModal {...defaultProps} editingBill={null} />);
+      expect(screen.getByText("Add Bill")).toBeInTheDocument();
+    });
+
+    it("should handle undefined editingBill", () => {
+      renderWithQuery(<AddBillModal {...defaultProps} editingBill={undefined} />);
+      expect(screen.getByText("Add Bill")).toBeInTheDocument();
+    });
+
+    it("should handle submitting state", () => {
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "Test Bill",
+          amount: "100",
+          dueDate: "2024-01-15",
+          frequency: "monthly",
+          category: "Utilities",
+          iconName: "Zap",
+        },
+        isSubmitting: true,
+        suggestedIconName: "DollarSign",
+        iconSuggestions: [],
+        categories: ["Utilities"],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("form-modal")).toBeInTheDocument();
+    });
+
+    it("should handle empty form data", () => {
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "",
+          amount: "",
+          dueDate: "",
+          frequency: "monthly",
+          category: "",
+          iconName: "",
+        },
+        isSubmitting: false,
+        suggestedIconName: "DollarSign",
+        iconSuggestions: [],
+        categories: [],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("bill-name-input")).toHaveValue("");
+    });
+
+    it("should handle pre-filled form data when editing", () => {
+      const editingBill = {
+        id: "1",
+        name: "Rent",
+        amount: 1500,
+        dueDate: "2024-01-01",
+        frequency: "monthly",
+        category: "Housing",
+      };
+
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "Rent",
+          amount: "1500",
+          dueDate: "2024-01-01",
+          frequency: "monthly",
+          category: "Housing",
+          iconName: "Home",
+        },
+        isSubmitting: false,
+        suggestedIconName: "Home",
+        iconSuggestions: [],
+        categories: ["Housing"],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} editingBill={editingBill} />);
+      expect(screen.getByText("Edit Bill")).toBeInTheDocument();
+      expect(screen.getByTestId("bill-name-input")).toHaveValue("Rent");
+    });
+
+    it("should handle large amount values", () => {
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: "Big Bill",
+          amount: "999999.99",
+          dueDate: "2024-01-15",
+          frequency: "monthly",
+          category: "Other",
+          iconName: "DollarSign",
+        },
+        isSubmitting: false,
+        suggestedIconName: "DollarSign",
+        iconSuggestions: [],
+        categories: ["Other"],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("bill-amount-input")).toHaveValue("999999.99");
+    });
+
+    it("should handle very long bill names", () => {
+      const longName = "A".repeat(100);
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: longName,
+          amount: "100",
+          dueDate: "2024-01-15",
+          frequency: "monthly",
+          category: "Utilities",
+          iconName: "Zap",
+        },
+        isSubmitting: false,
+        suggestedIconName: "Zap",
+        iconSuggestions: [],
+        categories: ["Utilities"],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("bill-name-input")).toHaveValue(longName);
+    });
+
+    it("should handle special characters in bill name", () => {
+      const specialName = "Rent & Utilities (Main)";
+      vi.mocked(useBillForm).mockReturnValue({
+        formData: {
+          name: specialName,
+          amount: "1200",
+          dueDate: "2024-01-15",
+          frequency: "monthly",
+          category: "Housing",
+          iconName: "Home",
+        },
+        isSubmitting: false,
+        suggestedIconName: "Home",
+        iconSuggestions: [],
+        categories: ["Housing"],
+        handleSubmit: vi.fn(),
+        updateField: vi.fn(),
+        resetForm: vi.fn(),
+        calculateBiweeklyAmount: vi.fn(),
+        calculateMonthlyAmount: vi.fn(),
+        getNextDueDate: vi.fn(),
+      } as any);
+
+      renderWithQuery(<AddBillModal {...defaultProps} />);
+      expect(screen.getByTestId("bill-name-input")).toHaveValue(specialName);
     });
   });
 });

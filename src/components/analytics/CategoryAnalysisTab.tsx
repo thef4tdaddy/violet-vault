@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "@/utils";
-import type { CategoryStat } from "@/utils/analytics/categoryHelpers";
+import type { CategoryStat } from "@/utils/features/analytics/categoryHelpers";
 
 interface CategoryAnalysisTabProps {
   categoryStats: CategoryStat[];

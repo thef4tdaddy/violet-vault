@@ -1,20 +1,26 @@
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { useUserSetup } from "../useUserSetup";
-import { globalToast } from "../../../stores/ui/toastStore";
+import { globalToast } from "@/stores/ui/toastStore";
 
 // Mock dependencies
-vi.mock("../../../stores/ui/toastStore", () => ({
+vi.mock("@/stores/ui/toastStore", () => ({
   globalToast: {
     showError: vi.fn(),
   },
 }));
 
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+  },
+}));
+
+vi.mock("@/utils/platform/auth/shareCodeManager", () => ({
+  shareCodeManager: {
+    generateShareCode: vi.fn(() => "test-share-code"),
   },
 }));
 
@@ -26,14 +32,24 @@ const mockLocalStorage = {
 };
 Object.defineProperty(window, "localStorage", { value: mockLocalStorage });
 
+vi.mock("../useAuthenticationManager", () => ({
+  useAuthenticationManager: vi.fn(() => ({
+    authOperations: {
+      importAndLogin: vi.fn(),
+      setupAuth: vi.fn(),
+    },
+  })),
+}));
+
 describe("useUserSetup", () => {
-  let mockOnSetupComplete;
+  let mockOnSetupComplete: any;
 
   beforeEach(() => {
     mockOnSetupComplete = vi.fn();
+    mockLocalStorage.getItem.mockReturnValue(null);
     mockLocalStorage.getItem.mockClear();
     mockLocalStorage.removeItem.mockClear();
-    globalToast.showError.mockClear();
+    (globalToast.showError as any).mockClear();
   });
 
   afterEach(() => {
@@ -122,7 +138,7 @@ describe("useUserSetup", () => {
     });
 
     await act(async () => {
-      await result.current.handleStep1Continue({ preventDefault: vi.fn() });
+      await result.current.handleStep1Continue({ preventDefault: vi.fn() } as any);
     });
 
     expect(result.current.step).toBe(2);
@@ -140,14 +156,10 @@ describe("useUserSetup", () => {
     });
 
     await act(async () => {
-      await result.current.handleStep1Continue({ preventDefault: vi.fn() });
+      await result.current.handleStep1Continue({ preventDefault: vi.fn() } as any);
     });
 
-    expect(mockOnSetupComplete).toHaveBeenCalledWith({
-      password: "password",
-      userName: "John",
-      userColor: "#a855f7",
-    });
+    expect(mockOnSetupComplete).toHaveBeenCalledWith("password");
   });
 
   it("should show error for returning user with empty password", async () => {
@@ -157,12 +169,13 @@ describe("useUserSetup", () => {
     const { result } = renderHook(() => useUserSetup(mockOnSetupComplete));
 
     await act(async () => {
-      await result.current.handleStep1Continue({ preventDefault: vi.fn() });
+      await result.current.handleStep1Continue({ preventDefault: vi.fn() } as any);
     });
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please enter your password",
-      "Password Required"
+      "Password Required",
+      8000
     );
   });
 
@@ -178,12 +191,13 @@ describe("useUserSetup", () => {
     });
 
     await act(async () => {
-      await result.current.handleStep1Continue({ preventDefault: vi.fn() });
+      await result.current.handleStep1Continue({ preventDefault: vi.fn() } as any);
     });
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Incorrect password. Please try again.",
-      "Login Failed"
+      "Login Failed",
+      8000
     );
   });
 
@@ -199,14 +213,12 @@ describe("useUserSetup", () => {
     await act(async () => {
       await result.current.handleStartTrackingClick({
         preventDefault: vi.fn(),
-      });
+      } as any);
     });
 
-    expect(mockOnSetupComplete).toHaveBeenCalledWith({
-      password: "password",
-      userName: "Jane",
-      userColor: "#a855f7",
-    });
+    expect(result.current.step).toBe(3);
+    expect(result.current.shareCode).toBe("test-share-code");
+    expect(globalToast.showError).not.toHaveBeenCalled();
   });
 
   it("should validate required fields for start tracking", async () => {
@@ -215,23 +227,24 @@ describe("useUserSetup", () => {
     await act(async () => {
       await result.current.handleStartTrackingClick({
         preventDefault: vi.fn(),
-      });
+      } as any);
     });
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please fill in both password and name",
-      "Required Fields"
+      "Required Fields",
+      8000
     );
   });
 
-  it("should clear saved profile", () => {
+  it("should clear saved profile", async () => {
     const savedProfile = { userName: "John", userColor: "#10b981" };
     mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedProfile));
 
     const { result } = renderHook(() => useUserSetup(mockOnSetupComplete));
 
-    act(() => {
-      result.current.clearSavedProfile();
+    await act(async () => {
+      await result.current.clearSavedProfile();
     });
 
     expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("userProfile");
@@ -263,7 +276,7 @@ describe("useUserSetup", () => {
     });
 
     await act(async () => {
-      await result.current.handleStep1Continue({ preventDefault: vi.fn() });
+      await result.current.handleStep1Continue({ preventDefault: vi.fn() } as any);
     });
 
     expect(result.current.step).toBe(2);

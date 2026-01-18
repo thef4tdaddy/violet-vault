@@ -7,10 +7,10 @@ import type { SavingsGoal } from "@/db/types";
 // Import the new modular components
 import SavingsSummaryCard from "./SavingsSummaryCard";
 import SavingsGoalCard from "./SavingsGoalCard";
-import AddEditGoalModal from "./AddEditGoalModal";
+import AddEditGoalModal, { type Goal as LocalGoal } from "./AddEditGoalModal";
 import DistributeModal from "./DistributeModal";
-import useSavingsGoalsActions from "../../hooks/savings/useSavingsGoalsActions";
-import { SAVINGS_PRIORITIES } from "../../utils/savings/savingsFormUtils";
+import useSavingsGoalsActions from "@/hooks/budgeting/envelopes/goals/useSavingsGoalsActions";
+import { SAVINGS_PRIORITIES } from "@/utils/domain/savings/savingsFormUtils";
 
 const SavingsGoals = ({
   savingsGoals = [],
@@ -20,12 +20,12 @@ const SavingsGoals = ({
   onDeleteGoal,
   onDistributeToGoals,
 }: {
-  savingsGoals?: unknown[];
+  savingsGoals?: SavingsGoal[];
   unassignedCash?: number;
-  onAddGoal: (goal: unknown) => void;
-  onUpdateGoal: (id: string, updates: unknown) => void;
+  onAddGoal: (goal: Partial<SavingsGoal>) => void;
+  onUpdateGoal: (id: string, updates: Partial<SavingsGoal>) => void;
   onDeleteGoal: (id: string) => void;
-  onDistributeToGoals: (amount: number, goals: unknown[]) => void;
+  onDistributeToGoals: (distribution: Record<string, number>) => void;
 }) => {
   const {
     showDistributeModal,
@@ -42,9 +42,7 @@ const SavingsGoals = ({
     onAddGoal,
     onUpdateGoal,
     onDeleteGoal,
-    onDistributeToGoals: onDistributeToGoals as unknown as (
-      distribution: unknown
-    ) => void | Promise<void>,
+    onDistributeToGoals,
   });
 
   return (
@@ -80,7 +78,7 @@ const SavingsGoals = ({
             })}
             Add Goal
           </Button>
-          {unassignedCash > 0 && (
+          {unassignedCash > 0 && savingsGoals.length > 0 && (
             <Button
               onClick={openDistributeModal}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors border-2 border-black shadow-lg"
@@ -130,7 +128,7 @@ const SavingsGoals = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {(savingsGoals as SavingsGoal[]).map((goal: SavingsGoal) => (
+            {savingsGoals.map((goal: SavingsGoal) => (
               <SavingsGoalCard
                 key={goal.id}
                 goal={goal}
@@ -147,16 +145,23 @@ const SavingsGoals = ({
       <AddEditGoalModal
         isOpen={isAddEditModalOpen}
         onClose={handleCloseModals}
-        onSubmit={handleGoalSubmit}
-        editingGoal={editingGoal}
+        onSubmit={
+          handleGoalSubmit as unknown as (goalData: Omit<LocalGoal, "id">, goalId?: string) => void
+        }
+        editingGoal={editingGoal as unknown as LocalGoal}
       />
 
-      {/* Distribute Cash Modal */}
       <DistributeModal
         isOpen={showDistributeModal}
         onClose={handleCloseModals}
         onDistribute={handleDistribute}
-        savingsGoals={savingsGoals as SavingsGoal[]}
+        savingsGoals={savingsGoals.map((g) => ({
+          ...g,
+          currentAmount:
+            typeof g.currentAmount === "string"
+              ? parseFloat(g.currentAmount)
+              : (g.currentAmount ?? 0),
+        }))}
         unassignedCash={unassignedCash}
       />
     </div>

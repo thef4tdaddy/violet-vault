@@ -3,18 +3,13 @@ import { Button } from "@/components/ui";
 import React from "react";
 import { getIcon } from "../../utils";
 
-// Type definitions
-interface SavingsGoal {
-  id: string;
-  name: string;
-  currentAmount?: number; // Optional for v2.0 envelope compatibility
-  currentBalance?: number; // v2.0 envelope field (used if currentAmount is missing)
-  targetAmount?: number; // Optional for safety
-  targetDate?: string | Date;
-  color?: string;
-  priority: string;
-  description?: string;
-}
+import type { SavingsGoal } from "@/db/types";
+
+// Extended interface for UI-specific props or legacy support
+type DetailedSavingsGoal = SavingsGoal & {
+  currentAmount?: number; // Legacy support
+  priority?: string; // Not in core schema?
+};
 
 interface Priority {
   value: string;
@@ -28,9 +23,9 @@ interface TimeRemaining {
 }
 
 interface SavingsGoalCardProps {
-  goal: SavingsGoal;
-  onEdit: (goal: SavingsGoal) => void;
-  onDelete: (goal: SavingsGoal) => void;
+  goal: DetailedSavingsGoal;
+  onEdit: (goal: DetailedSavingsGoal) => void;
+  onDelete: (goal: DetailedSavingsGoal) => void;
   priorities: Priority[];
 }
 

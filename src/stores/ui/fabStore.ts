@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Type definitions for FAB store
 interface FABAction {

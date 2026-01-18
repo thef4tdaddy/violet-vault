@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getIcon } from "../../utils";
-import { useConfirm } from "../../hooks/common/useConfirm";
+import { useConfirm } from "../../hooks/platform/ux/useConfirm";
 import QuickFundForm from "./QuickFundForm";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 /**
  * Quick Fund Modal

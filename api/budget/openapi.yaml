@@ -1,0 +1,814 @@
+openapi: 3.0.3
+info:
+  title: VioletVault Budget Calculation API
+  version: 2.0.0
+  description: |
+    Stateless Go backend for high-performance envelope budget calculations.
+
+    ## Privacy & Security
+    - **Stateless**: No data is stored on the server
+    - **Privacy-First**: All calculations happen in memory and are discarded immediately
+    - **No Logging**: User data is never logged or persisted
+    - **CORS Enabled**: Can be called from any origin
+
+    ## Features
+    - Envelope balance calculations
+    - Bill due date tracking and partitioning (upcoming/overdue)
+    - Utilization rate computation
+    - Global budget totals aggregation
+    - Biweekly funding needs calculation
+
+  contact:
+    name: VioletVault API Support
+    url: https://github.com/thef4tdaddy/violet-vault
+  license:
+    name: CC-BY-NC-SA-4.0
+    url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+servers:
+  - url: https://thef4tdaddy.github.io/violet-vault
+    description: Production server
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /api/budget:
+    post:
+      summary: Calculate envelope budgets
+      description: |
+        Performs comprehensive budget calculations for multiple envelopes.
+
+        **Multi-User Support**: This endpoint is stateless and can handle calculations
+        for multiple users simultaneously. Each request is independent and isolated.
+
+        **Performance**: Optimized for large datasets (1000+ envelopes, 10000+ transactions)
+
+      operationId: calculateBudget
+      tags:
+        - Budget Calculations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetCalculationRequest"
+            examples:
+              singleEnvelope:
+                summary: Single envelope with transactions
+                value:
+                  envelopes:
+                    - id: env1
+                      name: Groceries
+                      currentBalance: 500
+                      monthlyBudget: 600
+                      envelopeType: variable
+                  transactions:
+                    - id: tx1
+                      envelopeId: env1
+                      type: expense
+                      amount: -50
+                      date: "2026-01-01"
+                  bills: []
+              multipleEnvelopes:
+                summary: Multiple envelopes with bills
+                value:
+                  envelopes:
+                    - id: env1
+                      name: Rent
+                      currentBalance: 1200
+                      biweeklyAllocation: 600
+                      envelopeType: bill
+                    - id: env2
+                      name: Savings
+                      currentBalance: 500
+                      targetAmount: 2000
+                      envelopeType: savings
+                  transactions: []
+                  bills:
+                    - id: bill1
+                      envelopeId: env1
+                      amount: -1200
+                      dueDate: "2026-01-15"
+                      isPaid: false
+                      name: Rent Payment
+      responses:
+        "200":
+          description: Budget calculations completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BudgetCalculationResponse"
+              examples:
+                success:
+                  summary: Successful calculation
+                  value:
+                    success: true
+                    data:
+                      - id: env1
+                        name: Groceries
+                        currentBalance: 500
+                        totalSpent: 50
+                        totalUpcoming: 0
+                        totalOverdue: 0
+                        allocated: 500
+                        available: 500
+                        committed: 0
+                        utilizationRate: 0.083
+                        status: healthy
+                        upcomingBills: []
+                        overdueBills: []
+                        biweeklyNeed: 277.15
+                    totals:
+                      totalAllocated: 500
+                      totalSpent: 50
+                      totalBalance: 500
+                      totalUpcoming: 0
+                      totalBiweeklyNeed: 277.15
+                      billsDueCount: 0
+                      envelopeCount: 1
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidJson:
+                  summary: Malformed JSON
+                  value:
+                    success: false
+                    error: "Invalid JSON: unexpected end of JSON input"
+        "405":
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    options:
+      summary: CORS preflight
+      description: Handle CORS preflight requests
+      operationId: corsPreflight
+      tags:
+        - CORS
+      responses:
+        "200":
+          description: CORS headers returned
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: "*"
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: "POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+                example: "Content-Type"
+
+  /api/budget/batch:
+    post:
+      summary: Calculate budgets for multiple users in batch
+      description: |
+        Performs budget calculations for multiple users in a single request.
+
+        **Batch Processing**: Process up to 100 users per request with automatic isolation.
+        Each user's data is processed independently with guaranteed privacy.
+
+        **Performance**: Batch processing is ~40x faster than sequential individual requests
+        for 100 users (2.5ms vs 100ms+).
+
+      operationId: calculateBudgetBatch
+      tags:
+        - Budget Calculations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchRequest"
+            examples:
+              twoUsers:
+                summary: Batch calculation for two users
+                value:
+                  requests:
+                    - userId: user1
+                      envelopes:
+                        - id: env1
+                          name: Groceries
+                          currentBalance: 500
+                          monthlyBudget: 600
+                      transactions:
+                        - id: tx1
+                          envelopeId: env1
+                          type: expense
+                          amount: -50
+                          date: "2026-01-01"
+                      bills: []
+                    - userId: user2
+                      envelopes:
+                        - id: env2
+                          name: Rent
+                          currentBalance: 1200
+                          biweeklyAllocation: 600
+                      transactions: []
+                      bills:
+                        - id: bill1
+                          envelopeId: env2
+                          amount: -1200
+                          dueDate: "2026-01-15"
+                          isPaid: false
+      responses:
+        "200":
+          description: Batch calculations completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResponse"
+              examples:
+                success:
+                  summary: Successful batch calculation
+                  value:
+                    success: true
+                    results:
+                      - userId: user1
+                        success: true
+                        data:
+                          - id: env1
+                            totalSpent: 50
+                            totalUpcoming: 0
+                            status: healthy
+                        totals:
+                          totalAllocated: 500
+                          envelopeCount: 1
+                      - userId: user2
+                        success: true
+                        data:
+                          - id: env2
+                            totalUpcoming: 1200
+                            status: healthy
+                        totals:
+                          totalAllocated: 1200
+                          envelopeCount: 1
+                    summary:
+                      totalRequests: 2
+                      successfulCount: 2
+                      failedCount: 0
+                      totalEnvelopes: 2
+                      totalTransactions: 1
+                      totalBills: 1
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchErrorResponse"
+        "405":
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchErrorResponse"
+
+    options:
+      summary: CORS preflight for batch endpoint
+      description: Handle CORS preflight requests for batch endpoint
+      operationId: batchCorsPreflight
+      tags:
+        - CORS
+      responses:
+        "200":
+          description: CORS headers returned
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: "*"
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: "POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+                example: "Content-Type"
+
+components:
+  schemas:
+    BudgetCalculationRequest:
+      type: object
+      required:
+        - envelopes
+        - transactions
+        - bills
+      properties:
+        envelopes:
+          type: array
+          description: Array of envelopes to calculate budgets for
+          items:
+            $ref: "#/components/schemas/Envelope"
+        transactions:
+          type: array
+          description: Array of transactions for calculations
+          items:
+            $ref: "#/components/schemas/Transaction"
+        bills:
+          type: array
+          description: Array of bills for calculations
+          items:
+            $ref: "#/components/schemas/Bill"
+
+    Envelope:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: Unique envelope identifier
+          example: env-123
+        name:
+          type: string
+          description: Envelope name
+          example: Groceries
+        budget:
+          type: number
+          format: double
+          description: Budget amount
+          example: 600
+        allocated:
+          type: number
+          format: double
+          description: Allocated amount
+          example: 600
+        currentBalance:
+          type: number
+          format: double
+          description: Current balance
+          example: 500
+        envelopeType:
+          type: string
+          enum: [bill, variable, savings, sinking_fund, supplemental]
+          description: Type of envelope
+          example: variable
+        category:
+          type: string
+          description: Category for auto-classification
+          example: Living
+        biweeklyAllocation:
+          type: number
+          format: double
+          description: Biweekly allocation amount
+          example: 277.15
+        targetAmount:
+          type: number
+          format: double
+          description: Target amount for savings envelopes
+          example: 2000
+        monthlyBudget:
+          type: number
+          format: double
+          description: Monthly budget amount
+          example: 600
+        monthlyAmount:
+          type: number
+          format: double
+          description: Monthly amount
+          example: 600
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - envelopeId
+        - type
+        - amount
+      properties:
+        id:
+          type: string
+          description: Unique transaction identifier
+          example: tx-456
+        envelopeId:
+          type: string
+          description: Associated envelope ID
+          example: env-123
+        type:
+          type: string
+          enum: [expense, income, transfer, bill, recurring_bill]
+          description: Transaction type
+          example: expense
+        amount:
+          type: number
+          format: double
+          description: Transaction amount (negative for expenses)
+          example: -50.00
+        isPaid:
+          type: boolean
+          description: Whether the transaction/bill is paid
+          example: true
+        date:
+          type: string
+          format: date
+          description: Transaction date (ISO 8601)
+          example: "2026-01-01"
+        dueDate:
+          type: string
+          format: date
+          description: Due date for bills (ISO 8601)
+          example: "2026-01-15"
+        provider:
+          type: string
+          description: Bill provider or merchant
+          example: Walmart
+        description:
+          type: string
+          description: Transaction description
+          example: Grocery shopping
+
+    Bill:
+      type: object
+      required:
+        - id
+        - amount
+      properties:
+        id:
+          type: string
+          description: Unique bill identifier
+          example: bill-789
+        envelopeId:
+          type: string
+          description: Associated envelope ID
+          example: env-123
+        isPaid:
+          type: boolean
+          description: Whether the bill is paid
+          example: false
+        amount:
+          type: number
+          format: double
+          description: Bill amount (negative by convention)
+          example: -1200.00
+        dueDate:
+          type: string
+          format: date
+          description: Bill due date (ISO 8601)
+          example: "2026-01-15"
+        name:
+          type: string
+          description: Bill name
+          example: Rent Payment
+        type:
+          type: string
+          description: Bill type
+          example: recurring
+        frequency:
+          type: string
+          enum: [monthly, biweekly, weekly, quarterly, yearly]
+          description: Bill frequency
+          example: monthly
+        provider:
+          type: string
+          description: Bill provider
+          example: Property Management Co
+        description:
+          type: string
+          description: Bill description
+          example: Monthly rent payment
+        date:
+          type: string
+          format: date
+          description: Bill date
+          example: "2026-01-01"
+
+    EnvelopeData:
+      allOf:
+        - $ref: "#/components/schemas/Envelope"
+        - type: object
+          required:
+            - totalSpent
+            - totalUpcoming
+            - totalOverdue
+            - allocated
+            - available
+            - committed
+            - utilizationRate
+            - status
+            - biweeklyNeed
+          properties:
+            totalSpent:
+              type: number
+              format: double
+              description: Total amount spent from this envelope
+              example: 50.00
+            totalUpcoming:
+              type: number
+              format: double
+              description: Total amount of upcoming bills
+              example: 0
+            totalOverdue:
+              type: number
+              format: double
+              description: Total amount of overdue bills
+              example: 0
+            allocated:
+              type: number
+              format: double
+              description: Total allocated amount
+              example: 600
+            available:
+              type: number
+              format: double
+              description: Available balance after commitments
+              example: 500
+            committed:
+              type: number
+              format: double
+              description: Amount committed to bills
+              example: 0
+            utilizationRate:
+              type: number
+              format: double
+              description: Utilization rate (0.0 to 1.0+)
+              example: 0.083
+            status:
+              type: string
+              enum: [healthy, underfunded, overspent, overdue]
+              description: Envelope status
+              example: healthy
+            upcomingBills:
+              type: array
+              description: List of upcoming bills
+              items:
+                $ref: "#/components/schemas/Bill"
+            overdueBills:
+              type: array
+              description: List of overdue bills
+              items:
+                $ref: "#/components/schemas/Bill"
+            transactions:
+              type: array
+              description: Associated transactions
+              items:
+                $ref: "#/components/schemas/Transaction"
+            bills:
+              type: array
+              description: All bills for this envelope
+              items:
+                $ref: "#/components/schemas/Bill"
+            biweeklyNeed:
+              type: number
+              format: double
+              description: Calculated biweekly funding need
+              example: 277.15
+
+    GlobalTotals:
+      type: object
+      required:
+        - totalAllocated
+        - totalSpent
+        - totalBalance
+        - totalUpcoming
+        - totalBiweeklyNeed
+        - billsDueCount
+        - envelopeCount
+      properties:
+        totalAllocated:
+          type: number
+          format: double
+          description: Total allocated across all envelopes
+          example: 2500
+        totalSpent:
+          type: number
+          format: double
+          description: Total spent across all envelopes
+          example: 350
+        totalBalance:
+          type: number
+          format: double
+          description: Total balance across all envelopes
+          example: 2150
+        totalUpcoming:
+          type: number
+          format: double
+          description: Total upcoming bills across all envelopes
+          example: 1200
+        totalBiweeklyNeed:
+          type: number
+          format: double
+          description: Total biweekly funding need
+          example: 1154.31
+        billsDueCount:
+          type: integer
+          description: Count of bills due in the next 30 days
+          example: 3
+        envelopeCount:
+          type: integer
+          description: Total number of envelopes processed
+          example: 5
+
+    BudgetCalculationResponse:
+      type: object
+      required:
+        - success
+        - data
+        - totals
+      properties:
+        success:
+          type: boolean
+          description: Whether the calculation succeeded
+          example: true
+        data:
+          type: array
+          description: Calculated envelope data
+          items:
+            $ref: "#/components/schemas/EnvelopeData"
+        totals:
+          $ref: "#/components/schemas/GlobalTotals"
+        error:
+          type: string
+          description: Error message if success is false
+          example: "Invalid JSON: unexpected token"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Always false for errors
+          example: false
+        error:
+          type: string
+          description: Error message
+          example: "Method not allowed"
+
+    BatchRequest:
+      type: object
+      required:
+        - requests
+      properties:
+        requests:
+          type: array
+          description: Array of batch items to process
+          minItems: 1
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/BatchItem"
+
+    BatchItem:
+      type: object
+      required:
+        - userId
+        - envelopes
+        - transactions
+        - bills
+      properties:
+        userId:
+          type: string
+          description: User identifier for result matching
+          example: user-123
+        envelopes:
+          type: array
+          description: User's envelopes
+          items:
+            $ref: "#/components/schemas/Envelope"
+        transactions:
+          type: array
+          description: User's transactions
+          items:
+            $ref: "#/components/schemas/Transaction"
+        bills:
+          type: array
+          description: User's bills
+          items:
+            $ref: "#/components/schemas/Bill"
+        metadata:
+          type: object
+          description: Optional metadata for client use
+          additionalProperties: true
+          example:
+            source: dashboard
+            timestamp: "2026-01-06T20:00:00Z"
+
+    BatchResponse:
+      type: object
+      required:
+        - success
+        - results
+        - summary
+      properties:
+        success:
+          type: boolean
+          description: Whether the batch processing succeeded
+          example: true
+        results:
+          type: array
+          description: Array of calculation results per user
+          items:
+            $ref: "#/components/schemas/BatchResultItem"
+        summary:
+          $ref: "#/components/schemas/BatchSummary"
+        error:
+          type: string
+          description: Error message if success is false
+          example: "All batch chunks failed to process"
+
+    BatchResultItem:
+      type: object
+      required:
+        - userId
+        - success
+      properties:
+        userId:
+          type: string
+          description: User identifier from request
+          example: user-123
+        success:
+          type: boolean
+          description: Whether this user's calculation succeeded
+          example: true
+        data:
+          type: array
+          description: Calculated envelope data (if successful)
+          items:
+            $ref: "#/components/schemas/EnvelopeData"
+        totals:
+          $ref: "#/components/schemas/GlobalTotals"
+        error:
+          type: string
+          description: Error message if this user's calculation failed
+          example: "userId is required for batch items"
+        metadata:
+          type: object
+          description: Echoed metadata from request
+          additionalProperties: true
+
+    BatchSummary:
+      type: object
+      required:
+        - totalRequests
+        - successfulCount
+        - failedCount
+        - totalEnvelopes
+        - totalTransactions
+        - totalBills
+      properties:
+        totalRequests:
+          type: integer
+          description: Total number of users in batch
+          example: 10
+        successfulCount:
+          type: integer
+          description: Number of successful calculations
+          example: 9
+        failedCount:
+          type: integer
+          description: Number of failed calculations
+          example: 1
+        totalEnvelopes:
+          type: integer
+          description: Total envelopes across all users
+          example: 150
+        totalTransactions:
+          type: integer
+          description: Total transactions across all users
+          example: 1500
+        totalBills:
+          type: integer
+          description: Total bills across all users
+          example: 50
+
+    BatchErrorResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Always false for errors
+          example: false
+        error:
+          type: string
+          description: Error message
+          example: "Batch request must contain at least one item"
+
+tags:
+  - name: Budget Calculations
+    description: Envelope budget calculation endpoints
+  - name: CORS
+    description: CORS support endpoints

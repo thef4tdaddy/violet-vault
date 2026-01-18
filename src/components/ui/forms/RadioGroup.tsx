@@ -11,8 +11,10 @@ export interface RadioOption {
   disabled?: boolean;
 }
 
-export interface RadioGroupProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> {
+export interface RadioGroupProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange"
+> {
   /** Array of radio options */
   options: RadioOption[];
   /** Currently selected value */

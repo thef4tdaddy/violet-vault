@@ -117,7 +117,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] overflow-y-auto"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
+      aria-labelledby={title ? "modal-title" : undefined}
       onClick={(e) => {
         // Close on backdrop click
         if (e.target === modalRef.current) {

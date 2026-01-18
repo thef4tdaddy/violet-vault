@@ -7,7 +7,7 @@ import {
   getActionButtonStyle,
   formatRecoveryResult,
   hasRecoveryActions,
-} from "@/utils/common/syncHelpers";
+} from "@/utils/core/common/syncHelpers";
 
 /**
  * Recovery result from sync health operations

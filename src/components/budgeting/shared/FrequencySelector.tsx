@@ -1,7 +1,7 @@
 import React from "react";
 import { Select } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
+import { getFrequencyOptions } from "@/utils/core/common/frequencyCalculations";
 
 interface FrequencySelectorProps {
   selectedFrequency: string;

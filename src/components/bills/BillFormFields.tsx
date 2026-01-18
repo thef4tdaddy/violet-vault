@@ -1,9 +1,8 @@
-import type { FormEvent } from "react";
 import type { BillFormData } from "@/types/bills";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import { Textarea } from "@/components/ui";
 import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
-import { BillBasicFields, BillIconSelector, BillFormActions } from "./BillFormSections";
+import { BillBasicFields, BillIconSelector } from "./BillFormSections";
 
 type BillBasicFieldsProps = Parameters<typeof BillBasicFields>[0];
 type BillIconSelectorProps = Parameters<typeof BillIconSelector>[0];
@@ -13,9 +12,6 @@ interface BillFormFieldsProps {
   updateField: BillBasicFieldsProps["updateField"];
   canEdit: BillBasicFieldsProps["canEdit"];
   editingBill: BillBasicFieldsProps["editingBill"];
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  isSubmitting: boolean;
-  onClose: () => void;
   suggestedIconName: string;
   iconSuggestions: BillIconSelectorProps["iconSuggestions"];
   categories: string[];
@@ -29,8 +25,8 @@ interface BillFormFieldsProps {
 
 /**
  * Form fields section for AddBillModal
- * Pure UI component that preserves exact visual appearance
- * Refactored to reduce complexity by extracting sub-components
+ * Pure UI component - form wrapper and buttons handled by FormModal primitive
+ * Refactored to use FormModal primitive (Issue #1594)
  */
 const BillFormFields = ({
   // Form data and handlers
@@ -40,11 +36,6 @@ const BillFormFields = ({
   // UI state
   canEdit,
   editingBill,
-
-  // Form handlers
-  handleSubmit,
-  isSubmitting,
-  onClose,
 
   // Computed values
   suggestedIconName,
@@ -60,7 +51,7 @@ const BillFormFields = ({
   getNextDueDate,
 }: BillFormFieldsProps) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Basic Information */}
       <BillBasicFields
         formData={formData}
@@ -104,18 +95,17 @@ const BillFormFields = ({
         />
       </div>
 
-      {/* Action Buttons */}
-      <BillFormActions
-        formData={formData}
-        editingBill={editingBill}
-        canEdit={canEdit}
-        isSubmitting={isSubmitting}
-        onClose={onClose}
-        calculateBiweeklyAmount={calculateBiweeklyAmount}
-        calculateMonthlyAmount={calculateMonthlyAmount}
-        getNextDueDate={getNextDueDate}
-      />
-    </form>
+      {/* Helper Info Display */}
+      <div className="text-sm text-gray-600 space-y-1">
+        {formData.frequency === "biweekly" && formData.amount && (
+          <div>Monthly equivalent: ~${calculateMonthlyAmount()}</div>
+        )}
+        {formData.frequency === "monthly" && formData.amount && (
+          <div>Biweekly equivalent: ~${calculateBiweeklyAmount()}</div>
+        )}
+        {formData.dueDate && <div>Next due: {getNextDueDate()}</div>}
+      </div>
+    </div>
   );
 };
 

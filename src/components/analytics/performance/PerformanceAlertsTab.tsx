@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { getAlertIconType } from "../../../utils/performanceUtils";
+import { getAlertIconType } from "@/utils/performanceUtils";
 
 import { Alert } from "@/types/analytics";
 

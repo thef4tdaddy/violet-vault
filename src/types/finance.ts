@@ -8,18 +8,21 @@
  */
 export type TransactionType = "income" | "expense" | "transfer";
 
+export interface MetadataItem {
+  name: string;
+  price?: number;
+  totalPrice?: number;
+  category?: {
+    name: string;
+  };
+  [key: string]: unknown;
+}
+
 /**
  * Transaction metadata for additional context
  */
 export interface TransactionMetadata {
-  items?: Array<{
-    name: string;
-    price?: number;
-    totalPrice?: number;
-    category?: {
-      name: string;
-    };
-  }>;
+  items?: MetadataItem[];
   shipping?: number;
   tax?: number;
   splitData?: {

@@ -1,6 +1,5 @@
 import React from "react";
-import PageSummaryCard from "../ui/PageSummaryCard";
-import { getIcon } from "../../utils";
+import { MetricCard } from "../primitives/cards/MetricCard";
 
 // Minimal transaction interface for summary calculations
 interface TransactionForSummary {
@@ -12,8 +11,7 @@ interface TransactionSummaryCardsProps {
 }
 
 /**
- * Transaction summary cards using standardized PageSummaryCard component
- * Replaces custom gradient cards with standardized pattern
+ * Transaction summary cards using standardized MetricCard component
  */
 const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ transactions = [] }) => {
   // Calculate metrics
@@ -28,56 +26,39 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ trans
   const netCashFlow = totalIncome - totalExpenses;
   const transactionCount = transactions.length;
 
-  const cards = [
-    {
-      key: "monthly-spend",
-      icon: getIcon("TrendingDown"),
-      label: "Monthly Spend",
-      value: `$${totalExpenses.toFixed(2)}`,
-      color: "red" as const,
-      subtext: `${transactions.filter((t) => t.amount < 0).length} expenses`,
-    },
-    {
-      key: "income",
-      icon: getIcon("TrendingUp"),
-      label: "Income",
-      value: `$${totalIncome.toFixed(2)}`,
-      color: "green" as const,
-      subtext: `${transactions.filter((t) => t.amount > 0).length} deposits`,
-    },
-    {
-      key: "net-flow",
-      icon: getIcon("BarChart"),
-      label: "Net Flow",
-      value: `${netCashFlow >= 0 ? "+" : ""}$${netCashFlow.toFixed(2)}`,
-      color: netCashFlow >= 0 ? "cyan" : "amber",
-      subtext: netCashFlow >= 0 ? "Positive flow" : "Deficit",
-      alert: netCashFlow < 0,
-    } as const,
-    {
-      key: "transaction-count",
-      icon: getIcon("Hash"),
-      label: "Transactions",
-      value: transactionCount.toString(),
-      color: "blue" as const,
-      subtext: "This period",
-    },
-  ];
-
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {cards.map((card) => (
-        <PageSummaryCard
-          key={card.key}
-          icon={card.icon}
-          label={card.label}
-          value={card.value}
-          subtext={card.subtext}
-          color={card.color}
-          alert={card.alert}
-          onClick={() => {}}
-        />
-      ))}
+      <MetricCard
+        icon="TrendingDown"
+        title="Monthly Spend"
+        value={totalExpenses}
+        variant="danger"
+        format="currency"
+        subtitle={`${transactions.filter((t) => t.amount < 0).length} expenses`}
+      />
+      <MetricCard
+        icon="TrendingUp"
+        title="Income"
+        value={totalIncome}
+        variant="success"
+        format="currency"
+        subtitle={`${transactions.filter((t) => t.amount > 0).length} deposits`}
+      />
+      <MetricCard
+        icon="BarChart"
+        title="Net Flow"
+        value={netCashFlow}
+        variant={netCashFlow >= 0 ? "info" : "warning"}
+        format="currency"
+        subtitle={netCashFlow >= 0 ? "Positive flow" : "Deficit"}
+      />
+      <MetricCard
+        icon="Hash"
+        title="Transactions"
+        value={transactionCount}
+        variant="info" // blue mapped to info
+        subtitle="This period"
+      />
     </div>
   );
 };

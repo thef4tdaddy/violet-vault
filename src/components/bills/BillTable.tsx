@@ -4,7 +4,7 @@ import { getIcon } from "@/utils";
 import BillTableHeader from "./BillTableHeader";
 import BillTableEmptyState from "./BillTableEmptyState";
 import BillTableBulkActions from "./BillTableBulkActions";
-import { validateComponentProps } from "@/utils/validation/propValidator";
+import { validateComponentProps } from "@/utils/core/validation/propValidator";
 import { BillTablePropsSchema } from "@/domain/schemas/component-props";
 
 /**

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import type { Suggestion } from "@/utils/analytics/categoryHelpers";
+import type { Suggestion } from "@/utils/features/analytics/categoryHelpers";
 
 interface CategorySuggestionsTabProps {
   suggestions: Suggestion[];

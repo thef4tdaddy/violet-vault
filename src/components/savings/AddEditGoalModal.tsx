@@ -4,12 +4,12 @@ import { Button } from "@/components/ui";
 import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,
   SAVINGS_COLORS,
-} from "@/utils/savings/savingsFormUtils";
+} from "@/utils/domain/savings/savingsFormUtils";
 
 // Define types
 interface FormData {
@@ -23,7 +23,7 @@ interface FormData {
   priority: string;
 }
 
-interface Goal {
+export interface Goal {
   id: string;
   name: string;
   targetAmount?: number;

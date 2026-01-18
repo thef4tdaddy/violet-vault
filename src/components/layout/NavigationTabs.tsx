@@ -1,7 +1,7 @@
 import React, { memo, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getIcon } from "@/utils";
-import { getButtonClasses, hapticFeedback } from "@/utils/ui/touchFeedback";
+import { getButtonClasses, hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 
 interface NavButtonProps {
   active: boolean;

@@ -1,5 +1,5 @@
 import React from "react";
-import { renderIcon } from "../../../utils/icons";
+import { renderIcon } from "@/utils/ui/icons";
 
 /**
  * Props for SyncedStatus component

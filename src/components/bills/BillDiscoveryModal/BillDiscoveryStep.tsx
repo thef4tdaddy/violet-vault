@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button, Checkbox } from "@/components/ui";
 import { getIcon } from "@/utils";
 import { BillItemContent } from "./BillItemContent";
 import type { DiscoveredBill, Envelope } from "../BillDiscoveryModal";
@@ -91,12 +91,7 @@ export const BillDiscoveryStep: React.FC<BillDiscoveryStepProps> = ({
               <div className="flex items-start gap-4">
                 {/* Checkbox */}
                 <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => onToggleSelection(bill.id)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
+                  <Checkbox checked={isSelected} onChange={() => onToggleSelection(bill.id)} />
                 </div>
 
                 {/* Bill Item Content */}

@@ -227,11 +227,6 @@ describe("useUiStore", () => {
       expect(typeof state.setDebts).toBe("function");
     });
 
-    it("should have runMigrationIfNeeded method", () => {
-      const state = useUiStore.getState();
-      expect(typeof state.runMigrationIfNeeded).toBe("function");
-    });
-
     it("should have startBackgroundSync method", () => {
       const state = useUiStore.getState();
       expect(typeof state.startBackgroundSync).toBe("function");
@@ -474,13 +469,6 @@ describe("useUiStore", () => {
   });
 
   describe("async methods", () => {
-    it("runMigrationIfNeeded should be callable", async () => {
-      const state = useUiStore.getState();
-      expect(typeof state.runMigrationIfNeeded).toBe("function");
-      // Just test that it's callable, not that it succeeds
-      // since it depends on external storage
-    });
-
     it("loadPatchNotesForUpdate should be callable", () => {
       const state = useUiStore.getState();
       expect(typeof state.loadPatchNotesForUpdate).toBe("function");
@@ -489,6 +477,19 @@ describe("useUiStore", () => {
     it("startBackgroundSync should be callable", () => {
       const state = useUiStore.getState();
       expect(typeof state.startBackgroundSync).toBe("function");
+    });
+  });
+
+  describe("v2.0 migration removal", () => {
+    it("should not have runMigrationIfNeeded method", () => {
+      const state = useUiStore.getState();
+      expect(state.runMigrationIfNeeded).toBeUndefined();
+    });
+
+    it("should not have legacy migration methods in store", () => {
+      const state = useUiStore.getState();
+      // Verify migration-related methods are removed
+      expect(state).not.toHaveProperty("runMigrationIfNeeded");
     });
   });
 });

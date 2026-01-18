@@ -1,87 +1,29 @@
 /**
  * Zod Schemas Barrel Export
  * Central export point for all domain validation schemas
- * Part of Issue #412: Domain Types & Zod Schemas for Finance Models
  */
 
 // Auth Schemas & Types
-export {
-  AuthModeSchema,
-  SetupStepSchema,
-  UserDataSchema,
-  UserDataPartialSchema,
-  SecurityContextSchema,
-  AuthStateSchema,
-  AuthResultSchema,
-  PasswordValidationResultSchema,
-  LocalOnlyUserSchema,
-  LocalOnlyModeResultSchema,
-  JoinBudgetDataSchema,
-  KeyDerivationResultSchema,
-  ShareCodeOptionsSchema,
-  validateUserData,
-  validateUserDataSafe,
-  validateUserDataPartial,
-  validateAuthState,
-  validateAuthStateSafe,
-  validateAuthResult,
-  validateAuthResultSafe,
-  validateSecurityContext,
-  validateSecurityContextSafe,
-  validatePasswordValidationResult,
-  validatePasswordValidationResultSafe,
-  validateLocalOnlyUser,
-  validateLocalOnlyUserSafe,
-  validateLocalOnlyModeResult,
-  validateLocalOnlyModeResultSafe,
-  validateJoinBudgetData,
-  validateJoinBudgetDataSafe,
-  validateKeyDerivationResult,
-  validateKeyDerivationResultSafe,
-  validateShareCodeOptions,
-  validateShareCodeOptionsSafe,
-  type AuthMode,
-  type SetupStep,
-  type UserData,
-  type UserDataPartial,
-  type SecurityContext,
-  type AuthState,
-  type AuthResult,
-  type PasswordValidationResult,
-  type LocalOnlyUser,
-  type LocalOnlyModeResult,
-  type JoinBudgetData,
-  type KeyDerivationResult,
-  type ShareCodeOptions,
-} from "./auth";
+export * from "./auth";
 
 // Core Finance Schemas & Types
 export {
   EnvelopeSchema,
   EnvelopePartialSchema,
-  EnvelopeTypeSchema,
-  EnvelopePrioritySchema,
-  SupplementalAccountTypeSchema,
+  StandardEnvelopeSchema,
+  GoalEnvelopeSchema,
+  LiabilityEnvelopeSchema,
   SupplementalAccountSchema,
-  SupplementalAccountPartialSchema,
-  SavingsEnvelopeSchema,
-  SavingsEnvelopePartialSchema,
   validateEnvelope,
   validateEnvelopeSafe,
   validateEnvelopePartial,
-  validateSupplementalAccount,
-  validateSupplementalAccountSafe,
-  validateSavingsEnvelope,
-  validateSavingsEnvelopeSafe,
+  validateEnvelopePartialSafe,
   type Envelope,
-  type EnvelopePartial,
-  type EnvelopeType,
-  type EnvelopePriority,
-  type SupplementalAccountType,
+  type StandardEnvelope,
+  type GoalEnvelope,
+  type LiabilityEnvelope,
   type SupplementalAccount,
-  type SupplementalAccountPartial,
-  type SavingsEnvelope,
-  type SavingsEnvelopePartial,
+  type EnvelopePartial,
 } from "./envelope";
 
 export {
@@ -96,294 +38,37 @@ export {
   type TransactionType,
 } from "./transaction";
 
-export {
-  BillSchema,
-  BillFrequencySchema,
-  BillPartialSchema,
-  BillFormDataMinimalSchema,
-  validateBill,
-  validateBillSafe,
-  validateBillPartial,
-  validateBillFormDataMinimal,
-  type Bill,
-  type BillPartial,
-  type BillFrequency,
-  type BillFormDataMinimal,
-} from "./bill";
-
-export {
-  SavingsGoalSchema,
-  PrioritySchema,
-  SavingsGoalPartialSchema,
-  validateSavingsGoal,
-  validateSavingsGoalSafe,
-  validateSavingsGoalPartial,
-  type SavingsGoal,
-  type SavingsGoalPartial,
-  type Priority,
-} from "./savings-goal";
-
-export {
-  DebtSchema,
-  DebtTypeSchema,
-  DebtStatusSchema,
-  DebtPartialSchema,
-  validateDebt,
-  validateDebtSafe,
-  validateDebtPartial,
-  type Debt,
-  type DebtPartial,
-  type DebtType,
-  type DebtStatus,
-} from "./debt";
-
-export {
-  PaycheckHistorySchema,
-  PaycheckHistoryPartialSchema,
-  validatePaycheckHistory,
-  validatePaycheckHistorySafe,
-  validatePaycheckHistoryPartial,
-  type PaycheckHistory,
-  type PaycheckHistoryPartial,
-} from "./paycheck-history";
+// Legacy Aliases
+export * from "./bill";
+export * from "./debt";
+export * from "./savingsGoal";
 
 // Database Infrastructure Schemas & Types
-export {
-  BudgetRecordSchema,
-  BudgetRecordPartialSchema,
-  BalanceValueSchema,
-  OptionalBalanceValueSchema,
-  validateBudgetRecord,
-  validateBudgetRecordSafe,
-  validateBudgetRecordPartial,
-  validateBalanceValue,
-  validateBalanceValueStrict,
-  type BudgetRecord,
-  type BudgetRecordPartial,
-} from "./budget-record";
-
-export {
-  AuditLogEntrySchema,
-  AuditLogEntryPartialSchema,
-  validateAuditLogEntry,
-  validateAuditLogEntrySafe,
-  validateAuditLogEntryPartial,
-  type AuditLogEntry,
-  type AuditLogEntryPartial,
-} from "./audit-log";
-
-export {
-  CacheEntrySchema,
-  CacheEntryPartialSchema,
-  validateCacheEntry,
-  validateCacheEntrySafe,
-  validateCacheEntryPartial,
-  type CacheEntry,
-  type CacheEntryPartial,
-} from "./cache";
-
-export {
-  AutoBackupSchema,
-  BackupTypeSchema,
-  SyncTypeSchema,
-  AutoBackupPartialSchema,
-  BackupDataSchema,
-  BackupMetadataSchema,
-  validateAutoBackup,
-  validateAutoBackupSafe,
-  validateAutoBackupPartial,
-  validateBackupData,
-  validateBackupDataSafe,
-  type AutoBackup,
-  type AutoBackupPartial,
-  type BackupType,
-  type SyncType,
-  type BackupData,
-  type BackupMetadata,
-} from "./backup";
+export * from "./budget-record";
+export * from "./audit-log";
+export * from "./cache";
+export * from "./backup";
 
 // Version Control Schemas & Types
-export {
-  BudgetCommitSchema,
-  BudgetChangeSchema,
-  BudgetBranchSchema,
-  BudgetTagSchema,
-  validateBudgetCommit,
-  validateBudgetCommitSafe,
-  validateBudgetChange,
-  validateBudgetChangeSafe,
-  validateBudgetBranch,
-  validateBudgetBranchSafe,
-  validateBudgetTag,
-  validateBudgetTagSafe,
-  type BudgetCommit,
-  type BudgetChange,
-  type BudgetBranch,
-  type BudgetTag,
-} from "./version-control";
+export * from "./version-control";
 
 // Utility Schemas & Types
-export {
-  DateRangeSchema,
-  BulkUpdateTypeSchema,
-  BulkUpdateSchema,
-  DatabaseStatsSchema,
-  validateDateRange,
-  validateDateRangeSafe,
-  validateBulkUpdate,
-  validateBulkUpdateSafe,
-  validateDatabaseStats,
-  validateDatabaseStatsSafe,
-  type DateRange,
-  type BulkUpdateType,
-  type BulkUpdate,
-  type DatabaseStats,
-} from "./utility";
+export * from "./utility";
 
 // Bug Report Schemas & Types
-export {
-  BugReportSchema,
-  BugReportPartialSchema,
-  BugSeveritySchema,
-  SystemInfoSchema,
-  ContextInfoSchema,
-  validateBugReport,
-  validateBugReportSafe,
-  validateBugReportPartial,
-  type BugReport,
-  type BugReportPartial,
-  type BugSeverity,
-  type SystemInfo,
-  type ContextInfo,
-} from "./bug-report";
+export * from "./bug-report";
 
-// API Response Schemas & Types (Phase 2)
-export {
-  APISuccessResponseSchema,
-  APIErrorResponseSchema,
-  APIResponseSchema,
-  EncryptedDataSchema,
-  FirebaseDocumentSchema,
-  FirebaseChunkSchema,
-  FirebaseManifestSchema,
-  FirebaseSyncStatusSchema,
-  GitHubIssueResponseSchema,
-  ScreenshotUploadResponseSchema,
-  WebhookResponseSchema,
-  BugReportSubmissionResultSchema,
-  BugReportFallbackSubmissionResultSchema,
-  FirebaseAuthResponseSchema,
-  SyncOperationResultSchema,
-  ValidationResultSchema,
-  validateAPISuccessResponse,
-  validateAPISuccessResponseSafe,
-  validateAPIErrorResponse,
-  validateAPIErrorResponseSafe,
-  validateAPIResponse,
-  validateAPIResponseSafe,
-  validateEncryptedData,
-  validateEncryptedDataSafe,
-  validateFirebaseDocument,
-  validateFirebaseDocumentSafe,
-  validateFirebaseChunk,
-  validateFirebaseChunkSafe,
-  validateFirebaseManifest,
-  validateFirebaseManifestSafe,
-  validateFirebaseSyncStatus,
-  validateFirebaseSyncStatusSafe,
-  validateGitHubIssueResponse,
-  validateGitHubIssueResponseSafe,
-  validateScreenshotUploadResponse,
-  validateScreenshotUploadResponseSafe,
-  validateWebhookResponse,
-  validateWebhookResponseSafe,
-  validateBugReportSubmissionResult,
-  validateBugReportSubmissionResultSafe,
-  validateBugReportFallbackSubmissionResult,
-  validateBugReportFallbackSubmissionResultSafe,
-  validateFirebaseAuthResponse,
-  validateFirebaseAuthResponseSafe,
-  validateSyncOperationResult,
-  validateSyncOperationResultSafe,
-  validateValidationResult,
-  validateValidationResultSafe,
-  type APISuccessResponse,
-  type APIErrorResponse,
-  type APIResponse,
-  type EncryptedData,
-  type FirebaseDocument,
-  type FirebaseChunk,
-  type FirebaseManifest,
-  type FirebaseSyncStatus,
-  type GitHubIssueResponse,
-  type ScreenshotUploadResponse,
-  type WebhookResponse,
-  type BugReportSubmissionResult,
-  type BugReportFallbackSubmissionResult,
-  type FirebaseAuthResponse,
-  type SyncOperationResult,
-  type ValidationResult,
-} from "./api-responses";
+// API Response Schemas & Types
+export * from "./api-responses";
 
 // Import/Export Schemas & Types
-export {
-  ExportMetadataSchema,
-  LegacySupplementalAccountSchema,
-  ImportEnvelopeSchema,
-  ImportTransactionSchema,
-  ImportBillSchema,
-  ImportDebtSchema,
-  ImportedDataSchema,
-  validateImportedDataStructure,
-  validateImportedDataStructureSafe,
-  validateEnvelopes,
-  validateTransactions,
-  validateBills,
-  validateDebts,
-  formatValidationErrors,
-  type ExportMetadata,
-  type LegacySupplementalAccount,
-  type ImportEnvelope,
-  type ImportTransaction,
-  type ImportBill,
-  type ImportDebt,
-  type ImportedData,
-  type ItemValidationResult,
-} from "./import-export";
+export * from "./import-export";
 
-// Component Props Schemas & Types (Phase 3)
-export {
-  EnvelopeGridPropsSchema,
-  TransactionTablePropsSchema,
-  BillTablePropsSchema,
-  MainDashboardPropsSchema,
-  EnvelopeItemPropsSchema,
-  TransactionRowPropsSchema,
-  BillItemPropsSchema,
-  AnalyticsDashboardPropsSchema,
-  type EnvelopeGridProps,
-  type TransactionTableProps,
-  type BillTableProps,
-  type MainDashboardProps,
-  type EnvelopeItemProps,
-  type TransactionRowProps,
-  type BillItemProps,
-  type AnalyticsDashboardProps,
-} from "./component-props";
+// Component Props Schemas & Types
+export * from "./component-props";
 
-// Sync Schemas & Types (Issue #1341)
-export {
-  CloudSyncUserSchema,
-  ChunkedSyncStatsSchema,
-  LoadedDataSchema,
-  validateCloudSyncUser,
-  validateCloudSyncUserSafe,
-  validateChunkedSyncStats,
-  validateChunkedSyncStatsSafe,
-  validateLoadedData,
-  validateLoadedDataSafe,
-  formatSyncValidationErrors,
-  type CloudSyncUser,
-  type ChunkedSyncStatsValidated,
-  type LoadedData,
-} from "./sync";
+// Sync Schemas & Types
+export * from "./sync";
+
+// Auto-Funding Schemas & Types
+export * from "./auto-funding";

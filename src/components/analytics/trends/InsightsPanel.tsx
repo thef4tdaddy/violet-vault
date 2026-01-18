@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { formatPercent } from "../../../utils/analytics/trendHelpers";
+import { formatPercent } from "@/utils/features/analytics/trendHelpers";
 
 import { Insights, ForecastInsights } from "@/types/analytics";
 

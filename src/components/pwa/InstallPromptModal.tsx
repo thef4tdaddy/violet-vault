@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 // useUiStore import - store file lacks TypeScript types, will be fixed in uiStore.ts
 /* eslint-disable @typescript-eslint/ban-ts-comment */

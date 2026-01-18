@@ -1,5 +1,4 @@
-import { getIcon } from "@/utils";
-import PageSummaryCard from "../ui/PageSummaryCard";
+import { MetricCard } from "../primitives/cards/MetricCard";
 
 interface SummaryMetrics {
   totalExpenses?: number;
@@ -12,17 +11,17 @@ interface SummaryMetrics {
 
 const deriveHealthSummary = (
   healthScore: number
-): { color: "emerald" | "amber" | "red"; label: string } => {
+): { variant: "success" | "warning" | "danger"; label: string } => {
   if (healthScore >= 80) {
-    return { color: "emerald", label: "Excellent" };
+    return { variant: "success", label: "Excellent" };
   }
   if (healthScore >= 60) {
-    return { color: "amber", label: "Good" };
+    return { variant: "warning", label: "Good" };
   }
   if (healthScore >= 40) {
-    return { color: "red", label: "Fair" };
+    return { variant: "danger", label: "Fair" };
   }
-  return { color: "red", label: "Needs Attention" };
+  return { variant: "danger", label: "Needs Attention" };
 };
 
 const createSummaryCards = ({
@@ -39,48 +38,51 @@ const createSummaryCards = ({
   healthScore: number;
 }) => {
   const avgTransaction = expenseTransactionCount > 0 ? totalExpenses / expenseTransactionCount : 0;
-  const { color: healthColor, label: healthLabel } = deriveHealthSummary(healthScore);
-  const budgetAccuracyColor = budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red";
+  const { variant: healthVariant, label: healthLabel } = deriveHealthSummary(healthScore);
+
+  // strict typing for variant
+  const budgetAccuracyVariant: "success" | "warning" | "danger" =
+    budgetAccuracy > 80 ? "success" : budgetAccuracy > 60 ? "warning" : "danger";
 
   return [
     {
       key: "budget-health",
-      icon: getIcon("HeartPulse"),
-      label: "Budget Health",
+      icon: "HeartPulse",
+      title: "Budget Health",
       value: `${Math.round(healthScore)} / 100`,
-      color: healthColor,
-      subtext: healthLabel,
+      variant: healthVariant,
+      subtitle: healthLabel,
     },
     {
       key: "total-spending",
-      icon: getIcon("PieChart"),
-      label: "Total Spending",
-      value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
-      color: "blue" as const,
-      subtext: `${totalTransactionCount} transactions`,
+      icon: "PieChart",
+      title: "Total Spending",
+      value: { value: totalExpenses, format: "currency" as const },
+      variant: "info",
+      subtitle: `${totalTransactionCount} transactions`,
     },
     {
       key: "avg-transaction",
-      icon: getIcon("Calculator"),
-      label: "Avg Transaction",
-      value: `$${avgTransaction.toFixed(2)}`,
-      color: "teal" as const,
-      subtext: `${expenseTransactionCount} expense transactions`,
+      icon: "Calculator",
+      title: "Avg Transaction",
+      value: { value: avgTransaction, format: "currency" as const },
+      variant: "info",
+      subtitle: `${expenseTransactionCount} expense transactions`,
     },
     {
       key: "budget-accuracy",
-      icon: getIcon("Target"),
-      label: "Budget Accuracy",
-      value: `${budgetAccuracy.toFixed(1)}%`,
-      color: budgetAccuracyColor,
-      subtext: "Envelope adherence",
-      alert: budgetAccuracy < 60,
-    } as const,
-  ];
+      icon: "Target",
+      title: "Budget Accuracy",
+      value: { value: budgetAccuracy, format: "percentage" as const },
+      variant: budgetAccuracyVariant,
+      subtitle: "Envelope adherence",
+      loading: false, // MetricCard doesn't support 'alert' prop directly, mapping is visual via variant
+    },
+  ] as const;
 };
 
 /**
- * Analytics summary cards using standardized PageSummaryCard component
+ * Analytics summary cards using standardized MetricCard component
  * Displays key analytics metrics with consistent styling
  */
 const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: SummaryMetrics }) => {
@@ -104,18 +106,30 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {cards.map((card) => (
-        <PageSummaryCard
-          key={card.key}
-          icon={card.icon}
-          label={card.label}
-          value={card.value}
-          subtext={card.subtext}
-          color={card.color}
-          alert={card.alert}
-          onClick={() => {}}
-        />
-      ))}
+      {cards.map((card) => {
+        // Handle complex value object or primitive
+        const val =
+          typeof card.value === "object" && card.value !== null
+            ? (card.value as { value: number | string }).value
+            : card.value;
+        const fmt =
+          typeof card.value === "object" && card.value !== null
+            ? (card.value as { format: "currency" | "number" | "percentage" | "custom" }).format
+            : undefined;
+
+        return (
+          <MetricCard
+            key={card.key}
+            icon={card.icon}
+            title={card.title}
+            value={val as number | string}
+            subtitle={card.subtitle}
+            variant={card.variant}
+            format={fmt}
+            onClick={() => {}}
+          />
+        );
+      })}
     </div>
   );
 };

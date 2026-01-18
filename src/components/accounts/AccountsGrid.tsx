@@ -5,7 +5,7 @@ import {
   getAccountTypeInfo,
   calculateDaysUntilExpiration,
   getExpirationStatus,
-} from "@/utils/accounts";
+} from "@/utils/domain/accounts";
 
 interface AccountTypeInfo {
   value: string;

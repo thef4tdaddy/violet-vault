@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
-import logger from "../../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { TutorialStep } from "./useTutorialPositioning";
 
 /**

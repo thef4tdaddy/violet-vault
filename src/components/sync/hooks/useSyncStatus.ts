@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useSyncHealthMonitor } from "@/hooks/sync/useSyncHealthMonitor";
+import { useSyncHealthMonitor } from "@/hooks/platform/sync/useSyncHealthMonitor";
 
 interface User {
   id: string;

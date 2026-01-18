@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useOnboardingStore from "@/stores/ui/onboardingStore";
 import { useShallow } from "zustand/react/shallow";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { useTutorialSteps } from "./hooks/useTutorialSteps";
 import { useTutorialPositioning } from "./hooks/useTutorialPositioning";
 import { useTutorialHighlight } from "./hooks/useTutorialHighlight";

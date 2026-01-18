@@ -7,5 +7,5 @@
  * - Zustand for UI state only
  */
 
-export { AuthProvider, useAuth } from "./AuthContext";
+export { AuthProvider, useAuthContext } from "./AuthContext";
 export type { AuthContextValue, AuthContextState, AuthContextActions } from "./authConstants";

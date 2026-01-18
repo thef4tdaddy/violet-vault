@@ -213,10 +213,11 @@ const StandardTabs = ({
   }, [activeTab]);
 
   return (
-    <div className={`${containerClass} ${className} relative`}>
-      <nav
+    <nav className={`${containerClass} ${className} relative`}>
+      <div
         ref={containerRef}
         className={navClass}
+        role="tablist"
         style={{ scrollSnapType: "x mandatory", scrollPaddingInline: "1.5rem" }}
       >
         {tabs.map((tab) => (
@@ -234,12 +235,22 @@ const StandardTabs = ({
             }}
           />
         ))}
-      </nav>
+      </div>
 
       {/* Scroll masks to hide partial tabs on mobile */}
-      <div className="sm:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-violet-100 via-violet-100/80 to-transparent pointer-events-none backdrop-blur-sm" />
-      <div className="sm:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-violet-100 via-violet-100/80 to-transparent pointer-events-none backdrop-blur-sm" />
-    </div>
+      <div
+        className="absolute right-0 top-0 bottom-0 w-12 pointer-events-none z-10"
+        style={{
+          background: "linear-gradient(to left, white, transparent)",
+        }}
+      />
+      <div
+        className="absolute left-0 top-0 bottom-0 w-12 pointer-events-none z-10"
+        style={{
+          background: "linear-gradient(to right, white, transparent)",
+        }}
+      />
+    </nav>
   );
 };
 
@@ -271,6 +282,9 @@ const TabButton = forwardRef<HTMLButtonElement, TabButtonProps>(
         ref={ref}
         onClick={() => !isDisabled && onTabChange(tab.id)}
         disabled={isDisabled}
+        role="tab"
+        aria-selected={isActive}
+        aria-disabled={isDisabled}
         className={`
         font-medium ${config.text} ${config.padding} 
         flex items-center gap-2 transition-all duration-200

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import logger from "../../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Lazy loader component for Sentry monitoring
@@ -11,14 +11,14 @@ const SentryLoader = () => {
     const ensureSentryInitialized = async () => {
       try {
         // Check if Sentry is already initialized (from main.tsx)
-        const { getErrorReportingStatus } = await import("../../utils/common/sentry.js");
+        const { getErrorReportingStatus } = await import("@/utils/core/common/sentry");
         const status = getErrorReportingStatus();
 
         if (status.enabled) {
           logger.debug("Sentry already initialized early, ensuring full setup");
         } else {
           // Fallback: initialize if not already done
-          const { initSentry } = await import("../../utils/common/sentry.js");
+          const { initSentry } = await import("@/utils/core/common/sentry");
           initSentry();
           logger.debug("Sentry initialized via lazy loader fallback");
         }

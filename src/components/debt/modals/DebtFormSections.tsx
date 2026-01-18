@@ -1,6 +1,6 @@
 import { TextInput, Select } from "@/components/ui";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
-import type { DebtFormState } from "@/hooks/debts/useDebtForm";
+import type { DebtFormState } from "@/hooks/budgeting/envelopes/liabilities/useDebtForm";
 import type { DebtType, PaymentFrequency } from "@/types/debt";
 
 interface SectionProps {

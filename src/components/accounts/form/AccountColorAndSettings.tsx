@@ -1,4 +1,4 @@
-import { ACCOUNT_COLORS } from "@/utils/accounts";
+import { ACCOUNT_COLORS } from "@/utils/domain/accounts";
 import { Button } from "@/components/ui";
 
 interface AccountForm {

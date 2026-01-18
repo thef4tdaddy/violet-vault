@@ -1,5 +1,5 @@
 // Debt tracking constants and configurations
-import logger from "../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { DebtType, DebtTypeConfig, DebtAccount, DebtStats } from "../types/debt";
 
 // Re-export enums as constants for backward compatibility

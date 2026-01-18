@@ -1,8 +1,10 @@
 import React from "react";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
+import type { BillIconOption } from "@/utils/ui/icons";
+import type { Transaction } from "@/db/types";
 
 /**
  * TypeScript type definitions for bill components
+ * Phase 2 Migration: Bills are now Scheduled Transactions
  */
 
 // Frequency types
@@ -14,29 +16,42 @@ export type CalculationFrequency = Exclude<BillFrequency, "once">;
 // Bill status types
 export type BillStatus = "active" | "paid" | "overdue" | "upcoming";
 
-// Base bill interface
-export interface Bill {
+// Phase 2 Migration: Bill is now a Transaction with scheduled properties
+// Extended with computed fields for UI compatibility
+export interface Bill extends Omit<Transaction, "createdAt" | "updatedAt" | "id"> {
+  // Override id to always be string (Transaction allows string | number)
   id: string;
-  name: string;
-  provider?: string;
-  amount: number;
-  monthlyAmount?: number;
-  biweeklyAmount?: number;
-  frequency: BillFrequency;
-  customFrequency?: number;
-  dueDate: string;
-  nextDue?: string;
-  category: string;
-  color: string;
-  notes?: string;
-  iconName?: string;
-  icon?: string;
-  envelopeId?: string;
-  isPaid?: boolean;
-  paidDate?: string;
-  status?: BillStatus;
-  createdAt?: string;
-  updatedAt?: string;
+
+  // Computed backward-compatibility fields (derived from Transaction fields)
+  // name is required for UI compatibility (maps to Transaction.description)
+  name: string; // Computed getter: maps to Transaction.description (required)
+  dueDate?: string | Date; // Computed getter: maps to Transaction.date
+  isPaid?: boolean; // Computed: determined by existence of payment transaction
+  paidDate?: string | Date; // From paired payment transaction
+  paidAmount?: number; // From paired payment transaction
+  paymentTransactionId?: string; // ID of paired payment transaction
+
+  // Additional bill-specific fields (not in base Transaction)
+  provider?: string; // Bill provider/vendor
+  monthlyAmount?: number; // For recurring bills
+  biweeklyAmount?: number; // For recurring bills
+  frequency?: BillFrequency; // Bill frequency
+  customFrequency?: number; // Custom frequency multiplier
+  nextDue?: string; // Next due date for recurring bills
+  color?: string; // UI color
+  iconName?: string; // UI icon name
+  icon?: string; // UI icon
+  status?: BillStatus; // Bill status
+  archived?: boolean; // Legacy compatibility field
+
+  // Override Transaction timestamp types for flexibility
+  createdAt?: number | string;
+  updatedAt?: number | string;
+
+  // All other Transaction fields inherited: date, description, amount,
+  // envelopeId, category, type, isScheduled, recurrenceRule, lastModified, notes
+
+  // Index signature to satisfy Record<string, unknown> requirement
   [key: string]: unknown;
 }
 
@@ -45,7 +60,7 @@ export interface BillFormData {
   name: string;
   amount: string;
   frequency: BillFrequency;
-  dueDate: string;
+  dueDate: string | Date; // Allow Date for compatibility
   category: string;
   color: string;
   notes: string;

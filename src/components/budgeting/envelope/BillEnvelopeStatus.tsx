@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
-import { ENVELOPE_TYPES } from "../../../constants/categories";
-import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
-import type { BillEnvelopeResult } from "../../../utils/budgeting/billEnvelopeCalculations";
+import { getBillEnvelopeDisplayInfo } from "@/utils/domain/budgeting/billEnvelopeCalculations";
+import type { BillEnvelopeResult } from "@/utils/domain/budgeting/billEnvelopeCalculations";
 import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
 
 interface BillEnvelopeStatusProps {
@@ -11,7 +10,10 @@ interface BillEnvelopeStatusProps {
 
 export const BillEnvelopeStatus: React.FC<BillEnvelopeStatusProps> = React.memo(
   ({ envelope, bills }) => {
-    if (envelope.envelopeType !== ENVELOPE_TYPES.BILL || bills.length === 0) {
+    // Check for liability type (standardized)
+    // Accessing .type on discriminated union is valid
+    const isLiability = envelope.type === "liability";
+    if (!isLiability || bills.length === 0) {
       return null;
     }
 

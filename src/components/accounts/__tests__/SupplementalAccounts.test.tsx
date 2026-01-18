@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 import SupplementalAccounts from "../SupplementalAccounts";
 import userEvent from "@testing-library/user-event";
-import useSupplementalAccountsOriginal from "@/hooks/accounts/useSupplementalAccounts";
+import useSupplementalAccountsOriginal from "@/hooks/platform/accounts/useSupplementalAccounts";
 
 // Mock the custom hook
-vi.mock("@/hooks/accounts/useSupplementalAccounts", () => ({
+vi.mock("@/hooks/platform/accounts/useSupplementalAccounts", () => ({
   default: vi.fn(() => ({
     showAddModal: false,
     editingGoal: null,

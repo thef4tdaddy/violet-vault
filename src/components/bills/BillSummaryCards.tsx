@@ -1,5 +1,4 @@
-import { getIcon } from "../../utils";
-import PageSummaryCard from "../ui/PageSummaryCard";
+import { MetricCard } from "../primitives/cards/MetricCard";
 
 interface BillTotals {
   total?: number;
@@ -17,57 +16,56 @@ interface BillSummaryCardsProps {
 }
 
 /**
- * Bill summary cards using standardized gradient design
- * Pure UI component that preserves exact visual appearance
+ * Bill summary cards using standardized MetricCard component
  */
 const BillSummaryCards = ({ totals = {} }: BillSummaryCardsProps) => {
   const cards = [
     {
       key: "total-bills",
-      icon: getIcon("DollarSign"),
-      label: "Total Bills",
-      value: `$${(totals.total || 0).toFixed(2)}`,
-      color: "blue" as const,
-      subtext: `${totals.totalCount || 0} bills`,
+      icon: "DollarSign",
+      title: "Total Bills",
+      value: totals.total || 0,
+      variant: "info" as const,
+      subtitle: `${totals.totalCount || 0} bills`,
     },
     {
       key: "overdue",
-      icon: getIcon("AlertTriangle"),
-      label: "Overdue",
-      value: `$${(totals.overdue || 0).toFixed(2)}`,
-      color: "red" as const,
-      subtext: `${totals.overdueCount || 0} bills`,
-      alert: (totals.overdueCount || 0) > 0,
+      icon: "AlertTriangle",
+      title: "Overdue",
+      value: totals.overdue || 0,
+      variant: "danger" as const,
+      subtitle: `${totals.overdueCount || 0} bills`,
+      // alert logic handled by variant="danger" implicitly visually
     },
     {
       key: "paid",
-      icon: getIcon("CheckCircle"),
-      label: "Paid",
-      value: `$${(totals.paid || 0).toFixed(2)}`,
-      color: "green" as const,
-      subtext: `${totals.paidCount || 0} bills`,
+      icon: "CheckCircle",
+      title: "Paid",
+      value: totals.paid || 0,
+      variant: "success" as const,
+      subtitle: `${totals.paidCount || 0} bills`,
     },
     {
       key: "upcoming",
-      icon: getIcon("Clock"),
-      label: "Upcoming",
-      value: `$${(totals.upcoming || 0).toFixed(2)}`,
-      color: "amber" as const,
-      subtext: `${totals.upcomingCount || 0} bills`,
+      icon: "Clock",
+      title: "Upcoming",
+      value: totals.upcoming || 0,
+      variant: "warning" as const,
+      subtitle: `${totals.upcomingCount || 0} bills`,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <PageSummaryCard
+        <MetricCard
           key={card.key}
           icon={card.icon}
-          label={card.label}
+          title={card.title}
           value={card.value}
-          subtext={card.subtext}
-          color={card.color}
-          alert={card.alert}
+          subtitle={card.subtitle}
+          variant={card.variant}
+          format="currency"
           onClick={() => {}}
         />
       ))}

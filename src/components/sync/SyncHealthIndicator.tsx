@@ -1,4 +1,4 @@
-import { useSyncHealthIndicator } from "@/hooks/sync/useSyncHealthIndicator";
+import { useSyncHealthIndicator } from "@/hooks/platform/sync/useSyncHealthIndicator";
 import { Button } from "@/components/ui";
 
 /**

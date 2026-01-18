@@ -1,27 +1,16 @@
 import React from "react";
 import { Button, StylizedButtonText } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { usePaycheckForm } from "../../hooks/budgeting/usePaycheckForm";
-import { usePaycheckHistory } from "../../hooks/budgeting/usePaycheckHistory";
+import { usePaycheckProcessor } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckProcessor";
+import { usePaycheckHistory } from "@/hooks/budgeting/transactions/scheduled/income/usePaycheckHistory";
+import type { Envelope, PaycheckHistory as PaycheckHistoryRecord } from "@/db/types";
+import { type PaycheckTransaction } from "@/utils/domain/budgeting/paycheckUtils";
+import type { PaycheckHistoryItem } from "./paycheck/PaycheckHistoryComponents";
 import PaycheckAmountInput from "./paycheck/PaycheckAmountInput";
 import PaycheckPayerSelector from "./paycheck/PaycheckPayerSelector";
 import PaycheckAllocationModes from "./paycheck/PaycheckAllocationModes";
 import PaycheckAllocationPreview from "./paycheck/PaycheckAllocationPreview";
-import PaycheckHistory from "./paycheck/PaycheckHistory";
-
-interface Envelope {
-  id: string | number;
-  name?: string;
-  autoAllocate?: boolean;
-  currentBalance?: number;
-  monthlyAmount?: number;
-}
-
-interface PaycheckHistoryItem {
-  id: string | number;
-  payerName?: string;
-  amount?: number;
-}
+import PaycheckHistoryList from "./paycheck/PaycheckHistory";
 
 interface User {
   userName: string;
@@ -29,9 +18,9 @@ interface User {
 
 interface PaycheckProcessorProps {
   envelopes?: Envelope[];
-  paycheckHistory?: PaycheckHistoryItem[];
-  onProcessPaycheck: (data: unknown) => Promise<void>;
-  onDeletePaycheck: (paycheck: PaycheckHistoryItem) => Promise<void>;
+  paycheckHistory?: PaycheckHistoryRecord[];
+  onProcessPaycheck: (data: PaycheckTransaction) => Promise<void>;
+  onDeletePaycheck: (paycheck: PaycheckHistoryRecord) => Promise<void>;
   currentUser: User;
 }
 
@@ -47,12 +36,12 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
   onDeletePaycheck,
   currentUser,
 }) => {
-  // Custom hooks for state management
-  const formHook = usePaycheckForm({
-    paycheckHistory,
-    currentUser,
-    onProcessPaycheck,
+  // Use the new standard composition hook
+  const processor = usePaycheckProcessor({
     envelopes,
+    paycheckHistory,
+    onAddPaycheck: onProcessPaycheck,
+    currentUser,
   });
 
   const historyHook = usePaycheckHistory({
@@ -63,7 +52,7 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
   });
 
   // Calculate allocation preview
-  const preview = formHook.showPreview ? formHook.allocationPreview : null;
+  const preview = processor.showPreview ? processor.allocationPreview : null;
 
   return (
     <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
@@ -74,26 +63,20 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
       <div className="glassmorphism rounded-3xl p-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
-          <PaycheckForm formHook={formHook} />
+          <PaycheckForm processor={processor} />
 
           {/* Allocation Preview */}
           <PaycheckAllocationPreview
             preview={preview}
-            hasAmount={!!formHook.paycheckAmount}
+            hasAmount={!!processor.paycheckAmount}
             envelopes={envelopes as unknown as import("@/types/finance").Envelope[]}
           />
         </div>
       </div>
 
       {/* Paycheck History */}
-      <PaycheckHistory
-        paycheckHistory={
-          paycheckHistory as unknown as Array<{
-            id: string | number;
-            payerName?: string;
-            amount?: number;
-          }>
-        }
+      <PaycheckHistoryList
+        paycheckHistory={paycheckHistory as unknown as PaycheckHistoryItem[]}
         onDeletePaycheck={
           historyHook.handleDeletePaycheck as unknown as (
             paycheck: PaycheckHistoryItem
@@ -127,47 +110,49 @@ const PaycheckHeader = () => (
 /**
  * Main paycheck form component
  */
-const PaycheckForm: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({ formHook }) => (
+const PaycheckForm: React.FC<{ processor: ReturnType<typeof usePaycheckProcessor> }> = ({
+  processor,
+}) => (
   <div className="space-y-6">
     <PaycheckAmountInput
-      value={formHook.paycheckAmount}
-      onChange={formHook.setPaycheckAmount}
-      disabled={formHook.isProcessing}
+      value={processor.paycheckAmount}
+      onChange={processor.setPaycheckAmount}
+      disabled={processor.isProcessing}
     />
 
     <PaycheckPayerSelector
-      payerName={formHook.payerName}
-      uniquePayers={formHook.uniquePayers}
-      showAddNewPayer={formHook.showAddNewPayer}
-      newPayerName={formHook.newPayerName}
-      isProcessing={formHook.isProcessing}
-      onPayerChange={formHook.handlePayerChange}
-      onNewPayerNameChange={formHook.setNewPayerName}
-      onAddNewPayer={formHook.handleAddNewPayer}
-      onToggleAddNewPayer={formHook.setShowAddNewPayer}
-      getPayerPrediction={formHook.getPayerPrediction}
+      payerName={processor.payerName}
+      uniquePayers={processor.uniquePayers}
+      showAddNewPayer={processor.showAddNewPayer}
+      newPayerName={processor.newPayerName}
+      isProcessing={processor.isProcessing}
+      onPayerChange={processor.handlePayerChange}
+      onNewPayerNameChange={processor.setNewPayerName}
+      onAddNewPayer={processor.handleAddNewPayer}
+      onToggleAddNewPayer={processor.setShowAddNewPayer}
+      getPayerPrediction={processor.getPayerPrediction}
     />
 
     <PaycheckAllocationModes
-      allocationMode={formHook.allocationMode as "allocate" | "leftover"}
-      onChange={formHook.setAllocationMode}
-      disabled={formHook.isProcessing}
+      allocationMode={processor.allocationMode as "allocate" | "leftover"}
+      onChange={processor.setAllocationMode}
+      disabled={processor.isProcessing}
     />
 
-    <PaycheckFormButtons formHook={formHook} />
+    <PaycheckFormButtons processor={processor} />
   </div>
 );
 
 /**
  * Form action buttons component
  */
-const PaycheckFormButtons: React.FC<{ formHook: ReturnType<typeof usePaycheckForm> }> = ({
-  formHook,
+const PaycheckFormButtons: React.FC<{ processor: ReturnType<typeof usePaycheckProcessor> }> = ({
+  processor,
 }) => (
   <div className="flex gap-4">
     <Button
-      onClick={() => formHook.setShowPreview(true)}
-      disabled={!formHook.canSubmit}
+      onClick={() => processor.setShowPreview(true)}
+      disabled={!processor.canSubmit}
       className="flex-1 btn btn-secondary py-4 text-lg font-semibold rounded-2xl border-2 border-black"
     >
       {React.createElement(getIcon("Calculator"), {
@@ -176,14 +161,14 @@ const PaycheckFormButtons: React.FC<{ formHook: ReturnType<typeof usePaycheckFor
       Preview Allocation
     </Button>
 
-    {formHook.showPreview && (
+    {processor.showPreview && (
       <Button
-        onClick={formHook.handleProcessPaycheck}
-        disabled={formHook.isProcessing}
+        onClick={processor.handleProcessPaycheck}
+        disabled={processor.isProcessing}
         className="flex-1 btn btn-success py-4 text-lg font-semibold rounded-2xl border-2 border-black"
         data-tour="add-paycheck"
       >
-        {formHook.isProcessing ? (
+        {processor.isProcessing ? (
           <div className="flex items-center">
             <div className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full mr-2"></div>
             Processing...

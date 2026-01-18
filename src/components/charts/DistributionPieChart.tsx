@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/common/useChartConfig";
+import { useChartConfig } from "../../hooks/platform/ux/useChartConfig";
 
 // Default label formatter for pie chart
 const defaultLabelFormatter = (props: PieLabelRenderProps): React.ReactNode => {

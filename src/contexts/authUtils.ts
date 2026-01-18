@@ -1,5 +1,5 @@
 import React from "react";
-import logger from "../utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import { initialAuthState } from "./authConstants";
 import type { AuthContextState, SessionData } from "./authConstants";
 import type { UserData } from "@/types/auth";
@@ -15,7 +15,7 @@ import type { UserData } from "@/types/auth";
 type SetAuthState = React.Dispatch<React.SetStateAction<AuthContextState>>;
 
 // Helper function to initialize auth state from localStorage
-export const initializeAuthFromStorage = async (setAuthState: SetAuthState): Promise<void> => {
+export const initializeAuthFromStorage = (setAuthState: SetAuthState): void => {
   try {
     logger.auth("AuthContext: Initializing auth state from localStorage");
 
@@ -95,6 +95,14 @@ export const createSetAuthenticated =
 
 export const createClearAuth = (setAuthState: SetAuthState) => (): void => {
   logger.auth("AuthContext: Clearing auth state");
+
+  // Stop sync orchestrator on logout
+  import("@/services/sync/syncOrchestrator")
+    .then(({ syncOrchestrator }) => {
+      syncOrchestrator.stop();
+    })
+    .catch((err) => logger.error("Failed to stop syncOrchestrator on clearAuth", err));
+
   setAuthState(initialAuthState);
 };
 
@@ -108,12 +116,10 @@ export const createUpdateUser =
     setAuthState(
       (prev: AuthContextState): AuthContextState => ({
         ...prev,
-        user: prev.user
-          ? {
-              ...prev.user,
-              ...updatedUserData,
-            }
-          : null,
+        user: {
+          ...(prev.user || {}),
+          ...updatedUserData,
+        } as UserData,
       })
     );
   };
@@ -146,6 +152,14 @@ export const createUpdateActivity = (setAuthState: SetAuthState) => (): void => 
 
 export const createLockSession = (setAuthState: SetAuthState) => (): void => {
   logger.auth("AuthContext: Locking session");
+
+  // Stop sync orchestrator on lock (since key is cleared)
+  import("@/services/sync/syncOrchestrator")
+    .then(({ syncOrchestrator }) => {
+      syncOrchestrator.stop();
+    })
+    .catch((err) => logger.error("Failed to stop syncOrchestrator on lockSession", err));
+
   setAuthState((prev) => ({
     ...prev,
     isUnlocked: false,

@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useConfirm } from "@/hooks/common/useConfirm";
+import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { globalToast } from "@/stores/ui/toastStore";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
-import { useAutoFunding } from "@/hooks/budgeting/autofunding";
-import { useEnvelopes } from "@/hooks/budgeting/useEnvelopes";
-import logger from "@/utils/common/logger";
+import { useAutoFunding } from "@/hooks/budgeting/allocations";
+import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
+import logger from "@/utils/core/common/logger";
 import { DashboardHeader, DashboardTabs, DashboardContent } from "./AutoFundingDashboardComponents";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import type { AutoFundingRule } from "@/utils/budgeting/autofunding/rules";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
 import type { Envelope } from "@/types/finance";
 
 interface AutoFundingDashboardProps {
@@ -94,8 +94,8 @@ const AutoFundingDashboard = ({ isOpen, onClose }: AutoFundingDashboardProps) =>
       const result = await executeRules("manual");
 
       if (result.success && "execution" in result) {
-        const totalFunded = result.execution.totalFunded || 0;
-        const rulesExecuted = result.execution.rulesExecuted || 0;
+        const totalFunded = result.execution?.totalFunded || 0;
+        const rulesExecuted = result.execution?.rulesExecuted || 0;
 
         if (totalFunded > 0) {
           globalToast.showSuccess(
@@ -107,16 +107,15 @@ const AutoFundingDashboard = ({ isOpen, onClose }: AutoFundingDashboardProps) =>
           globalToast.showWarning(
             "Rules executed but no funds were transferred. Check your rules and available balances.",
             "No Funds Transferred",
-            6000
+            5000
           );
         }
       } else {
-        const errorMessage = result.error ?? "Unknown error";
-        globalToast.showError("Failed to execute rules: " + errorMessage, "Execution Failed", 8000);
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed", 8000);
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       globalToast.showError("Failed to execute rules: " + errorMessage, "Execution Failed", 8000);
     } finally {
       setIsExecuting(false);
@@ -135,35 +134,36 @@ const AutoFundingDashboard = ({ isOpen, onClose }: AutoFundingDashboardProps) =>
           <div className="flex flex-col h-full">
             <DashboardHeader rules={rules} onClose={onClose} />
 
-            <div className="px-6">
-              <DashboardTabs
+            <div className="flex-1 overflow-hidden p-6 flex flex-col gap-6">
+              <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <DashboardTabs
+                  activeTab={activeTab}
+                  setActiveTab={(tab: string) => setActiveTab(tab as "rules" | "history")}
+                  rules={rules}
+                  executionHistory={executionHistory}
+                />
+              </div>
+
+              <DashboardContent
                 activeTab={activeTab}
-                setActiveTab={(tab: string) => setActiveTab(tab as "rules" | "history")}
                 rules={rules}
                 executionHistory={executionHistory}
+                showExecutionDetails={showExecutionDetails}
+                setShowExecutionDetails={(show: string | null) => setShowExecutionDetails(show)}
+                handleCreateRule={handleCreateRule}
+                handleEditRule={handleEditRule}
+                handleDeleteRule={handleDeleteRule}
+                handleToggleRule={handleToggleRule}
+                handleExecuteRules={handleExecuteRules}
+                isExecuting={isExecuting}
+                RulesTabComponent={RulesTab}
+                HistoryTabComponent={HistoryTab}
               />
             </div>
-
-            <DashboardContent
-              activeTab={activeTab}
-              rules={rules}
-              executionHistory={executionHistory}
-              showExecutionDetails={showExecutionDetails}
-              setShowExecutionDetails={(show: string | null) => setShowExecutionDetails(show)}
-              handleCreateRule={handleCreateRule}
-              handleEditRule={handleEditRule}
-              handleDeleteRule={handleDeleteRule}
-              handleToggleRule={handleToggleRule}
-              handleExecuteRules={handleExecuteRules}
-              isExecuting={isExecuting}
-              RulesTabComponent={RulesTab}
-              HistoryTabComponent={HistoryTab}
-            />
           </div>
         </div>
       </div>
 
-      {/* Rule Builder Modal */}
       <AutoFundingRuleBuilder
         isOpen={showRuleBuilder}
         onClose={() => {

@@ -1,0 +1,69 @@
+{
+  "envelopes": [
+    {
+      "id": "env-groceries",
+      "name": "Groceries",
+      "category": "Food",
+      "archived": false,
+      "lastModified": 1704153600000,
+      "currentBalance": 500.0,
+      "envelopeType": "variable"
+    },
+    {
+      "id": "env-rent",
+      "name": "Rent",
+      "category": "Housing",
+      "archived": false,
+      "lastModified": 1704153600000,
+      "currentBalance": 1200.0,
+      "envelopeType": "bill"
+    },
+    {
+      "id": "env-gas",
+      "name": "Gas",
+      "category": "Transportation",
+      "archived": false,
+      "lastModified": 1704153600000,
+      "currentBalance": 150.0,
+      "envelopeType": "variable"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "txn-1",
+      "date": "2024-01-01",
+      "amount": -50.0,
+      "envelopeId": "env-groceries",
+      "category": "Food",
+      "type": "expense",
+      "lastModified": 1704153600000,
+      "description": "Grocery shopping"
+    },
+    {
+      "id": "txn-2",
+      "date": "2024-01-02",
+      "amount": -1200.0,
+      "envelopeId": "env-rent",
+      "category": "Housing",
+      "type": "expense",
+      "lastModified": 1704153600000,
+      "description": "Rent payment"
+    },
+    {
+      "id": "txn-3",
+      "date": "2024-01-03",
+      "amount": 3000.0,
+      "envelopeId": "unassigned",
+      "category": "Income",
+      "type": "income",
+      "lastModified": 1704153600000,
+      "description": "Paycheck"
+    }
+  ],
+  "metadata": {
+    "id": "budget-main",
+    "lastModified": 1704153600000,
+    "actualBalance": 3600.0,
+    "unassignedCash": 1750.0
+  }
+}

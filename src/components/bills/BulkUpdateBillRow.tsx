@@ -1,6 +1,6 @@
 import React from "react";
-import { hasChanges, formatAmountChange } from "@/utils/bills/billUpdateHelpers";
-import type { BillChange } from "@/utils/bills/billUpdateHelpers";
+import { hasChanges, formatAmountChange } from "@/utils/domain/bills/billUpdateHelpers";
+import type { BillChange } from "@/utils/domain/bills/billUpdateHelpers";
 import {
   AmountUpdateField,
   DateUpdateField,

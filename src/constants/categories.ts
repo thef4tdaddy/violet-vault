@@ -65,10 +65,10 @@ export const BILL_CATEGORIES = [
 // Envelope types for classification
 export const ENVELOPE_TYPES = {
   BILL: "bill",
-  VARIABLE: "variable",
-  SAVINGS: "savings",
-  SINKING_FUND: "sinking_fund", // @deprecated - Use SAVINGS with targetDate instead
-  SUPPLEMENTAL: "supplemental", // For HSA, FSA, and other supplemental accounts
+  VARIABLE: "standard",
+  SAVINGS: "goal",
+  SINKING_FUND: "sinking_fund", // Legacy type for migration
+  SUPPLEMENTAL: "supplemental",
 } as const;
 
 export type EnvelopeType = (typeof ENVELOPE_TYPES)[keyof typeof ENVELOPE_TYPES];
@@ -103,7 +103,7 @@ export const ENVELOPE_TYPE_CONFIG: Record<EnvelopeType, EnvelopeTypeConfig> = {
     displayFormat: "Due: ${amount}/biweekly",
   },
   [ENVELOPE_TYPES.VARIABLE]: {
-    name: "Variable Expense Envelope",
+    name: "Regular Envelope",
     description: "Regular but flexible spending (gas, groceries, medical, pet expenses)",
     color: "orange",
     borderColor: "border-orange-500",

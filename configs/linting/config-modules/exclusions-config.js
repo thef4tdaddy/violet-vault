@@ -23,8 +23,8 @@ export default [
       "src/utils/**/calculations/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/validation/**/*.{js,jsx,ts,tsx}",
       "src/utils/**/formatting/**/*.{js,jsx,ts,tsx}",
-      "src/utils/accounts/accountValidation.ts", // Account validation - complex form validation logic
-      "src/utils/sync/**/*.{js,jsx,ts,tsx}", // Sync utilities - complex data coordination
+      "src/utils/domain/accounts/accountValidation.ts", // Account validation - complex form validation logic
+      "src/utils/features/sync/**/*.{js,jsx,ts,tsx}", // Sync utilities - complex data coordination
       "src/services/sync/**/*.{js,jsx,ts,tsx}",
       "src/services/auth/**/*.{js,jsx,ts,tsx}",
       "src/services/authService.ts", // Core authentication service - security-critical
@@ -84,10 +84,11 @@ export default [
   },
   {
     // Allow direct icon imports only in the icon utility file
-    files: ["**/iconImport.{js,ts}", "src/utils/icons/index.ts"],
+    files: ["**/iconImport.{js,ts}", "src/utils/ui/icons/index.ts"],
     rules: {
       "no-restricted-imports": "off", // Icon utility can import from react-icons and lucide-react
       "no-direct-icon-imports/no-direct-icon-imports": "off", // Icon utility needs to import from react-icons
+      "max-lines": "off", // Icon utility legitimately grows as more icons are added
     },
   },
   {
@@ -202,8 +203,8 @@ export default [
       "**/debtDebugConfig.{js,ts}", // Debt debugging configuration
       "**/masterSyncValidator.{js,ts}", // Sync validation testing utility
       "**/highlight.{js,ts}", // Error monitoring utility
-      "src/utils/common/logger.ts", // Logger utility can use console patterns
-      "src/utils/debug/**/*.{js,jsx,ts,tsx}", // All debug utilities
+      "src/utils/core/common/logger.ts", // Logger utility can use console patterns
+      "src/utils/dev/debug/**/*.{js,jsx,ts,tsx}", // All debug utilities
     ],
     rules: {
       "no-console": "off", // These utilities legitimately use console for debugging
@@ -239,8 +240,8 @@ export default [
     // These have complexity inherent to their problem domain, not design issues
     files: [
       // PWA/Service Worker - Browser API complexity
-      "src/utils/pwa/patchNotesManager.ts", // Version content parsing logic
-      "src/utils/pwa/serviceWorkerDiagnostics.ts", // Cache health check diagnostics
+      "src/utils/platform/pwa/patchNotesManager.ts", // Version content parsing logic
+      "src/utils/platform/pwa/serviceWorkerDiagnostics.ts", // Cache health check diagnostics
       "src/components/pwa/OfflineStatusIndicator.tsx", // Network status detection
       "src/components/pwa/PatchNotesModal.tsx", // Version content rendering
       "src/components/pwa/ShareTargetHandler.tsx", // PWA Share Target API handling
@@ -259,7 +260,7 @@ export default [
 
       // Security & Data Integrity
       "src/components/security/LockScreen.tsx", // Multi-mode security state machine (260 lines)
-      "src/utils/budgeting/envelopeIntegrityChecker.ts", // Comprehensive data validation
+      "src/utils/domain/budgeting/envelopeIntegrityChecker.ts", // Comprehensive data validation
       "src/hooks/bills/useBillManager.ts", // Bill orchestration hook coordinating queries and bulk operations
     ],
     rules: {
@@ -333,6 +334,7 @@ export default [
     // This is a known limitation of the library, not a design issue
     files: [
       "src/hooks/transactions/useTransactionTable.ts", // Uses TanStack Virtual
+      "src/components/primitives/tables/DataTable.tsx", // Uses TanStack Virtual
     ],
     rules: {
       "react-hooks/incompatible-library": "off", // TanStack Virtual API limitation
@@ -384,7 +386,10 @@ export default [
   },
   {
     // Deep archival utilities handle multi-step workflows that are inherently complex
-    files: ["src/utils/common/transactionArchiving.ts", "src/utils/security/keyExport.ts"],
+    files: [
+      "src/utils/core/common/transactionArchiving.ts",
+      "src/utils/platform/security/keyExport.ts",
+    ],
     rules: {
       complexity: "off",
     },
@@ -401,7 +406,7 @@ export default [
     // APPROVED: Complexity exclusion for event filtering logic
     // The filterSentryEvent function needs to check multiple conditions (level, message, exception, request)
     // to properly filter out non-error messages, CORS errors, and sensitive data
-    files: ["src/utils/common/sentry.ts"],
+    files: ["src/utils/core/common/sentry.ts"],
     rules: {
       complexity: "off", // Multiple filtering conditions needed for noise reduction
     },
@@ -414,6 +419,27 @@ export default [
     files: ["src/components/budgeting/EnvelopeSystem.tsx"],
     rules: {
       "zustand-safe-patterns/zustand-no-store-actions-in-deps": "off", // updateBiweeklyAllocations is a useCallback, not a Zustand action
+    },
+  },
+  {
+    // useBillManager.ts - False positive for selective subscriptions on local state hook
+    files: ["src/hooks/budgeting/transactions/scheduled/expenses/useBillManager.ts"],
+    rules: {
+      "zustand-safe-patterns/zustand-selective-subscriptions": "off",
+    },
+  },
+  {
+    // MainDashboard.tsx - False positive for selective subscriptions on local state hook
+    files: ["src/components/pages/MainDashboard.tsx"],
+    rules: {
+      "zustand-safe-patterns/zustand-selective-subscriptions": "off",
+    },
+  },
+  {
+    // ServiceStatusBadge.tsx - Custom status badge using native buttons for specific styling
+    files: ["src/components/common/ServiceStatusBadge.tsx"],
+    rules: {
+      "enforce-ui-library/enforce-ui-library": "off",
     },
   },
 ];

@@ -50,7 +50,7 @@ const AccountBalanceOverview = ({
   const diffStyles = getDifferenceCardStyles(isBalanced, difference);
 
   return (
-    <div className="rounded-2xl p-6">
+    <div className="rounded-2xl p-6" data-testid="account-balance-overview">
       <h2 className="font-black text-black text-xl mb-6 flex items-center">
         {React.createElement(getIcon("CreditCard"), {
           className: "h-6 w-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0",

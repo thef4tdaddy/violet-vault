@@ -1,4 +1,4 @@
-import { ACCOUNT_TYPES } from "@/utils/accounts";
+import { ACCOUNT_TYPES } from "@/utils/domain/accounts";
 import { Select, Checkbox } from "@/components/ui";
 
 interface AccountForm {

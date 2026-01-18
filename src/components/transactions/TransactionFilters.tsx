@@ -63,6 +63,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         <Button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
+          aria-label={isExpanded ? "Collapse filters" : "Expand filters"}
         >
           {isExpanded
             ? React.createElement(getIcon("ChevronUp"), {
@@ -155,6 +156,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
               <Button
                 onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
+                aria-label={sortOrder === "asc" ? "Sort descending" : "Sort ascending"}
               >
                 {sortOrder === "asc"
                   ? React.createElement(getIcon("ChevronUp"), {

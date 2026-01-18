@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { createPortal } from "react-dom";
 import { getIcon } from "../../../utils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 // Lazy load the history viewer for better performance
 const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));

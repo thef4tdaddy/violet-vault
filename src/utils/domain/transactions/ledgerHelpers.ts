@@ -1,0 +1,93 @@
+/**
+ * Utility functions for TransactionLedger calculations and configurations
+ */
+import type { Transaction, Envelope } from "@/types/finance";
+import type { FilterConfig } from "@/components/ui/StandardFilters";
+
+/**
+ * Calculate transaction totals and net cash flow
+ */
+export const calculateTransactionTotals = (
+  transactions: Transaction[]
+): { totalIncome: number; totalExpenses: number; netCashFlow: number } => {
+  const totalIncome = transactions
+    .filter((t) => t && typeof t.amount === "number" && t.amount > 0)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const totalExpenses = transactions
+    .filter((t) => t && typeof t.amount === "number" && t.amount < 0)
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  const netCashFlow = totalIncome - totalExpenses;
+
+  return {
+    totalIncome,
+    totalExpenses,
+    netCashFlow,
+  };
+};
+
+/**
+ * Get filter configurations for StandardFilters component
+ */
+export const getTransactionFilterConfigs = (envelopes: Envelope[]): FilterConfig[] => [
+  {
+    key: "dateFilter",
+    type: "select",
+    defaultValue: "all",
+    options: [
+      { value: "all", label: "All Time" },
+      { value: "today", label: "Today" },
+      { value: "week", label: "This Week" },
+      { value: "month", label: "This Month" },
+    ],
+  },
+  {
+    key: "typeFilter",
+    type: "select",
+    defaultValue: "all",
+    options: [
+      { value: "all", label: "All Types" },
+      { value: "income", label: "Income" },
+      { value: "expense", label: "Expenses" },
+    ],
+  },
+  {
+    key: "envelopeFilter",
+    type: "select",
+    defaultValue: "all",
+    options: [
+      { value: "all", label: "All Envelopes" },
+      { value: "", label: "Unassigned" },
+      ...envelopes.map((env) => ({ value: String(env.id), label: env.name })),
+    ],
+  },
+  {
+    key: "sortBy",
+    type: "select",
+    defaultValue: "date",
+    options: [
+      { value: "date", label: "Date" },
+      { value: "amount", label: "Amount" },
+      { value: "description", label: "Description" },
+    ],
+  },
+  {
+    key: "sortOrder",
+    type: "select",
+    defaultValue: "desc",
+    options: [
+      { value: "desc", label: "Descending" },
+      { value: "asc", label: "Ascending" },
+    ],
+  },
+];
+
+/**
+ * Format transaction count and net cash flow for display
+ * Properly pluralizes "transaction" based on count
+ */
+export const formatLedgerSummary = (transactionCount: number, netCashFlow: number): string => {
+  const transactionText = transactionCount === 1 ? "transaction" : "transactions";
+  return `${transactionCount} ${transactionText} • Net: $${netCashFlow.toFixed(2)}`;
+};

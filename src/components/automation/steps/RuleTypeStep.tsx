@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
-import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
+import { RULE_TYPES } from "@/utils/domain/budgeting/autofunding";
 
 interface RuleData {
   name: string;

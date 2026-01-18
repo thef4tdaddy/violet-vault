@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
+import { getLocalOnlyMode } from "@/utils/data/settings/settingsHelpers";
 
 interface DataManagementSectionProps {
   onOpenActivityFeed: () => void;

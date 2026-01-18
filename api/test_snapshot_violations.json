@@ -1,0 +1,50 @@
+{
+  "envelopes": [
+    {
+      "id": "env-groceries",
+      "name": "Groceries",
+      "category": "Food",
+      "archived": false,
+      "lastModified": 1704153600000,
+      "currentBalance": 500.0,
+      "envelopeType": "variable"
+    },
+    {
+      "id": "env-rent",
+      "name": "Rent",
+      "category": "Housing",
+      "archived": false,
+      "lastModified": 1704153600000,
+      "currentBalance": -50.0,
+      "envelopeType": "bill"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "txn-orphan",
+      "date": "2024-01-01",
+      "amount": -50.0,
+      "envelopeId": "env-nonexistent",
+      "category": "Food",
+      "type": "expense",
+      "lastModified": 1704153600000,
+      "description": "Orphaned transaction"
+    },
+    {
+      "id": "txn-income",
+      "date": "2024-01-03",
+      "amount": 3000.0,
+      "envelopeId": "unassigned",
+      "category": "Income",
+      "type": "income",
+      "lastModified": 1704153600000,
+      "description": "Paycheck"
+    }
+  ],
+  "metadata": {
+    "id": "budget-main",
+    "lastModified": 1704153600000,
+    "actualBalance": 5000.0,
+    "unassignedCash": 3000.0
+  }
+}

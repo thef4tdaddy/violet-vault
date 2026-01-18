@@ -17,15 +17,15 @@ rules:
       - "CRITICAL: GitHub workflow files (.github/workflows/*.yml) must be committed separately and cherry-picked to main to actually run"
       - "Workflow changes: commit on develop, then cherry-pick to main (workflows only run from main branch)"
 
-  # Architecture: ChastityOS v4.0.0
-  - name: "Data Flow Architecture"
-    description: "Follow the critical data flow pattern"
-    pattern: "Firebase (cloud) ↔ Dexie (local IndexedDB) ↔ TanStack Query (cache) ↔ React Components"
+  # Architecture: v2.0 Hybrid Polyglot
+  - name: "v2.0 Hybrid Architecture"
+    description: "React Frontend + Go/Python Backend via Vercel Serverless"
     rules:
-      - "All external data flows through Firebase first"
-      - "Local data persists in Dexie IndexedDB"
-      - "TanStack Query manages server state caching"
-      - "Components receive data from TanStack Query hooks only"
+      - "Frontend: React (Vite) + Dexie (Local) + Firebase (E2EE Cloud)"
+      - "Backend (Go): /api/*.go - Used for bug reporting and API proxies"
+      - "Backend (Python): /api/*.py - Used for analytics and paycheck prediction"
+      - "Data Flow: Firebase (E2EE) ↔ Dexie (Local) ↔ TanStack Query ↔ React UI"
+      - "CRITICAL: Sensitive budgeting data must remain decrytped only in the browser (E2EE)"
 
   # State Management
   - name: "State Management Rules"
@@ -39,20 +39,15 @@ rules:
       - "CRITICAL: Auth state is in React Context, not Zustand (v2.0+)"
       - "Pattern: useQuery for reads, useMutation for writes"
 
-  # Directory Structure
+  # Directory Structure (v2.0)
   - name: "Directory Structure & Rules"
     rules:
-      - "`/src/components/` - UI ONLY, zero business logic, zero API calls, pure presentation"
-      - "`/src/services/` - ALL business logic, Firebase operations, data processing, service layer"
-      - "`/src/hooks/api/` - TanStack Query hooks (useQuery, useMutation)"
-      - "`/src/hooks/state/` - Zustand store hooks (UI state only)"
-      - "`/src/stores/` - Zustand store definitions (UI state only)"
-      - "`/src/utils/` - Pure utility functions, validation, formatting, helpers"
-      - "`/src/contexts/` - React contexts (AuthContext, app-level state)"
-      - "`/src/types/` - TypeScript type definitions and interfaces"
-      - "`/src/domain/schemas/` - Zod validation schemas for all data models"
-      - "`/src/constants/` - Application constants and enums"
-      - "`/src/db/` - Dexie database setup and types"
+      - "`/src/` - React Frontend source code"
+      - "`/api/` - Polyglot Serverless Functions (Go, Python, Node.js)"
+      - "`/src/services/` - Client-side business logic and Firebase orchestration"
+      - "`/src/hooks/api/` - TanStack Query hooks for both Firebase and /api calls"
+      - "`/src/domain/schemas/` - Zod validation schemas (used for frontend and /api responses)"
+      - "`/scripts/` - CI/CD and automation scripts (Full Salvo)"
 
   # CRITICAL RULES - ZERO TOLERANCE
   - name: "🚫 NO ANY TYPES - EVER"
@@ -78,21 +73,14 @@ rules:
       - "Prettier will auto-format, but start with @ imports"
       - "Code review will flag any relative imports"
 
-  # Code Quality
-  - name: "Code Quality Standards"
+  # Code Quality (Full Salvo v2.0)
+  - name: "Polyglot Quality Standards"
     rules:
-      - "Use `logger` utility instead of console.log: `import logger from '@/utils/common/logger'`"
-      - "TypeScript strict mode enabled - use proper types ONLY"
-      - "Use path alias `@` for imports: `import { foo } from '@/utils/bar'`"
-      - "All imports must resolve to @ paths when possible"
-      - "No unused variables - use underscore prefix if intentional: `const _unused = value`"
-      - "ESLint must pass with zero errors"
-      - "Prettier must format all code automatically"
-      - "Max 100 imports per file (split large files)"
-      - "Max 200 lines per component (extract logic to hooks/utils)"
-      - "Max 300 lines per service (split into focused services)"
-      - "Track ESLint and TypeScript errors in issue #748 (combined code quality tracking)"
-      - "TypeScript strict mode errors tracked separately in issue #748"
+      - "Python: Use Ruff (linter/formatter) and Mypy (types)"
+      - "Go: Use golangci-lint and gofmt"
+      - "React: Use ESLint, Prettier, and TSC"
+      - "ALL: Run './scripts/full_salvo.sh' locally before opening PRs"
+      - "Logger: Always use @/utils/common/logger for frontend logging"
 
   # Naming Conventions
   - name: "Naming Conventions"

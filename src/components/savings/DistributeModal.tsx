@@ -5,9 +5,9 @@ import { getIcon } from "../../utils";
 import {
   SAVINGS_PRIORITIES,
   calculateGoalDistribution,
-} from "../../utils/savings/savingsFormUtils";
+} from "@/utils/domain/savings/savingsFormUtils";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 interface SavingsGoal {
   id: string;

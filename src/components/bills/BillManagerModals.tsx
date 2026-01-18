@@ -8,7 +8,7 @@ import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
 import BillDetailModal from "./modals/BillDetailModal";
 import ObjectHistoryViewer from "@/components/history/ObjectHistoryViewer";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Generic Bill-like entity - flexible to accept any bill structure

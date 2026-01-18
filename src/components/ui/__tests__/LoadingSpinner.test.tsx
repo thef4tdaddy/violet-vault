@@ -3,7 +3,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import LoadingSpinner from "../LoadingSpinner";
 
 // Mock the icon utility
-vi.mock("@/utils/icons", () => ({
+vi.mock("@/utils/ui/icons", () => ({
   renderIcon: vi.fn((name: string, props: { className?: string }) => (
     <svg data-testid={`icon-${name}`} className={props.className}>
       <circle cx="12" cy="12" r="10" />

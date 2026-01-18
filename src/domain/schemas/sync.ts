@@ -5,7 +5,7 @@
  */
 
 import { z } from "zod";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Cloud Sync User Schema - validates user info for cloud sync operations

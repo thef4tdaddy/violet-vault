@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
-import { useReceiptToTransaction } from "../../hooks/receipts/useReceiptToTransaction";
+import { useReceiptToTransaction } from "@/hooks/platform/receipts/useReceiptToTransaction";
 import ReceiptDataStep from "./steps/ReceiptDataStep";
 import EnvelopeSelectionStep from "./steps/EnvelopeSelectionStep";
 import ConfirmationStep from "./steps/ConfirmationStep";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 // ModalHeader - displays title and close button
 const ModalHeader: React.FC<{ step: number; onClose: () => void }> = ({ step, onClose }) => (
@@ -38,7 +38,7 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => (
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black border-2 border-black shadow-md ${
               stepNum <= currentStep
-                ? "bg-gradient-to-r from-purple-500 to-blue-600 text-white"
+                ? "bg-linear-to-r from-purple-500 to-blue-600 text-white"
                 : "bg-white/60 backdrop-blur-sm text-gray-500"
             }`}
           >
@@ -48,7 +48,7 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => (
             <div
               className={`flex-1 h-3 mx-4 rounded-full border-2 border-black shadow-sm ${
                 stepNum < currentStep
-                  ? "bg-gradient-to-r from-purple-500 to-blue-600"
+                  ? "bg-linear-to-r from-purple-500 to-blue-600"
                   : "bg-gray-200/60 backdrop-blur-sm"
               }`}
             />
@@ -82,7 +82,7 @@ const ModalFooter: React.FC<{
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          className="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
+          className="px-8 py-3 bg-linear-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
         >
           Next
           {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 ml-2" })}
@@ -91,7 +91,7 @@ const ModalFooter: React.FC<{
         <Button
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
+          className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all border-2 border-black shadow-md hover:shadow-lg font-black flex items-center"
         >
           {isSubmitting ? "Creating..." : "Create Transaction"}
           {React.createElement(getIcon("Check"), { className: "h-4 w-4 ml-2" })}

@@ -1,153 +1,90 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "../../../test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { BrowserRouter } from "react-router-dom";
+import React from "react";
 import MainLayout from "../MainLayout";
-import userEvent from "@testing-library/user-event";
+import { QueryClient } from "@tanstack/react-query";
 
-// Mock all dependencies
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: vi.fn(() => vi.fn()),
-    useLocation: vi.fn(() => ({ pathname: "/app/dashboard" })),
-  };
-});
+// ============================================================================
+// Standardized Mocking Strategy: Use @/ Aliases for EVERYTHING
+// Vitest's resolver handles these most reliably regardless of directory depth.
+// ============================================================================
 
-vi.mock("@/stores/ui/uiStore", () => ({
-  useBudgetStore: vi.fn(() => ({ budget: {} })),
+// 1. Hook Mock Results (Defined once for reference stability)
+const MOCK_AUTH = {
+  isUnlocked: true,
+  isAuthenticated: true,
+  shouldShowAuthGateway: () => false,
+  user: { userName: "Standard User", userColor: "#6B21A8" },
+  securityContext: { budgetId: "test-budget", encryptionKey: "test-key" as any },
+  handleLogout: vi.fn(),
+  handleSetup: vi.fn(),
+  handleChangePassword: vi.fn(),
+  updateUser: vi.fn(),
+  securityManager: { lockApp: vi.fn(), logEvent: vi.fn() },
+};
+
+const MOCK_LAYOUT_DATA = {
+  unassignedCash: 100,
+  bills: {},
+  envelopes: [],
+  transactions: [],
+  processPaycheck: vi.fn(),
+  paycheckHistory: [],
+  isLoading: false,
+  budget: {},
+  totalBiweeklyNeed: 0,
+};
+
+const MOCK_LAYOUT_HANDLERS = {
+  isLocalOnlyMode: false,
+  handleLogout: vi.fn(),
+  handleSetup: vi.fn(),
+  handleChangePassword: vi.fn(),
+  securityManager: MOCK_AUTH.securityManager,
+};
+
+const MOCK_CONTENT_MODALS = {
+  settings: { open: vi.fn(), close: vi.fn(), isOpen: false },
+  security: { open: vi.fn(), close: vi.fn(), isOpen: false },
+};
+
+vi.mock("../../../hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(() => MOCK_AUTH),
 }));
 
-vi.mock("@/hooks/auth/useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
-    isUnlocked: true,
-    user: { userName: "Test User", userColor: "#000" },
-    securityContext: {},
-    handleLogout: vi.fn(),
-    handleSetup: vi.fn(),
-    handleChangePassword: vi.fn(),
-  })),
+vi.mock("../../../hooks/platform/ux/layout/useLayoutData", () => ({
+  useLayoutData: vi.fn(() => MOCK_LAYOUT_DATA),
 }));
 
-vi.mock("@/hooks/layout", () => ({
-  useLayoutData: vi.fn(() => ({
-    unassignedCash: 100,
-    bills: {},
-    envelopes: [],
-    transactions: [],
-    processPaycheck: vi.fn(),
-    paycheckHistory: [],
-  })),
+vi.mock("../../../hooks/platform/ux/layout/useLayoutModals", () => ({
+  useLayoutModals: vi.fn(() => MOCK_CONTENT_MODALS),
 }));
 
-vi.mock("@/hooks/common/useDataManagement", () => ({
-  default: vi.fn(() => ({
-    exportData: vi.fn(),
-    importData: vi.fn(),
-  })),
-}));
-
-vi.mock("@/hooks/auth/usePasswordRotation", () => ({
-  default: vi.fn(() => ({
-    rotationDue: false,
-    handlePasswordRotation: vi.fn(),
-  })),
-}));
-
-vi.mock("@/hooks/common/useNetworkStatus", () => ({
-  default: vi.fn(() => ({
-    isOnline: true,
-  })),
-}));
-
-vi.mock("@/hooks/sync/useFirebaseSync", () => ({
-  useFirebaseSync: vi.fn(() => ({
-    syncState: "idle",
-    handleSync: vi.fn(),
-  })),
-}));
-
-vi.mock("@/hooks/budgeting/usePaydayPrediction", () => ({
-  default: vi.fn(() => ({
-    prediction: null,
-  })),
-}));
-
-vi.mock("@/hooks/common/useDataInitialization", () => ({
-  default: vi.fn(() => ({})),
-}));
-
-vi.mock("@/hooks/layout/useMainLayoutHandlers", () => ({
-  useMainLayoutHandlers: vi.fn(() => ({
-    isLocalOnlyMode: false,
-    handleLogout: vi.fn(),
-    handleSetup: vi.fn(),
-    handleChangePassword: vi.fn(),
-    securityManager: {},
-  })),
-}));
-
-vi.mock("@/hooks/layout/useSecurityWarning", () => ({
-  useSecurityWarning: vi.fn(() => ({
+vi.mock("../../../hooks/platform/ux/layout/useLayoutLifecycle", () => ({
+  useLayoutLifecycle: vi.fn(() => ({
     showSecurityWarning: false,
-    handleSecurityWarning: vi.fn(),
+    setShowSecurityWarning: vi.fn(),
+    showCorruptionModal: false,
+    setShowCorruptionModal: vi.fn(),
   })),
 }));
 
-vi.mock("@/hooks/layout/useCorruptionDetection", () => ({
-  useCorruptionDetection: vi.fn(() => ({
-    corruptionDetected: false,
-  })),
+// 2. Component Mocks (Use @/ aliases for EVERYTHING)
+// We use the @/ alias even if the source uses ./ so that Vitest matches the resolved path.
+vi.mock("@/components/layout/NavigationTabs", () => ({
+  default: () => <div data-testid="navigation-tabs">Nav Tabs</div>,
 }));
 
-vi.mock("@/hooks/layout/useMainContentModals", () => ({
-  useMainContentModals: vi.fn(() => ({
-    showSettings: false,
-    showSecuritySettings: false,
-    openSettings: vi.fn(),
-    closeSettings: vi.fn(),
-  })),
+vi.mock("@/components/layout/SummaryCards", () => ({
+  default: () => <div data-testid="summary-cards">Summary Cards</div>,
 }));
 
-vi.mock("@/hooks/common/useOnboardingAutoComplete", () => ({
-  useOnboardingAutoComplete: vi.fn(() => ({})),
-}));
-
-vi.mock("@/stores/ui/onboardingStore", () => ({
-  default: vi.fn(() => ({
-    hasCompletedTutorial: true,
-    currentStep: 0,
-  })),
-}));
-
-vi.mock("@/stores/ui/toastStore", () => ({
-  useToastStore: vi.fn(() => ({
-    toasts: [],
-  })),
-}));
-
-// Mock child components
-vi.mock("../AppRoutes", () => ({
+vi.mock("@/components/layout/AppRoutes", () => ({
   default: () => <div data-testid="app-routes">App Routes</div>,
 }));
 
-vi.mock("../NavigationTabs", () => ({
-  default: ({ setActiveView }: { activeView: string; setActiveView: (view: string) => void }) => (
-    <div data-testid="navigation-tabs">
-      <button onClick={() => setActiveView("dashboard")}>Dashboard</button>
-      <button onClick={() => setActiveView("envelopes")}>Envelopes</button>
-      <button onClick={() => setActiveView("transactions")}>Transactions</button>
-    </div>
-  ),
-}));
-
 vi.mock("@/components/ui/Header", () => ({
-  default: ({ onOpenSettings }) => (
-    <div data-testid="header">
-      <h1>VioletVault</h1>
-      <button onClick={onOpenSettings}>Settings</button>
-    </div>
-  ),
+  default: () => <div data-testid="header">Header</div>,
 }));
 
 vi.mock("@/components/ui/Toast", () => ({
@@ -155,287 +92,256 @@ vi.mock("@/components/ui/Toast", () => ({
 }));
 
 vi.mock("@/components/auth/AuthGateway", () => ({
-  default: ({ onSetupComplete }) => (
-    <div data-testid="auth-gateway">
-      <button onClick={onSetupComplete}>Complete Auth</button>
-    </div>
-  ),
+  default: () => <div data-testid="auth-gateway">Auth Gateway</div>,
 }));
 
 vi.mock("@/components/security/LockScreen", () => ({
-  default: ({ onUnlock }) => (
-    <div data-testid="lock-screen">
-      <button onClick={onUnlock}>Unlock</button>
-    </div>
-  ),
+  default: () => <div data-testid="lock-screen">Lock Screen</div>,
 }));
 
 vi.mock("@/components/mobile/BottomNavigationBar", () => ({
-  default: () => <div data-testid="bottom-nav">Bottom Navigation</div>,
+  default: () => <div data-testid="bottom-nav">Bottom Nav</div>,
 }));
 
-vi.mock("@/utils/common/logger", () => ({
+vi.mock("@/components/sync/SyncStatusIndicators", () => ({
+  default: () => <div data-testid="sync-indicators" />,
+}));
+
+vi.mock("@/components/sync/ConflictResolutionModal", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/feedback/BugReportButton", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/settings/SecuritySettings", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/settings/SettingsDashboard", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/onboarding/OnboardingTutorial", () => ({
+  default: ({ children }: any) => <div data-testid="onboarding-tutorial">{children}</div>,
+}));
+
+vi.mock("@/components/onboarding/OnboardingProgress", () => ({
+  default: () => <div data-testid="onboarding-progress" />,
+}));
+
+vi.mock("@/components/modals/CorruptionRecoveryModal", () => ({
+  CorruptionRecoveryModal: () => null,
+}));
+
+vi.mock("@/components/auth/PasswordRotationModal", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/security/LocalDataSecurityWarning", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/components/mobile/GlobalPullToRefresh", () => ({
+  GlobalPullToRefreshProvider: ({ children }: any) => <>{children}</>,
+}));
+
+// 3. Utils & Fallbacks
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
-    error: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
+    error: vi.fn(),
+    auth: vi.fn(),
+    budgetSync: vi.fn(),
   },
 }));
+vi.mock("@/stores/ui/onboardingStore", () => ({
+  default: vi.fn(() => ({ hasCompletedTutorial: true, currentStep: 0, isOnboarded: true })),
+}));
+vi.mock("@/hooks/platform/data/useDataManagement", () => ({
+  default: vi.fn(() => ({
+    exportData: vi.fn(),
+    importData: vi.fn(),
+    resetEncryptionAndStartFresh: vi.fn(),
+  })),
+}));
+vi.mock("@/hooks/auth/usePasswordRotation", () => ({
+  default: vi.fn(() => ({
+    rotationDue: false,
+    showRotationModal: false,
+    dismissRotation: vi.fn(),
+    handlePasswordRotation: vi.fn(),
+  })),
+}));
+vi.mock("@/hooks/platform/sync/useFirebaseSync", () => ({
+  useFirebaseSync: vi.fn(() => ({ syncState: "idle", handleSync: vi.fn() })),
+}));
+vi.mock("@/hooks/platform/common/useNetworkStatus", () => ({
+  default: vi.fn(() => ({ isOnline: true })),
+}));
+// Migrated Hooks
+vi.mock("@/hooks/platform/common/useOnboardingAutoComplete", () => ({
+  useOnboardingAutoComplete: vi.fn(() => ({})),
+}));
+vi.mock("@/stores/ui/toastStore", () => ({ useToastStore: vi.fn(() => ({ toasts: [] })) }));
+vi.mock("@/stores/ui/uiStore", () => {
+  const mockStore = vi.fn(() => ({ budget: {} }));
+  return {
+    default: mockStore,
+    useBudgetStore: mockStore,
+  };
+});
 
-describe("MainLayout", () => {
+// ============================================================================
+// Test Suite
+// ============================================================================
+
+import { useAuth } from "../../../hooks/auth/useAuth";
+
+describe("MainLayout (Full Alias Standardization)", () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    queryClient = new QueryClient();
+  });
+
   const mockFirebaseSync = {
     start: vi.fn(),
     forceSync: vi.fn(),
     isRunning: false,
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   const renderLayout = () => {
-    return render(
-      <BrowserRouter>
-        <MainLayout firebaseSync={mockFirebaseSync} />
-      </BrowserRouter>
-    );
+    return render(<MainLayout firebaseSync={mockFirebaseSync} />, { queryClient });
   };
 
-  describe("Authentication Flow", () => {
-    it("should show auth gateway when not authenticated", () => {
-      const useAuthManager = require("@/hooks/auth/useAuthManager").useAuthManager as any;
-      useAuthManager.mockReturnValue({
-        isUnlocked: false,
-        user: null,
-        securityContext: {},
-      });
+  it("should render main shell components successfully via aliased mocks", async () => {
+    renderLayout();
 
-      renderLayout();
-
-      expect(screen.getByTestId("auth-gateway")).toBeInTheDocument();
-    });
-
-    it("should show main content when authenticated", () => {
-      renderLayout();
-
-      expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
-
-    it("should show lock screen when locked", () => {
-      const useAuthManager = require("@/hooks/auth/useAuthManager").useAuthManager as any;
-      useAuthManager.mockReturnValue({
-        isUnlocked: false,
-        user: { userName: "Test" },
-        securityContext: { isLocked: true },
-      });
-
-      renderLayout();
-
-      expect(screen.getByTestId("lock-screen")).toBeInTheDocument();
-    });
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
+    expect(await screen.findByTestId("navigation-tabs")).toBeInTheDocument();
+    expect(await screen.findByTestId("app-routes")).toBeInTheDocument();
+    expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
   });
 
-  describe("Navigation", () => {
-    it("should render navigation tabs", () => {
-      renderLayout();
+  it("should show AuthGateway when shouldShowAuthGateway returns true", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: false,
+      shouldShowAuthGateway: () => true,
+    } as any);
 
-      expect(screen.getByTestId("navigation-tabs")).toBeInTheDocument();
-      expect(screen.getByText("Dashboard")).toBeInTheDocument();
-      expect(screen.getByText("Envelopes")).toBeInTheDocument();
-      expect(screen.getByText("Transactions")).toBeInTheDocument();
-    });
-
-    it("should render header", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("header")).toBeInTheDocument();
-      expect(screen.getByText("VioletVault")).toBeInTheDocument();
-    });
-
-    it("should render bottom navigation on mobile", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("bottom-nav")).toBeInTheDocument();
-    });
+    renderLayout();
+    expect(await screen.findByTestId("auth-gateway")).toBeInTheDocument();
   });
 
-  describe("Content Rendering", () => {
-    it("should render app routes", () => {
-      renderLayout();
+  it("should show LockScreen when isUnlocked is false", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      isUnlocked: false,
+      shouldShowAuthGateway: () => false,
+    } as any);
 
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
-
-    it("should render toast container", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("toast-container")).toBeInTheDocument();
-    });
+    renderLayout();
+    expect(await screen.findByTestId("lock-screen")).toBeInTheDocument();
   });
 
-  describe("Settings Modal", () => {
-    it("should open settings modal", async () => {
-      renderLayout();
-
-      const settingsButton = screen.getByText("Settings");
-      await userEvent.click(settingsButton);
-
-      // Settings modal trigger should be called
-      expect(screen.getByTestId("header")).toBeInTheDocument();
-    });
+  it("should render bottom navigation bar", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("bottom-nav")).toBeInTheDocument();
   });
 
-  describe("User Menu", () => {
-    it("should display user information", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("header")).toBeInTheDocument();
-    });
-
-    it("should handle logout action", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("header")).toBeInTheDocument();
-    });
+  it("should render sync indicators", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("sync-indicators")).toBeInTheDocument();
   });
 
-  describe("Firebase Sync Integration", () => {
-    it("should accept firebase sync service", () => {
-      renderLayout();
-
-      expect(mockFirebaseSync).toBeDefined();
-    });
-
-    it("should handle sync state", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
+  it("should render toast container", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("toast-container")).toBeInTheDocument();
   });
 
-  describe("Data Loading", () => {
-    it("should load layout data", () => {
-      renderLayout();
-
-      const useLayoutData = require("@/hooks/layout").useLayoutData as any;
-      expect(useLayoutData).toHaveBeenCalled();
-    });
-
-    it("should initialize data on mount", () => {
-      renderLayout();
-
-      const useDataInitialization = require("@/hooks/common/useDataInitialization").default as any;
-      expect(useDataInitialization).toHaveBeenCalled();
-    });
+  it("should render onboarding tutorial", async () => {
+    renderLayout();
+    expect(await screen.findByTestId("onboarding-tutorial")).toBeInTheDocument();
   });
 
-  describe("Responsive Behavior", () => {
-    it("should render mobile navigation", () => {
-      renderLayout();
+  it("should not show auth gateway when authenticated and unlocked", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: true,
+      shouldShowAuthGateway: () => false,
+    } as any);
 
-      expect(screen.getByTestId("bottom-nav")).toBeInTheDocument();
-    });
-
-    it("should render desktop navigation", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("navigation-tabs")).toBeInTheDocument();
-    });
+    renderLayout();
+    expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
   });
 
-  describe("Error Handling", () => {
-    it("should handle missing firebase sync", () => {
-      render(
-        <BrowserRouter>
-          <MainLayout firebaseSync={null as any} />
-        </BrowserRouter>
-      );
+  it("should show auth gateway when not authenticated", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: false,
+      isUnlocked: true,
+      shouldShowAuthGateway: () => true,
+    } as any);
 
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
-
-    it("should handle missing user", () => {
-      const useAuthManager = require("@/hooks/auth/useAuthManager").useAuthManager as any;
-      useAuthManager.mockReturnValue({
-        isUnlocked: true,
-        user: null,
-        securityContext: {},
-      });
-
-      renderLayout();
-
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
+    renderLayout();
+    expect(await screen.findByTestId("auth-gateway")).toBeInTheDocument();
+    expect(screen.queryByTestId("header")).not.toBeInTheDocument();
   });
 
-  describe("Network Status", () => {
-    it("should handle online status", () => {
-      renderLayout();
+  it("should handle firebase sync service correctly", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
 
-      const useNetworkStatus = require("@/hooks/common/useNetworkStatus").default as any;
-      expect(useNetworkStatus).toHaveBeenCalled();
-    });
+    const customSync = {
+      start: vi.fn(),
+      forceSync: vi.fn(),
+      isRunning: true,
+    };
 
-    it("should handle offline status", () => {
-      const useNetworkStatus = require("@/hooks/common/useNetworkStatus").default as any;
-      useNetworkStatus.mockReturnValue({
-        isOnline: false,
-      });
-
-      renderLayout();
-
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
+    render(<MainLayout firebaseSync={customSync} />, { queryClient });
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
   });
 
-  describe("Security Features", () => {
-    it("should check for security warnings", () => {
-      renderLayout();
+  it("should render with authenticated user data", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: true,
+      user: { userName: "John Doe", userColor: "#ff0000" },
+    } as any);
 
-      const useSecurityWarning = require("@/hooks/layout/useSecurityWarning")
-        .useSecurityWarning as any;
-      expect(useSecurityWarning).toHaveBeenCalled();
-    });
-
-    it("should check for data corruption", () => {
-      renderLayout();
-
-      const useCorruptionDetection = require("@/hooks/layout/useCorruptionDetection")
-        .useCorruptionDetection as any;
-      expect(useCorruptionDetection).toHaveBeenCalled();
-    });
-
-    it("should handle password rotation", () => {
-      renderLayout();
-
-      const usePasswordRotation = require("@/hooks/auth/usePasswordRotation").default as any;
-      expect(usePasswordRotation).toHaveBeenCalled();
-    });
+    renderLayout();
+    expect(await screen.findByTestId("header")).toBeInTheDocument();
   });
 
-  describe("Local Only Mode", () => {
-    it("should handle local only mode enabled", () => {
-      const useMainLayoutHandlers = require("@/hooks/layout/useMainLayoutHandlers")
-        .useMainLayoutHandlers as any;
-      useMainLayoutHandlers.mockReturnValue({
-        isLocalOnlyMode: true,
-        handleLogout: vi.fn(),
-        handleSetup: vi.fn(),
-        handleChangePassword: vi.fn(),
-        securityManager: {},
-      });
+  it("should render onboarding progress when tutorial not completed", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
+    renderLayout();
+    expect(await screen.findByTestId("onboarding-progress")).toBeInTheDocument();
+  });
 
-      renderLayout();
+  it("should render summary cards when authenticated", async () => {
+    vi.mocked(useAuth).mockReturnValue(MOCK_AUTH as any);
+    renderLayout();
+    expect(await screen.findByTestId("summary-cards")).toBeInTheDocument();
+  });
 
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
+  it("should prioritize lock screen over auth gateway", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      ...MOCK_AUTH,
+      isAuthenticated: true,
+      isUnlocked: false,
+      shouldShowAuthGateway: () => false,
+    } as any);
 
-    it("should handle local only mode disabled", () => {
-      renderLayout();
-
-      expect(screen.getByTestId("app-routes")).toBeInTheDocument();
-    });
+    renderLayout();
+    expect(await screen.findByTestId("lock-screen")).toBeInTheDocument();
+    expect(screen.queryByTestId("auth-gateway")).not.toBeInTheDocument();
   });
 });

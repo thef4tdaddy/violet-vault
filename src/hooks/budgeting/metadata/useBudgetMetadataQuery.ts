@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/utils/common/queryClient";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 interface BudgetMetadata {
   id: string;

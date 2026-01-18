@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
 import SyncDebugToolsSection from "./SyncDebugToolsSection";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 // Development mode detection utility
 const isDevelopmentMode = () => {
   return (

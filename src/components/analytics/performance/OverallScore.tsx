@@ -1,5 +1,5 @@
 import React from "react";
-import { getPerformanceMessage } from "../../../utils/performanceUtils";
+import { getPerformanceMessage } from "@/utils/performanceUtils";
 
 interface OverallScoreProps {
   score: number;

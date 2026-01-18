@@ -1,0 +1,110 @@
+name: Cleanup Stale Copilot Branches
+
+on:
+  schedule:
+    # Run daily at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (don't actually delete)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      days_inactive:
+        description: "Days of inactivity before deletion"
+        required: false
+        default: "3"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Clean Up Stale Copilot Branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history to check last commit dates
+
+      - name: Clean Up Stale Branches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Configuration
+          DRY_RUN="${{ inputs.dry_run || 'false' }}"
+          DAYS_INACTIVE="${{ inputs.days_inactive || '3' }}"
+          CUTOFF_DATE=$(date -d "$DAYS_INACTIVE days ago" +%s)
+
+          echo "🧹 Copilot Branch Cleanup"
+          echo "========================"
+          echo "Dry Run: $DRY_RUN"
+          echo "Days Inactive: $DAYS_INACTIVE"
+          echo "Cutoff Date: $(date -d "@$CUTOFF_DATE" '+%Y-%m-%d %H:%M:%S')"
+          echo ""
+
+          # Get all remote copilot branches
+          COPILOT_BRANCHES=$(git branch -r | grep 'origin/copilot/' | sed 's/origin\///' | tr -d ' ')
+
+          if [ -z "$COPILOT_BRANCHES" ]; then
+            echo "✅ No copilot branches found"
+            exit 0
+          fi
+
+          DELETED_COUNT=0
+          KEPT_COUNT=0
+
+          echo "📋 Analyzing copilot branches..."
+          echo ""
+
+          for BRANCH in $COPILOT_BRANCHES; do
+            # Get the last commit date for this branch
+            LAST_COMMIT_DATE=$(git log -1 --format=%ct origin/$BRANCH 2>/dev/null || echo "0")
+            
+            if [ "$LAST_COMMIT_DATE" = "0" ]; then
+              echo "⚠️  Could not get commit date for $BRANCH, skipping"
+              continue
+            fi
+            
+            DAYS_OLD=$(( ($(date +%s) - LAST_COMMIT_DATE) / 86400 ))
+            
+            if [ "$LAST_COMMIT_DATE" -lt "$CUTOFF_DATE" ]; then
+              echo "🗑️  $BRANCH (${DAYS_OLD} days old)"
+              
+              if [ "$DRY_RUN" = "false" ]; then
+                git push origin --delete "$BRANCH" 2>&1 || echo "   ⚠️  Failed to delete $BRANCH"
+                DELETED_COUNT=$((DELETED_COUNT + 1))
+              else
+                echo "   [DRY RUN] Would delete"
+                DELETED_COUNT=$((DELETED_COUNT + 1))
+              fi
+            else
+              echo "✅ $BRANCH (${DAYS_OLD} days old) - keeping"
+              KEPT_COUNT=$((KEPT_COUNT + 1))
+            fi
+          done
+
+          echo ""
+          echo "📊 Summary"
+          echo "=========="
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Would delete: $DELETED_COUNT branches"
+          else
+            echo "Deleted: $DELETED_COUNT branches"
+          fi
+          echo "Kept: $KEPT_COUNT branches"
+
+          # Create issue if branches were deleted
+          if [ "$DELETED_COUNT" -gt 0 ] && [ "$DRY_RUN" = "false" ]; then
+            gh issue create \
+              --title "🧹 Automated Cleanup: Deleted $DELETED_COUNT stale copilot branches" \
+              --body "The automated branch cleanup workflow has deleted $DELETED_COUNT copilot branches that were inactive for more than $DAYS_INACTIVE days. Kept $KEPT_COUNT active branches. See the workflow run at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} for details." \
+              --label "automated" \
+              --label "housekeeping" || echo "Failed to create issue (may already exist)"
+          fi

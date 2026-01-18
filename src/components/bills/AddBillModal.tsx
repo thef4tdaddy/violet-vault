@@ -1,29 +1,26 @@
 /**
- * AddBillModal Component - Refactored for Issue #152
+ * AddBillModal Component - Migrated to use FormModal primitive (Issue #1594)
  *
  * UI-only component using useBillForm hook for all business logic
- * Reduced from 923 LOC to ~350 LOC by extracting form logic
+ * Migrated from custom modal to FormModal primitive for consistency
  * Enhanced with mobile slide-up functionality for Issue #164
  */
-import { useEffect, useCallback, useMemo } from "react";
-import type { FormEvent, RefObject } from "react";
-import { useBillForm } from "@/hooks/bills/useBillForm";
-import useEditLock from "@/hooks/common/useEditLock";
-import { useMobileDetection } from "@/hooks/ui/useMobileDetection";
-// Edit locking managed through useEditLock hook, but service needs initialization
-import { initializeEditLocks } from "@/services/editLockService";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { useBillForm } from "@/hooks/budgeting/transactions/scheduled/expenses/useBillForm";
+import useEditLock from "@/hooks/core/auth/security/useEditLock";
+import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
+import { useEditLockInit } from "@/hooks/core/auth/security/useEditLockInit";
+import { useAuth } from "@/hooks/auth/useAuth";
 import EditLockIndicator from "../ui/EditLockIndicator";
-import BillModalHeader from "./BillModalHeader";
+import FormModal from "@/components/primitives/modals/FormModal";
 import BillFormFields from "./BillFormFields";
 import SlideUpModal from "../mobile/SlideUpModal";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
-import { useLayoutData } from "@/hooks/layout/useLayoutData";
-import { useSmartSuggestions } from "@/hooks/analytics/useSmartSuggestions";
-import type { BillIconOption } from "@/utils/billIcons/iconOptions";
-import type { BillSuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import { useLayoutData } from "@/hooks/platform/ux/layout/useLayoutData";
+import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
+import type { BillIconOption } from "@/utils/ui/icons";
+import type { BillSuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { BillFormData, Bill } from "@/types/bills";
-import type { TransactionForStats } from "@/utils/analytics/categoryHelpers";
+import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 
 /**
  * Lock data structure for edit locking
@@ -97,11 +94,10 @@ interface AddBillModalProps {
 
 interface BillModalState {
   isMobile: boolean;
-  modalRef: RefObject<HTMLDivElement | null>;
   formData: BillFormData;
   isSubmitting: boolean;
   categories: string[];
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
   updateField: (field: keyof BillFormData, value: string | boolean) => void;
   canEdit: boolean;
   isLocked: boolean;
@@ -121,7 +117,7 @@ interface BillModalState {
 const useBillModalState = ({
   isOpen,
   editingBill,
-  _forceMobileMode = false,
+
   onAddBill,
   onUpdateBill,
   onDeleteBill,
@@ -129,7 +125,6 @@ const useBillModalState = ({
   onError,
 }: AddBillModalProps): BillModalState => {
   const isMobile = useMobileDetection();
-  const modalRef = useModalAutoScroll(isOpen && !(isMobile || _forceMobileMode));
   const { transactions: layoutTransactions = [], bills: billsQuery } = useLayoutData();
 
   const transactionsForStats = useMemo(() => {
@@ -204,16 +199,10 @@ const useBillModalState = ({
     onError,
   });
 
-  const {
-    securityContext: { budgetId },
-    user: currentUser,
-  } = useAuthManager();
+  const { budgetId, user: currentUser } = useAuth();
 
-  useEffect(() => {
-    if (isOpen && budgetId && currentUser) {
-      initializeEditLocks(budgetId ?? "", currentUser);
-    }
-  }, [isOpen, budgetId, currentUser]);
+  // Using hook to avoid direct service import
+  useEditLockInit(isOpen ? budgetId : null, isOpen ? currentUser : null);
 
   const { isLocked, isOwnLock, canEdit, lock, breakLock } = useEditLock(
     editingBill ? "bill" : null,
@@ -257,12 +246,15 @@ const useBillModalState = ({
   }, [calculateMonthlyAmount, formData.amount, formData.frequency, formData.customFrequency]);
 
   const computeNextDueDate = useCallback(() => {
-    return getNextDueDate(formData.frequency, formData.dueDate);
+    const dateStr =
+      formData.dueDate instanceof Date
+        ? formData.dueDate.toISOString().split("T")[0]
+        : formData.dueDate;
+    return getNextDueDate(formData.frequency, dateStr);
   }, [getNextDueDate, formData.frequency, formData.dueDate]);
 
   return {
     isMobile,
-    modalRef,
     formData,
     isSubmitting,
     categories,
@@ -289,7 +281,6 @@ const AddBillModal = (props: AddBillModalProps) => {
 
   const {
     isMobile,
-    modalRef,
     formData,
     isSubmitting,
     categories,
@@ -313,11 +304,12 @@ const AddBillModal = (props: AddBillModalProps) => {
   if (!isOpen) return null;
 
   const modalTitle = editingBill ? "Edit Bill" : "Add Bill";
+  const submitLabel = editingBill ? "Update Bill" : "Add Bill";
 
-  const renderModalContent = () => (
+  const renderFormContent = () => (
     <>
       {editingBill && (isLocked || isOwnLock) && (
-        <div className="border-b border-gray-200 px-6 py-3">
+        <div className="mb-4 -mx-6 px-6 py-3 border-b border-gray-200">
           <EditLockIndicator
             isLocked={isLocked}
             isOwnLock={isOwnLock}
@@ -333,9 +325,6 @@ const AddBillModal = (props: AddBillModalProps) => {
         updateField={updateField}
         canEdit={canEdit}
         editingBill={editingBill}
-        handleSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        onClose={onClose}
         suggestedIconName={resolvedIconName}
         iconSuggestions={resolvedIconSuggestions}
         categories={categories}
@@ -360,22 +349,33 @@ const AddBillModal = (props: AddBillModalProps) => {
         showHandle={true}
         backdrop={true}
       >
-        <div className="pb-6">{renderModalContent()}</div>
+        <form
+          onSubmit={async (e) => {
+            await handleSubmit(e);
+          }}
+          className="pb-6"
+        >
+          {renderFormContent()}
+        </form>
       </SlideUpModal>
     );
   }
 
-  // Desktop centered modal
+  // Desktop FormModal primitive
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl my-auto border-2 border-black"
-      >
-        <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
-        {renderModalContent()}
-      </div>
-    </div>
+    <FormModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={async (e) => {
+        await handleSubmit(e);
+      }}
+      title={modalTitle}
+      submitLabel={submitLabel}
+      loading={isSubmitting}
+      size="xl"
+    >
+      {renderFormContent()}
+    </FormModal>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
-import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
+import { useDebtStrategies } from "@/hooks/budgeting/envelopes/liabilities/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
 import type { DebtAccount } from "../../types/debt";

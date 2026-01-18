@@ -4,6 +4,20 @@
       "GENERATE_SOURCEMAP": "true"
     }
   },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "develop": true
+    }
+  },
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.12"
+    },
+    "api/**/*.go": {
+      "runtime": "go1.x"
+    }
+  },
   "installCommand": "npm ci",
   "buildCommand": "npm ci && if [ \"$VERCEL_ENV\" == \"preview\" ]; then npm run build:dev; else npm run build; fi",
   "headers": [

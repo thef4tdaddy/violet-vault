@@ -5,17 +5,12 @@
 
 export default {
   // Hooks directory rules - enforce React patterns (excluding utility files)
-  files: ['src/hooks/**/*.{js,jsx,ts,tsx}'],
+  files: ["src/hooks/**/*.{js,jsx,ts,tsx}"],
   ignores: [
-    'src/hooks/api/queryClient.ts', // QueryClient setup utility
-    'src/hooks/**/types.{ts,tsx}', // Type definition files
-    'src/hooks/**/constants.{ts,tsx}', // Constants files
-    'src/hooks/**/*-utils.{ts,tsx}', // Utility files (e.g., auth-utils.ts, events-utils.ts)
-    'src/hooks/**/*-operations.{ts,tsx}', // Operations files (e.g., notification-operations.ts)
-    'src/hooks/**/operations.{ts,tsx}', // Operation helper files (e.g., authOperations.ts)
-    'src/hooks/**/mutations.{ts,tsx}', // Mutation helper files (e.g., billMutations.ts, savingsMutations.ts)
-    'src/hooks/**/queryFunctions.{ts,tsx}', // Query function helpers (e.g., useBudgetData/queryFunctions.ts)
-    'src/hooks/**/*Operations.{ts,tsx}', // Camelcase operation helpers (e.g., useConnectionOperations.ts)
+    "src/hooks/api/queryClient.ts", // QueryClient setup utility
+    "src/hooks/**/types.{ts,tsx}", // Type definition files
+    "src/hooks/**/constants.{ts,tsx}", // Constants files
+    "src/hooks/**/*-utils.{ts,tsx}", // Utility files (e.g., auth-utils.ts, events-utils.ts)
   ],
   rules: {
     // Architecture note: Removed overly-complex no-restricted-syntax rule that tried to enforce

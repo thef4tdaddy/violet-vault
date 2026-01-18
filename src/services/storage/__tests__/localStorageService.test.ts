@@ -1,10 +1,10 @@
 // LocalStorage Service Tests
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { localStorageService } from "../localStorageService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // Mock logger
-vi.mock("../../../utils/common/logger", () => ({
+vi.mock("@/utils/core/common/logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -14,47 +14,33 @@ vi.mock("../../../utils/common/logger", () => ({
 }));
 
 describe("LocalStorageService", () => {
-  // Create a mock localStorage
-  let mockStorage: Record<string, string> = {};
+  // Capture original Object.keys to avoid recursion in spy
+  const originalKeys = Object.keys;
 
   beforeEach(() => {
-    // Reset mock storage
-    mockStorage = {};
+    // Clear global mock storage
+    localStorage.clear();
+    // Clear logger mocks
+    vi.clearAllMocks();
 
-    // Mock localStorage methods
-    Storage.prototype.getItem = vi.fn((key: string) => {
-      return key in mockStorage ? mockStorage[key] : null;
-    });
-    Storage.prototype.setItem = vi.fn((key: string, value: string) => {
-      mockStorage[key] = value;
-    });
-    Storage.prototype.removeItem = vi.fn((key: string) => {
-      delete mockStorage[key];
-    });
-    Storage.prototype.clear = vi.fn(() => {
-      mockStorage = {};
-    });
-
-    // Mock Object.keys for localStorage to return our mock keys
-    const originalKeys = Object.keys;
-    Object.keys = vi.fn((obj: any) => {
+    // spyOn Object.keys directly so restoreAllMocks can handle it
+    vi.spyOn(Object, "keys").mockImplementation((obj) => {
+      // If we are getting keys of localStorage, use the internal store from the mock
       if (obj === localStorage || obj === global.localStorage) {
-        return Object.keys(mockStorage);
+        return originalKeys((localStorage as any).store || {});
       }
       return originalKeys(obj);
-    }) as any;
-
-    // Clear all mocks
-    vi.clearAllMocks();
+    });
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("getItem", () => {
     it("should get item from localStorage", () => {
-      mockStorage["testKey"] = "testValue";
+      localStorage.setItem("testKey", "testValue");
 
       const result = localStorageService.getItem("testKey");
 
@@ -69,7 +55,7 @@ describe("LocalStorageService", () => {
     });
 
     it("should handle errors and return null", () => {
-      Storage.prototype.getItem = vi.fn(() => {
+      (localStorage.getItem as any).mockImplementationOnce(() => {
         throw new Error("Storage error");
       });
 
@@ -88,11 +74,11 @@ describe("LocalStorageService", () => {
       localStorageService.setItem("testKey", "testValue");
 
       expect(localStorage.setItem).toHaveBeenCalledWith("testKey", "testValue");
-      expect(mockStorage["testKey"]).toBe("testValue");
+      expect(localStorage.getItem("testKey")).toBe("testValue");
     });
 
     it("should handle errors gracefully", () => {
-      Storage.prototype.setItem = vi.fn(() => {
+      (localStorage.setItem as any).mockImplementationOnce(() => {
         throw new Error("Storage full");
       });
 
@@ -107,16 +93,16 @@ describe("LocalStorageService", () => {
 
   describe("removeItem", () => {
     it("should remove item from localStorage", () => {
-      mockStorage["testKey"] = "testValue";
+      localStorage.setItem("testKey", "testValue");
 
       localStorageService.removeItem("testKey");
 
       expect(localStorage.removeItem).toHaveBeenCalledWith("testKey");
-      expect(mockStorage["testKey"]).toBeUndefined();
+      expect(localStorage.getItem("testKey")).toBeNull();
     });
 
     it("should handle errors gracefully", () => {
-      Storage.prototype.removeItem = vi.fn(() => {
+      (localStorage.removeItem as any).mockImplementationOnce(() => {
         throw new Error("Remove error");
       });
 
@@ -132,7 +118,7 @@ describe("LocalStorageService", () => {
   describe("getJSON", () => {
     it("should get and parse JSON from localStorage", () => {
       const testData = { name: "test", value: 123 };
-      mockStorage["testKey"] = JSON.stringify(testData);
+      localStorage.setItem("testKey", JSON.stringify(testData));
 
       const result = localStorageService.getJSON("testKey");
 
@@ -146,7 +132,7 @@ describe("LocalStorageService", () => {
     });
 
     it("should handle JSON parse errors", () => {
-      mockStorage["testKey"] = "invalid json {";
+      localStorage.setItem("testKey", "invalid json {");
 
       const result = localStorageService.getJSON("testKey");
 
@@ -158,7 +144,7 @@ describe("LocalStorageService", () => {
     });
 
     it("should handle null values", () => {
-      mockStorage["testKey"] = "null";
+      localStorage.setItem("testKey", "null");
 
       const result = localStorageService.getJSON("testKey");
 
@@ -172,7 +158,7 @@ describe("LocalStorageService", () => {
 
       localStorageService.setJSON("testKey", testData);
 
-      expect(mockStorage["testKey"]).toBe(JSON.stringify(testData));
+      expect(localStorage.getItem("testKey")).toBe(JSON.stringify(testData));
     });
 
     it("should handle JSON stringify errors", () => {
@@ -190,17 +176,17 @@ describe("LocalStorageService", () => {
 
   describe("clear", () => {
     it("should clear all localStorage items", () => {
-      mockStorage["key1"] = "value1";
-      mockStorage["key2"] = "value2";
+      localStorage.setItem("key1", "value1");
+      localStorage.setItem("key2", "value2");
 
       localStorageService.clear();
 
       expect(localStorage.clear).toHaveBeenCalled();
-      expect(Object.keys(mockStorage).length).toBe(0);
+      expect(localStorage.length).toBe(0);
     });
 
     it("should handle errors gracefully", () => {
-      Storage.prototype.clear = vi.fn(() => {
+      (localStorage.clear as any).mockImplementationOnce(() => {
         throw new Error("Clear error");
       });
 
@@ -212,9 +198,9 @@ describe("LocalStorageService", () => {
 
   describe("getKeysByPrefix", () => {
     it("should get all keys matching a prefix", () => {
-      mockStorage["violet_key1"] = "value1";
-      mockStorage["violet_key2"] = "value2";
-      mockStorage["other_key"] = "value3";
+      localStorage.setItem("violet_key1", "value1");
+      localStorage.setItem("violet_key2", "value2");
+      localStorage.setItem("other_key", "value3");
 
       const result = localStorageService.getKeysByPrefix("violet_");
 
@@ -224,7 +210,7 @@ describe("LocalStorageService", () => {
     });
 
     it("should return empty array when no keys match", () => {
-      mockStorage["other_key1"] = "value1";
+      localStorage.setItem("other_key1", "value1");
 
       const result = localStorageService.getKeysByPrefix("violet_");
 
@@ -234,7 +220,7 @@ describe("LocalStorageService", () => {
     it("should handle errors and return empty array", () => {
       // Test error handling by causing an error in the filter operation
       // We'll restore Object.keys properly in afterEach
-      mockStorage["test"] = "value";
+      localStorage.setItem("test", "value");
 
       // Just verify it returns empty array when there's an exception
       // We can't easily test Object.keys error without breaking the test framework
@@ -246,9 +232,9 @@ describe("LocalStorageService", () => {
 
   describe("removeByPrefix", () => {
     it("should remove all items matching a prefix", () => {
-      mockStorage["violet_key1"] = "value1";
-      mockStorage["violet_key2"] = "value2";
-      mockStorage["other_key"] = "value3";
+      localStorage.setItem("violet_key1", "value1");
+      localStorage.setItem("violet_key2", "value2");
+      localStorage.setItem("other_key", "value3");
 
       // Mock getKeysByPrefix
       vi.spyOn(localStorageService as any, "getKeysByPrefix").mockReturnValue([
@@ -284,7 +270,7 @@ describe("LocalStorageService", () => {
         salt: [4, 5, 6],
         iv: [7, 8, 9],
       };
-      mockStorage["envelopeBudgetData"] = JSON.stringify(budgetData);
+      localStorage.setItem("envelopeBudgetData", JSON.stringify(budgetData));
 
       const result = localStorageService.getBudgetData();
 
@@ -308,13 +294,13 @@ describe("LocalStorageService", () => {
 
       localStorageService.setBudgetData(budgetData);
 
-      expect(mockStorage["envelopeBudgetData"]).toBe(JSON.stringify(budgetData));
+      expect(localStorage.getItem("envelopeBudgetData")).toBe(JSON.stringify(budgetData));
     });
   });
 
   describe("removeBudgetData", () => {
     it("should remove budget data from localStorage", () => {
-      mockStorage["envelopeBudgetData"] = "test";
+      localStorage.setItem("envelopeBudgetData", "test");
 
       localStorageService.removeBudgetData();
 
@@ -325,7 +311,7 @@ describe("LocalStorageService", () => {
   describe("getUserProfile", () => {
     it("should get user profile from localStorage", () => {
       const profile = { userName: "John", userColor: "#FF0000" };
-      mockStorage["userProfile"] = JSON.stringify(profile);
+      localStorage.setItem("userProfile", JSON.stringify(profile));
 
       const result = localStorageService.getUserProfile();
 
@@ -345,14 +331,14 @@ describe("LocalStorageService", () => {
 
       localStorageService.setUserProfile(profile);
 
-      expect(mockStorage["userProfile"]).toBe(JSON.stringify(profile));
+      expect(localStorage.getItem("userProfile")).toBe(JSON.stringify(profile));
     });
   });
 
   describe("getAutoFundingData", () => {
     it("should get auto-funding data from localStorage", () => {
       const autoFundingData = { enabled: true, amount: 100 };
-      mockStorage["violetVault_autoFundingData"] = JSON.stringify(autoFundingData);
+      localStorage.setItem("violetVault_autoFundingData", JSON.stringify(autoFundingData));
 
       const result = localStorageService.getAutoFundingData();
 
@@ -366,13 +352,15 @@ describe("LocalStorageService", () => {
 
       localStorageService.setAutoFundingData(autoFundingData);
 
-      expect(mockStorage["violetVault_autoFundingData"]).toBe(JSON.stringify(autoFundingData));
+      expect(localStorage.getItem("violetVault_autoFundingData")).toBe(
+        JSON.stringify(autoFundingData)
+      );
     });
   });
 
   describe("removeAutoFundingData", () => {
     it("should remove auto-funding data from localStorage", () => {
-      mockStorage["violetVault_autoFundingData"] = "test";
+      localStorage.setItem("violetVault_autoFundingData", "test");
 
       localStorageService.removeAutoFundingData();
 
@@ -382,7 +370,7 @@ describe("LocalStorageService", () => {
 
   describe("getSmartSuggestionsCollapsed", () => {
     it("should get collapsed state as boolean", () => {
-      mockStorage["smartSuggestions_collapsed"] = JSON.stringify(true);
+      localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(true));
 
       const result = localStorageService.getSmartSuggestionsCollapsed();
 
@@ -396,7 +384,7 @@ describe("LocalStorageService", () => {
     });
 
     it("should parse string 'false' correctly", () => {
-      mockStorage["smartSuggestions_collapsed"] = JSON.stringify(false);
+      localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(false));
 
       const result = localStorageService.getSmartSuggestionsCollapsed();
 
@@ -408,14 +396,14 @@ describe("LocalStorageService", () => {
     it("should set collapsed state as JSON", () => {
       localStorageService.setSmartSuggestionsCollapsed(true);
 
-      expect(mockStorage["smartSuggestions_collapsed"]).toBe(JSON.stringify(true));
+      expect(localStorage.getItem("smartSuggestions_collapsed")).toBe(JSON.stringify(true));
     });
   });
 
   describe("getLastSyncTime", () => {
     it("should get last sync time from localStorage", () => {
       const syncTime = "2024-01-01T00:00:00Z";
-      mockStorage["lastSyncTime"] = syncTime;
+      localStorage.setItem("lastSyncTime", syncTime);
 
       const result = localStorageService.getLastSyncTime();
 
@@ -435,14 +423,14 @@ describe("LocalStorageService", () => {
 
       localStorageService.setLastSyncTime(syncTime);
 
-      expect(mockStorage["lastSyncTime"]).toBe(syncTime);
+      expect(localStorage.getItem("lastSyncTime")).toBe(syncTime);
     });
   });
 
   describe("getLastPaydayNotification", () => {
     it("should get last payday notification date from localStorage", () => {
       const date = "2024-01-01";
-      mockStorage["lastPaydayNotification"] = date;
+      localStorage.setItem("lastPaydayNotification", date);
 
       const result = localStorageService.getLastPaydayNotification();
 
@@ -462,7 +450,7 @@ describe("LocalStorageService", () => {
 
       localStorageService.setLastPaydayNotification(date);
 
-      expect(mockStorage["lastPaydayNotification"]).toBe(date);
+      expect(localStorage.getItem("lastPaydayNotification")).toBe(date);
     });
   });
 
@@ -476,11 +464,11 @@ describe("LocalStorageService", () => {
     });
 
     it("should handle empty strings", () => {
-      // First set empty string directly in mockStorage
-      mockStorage["testKey"] = "";
+      // First set empty string directly in localStorage
+      localStorage.setItem("testKey", "");
 
       // Verify it's stored
-      expect(mockStorage["testKey"]).toBe("");
+      expect(localStorage.getItem("testKey")).toBe("");
 
       // When getting empty string, our mock should return it
       const result = localStorageService.getItem("testKey");
@@ -491,7 +479,7 @@ describe("LocalStorageService", () => {
       const specialKey = "test:key@#$%";
       localStorageService.setItem(specialKey, "value");
 
-      expect(mockStorage[specialKey]).toBe("value");
+      expect(localStorage.getItem(specialKey)).toBe("value");
     });
 
     it("should handle large JSON objects", () => {

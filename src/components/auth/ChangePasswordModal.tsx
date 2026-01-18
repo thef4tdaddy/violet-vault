@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import { AuthResult } from "@/types/auth";
 
 interface ChangePasswordModalProps {
@@ -92,19 +92,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
           />
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <div className="flex justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary border-2 border-black"
-              disabled={isLoading}
-            >
+            <Button type="button" onClick={onClose} variant="secondary" disabled={isLoading}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary border-2 border-black"
-              disabled={isLoading}
-            >
+            <Button type="submit" disabled={isLoading}>
               {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>

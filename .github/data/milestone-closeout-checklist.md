@@ -23,12 +23,20 @@ Please review and update the following in **develop** branch:
 - [ ] `/docs/ESLint-Rules.md` - Verify all rules are documented with current status
       → https://github.com/thef4tdaddy/violet-vault/blob/develop/docs/ESLint-Rules.md
 
-### 🔗 Dependencies & tooling
+### 🔗 Dependencies & Tooling
 
 - [ ] Run a dependency health check (`npm outdated` and `npx npm-check-updates`).
 - [ ] Assess which updates are **worth** doing this cycle (security, bugfix, perf, TypeScript types, build tooling). Note breaking changes.
-- [ ] If updating, create seperate branch for update, test, then merge into develop before release; otherwise record rationale in `/docs/milestones.md` under this milestone.
+- [ ] If updating, create separate branch for update, test, then merge into develop before release; otherwise record rationale in `/docs/milestones.md` under this milestone.
 - [ ] After updates, run CI locally: `npm run build && npm test && npm run typecheck`.
+- [ ] Verify multi-language tooling: `./scripts/full_salvo.sh` (TypeScript, Go, Python)
+
+### 📦 Release Planning
+
+- [ ] Review versioning strategy: stable releases from `main`, pre-releases from `develop` (every 10 commits)
+- [ ] Verify Release Please configuration is up-to-date in `.github/workflows/release-please.yml`
+- [ ] Check that conventional commits are being used for proper version bumping
+- [ ] Confirm deployment strategy: patch auto-deploy, minor/major require approval
 
 ### 📝 Documentation audit
 

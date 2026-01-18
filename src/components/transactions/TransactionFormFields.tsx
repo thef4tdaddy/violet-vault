@@ -9,7 +9,7 @@ import {
 } from "./TransactionFormSections";
 import type { Transaction } from "@/types/finance";
 import type { TransactionFormData } from "@/domain/schemas/transaction";
-import type { TransactionCategorySuggestion } from "@/hooks/analytics/useSmartSuggestions";
+import type { TransactionCategorySuggestion } from "@/hooks/platform/analytics/useSmartSuggestions";
 
 // Local Envelope interface with minimal required properties
 interface Envelope {

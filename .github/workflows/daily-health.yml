@@ -1,0 +1,302 @@
+name: Daily Health Check
+
+on:
+  schedule:
+    # Run every day at 09:00 UTC
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+    inputs:
+      context:
+        description: "Execution Context"
+        required: true
+        default: "alpha"
+        type: choice
+        options:
+          - alpha
+          - beta
+          - production
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # TODO (v2.0 Beta): Update 'alpha' to target 'develop' once the hybrid rewrite reaches beta stability.
+          # TODO (v2.0 Live): Revert to 'github.ref' or explicit 'main' once v2.0 is fully merged to production.
+          ref: ${{ (inputs.context || 'alpha') == 'alpha' && 'feat/polygot-rewrite' || (inputs.context == 'beta' && 'develop' || github.ref) }}
+
+      # --- Setup Environments ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Setup Go
+        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
+        if: hashFiles('api/go.sum') != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+          cache-dependency-path: api/go.sum
+
+      - name: Setup Python
+        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
+        if: hashFiles('requirements.txt', 'pyproject.toml', 'api/requirements.txt') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      # --- Install Dependencies ---
+      - name: Install Node Deps
+        run: npm ci
+
+      - name: Install Python Deps
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f "pyproject.toml" ]; then
+            pip install .
+          fi
+          if [ -f "api/requirements.txt" ]; then
+            pip install -r api/requirements.txt
+          fi
+          pip install pytest pytest-cov
+
+      - name: Install Go Deps
+        if: hashFiles('api/go.mod') != ''
+        run: |
+          cd api
+          go mod download
+          cd ..
+
+      # --- Build ---
+      - name: Build Frontend
+        id: build
+        run: npm run build
+
+      # --- Tests & Coverage ---
+
+      # 1. Frontend (Vitest)
+      - name: Frontend Tests
+        id: test_frontend
+        continue-on-error: true
+        run: |
+          npm run test:coverage -- --coverage.reporter=text --coverage.reporter=json-summary > frontend-test.txt 2>&1
+          exit_code=$?
+          cat frontend-test.txt
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
+
+          # Extract coverage percentage if available
+          if [ -f "coverage/coverage-summary.json" ]; then
+            COVERAGE=$(node -e "try { const data=require('./coverage/coverage-summary.json'); console.log(data.total.lines.pct); } catch(e) { console.log('0'); }")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+
+      # 2. Go Backend
+      - name: Go Tests
+        id: test_go
+        if: hashFiles('api/**/*.go') != ''
+        continue-on-error: true
+        run: |
+          cd api
+          # Go 1.23 coverage
+          go test ./... -coverprofile=coverage.out > ../go-test.txt 2>&1
+          exit_code=$?
+
+          # Extract coverage percentage
+          if [ -f "coverage.out" ]; then
+            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            # Generate HTML coverage report
+            go tool cover -html=coverage.out -o coverage.html
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+
+          cd ..
+          cat go-test.txt
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
+
+      # 3. Python Backend
+      - name: Python Tests
+        id: test_python
+        if: hashFiles('api/**/*.py') != ''
+        continue-on-error: true
+        run: |
+          source .venv/bin/activate
+          cd api
+          # Run pytest with coverage (add JSON report)
+          # Use python -m pytest to ensure it uses the venv's interpreter
+          python -m pytest --cov=. --cov-report=term-missing --cov-report=html --cov-report=json > ../python-test.txt 2>&1
+          exit_code=$?
+
+          # Extract coverage percentage
+          if [ -f "coverage.json" ]; then
+            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data['totals']['percent_covered'])" 2>/dev/null || echo "0")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+
+          cd ..
+          cat python-test.txt
+          echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+          if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
+
+      # --- Reporting ---
+      - name: Health Report & Tasks
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Gather Statuses
+            const contextName = '${{ inputs.context || 'scheduled' }}';
+            const buildStatus = '${{ steps.build.outcome }}';
+            const feStatus = '${{ steps.test_frontend.outputs.status }}' || 'skipped';
+            const goStatus = '${{ steps.test_go.outputs.status }}' || 'skipped';
+            const pyStatus = '${{ steps.test_python.outputs.status }}' || 'skipped';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Get coverage percentages
+            const frontendCoverage = parseFloat('${{ steps.test_frontend.outputs.coverage }}') || 0;
+            const pythonCoverage = parseFloat('${{ steps.test_python.outputs.coverage }}') || 0;
+            const goCoverage = parseFloat('${{ steps.test_go.outputs.coverage }}') || 0;
+
+            const isHealthy = buildStatus === 'success' && 
+                             (feStatus !== 'failure') && 
+                             (goStatus !== 'failure') && 
+                             (pyStatus !== 'failure');
+            const emoji = isHealthy ? '✅' : '❌';
+            const dateStr = new Date().toISOString().split('T')[0];
+            const title = `Daily Health: ${dateStr} - ${emoji}`;
+
+            let body = `## ${emoji} Daily Health Check: ${dateStr}\n\n`;
+            body += `**Context**: ${contextName}\n`;
+            body += `**Workflow Run**: [View Logs](${runUrl})\n\n`;
+
+            // Add Coverage Table (always show)
+            body += `## 📊 Test Coverage\n\n`;
+            body += `| Suite | Coverage | Status |\n`;
+            body += `|-------|----------|--------|\n`;
+            body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+            body += `\n**Coverage Reports**: [Download artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
+
+            body += `### Status Breakdown\n`;
+            body += `- **Build**: ${buildStatus === 'success' ? '✅ Pass' : '❌ FAIL'}\n`;
+            body += `- **Frontend Tests**: ${feStatus === 'success' ? '✅ Pass' : (feStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
+            body += `- **Go Tests**: ${goStatus === 'success' ? '✅ Pass' : (goStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
+            body += `- **Python Tests**: ${pyStatus === 'success' ? '✅ Pass' : (pyStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
+
+            // Frontend Coverage Parsing (JSON)
+            if (fs.existsSync('coverage/coverage-summary.json')) {
+               try {
+                   const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+                   const total = coverage.total.lines.pct;
+                   body += `\n### Frontend Coverage Details\n`;
+                   body += `- **Total**: ${total}%\n`;
+                   
+                   // Find worst offenders
+                   const lowCovFiles = [];
+                   for (const [filepath, metrics] of Object.entries(coverage)) {
+                       if (filepath === 'total') continue;
+                       if (filepath.includes('config') || filepath.includes('.d.ts')) continue;
+                       
+                       if (metrics.lines.pct < 80) {
+                           lowCovFiles.push({ file: filepath, pct: metrics.lines.pct });
+                       }
+                   }
+                   
+                   lowCovFiles.sort((a, b) => a.pct - b.pct);
+                   
+                   if (lowCovFiles.length > 0) {
+                       body += `\n**Lowest Coverage Files:**\n`;
+                       for (const item of lowCovFiles.slice(0, 5)) {
+                           body += `- \`${item.file}\`: ${item.pct}%\n`;
+                       }
+
+                       // Create Tasks for worst 3 frontend offenders
+                       // When frontend < 80%: Only create frontend issues (focus on core app)
+                       // When frontend >= 80%: Create frontend + backend issues (TODO: implement backend parsing)
+                       const candidates = lowCovFiles.slice(0, 3);
+                       for (const item of candidates) {
+                           const parts = item.file.split('/');
+                           const basename = parts[parts.length - 1];
+                           const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+                           
+                           const existing = await github.rest.search.issuesAndPullRequests({
+                               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
+                           });
+                           
+                           if (existing.data.total_count === 0) {
+                               await github.rest.issues.create({
+                                   owner: context.repo.owner,
+                                   repo: context.repo.repo,
+                                   title: issueTitle,
+                                   body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
+                                   labels: ['coverage-gap', 'help-wanted', 'automated']
+                               });
+                           }
+                       }
+                       
+                       // TODO: When frontend >= 80%, also parse and create issues for backend worst offenders
+                       // This requires parsing Go coverage.out and Python coverage.json for file-level coverage
+                   }
+               } catch (e) {
+                   console.error("Error parsing FE coverage", e);
+               }
+            }
+
+            body += `\n---\n*VioletVault Health Bot*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['daily-health']
+            });
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.out,./api/coverage.json
+          flags: daily-health
+          name: daily-health-check
+          fail_ci_if_error: false
+
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-logs
+          path: |
+            coverage/
+            frontend-test.txt
+            go-test.txt
+            python-test.txt
+            api/coverage.out
+            api/coverage.html
+            api/htmlcov/
+            api/coverage.json
+          retention-days: 7

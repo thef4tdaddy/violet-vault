@@ -1,5 +1,5 @@
 import React from "react";
-import MetricCard from "./MetricCard";
+import { MetricCard } from "@/components/primitives";
 
 interface PerformanceMetrics {
   budgetAdherence: number;
@@ -18,6 +18,16 @@ interface MetricsGridProps {
  * Extracted from PerformanceMonitor.jsx for better organization
  */
 const MetricsGrid: React.FC<MetricsGridProps> = ({ performanceMetrics }) => {
+  // Helper to determine variant based on score
+  const getVariantForScore = (
+    score: number
+  ): "default" | "success" | "warning" | "danger" | "info" => {
+    if (score >= 90) return "success";
+    if (score >= 70) return "info";
+    if (score >= 50) return "warning";
+    return "danger";
+  };
+
   const metricsConfig = [
     {
       title: "Budget Adherence",
@@ -51,9 +61,12 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ performanceMetrics }) => {
         <MetricCard
           key={metric.title}
           title={metric.title}
-          score={metric.score}
-          iconName={metric.iconName}
-          description={metric.description}
+          value={metric.score}
+          icon={metric.iconName}
+          subtitle={metric.description}
+          variant={getVariantForScore(metric.score)}
+          format="custom"
+          customFormatter={(val) => `${val}/100`}
         />
       ))}
     </div>

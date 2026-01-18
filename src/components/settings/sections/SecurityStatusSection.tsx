@@ -1,5 +1,5 @@
 import React from "react";
-import { getIcon } from "../../../utils/icons";
+import { getIcon } from "@/utils/ui/icons";
 import type { SecuritySettings, SecurityEvent } from "@/services/security/securityService";
 
 interface SecurityStatusSectionProps {

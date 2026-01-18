@@ -52,7 +52,7 @@ const SERIES_BY_TYPE: Record<ChartType, ChartSeriesItem[]> = {
 };
 
 interface TrendLineChartProps {
-  title?: string;
+  title?: ReactNode;
   subtitle?: ReactNode;
   data?: Array<Record<string, unknown>>;
   chartType?: ChartType | string;

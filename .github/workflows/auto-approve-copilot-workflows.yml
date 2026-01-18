@@ -22,6 +22,16 @@ jobs:
       github.actor == 'Copilot' || 
       contains(github.actor, 'copilot')
     steps:
+      - name: Debug Workflow Trigger
+        run: |
+          echo "🔍 Workflow Debug Information"
+          echo "Event: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR Author: ${{ github.event.pull_request.user.login }}"
+          echo "PR State: ${{ github.event.pull_request.state }}"
+
       - name: Auto-approve workflow runs for Copilot PRs
         uses: actions/github-script@v8
         with:

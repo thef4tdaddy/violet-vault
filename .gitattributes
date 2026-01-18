@@ -5,3 +5,4 @@
 # For local merges: always use theirs (develop) version
 # For GitHub UI: workflow automatically resolves conflicts
 docs/audits/audit-report.md merge=ours
+package.json merge=ours

@@ -1,5 +1,5 @@
 import React from "react";
-import { renderIcon } from "@/utils/icons";
+import { renderIcon } from "@/utils/ui/icons";
 import { useSyncStatus } from "./hooks/useSyncStatus";
 import { SyncingStatus } from "./status/SyncingStatus";
 import { SyncedStatus } from "./status/SyncedStatus";

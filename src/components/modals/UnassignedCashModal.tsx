@@ -6,13 +6,14 @@ import { getIcon } from "@/utils";
 import { useBudgetStore } from "@/stores/ui/uiStore";
 /* eslint-enable @typescript-eslint/ban-ts-comment */
 import useUnassignedCashDistribution, {
+  type DistributionPreviewItem,
+} from "@/hooks/budgeting/allocations/useUnassignedCashDistribution";
+import {
   type EnvelopeRecord,
   type BillRecord,
-  type DistributionPreviewItem,
-} from "@/hooks/budgeting/useUnassignedCashDistribution";
-import { ENVELOPE_TYPES } from "@/constants/categories";
+} from "@/hooks/budgeting/allocations/useUnassignedCashDistributionHelpers";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
@@ -246,7 +247,7 @@ const EnvelopeItem = memo(
     bills = [],
   }: EnvelopeItemProps) => {
     const newBalance = (envelope.currentBalance || 0) + distributionAmount;
-    const isBillEnvelope = envelope.envelopeType === ENVELOPE_TYPES.BILL;
+    const isBillEnvelope = envelope.type === "liability";
 
     return (
       <div className="bg-white border rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -255,10 +256,10 @@ const EnvelopeItem = memo(
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="flex items-center flex-1">
               <div
-                className="w-4 h-4 rounded-full mr-3 flex-shrink-0"
+                className="w-4 h-4 rounded-full mr-3 shrink-0"
                 style={{ backgroundColor: envelope.color }}
               />
-              <div className="flex-1 min-w-0">
+              <div className="shrink-0">
                 <h5 className="font-medium text-gray-900 text-sm truncate">{envelope.name}</h5>
                 <p className="text-xs text-gray-600 truncate">
                   Current: ${(envelope.currentBalance || 0).toFixed(2)}
@@ -304,17 +305,30 @@ const EnvelopeItem = memo(
   }
 );
 
-const UnassignedCashModal = () => {
+interface UnassignedCashModalProps {
+  isOpen?: boolean;
+  closeUnassignedCashModal?: () => void;
+  unassignedCash?: number;
+}
+
+const UnassignedCashModal = ({
+  isOpen: overrideIsOpen,
+  closeUnassignedCashModal: overrideClose,
+  unassignedCash: overrideUnassignedCash,
+}: UnassignedCashModalProps) => {
   /* eslint-disable @typescript-eslint/ban-ts-comment */
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
-  const isUnassignedCashModalOpen: boolean = useBudgetStore(
+  const storeIsOpen: boolean = useBudgetStore(
     (state: { isUnassignedCashModalOpen?: boolean }) => state.isUnassignedCashModalOpen
   );
   // @ts-ignore - TS7005: useBudgetStore lacks proper types (upstream issue in uiStore.ts)
-  const closeUnassignedCashModal: () => void = useBudgetStore(
+  const storeClose: () => void = useBudgetStore(
     (state: { closeUnassignedCashModal?: () => void }) => state.closeUnassignedCashModal
   );
   /* eslint-enable @typescript-eslint/ban-ts-comment */
+
+  const finalIsOpen = overrideIsOpen !== undefined ? overrideIsOpen : storeIsOpen;
+  const finalClose = overrideClose !== undefined ? overrideClose : storeClose;
   const {
     distributions,
     isProcessing,
@@ -333,23 +347,26 @@ const UnassignedCashModal = () => {
     getDistributionPreview,
   } = useUnassignedCashDistribution();
 
-  const modalRef = useModalAutoScroll(isUnassignedCashModalOpen);
+  const finalUnassignedCash =
+    overrideUnassignedCash !== undefined ? overrideUnassignedCash : unassignedCash;
 
-  if (!isUnassignedCashModalOpen) return null;
+  const modalRef = useModalAutoScroll(finalIsOpen);
+
+  if (!finalIsOpen) return null;
 
   const distributionEnvelopes = Array.isArray(envelopes) ? envelopes : [];
   const typedBills = Array.isArray(bills) ? (bills as BillRecord[]) : [];
 
   const preview = getDistributionPreview();
   const hasDistributions = Number(totalDistributed) > 0;
-  const isOverDistributed = Number(totalDistributed) > Number(unassignedCash);
+  const isOverDistributed = Number(totalDistributed) > Number(finalUnassignedCash);
 
   return (
     <UnassignedCashModalContent
       modalRef={modalRef}
-      unassignedCash={Number(unassignedCash)}
+      unassignedCash={Number(finalUnassignedCash)}
       isProcessing={isProcessing}
-      closeUnassignedCashModal={closeUnassignedCashModal}
+      closeUnassignedCashModal={finalClose}
       totalDistributed={Number(totalDistributed)}
       remainingCash={Number(remainingCash)}
       isOverDistributed={isOverDistributed}

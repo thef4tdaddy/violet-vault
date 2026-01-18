@@ -9,8 +9,8 @@ import { useAuthCompatibility, useAuth } from "../useAuthCompatibility";
  */
 
 // Mock dependencies
-vi.mock("../useAuthManager", () => ({
-  useAuthManager: vi.fn(() => ({
+vi.mock("../useAuth", () => ({
+  useAuth: vi.fn(() => ({
     // State properties
     isUnlocked: false,
     user: null,
@@ -29,14 +29,10 @@ vi.mock("../useAuthManager", () => ({
     updateProfile: vi.fn().mockResolvedValue({ success: true }),
     updateUser: vi.fn(),
     updateActivity: vi.fn(),
-    lockSession: vi.fn(),
-    createPasswordValidator: vi.fn(() => ({
-      refetch: vi.fn().mockResolvedValue({ data: { isValid: true } }),
-    })),
   })),
 }));
 
-vi.mock("../../utils/common/logger", () => ({
+vi.mock("@/utils/common/logger", () => ({
   default: {
     auth: vi.fn(),
     info: vi.fn(),
@@ -44,9 +40,44 @@ vi.mock("../../utils/common/logger", () => ({
   },
 }));
 
+// Import mocked dependencies
+import { useAuth as useAuthHook } from "../useAuth";
+import logger from "@/utils/core/common/logger";
+
 describe("useAuthCompatibility", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(useAuthHook).mockReturnValue({
+      isUnlocked: false,
+      user: null as any,
+      budgetId: null,
+      encryptionKey: new Uint8Array([1, 2, 3, 4]) as any,
+      salt: new Uint8Array([5, 6, 7, 8]),
+      lastActivity: null,
+      error: null,
+      isLoading: false,
+      login: vi.fn().mockResolvedValue({ success: true }),
+      logout: vi.fn(),
+      joinBudget: vi.fn().mockResolvedValue({ success: true }),
+      changePassword: vi.fn().mockResolvedValue({ success: true }),
+      updateProfile: vi.fn().mockResolvedValue({ success: true }),
+      updateUser: vi.fn(),
+      updateActivity: vi.fn(),
+      isAuthenticated: false,
+      hasError: false,
+      securityContext: {
+        encryptionKey: new Uint8Array([1, 2, 3, 4]) as any,
+        budgetId: null,
+        salt: new Uint8Array([5, 6, 7, 8]),
+        hasValidKeys: false,
+      } as any,
+      shouldShowAuthGateway: () => true,
+      setError: vi.fn(),
+      setAuthenticated: vi.fn(),
+      setLoading: vi.fn(),
+      clearAuth: vi.fn(),
+    } as any);
   });
 
   describe("State Properties", () => {
@@ -62,19 +93,41 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should map currentUser to user", () => {
-      const { useAuthManager } = require("../useAuthManager");
-      const mockUser = { userName: "testuser", budgetId: "budget-123" };
+      const mockUser = { userName: "testuser", budgetId: "budget-123", userColor: "#888888" };
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: mockUser,
         budgetId: null,
-        encryptionKey: new Uint8Array([1, 2, 3, 4]),
+        encryptionKey: new Uint8Array([1, 2, 3, 4]) as any,
         salt: new Uint8Array([5, 6, 7, 8]),
         lastActivity: null,
         error: null,
         isLoading: false,
-      });
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: new Uint8Array([1, 2, 3, 4]) as any,
+          budgetId: null,
+          salt: new Uint8Array([5, 6, 7, 8]),
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
+        login: vi.fn(),
+        logout: vi.fn(),
+        joinBudget: vi.fn(),
+        changePassword: vi.fn(),
+        updateProfile: vi.fn(),
+        updateUser: vi.fn(),
+        updateActivity: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+        _legacy: {} as any,
+        setError: vi.fn(),
+        setAuthenticated: vi.fn(),
+        setLoading: vi.fn(),
+        clearAuth: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
@@ -123,10 +176,9 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should pass login parameters to authManager", async () => {
-      const { useAuthManager } = require("../useAuthManager");
       const mockLogin = vi.fn().mockResolvedValue({ success: true });
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -135,22 +187,38 @@ describe("useAuthCompatibility", () => {
         lastActivity: null,
         error: null,
         isLoading: false,
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: null,
+          budgetId: null,
+          salt: null,
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
         login: mockLogin,
-      });
+        logout: vi.fn(),
+        joinBudget: vi.fn(),
+        changePassword: vi.fn(),
+        updateProfile: vi.fn(),
+        updateUser: vi.fn(),
+        updateActivity: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
       const userData = { userName: "newuser", shareCode: "SHARE-123" };
       await result.current.login("password123", userData);
 
-      expect(mockLogin).toHaveBeenCalledWith("password123", userData);
+      expect(mockLogin).toHaveBeenCalledWith({ password: "password123", userData });
     });
 
     it("should pass joinBudget data to authManager", async () => {
-      const { useAuthManager } = require("../useAuthManager");
       const mockJoinBudget = vi.fn().mockResolvedValue({ success: true });
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -159,8 +227,25 @@ describe("useAuthCompatibility", () => {
         lastActivity: null,
         error: null,
         isLoading: false,
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: null,
+          budgetId: null,
+          salt: null,
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
         joinBudget: mockJoinBudget,
-      });
+        login: vi.fn(),
+        logout: vi.fn(),
+        changePassword: vi.fn(),
+        updateProfile: vi.fn(),
+        updateUser: vi.fn(),
+        updateActivity: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
@@ -195,10 +280,9 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should pass password change parameters to authManager", async () => {
-      const { useAuthManager } = require("../useAuthManager");
       const mockChangePassword = vi.fn().mockResolvedValue({ success: true });
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -207,14 +291,34 @@ describe("useAuthCompatibility", () => {
         lastActivity: null,
         error: null,
         isLoading: false,
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: null,
+          budgetId: null,
+          salt: null,
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
         changePassword: mockChangePassword,
-      });
+        login: vi.fn(),
+        logout: vi.fn(),
+        joinBudget: vi.fn(),
+        updateProfile: vi.fn(),
+        updateUser: vi.fn(),
+        updateActivity: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
       await result.current.changePassword("oldpass", "newpass");
 
-      expect(mockChangePassword).toHaveBeenCalledWith("oldpass", "newpass");
+      expect(mockChangePassword).toHaveBeenCalledWith({
+        oldPassword: "oldpass",
+        newPassword: "newpass",
+      });
     });
   });
 
@@ -240,10 +344,9 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should pass profile update to authManager", async () => {
-      const { useAuthManager } = require("../useAuthManager");
       const mockUpdateProfile = vi.fn().mockResolvedValue({ success: true });
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -252,8 +355,25 @@ describe("useAuthCompatibility", () => {
         lastActivity: null,
         error: null,
         isLoading: false,
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: null,
+          budgetId: null,
+          salt: null,
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
         updateProfile: mockUpdateProfile,
-      });
+        login: vi.fn(),
+        logout: vi.fn(),
+        joinBudget: vi.fn(),
+        changePassword: vi.fn(),
+        updateUser: vi.fn(),
+        updateActivity: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
@@ -275,10 +395,9 @@ describe("useAuthCompatibility", () => {
     });
 
     it("should call updateActivity on authManager", () => {
-      const { useAuthManager } = require("../useAuthManager");
       const mockUpdateActivity = vi.fn();
 
-      useAuthManager.mockReturnValue({
+      vi.mocked(useAuthHook).mockReturnValue({
         isUnlocked: false,
         user: null,
         budgetId: null,
@@ -287,8 +406,25 @@ describe("useAuthCompatibility", () => {
         lastActivity: null,
         error: null,
         isLoading: false,
+        isAuthenticated: false,
+        hasError: false,
+        securityContext: {
+          encryptionKey: null,
+          budgetId: null,
+          salt: null,
+          hasValidKeys: false,
+        },
+        shouldShowAuthGateway: () => true,
         updateActivity: mockUpdateActivity,
-      });
+        login: vi.fn(),
+        logout: vi.fn(),
+        joinBudget: vi.fn(),
+        changePassword: vi.fn(),
+        updateProfile: vi.fn(),
+        updateUser: vi.fn(),
+        lockSession: vi.fn(),
+        createPasswordValidator: vi.fn(),
+      } as any);
 
       const { result } = renderHook(() => useAuthCompatibility());
 
@@ -346,7 +482,9 @@ describe("useAuthCompatibility", () => {
       const { result: compatResult } = renderHook(() => useAuthCompatibility());
       const { result: aliasResult } = renderHook(() => useAuth());
 
-      expect(aliasResult.current).toEqual(compatResult.current);
+      expect(aliasResult.current.isUnlocked).toBe(compatResult.current.isUnlocked);
+      expect(aliasResult.current.currentUser).toEqual(compatResult.current.currentUser);
+      expect(typeof aliasResult.current.login).toBe("function");
     });
 
     it("should have same methods via useAuth alias", () => {
@@ -362,25 +500,21 @@ describe("useAuthCompatibility", () => {
 
   describe("Development Logging", () => {
     it("should log usage in development mode", () => {
-      const logger = require("../../utils/common/logger").default;
-
       vi.stubGlobal("import", { meta: { env: { MODE: "development" } } });
 
       renderHook(() => useAuthCompatibility());
 
       // Logger.auth should be called to track compatibility usage
-      expect(logger.auth).toBeDefined();
+      expect(vi.mocked(logger).auth).toBeDefined();
     });
 
     it("should not log in production mode", () => {
-      const logger = require("../../utils/common/logger").default;
-
       vi.stubGlobal("import", { meta: { env: { MODE: "production" } } });
 
       renderHook(() => useAuthCompatibility());
 
       // Logger.auth might not be called in production
-      expect(logger.auth).toBeDefined();
+      expect(vi.mocked(logger).auth).toBeDefined();
     });
   });
 

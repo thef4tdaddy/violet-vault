@@ -3,7 +3,7 @@ import {
   useTouchFeedback,
   type HapticFeedbackType,
   type TouchFeedbackType,
-} from "@/utils/ui/touchFeedback";
+} from "@/utils/ui/feedback/touchFeedback";
 
 interface TouchButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;

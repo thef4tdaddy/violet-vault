@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/common/useChartConfig";
+import { useChartConfig } from "../../hooks/platform/ux/useChartConfig";
 
 // Chart datum type
 type ChartDatum = Record<string, unknown>;
@@ -86,7 +86,7 @@ const ComposedFinancialChart = ({
   xAxisKey = "month",
   ...props
 }: {
-  title?: string;
+  title?: React.ReactNode;
   subtitle?: React.ReactNode;
   data?: ChartDatum[];
   series?: SeriesItem[];
@@ -233,7 +233,7 @@ export const CashFlowChart = ({
   ...props
 }: {
   data: ChartDatum[];
-  title?: string;
+  title?: React.ReactNode;
   [key: string]: unknown;
 }) => {
   const series = [
@@ -269,7 +269,7 @@ export const BudgetVsActualChart = ({
   ...props
 }: {
   data: ChartDatum[];
-  title?: string;
+  title?: React.ReactNode;
   _orientation?: string;
   [key: string]: unknown;
 }) => {

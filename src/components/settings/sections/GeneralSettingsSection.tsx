@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
 import useUiStore, { type UiStore } from "../../../stores/ui/uiStore";
-import pwaManager from "../../../utils/pwa/pwaManager";
-import logger from "../../../utils/common/logger";
+import pwaManager from "@/utils/platform/pwa/pwaManager";
+import logger from "@/utils/core/common/logger";
 
 interface PwaStatus {
   isInstalled: boolean;

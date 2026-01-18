@@ -7,12 +7,16 @@ import React from "react";
 
 // Base user data structure
 export interface UserData {
+  id?: string;
+  email?: string;
   userName: string;
   userColor: string;
   budgetId?: string;
   shareCode?: string;
   sharedBy?: string;
+  joinedVia?: "shareCode" | "link" | "standard" | null;
   password?: string;
+  [key: string]: unknown;
 }
 
 // Authentication state interface

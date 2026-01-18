@@ -1,10 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "../../../utils";
-import type { ExecutionHistoryEntry } from "@/hooks/budgeting/autofunding/types";
+import type { ExecutionRecord } from "@/db/types";
 
 interface HistoryTabProps {
-  executionHistory: ExecutionHistoryEntry[];
+  executionHistory: ExecutionRecord[];
   showExecutionDetails: string | null;
   onToggleDetails: (id: string | null) => void;
 }
@@ -67,7 +67,9 @@ const HistoryTab: React.FC<HistoryTabProps> = ({
                         {React.createElement(getIcon("Calendar"), {
                           className: "h-3 w-3",
                         })}
-                        {new Date(execution.executedAt || execution.timestamp).toLocaleString()}
+                        {new Date(
+                          (execution.executedAt || execution.timestamp) as string
+                        ).toLocaleString()}
                       </span>
                       {(execution.success as boolean | undefined) !== false && (
                         <>

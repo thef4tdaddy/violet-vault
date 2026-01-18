@@ -3,8 +3,8 @@ import { Button } from "@/components/ui";
 import { getIcon } from "../../utils";
 import ReceiptScanner from "./ReceiptScanner";
 import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
-import { preloadOCR } from "../../utils/common/ocrProcessor";
-import logger from "../../utils/common/logger";
+import { preloadOCR } from "@/utils/core/common/ocrProcessor";
+import logger from "@/utils/core/common/logger";
 
 interface ProcessedReceipt {
   id?: string;

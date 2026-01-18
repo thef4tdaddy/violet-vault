@@ -1,224 +1,48 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui";
-import { useConfirm } from "@/hooks/common/useConfirm";
 import { getIcon } from "@/utils";
-import { useSecurityManager } from "@/hooks/auth/useSecurityManager";
-import { useAuthManager } from "@/hooks/auth/useAuthManager";
-import { usePasswordValidation } from "@/hooks/auth/queries/usePasswordValidation";
+import { useAuth } from "@/hooks/auth/useAuth";
 import shieldLogo from "@/assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 const LockScreen = () => {
-  const { isLocked, unlockSession, securityEvents } = useSecurityManager();
-  const { logout } = useAuthManager();
-  const confirm = useConfirm();
+  const auth = useAuth();
+  const { isLocked, securityEvents, logout } = auth;
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [error, setError] = useState("");
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [pendingConfirm, setPendingConfirm] = useState<{ cancel: () => void } | null>(null);
-  const [passwordToValidate, setPasswordToValidate] = useState("");
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
-  type ValidationResult =
-    | { isValid: boolean; reason?: string; isCorrupted?: boolean }
-    | { isValid: boolean; reason: string; error: unknown };
+  const [now, setNow] = useState(() => Date.now());
 
-  const processedValidationRef = useRef<ValidationResult | null>(null);
-
-  // Password validation query
-  const { data: validationResult, isLoading: isValidating } = usePasswordValidation(
-    passwordToValidate,
-    {
-      enabled: !!passwordToValidate,
-    }
-  );
-
-  // Memoize handleIncorrectPassword callback first, before any useEffect that references it
-  // This prevents temporal dead zone issues with the dependency array
-  const handleIncorrectPassword = useCallback(async () => {
-    setIsUnlocking(false);
-    setError("Invalid password");
-    setFailedAttempts((prev) => prev + 1);
-    setPassword("");
-    setPasswordToValidate("");
-
-    // Enhanced error message for wrong password
-    const confirmPromise = new Promise((resolve) => {
-      const originalConfirm = confirm({
-        title: "Incorrect Password",
-        message:
-          "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
-        confirmLabel: "Start New Budget",
-        cancelLabel: "Try Again",
-        destructive: true,
-      });
-
-      originalConfirm.then(resolve).catch(() => resolve(false));
-
-      // Store cancellation function
-      setPendingConfirm({
-        cancel: () => {
-          resolve(false); // Resolve as cancelled
-        },
-      });
-    });
-
-    let shouldCreateNew;
-    try {
-      shouldCreateNew = await confirmPromise;
-    } finally {
-      setPendingConfirm(null);
-    }
-
-    if (shouldCreateNew) {
-      // User wants to create new budget - logout and clear data
-      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed during session reset/logout
-      localStorage.removeItem("envelopeBudgetData");
-      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed during session reset/logout
-      localStorage.removeItem("userProfile");
-      logout();
-      window.location.reload();
-      return;
-    }
-  }, [confirm, logout]);
-
-  // Handle corrupted data
-  const handleCorruptedData = useCallback(async () => {
-    setIsUnlocking(false);
-    setPasswordToValidate("");
-    setPassword("");
-
-    logger.warn("Validation corruption detected during unlock", {
-      location: "LockScreen",
-      bufferedLogCount: logger.getBufferedLogCount(),
-    });
-
-    const downloadLogsSection =
-      (import.meta.env.DEV || logger.getBufferedLogCount() > 0) && typeof window !== "undefined" ? (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-left text-sm text-red-700">
-          <p className="font-medium">Need to share a debug log?</p>
-          <p className="mt-1">
-            Download the recent console buffer and attach it to your bug report. Contains the latest{" "}
-            {logger.getBufferedLogCount()} entries.
-          </p>
-          <Button
-            type="button"
-            className="mt-3 inline-flex items-center rounded-md border border-red-500 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
-            onClick={() => logger.downloadBufferedLogs("violet-vault-validation-debug-log.txt")}
-          >
-            Download console log
-          </Button>
-        </div>
-      ) : null;
-
-    const confirmPromise = new Promise((resolve) => {
-      const originalConfirm = confirm({
-        title: "🔧 Corrupted Validation Data Detected",
-        message:
-          "The encrypted validation data in your browser is corrupted (OperationError).\n\nYour cloud data is safe, but local validation is failing.\n\nClear corrupted data and sync fresh from cloud?",
-        confirmLabel: "Clear & Sync Fresh",
-        cancelLabel: "Cancel",
-        destructive: false,
-        children: downloadLogsSection ?? undefined,
-      });
-
-      originalConfirm.then(resolve).catch(() => resolve(false));
-
-      setPendingConfirm({
-        cancel: () => {
-          resolve(false);
-        },
-      });
-    });
-
-    let shouldClear;
-    try {
-      shouldClear = await confirmPromise;
-    } finally {
-      setPendingConfirm(null);
-    }
-
-    if (shouldClear) {
-      // Clear corrupted local data - cloud data is safe
-      // eslint-disable-next-line no-restricted-syntax -- Direct localStorage clear needed to fix corrupted validation data
-      localStorage.removeItem("envelopeBudgetData");
-
-      // Reload to sync fresh from cloud
-      window.location.reload();
-    }
-  }, [confirm]);
-
-  // Handle validation results
   useEffect(() => {
-    if (passwordToValidate && validationResult !== undefined && !isValidating) {
-      // Prevent processing the same validation result multiple times
-      if (processedValidationRef.current === validationResult) {
-        return;
-      }
-      processedValidationRef.current = validationResult;
+    if (!isLocked) return;
 
-      if ((validationResult as { isValid?: boolean })?.isValid) {
-        // Password is correct, unlock the session
-        if (pendingConfirm) {
-          pendingConfirm.cancel();
-          setPendingConfirm(null);
-        }
-        unlockSession();
-        setPassword("");
-        setPasswordToValidate("");
-        setFailedAttempts(0);
-        setError("");
-        setIsUnlocking(false);
-      } else if ((validationResult as { isCorrupted?: boolean })?.isCorrupted) {
-        // Corrupted validation data detected
-        handleCorruptedData();
-      } else {
-        // Password is incorrect
-        handleIncorrectPassword();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pendingConfirm intentionally excluded to prevent infinite loop from state updates
-  }, [
-    validationResult,
-    isValidating,
-    passwordToValidate,
-    unlockSession,
-    handleIncorrectPassword,
-    handleCorruptedData,
-  ]);
-
-  // Count recent failed attempts from security events
-  useEffect(() => {
-    if (isLocked) {
-      const recentFailures = securityEvents.filter(
-        (event) =>
-          event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
-      ).length;
-      setFailedAttempts(recentFailures);
-    }
-  }, [isLocked, securityEvents]);
-
-  // Focus password input when locked
-  useEffect(() => {
-    if (isLocked && passwordInputRef.current) {
-      const timer = setTimeout(() => {
-        passwordInputRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 30000); // Update every 30 seconds
+    return () => clearInterval(timer);
   }, [isLocked]);
 
-  // Clear error when user starts typing
-  useEffect(() => {
-    if (password && error) {
-      setError("");
-    }
-  }, [password, error]);
+  const failedAttempts = useMemo(() => {
+    if (!isLocked) return 0;
+    return securityEvents.filter(
+      (event) =>
+        event.type === "FAILED_UNLOCK" && now - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
+    ).length;
+  }, [isLocked, securityEvents, now]);
 
+  const handleCorruptedData = () => {
+    setError("Corrupted data detected. Please reset your local data.");
+  };
+
+  const handleIncorrectPassword = () => {
+    setError("Incorrect password. Please try again.");
+  };
+
+  // Handle validation results
   const handleUnlock = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -230,8 +54,22 @@ const LockScreen = () => {
     setIsUnlocking(true);
     setError("");
 
-    // Trigger password validation
-    setPasswordToValidate(password);
+    try {
+      const result = await auth.login({ password });
+
+      if (result.success) {
+        // Password is correct, unlock the session
+      } else if (result.code === "CORRUPTED") {
+        handleCorruptedData();
+      } else {
+        handleIncorrectPassword();
+      }
+      setIsUnlocking(false);
+    } catch (err) {
+      logger.error("Unlock failed", err);
+      setError("An unexpected error occurred");
+      setIsUnlocking(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -240,10 +78,20 @@ const LockScreen = () => {
     }
   };
 
+  // Focus password input when locked
+  useEffect(() => {
+    if (isLocked && passwordInputRef.current) {
+      const timer = setTimeout(() => {
+        passwordInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLocked]);
+
   if (!isLocked) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-[9999]">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-9999">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -305,7 +153,10 @@ const LockScreen = () => {
                     ref={passwordInputRef}
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError("");
+                    }}
                     onKeyPress={handleKeyPress}
                     disabled={isUnlocking}
                     placeholder="Enter your password"
@@ -360,7 +211,8 @@ const LockScreen = () => {
                 </Button>
 
                 <Button
-                  onClick={logout}
+                  type="button"
+                  onClick={() => logout()}
                   className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
                 >
                   {React.createElement(getIcon("UserX"), {

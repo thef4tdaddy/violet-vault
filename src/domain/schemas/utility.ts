@@ -26,6 +26,7 @@ export const BulkUpdateTypeSchema = z.enum([
   "bill",
   "savingsGoal",
   "paycheck",
+  "autoFundingRule",
 ]);
 export type BulkUpdateType = z.infer<typeof BulkUpdateTypeSchema>;
 

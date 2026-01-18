@@ -1,7 +1,7 @@
 import React, { createElement } from "react";
 import { Button } from "@/components/ui";
 import { getIcon } from "@/utils";
-import { useDebtManagement } from "@/hooks/debts/useDebtManagement";
+import { useDebtManagement } from "@/hooks/budgeting/envelopes/liabilities/useDebtManagement";
 
 /**
  * Small debt summary widget for dashboard

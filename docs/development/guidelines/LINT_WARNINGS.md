@@ -263,7 +263,7 @@ The project includes an automated lint warning tracker that:
 #### Workflow Details
 
 - **Workflow:** `.github/workflows/lint-warnings-tracker.yml`
-- **Parser Script:** `scripts/parse-eslint-warnings.js`
+
 - **Data File:** `.github/data/lint-warnings.json` (auto-updated)
 - **Threshold:** 20% increase limit (currently suspended due to refactoring)
 - **Actions:** Blocks PRs exceeding threshold, comments on all PRs with analysis

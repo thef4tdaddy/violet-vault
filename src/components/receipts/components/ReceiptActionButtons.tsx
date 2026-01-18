@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { hasMinimumExtractedData } from "@/utils/receipts/receiptHelpers";
+import { hasMinimumExtractedData } from "@/utils/features/receipts/receiptHelpers";
 
 interface ExtractedData {
   merchant?: string | null;

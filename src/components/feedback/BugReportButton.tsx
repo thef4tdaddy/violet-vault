@@ -6,7 +6,7 @@ import { StepOne } from "./steps/StepOne";
 import { StepTwo } from "./steps/StepTwo";
 import { StepThree } from "./steps/StepThree";
 import { StepFour } from "./steps/StepFour";
-import { useModalAutoScroll } from "@/hooks/ui/useModalAutoScroll";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**
