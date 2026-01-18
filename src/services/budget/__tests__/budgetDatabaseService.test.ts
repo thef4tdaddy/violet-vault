@@ -166,18 +166,6 @@ describe("BudgetDatabaseService", () => {
     isScheduled: false,
   };
 
-  const mockIncomeTransaction: Transaction = {
-    id: "txn-2",
-    date: new Date("2024-01-01"),
-    amount: 1000.0,
-    envelopeId: "env-2",
-    category: "Income",
-    type: "income",
-    lastModified: Date.now(),
-    description: "Paycheck",
-    isScheduled: false,
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
