@@ -492,13 +492,9 @@ describe("BackgroundSyncManager", () => {
 
       // Sync was attempted during queueOperation
       const status = backgroundSyncManager.getSyncStatus();
-      if (status.pendingCount > 0) {
-        expect(status.waitingForRetry).toBeGreaterThan(0);
-        expect(status.pendingOperations[0].timeUntilRetry).toBeGreaterThan(0);
-      } else {
-        // If operations were somehow cleared, skip this test
-        expect(status.pendingCount).toBeGreaterThan(0);
-      }
+      expect(status.pendingCount).toBeGreaterThan(0);
+      expect(status.waitingForRetry).toBeGreaterThan(0);
+      expect(status.pendingOperations[0].timeUntilRetry).toBeGreaterThan(0);
     });
   });
 
