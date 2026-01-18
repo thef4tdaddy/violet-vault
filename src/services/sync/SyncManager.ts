@@ -1,18 +1,18 @@
 /**
  * SyncManager - Unified "One-Box" Sync Management Service
- * 
+ *
  * Consolidates SyncQueue, SyncMutex, and masterSyncValidator into a cohesive
  * internal API to simplify sync flow and reduce individual service calls.
- * 
+ *
  * Part of GitHub Issue #1463 - v2.0 Architecture Refactoring
  * Addresses: Service Layer: Sync Orchestration Consolidation
- * 
+ *
  * Internal Components:
  * - SyncQueue: Debouncing and batching
  * - SyncMutex: Concurrency control
  * - Health Monitor: Status tracking
  * - Validator: Diagnostics and validation
- * 
+ *
  * Public API:
  * - executeSync(): Queue and execute sync with mutex protection
  * - checkHealth(): Quick health status check
@@ -24,9 +24,9 @@
 import { SyncQueue } from "@/utils/features/sync/SyncQueue";
 import { SyncMutex } from "@/utils/features/sync/SyncMutex";
 import { syncHealthMonitor } from "@/utils/features/sync/syncHealthMonitor";
-import { 
-  getQuickSyncStatus, 
-  runMasterSyncValidation 
+import {
+  getQuickSyncStatus,
+  runMasterSyncValidation,
 } from "@/utils/features/sync/masterSyncValidator";
 import logger from "@/utils/core/common/logger";
 
@@ -44,6 +44,7 @@ export interface HealthCheckResult {
     details?: string;
     error?: string;
   }>;
+  [key: string]: unknown;
 }
 
 /**
@@ -170,14 +171,11 @@ export class SyncManager {
     }
 
     // Otherwise, queue the operation with debouncing
-    const result = await this.queue.enqueue(
-      operationType,
-      async () => {
-        // Execute with mutex protection
-        return await this.executeWithMutex(operation, operationType, timeout);
-      }
-    );
-    
+    const result = await this.queue.enqueue(operationType, async () => {
+      // Execute with mutex protection
+      return await this.executeWithMutex(operation, operationType, timeout);
+    });
+
     // Type assertion is safe here because we control the operation's return type
     // The queue returns unknown for flexibility, but our operation returns T
     return result as T;
@@ -206,7 +204,7 @@ export class SyncManager {
    */
   public async checkHealth(): Promise<HealthCheckResult> {
     logger.debug("🎯 SyncManager: Checking sync health");
-    
+
     try {
       const health = await getQuickSyncStatus();
       return health;
@@ -233,7 +231,7 @@ export class SyncManager {
    */
   public async validateSync(): Promise<ValidationResult> {
     logger.info("🎯 SyncManager: Running full sync validation");
-    
+
     try {
       const results = await runMasterSyncValidation();
       return results;

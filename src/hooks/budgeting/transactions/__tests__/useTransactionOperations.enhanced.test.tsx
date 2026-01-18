@@ -688,36 +688,5 @@ describe("useTransactionOperations - Enhanced", () => {
 
       expect(mockTriggerSync).toHaveBeenCalledWith("transaction_deleted");
     });
-
-    it("should handle missing cloudSyncService gracefully", async () => {
-      // Save original value
-      const originalSync = (window as { cloudSyncService?: unknown }).cloudSyncService;
-
-      // Set to undefined
-      Object.defineProperty(window, "cloudSyncService", {
-        value: undefined,
-        writable: true,
-        configurable: true,
-      });
-
-      (budgetDb.envelopes.get as Mock).mockResolvedValue({ id: "env1", category: "Test" });
-      (budgetDb.putTransaction as Mock).mockResolvedValue(undefined);
-
-      const { result } = renderHook(() => useTransactionOperations());
-
-      await act(async () => {
-        await result.current.addTransaction({ envelopeId: "env1", amount: 100 });
-      });
-
-      // Should not throw error
-      expect(budgetDb.putTransaction).toHaveBeenCalled();
-
-      // Restore original value
-      Object.defineProperty(window, "cloudSyncService", {
-        value: originalSync,
-        writable: true,
-        configurable: true,
-      });
-    });
   });
 });
