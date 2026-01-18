@@ -173,7 +173,7 @@ export class SyncManager {
     }
 
     // Otherwise, queue the operation with debouncing
-    return await this.queue.enqueue(
+    const result = await this.queue.enqueue(
       operationType,
       async () => {
         // Execute with mutex protection
@@ -181,7 +181,11 @@ export class SyncManager {
           return await operation();
         }, operationType);
       }
-    ) as T;
+    );
+    
+    // Type assertion is safe here because we control the operation's return type
+    // The queue returns unknown for flexibility, but our operation returns T
+    return result as T;
   }
 
   /**

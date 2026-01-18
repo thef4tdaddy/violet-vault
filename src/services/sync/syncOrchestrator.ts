@@ -125,7 +125,7 @@ export class SyncOrchestrator {
     // Stop offline queue processing
     offlineRequestQueueService.stopProcessingInterval();
 
-    // Clear sync manager state
+    // Clear sync manager queue
     syncManager.clearQueue();
 
     logger.production("SyncOrchestrator: Stopped");
@@ -141,13 +141,21 @@ export class SyncOrchestrator {
     logger.debug(`SyncOrchestrator: Scheduling sync with priority: ${priority}`);
     
     // Use SyncManager to handle queueing and debouncing
-    void syncManager.executeSync(
-      async () => {
-        return await this.performSync();
-      },
-      "scheduled-sync",
-      { priority, skipQueue: priority === "high" }
-    );
+    // Fire-and-forget pattern - errors are logged within syncManager
+    syncManager
+      .executeSync(
+        async () => {
+          return await this.performSync();
+        },
+        "scheduled-sync",
+        { priority, skipQueue: priority === "high" }
+      )
+      .catch((error) => {
+        logger.error("SyncOrchestrator: Scheduled sync failed", {
+          error: error instanceof Error ? error.message : String(error),
+          priority,
+        });
+      });
   }
 
   /**

@@ -145,7 +145,7 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
         ...prev,
         isHealthy: false,
         status: "ERROR",
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
         isLoading: false,
       }));
     }
