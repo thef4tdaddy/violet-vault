@@ -260,7 +260,8 @@ func createGitHubIssue(title, body string, labels []string, token string) (int, 
 
 	if resp.StatusCode != http.StatusCreated {
 		bodyBytes, _ := io.ReadAll(resp.Body)
-		_ = bodyBytes // body is intentionally not exposed in the error to avoid leaking GitHub API details
+		// Log the error body from GitHub for easier debugging on the server-side.
+		log.Printf("GitHub API error: status %d, body: %s", resp.StatusCode, string(bodyBytes))
 		return 0, "", fmt.Errorf("failed to create GitHub issue: unexpected status %d", resp.StatusCode)
 	}
 
