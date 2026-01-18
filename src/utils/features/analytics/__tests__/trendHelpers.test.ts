@@ -6,6 +6,10 @@ import {
   getCategoryChartColor,
   currencyTooltipFormatter,
   velocityTooltipFormatter,
+  getTrendIcon,
+  getTrendColor,
+  getHealthColor,
+  getHealthLabel,
 } from "../trendHelpers";
 
 describe("trendHelpers", () => {
@@ -125,6 +129,86 @@ describe("trendHelpers", () => {
       const [value, name] = velocityTooltipFormatter(1234, "change");
       expect(value).toBe("$1,234");
       expect(name).toBe("Amount Change");
+    });
+  });
+
+  describe("getTrendIcon", () => {
+    it("should return emoji for increasing trend", () => {
+      expect(getTrendIcon("increasing")).toBe("📈");
+    });
+
+    it("should return emoji for decreasing trend", () => {
+      expect(getTrendIcon("decreasing")).toBe("📉");
+    });
+
+    it("should return emoji for stable trend", () => {
+      expect(getTrendIcon("stable")).toBe("➡️");
+    });
+
+    it("should return default for unknown trend", () => {
+      expect(getTrendIcon("unknown")).toBe("➡️");
+    });
+  });
+
+  describe("getTrendColor", () => {
+    it("should return red for increasing trend", () => {
+      expect(getTrendColor("increasing")).toBe("text-red-600");
+    });
+
+    it("should return green for decreasing trend", () => {
+      expect(getTrendColor("decreasing")).toBe("text-green-600");
+    });
+
+    it("should return gray for stable trend", () => {
+      expect(getTrendColor("stable")).toBe("text-gray-600");
+    });
+
+    it("should return default for unknown trend", () => {
+      expect(getTrendColor("unknown")).toBe("text-gray-600");
+    });
+  });
+
+  describe("getHealthColor", () => {
+    it("should return green for excellent health (>= 80)", () => {
+      expect(getHealthColor(80)).toBe("bg-green-500");
+      expect(getHealthColor(100)).toBe("bg-green-500");
+    });
+
+    it("should return yellow for good health (>= 60)", () => {
+      expect(getHealthColor(60)).toBe("bg-yellow-500");
+      expect(getHealthColor(75)).toBe("bg-yellow-500");
+    });
+
+    it("should return orange for fair health (>= 40)", () => {
+      expect(getHealthColor(40)).toBe("bg-orange-500");
+      expect(getHealthColor(55)).toBe("bg-orange-500");
+    });
+
+    it("should return red for poor health (< 40)", () => {
+      expect(getHealthColor(0)).toBe("bg-red-500");
+      expect(getHealthColor(39)).toBe("bg-red-500");
+    });
+  });
+
+  describe("getHealthLabel", () => {
+    it("should return Excellent for score >= 80", () => {
+      expect(getHealthLabel(80)).toBe("Excellent");
+      expect(getHealthLabel(100)).toBe("Excellent");
+    });
+
+    it("should return Good for score >= 60", () => {
+      expect(getHealthLabel(60)).toBe("Good");
+      expect(getHealthLabel(75)).toBe("Good");
+    });
+
+    it("should return Fair for score >= 40", () => {
+      expect(getHealthLabel(40)).toBe("Fair");
+      expect(getHealthLabel(55)).toBe("Fair");
+    });
+
+    it("should return Needs Attention for score < 40", () => {
+      expect(getHealthLabel(0)).toBe("Needs Attention");
+      expect(getHealthLabel(39)).toBe("Needs Attention");
     });
   });
 });

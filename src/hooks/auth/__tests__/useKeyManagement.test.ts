@@ -160,6 +160,80 @@ describe("useKeyManagement", () => {
     });
   });
 
+  describe("copyKeyToClipboard", () => {
+    it("should copy key to clipboard successfully", async () => {
+      (keyExportUtils.exportKeyData as any).mockResolvedValue(mockKeyData);
+      (keyExportUtils.exportToClipboard as any).mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useKeyManagement());
+
+      let clipboardResult;
+      await act(async () => {
+        clipboardResult = await result.current.copyKeyToClipboard(30);
+      });
+
+      expect(clipboardResult).toEqual({
+        success: true,
+        clearAfterSeconds: 30,
+        fingerprint: mockKeyData.fingerprint,
+      });
+      expect(keyExportUtils.exportToClipboard).toHaveBeenCalledWith(mockKeyData, 30000);
+    });
+
+    it("should handle clipboard copy failure", async () => {
+      (keyExportUtils.exportKeyData as any).mockResolvedValue(mockKeyData);
+      (keyExportUtils.exportToClipboard as any).mockRejectedValue(new Error("Clipboard error"));
+
+      const { result } = renderHook(() => useKeyManagement());
+
+      await act(async () => {
+        try {
+          await result.current.copyKeyToClipboard();
+        } catch (e) {
+          // Expected
+        }
+      });
+
+      expect(result.current.error).toContain("Failed to copy key to clipboard");
+      expect(logger.error).toHaveBeenCalled();
+    });
+  });
+
+  describe("downloadKeyFile", () => {
+    it("should download key file successfully", async () => {
+      (keyExportUtils.exportKeyData as any).mockResolvedValue(mockKeyData);
+      (keyExportUtils.downloadKeyFile as any).mockImplementation(() => {});
+
+      const { result } = renderHook(() => useKeyManagement());
+      const filename = "my-backup";
+
+      let downloadResult;
+      await act(async () => {
+        downloadResult = await result.current.downloadKeyFile(filename);
+      });
+
+      expect(downloadResult).toEqual({ success: true, filename: "my-backup.json" });
+      expect(keyExportUtils.downloadKeyFile).toHaveBeenCalledWith(mockKeyData, filename, false);
+    });
+
+    it("should handle download failure", async () => {
+      (keyExportUtils.exportKeyData as any).mockRejectedValue(new Error("Export error"));
+
+      const { result } = renderHook(() => useKeyManagement());
+
+      await act(async () => {
+        try {
+          await result.current.downloadKeyFile();
+        } catch (e) {
+          // Expected
+        }
+      });
+
+      expect(result.current.error).toContain("Failed to download key file");
+      expect(logger.error).toHaveBeenCalled();
+    });
+  });
+
   describe("downloadProtectedKeyFile", () => {
     it("should download protected key file successfully", async () => {
       const mockProtectedFile = { data: "encrypted-data", salt: "abc" };
