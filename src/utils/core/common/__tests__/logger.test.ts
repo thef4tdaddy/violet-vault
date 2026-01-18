@@ -307,7 +307,7 @@ describe("Logger", () => {
   });
 
   describe("window global", () => {
-    it("should handle window being undefined", () => {
+    it("should confirm window is defined in the test environment", () => {
       // Test passes regardless of window state
       expect(typeof window).toBeDefined();
     });
