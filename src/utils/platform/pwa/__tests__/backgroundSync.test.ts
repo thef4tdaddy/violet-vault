@@ -113,9 +113,6 @@ describe("BackgroundSyncManager", () => {
       expect(queuedOp.retryCount).toBe(0);
       expect(queuedOp.maxRetries).toBe(3);
       expect(queuedOp.timestamp).toBeDefined();
-
-      // Restore online state
-      setOnlineState(true);
     });
 
     it("should attempt sync immediately when online", async () => {
