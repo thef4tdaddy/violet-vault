@@ -1,114 +1,52 @@
 /**
- * Paycheck processing utilities
- * Extracted from paycheckMutations.js for better maintainability
- * Updated for Issue #1340: Creates proper transaction records for paycheck processing
+ * Paycheck processing utilities (Backward Compatibility Layer)
+ *
+ * REFACTORED for Issue #1463: Domain Logic Decoupling
+ * This file now serves as a backward-compatible wrapper around the new architecture:
+ *
+ * Architecture:
+ * - paycheckProcessingCore.ts: Pure domain logic (creates execution plans)
+ * - paycheckService.ts: Service layer (executes plans with side effects)
+ * - paycheckProcessing.ts: This file - backward compatibility wrapper
+ *
+ * The new architecture separates pure domain logic from side effects,
+ * making the code more testable and maintainable.
  */
 
-import { v4 as uuidv4 } from "uuid";
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "@/db/budgetDb";
 import type { Transaction } from "@/db/types";
-import {
-  calculatePaycheckBalances,
-  validateBalances,
-  type CurrentBalances,
-} from "@/utils/core/common/balanceCalculator";
 import logger from "@/utils/core/common/logger";
-import { createPaycheckTransactions } from "@/services/transactions/paycheckTransactionService";
-
-interface BalanceItem {
-  currentBalance?: string | number;
-  name?: string;
-}
+import { createPaycheckExecutionPlan } from "./paycheckProcessingCore";
+import {
+  getCurrentBalances as serviceGetCurrentBalances,
+  executePaycheckPlan,
+  enrichAllocationsWithNames,
+} from "@/services/budgeting/paycheckService";
+import type { CurrentBalances } from "./paycheckProcessingTypes";
 
 interface BalanceCollection {
-  data?: BalanceItem[];
-}
-
-interface EnvelopeAllocationWithName {
-  envelopeId: string;
-  envelopeName?: string;
-  amount: number;
+  data?: Array<{
+    currentBalance?: string | number;
+    name?: string;
+  }>;
 }
 
 /**
  * Get current balances from database and queries
+ * @deprecated Use serviceGetCurrentBalances from paycheckService directly
  */
-export const getCurrentBalances = async (
-  envelopesQuery: BalanceCollection,
-  savingsGoalsQuery: BalanceCollection
-): Promise<CurrentBalances> => {
-  // Get current metadata from Dexie (proper data source)
-  const currentMetadata = await getBudgetMetadata();
-  const currentActualBalance = Number(currentMetadata?.actualBalance ?? 0);
-  const currentUnassignedCash = Number(currentMetadata?.unassignedCash ?? 0);
-
-  // Calculate current virtual balance from envelope balances
-  const currentEnvelopes = envelopesQuery.data || [];
-  const currentSavings = savingsGoalsQuery.data || [];
-
-  const currentTotalEnvelopeBalance = currentEnvelopes.reduce((sum: number, env: BalanceItem) => {
-    const balance = env.currentBalance;
-    return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
-  }, 0);
-  const currentTotalSavingsBalance = currentSavings.reduce((sum: number, saving: BalanceItem) => {
-    const balance = saving.currentBalance;
-    return sum + (balance !== undefined ? parseFloat(String(balance)) || 0 : 0);
-  }, 0);
-  const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
-
-  logger.info("Current balances before paycheck", {
-    currentActualBalance,
-    currentUnassignedCash,
-    currentVirtualBalance,
-    currentTotalEnvelopeBalance,
-    currentTotalSavingsBalance,
-    currentMetadata,
-  });
-
-  return {
-    actualBalance: currentActualBalance,
-    virtualBalance: currentVirtualBalance,
-    unassignedCash: currentUnassignedCash,
-    isActualBalanceManual: Boolean(currentMetadata?.isActualBalanceManual),
-  };
-};
+export const getCurrentBalances = serviceGetCurrentBalances;
 
 /**
  * Process envelope allocations for a paycheck
+ * @deprecated This is now handled internally by executePaycheckPlan
+ * Kept for backward compatibility in tests
  */
-export const processEnvelopeAllocations = async (
-  allocations: Array<{ envelopeId: string; amount: number }>
-) => {
-  if (allocations.length === 0) return;
-
-  logger.info("Updating envelope balances", {
-    envelopeCount: allocations.length,
-    allocations,
-  });
-
-  for (const allocation of allocations) {
-    const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
-    if (envelope) {
-      const oldBalance = envelope.currentBalance || 0;
-      const newBalance = oldBalance + allocation.amount;
-
-      await budgetDb.envelopes.update(allocation.envelopeId, {
-        currentBalance: newBalance,
-      });
-
-      logger.info("Updated envelope balance", {
-        envelopeId: allocation.envelopeId,
-        oldBalance,
-        newBalance,
-        allocation: allocation.amount,
-      });
-    }
-  }
-};
+export { executeEnvelopeAllocations as processEnvelopeAllocations } from "@/services/budgeting/paycheckService";
 
 /**
  * Create and save paycheck history record with transaction references
- * Updated for Issue #1340: Links paycheck record to created transactions
+ * @deprecated This is now handled internally by executePaycheckPlan
+ * Kept for backward compatibility in tests
  */
 export const createPaycheckRecord = async (
   paycheckData: { amount: number; payerName?: string; mode: string; notes?: string },
@@ -116,25 +54,28 @@ export const createPaycheckRecord = async (
   newBalances: { unassignedCash: number; actualBalance: number },
   allocations: Array<{ envelopeId: string; envelopeName?: string; amount: number }>,
   transactionIds?: { incomeTransactionId: string; transferTransactionIds: string[] }
-) => {
-  // Create map of allocations for the transaction record
+): Promise<Transaction> => {
+  // This is a stub for backward compatibility
+  // In the new architecture, this is handled by executePaycheckPlan
+  logger.warn("createPaycheckRecord is deprecated - use executePaycheckPlan instead");
+
   const allocationsMap: Record<string, number> = {};
   allocations.forEach((a) => {
     allocationsMap[a.envelopeId] = a.amount;
   });
 
+  const now = Date.now();
   const paycheckRecord: Transaction = {
-    id: `paycheck_${Date.now()}`,
+    id: `paycheck_${now}`,
     date: new Date(),
     amount: paycheckData.amount,
     payerName: paycheckData.payerName || "Unknown",
-    lastModified: Date.now(),
-    createdAt: Date.now(),
+    lastModified: now,
+    createdAt: now,
     type: "income",
     category: "Income",
     envelopeId: "unassigned",
     isScheduled: false,
-    // Additional custom fields
     mode: paycheckData.mode as "allocate" | "leftover",
     unassignedCashBefore: currentBalances.unassignedCash,
     unassignedCashAfter: newBalances.unassignedCash,
@@ -142,98 +83,22 @@ export const createPaycheckRecord = async (
     actualBalanceAfter: newBalances.actualBalance,
     allocations: allocationsMap,
     notes: paycheckData.notes || "",
-    // Transaction IDs for audit trail (Issue #1340)
     incomeTransactionId: transactionIds?.incomeTransactionId,
     transferTransactionIds: transactionIds?.transferTransactionIds || [],
   };
-
-  // Save paycheck record to transactions table
-  await budgetDb.transactions.add(paycheckRecord);
-
-  logger.info("Paycheck processing completed successfully", {
-    paycheckId: paycheckRecord.id,
-    finalBalances: newBalances,
-    incomeTransactionId: transactionIds?.incomeTransactionId,
-    transferTransactionIds: transactionIds?.transferTransactionIds,
-  });
 
   return paycheckRecord;
 };
 
 /**
- * Prepare allocations with envelope names for transaction creation
- * Helper function to reduce main processPaycheck statement count
- */
-const prepareAllocationsWithNames = async (
-  envelopeAllocations:
-    | Array<{ envelopeId: string; envelopeName?: string; amount: number }>
-    | undefined
-): Promise<EnvelopeAllocationWithName[]> => {
-  const allocations: EnvelopeAllocationWithName[] =
-    envelopeAllocations?.map((alloc) => ({
-      envelopeId: alloc.envelopeId,
-      envelopeName: alloc.envelopeName,
-      amount: alloc.amount,
-    })) || [];
-
-  // Enrich allocations with envelope names if not provided
-  for (const alloc of allocations) {
-    if (!alloc.envelopeName) {
-      const envelope = await budgetDb.envelopes.get(alloc.envelopeId);
-      if (envelope) {
-        alloc.envelopeName = envelope.name;
-      }
-    }
-  }
-
-  return allocations;
-};
-
-/**
- * Create paycheck transaction records
- * Returns transaction IDs for audit trail, or undefined if creation fails
- */
-const createTransactionsForPaycheck = async (
-  paycheckId: string,
-  paycheckData: { amount: number; payerName?: string; notes?: string },
-  allocations: EnvelopeAllocationWithName[]
-): Promise<{ incomeTransactionId: string; transferTransactionIds: string[] } | undefined> => {
-  try {
-    const transactionResult = await createPaycheckTransactions(
-      {
-        paycheckId,
-        amount: paycheckData.amount,
-        payerName: paycheckData.payerName,
-        notes: paycheckData.notes,
-      },
-      allocations
-    );
-
-    const transactionIds = {
-      incomeTransactionId: transactionResult.incomeTransactionId,
-      transferTransactionIds: transactionResult.transferTransactionIds,
-    };
-
-    logger.info("Created paycheck transactions", {
-      paycheckId,
-      incomeTransactionId: transactionIds.incomeTransactionId,
-      transferCount: transactionIds.transferTransactionIds.length,
-    });
-
-    return transactionIds;
-  } catch (error) {
-    logger.error("Failed to create paycheck transactions", error, {
-      paycheckId,
-      amount: paycheckData.amount,
-    });
-    // Return undefined - paycheck processing will continue without transaction records
-    return undefined;
-  }
-};
-
-/**
  * Process paycheck with balance calculations, allocations, and transaction creation
- * Updated for Issue #1340: Creates proper transaction records
+ *
+ * REFACTORED for Issue #1463:
+ * This function now uses the new architecture:
+ * 1. Get current balances from database
+ * 2. Enrich allocations with envelope names
+ * 3. Create execution plan (pure domain logic)
+ * 4. Execute the plan (side effects)
  *
  * Flow:
  * 1. Create income transaction to "unassigned"
@@ -252,81 +117,39 @@ export const processPaycheck = async (
   },
   envelopesQuery: BalanceCollection,
   savingsGoalsQuery: BalanceCollection
-) => {
-  // Use uuidv4() for guaranteed uniqueness to prevent collisions
-  const paycheckId = `paycheck_${uuidv4()}`;
-
-  logger.info("Starting paycheck processing", {
-    paycheckId,
+): Promise<Transaction> => {
+  logger.info("Starting paycheck processing (new architecture)", {
     amount: paycheckData.amount,
     mode: paycheckData.mode,
     allocations: paycheckData.envelopeAllocations?.length || 0,
   });
 
-  // Get current balances
+  // Step 1: Get current balances from database (side effect)
   const currentBalances = await getCurrentBalances(envelopesQuery, savingsGoalsQuery);
 
-  // Cast for compatibility with calculatePaycheckBalances
-  const balanceContext = currentBalances as unknown as {
-    actualBalance: number;
-    virtualBalance: number;
-    unassignedCash: number;
-    isActualBalanceManual: boolean;
-  };
-
-  // Prepare allocations with envelope names for transaction creation
-  const allocations = await prepareAllocationsWithNames(paycheckData.envelopeAllocations);
-
-  // Use centralized balance calculator to ensure consistency
-  const newBalances = calculatePaycheckBalances(balanceContext, paycheckData, allocations);
-
-  // Validate the calculation
-  const validation = validateBalances(newBalances);
-  if (!validation.isValid) {
-    logger.warn("Balance validation failed after paycheck processing", {
-      errors: validation.errors,
-      warnings: validation.warnings,
-      paycheck: paycheckData,
-      newBalances,
-    });
-  }
-
-  logger.info("Calculated new balances using centralized calculator", {
-    actualBalance: `${currentBalances.actualBalance} → ${newBalances.actualBalance}`,
-    unassignedCash: `${currentBalances.unassignedCash} → ${newBalances.unassignedCash}`,
-    paycheckAmount: paycheckData.amount,
-    allocationsCount: allocations.length,
-  });
-
-  // Issue #1340: Create transaction records for paycheck
-  const transactionIds = await createTransactionsForPaycheck(paycheckId, paycheckData, allocations);
-
-  // Update budget metadata in Dexie using calculated balances
-  await setBudgetMetadata({
-    actualBalance: newBalances.actualBalance,
-    unassignedCash: newBalances.unassignedCash,
-  });
-
-  // Update envelope balances in Dexie if allocating
-  await processEnvelopeAllocations(allocations);
-
-  // Create paycheck history record with transaction references
-  const paycheckRecord = await createPaycheckRecord(
-    paycheckData,
-    currentBalances,
-    newBalances,
-    allocations,
-    transactionIds
+  // Step 2: Enrich allocations with envelope names if needed (side effect)
+  const enrichedAllocations = await enrichAllocationsWithNames(
+    paycheckData.envelopeAllocations || []
   );
 
-  // Log the successful paycheck processing
-  const totalAllocated = allocations.reduce((sum, allocation) => sum + allocation.amount, 0);
+  // Step 3: Create execution plan (pure domain logic - no side effects)
+  const executionPlan = createPaycheckExecutionPlan(
+    {
+      ...paycheckData,
+      envelopeAllocations: enrichedAllocations,
+    },
+    currentBalances
+  );
+
+  // Step 4: Execute the plan (all side effects happen here)
+  const paycheckRecord = await executePaycheckPlan(executionPlan);
+
   logger.info("Paycheck processed successfully", {
+    paycheckId: executionPlan.paycheckId,
     paycheckAmount: paycheckData.amount,
-    totalAllocated,
-    unassignedCash: newBalances.unassignedCash,
-    actualBalance: newBalances.actualBalance,
-    incomeTransactionId: transactionIds?.incomeTransactionId,
+    totalAllocated: enrichedAllocations.reduce((sum, a) => sum + a.amount, 0),
+    unassignedCash: executionPlan.balanceUpdates.unassignedCash,
+    actualBalance: executionPlan.balanceUpdates.actualBalance,
   });
 
   return paycheckRecord;
