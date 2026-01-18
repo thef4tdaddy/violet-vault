@@ -167,7 +167,7 @@ const plan = createPaycheckExecutionPlan(data, balances);
 
 // 3. Validate plan (pure)
 if (!plan.validation.isValid) {
-  throw new Error(plan.validation.errors.map(error => error.message).join(", "));
+  throw new Error(plan.validation.errors.map((error) => error.message).join(", "));
 }
 
 // 4. Execute plan (side effect)

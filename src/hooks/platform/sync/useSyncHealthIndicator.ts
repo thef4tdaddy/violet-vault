@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type RefObject } from "react";
-import { getQuickSyncStatus } from "@/utils/features/sync/masterSyncValidator";
+import { syncManager } from "@/services/sync/SyncManager";
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import logger from "@/utils/core/common/logger";
 
@@ -105,7 +105,7 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
     logger.info("🔄 Sync Health: Checking sync health...");
     try {
       setSyncStatus((prev) => ({ ...prev, isLoading: true }));
-      const health = await getQuickSyncStatus();
+      const health = await syncManager.checkHealth();
       logger.info("✅ Sync Health: Health check completed", health);
       setSyncStatus({
         ...health,
@@ -125,32 +125,29 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
 
   const runFullValidation = async (): Promise<void> => {
     logger.info("🚀 Sync Health UI: Full validation button clicked");
-    if (
-      typeof window !== "undefined" &&
-      (window as { runMasterSyncValidation?: () => Promise<ValidationResults> })
-        .runMasterSyncValidation
-    ) {
+    try {
       logger.info("🚀 Running full sync validation from UI...");
-      try {
-        const results = await (
-          window as { runMasterSyncValidation: () => Promise<ValidationResults> }
-        ).runMasterSyncValidation();
-        logger.info("✅ Sync Health: Full validation completed", { ...results.summary });
-        // Update status based on results
-        setSyncStatus({
-          isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
-          status:
-            results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
-          failedTests: results.summary.totalFailed,
-          lastChecked: new Date().toISOString(),
-          isLoading: false,
-          fullResults: results,
-        });
-      } catch (error) {
-        logger.error("Full validation failed:", error);
-      }
-    } else {
-      logger.warn("🚨 Sync Health: runMasterSyncValidation not available on window");
+      const results = await syncManager.validateSync();
+      logger.info("✅ Sync Health: Full validation completed", { ...results.summary });
+      // Update status based on results
+      setSyncStatus({
+        isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
+        status:
+          results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
+        failedTests: results.summary.totalFailed,
+        lastChecked: new Date().toISOString(),
+        isLoading: false,
+        fullResults: results,
+      });
+    } catch (error) {
+      logger.error("Full validation failed:", error);
+      setSyncStatus((prev) => ({
+        ...prev,
+        isHealthy: false,
+        status: "ERROR",
+        error: error instanceof Error ? error.message : String(error),
+        isLoading: false,
+      }));
     }
   };
 
