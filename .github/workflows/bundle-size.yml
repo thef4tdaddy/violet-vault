@@ -41,6 +41,8 @@ jobs:
 
       - name: Build PR bundle
         run: npm run build:staging
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Analyze PR bundle
         id: pr_bundle
@@ -101,6 +103,8 @@ jobs:
       - name: Build base bundle
         if: github.event_name == 'pull_request'
         run: npm run build:staging
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Analyze base bundle
         if: github.event_name == 'pull_request'

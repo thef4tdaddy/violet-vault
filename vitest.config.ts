@@ -33,6 +33,10 @@ export default defineConfig({
     },
     testTimeout: 30000, // 30s timeout to prevent crashes during high load
     hookTimeout: 30000,
+    reporters: ["default", "junit"],
+    outputFile: {
+      junit: "./coverage/junit.xml",
+    },
   },
   resolve: {
     alias: {
