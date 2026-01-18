@@ -45,9 +45,12 @@ export const useKeyManagement = () => {
   const exportKey = useCallback(async (): Promise<ExportedKeyData> => {
     return withAsyncOperation(
       async () => {
-        validateEncryptionContext(encryptionKey, salt, budgetId);
-        // After validation, we know these are non-null
-        const keyData = await keyExportUtils.exportKeyData(encryptionKey!, salt!, budgetId!);
+        const {
+          encryptionKey: key,
+          salt: s,
+          budgetId: id,
+        } = validateEncryptionContext(encryptionKey, salt, budgetId);
+        const keyData = await keyExportUtils.exportKeyData(key, s, id);
         logger.debug("Key exported successfully", {
           fingerprint: keyData.fingerprint.substring(0, 8),
           budgetId: keyData.budgetId,

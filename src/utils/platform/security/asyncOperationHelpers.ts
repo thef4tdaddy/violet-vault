@@ -38,18 +38,19 @@ export async function withAsyncOperation<T>(
 }
 
 /**
- * Validates encryption key availability
+ * Validates encryption key availability and returns validated context
  * Throws error if key, salt, or budgetId is missing
- * Acts as a type guard to ensure values are non-null
+ * Returns validated context to avoid non-null assertions
  */
 export function validateEncryptionContext(
   encryptionKey: CryptoKey | null,
   salt: Uint8Array | null,
   budgetId: string | null
-): void {
+): { encryptionKey: CryptoKey; salt: Uint8Array; budgetId: string } {
   if (!encryptionKey || !salt || !budgetId) {
     throw new Error("No encryption key available - please login first");
   }
+  return { encryptionKey, salt, budgetId };
 }
 
 /**

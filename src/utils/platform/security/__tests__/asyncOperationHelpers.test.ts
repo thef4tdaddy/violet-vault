@@ -77,14 +77,18 @@ describe("asyncOperationHelpers", () => {
   });
 
   describe("validateEncryptionContext", () => {
-    it("should not throw when all parameters are provided", () => {
+    it("should return validated context when all parameters are provided", () => {
       const mockKey = {} as CryptoKey;
       const mockSalt = new Uint8Array([1, 2, 3]);
       const mockBudgetId = "test-budget";
 
-      expect(() => {
-        validateEncryptionContext(mockKey, mockSalt, mockBudgetId);
-      }).not.toThrow();
+      const result = validateEncryptionContext(mockKey, mockSalt, mockBudgetId);
+
+      expect(result).toEqual({
+        encryptionKey: mockKey,
+        salt: mockSalt,
+        budgetId: mockBudgetId,
+      });
     });
 
     it("should throw when encryptionKey is missing", () => {
