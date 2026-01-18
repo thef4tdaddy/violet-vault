@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { budgetDatabaseService } from "../budgetDatabaseService";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/core/common/logger";
-import { EnvelopeSchema } from "@/domain/schemas/envelope";
 import { TransactionSchema } from "@/domain/schemas/transaction";
 import type { Envelope } from "@/domain/schemas/envelope";
 import type { Transaction } from "@/domain/schemas/transaction";
