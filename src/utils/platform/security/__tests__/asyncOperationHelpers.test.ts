@@ -44,7 +44,7 @@ describe("asyncOperationHelpers", () => {
       const mockOperation = vi.fn().mockRejectedValue(mockError);
 
       await expect(withAsyncOperation(mockOperation, handlers, "Test operation")).rejects.toThrow(
-        "Test operation: Operation failed"
+        "Operation failed"
       );
 
       expect(mockSetLoading).toHaveBeenCalledWith(true);
@@ -69,7 +69,7 @@ describe("asyncOperationHelpers", () => {
       const mockOperation = vi.fn().mockRejectedValue("string error");
 
       await expect(withAsyncOperation(mockOperation, handlers, "Test operation")).rejects.toThrow(
-        "Test operation: string error"
+        "string error"
       );
 
       expect(mockSetError).toHaveBeenCalledWith("Test operation: string error");

@@ -31,7 +31,8 @@ export async function withAsyncOperation<T>(
     const errorMessage = `${context}: ${err instanceof Error ? err.message : String(err)}`;
     handlers.setError(errorMessage);
     logger.error(context, err);
-    throw new Error(errorMessage);
+    // Re-throw original error to preserve stack trace
+    throw err;
   } finally {
     handlers.setLoading(false);
   }

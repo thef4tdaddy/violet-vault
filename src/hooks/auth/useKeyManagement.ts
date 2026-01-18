@@ -90,6 +90,23 @@ export const useKeyManagement = () => {
   );
 
   /**
+   * Internal method to create protected key file without async wrapper
+   * Used by downloadProtectedKeyFile to avoid nested wrappers
+   */
+  const _createProtectedKeyInternal = useCallback(
+    async (exportPassword: string): Promise<ProtectedKeyFile> => {
+      validateExportPassword(exportPassword);
+
+      const keyData = await _exportKeyInternal();
+      const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(keyData, exportPassword);
+
+      logger.debug("Protected key file created successfully");
+      return protectedKeyFile;
+    },
+    [_exportKeyInternal]
+  );
+
+  /**
    * Copy key to clipboard (auto-clears after 30 seconds)
    */
   const copyKeyToClipboard = useCallback(
@@ -153,7 +170,7 @@ export const useKeyManagement = () => {
     ): Promise<{ success: boolean; filename: string }> => {
       return withAsyncOperation(
         async () => {
-          const protectedKeyFile = await exportProtectedKey(exportPassword);
+          const protectedKeyFile = await _createProtectedKeyInternal(exportPassword);
           keyExportUtils.downloadKeyFile(protectedKeyFile, filename, true);
 
           logger.debug("Protected key file downloaded", { filename });
@@ -163,7 +180,7 @@ export const useKeyManagement = () => {
         "Failed to download protected key file"
       );
     },
-    [exportProtectedKey]
+    [_createProtectedKeyInternal]
   );
 
   /**
