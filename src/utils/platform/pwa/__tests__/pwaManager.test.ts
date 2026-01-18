@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import pwaManager from "../pwaManager";
 import logger from "@/utils/core/common/logger";
+import { checkForVersionUpdate } from "@/utils/core/common/version";
+import type { BeforeInstallPromptEvent } from "@/stores/ui/uiStoreActions";
 
 // Mock dependencies
 vi.mock("@/utils/core/common/logger", () => ({
@@ -31,13 +33,19 @@ const mockServiceWorkerRegistration = {
   addEventListener: vi.fn(),
 };
 
+// Store original navigator.serviceWorker for restoration
+const originalServiceWorker = global.navigator?.serviceWorker;
+
+// Create mock service worker container
+const createMockServiceWorker = () => ({
+  getRegistration: vi.fn(),
+  addEventListener: vi.fn(),
+  controller: null,
+});
+
 global.navigator = {
   ...global.navigator,
-  serviceWorker: {
-    getRegistration: vi.fn(),
-    addEventListener: vi.fn(),
-    controller: null,
-  } as unknown as ServiceWorkerContainer,
+  serviceWorker: createMockServiceWorker() as unknown as ServiceWorkerContainer,
   onLine: true,
   userAgent: "Mozilla/5.0",
 };
@@ -94,6 +102,13 @@ describe("PWAManager", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.clear();
+
+    // Ensure service worker mock exists and is fresh
+    Object.defineProperty(navigator, "serviceWorker", {
+      value: createMockServiceWorker(),
+      configurable: true,
+      writable: true,
+    });
 
     mockUiStore = {
       setUpdateAvailable: vi.fn(),
@@ -157,6 +172,7 @@ describe("PWAManager", () => {
       Object.defineProperty(navigator, "serviceWorker", {
         value: originalServiceWorker,
         configurable: true,
+        writable: true,
       });
     });
   });
@@ -241,10 +257,15 @@ describe("PWAManager", () => {
       };
 
       pwaManager.registration = registration as unknown as ServiceWorkerRegistration;
-      Object.defineProperty(navigator.serviceWorker, "controller", {
-        value: { state: "activated" },
-        configurable: true,
-      });
+
+      // Ensure navigator.serviceWorker exists and has controller property
+      if (navigator.serviceWorker) {
+        Object.defineProperty(navigator.serviceWorker, "controller", {
+          value: { state: "activated" },
+          configurable: true,
+          writable: true,
+        });
+      }
 
       pwaManager.handleUpdateFound();
 
@@ -271,10 +292,15 @@ describe("PWAManager", () => {
       };
 
       pwaManager.registration = registration as unknown as ServiceWorkerRegistration;
-      Object.defineProperty(navigator.serviceWorker, "controller", {
-        value: null,
-        configurable: true,
-      });
+
+      // Ensure navigator.serviceWorker exists and has controller property
+      if (navigator.serviceWorker) {
+        Object.defineProperty(navigator.serviceWorker, "controller", {
+          value: null,
+          configurable: true,
+          writable: true,
+        });
+      }
 
       pwaManager.handleUpdateFound();
 
@@ -474,11 +500,26 @@ describe("PWAManager", () => {
     });
 
     it("should detect installable state", () => {
+      // Ensure navigator.userAgent is not iOS
+      Object.defineProperty(navigator, "userAgent", {
+        value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        configurable: true,
+        writable: true,
+      });
+
+      // Mock matchMedia to return false for standalone mode
+      vi.mocked(window.matchMedia).mockReturnValue({
+        matches: false,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      } as MediaQueryList);
+
+      const mockEvent = {} as BeforeInstallPromptEvent;
       pwaManager.uiStore = {
         ...mockUiStore,
         getState: () => ({
           ...mockUiStore.getState(),
-          installPromptEvent: {} as never,
+          installPromptEvent: mockEvent,
         }),
       };
 
@@ -491,7 +532,6 @@ describe("PWAManager", () => {
 
   describe("checkForVersionUpdate", () => {
     it("should not show patch notes when no update", () => {
-      const { checkForVersionUpdate } = require("@/utils/core/common/version");
       vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: false,
         isFirstTime: false,
@@ -507,7 +547,6 @@ describe("PWAManager", () => {
     });
 
     it("should show patch notes on version update", async () => {
-      const { checkForVersionUpdate } = require("@/utils/core/common/version");
       vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: true,
         isFirstTime: false,
@@ -528,7 +567,6 @@ describe("PWAManager", () => {
     });
 
     it("should not show patch notes for first-time users", () => {
-      const { checkForVersionUpdate } = require("@/utils/core/common/version");
       vi.mocked(checkForVersionUpdate).mockReturnValue({
         hasUpdate: false,
         isFirstTime: true,
@@ -544,7 +582,6 @@ describe("PWAManager", () => {
     });
 
     it("should handle version check errors", () => {
-      const { checkForVersionUpdate } = require("@/utils/core/common/version");
       vi.mocked(checkForVersionUpdate).mockImplementation(() => {
         throw new Error("Version check failed");
       });
