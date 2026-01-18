@@ -40,28 +40,29 @@ export const useKeyManagement = () => {
   }, []);
 
   /**
+   * Core export logic without async operation wrapper
+   * Used internally by other export methods to avoid nested wrappers
+   */
+  const _exportKeyInternal = useCallback(async (): Promise<ExportedKeyData> => {
+    const {
+      encryptionKey: key,
+      salt: s,
+      budgetId: id,
+    } = validateEncryptionContext(encryptionKey, salt, budgetId);
+    const keyData = await keyExportUtils.exportKeyData(key, s, id);
+    logger.debug("Key exported successfully", {
+      fingerprint: keyData.fingerprint.substring(0, 8),
+      budgetId: keyData.budgetId,
+    });
+    return keyData;
+  }, [encryptionKey, salt, budgetId]);
+
+  /**
    * Export current encryption key as unprotected JSON
    */
   const exportKey = useCallback(async (): Promise<ExportedKeyData> => {
-    return withAsyncOperation(
-      async () => {
-        const {
-          encryptionKey: key,
-          salt: s,
-          budgetId: id,
-        } = validateEncryptionContext(encryptionKey, salt, budgetId);
-        const keyData = await keyExportUtils.exportKeyData(key, s, id);
-        logger.debug("Key exported successfully", {
-          fingerprint: keyData.fingerprint.substring(0, 8),
-          budgetId: keyData.budgetId,
-        });
-
-        return keyData;
-      },
-      { setLoading, setError },
-      "Failed to export key"
-    );
-  }, [encryptionKey, salt, budgetId]);
+    return withAsyncOperation(_exportKeyInternal, { setLoading, setError }, "Failed to export key");
+  }, [_exportKeyInternal]);
 
   /**
    * Export key as password-protected file
@@ -72,7 +73,7 @@ export const useKeyManagement = () => {
         async () => {
           validateExportPassword(exportPassword);
 
-          const keyData = await exportKey();
+          const keyData = await _exportKeyInternal();
           const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(
             keyData,
             exportPassword
@@ -85,7 +86,7 @@ export const useKeyManagement = () => {
         "Failed to create protected key file"
       );
     },
-    [exportKey]
+    [_exportKeyInternal]
   );
 
   /**
@@ -97,7 +98,7 @@ export const useKeyManagement = () => {
     ): Promise<{ success: boolean; clearAfterSeconds: number; fingerprint: string }> => {
       return withAsyncOperation(
         async () => {
-          const keyData = await exportKey();
+          const keyData = await _exportKeyInternal();
           await keyExportUtils.exportToClipboard(keyData, clearAfterSeconds * 1000);
 
           logger.debug("Key copied to clipboard", {
@@ -115,7 +116,7 @@ export const useKeyManagement = () => {
         "Failed to copy key to clipboard"
       );
     },
-    [exportKey]
+    [_exportKeyInternal]
   );
 
   /**
@@ -125,7 +126,7 @@ export const useKeyManagement = () => {
     async (filename = "violet-vault-backup"): Promise<{ success: boolean; filename: string }> => {
       return withAsyncOperation(
         async () => {
-          const keyData = await exportKey();
+          const keyData = await _exportKeyInternal();
           keyExportUtils.downloadKeyFile(keyData, filename, false);
 
           logger.debug("Key file downloaded", {
@@ -139,7 +140,7 @@ export const useKeyManagement = () => {
         "Failed to download key file"
       );
     },
-    [exportKey]
+    [_exportKeyInternal]
   );
 
   /**
@@ -171,7 +172,7 @@ export const useKeyManagement = () => {
   const generateQRCode = useCallback(async (): Promise<{ success: boolean; qrUrl: string }> => {
     return withAsyncOperation(
       async () => {
-        const keyData = await exportKey();
+        const keyData = await _exportKeyInternal();
         const qrUrl = await keyExportUtils.generateQRCode(keyData);
         setQrCodeUrl(qrUrl);
 
@@ -184,7 +185,7 @@ export const useKeyManagement = () => {
       { setLoading, setError },
       "Failed to generate QR code"
     );
-  }, [exportKey]);
+  }, [_exportKeyInternal]);
 
   /**
    * Import key from file data
