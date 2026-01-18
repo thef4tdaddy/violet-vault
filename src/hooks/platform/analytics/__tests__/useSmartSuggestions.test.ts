@@ -202,7 +202,7 @@ describe("useSmartSuggestions", () => {
     it("should handle empty transactions array", () => {
       const { result } = renderHook(() => useSmartSuggestions({ transactions: [], bills: [] }));
 
-      const suggestion = result.current.suggestTransactionCategory("Test Merchant");
+      result.current.suggestTransactionCategory("Test Merchant");
       // Should still work with pattern matching
       expect(result.current.suggestTransactionCategory).toBeDefined();
     });
