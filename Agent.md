@@ -16,6 +16,7 @@ We are performing a **Full Rewrite** of VioletVault into a **Hybrid Polyglot Arc
 
 - **General**: No placeholders. High aesthetics (Glassmorphism, Dark Mode).
 - **React**: ESLint, Prettier, strict TypeScript.
+- **Testing**: Mandatory >80% coverage for all new/modified code (Front & Back).
 - **Go**: `golangci-lint`, `gofmt`.
 - **Python**: `Ruff` (Linter & Formatter), `Mypy` (Typing).
 
@@ -31,4 +32,5 @@ Refer to GitHub Epic [#1463](https://github.com/thef4tdaddy/violet-vault/issues/
 
 - Core budgeting data MUST stay client-side encrypted (E2EE).
 - Only non-sensitive or already-decrypted logic should be offloaded to `/api`.
+- All PRs MUST include tests for new files (target 80%+ coverage).
 - Always run `full_salvo.sh` before PRs.

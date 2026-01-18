@@ -9,6 +9,7 @@ Architecture Simplification and v2.0 Hybrid Rewrite.
 - Create GH issues for bugs (label: `bug`) and features (label: `enhancement`, `roadmap`).
 - Commit changes frequently.
 - Run `prettier` before committing.
+- **Mandatory 80%+ test coverage for all new/modified code (Front & Back).**
 - Data Flow: Firebase → Dexie → TanStack Query.
 - State: React Context (Auth) / Zustand (UI only).
 
