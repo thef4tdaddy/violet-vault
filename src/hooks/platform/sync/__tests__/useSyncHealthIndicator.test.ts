@@ -3,9 +3,8 @@ import { useSyncHealthIndicator } from "../useSyncHealthIndicator";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock dependencies
-vi.mock("@/utils/features/sync/masterSyncValidator", () => ({
-  getQuickSyncStatus: vi.fn(),
-}));
+// Mock dependencies
+// masterSyncValidator is deprecated in v2.0
 
 // Mock dependencies
 vi.mock("@/services/sync/SyncManager", () => ({
@@ -183,10 +182,6 @@ describe("useSyncHealthIndicator", () => {
     };
 
     (global.window as any).forceCloudDataReset = vi.fn().mockResolvedValue(mockResult);
-    getQuickSyncStatus.mockResolvedValue({
-      isHealthy: true,
-      status: "HEALTHY",
-    });
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 

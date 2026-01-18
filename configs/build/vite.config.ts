@@ -63,16 +63,16 @@ const getGitInfo = () => {
   }
 };
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   const gitInfo = getGitInfo();
 
-  // Enable debug mode for develop branch deployments
-  const isDevelopBranch = gitInfo.branch === "develop";
-  const isProduction = process.env.NODE_ENV === "production";
-  const viteNodeEnv = process.env.VITE_NODE_ENV;
-  const enableDebugBuild =
-    (isDevelopBranch && isProduction) || viteNodeEnv === "development";
-  const isDevelopmentMode = viteNodeEnv === "development" || !isProduction;
+  // Mode detection
+  const isProduction = mode === "production" || process.env.NODE_ENV === "production";
+  const viteNodeEnv = process.env.VITE_NODE_ENV || mode;
+  // Enable debug mode for staging branches
+  const isStagedBranch = ["develop", "feat/polygot-rewrite"].includes(gitInfo.branch);
+  const enableDebugBuild = isStagedBranch && isProduction;
+  const isDevelopmentMode = mode === "development" || viteNodeEnv === "development";
 
   return {
     root: path.resolve(__dirname, "../../"),
@@ -200,7 +200,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
-          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+          maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
           navigateFallback: "/offline",
           navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
           additionalManifestEntries: [{ url: "/offline", revision: null }],
@@ -326,7 +326,8 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 1500, // Increased for feature-rich app with lazy-loaded routes
       reportCompressedSize: isProduction,
       minify: (isDevelopmentMode ? false : "terser") as "terser" | false,
-      sourcemap: (enableDebugBuild || isDevelopmentMode ? 'inline' : false) as 'inline' | false,
+      // Use external maps for production to keep JS small, inline for dev for speed
+      sourcemap: enableDebugBuild ? true : (isDevelopmentMode ? 'inline' : false),
       rollupOptions: {
         input: {
           main: path.resolve(__dirname, "../../index.html"),
