@@ -157,6 +157,8 @@ export const validatePaycheckInput = (
       }
       if (alloc.amount < 0) {
         errors.push(`Allocation at index ${index} has negative amount`);
+      } else if (alloc.amount === 0) {
+        errors.push(`Allocation at index ${index} has zero amount; allocation amount must be greater than 0`);
       }
     });
   }
