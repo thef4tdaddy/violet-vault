@@ -173,6 +173,10 @@ class PWAManager {
    * Set up update detection and handling
    */
   setupUpdateDetection() {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
     // Listen for service worker controlling the page
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       logger.info("🔄 Service worker controller changed - reloading page");
