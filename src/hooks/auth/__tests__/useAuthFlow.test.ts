@@ -206,4 +206,152 @@ describe("useAuthFlow", () => {
       ).rejects.toThrow("Profile update failed");
     });
   });
+
+  describe("SyncMutex integration", () => {
+    it("should serialize multiple concurrent handleSetup calls", async () => {
+      const executionOrder: string[] = [];
+
+      (handleExistingUserLogin as any).mockImplementation(async (password: string) => {
+        executionOrder.push(`start-${password}`);
+        // Simulate async work
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        executionOrder.push(`end-${password}`);
+        return { success: true };
+      });
+
+      const { result } = renderHook(() => useAuthFlow());
+
+      // Fire multiple concurrent calls
+      await act(async () => {
+        await Promise.all([
+          result.current.handleSetup("password1"),
+          result.current.handleSetup("password2"),
+          result.current.handleSetup("password3"),
+        ]);
+      });
+
+      // Verify operations were serialized (each start is followed by its own end)
+      expect(executionOrder).toEqual([
+        "start-password1",
+        "end-password1",
+        "start-password2",
+        "end-password2",
+        "start-password3",
+        "end-password3",
+      ]);
+    });
+
+    it("should serialize handleChangePassword when handleSetup is in progress", async () => {
+      const executionOrder: string[] = [];
+
+      (handleExistingUserLogin as any).mockImplementation(async () => {
+        executionOrder.push("setup-start");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        executionOrder.push("setup-end");
+        return { success: true };
+      });
+
+      mockAuth.changePassword.mockImplementation(async () => {
+        executionOrder.push("password-change-start");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        executionOrder.push("password-change-end");
+        return { success: true };
+      });
+
+      const { result } = renderHook(() => useAuthFlow());
+
+      await act(async () => {
+        // Start both operations concurrently
+        await Promise.all([
+          result.current.handleSetup("password"),
+          result.current.handleChangePassword("old", "new"),
+        ]);
+      });
+
+      // Verify handleChangePassword waited for handleSetup to complete
+      expect(executionOrder).toEqual([
+        "setup-start",
+        "setup-end",
+        "password-change-start",
+        "password-change-end",
+      ]);
+    });
+
+    it("should release mutex lock even when operation throws error", async () => {
+      const executionOrder: string[] = [];
+
+      (handleExistingUserLogin as any)
+        .mockImplementationOnce(async () => {
+          executionOrder.push("first-start");
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          executionOrder.push("first-error");
+          throw new Error("First operation failed");
+        })
+        .mockImplementationOnce(async () => {
+          executionOrder.push("second-start");
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          executionOrder.push("second-success");
+          return { success: true };
+        });
+
+      const { result } = renderHook(() => useAuthFlow());
+
+      await act(async () => {
+        // Both calls execute, first shows error toast, second succeeds
+        await Promise.all([
+          result.current.handleSetup("password1"),
+          result.current.handleSetup("password2"),
+        ]);
+      });
+
+      // Verify second operation executed after first one failed
+      // First operation error was caught and toast shown, but mutex was released
+      expect(executionOrder).toEqual([
+        "first-start",
+        "first-error",
+        "second-start",
+        "second-success",
+      ]);
+
+      // Verify both operations were attempted
+      expect(handleExistingUserLogin).toHaveBeenCalledTimes(2);
+
+      // Verify error toast was shown for the first operation
+      expect(mockToast.showErrorToast).toHaveBeenCalledWith(
+        expect.stringContaining("First operation failed"),
+        "Setup Error"
+      );
+    });
+
+    it("should allow different operations to be serialized", async () => {
+      const executionOrder: string[] = [];
+
+      (handleExistingUserLogin as any).mockImplementation(async () => {
+        executionOrder.push("setup-start");
+        await new Promise((resolve) => setTimeout(resolve, 30));
+        executionOrder.push("setup-end");
+        return { success: true };
+      });
+
+      mockAuth.updateProfile.mockImplementation(async () => {
+        executionOrder.push("profile-start");
+        await new Promise((resolve) => setTimeout(resolve, 30));
+        executionOrder.push("profile-end");
+        return { success: true };
+      });
+
+      const { result } = renderHook(() => useAuthFlow());
+
+      await act(async () => {
+        // Fire multiple different operations concurrently
+        await Promise.all([
+          result.current.handleSetup("password"),
+          result.current.handleUpdateProfile({ displayName: "Test" }),
+        ]);
+      });
+
+      // Verify operations were serialized
+      expect(executionOrder).toEqual(["setup-start", "setup-end", "profile-start", "profile-end"]);
+    });
+  });
 });
