@@ -597,7 +597,7 @@ export const calculateQuickFundUpdate = (
 
   // Determine the correct field to update based on envelope type
   let updateField = "monthlyBudget"; // Default for variable envelopes
-  if (envelope.type === "goal" || envelope.type === ENVELOPE_TYPES.SAVINGS) {
+  if (envelope.type === ENVELOPE_TYPES.SAVINGS) {
     updateField = "monthlyContribution";
   } else if (envelope.type === "liability" || envelope.type === ENVELOPE_TYPES.BILL) {
     updateField = "biweeklyAllocation";
