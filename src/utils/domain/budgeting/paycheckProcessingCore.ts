@@ -25,11 +25,13 @@ import type {
  *
  * @param paycheckData - Input data for the paycheck
  * @param currentBalances - Current system balances
+ * @param timestamp - Optional timestamp for record creation (defaults to Date.now() if not provided)
  * @returns Execution plan describing all operations to perform
  */
 export const createPaycheckExecutionPlan = (
   paycheckData: PaycheckInput,
-  currentBalances: CurrentBalances
+  currentBalances: CurrentBalances,
+  timestamp?: number
 ): PaycheckExecutionPlan => {
   // Generate unique ID for this paycheck
   const paycheckId = `paycheck_${uuidv4()}`;
@@ -37,11 +39,27 @@ export const createPaycheckExecutionPlan = (
   // Prepare allocations (these would come from input or be enriched later)
   const allocations = paycheckData.envelopeAllocations || [];
 
+  // Validate input data
+  const inputValidation = validatePaycheckInput(paycheckData);
+
   // Calculate new balances using centralized calculator
   const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
 
-  // Validate the calculation
-  const validation = validateBalances(newBalances);
+  // Validate the balance calculation
+  const balanceValidation = validateBalances(newBalances);
+
+  // Combine validations
+  const combinedValidation = {
+    isValid: inputValidation.isValid && balanceValidation.isValid,
+    errors: [
+      ...inputValidation.errors.map((msg) => ({
+        type: "INPUT_VALIDATION",
+        message: msg,
+      })),
+      ...balanceValidation.errors,
+    ],
+    warnings: balanceValidation.warnings,
+  };
 
   // Create balance update plan
   const balanceUpdates: BalanceUpdate = {
@@ -64,7 +82,8 @@ export const createPaycheckExecutionPlan = (
     paycheckData,
     currentBalances,
     newBalances,
-    allocations
+    allocations,
+    timestamp
   );
 
   return {
@@ -73,20 +92,23 @@ export const createPaycheckExecutionPlan = (
     envelopeAllocations: allocations,
     transactionCreation,
     paycheckRecord,
-    validation,
+    validation: combinedValidation,
   };
 };
 
 /**
  * Create a plan for the paycheck record
  * Pure function that describes what the paycheck record should contain
+ *
+ * @param timestamp - Optional timestamp for record creation (defaults used in service layer if not provided)
  */
 const createPaycheckRecordPlan = (
   paycheckId: string,
   paycheckData: PaycheckInput,
   currentBalances: CurrentBalances,
   newBalances: { actualBalance: number; unassignedCash: number },
-  allocations: EnvelopeAllocation[]
+  allocations: EnvelopeAllocation[],
+  timestamp?: number
 ): Omit<PaycheckRecordPlan, "incomeTransactionId" | "transferTransactionIds"> => {
   // Create allocations map
   const allocationsMap: Record<string, number> = {};
@@ -94,11 +116,12 @@ const createPaycheckRecordPlan = (
     allocationsMap[a.envelopeId] = a.amount;
   });
 
-  const now = Date.now();
+  // Use provided timestamp or undefined (will be set by service layer)
+  const now = timestamp ?? Date.now();
 
   return {
     id: paycheckId,
-    date: new Date(),
+    date: new Date(now),
     amount: paycheckData.amount,
     payerName: paycheckData.payerName || "Unknown",
     lastModified: now,
@@ -158,7 +181,9 @@ export const validatePaycheckInput = (
       if (alloc.amount < 0) {
         errors.push(`Allocation at index ${index} has negative amount`);
       } else if (alloc.amount === 0) {
-        errors.push(`Allocation at index ${index} has zero amount; allocation amount must be greater than 0`);
+        errors.push(
+          `Allocation at index ${index} has zero amount; allocation amount must be greater than 0`
+        );
       }
     });
   }

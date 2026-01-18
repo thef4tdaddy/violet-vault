@@ -53,8 +53,8 @@ export interface PaycheckExecutionPlan {
   paycheckRecord: Omit<PaycheckRecordPlan, "incomeTransactionId" | "transferTransactionIds">;
   validation: {
     isValid: boolean;
-    errors: string[];
-    warnings: string[];
+    errors: Array<{ type: string; message: string; difference?: number }>;
+    warnings: Array<{ type: string; message: string; amount?: number }>;
   };
 }
 

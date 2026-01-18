@@ -108,18 +108,22 @@ export const executeEnvelopeAllocations = async (
 /**
  * Enrich allocations with envelope names from database
  * Side effect: Reads from Dexie database
+ * Returns new allocation objects to avoid mutation
  */
 export const enrichAllocationsWithNames = async (
   allocations: EnvelopeAllocation[]
 ): Promise<EnvelopeAllocation[]> => {
-  const enrichedAllocations = [...allocations];
+  const enrichedAllocations: EnvelopeAllocation[] = [];
 
-  for (const alloc of enrichedAllocations) {
+  for (const alloc of allocations) {
     if (!alloc.envelopeName) {
       const envelope = await budgetDb.envelopes.get(alloc.envelopeId);
-      if (envelope) {
-        alloc.envelopeName = envelope.name;
-      }
+      enrichedAllocations.push({
+        ...alloc,
+        envelopeName: envelope?.name,
+      });
+    } else {
+      enrichedAllocations.push({ ...alloc });
     }
   }
 
