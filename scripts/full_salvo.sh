@@ -186,8 +186,8 @@ run_check "Prettier" "npm run format"
 # Vitest
 run_check "Vitest" "npm run test:run"
 
-# Build verification
-run_check "Build" "npm run build"
+# Build verification - Use staging for faster verification (keeps maps/debug)
+run_check "Build" "npm run build:staging"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 2. Go Backend Checks
