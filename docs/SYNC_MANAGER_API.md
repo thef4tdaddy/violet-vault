@@ -31,16 +31,13 @@
 Queue and execute a sync operation with automatic mutex protection.
 
 ```typescript
-import { syncManager } from '@/services/sync/SyncManager';
+import { syncManager } from "@/services/sync/SyncManager";
 
 // Normal priority (queued with debouncing)
-await syncManager.executeSync(
-  async () => {
-    // Your sync logic
-    return result;
-  },
-  'my-sync-operation'
-);
+await syncManager.executeSync(async () => {
+  // Your sync logic
+  return result;
+}, "my-sync-operation");
 
 // High priority (immediate execution)
 await syncManager.executeSync(
@@ -48,8 +45,8 @@ await syncManager.executeSync(
     // Your sync logic
     return result;
   },
-  'urgent-sync',
-  { priority: 'high' }
+  "urgent-sync",
+  { priority: "high" }
 );
 
 // Skip queue (immediate with mutex)
@@ -58,7 +55,7 @@ await syncManager.executeSync(
     // Your sync logic
     return result;
   },
-  'direct-sync',
+  "direct-sync",
   { skipQueue: true }
 );
 
@@ -68,12 +65,13 @@ await syncManager.executeSync(
     // Long-running sync operation
     return result;
   },
-  'long-sync',
+  "long-sync",
   { timeout: 120000 } // 2 minutes
 );
 ```
 
 **Parameters:**
+
 - `operation`: `() => Promise<T>` - The async function to execute
 - `operationType`: `string` - Name/identifier for the operation
 - `options?`: `SyncOperationOptions`
@@ -93,8 +91,8 @@ Perform a quick, non-blocking health check of the sync system.
 const health = await syncManager.checkHealth();
 
 console.log(health.isHealthy); // true/false
-console.log(health.status);    // "HEALTHY" | "ISSUES_DETECTED" | "ERROR"
-console.log(health.checks);    // Array of individual check results
+console.log(health.status); // "HEALTHY" | "ISSUES_DETECTED" | "ERROR"
+console.log(health.checks); // Array of individual check results
 ```
 
 **Returns:** `Promise<HealthCheckResult>`
@@ -108,10 +106,10 @@ Run the full validation suite including health checks, flow validation, edge cas
 ```typescript
 const results = await syncManager.validateSync();
 
-console.log(results.summary.overallStatus);  // "ALL_SYSTEMS_GO" | "ISSUES_DETECTED"
-console.log(results.summary.totalTests);     // Total number of tests
-console.log(results.summary.totalPassed);    // Number of passed tests
-console.log(results.summary.totalFailed);    // Number of failed tests
+console.log(results.summary.overallStatus); // "ALL_SYSTEMS_GO" | "ISSUES_DETECTED"
+console.log(results.summary.totalTests); // Total number of tests
+console.log(results.summary.totalPassed); // Number of passed tests
+console.log(results.summary.totalFailed); // Number of failed tests
 ```
 
 **Returns:** `Promise<ValidationResult>`
@@ -152,12 +150,13 @@ const result = await syncManager.forceSync(
     // Critical sync operation
     return data;
   },
-  'critical-sync',
+  "critical-sync",
   30000 // Optional: custom timeout in ms
 );
 ```
 
 **Parameters:**
+
 - `operation`: `() => Promise<T>` - The async function to execute
 - `operationType`: `string` - Name/identifier for the operation (default: "force-sync")
 - `timeout`: `number` - Timeout in milliseconds (default: 60000)
@@ -230,13 +229,13 @@ if (syncManager.isInitialized()) {
 ### Before (Multiple Service Calls)
 
 ```typescript
-import { getQuickSyncStatus } from '@/utils/features/sync/masterSyncValidator';
-import { SyncQueue } from '@/utils/features/sync/SyncQueue';
-import { globalSyncMutex } from '@/utils/features/sync/SyncMutex';
+import { getQuickSyncStatus } from "@/utils/features/sync/masterSyncValidator";
+import { SyncQueue } from "@/utils/features/sync/SyncQueue";
+import { globalSyncMutex } from "@/utils/features/sync/SyncMutex";
 
 // Multiple imports and complex orchestration
 const queue = new SyncQueue();
-await globalSyncMutex.acquire('sync-op');
+await globalSyncMutex.acquire("sync-op");
 // ... complex logic
 const health = await getQuickSyncStatus();
 ```
@@ -244,10 +243,10 @@ const health = await getQuickSyncStatus();
 ### After (Unified SyncManager)
 
 ```typescript
-import { syncManager } from '@/services/sync/SyncManager';
+import { syncManager } from "@/services/sync/SyncManager";
 
 // Single import, simple API
-await syncManager.executeSync(operation, 'sync-op');
+await syncManager.executeSync(operation, "sync-op");
 const health = await syncManager.checkHealth();
 ```
 
@@ -259,7 +258,7 @@ The `SyncOrchestrator` now uses `SyncManager` internally for all sync operations
 
 ```typescript
 // Schedule sync with debouncing and mutex protection
-syncOrchestrator.scheduleSync('high');
+syncOrchestrator.scheduleSync("high");
 
 // Force immediate sync
 await syncOrchestrator.forceSync();
@@ -275,7 +274,7 @@ The `SyncManager` handles all queue management, mutex locking, and health tracki
 
 ```typescript
 interface SyncOperationOptions {
-  priority?: 'normal' | 'high';
+  priority?: "normal" | "high";
   skipQueue?: boolean;
   timeout?: number;
 }
@@ -341,7 +340,7 @@ interface SyncManagerStatus {
     };
   };
   health: {
-    status: 'healthy' | 'degraded' | 'unhealthy' | 'slow';
+    status: "healthy" | "degraded" | "unhealthy" | "slow";
     issues: string[];
     metrics: {
       totalAttempts: number;
@@ -364,31 +363,34 @@ interface SyncManagerStatus {
 ### Migrating from Direct SyncQueue Usage
 
 **Before:**
-```typescript
-import { SyncQueue } from '@/utils/features/sync/SyncQueue';
 
-const queue = new SyncQueue({ name: 'MyQueue' });
-await queue.enqueue('operation', async () => {
+```typescript
+import { SyncQueue } from "@/utils/features/sync/SyncQueue";
+
+const queue = new SyncQueue({ name: "MyQueue" });
+await queue.enqueue("operation", async () => {
   // logic
 });
 ```
 
 **After:**
+
 ```typescript
-import { syncManager } from '@/services/sync/SyncManager';
+import { syncManager } from "@/services/sync/SyncManager";
 
 await syncManager.executeSync(async () => {
   // logic
-}, 'operation');
+}, "operation");
 ```
 
 ### Migrating from Direct SyncMutex Usage
 
 **Before:**
-```typescript
-import { globalSyncMutex } from '@/utils/features/sync/SyncMutex';
 
-await globalSyncMutex.acquire('operation');
+```typescript
+import { globalSyncMutex } from "@/utils/features/sync/SyncMutex";
+
+await globalSyncMutex.acquire("operation");
 try {
   // logic
 } finally {
@@ -397,27 +399,37 @@ try {
 ```
 
 **After:**
-```typescript
-import { syncManager } from '@/services/sync/SyncManager';
 
-await syncManager.executeSync(async () => {
-  // logic
-}, 'operation', { skipQueue: true });
+```typescript
+import { syncManager } from "@/services/sync/SyncManager";
+
+await syncManager.executeSync(
+  async () => {
+    // logic
+  },
+  "operation",
+  { skipQueue: true }
+);
 ```
 
 ### Migrating from masterSyncValidator
 
 **Before:**
+
 ```typescript
-import { getQuickSyncStatus, runMasterSyncValidation } from '@/utils/features/sync/masterSyncValidator';
+import {
+  getQuickSyncStatus,
+  runMasterSyncValidation,
+} from "@/utils/features/sync/masterSyncValidator";
 
 const health = await getQuickSyncStatus();
 const results = await runMasterSyncValidation();
 ```
 
 **After:**
+
 ```typescript
-import { syncManager } from '@/services/sync/SyncManager';
+import { syncManager } from "@/services/sync/SyncManager";
 
 const health = await syncManager.checkHealth();
 const results = await syncManager.validateSync();

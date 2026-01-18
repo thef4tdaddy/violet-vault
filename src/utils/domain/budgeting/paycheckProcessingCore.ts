@@ -115,8 +115,9 @@ const createPaycheckRecordPlan = (options: {
   allocations: EnvelopeAllocation[];
   timestamp?: number;
 }): Omit<PaycheckRecordPlan, "incomeTransactionId" | "transferTransactionIds"> => {
-  const { paycheckId, paycheckData, currentBalances, newBalances, allocations, timestamp } = options;
-  
+  const { paycheckId, paycheckData, currentBalances, newBalances, allocations, timestamp } =
+    options;
+
   // Create allocations map
   const allocationsMap: Record<string, number> = {};
   allocations.forEach((a) => {

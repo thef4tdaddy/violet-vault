@@ -7,6 +7,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import viteCompression from "vite-plugin-compression";
 import path from "path";
 import { execSync } from "child_process";
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 
 // Get git commit information at build time
 const getGitInfo = () => {
@@ -296,6 +297,11 @@ export default defineConfig(() => {
         threshold: 10240,
         algorithm: "brotliCompress",
         ext: ".br",
+      }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "violet-vault-frontend",
+        uploadToken: process.env.CODECOV_TOKEN,
       }),
     ],
     resolve: {

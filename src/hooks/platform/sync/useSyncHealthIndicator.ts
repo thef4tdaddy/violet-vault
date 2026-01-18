@@ -135,8 +135,7 @@ export const useSyncHealthIndicator = (): UseSyncHealthIndicatorReturn => {
       // Update status based on results
       setSyncStatus({
         isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
-        status:
-          results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
+        status: results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
         failedTests: results.summary.totalFailed,
         lastChecked: new Date().toISOString(),
         isLoading: false,

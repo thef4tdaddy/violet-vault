@@ -139,7 +139,7 @@ export class SyncOrchestrator {
     if (!this.isRunning) return;
 
     logger.debug(`SyncOrchestrator: Scheduling sync with priority: ${priority}`);
-    
+
     // Use SyncManager to handle queueing and debouncing
     // Fire-and-forget pattern - errors are logged within syncManager
     syncManager
@@ -179,12 +179,9 @@ export class SyncOrchestrator {
     logger.info("SyncOrchestrator: Force sync requested");
 
     // Use SyncManager to force immediate sync with mutex protection
-    return await syncManager.forceSync(
-      async () => {
-        return await this.performSync();
-      },
-      "force-sync"
-    );
+    return await syncManager.forceSync(async () => {
+      return await this.performSync();
+    }, "force-sync");
   }
 
   /**
