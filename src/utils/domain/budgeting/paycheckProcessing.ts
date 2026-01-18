@@ -135,8 +135,11 @@ export const processPaycheck = async (
   // Step 3: Create execution plan (pure domain logic - no side effects)
   const executionPlan = createPaycheckExecutionPlan(
     {
-      ...paycheckData,
+      amount: paycheckData.amount,
+      mode: paycheckData.mode as "allocate" | "leftover",
       envelopeAllocations: enrichedAllocations,
+      notes: paycheckData.notes,
+      payerName: paycheckData.payerName,
     },
     currentBalances
   );

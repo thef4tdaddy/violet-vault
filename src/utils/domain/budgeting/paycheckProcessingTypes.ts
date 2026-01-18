@@ -7,6 +7,7 @@
 export interface BalanceUpdate {
   actualBalance: number;
   unassignedCash: number;
+  [key: string]: unknown;
 }
 
 export interface EnvelopeAllocation {
