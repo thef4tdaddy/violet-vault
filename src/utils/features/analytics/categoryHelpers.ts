@@ -149,6 +149,22 @@ export const formatCurrency = (amount: number | null | undefined): string => {
 };
 
 /**
+ * Format number with fixed decimal places (no currency symbol)
+ */
+export const formatNumber = (value: number | null | undefined, decimals = 2): string => {
+  if (value == null || isNaN(value)) return "0";
+  return value.toFixed(decimals);
+};
+
+/**
+ * Format percentage for display
+ */
+export const formatPercentage = (value: number | null | undefined, decimals = 1): string => {
+  if (value == null || isNaN(value)) return "0%";
+  return `${value.toFixed(decimals)}%`;
+};
+
+/**
  * Format frequency as readable text
  */
 export const formatFrequency = (frequency: number): string => {

@@ -4,6 +4,8 @@ import {
   processSuggestions,
   applySuggestionToData,
   formatCurrency,
+  formatNumber,
+  formatPercentage,
   formatFrequency,
   getFrequencyCategory,
   calculateSuggestionImpact,
@@ -294,6 +296,48 @@ describe("categoryHelpers", () => {
     it("should add commas for large numbers", () => {
       expect(formatCurrency(1234567)).toBe("$1,234,567");
       expect(formatCurrency(1234567.89)).toBe("$1,234,567.89");
+    });
+  });
+
+  describe("formatNumber", () => {
+    it("should format numbers with default 2 decimals", () => {
+      expect(formatNumber(1234.567)).toBe("1234.57");
+      expect(formatNumber(1234)).toBe("1234.00");
+    });
+
+    it("should format numbers with specified decimals", () => {
+      expect(formatNumber(1234.567, 1)).toBe("1234.6");
+      expect(formatNumber(1234.567, 3)).toBe("1234.567");
+    });
+
+    it("should handle null and undefined", () => {
+      expect(formatNumber(null)).toBe("0");
+      expect(formatNumber(undefined)).toBe("0");
+    });
+
+    it("should handle NaN", () => {
+      expect(formatNumber(NaN)).toBe("0");
+    });
+  });
+
+  describe("formatPercentage", () => {
+    it("should format percentages with default 1 decimal", () => {
+      expect(formatPercentage(45.67)).toBe("45.7%");
+      expect(formatPercentage(100)).toBe("100.0%");
+    });
+
+    it("should format percentages with specified decimals", () => {
+      expect(formatPercentage(45.678, 2)).toBe("45.68%");
+      expect(formatPercentage(45.678, 0)).toBe("46%");
+    });
+
+    it("should handle null and undefined", () => {
+      expect(formatPercentage(null)).toBe("0%");
+      expect(formatPercentage(undefined)).toBe("0%");
+    });
+
+    it("should handle NaN", () => {
+      expect(formatPercentage(NaN)).toBe("0%");
     });
   });
 
