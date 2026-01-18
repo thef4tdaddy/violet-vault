@@ -966,6 +966,21 @@ describe("envelopeFormUtils", () => {
 
       expect(result.monthlyAmount).toBe("");
     });
+
+    it("should handle missing name and provider (edge case)", () => {
+      const bill = {
+        id: "bill123",
+        category: "Utilities",
+        amount: 100,
+      };
+
+      const result = transformBillToEnvelopeForm(bill, currentFormData);
+
+      expect(result.name).toBe("");
+      expect(result.description).toBe("Bill envelope for undefined");
+      // This edge case should be caught by envelope form validation later
+      // as empty names are not allowed per validateEnvelopeForm
+    });
   });
 
   describe("calculateQuickFundUpdate", () => {
