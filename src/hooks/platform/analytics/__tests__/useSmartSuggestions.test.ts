@@ -217,7 +217,7 @@ describe("useSmartSuggestions", () => {
     it("should handle special characters in merchant names", () => {
       const { result } = renderHook(() => useSmartSuggestions({ transactions, bills: [] }));
 
-      const suggestion = result.current.suggestTransactionCategory("Café & Restaurant");
+      result.current.suggestTransactionCategory("Café & Restaurant");
       // Should not crash
       expect(result.current.suggestTransactionCategory).toBeDefined();
     });
