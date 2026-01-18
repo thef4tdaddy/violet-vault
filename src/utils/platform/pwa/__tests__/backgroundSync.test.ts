@@ -417,9 +417,6 @@ describe("BackgroundSyncManager", () => {
       const parsed = JSON.parse(saved!);
       expect(parsed).toHaveLength(1);
       expect(parsed[0].type).toBe("transaction");
-
-      // Restore online state
-      setOnlineState(true);
     });
 
     it("should load pending operations from localStorage", () => {
