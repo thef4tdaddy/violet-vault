@@ -1,4 +1,5 @@
 import React from "react";
+import { formatCurrency } from "@/utils/features/analytics/categoryHelpers";
 import { BudgetVsActualChart } from "../../charts";
 
 interface EnvelopeHealth {
@@ -59,13 +60,13 @@ const HealthTab: React.FC<HealthTabProps> = ({ envelopeHealth, budgetVsActual })
                     <div className="flex justify-between">
                       <span className="text-gray-600">Balance:</span>
                       <span className="font-medium">
-                        ${(envelope.currentBalance || 0).toFixed(2)}
+                        {formatCurrency(envelope.currentBalance || 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Budget:</span>
                       <span className="font-medium">
-                        ${(envelope.monthlyBudget || 0).toFixed(2)}
+                        {formatCurrency(envelope.monthlyBudget || 0)}
                       </span>
                     </div>
                   </div>

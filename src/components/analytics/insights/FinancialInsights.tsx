@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  getTrendIcon,
+  getTrendColor,
+  getHealthColor,
+  getHealthLabel,
+} from "@/utils/features/analytics/trendHelpers";
+import { formatCurrency, formatPercentage } from "@/utils/features/analytics/categoryHelpers";
 
 export interface VelocityData {
   averageMonthlyExpenses: number;
@@ -22,43 +29,6 @@ interface FinancialInsightsProps {
   topCategories: TopCategory[];
   healthScore: number;
 }
-
-// Helper functions
-const getTrendIcon = (direction: string) => {
-  const icons = {
-    increasing: "📈",
-    decreasing: "📉",
-    stable: "➡️",
-  };
-  return (
-    <span role="img" aria-label={`${direction} trend`}>
-      {icons[direction as keyof typeof icons] || icons.stable}
-    </span>
-  );
-};
-
-const getTrendColor = (direction: string) => {
-  const colors = {
-    increasing: "text-red-600",
-    decreasing: "text-green-600",
-    stable: "text-gray-600",
-  };
-  return colors[direction as keyof typeof colors] || colors.stable;
-};
-
-const getHealthColor = (score: number) => {
-  if (score >= 80) return "bg-green-500";
-  if (score >= 60) return "bg-yellow-500";
-  if (score >= 40) return "bg-orange-500";
-  return "bg-red-500";
-};
-
-const getHealthLabel = (score: number) => {
-  if (score >= 80) return "Excellent";
-  if (score >= 60) return "Good";
-  if (score >= 40) return "Fair";
-  return "Needs Attention";
-};
 
 // Sub-components
 const BudgetHealthScore: React.FC<{ healthScore: number }> = ({ healthScore }) => (
@@ -96,13 +66,16 @@ const SpendingVelocity: React.FC<{ velocity: VelocityData }> = ({ velocity }) =>
       <div>
         <div className="text-sm text-gray-600 mb-1">Average Monthly</div>
         <div className="text-2xl font-black text-black">
-          ${velocity.averageMonthlyExpenses.toFixed(0)}
+          {formatCurrency(velocity.averageMonthlyExpenses)}
         </div>
       </div>
       <div>
         <div className="text-sm text-gray-600 mb-1">Trend</div>
         <div className={`text-2xl font-black ${getTrendColor(velocity.trendDirection)}`}>
-          {getTrendIcon(velocity.trendDirection)} {velocity.trendDirection}
+          <span role="img" aria-label={`${velocity.trendDirection} trend`}>
+            {getTrendIcon(velocity.trendDirection)}
+          </span>{" "}
+          {velocity.trendDirection}
         </div>
       </div>
       {velocity.percentChange !== undefined && (
@@ -110,14 +83,14 @@ const SpendingVelocity: React.FC<{ velocity: VelocityData }> = ({ velocity }) =>
           <div className="text-sm text-gray-600 mb-1">Change</div>
           <div className={`text-xl font-black ${getTrendColor(velocity.trendDirection)}`}>
             {velocity.percentChange > 0 ? "+" : ""}
-            {velocity.percentChange.toFixed(1)}%
+            {formatPercentage(velocity.percentChange)}
           </div>
         </div>
       )}
       <div>
         <div className="text-sm text-gray-600 mb-1">Projected Next Month</div>
         <div className="text-xl font-black text-purple-600">
-          ${velocity.projectedNextMonth.toFixed(0)}
+          {formatCurrency(velocity.projectedNextMonth)}
         </div>
       </div>
     </div>
@@ -139,7 +112,9 @@ const TopSpendingCategories: React.FC<{ topCategories: TopCategory[] }> = ({ top
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-black">{category.name}</span>
-              <span className="text-sm text-gray-600">{category.percentOfTotal.toFixed(1)}%</span>
+              <span className="text-sm text-gray-600">
+                {formatPercentage(category.percentOfTotal)}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden border border-black">
@@ -148,10 +123,12 @@ const TopSpendingCategories: React.FC<{ topCategories: TopCategory[] }> = ({ top
                   style={{ width: `${category.percentOfTotal}%` }}
                 />
               </div>
-              <span className="text-sm font-bold text-black">${category.expenses.toFixed(0)}</span>
+              <span className="text-sm font-bold text-black">
+                {formatCurrency(category.expenses)}
+              </span>
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {category.count} transactions · Avg ${category.avgTransactionSize.toFixed(0)}
+              {category.count} transactions · Avg {formatCurrency(category.avgTransactionSize)}
             </div>
           </div>
         </div>

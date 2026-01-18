@@ -44,6 +44,26 @@ export const getGrowthRateColor = (growthRate: number) => {
 };
 
 /**
+ * Get trend icon emoji based on direction
+ */
+export const getTrendIcon = (direction: string) => {
+  const icons = {
+    increasing: "📈",
+    decreasing: "📉",
+    stable: "➡️",
+  };
+  return icons[direction as keyof typeof icons] || icons.stable;
+};
+
+/**
+ * Get CSS color class based on trend direction (uses getTrendIconConfig for consistency)
+ */
+export const getTrendColor = (direction: string) => {
+  const config = getTrendIconConfig(direction);
+  return config.iconColor;
+};
+
+/**
  * Generate dynamic category chart colors
  */
 export const getCategoryChartColor = (index: number) => {
@@ -92,4 +112,24 @@ export const SEASON_COLORS = {
   Spring: "#10B981",
   Summer: "#F59E0B",
   Fall: "#EF4444",
+};
+
+/**
+ * Get health score background color class
+ */
+export const getHealthColor = (score: number) => {
+  if (score >= 80) return "bg-green-500";
+  if (score >= 60) return "bg-yellow-500";
+  if (score >= 40) return "bg-orange-500";
+  return "bg-red-500";
+};
+
+/**
+ * Get health score label
+ */
+export const getHealthLabel = (score: number) => {
+  if (score >= 80) return "Excellent";
+  if (score >= 60) return "Good";
+  if (score >= 40) return "Fair";
+  return "Needs Attention";
 };
