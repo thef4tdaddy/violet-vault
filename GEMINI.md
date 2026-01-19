@@ -56,4 +56,4 @@ Use `full_salvo.sh` for multi-language verification.
 
 ---
 
-_Last Updated: January 18, 2026_
+Last Updated: January 19, 2026
