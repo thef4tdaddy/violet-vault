@@ -119,7 +119,11 @@ export const queryKeys = {
 
   // SentinelShare - Cross-app transaction matching
   sentinelShare: ["sentinelShare"],
-  sentinelReceipts: (filters: FilterParams = {}) => [...queryKeys.sentinelShare, "receipts", filters],
+  sentinelReceipts: (filters: FilterParams = {}) => [
+    ...queryKeys.sentinelShare,
+    "receipts",
+    filters,
+  ],
   sentinelReceiptById: (id: EntityId) => [...queryKeys.sentinelShare, "receipt", id],
   sentinelPendingReceipts: () => [...queryKeys.sentinelShare, "pending"],
 };

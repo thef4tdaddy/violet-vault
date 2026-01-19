@@ -67,9 +67,7 @@ export async function fetchSentinelReceipts(): Promise<SentinelReceiptsResponseT
 /**
  * Update the status of a SentinelShare receipt
  */
-export async function updateReceiptStatus(
-  options: UpdateReceiptStatusOptions
-): Promise<void> {
+export async function updateReceiptStatus(options: UpdateReceiptStatusOptions): Promise<void> {
   try {
     logger.debug("Updating SentinelShare receipt status", {
       receiptId: options.receiptId,
