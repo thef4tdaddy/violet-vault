@@ -56,7 +56,6 @@ Refer to GitHub Epic [#1463](https://github.com/thef4tdaddy/violet-vault/issues/
 - **Auth in Context**: Auth state lives in React Context, not Zustand (v2.0+)
 - **Test coverage**: All PRs MUST include tests (80%+ for new files)
 - **Commit frequently**: Small, focused commits with conventional commit messages
-- **Run Prettier**: `npm run format` before committing
 
 ## 📚 Key Documentation
 

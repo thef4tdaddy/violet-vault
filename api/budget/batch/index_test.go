@@ -1,27 +1,36 @@
-package budget
+package handler
 
 import (
 	"testing"
+	"time"
+
+	"github.com/thef4tdaddy/violet-vault/api/_pkg/budget"
 )
+
+// Helper to create date strings
+func date(daysFromNow int) string {
+	t := time.Now().Add(time.Duration(daysFromNow) * 24 * time.Hour)
+	return t.Format("2006-01-02")
+}
 
 func TestProcessBatch(t *testing.T) {
 	// Setup test data
-	env1 := Envelope{
+	env1 := budget.Envelope{
 		ID:             "env1",
 		Name:           "Groceries",
 		CurrentBalance: 500,
-		Type:           EnvelopeTypeStandard,
+		Type:           budget.EnvelopeTypeStandard,
 	}
 
-	env2 := Envelope{
+	env2 := budget.Envelope{
 		ID:             "env2",
 		Name:           "Rent",
 		CurrentBalance: 1200,
-		Type:           EnvelopeTypeLiability,
+		Type:           budget.EnvelopeTypeLiability,
 		MinimumPayment: 1200,
 	}
 
-	tx1 := Transaction{
+	tx1 := budget.Transaction{
 		ID:         "tx1",
 		EnvelopeID: "env1",
 		Type:       "expense",
@@ -29,7 +38,7 @@ func TestProcessBatch(t *testing.T) {
 		Date:       date(-1),
 	}
 
-	tx2 := Transaction{
+	tx2 := budget.Transaction{
 		ID:          "tx2",
 		EnvelopeID:  "env2",
 		Type:        "expense",
@@ -39,19 +48,19 @@ func TestProcessBatch(t *testing.T) {
 	}
 
 	// Create batch request
-	requests := []BatchItem{
+	requests := []budget.BatchItem{
 		{
 			UserID:       "user1",
-			Envelopes:    []Envelope{env1},
-			Transactions: []Transaction{tx1},
+			Envelopes:    []budget.Envelope{env1},
+			Transactions: []budget.Transaction{tx1},
 			Metadata: map[string]interface{}{
 				"source": "test",
 			},
 		},
 		{
 			UserID:       "user2",
-			Envelopes:    []Envelope{env2},
-			Transactions: []Transaction{tx2},
+			Envelopes:    []budget.Envelope{env2},
+			Transactions: []budget.Transaction{tx2},
 		},
 	}
 
@@ -89,7 +98,7 @@ func TestProcessBatch(t *testing.T) {
 }
 
 func TestProcessBatchEmpty(t *testing.T) {
-	requests := []BatchItem{}
+	requests := []budget.BatchItem{}
 	results, summary := ProcessBatch(requests)
 
 	if summary.TotalRequests != 0 {
