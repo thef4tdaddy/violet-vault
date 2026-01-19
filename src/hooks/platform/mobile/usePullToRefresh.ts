@@ -111,6 +111,7 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const startScrollTop = useRef(0);
+  const hasTriggeredHaptic = useRef(false);
 
   // Framer Motion values
   const motionY = useMotionValue(0);
@@ -141,6 +142,7 @@ export const usePullToRefresh = (
         // Only start pulling if at top of container
         if (startScrollTop.current === 0) {
           setIsPulling(true);
+          hasTriggeredHaptic.current = false; // Reset haptic flag
         }
       }
     },
@@ -166,13 +168,14 @@ export const usePullToRefresh = (
         setPullDistance(distance);
         motionY.set(distance);
 
-        // Trigger haptic feedback at threshold
-        if (distance >= threshold && pullDistance < threshold) {
+        // Trigger haptic feedback once when crossing threshold
+        if (distance >= threshold && !hasTriggeredHaptic.current) {
           hapticFeedback(15, "medium");
+          hasTriggeredHaptic.current = true;
         }
       }
     },
-    [isEnabled, isPulling, isRefreshing, threshold, pullDistance, motionY]
+    [isEnabled, isPulling, isRefreshing, threshold, motionY]
   );
 
   /**
@@ -208,6 +211,7 @@ export const usePullToRefresh = (
       setPullDistance(0);
       motionY.set(0);
       startScrollTop.current = 0;
+      hasTriggeredHaptic.current = false;
     },
     [
       isEnabled,

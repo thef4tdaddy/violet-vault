@@ -2,7 +2,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { getIcon } from "@/utils";
-import usePullToRefresh from "@/hooks/platform/mobile/usePullToRefresh";
+import { usePullToRefresh } from "@/hooks/platform/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
