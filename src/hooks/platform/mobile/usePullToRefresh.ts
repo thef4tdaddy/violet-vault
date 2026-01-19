@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useMotionValue, useSpring, useTransform, PanInfo } from "framer-motion";
+import { useMotionValue, useSpring, useTransform, PanInfo, MotionValue } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
@@ -36,11 +36,11 @@ interface UsePullToRefreshReturn {
   /** Whether pull distance exceeds threshold */
   isReady: boolean;
   /** Framer Motion Y position motion value */
-  motionY: ReturnType<typeof useMotionValue>;
+  motionY: MotionValue<number>;
   /** Smooth spring animation for Y position */
-  springY: ReturnType<typeof useSpring>;
+  springY: MotionValue<number>;
   /** Rotation value based on pull progress (0-180 degrees) */
-  pullRotation: ReturnType<typeof useTransform>;
+  pullRotation: MotionValue<number>;
   /** Framer Motion drag handlers */
   dragHandlers: {
     onPanStart: (event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => void;
@@ -48,24 +48,24 @@ interface UsePullToRefreshReturn {
     onPanEnd: (event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => void;
   };
   /** Container ref for scroll detection */
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   /** Whether pull-to-refresh is enabled (mobile only) */
   isEnabled: boolean;
 }
 
 /**
  * Modern pull-to-refresh hook using Framer Motion spring physics.
- * 
+ *
  * Provides buttery-smooth pull-to-refresh interaction on mobile devices with:
  * - Physics-based spring animations via Framer Motion
  * - Haptic feedback at refresh threshold
  * - TanStack Query cache invalidation
  * - Mobile-only activation (disabled on desktop)
- * 
+ *
  * @param onRefresh - Async function to call when refresh is triggered
  * @param options - Configuration options
  * @returns Pull-to-refresh state, handlers, and motion values
- * 
+ *
  * @example
  * ```tsx
  * const { dragHandlers, motionY, isRefreshing, containerRef } = usePullToRefresh(
@@ -74,7 +74,7 @@ interface UsePullToRefreshReturn {
  *     await fetchData();
  *   }
  * );
- * 
+ *
  * return (
  *   <motion.div
  *     ref={containerRef}
@@ -162,7 +162,7 @@ export const usePullToRefresh = (
         // Apply resistance curve for natural feel
         const resistance = 2.5;
         const distance = Math.min(pullY / resistance, threshold * 1.5);
-        
+
         setPullDistance(distance);
         motionY.set(distance);
 
@@ -196,7 +196,7 @@ export const usePullToRefresh = (
 
           // Execute custom refresh function
           await onRefresh();
-        } catch (error) {
+        } catch {
           // Error handled silently - logged if needed in onRefresh
         } finally {
           setIsRefreshing(false);

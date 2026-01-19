@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 import { getIcon } from "@/utils";
 import usePullToRefresh from "@/hooks/platform/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
@@ -48,18 +49,18 @@ const GlobalPullToRefresh: React.FC = () => {
               })}
             </div>
           ) : (
-            <div
+            <motion.div
               className={`transition-all duration-200 ${
                 isReady ? "text-green-600 scale-110" : "text-purple-600"
               }`}
               style={{
-                transform: `rotate(${pullRotation}deg)`,
+                rotate: pullRotation,
               }}
             >
               {React.createElement(getIcon("ArrowDown"), {
                 className: "w-12 h-12",
               })}
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -88,7 +89,7 @@ const GlobalPullToRefresh: React.FC = () => {
   return createPortal(modalContent, document.body);
 };
 
-// Export a wrapper component that attaches the ref to the main app container
+// Export a wrapper component that attaches the drag handlers to the main app container
 export const GlobalPullToRefreshProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -98,16 +99,24 @@ export const GlobalPullToRefreshProvider: React.FC<{ children: React.ReactNode }
     await queryClient.invalidateQueries();
   };
 
-  const { containerRef, pullStyles } = usePullToRefresh(refreshData, {
+  const { containerRef, dragHandlers, springY } = usePullToRefresh(refreshData, {
     threshold: 80,
     enabled: true,
   });
 
   return (
-    <div ref={containerRef} style={pullStyles} className="min-h-screen">
+    <motion.div
+      ref={containerRef}
+      style={{ y: springY }}
+      {...dragHandlers}
+      drag="y"
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={0.2}
+      className="min-h-screen"
+    >
       {children}
       <GlobalPullToRefresh />
-    </div>
+    </motion.div>
   );
 };
 
