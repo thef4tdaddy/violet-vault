@@ -10,7 +10,7 @@
       "runtime": "python3.12"
     },
     "api/**/*.go": {
-      "runtime": "go1.x"
+      "runtime": "go1.22"
     }
   },
   "installCommand": "npm ci",
