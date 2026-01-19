@@ -3,7 +3,7 @@ Data Models for VioletVault Analytics Service
 Mirrors the TypeScript/Zod schemas from the frontend
 """
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
