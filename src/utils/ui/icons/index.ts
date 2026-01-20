@@ -58,6 +58,7 @@ import {
 
   // Utilities & Services
   Zap,
+  Lightbulb,
   Droplets,
   Flame,
   Wifi,
@@ -190,60 +191,96 @@ export const ICON_REGISTRY = {
   "chevron-right": ChevronRight,
   "chevron-up": ChevronUp,
   "chevron-down": ChevronDown,
+  ArrowRight,
+  ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
   menu: Menu,
+  Menu: Menu,
   x: X,
-  X: X, // PascalCase alias for close buttons
+  X: X,
   plus: Plus,
+  Plus: Plus,
   minus: Minus,
+  Minus: Minus,
   edit: Edit,
+  Edit: Edit,
+  edit2: Edit,
+  Edit2: Edit,
   trash: Trash2,
+  Trash2: Trash2,
   search: Search,
+  Search: Search,
   filter: Filter,
+  Filter: Filter,
   settings: Settings,
+  Settings: Settings,
   "more-horizontal": MoreHorizontal,
   "more-vertical": MoreVertical,
+  MoreHorizontal,
+  MoreVertical,
 
   // Status & Feedback
   check: Check,
+  Check: Check,
   "check-circle": CheckCircle,
-  CheckCircle: CheckCircle, // PascalCase alias
+  CheckCircle: CheckCircle,
   "x-circle": XCircle,
-  XCircle: XCircle, // PascalCase alias
+  XCircle: XCircle,
   "alert-circle": AlertCircle,
-  AlertCircle: AlertCircle, // PascalCase alias
+  AlertCircle: AlertCircle,
   "alert-triangle": AlertTriangle,
-  AlertTriangle: AlertTriangle, // PascalCase alias
+  AlertTriangle: AlertTriangle,
   info: Info,
-  Info: Info, // PascalCase alias
+  Info: Info,
   help: HelpCircle,
   "help-circle": HelpCircle,
   HelpCircle: HelpCircle,
   eye: Eye,
+  Eye: Eye,
   "eye-off": EyeOff,
+  EyeOff: EyeOff,
   "thumbs-up": ThumbsUp,
   "thumbs-down": ThumbsDown,
   star: Star,
+  Star: Star,
   heart: Heart,
+  Heart: Heart,
   Tag: Tag,
   Target: Target,
   bug: Bug,
-  Bug: Bug, // PascalCase alias
+  Bug: Bug,
 
   // Financial & Business
   "dollar-sign": DollarSign,
+  DollarSign: DollarSign,
   "credit-card": CreditCard,
+  CreditCard: CreditCard,
   "piggy-bank": PiggyBank,
+  PiggyBank: PiggyBank,
   calculator: Calculator,
+  Calculator: Calculator,
   "trending-up": TrendingUp,
   "trending-down": TrendingDown,
   TrendingUp: TrendingUp,
+  TrendingDown: TrendingDown,
   Wallet: Wallet,
   "bar-chart": BarChart,
   "pie-chart": PieChart,
+  BarChart: BarChart,
+  PieChart: PieChart,
   activity: Activity,
+  Activity: Activity,
 
   // Utilities & Services (matching debt constants)
   Zap: Zap,
+  zap: Zap,
+  Lightbulb: Lightbulb,
+  lightbulb: Lightbulb,
   Droplets: Droplets,
   Flame: Flame,
   Wifi: Wifi,
@@ -350,8 +387,6 @@ export const ICON_REGISTRY = {
 
   // Debt Types (matching constants/debts.js)
   Scale: Scale, // For Chapter 13
-  DollarSign: DollarSign, // For Other debt type
-  CreditCard: CreditCard, // For Credit Card debt type
 };
 
 /**

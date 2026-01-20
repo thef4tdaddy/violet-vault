@@ -51,7 +51,7 @@ const AccountBalanceOverview = ({
 
   return (
     <div className="space-y-6" data-testid="account-balance-overview">
-      <div className="flex items-center px-2">
+      <div className="px-2">
         <h2 className="font-black text-black text-xl mb-6 flex items-center">
           {React.createElement(getIcon("CreditCard"), {
             className: "h-6 w-6 mr-2 sm:mr-3 text-blue-600 flex-shrink-0",

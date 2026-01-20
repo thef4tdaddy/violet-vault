@@ -40,6 +40,9 @@ vi.mock("../../../../db/budgetDb", () => ({
     }),
     envelopes: { clear: vi.fn(), bulkAdd: vi.fn() },
     transactions: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budget: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budgetCommits: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budgetChanges: { clear: vi.fn(), bulkAdd: vi.fn() },
   },
 }));
 

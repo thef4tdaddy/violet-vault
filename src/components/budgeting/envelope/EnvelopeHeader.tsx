@@ -38,7 +38,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
             onToggleCollapse();
           }, "light")}
           className={getButtonClasses(
-            "md:hidden flex-shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
+            "md:hidden shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
             "small"
           )}
           aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
@@ -53,7 +53,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
             {/* Color indicator */}
             {envelope.color && (
               <div
-                className="w-3 h-3 rounded-full flex-shrink-0"
+                className="w-3 h-3 rounded-full shrink-0"
                 style={{ backgroundColor: envelope.color }}
                 title={`Color: ${envelope.color}`}
               />
@@ -70,12 +70,12 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
               onEdit?.(envelope);
             }, "light")}
             className={getButtonClasses(
-              "p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded border border-blue-200",
+              "p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 min-h-[40px] min-w-[40px] flex items-center justify-center rounded border border-blue-200",
               "small"
             )}
             title="Edit envelope"
           >
-            {React.createElement(getIcon("Edit2"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Edit"), { className: "h-3.5 w-3.5" })}
           </Button>
           <Button
             onClick={withHapticFeedback((e) => {
@@ -83,13 +83,13 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
               onViewHistory?.(envelope);
             }, "light")}
             className={getButtonClasses(
-              "p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded border border-amber-200",
+              "p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 min-h-[40px] min-w-[40px] flex items-center justify-center rounded border border-amber-200",
               "small"
             )}
             title="View transaction history"
           >
             {React.createElement(getIcon("Clock"), {
-              className: "h-4 w-4",
+              className: "h-3.5 w-3.5",
             })}
           </Button>
         </div>

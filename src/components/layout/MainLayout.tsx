@@ -456,47 +456,45 @@ const MainContentLayoutView = ({
   return (
     <div className="min-h-screen bg-brand-900 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
       <div className="relative mx-auto max-w-7xl">
-        {/* Main Content Area with "Inlaid" look - Triple Layered Border System */}
-        <div className="bg-purple-100/40 rounded-[2.5rem] p-2 sm:p-4 hard-border shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]">
-          <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 relative z-10 transition-all duration-500 shadow-xl">
-            <Header
-              currentUser={currentUser}
-              isLocalOnlyMode={isLocalOnlyMode}
-              onUserChange={onNavigateToAuth}
-              onUpdateProfile={onUpdateProfile}
-              onShowSettings={(section) => settings.open(section)}
-              onShowDataSettings={() => settings.open("general")}
-            />
+        {/* Simplified Layout - Dark Background -> White Content Box */}
+        <div className="bg-white rounded-[2.5rem] hard-border p-4 sm:p-8 relative z-10 transition-all duration-500 shadow-xl min-h-[85vh]">
+          <Header
+            currentUser={currentUser}
+            isLocalOnlyMode={isLocalOnlyMode}
+            onUserChange={onNavigateToAuth}
+            onUpdateProfile={onUpdateProfile}
+            onShowSettings={(section) => settings.open(section)}
+            onShowDataSettings={() => settings.open("general")}
+          />
 
-            {rotationDue && (
-              <div className="mb-6 rounded-xl border-2 border-black bg-amber-100 p-4 text-center text-amber-900 font-bold">
-                ⚠️ Your password is over 90 days old. Please change it in settings.
-              </div>
-            )}
+          {rotationDue && (
+            <div className="mb-6 rounded-xl border-2 border-black bg-amber-100 p-4 text-center text-amber-900 font-bold">
+              ⚠️ Your password is over 90 days old. Please change it in settings.
+            </div>
+          )}
 
-            <NavigationTabs />
-            <OnboardingProgress />
-            <SummaryCards />
+          <NavigationTabs />
+          <OnboardingProgress />
+          <SummaryCards />
 
-            <AppRoutes
-              budget={(budget || {}) as Record<string, unknown>}
-              currentUser={(currentUser || {}) as Record<string, unknown>}
-              totalBiweeklyNeed={totalBiweeklyNeed}
-              setActiveView={setActiveView}
-            />
+          <AppRoutes
+            budget={(budget || {}) as Record<string, unknown>}
+            currentUser={(currentUser || {}) as Record<string, unknown>}
+            totalBiweeklyNeed={totalBiweeklyNeed}
+            setActiveView={setActiveView}
+          />
 
-            <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+          <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
 
-            <div className="mt-12 pt-8 border-t-2 border-black/10 text-center">
-              <div className="inline-block bg-brand-50 rounded-2xl hard-border p-4 shadow-sm hover:shadow-md transition-all">
-                <p className="text-sm text-gray-800">
-                  <span className="font-black text-purple-700">{getVersionInfo().displayName}</span>{" "}
-                  <span className="font-mono">v{getVersionInfo().version}</span>
-                </p>
-                <p className="mt-1 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
-                  Last updated: {getVersionInfo().buildDate}
-                </p>
-              </div>
+          <div className="mt-12 pt-8 border-t-2 border-black/10 text-center">
+            <div className="inline-block bg-brand-50 rounded-2xl hard-border p-4 shadow-sm hover:shadow-md transition-all">
+              <p className="text-sm text-gray-800">
+                <span className="font-black text-purple-700">{getVersionInfo().displayName}</span>{" "}
+                <span className="font-mono">v{getVersionInfo().version}</span>
+              </p>
+              <p className="mt-1 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                Last updated: {getVersionInfo().buildDate}
+              </p>
             </div>
           </div>
         </div>

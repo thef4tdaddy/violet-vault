@@ -26,7 +26,7 @@ import {
 describe("Test Fixtures", () => {
   describe("standardEnvelopes", () => {
     it("should have valid envelopes", () => {
-      expect(standardEnvelopes).toHaveLength(5);
+      expect(standardEnvelopes).toHaveLength(7);
 
       standardEnvelopes.forEach((envelope) => {
         expect(() => validateEnvelope(envelope)).not.toThrow();

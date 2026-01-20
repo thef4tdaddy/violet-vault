@@ -139,7 +139,7 @@ const NavigationTabs = memo(() => {
     <div className="bg-brand-50 rounded-3xl mb-6 lg:shadow-xl hard-border hidden sm:block lg:static z-50 overflow-hidden relative">
       <nav
         ref={navRef}
-        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-2 lg:py-1.5"
+        className="flex justify-evenly lg:justify-around items-stretch overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 h-full"
       >
         {tabs.map((tab) => (
           <NavButton
@@ -174,7 +174,7 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }: NavButtonPr
     data-tab={viewKey}
     onClick={() => hapticFeedback(10, "light")}
     className={getButtonClasses(
-      `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-black border-x border-black/5 ${
+      `shrink-0 lg:flex-1 flex flex-col items-center justify-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-black border-x border-black/5 h-full ${
         active
           ? "border-b-4 border-black text-brand-700 bg-brand-200/50 shadow-inner"
           : "border-transparent text-gray-700 hover:text-brand-600 hover:bg-brand-50/40"

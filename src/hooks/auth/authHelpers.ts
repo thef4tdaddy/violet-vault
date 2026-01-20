@@ -100,16 +100,18 @@ export const handleNewUserSetup = async (
     userColor: (userData.userColor as string) || "#a855f7",
   };
 
+  const { fullBudgetState } = await import("@/utils/core/testing/factories/fixtures");
+
   const initialBudgetData = {
     currentUser: {
       ...finalUserData,
       shareCode: shareCode,
     },
-    envelopes: [],
-    bills: [],
-    transactions: [],
-    actualBalance: { amount: 0, isManual: false },
-    unassignedCash: 0,
+    envelopes: fullBudgetState.envelopes,
+    bills: fullBudgetState.bills,
+    transactions: fullBudgetState.transactions,
+    actualBalance: { amount: fullBudgetState.unassignedCash + 5000, isManual: true },
+    unassignedCash: fullBudgetState.unassignedCash,
     metadata: {
       version: "2.0.0",
       createdAt: new Date().toISOString(),

@@ -116,74 +116,66 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   }
 
   return (
-    <div className="relative rounded-[2.5rem] bg-purple-100/40 p-2 sm:p-4 hard-border shadow-inner">
-      <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 space-y-8 min-h-[700px] shadow-xl relative z-10 transition-all duration-500">
-        {/* Payday Prediction */}
-        {paydayPrediction && (
-          <div className="hard-border rounded-2xl overflow-hidden shadow-md">
-            <PaydayPrediction
-              prediction={paydayPrediction}
-              className="mb-0" // Remove margin to stay inside border
-              onProcessPaycheck={handleProcessPaycheck}
-              onPrepareEnvelopes={handlePrepareEnvelopes}
-            />
-          </div>
-        )}
-
-        {/* Debt Summary Widget */}
-        <div className="hard-border rounded-2xl overflow-hidden shadow-md">
-          <DebtSummaryWidget
-            onNavigateToDebts={() => {
-              if (setActiveView) {
-                setActiveView("debts");
-              } else {
-                logger.debug("Navigate to debts requested - setActiveView not available");
-              }
-            }}
-          />
-        </div>
-
-        {/* Account Balance Overview */}
-        <AccountBalanceOverview
-          actualBalance={actualBalance}
-          totalVirtualBalance={totalVirtualBalance}
-          totalEnvelopeBalance={totalEnvelopeBalance}
-          totalSavingsBalance={totalSavingsBalance}
-          unassignedCash={unassignedCash}
-          difference={difference}
-          isBalanced={isBalanced}
-          onUpdateBalance={handleUpdateBalance}
-          onOpenReconcileModal={openReconcileModal}
-          onAutoReconcileDifference={handleAutoReconcileDifference}
+    <div className="bg-purple-100 rounded-2xl p-4 sm:p-6 space-y-6 hard-border shadow-inner-lg transition-all duration-500">
+      {/* Payday Prediction */}
+      {paydayPrediction && (
+        <PaydayPrediction
+          prediction={paydayPrediction}
+          className="mb-0"
+          onProcessPaycheck={handleProcessPaycheck}
+          onPrepareEnvelopes={handlePrepareEnvelopes}
         />
+      )}
 
-        {/* Recent Transactions */}
-        <div className="hard-border rounded-2xl overflow-hidden shadow-md">
-          <RecentTransactionsWidget
-            transactions={recentTransactions as never}
-            getEnvelopeOptions={getEnvelopeOptions}
-          />
-        </div>
-
-        <ReconcileTransactionModal
-          isOpen={showReconcileModal}
-          onClose={closeReconcileModal}
-          newTransaction={newTransaction}
-          onUpdateTransaction={
-            updateNewTransaction as (
-              updates: Partial<{
-                type?: string;
-                amount?: string;
-                description?: string;
-                envelopeId?: string;
-                date?: string;
-              }>
-            ) => void
+      {/* Debt Summary Widget */}
+      <DebtSummaryWidget
+        onNavigateToDebts={() => {
+          if (setActiveView) {
+            setActiveView("debts");
+          } else {
+            logger.debug("Navigate to debts requested - setActiveView not available");
           }
-          onReconcile={onReconcileTransaction}
-          getEnvelopeOptions={getEnvelopeOptions}
-        />
-      </div>
+        }}
+      />
+
+      {/* Account Balance Overview */}
+      <AccountBalanceOverview
+        actualBalance={actualBalance}
+        totalVirtualBalance={totalVirtualBalance}
+        totalEnvelopeBalance={totalEnvelopeBalance}
+        totalSavingsBalance={totalSavingsBalance}
+        unassignedCash={unassignedCash}
+        difference={difference}
+        isBalanced={isBalanced}
+        onUpdateBalance={handleUpdateBalance}
+        onOpenReconcileModal={openReconcileModal}
+        onAutoReconcileDifference={handleAutoReconcileDifference}
+      />
+
+      {/* Recent Transactions */}
+      <RecentTransactionsWidget
+        transactions={recentTransactions as never}
+        getEnvelopeOptions={getEnvelopeOptions}
+      />
+
+      <ReconcileTransactionModal
+        isOpen={showReconcileModal}
+        onClose={closeReconcileModal}
+        newTransaction={newTransaction}
+        onUpdateTransaction={
+          updateNewTransaction as (
+            updates: Partial<{
+              type?: string;
+              amount?: string;
+              description?: string;
+              envelopeId?: string;
+              date?: string;
+            }>
+          ) => void
+        }
+        onReconcile={onReconcileTransaction}
+        getEnvelopeOptions={getEnvelopeOptions}
+      />
     </div>
   );
 };

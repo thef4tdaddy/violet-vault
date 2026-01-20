@@ -20,6 +20,9 @@ let baseData = {
   savingsGoals: [],
   supplementalAccounts: [],
   debts: [],
+  budgetCommits: [],
+  budgetChanges: [],
+  budget: [],
 };
 try {
   baseData = require("./violet-vault-test-budget.json");
@@ -44,10 +47,22 @@ const getDateString = (daysAgo) => {
  * v2.0 DATA DEFINITION
  */
 
+/**
+ * BUDGET METADATA
+ */
+const budgetMetadata = [];
+budgetMetadata.push({
+  id: "metadata",
+  unassignedCash: 1250.5,
+  actualBalance: 15750.5,
+  lastModified: Date.now(),
+});
+
 const envelopes = [];
 const transactions = [];
+const budgetCommits = [];
+const budgetChanges = [];
 
-// 1. Core Budget Envelopes
 const coreEnvelopes = [
   {
     id: "env-groceries",
@@ -63,7 +78,14 @@ const coreEnvelopes = [
     targetAmount: 300,
     color: "#f59e0b",
   },
-  { id: "env-rent", name: "Rent", category: "Housing", targetAmount: 1800, color: "#3b82f6" },
+  {
+    id: "env-rent",
+    name: "Rent",
+    category: "Housing",
+    targetAmount: 1800,
+    color: "#3b82f6",
+    type: "liability",
+  },
   {
     id: "env-utilities",
     name: "Utilities",
@@ -87,17 +109,57 @@ const coreEnvelopes = [
   },
 ];
 
-coreEnvelopes.forEach((env) => {
+coreEnvelopes.forEach((env, idx) => {
+  let variance = 0.8;
+  if (idx === 0) variance = 1.2; // Over budget groceries
+  if (idx === 4) variance = 0.1; // Mostly empty fun money
+
+  const currentBalance = Math.floor(Math.random() * env.targetAmount * variance);
+
   envelopes.push({
     ...env,
-    type: "standard",
+    type: env.type || "standard",
     archived: false,
-    autoAllocate: true, // NEW: Enabled for viable demo
-    currentBalance: Math.floor(Math.random() * env.targetAmount * 0.8),
+    autoAllocate: true,
+    currentBalance,
+    monthlyBudget: env.targetAmount, // Add monthlyBudget for calculations
     lastModified: getTimestamp(0),
     createdAt: getTimestamp(365),
     description: `Standard ${env.name} envelope`,
   });
+});
+
+// NEW: Over-budget scenario for UI testing
+envelopes.push({
+  id: "env-over-budget",
+  name: "Excessive Spending",
+  category: "Shopping",
+  type: "standard",
+  archived: false,
+  autoAllocate: true,
+  currentBalance: 50,
+  monthlyBudget: 100, // 50% utilization (realistic)
+  color: "#ef4444",
+  description: "Envelope with unrealistic percentage (> 100%)",
+  lastModified: getTimestamp(0),
+  createdAt: getTimestamp(10),
+});
+
+// NEW: Bi-weekly need with 0 bills due
+envelopes.push({
+  id: "env-biweekly-need-demo",
+  name: "Biweekly Savings",
+  category: "Savings",
+  type: "standard",
+  archived: false,
+  autoAllocate: true,
+  currentBalance: 250,
+  biweeklyAllocation: 125, // Has biweekly need
+  monthlyBudget: 270,
+  color: "#8b5cf6",
+  description: "Has biweekly need but 0 bills due",
+  lastModified: getTimestamp(0),
+  createdAt: getTimestamp(30),
 });
 
 // 2. Savings Goals -> goal envelopes
@@ -186,7 +248,7 @@ const liabilities = [
   {
     id: "debt-chase",
     name: "Chase Freedom",
-    type: "credit_card",
+    type: "liability",
     balance: 2450,
     minPayment: 85,
     rate: 18.99,
@@ -195,7 +257,7 @@ const liabilities = [
   {
     id: "debt-student",
     name: "Great Lakes Loan",
-    type: "student",
+    type: "liability",
     balance: 12500,
     minPayment: 150,
     rate: 4.5,
@@ -204,7 +266,7 @@ const liabilities = [
   {
     id: "debt-auto",
     name: "Ally Car Loan",
-    type: "auto",
+    type: "liability",
     balance: 18400,
     minPayment: 425,
     rate: 5.2,
@@ -217,7 +279,7 @@ liabilities.forEach((debt) => {
     id: debt.id,
     name: debt.name,
     category: "Debt",
-    type: debt.type,
+    type: "liability", // Use strict liability for debt
     status: "active",
     archived: false,
     currentBalance: debt.balance,
@@ -232,11 +294,61 @@ liabilities.forEach((debt) => {
   });
 });
 
+// NEW: Flexible envelopes (Stacked behavior)
+envelopes.push({
+  id: "env-flexible-demo",
+  name: "Flexible Spending",
+  category: "Other",
+  type: "standard",
+  archived: false,
+  autoAllocate: true,
+  currentBalance: 85,
+  targetAmount: 200,
+  monthlyBudget: 200,
+  color: "#f43f5e",
+  description: "Flexible envelope for testing amount stacking",
+  lastModified: getTimestamp(0),
+  createdAt: getTimestamp(5),
+});
+
 // 5. Bills -> bill type envelopes
 const bills = [
-  { id: "bill-netflix", name: "Netflix", amount: 19.99, due: 15 },
-  { id: "bill-internet", name: "Comcast Xfinity", amount: 89.99, due: 10 },
-  { id: "bill-electric", name: "General Electric", amount: 125.5, due: 5 },
+  {
+    id: "bill-netflix",
+    name: "Netflix",
+    amount: 19.99,
+    due: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  },
+  {
+    id: "bill-internet",
+    name: "Comcast Xfinity",
+    amount: 89.99,
+    due: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  },
+  {
+    id: "bill-electric",
+    name: "General Electric",
+    amount: 125.5,
+    due: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  },
+  {
+    id: "bill-water",
+    name: "City Water",
+    amount: 45.0,
+    due: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  }, // Upcoming
+  {
+    id: "bill-trash",
+    name: "Waste Management",
+    amount: 30.0,
+    due: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  }, // Upcoming
+  {
+    id: "bill-insurance",
+    name: "Geico Insurance",
+    amount: 120.0,
+    due: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  }, // Overdue
 ];
 
 bills.forEach((bill) => {
@@ -265,8 +377,30 @@ bills.forEach((bill) => {
  */
 
 const merchants = {
-  groceries: ["Whole Foods", "Trader Joes", "Costco", "Kroger", "Aldi", "Publix", "Safeway"],
-  gas: ["Shell", "Chevron", "BP", "Exxon", "7-Eleven", "Arco", "Circle K"],
+  groceries: [
+    "Whole Foods",
+    "Trader Joes",
+    "Costco",
+    "Kroger",
+    "Aldi",
+    "Publix",
+    "Safeway",
+    "H-E-B",
+    "Wegmans",
+    "Lidl",
+  ],
+  gas: [
+    "Shell",
+    "Chevron",
+    "BP",
+    "Exxon",
+    "7-Eleven",
+    "Arco",
+    "Circle K",
+    "Valero",
+    "Wawa",
+    "QuikTrip",
+  ],
   entertainment: [
     "Netflix",
     "Spotify",
@@ -276,6 +410,9 @@ const merchants = {
     "Hulu",
     "Apple",
     "Nintendo",
+    "PlayStation",
+    "Xbox",
+    "Audible",
   ],
   restaurants: [
     "Starbucks",
@@ -285,7 +422,21 @@ const merchants = {
     "Sweetgreen",
     "Shake Shack",
     "Olive Garden",
+    "Panera Bread",
+    "Taco Bell",
+    "Chick-fil-A",
   ],
+  shopping: [
+    "Amazon",
+    "Target",
+    "Walmart",
+    "Best Buy",
+    "Home Depot",
+    "Lowes",
+    "TJ Maxx",
+    "Marshalls",
+  ],
+  utilities: ["Verizon", "AT&T", "T-Mobile", "Comcast", "Spectrum", "ConEd", "PG&E", "Duke Energy"],
 };
 
 let txnIdCount = 1000;
@@ -294,10 +445,10 @@ let txnIdCount = 1000;
 for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
   const monthStart = monthsAgo * 30;
 
-  // 15 Random Expenses per month
-  for (let i = 0; i < 15; i++) {
+  // 25 Random Expenses per month (increased for more variety)
+  for (let i = 0; i < 25; i++) {
     const daysAgo = monthStart + Math.floor(Math.random() * 28);
-    const categoryType = i % 4;
+    const categoryType = i % 5;
 
     let envId = "env-groceries";
     let category = "Food & Dining";
@@ -323,6 +474,12 @@ for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
       merchantList = merchants.restaurants;
       desc = "Dining Out";
       amount = (Math.random() * 40 + 10).toFixed(2);
+    } else if (categoryType === 4) {
+      envId = "env-utilities";
+      category = "Shopping";
+      merchantList = merchants.shopping;
+      desc = "Retail Purchase";
+      amount = (Math.random() * 150 + 10).toFixed(2);
     }
 
     transactions.push({
@@ -343,6 +500,7 @@ for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
   [2, 5, 10].forEach((dayOffset, idx) => {
     const daysAgo = monthStart + dayOffset;
     const billsList = ["env-rent", "bill-electric", "bill-internet"];
+    const merchantList = ["Rent Management", "General Electric", "Comcast Xfinity"];
     const amounts = [1800, 125.5, 89.99];
 
     transactions.push({
@@ -355,18 +513,18 @@ for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
       isScheduled: true,
       lastModified: getTimestamp(daysAgo),
       createdAt: getTimestamp(daysAgo),
-      description: `Monthly payment: ${billsList[idx]}`,
+      description: `Monthly payment: ${merchantList[idx]}`,
+      merchant: merchantList[idx],
     });
   });
 
-  // Biweekly Paychecks (The core of "Viable" data)
+  // Paycheck History (Populating history)
   [3, 17].forEach((dayOffset) => {
     const daysAgo = monthStart + dayOffset;
-    const gross = 3500;
     const net = 2500;
 
     transactions.push({
-      id: `txn-${txnIdCount++}`,
+      id: `txn-pay-${txnIdCount++}`,
       date: getDateString(daysAgo),
       amount: net,
       envelopeId: "unassigned",
@@ -374,25 +532,52 @@ for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
       type: "income",
       lastModified: getTimestamp(daysAgo),
       createdAt: getTimestamp(daysAgo),
-      description: "Biweekly Paycheck (Net)",
+      description: "Biweekly Paycheck",
       merchant: "Acme Corp",
-      // Detailed v2.0 Allocations
       allocations: {
         "env-rent": 900,
         "env-groceries": 300,
         "env-gas": 150,
-        "env-emergency": 500,
-        "goal-tesla": 250,
-        "debt-chase": 100,
-        "goal-wedding": 300,
       },
-      unassignedCashBefore: 120,
-      unassignedCashAfter: 120, // After allocations, unassigned often remains same or increases
-      actualBalanceBefore: 4500,
-      actualBalanceAfter: 4500 + net,
     });
   });
+
+  // NEW: Transaction data to trigger Smart Suggestions
+  // Lots of Amazon spending without a dedicated Amazon envelope
+  if (monthsAgo < 3) {
+    for (let j = 0; j < 5; j++) {
+      const daysAgo = monthStart + Math.floor(Math.random() * 25);
+      transactions.push({
+        id: `txn-suggest-${txnIdCount++}`,
+        date: getDateString(daysAgo),
+        amount: -(Math.random() * 50 + 20).toFixed(2),
+        envelopeId: "unassigned", // Not assigned to any envelope
+        category: "Shopping",
+        type: "expense",
+        merchant: "Amazon.com",
+        description: "Unassigned Amazon Spending",
+        lastModified: getTimestamp(daysAgo),
+        createdAt: getTimestamp(daysAgo),
+      });
+    }
+  }
 }
+
+// Add some very recent transactions for more "active" feel
+[0, 1, 2].forEach((daysAgo) => {
+  transactions.push({
+    id: `txn-recent-${daysAgo}`,
+    date: getDateString(daysAgo),
+    amount: -(Math.random() * 25 + 5).toFixed(2),
+    envelopeId: "env-groceries",
+    category: "Food & Dining",
+    type: "expense",
+    lastModified: getTimestamp(daysAgo),
+    createdAt: getTimestamp(daysAgo),
+    description: "Recent Coffee/Snack",
+    merchant: merchants.restaurants[Math.floor(Math.random() * merchants.restaurants.length)],
+  });
+});
 
 // NEW: Add Supplemental Spending for "Last 30 Days" check
 // This ensures FSA/HSA cards don't show $0 spending
@@ -418,6 +603,32 @@ supplementalSpending.forEach((item, idx) => {
   });
 });
 
+/**
+ * HISTORY GENERATION (Version Control)
+ */
+
+const coreEnvIds = ["env-groceries", "env-rent", "env-utilities"];
+coreEnvIds.forEach((envId, idx) => {
+  const hash = `hash-${idx}-${Date.now()}`;
+  budgetCommits.push({
+    hash: hash,
+    timestamp: getTimestamp(idx + 1),
+    message: `Updated budget for ${envId}`,
+    author: "Test User",
+    changes: idx === 0 ? { currentBalance: 150 } : {},
+  });
+
+  budgetChanges.push({
+    commitHash: hash,
+    entityType: "envelope",
+    entityId: envId,
+    changeType: "update",
+    description: `Manual adjustment of ${envId}`,
+    oldValue: { currentBalance: 100 },
+    newValue: { currentBalance: 150 },
+  });
+});
+
 // Sort transactions by date descending
 transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -426,15 +637,18 @@ transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
  */
 
 const outputV2 = {
+  budget: budgetMetadata,
   envelopes,
   transactions,
+  budgetCommits,
+  budgetChanges,
   // Meta fields expected by the app
   exportMetadata: {
     appVersion: "2.0.0-beta.1",
     budgetId: "violet-vault-viable-v2",
     exportDate: new Date().toISOString(),
     isV2Schema: true,
-    description: "Complete v2.0 Unified Test Data (Envelopes + Transactions + Wealth)",
+    description: "Complete v2.0 Unified Test Data (Envelopes + Transactions + History)",
   },
 };
 
