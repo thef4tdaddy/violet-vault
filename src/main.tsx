@@ -124,13 +124,7 @@ const initializeSentryEarly = () => {
       const flushErrorQueue = () => {
         if (errorQueue.length === 0) return;
         import("@/utils/core/common/sentry")
-          .then(({ captureError, initSentry }) => {
-            // Ensure Sentry is initialized before capturing
-            try {
-              initSentry();
-            } catch {
-              // Already initialized or failed, continue anyway
-            }
+          .then(({ captureError }) => {
             errorQueue.forEach(({ error, context }) => {
               captureError(error, context);
             });
@@ -289,7 +283,7 @@ const initializeApp = () => {
         );
 
         try {
-          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator");
           // Re-sync logic for v2.0 orchestrator
           logger.info("✅ Reseting cloud data via SyncOrchestrator...");
           const result = await syncOrchestrator.forceSync();
@@ -308,7 +302,7 @@ const initializeApp = () => {
       window.clearCloudDataOnly = async () => {
         logger.info("🧹 Clearing cloud data only (no restart)...");
         try {
-          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator.js");
+          const { syncOrchestrator } = await import("./services/sync/syncOrchestrator");
           syncOrchestrator.stop();
           logger.info("⏸️ Stopped sync service");
           return { success: true, message: "Cloud data reset, sync stopped" };

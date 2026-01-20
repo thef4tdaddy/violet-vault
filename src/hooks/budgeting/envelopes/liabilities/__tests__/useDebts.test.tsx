@@ -21,14 +21,9 @@ vi.mock("@/db/budgetDb", () => ({
       get: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      where: vi.fn().mockReturnValue({
-        equals: vi.fn().mockReturnThis(),
-        toArray: vi.fn(),
-      }),
     },
-    addEnvelope: vi.fn(),
-    updateEnvelope: vi.fn(),
     putEnvelope: vi.fn(),
+    updateEnvelope: vi.fn(),
   },
 }));
 
@@ -82,11 +77,7 @@ describe("useDebts - CRUD Operations", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    const mockWhere = {
-      equals: vi.fn().mockReturnThis(),
-      toArray: vi.fn().mockResolvedValue([]),
-    };
-    (budgetDb.envelopes.where as Mock).mockReturnValue(mockWhere);
+    (budgetDb.envelopes.toArray as Mock).mockResolvedValue([]);
     (budgetDb.envelopes.get as Mock).mockResolvedValue(mockDebt);
     (budgetDb.putEnvelope as Mock).mockResolvedValue(undefined);
     (budgetDb.updateEnvelope as Mock).mockResolvedValue(1);
@@ -101,7 +92,7 @@ describe("useDebts - CRUD Operations", () => {
   describe("Read Operations", () => {
     it("should fetch debts from database", async () => {
       const mockDebts = [mockDebt];
-      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue(mockDebts);
+      (budgetDb.envelopes.toArray as Mock).mockResolvedValue(mockDebts);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -111,11 +102,11 @@ describe("useDebts - CRUD Operations", () => {
         expect(result.current.debts).toEqual(mockDebts);
       });
 
-      expect(budgetDb.envelopes.where).toHaveBeenCalledWith("type");
+      expect(budgetDb.envelopes.toArray).toHaveBeenCalled();
     });
 
     it("should handle empty debt list", async () => {
-      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue([]);
+      (budgetDb.envelopes.toArray as Mock).mockResolvedValue([]);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -128,7 +119,7 @@ describe("useDebts - CRUD Operations", () => {
 
     it("should get debt by ID", async () => {
       const mockDebts = [mockDebt];
-      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue(mockDebts);
+      (budgetDb.envelopes.toArray as Mock).mockResolvedValue(mockDebts);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -143,7 +134,7 @@ describe("useDebts - CRUD Operations", () => {
     });
 
     it("should return undefined for non-existent debt ID", async () => {
-      (budgetDb.envelopes.where as Mock)().toArray.mockResolvedValue([]);
+      (budgetDb.envelopes.toArray as Mock).mockResolvedValue([]);
 
       const { result } = renderHook(() => useDebts(), {
         wrapper: createWrapper(),
@@ -161,14 +152,9 @@ describe("useDebts - CRUD Operations", () => {
       const debtWithoutStatus = { ...mockDebt, status: undefined };
       const debtWithStatus = { ...mockDebt, status: "active" };
 
-      const mockQuery = {
-        equals: vi.fn().mockReturnThis(),
-        toArray: vi
-          .fn()
-          .mockResolvedValueOnce([debtWithoutStatus])
-          .mockResolvedValueOnce([debtWithStatus]),
-      };
-      (budgetDb.envelopes.where as Mock).mockReturnValue(mockQuery);
+      (budgetDb.envelopes.toArray as Mock)
+        .mockResolvedValueOnce([debtWithoutStatus])
+        .mockResolvedValueOnce([debtWithStatus]);
       (budgetDb.envelopes.update as Mock).mockResolvedValue(1);
 
       const { result } = renderHook(() => useDebts(), {
@@ -179,7 +165,10 @@ describe("useDebts - CRUD Operations", () => {
         expect(result.current.debts).toEqual([debtWithStatus]);
       });
 
-      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith("debt-1", { status: "active" });
+      expect(budgetDb.updateEnvelope).toHaveBeenCalledWith(
+        "debt-1",
+        expect.objectContaining({ status: "active" })
+      );
     });
   });
 

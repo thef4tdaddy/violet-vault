@@ -101,6 +101,8 @@ export const useAuth = () => {
             result.isNewUser || false
           );
         }
+        // Ensure security manager is also unlocked
+        securityManager.unlockSession();
       } else {
         context.setError(result.error ?? "Login failed");
       }

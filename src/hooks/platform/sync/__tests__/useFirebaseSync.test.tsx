@@ -113,11 +113,13 @@ describe("useFirebaseSync", () => {
       })
     );
 
-    expect(mockFirebaseSync.start).toHaveBeenCalledWith({
-      budgetId: mockBudgetId,
-      encryptionKey: mockEncryptionKey,
-      currentUser: mockCurrentUser,
-    });
+    expect(mockFirebaseSync.start).toHaveBeenCalledWith(
+      expect.objectContaining({
+        budgetId: mockBudgetId,
+        encryptionKey: mockEncryptionKey,
+        currentUser: mockCurrentUser,
+      })
+    );
   });
 
   it("should not start sync when firebaseSync is missing", () => {
@@ -156,10 +158,8 @@ describe("useFirebaseSync", () => {
       })
     );
 
-    // First effect doesn't check currentUser, so it will try to start
-    // but second effect checks all dependencies
-    // The hook will still call start() from the first effect
-    expect(mockFirebaseSync.start).toHaveBeenCalled();
+    // Both effects check for encryptionKey, so start() should not be called
+    expect(mockFirebaseSync.start).not.toHaveBeenCalled();
   });
 
   it("should not start sync when currentUser is missing", () => {

@@ -29,7 +29,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
         flex flex-col items-center justify-center
         px-2 py-2
         relative transition-all duration-200 ease-out
-        ${isActive ? "text-purple-600" : "text-gray-600 hover:text-gray-800"}
+        ${isActive ? "text-brand-600" : "text-gray-600 hover:text-gray-800"}
       `}
       style={{
         scrollSnapAlign: "center",
@@ -65,7 +65,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
         <div
           className="
             absolute -top-1 left-1/2 transform -translate-x-1/2
-            w-1 h-1 bg-purple-600 rounded-full
+            w-1 h-1 bg-brand-600 rounded-full
             animate-pulse
           "
         />

@@ -59,6 +59,7 @@ const LockScreen = () => {
 
       if (result.success) {
         // Password is correct, unlock the session
+        auth.unlockSession();
       } else if (result.code === "CORRUPTED") {
         handleCorruptedData();
       } else {

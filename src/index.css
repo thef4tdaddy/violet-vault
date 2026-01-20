@@ -5,19 +5,19 @@
 
 /* Tailwind v4 CSS-first configuration */
 @theme {
-  /* Use your existing CSS custom properties for colors */
-  --color-brand-50: #faf5ff;
-  --color-brand-100: #f3e8ff;
-  --color-brand-200: #e9d5ff;
-  --color-brand-300: #d8b4fe;
-  --color-brand-400: #c084fc;
-  --color-brand-500: #a855f7;
-  --color-brand-600: #9333ea;
-  --color-brand-700: #7c3aed;
-  --color-brand-800: #6b21a8;
-  --color-brand-900: #581c87;
+  /* Use Violet palette for brand and purple mappings */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
 
-  /* Map Tailwind color names to your theme */
+  /* Map Tailwind purple names to brand (redirecting to violet for brand consistency) */
   --color-purple-50: var(--color-brand-50);
   --color-purple-100: var(--color-brand-100);
   --color-purple-200: var(--color-brand-200);
@@ -28,6 +28,18 @@
   --color-purple-700: var(--color-brand-700);
   --color-purple-800: var(--color-brand-800);
   --color-purple-900: var(--color-brand-900);
+
+  /* Ensure violet also maps to brand for components using violet- classes */
+  --color-violet-50: var(--color-brand-50);
+  --color-violet-100: var(--color-brand-100);
+  --color-violet-200: var(--color-brand-200);
+  --color-violet-300: var(--color-brand-300);
+  --color-violet-400: var(--color-brand-400);
+  --color-violet-500: var(--color-brand-500);
+  --color-violet-600: var(--color-brand-600);
+  --color-violet-700: var(--color-brand-700);
+  --color-violet-800: var(--color-brand-800);
+  --color-violet-900: var(--color-brand-900);
 
   /* Success colors (emerald) */
   --color-emerald-50: #ecfdf5;
@@ -79,4 +91,36 @@
   --font-family-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-family-mono:
     "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+}
+
+@utility glassmorphism {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+@utility glassmorphism-dark {
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+@utility hard-border {
+  border: 2px solid #000000;
+}
+
+@layer base {
+  body {
+    background-color: #4c1d95; /* Deep purple brand-900 for that inlaid look */
+    @apply text-gray-900 transition-colors duration-300;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    @apply bg-gray-950 text-white;
+  }
 }

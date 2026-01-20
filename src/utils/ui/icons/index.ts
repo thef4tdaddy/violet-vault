@@ -171,6 +171,7 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
   color?: string;
   className?: string;
   title?: string;
+  "data-testid"?: string;
 }
 
 /**

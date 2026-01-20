@@ -22,7 +22,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }: DebtSummaryWidgetProps) => {
   }
 
   return (
-    <div className="glassmorphism rounded-2xl p-4 border border-white/20 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white rounded-2xl p-6 hard-border shadow-lg transition-all duration-200">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <div className="relative mr-3">

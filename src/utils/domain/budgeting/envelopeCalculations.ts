@@ -498,7 +498,7 @@ export const calculateEnvelopeTotals = (envelopeData: EnvelopeData[]): TotalsAcc
   return envelopeData.reduce((acc, env) => {
     const envelopeType = getEnvelopeType(env);
 
-    acc.totalAllocated += env.currentBalance || 0;
+    acc.totalAllocated += env.allocated || 0;
     acc.totalSpent += env.totalSpent || 0;
     acc.totalBalance += env.currentBalance || 0;
     acc.totalUpcoming += env.totalUpcoming || 0;

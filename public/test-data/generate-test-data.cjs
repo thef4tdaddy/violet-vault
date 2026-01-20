@@ -92,6 +92,7 @@ coreEnvelopes.forEach((env) => {
     ...env,
     type: "standard",
     archived: false,
+    autoAllocate: true, // NEW: Enabled for viable demo
     currentBalance: Math.floor(Math.random() * env.targetAmount * 0.8),
     lastModified: getTimestamp(0),
     createdAt: getTimestamp(365),
@@ -157,7 +158,7 @@ const supplementalAccounts = [
     type: "FSA",
     balance: 850,
     contribution: 3050,
-    expiry: "2025-12-31",
+    expiry: "2026-12-31", // Fixed: Future expiration for 2026
   },
 ];
 
@@ -245,6 +246,7 @@ bills.forEach((bill) => {
     category: "Bills & Utilities",
     type: "bill",
     archived: false,
+    autoAllocate: true, // NEW: Enabled for viable demo
     currentBalance: 0,
     targetAmount: bill.amount,
     dueDate: bill.due,
@@ -391,6 +393,30 @@ for (let monthsAgo = 0; monthsAgo < 6; monthsAgo++) {
     });
   });
 }
+
+// NEW: Add Supplemental Spending for "Last 30 Days" check
+// This ensures FSA/HSA cards don't show $0 spending
+const supplementalSpending = [
+  { envId: "sa-fsa", merchant: "CVS Pharmacy", amount: 45.5, desc: "Prescription Refill" },
+  { envId: "sa-hsa", merchant: "City Hospital", amount: 150.0, desc: "Doctor's Visit" },
+  { envId: "sa-fsa", merchant: "Walgreens", amount: 22.99, desc: "First Aid Kit" },
+];
+
+supplementalSpending.forEach((item, idx) => {
+  const daysAgo = Math.floor(Math.random() * 25); // Recent spend
+  transactions.push({
+    id: `txn-supplemental-${idx}`,
+    date: getDateString(daysAgo),
+    amount: -item.amount,
+    envelopeId: item.envId,
+    category: "Health",
+    type: "expense",
+    lastModified: getTimestamp(daysAgo),
+    createdAt: getTimestamp(daysAgo),
+    description: item.desc,
+    merchant: item.merchant,
+  });
+});
 
 // Sort transactions by date descending
 transactions.sort((a, b) => new Date(b.date) - new Date(a.date));

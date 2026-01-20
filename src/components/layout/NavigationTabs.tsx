@@ -136,10 +136,10 @@ const NavigationTabs = memo(() => {
   const activeView = getCurrentView();
 
   return (
-    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 hidden sm:block lg:static z-50 overflow-hidden relative">
+    <div className="bg-brand-50 rounded-3xl mb-6 lg:shadow-xl hard-border hidden sm:block lg:static z-50 overflow-hidden relative">
       <nav
         ref={navRef}
-        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-3 lg:py-2"
+        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-2 lg:py-1.5"
       >
         {tabs.map((tab) => (
           <NavButton
@@ -156,11 +156,11 @@ const NavigationTabs = memo(() => {
       {/* Mobile scroll indicators - only show on small screens */}
       <div
         ref={rightFadeRef}
-        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/60 via-white/20 to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
+        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-brand-100/40 via-transparent to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
       ></div>
       <div
         ref={leftFadeRef}
-        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/60 via-white/20 to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
+        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-brand-100/40 via-transparent to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
       ></div>
     </div>
   );
@@ -174,16 +174,16 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }: NavButtonPr
     data-tab={viewKey}
     onClick={() => hapticFeedback(10, "light")}
     className={getButtonClasses(
-      `flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
+      `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/5 ${
         active
-          ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
-          : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
+          ? "border-t-2 lg:border-b-2 border-brand-500 text-brand-600 bg-brand-100/50 ring-1 ring-brand-300/30"
+          : "border-transparent text-gray-600 hover:text-brand-600 hover:bg-brand-50/40 hover:border-brand-200/50"
       }`,
       "tab"
     )}
     style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
   >
-    <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
+    <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
     <span className="text-center lg:text-left leading-tight">
       {/* Responsive label display with better text truncation */}
       <span className="hidden lg:inline truncate">{label}</span>

@@ -49,7 +49,7 @@ const Header = memo(
                       (window.location.hostname.includes("vercel.app") &&
                         !window.location.hostname.includes("violet-vault-production"))
                     ? "border-red-500" // Preview/staging environments
-                    : "border-purple-600" // Production
+                    : "border-brand-600" // Production
               }`}
             >
               <img
@@ -102,7 +102,7 @@ const Header = memo(
 
               <button
                 onClick={() => onShowSettings()}
-                className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
+                className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-bold hard-border bg-white text-black hover:bg-gray-100 transition-all"
                 title="Open Settings Dashboard"
               >
                 {React.createElement(getIcon("Settings"), {

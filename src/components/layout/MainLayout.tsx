@@ -454,37 +454,53 @@ const MainContentLayoutView = ({
   const { settings, security } = modals;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-orange-50/30">
+    <div className="min-h-screen bg-brand-900 py-4 sm:py-8 px-2 sm:px-4">
       <div className="relative mx-auto max-w-7xl">
-        <div className="relative z-10">
-          <Header
-            currentUser={currentUser}
-            isLocalOnlyMode={isLocalOnlyMode}
-            onUserChange={onNavigateToAuth}
-            onUpdateProfile={onUpdateProfile}
-            onShowSettings={(section) => settings.open(section)}
-            onShowDataSettings={() => settings.open("general")}
-          />
+        {/* Main Content Area with "Inlaid" look */}
+        <div className="bg-purple-100/10 rounded-[2.5rem] p-3 sm:p-6 hard-border shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]">
+          <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 relative z-10 transition-all duration-500">
+            <Header
+              currentUser={currentUser}
+              isLocalOnlyMode={isLocalOnlyMode}
+              onUserChange={onNavigateToAuth}
+              onUpdateProfile={onUpdateProfile}
+              onShowSettings={(section) => settings.open(section)}
+              onShowDataSettings={() => settings.open("general")}
+            />
+
+            {rotationDue && (
+              <div className="mb-6 rounded-xl border-2 border-black bg-amber-100 p-4 text-center text-amber-900 font-bold">
+                ⚠️ Your password is over 90 days old. Please change it in settings.
+              </div>
+            )}
+
+            <NavigationTabs />
+            <OnboardingProgress />
+            <SummaryCards />
+
+            <AppRoutes
+              budget={(budget || {}) as Record<string, unknown>}
+              currentUser={(currentUser || {}) as Record<string, unknown>}
+              totalBiweeklyNeed={totalBiweeklyNeed}
+              setActiveView={setActiveView}
+            />
+
+            <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+
+            <div className="mt-12 pt-8 border-t-2 border-black/10 text-center">
+              <div className="inline-block bg-brand-50 rounded-2xl hard-border p-4 shadow-sm hover:shadow-md transition-all">
+                <p className="text-sm text-gray-800">
+                  <span className="font-black text-purple-700">{getVersionInfo().displayName}</span>{" "}
+                  <span className="font-mono">v{getVersionInfo().version}</span>
+                </p>
+                <p className="mt-1 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                  Last updated: {getVersionInfo().buildDate}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {rotationDue && (
-          <div className="mb-4 rounded-lg border border-amber-300 bg-amber-100 p-4 text-center text-amber-700">
-            Your password is over 90 days old. Please change it.
-          </div>
-        )}
-
-        <NavigationTabs />
-        <OnboardingProgress />
-        <SummaryCards />
-
-        <AppRoutes
-          budget={(budget || {}) as Record<string, unknown>}
-          currentUser={(currentUser || {}) as Record<string, unknown>}
-          totalBiweeklyNeed={totalBiweeklyNeed}
-          setActiveView={setActiveView}
-        />
-
-        <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
           syncConflicts={
             Array.isArray(syncConflicts) && syncConflicts.length > 0
@@ -498,17 +514,6 @@ const MainContentLayoutView = ({
         <BottomNavigationBar />
 
         {!showSecurityWarning && <BugReportButton />}
-
-        <div className="mt-8 text-center">
-          <div className="glassmorphism mx-auto max-w-md rounded-2xl border border-gray-800/20 p-4">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
-              v{getVersionInfo().version}
-            </p>
-            <p className="mt-1 text-xs text-gray-500">Last updated: {getVersionInfo().buildDate}</p>
-            <p className="mt-1 text-xs text-gray-500">Built with ❤️ for secure budgeting</p>
-          </div>
-        </div>
       </div>
 
       <SecuritySettings isOpen={security.isOpen} onClose={() => security.setOpen(false)} />

@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
@@ -8,6 +9,7 @@ import {
   type ValidatedImportData,
 } from "@/utils/data/dataManagement/validationUtils";
 import { budgetDb } from "@/db/budgetDb";
+import { Transaction } from "@/db/types";
 import logger from "@/utils/core/common/logger";
 
 interface ImportCounts {
@@ -24,13 +26,14 @@ interface ImportResult {
 
 export const useImportData = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
   const confirm = useConfirm();
 
   const getImportCounts = useCallback(
     (data: ValidatedImportData): ImportCounts => ({
       envelopes: data.envelopes?.length || 0,
-      transactions: data.transactions?.length || 0,
+      transactions: data.allTransactions?.length || 0,
       auditLog: 0,
     }),
     []
@@ -39,20 +42,29 @@ export const useImportData = () => {
   const performImport = useCallback(
     async (data: ValidatedImportData) => {
       try {
-        await budgetDb.transaction("rw", budgetDb.envelopes, budgetDb.transactions, async () => {
+        await budgetDb.transaction("rw", [budgetDb.envelopes, budgetDb.transactions], async () => {
           await budgetDb.envelopes.clear();
           await budgetDb.transactions.clear();
 
           if (data.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
-          if (data.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
+          if (data.allTransactions?.length)
+            await budgetDb.transactions.bulkAdd(data.allTransactions as Transaction[]);
         });
+
+        // Invalidate all related queries to force fresh data in UI
+        await queryClient.invalidateQueries({ queryKey: ["envelopes"] });
+        await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        await queryClient.invalidateQueries({ queryKey: ["budget-metadata"] });
+        await queryClient.invalidateQueries({ queryKey: ["unassigned-cash"] });
+        await queryClient.invalidateQueries({ queryKey: ["actual-balance"] });
+
         showSuccessToast("Data imported successfully");
       } catch (error) {
         logger.error("Import failed during database operation", error);
         throw error;
       }
     },
-    [showSuccessToast]
+    [showSuccessToast, queryClient]
   );
 
   const executeImport = useCallback(

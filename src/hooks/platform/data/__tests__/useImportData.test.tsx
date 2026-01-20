@@ -7,6 +7,8 @@ import { validateImportedData } from "@/utils/data/dataManagement/validationUtil
 import { budgetDb } from "../../../../db/budgetDb";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
 
 // Mock dependencies with explicit factories
 vi.mock("../../../../hooks/auth/useAuth", () => ({
@@ -40,6 +42,17 @@ vi.mock("../../../../db/budgetDb", () => ({
     transactions: { clear: vi.fn(), bulkAdd: vi.fn() },
   },
 }));
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
 
 describe("useImportData", () => {
   const mockUser = { userName: "testuser", budgetId: "123" };
@@ -76,7 +89,9 @@ describe("useImportData", () => {
   });
 
   it("should import data successfully", async () => {
-    const { result } = renderHook(() => useImportData());
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.executeImport(mockData);
@@ -94,7 +109,9 @@ describe("useImportData", () => {
       validationWarnings: ["Warning 1"],
     } as any);
 
-    const { result } = renderHook(() => useImportData());
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.executeImport(mockData);
@@ -109,7 +126,9 @@ describe("useImportData", () => {
   it("should handle errors during import", async () => {
     vi.mocked(budgetDb.envelopes.clear).mockRejectedValue(new Error("DB error"));
 
-    const { result } = renderHook(() => useImportData());
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.executeImport(mockData);
