@@ -138,11 +138,13 @@ describe("AccountCard", () => {
       // Should not render actual content
       expect(screen.queryByText(/CHECKING ACCOUNT/i)).not.toBeInTheDocument();
 
-      // Should render skeleton with animation
+      // Should render skeleton with animation and accessibility attributes
       const skeleton = container.querySelector(".animate-pulse");
       expect(skeleton).toBeInTheDocument();
       expect(skeleton).toHaveClass("bg-white/90");
       expect(skeleton).toHaveClass("backdrop-blur-sm");
+      expect(skeleton).toHaveAttribute("aria-label", "Loading account information");
+      expect(skeleton).toHaveAttribute("aria-busy", "true");
     });
   });
 

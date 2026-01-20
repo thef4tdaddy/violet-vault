@@ -2,6 +2,9 @@ import React from "react";
 import AccountCards from "@/components/dashboard/AccountCards";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Create QueryClient outside component to persist across renders
+const queryClient = new QueryClient();
+
 /**
  * Demo page showcasing the glassmorphic account cards
  *
@@ -14,8 +17,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
  * 3. AccountCards will automatically fetch data via TanStack Query hooks
  */
 const AccountCardsDemo: React.FC = () => {
-  const queryClient = new QueryClient();
-
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-8">

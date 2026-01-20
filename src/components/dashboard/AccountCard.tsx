@@ -39,8 +39,6 @@ const getCardConfig = (type: AccountCardType, isWarning: boolean) => {
       title: "Checking Account",
       gradientFrom: "from-blue-50",
       gradientTo: "to-blue-100",
-      borderColor: "border-blue-200",
-      borderHoverColor: "hover:border-blue-400",
       iconColor: "text-blue-600",
       balanceColor: "text-blue-900",
     },
@@ -49,8 +47,6 @@ const getCardConfig = (type: AccountCardType, isWarning: boolean) => {
       title: "Savings Account",
       gradientFrom: "from-green-50",
       gradientTo: "to-green-100",
-      borderColor: "border-green-200",
-      borderHoverColor: "hover:border-green-400",
       iconColor: "text-green-600",
       balanceColor: "text-green-900",
     },
@@ -59,8 +55,6 @@ const getCardConfig = (type: AccountCardType, isWarning: boolean) => {
       title: "Unassigned Cash",
       gradientFrom: isWarning ? "from-purple-50" : "from-gray-50",
       gradientTo: isWarning ? "to-purple-100" : "to-gray-100",
-      borderColor: isWarning ? "border-purple-300" : "border-gray-200",
-      borderHoverColor: isWarning ? "hover:border-purple-500" : "hover:border-gray-400",
       iconColor: isWarning ? "text-purple-600" : "text-gray-600",
       balanceColor: isWarning ? "text-purple-900" : "text-gray-900",
     },
@@ -73,7 +67,11 @@ const getCardConfig = (type: AccountCardType, isWarning: boolean) => {
  * Loading skeleton for AccountCard
  */
 const AccountCardSkeleton: React.FC = () => (
-  <div className="bg-white/90 backdrop-blur-sm border-2 border-black rounded-xl shadow-xl p-6 animate-pulse">
+  <div
+    className="bg-white/90 backdrop-blur-sm border-2 border-black rounded-xl shadow-xl p-6 animate-pulse"
+    aria-label="Loading account information"
+    aria-busy="true"
+  >
     <div className="flex justify-between items-start mb-4">
       <div className="h-6 bg-gray-200 rounded w-32"></div>
       <div className="h-6 w-6 bg-gray-200 rounded-full"></div>
@@ -120,12 +118,10 @@ export const AccountCard: React.FC<AccountCardProps> = ({
   // Format balance with proper styling
   const isNegative = balance < 0;
   const displayBalance = Math.abs(balance).toFixed(2);
-  const balanceColor = isNegative
-    ? "text-red-600"
-    : config.balanceColor;
+  const balanceColor = isNegative ? "text-red-600" : config.balanceColor;
 
   return (
-    <div
+    <article
       className={`
         bg-white/90 backdrop-blur-sm 
         border-2 border-black 
@@ -137,6 +133,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({
         bg-gradient-to-br ${config.gradientFrom} ${config.gradientTo}
       `}
       data-testid={`account-card-${type}`}
+      aria-label={`${config.title} card`}
     >
       {/* Header with icon */}
       <div className="flex justify-between items-start mb-4">
@@ -149,18 +146,24 @@ export const AccountCard: React.FC<AccountCardProps> = ({
         </div>
         {React.createElement(getIcon(config.icon), {
           className: `h-6 w-6 ${config.iconColor} group-hover:scale-110 transition-transform duration-300`,
+          "aria-hidden": "true",
         })}
       </div>
 
       {/* Balance display */}
       <div className="mb-4">
-        <div className={`text-4xl font-bold ${balanceColor} transition-all duration-300`}>
+        <div
+          className={`text-4xl font-bold ${balanceColor} transition-all duration-300`}
+          aria-label={`Balance: ${isNegative ? "-" : ""}$${displayBalance}`}
+        >
           {isNegative && "-"}${displayBalance}
         </div>
         {isNegative && (
           <div className="flex items-center text-red-600 text-sm mt-1">
             {React.createElement(getIcon("AlertTriangle"), {
               className: "h-4 w-4 mr-1",
+              "aria-label": "Warning",
+              role: "img",
             })}
             <span>Overspent</span>
           </div>
@@ -172,6 +175,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({
         <div className="text-sm text-gray-600 mb-4 flex items-center">
           {React.createElement(getIcon("Info"), {
             className: "h-3.5 w-3.5 mr-1.5",
+            "aria-hidden": "true",
           })}
           {subtitle}
         </div>
@@ -189,11 +193,12 @@ export const AccountCard: React.FC<AccountCardProps> = ({
           {action.icon &&
             React.createElement(getIcon(action.icon), {
               className: "h-4 w-4 mr-2",
+              "aria-hidden": "true",
             })}
           {action.label}
         </Button>
       )}
-    </div>
+    </article>
   );
 };
 

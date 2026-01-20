@@ -3,6 +3,11 @@ import { useActualBalance } from "@/hooks/budgeting/metadata/useActualBalance";
 import { useUnassignedCash } from "@/hooks/budgeting/metadata/useUnassignedCash";
 
 /**
+ * Threshold for determining if unassigned cash is high (needs allocation)
+ */
+const UNASSIGNED_HIGH_THRESHOLD = 500;
+
+/**
  * Account balances data structure
  */
 export interface AccountBalances {
@@ -52,7 +57,6 @@ export const useAccountBalances = () => {
     const savingsBalance = 0; // TODO: Implement savings account tracking
 
     // Determine if unassigned cash is high (threshold: > $500)
-    const UNASSIGNED_HIGH_THRESHOLD = 500;
     const isUnassignedHigh = unassignedCash > UNASSIGNED_HIGH_THRESHOLD;
 
     return {

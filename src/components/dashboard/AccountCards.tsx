@@ -51,6 +51,7 @@ export const AccountCards: React.FC<AccountCardsProps> = ({ className = "" }) =>
       <div
         className="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center"
         data-testid="account-cards-error"
+        role="alert"
       >
         <p className="text-red-600 font-semibold">Failed to load account data</p>
         <p className="text-red-500 text-sm mt-2">{error.message}</p>
@@ -59,9 +60,10 @@ export const AccountCards: React.FC<AccountCardsProps> = ({ className = "" }) =>
   }
 
   return (
-    <div
+    <section
       className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}
       data-testid="account-cards-container"
+      aria-label="Account balance cards"
     >
       {/* Checking Account Card */}
       <AccountCard
@@ -98,7 +100,7 @@ export const AccountCards: React.FC<AccountCardsProps> = ({ className = "" }) =>
         isLoading={isLoading}
         isWarning={accountBalances.unassigned.isHigh || accountBalances.unassigned.isNegative}
       />
-    </div>
+    </section>
   );
 };
 
