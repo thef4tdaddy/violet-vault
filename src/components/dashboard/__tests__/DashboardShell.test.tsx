@@ -1,12 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import DashboardShell from "../DashboardShell";
 import "@testing-library/jest-dom";
 
 describe("DashboardShell", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     it("should render the dashboard shell container", () => {
