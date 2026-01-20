@@ -174,10 +174,10 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }: NavButtonPr
     data-tab={viewKey}
     onClick={() => hapticFeedback(10, "light")}
     className={getButtonClasses(
-      `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/5 ${
+      `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-black border-x border-black/5 ${
         active
-          ? "border-t-2 lg:border-b-2 border-brand-500 text-brand-600 bg-brand-100/50 ring-1 ring-brand-300/30"
-          : "border-transparent text-gray-600 hover:text-brand-600 hover:bg-brand-50/40 hover:border-brand-200/50"
+          ? "border-b-4 border-black text-brand-700 bg-brand-200/50 shadow-inner"
+          : "border-transparent text-gray-700 hover:text-brand-600 hover:bg-brand-50/40"
       }`,
       "tab"
     )}

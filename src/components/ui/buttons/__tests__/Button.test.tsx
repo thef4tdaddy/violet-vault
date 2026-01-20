@@ -1,4 +1,6 @@
+/** @vitest-environment jsdom */
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import Button from "../Button";
@@ -61,7 +63,7 @@ describe("Button", () => {
     it("should render outline variant", () => {
       render(<Button variant="outline">Outline</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("border-gray-300");
+      expect(button).toHaveClass("hard-border");
     });
   });
 

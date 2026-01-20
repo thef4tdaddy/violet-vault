@@ -454,11 +454,11 @@ const MainContentLayoutView = ({
   const { settings, security } = modals;
 
   return (
-    <div className="min-h-screen bg-brand-900 py-4 sm:py-8 px-2 sm:px-4">
+    <div className="min-h-screen bg-brand-900 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
       <div className="relative mx-auto max-w-7xl">
-        {/* Main Content Area with "Inlaid" look */}
-        <div className="bg-purple-100/10 rounded-[2.5rem] p-3 sm:p-6 hard-border shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]">
-          <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 relative z-10 transition-all duration-500">
+        {/* Main Content Area with "Inlaid" look - Triple Layered Border System */}
+        <div className="bg-purple-100/40 rounded-[2.5rem] p-2 sm:p-4 hard-border shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]">
+          <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 relative z-10 transition-all duration-500 shadow-xl">
             <Header
               currentUser={currentUser}
               isLocalOnlyMode={isLocalOnlyMode}

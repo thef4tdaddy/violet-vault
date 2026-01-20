@@ -1,4 +1,6 @@
-import { MetricCard } from "../primitives/cards/MetricCard";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 interface SupplementalAccount {
   id: string | number;
@@ -46,43 +48,39 @@ const AccountsSummaryCards = ({ accounts = [] }: AccountsSummaryCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {/* Total Accounts */}
-      <MetricCard
-        icon="CreditCard"
-        title="Total Accounts"
+      <PageSummaryCard
+        icon={getIcon("CreditCard")}
+        label="Total Accounts"
         value={accounts.length}
-        variant="info"
-        subtitle={`${activeAccounts} with funds`}
+        color="blue"
+        subtext={`${activeAccounts} with funds`}
       />
 
       {/* Total Value */}
-      <MetricCard
-        icon="DollarSign"
-        title="Total Value"
-        value={totalValue}
-        variant="success"
-        format="currency"
-        subtitle="Combined balance"
+      <PageSummaryCard
+        icon={getIcon("DollarSign")}
+        label="Total Value"
+        value={formatCurrency(totalValue)}
+        color="green"
+        subtext="Combined balance"
       />
 
       {/* 30-Day Spending */}
-      <MetricCard
-        icon="TrendingDown"
-        title="Last 30 Days"
-        value={last30DaysSpending}
-        variant="warning"
-        format="currency"
-        subtitle="Total spending"
+      <PageSummaryCard
+        icon={getIcon("TrendingDown")}
+        label="Last 30 Days"
+        value={formatCurrency(last30DaysSpending)}
+        color="orange"
+        subtext="Total spending"
       />
 
       {/* Depletion Estimate */}
-      <MetricCard
-        icon="Clock"
-        title="Depletion Est."
+      <PageSummaryCard
+        icon={getIcon("Clock")}
+        label="Depletion Est."
         value={depletionEstimate}
-        variant="info"
-        format="custom"
-        customFormatter={(val) => String(val)}
-        subtitle="At current rate"
+        color="blue"
+        subtext="At current rate"
       />
     </div>
   );

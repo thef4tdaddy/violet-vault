@@ -3,27 +3,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import BillSummaryCards from "../BillSummaryCards";
 import "@testing-library/jest-dom";
 
-// Mock child components and utilities
-vi.mock("../../primitives/cards/MetricCard", () => ({
-  MetricCard: ({ title, value, subtitle }: any) => (
-    <div data-testid="summary-card">
-      <span data-testid="card-label">{title}</span>
-      <span data-testid="card-value">
-        {/* MetricCard handles formatting internally, so we simulate the output for tests if passed raw number
-            In the actual component, value is passed as number and format="currency" used.
-            For this mock, we'll just check if value is passed correctly, or we can simple render it.
-            Since the component passes raw numbers, we might want to just render inputs to verify prop passing,
-            BUT the original tests asserted formatted strings.
-            To minimize test churn, let's just render the value as a string for now, and update assertions to look for the raw value OR mock the formatting.
-            Actually, the component now relies on MetricCard to format.
-            Let's mock MetricCard to format simpler or just render raw.
-        */}
-        {typeof value === "number" ? value.toString() : value}
-      </span>
-      <span data-testid="card-subtext">{subtitle}</span>
-    </div>
-  ),
-}));
+// No mock needed for PageSummaryCard, we'll use the real one since we added data-testid support
 
 describe("BillSummaryCards", () => {
   const defaultProps = {
@@ -52,23 +32,24 @@ describe("BillSummaryCards", () => {
 
     it("should pass correct values to cards", () => {
       render(<BillSummaryCards {...defaultProps} />);
-      // Since we mocked MetricCard to simply render toString(), check for that
-      expect(screen.getByText("1500")).toBeInTheDocument();
+      expect(
+        screen.getByText((content) => content.includes("$1") && content.includes("500.00"))
+      ).toBeInTheDocument();
     });
 
     it("should pass overdue amount", () => {
       render(<BillSummaryCards {...defaultProps} />);
-      expect(screen.getByText("200")).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes("$200.00"))).toBeInTheDocument();
     });
 
     it("should pass paid amount", () => {
       render(<BillSummaryCards {...defaultProps} />);
-      expect(screen.getByText("300")).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes("$300.00"))).toBeInTheDocument();
     });
 
     it("should pass upcoming amount", () => {
       render(<BillSummaryCards {...defaultProps} />);
-      expect(screen.getByText("500")).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes("$500.00"))).toBeInTheDocument();
     });
 
     it("should display bill counts", () => {
@@ -109,8 +90,7 @@ describe("BillSummaryCards", () => {
       };
 
       render(<BillSummaryCards {...props} />);
-      // We expect the mock to render "0"
-      expect(screen.getByText("0")).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes("$0.00"))).toBeInTheDocument();
     });
   });
 
@@ -138,7 +118,9 @@ describe("BillSummaryCards", () => {
       };
 
       render(<BillSummaryCards {...props} />);
-      expect(screen.getByText("9999.99")).toBeInTheDocument();
+      expect(
+        screen.getByText((content) => content.includes("$9") && content.includes("999.99"))
+      ).toBeInTheDocument();
     });
   });
 

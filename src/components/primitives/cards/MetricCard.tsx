@@ -167,14 +167,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     >
       <div className="space-y-4">
         {/* Icon (Circular) and Title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {Icon && (
             <div
               data-testid="metric-card-icon-container"
-              className={`shrink-0 h-10 w-10 rounded-full ${variantBgColors[variant]} flex items-center justify-center shadow-md`}
+              className={`shrink-0 h-12 w-12 rounded-full ${variantBgColors[variant]} flex items-center justify-center shadow-md border border-white/20`}
             >
               {React.createElement(Icon, {
-                className: "h-5 w-5 text-white",
+                className: "h-6 w-6 text-white",
                 "data-testid": "mock-icon",
               })}
             </div>

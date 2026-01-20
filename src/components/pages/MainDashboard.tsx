@@ -116,28 +116,32 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
   }
 
   return (
-    <div className="relative rounded-2xl bg-purple-50/50 p-2 sm:p-4 hard-border shadow-inner">
-      <div className="bg-white rounded-lg hard-border p-4 sm:p-6 space-y-8 min-h-[600px] shadow-sm">
+    <div className="relative rounded-[2.5rem] bg-purple-100/40 p-2 sm:p-4 hard-border shadow-inner">
+      <div className="bg-white rounded-[2rem] hard-border p-4 sm:p-8 space-y-8 min-h-[700px] shadow-xl relative z-10 transition-all duration-500">
         {/* Payday Prediction */}
         {paydayPrediction && (
-          <PaydayPrediction
-            prediction={paydayPrediction}
-            className="mb-6"
-            onProcessPaycheck={handleProcessPaycheck}
-            onPrepareEnvelopes={handlePrepareEnvelopes}
-          />
+          <div className="hard-border rounded-2xl overflow-hidden shadow-md">
+            <PaydayPrediction
+              prediction={paydayPrediction}
+              className="mb-0" // Remove margin to stay inside border
+              onProcessPaycheck={handleProcessPaycheck}
+              onPrepareEnvelopes={handlePrepareEnvelopes}
+            />
+          </div>
         )}
 
         {/* Debt Summary Widget */}
-        <DebtSummaryWidget
-          onNavigateToDebts={() => {
-            if (setActiveView) {
-              setActiveView("debts");
-            } else {
-              logger.debug("Navigate to debts requested - setActiveView not available");
-            }
-          }}
-        />
+        <div className="hard-border rounded-2xl overflow-hidden shadow-md">
+          <DebtSummaryWidget
+            onNavigateToDebts={() => {
+              if (setActiveView) {
+                setActiveView("debts");
+              } else {
+                logger.debug("Navigate to debts requested - setActiveView not available");
+              }
+            }}
+          />
+        </div>
 
         {/* Account Balance Overview */}
         <AccountBalanceOverview
@@ -154,10 +158,12 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
         />
 
         {/* Recent Transactions */}
-        <RecentTransactionsWidget
-          transactions={recentTransactions as never}
-          getEnvelopeOptions={getEnvelopeOptions}
-        />
+        <div className="hard-border rounded-2xl overflow-hidden shadow-md">
+          <RecentTransactionsWidget
+            transactions={recentTransactions as never}
+            getEnvelopeOptions={getEnvelopeOptions}
+          />
+        </div>
 
         <ReconcileTransactionModal
           isOpen={showReconcileModal}

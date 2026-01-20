@@ -139,10 +139,7 @@ const AccountBalanceOverview = ({
 
         {/* Quick Actions */}
         <div className="flex gap-3 mt-6">
-          <Button
-            onClick={onOpenReconcileModal}
-            className="btn btn-secondary border-2 border-black flex items-center"
-          >
+          <Button onClick={onOpenReconcileModal} variant="secondary" className="flex items-center">
             {React.createElement(getIcon("RefreshCw"), {
               className: "h-4 w-4 mr-2",
             })}
@@ -152,7 +149,9 @@ const AccountBalanceOverview = ({
           {!isBalanced && Math.abs(difference) > 0.01 && (
             <Button
               onClick={() => onAutoReconcileDifference(difference)}
-              className="btn btn-primary border-2 border-black flex items-center bg-green-600 hover:bg-green-700 text-white"
+              variant="primary"
+              color="green"
+              className="flex items-center"
             >
               {React.createElement(getIcon("CheckCircle"), {
                 className: "h-4 w-4 mr-2",

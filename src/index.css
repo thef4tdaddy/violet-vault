@@ -5,19 +5,19 @@
 
 /* Tailwind v4 CSS-first configuration */
 @theme {
-  /* Use Violet palette for brand and purple mappings */
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
+  /* Use Legacy Purple palette for brand mappings (standardized across v2.0) */
+  --color-brand-50: #faf5ff;
+  --color-brand-100: #f3e8ff;
+  --color-brand-200: #e9d5ff;
+  --color-brand-300: #d8b4fe;
+  --color-brand-400: #c084fc;
+  --color-brand-500: #a855f7;
+  --color-brand-600: #9333ea;
+  --color-brand-700: #7c3aed;
+  --color-brand-800: #6b21a8;
+  --color-brand-900: #581c87;
 
-  /* Map Tailwind purple names to brand (redirecting to violet for brand consistency) */
+  /* Map Tailwind purple/violet names to brand for consistent usage */
   --color-purple-50: var(--color-brand-50);
   --color-purple-100: var(--color-brand-100);
   --color-purple-200: var(--color-brand-200);
@@ -29,7 +29,6 @@
   --color-purple-800: var(--color-brand-800);
   --color-purple-900: var(--color-brand-900);
 
-  /* Ensure violet also maps to brand for components using violet- classes */
   --color-violet-50: var(--color-brand-50);
   --color-violet-100: var(--color-brand-100);
   --color-violet-200: var(--color-brand-200);
@@ -94,11 +93,31 @@
 }
 
 @utility glassmorphism {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+@utility glass-enhanced {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 @utility glassmorphism-dark {
