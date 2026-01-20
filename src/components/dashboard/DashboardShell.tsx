@@ -54,37 +54,39 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
       data-testid="dashboard-shell"
     >
       {/* Top Row - Logo, Profile, PaydayBanner */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
-        data-testid="dashboard-top-row"
-      >
-        {/* Logo Section */}
-        {logo && (
-          <div className="flex items-center" data-testid="dashboard-logo">
-            {logo}
-          </div>
-        )}
+      {(logo || profile || paydayBanner) && (
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
+          data-testid="dashboard-top-row"
+        >
+          {/* Logo Section */}
+          {logo && (
+            <div className="flex items-center" data-testid="dashboard-logo">
+              {logo}
+            </div>
+          )}
 
-        {/* Profile Section */}
-        {profile && (
-          <div
-            className="flex items-center justify-center md:justify-end lg:justify-center"
-            data-testid="dashboard-profile"
-          >
-            {profile}
-          </div>
-        )}
+          {/* Profile Section */}
+          {profile && (
+            <div
+              className="flex items-center justify-center md:justify-end lg:justify-center"
+              data-testid="dashboard-profile"
+            >
+              {profile}
+            </div>
+          )}
 
-        {/* PaydayBanner Section */}
-        {paydayBanner && (
-          <div
-            className="flex items-center justify-center md:col-span-2 lg:col-span-1 lg:justify-end"
-            data-testid="dashboard-payday-banner"
-          >
-            {paydayBanner}
-          </div>
-        )}
-      </div>
+          {/* PaydayBanner Section */}
+          {paydayBanner && (
+            <div
+              className="flex items-center justify-center md:col-span-2 lg:col-span-1 lg:justify-end"
+              data-testid="dashboard-payday-banner"
+            >
+              {paydayBanner}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main Content Grid - Responsive Bento Grid */}
       {children && (
