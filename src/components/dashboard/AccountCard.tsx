@@ -122,9 +122,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({
   const displayBalance = Math.abs(balance).toFixed(2);
   const balanceColor = isNegative
     ? "text-red-600"
-    : isWarning
-      ? config.balanceColor
-      : config.balanceColor;
+    : config.balanceColor;
 
   return (
     <div
