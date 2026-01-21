@@ -143,3 +143,25 @@ class IntegrityAuditResult(BaseModel):
     summary: dict = Field(..., description="Summary statistics (counts by severity and type)")
     timestamp: str = Field(..., description="When the audit was performed (ISO format)")
     snapshotSize: dict = Field(..., description="Size of the data snapshot analyzed")
+
+
+class SentinelReceipt(BaseModel):
+    """
+    SentinelShare receipt entity for cross-app matching
+    Mirrors src/domain/schemas/sentinel.ts
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    id: str = Field(..., min_length=1)
+    amount: float
+    merchant: str = Field(..., min_length=1)
+    date: str = Field(..., description="ISO datetime")
+    category: str | None = None
+    description: str | None = None
+    status: Literal["pending", "matched", "ignored"] = Field(default="pending")
+    createdAt: str = Field(..., description="ISO datetime")
+    updatedAt: str = Field(..., description="ISO datetime")
+    matchedTransactionId: str | None = None
+    sourceApp: str | None = None
+    metadata: dict | None = Field(default_factory=lambda: {})

@@ -28,7 +28,11 @@ import type { SentinelReceipt, UpdateReceiptStatusOptions } from "@/types/sentin
  * @returns {Function} refetch - Manually trigger a refetch
  * @returns {Function} updateStatus - Update receipt status with optimistic updates
  */
-export function useSentinelReceipts() {
+export interface UseSentinelReceiptsOptions {
+  retry?: boolean | number;
+}
+
+export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -54,7 +58,7 @@ export function useSentinelReceipts() {
     refetchIntervalInBackground: false, // Pause polling when tab is inactive
     refetchOnWindowFocus: true, // Resume polling when tab becomes active
     refetchOnMount: true,
-    retry: 3,
+    retry: options.retry ?? 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     placeholderData: (previousData) => previousData, // Keep previous data while refetching
   });

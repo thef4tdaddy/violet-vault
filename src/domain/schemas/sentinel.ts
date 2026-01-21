@@ -23,7 +23,7 @@ export const SentinelReceiptSchema = z.object({
   updatedAt: z.string().datetime(),
   matchedTransactionId: z.string().optional(),
   sourceApp: z.string().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 /**

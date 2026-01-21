@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.analytics import EnvelopeIntegrityAuditor
 from api.models import AuditSnapshot, IntegrityAuditResult
+from api.sentinel.receipts import router as sentinel_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -29,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Route Mounting
+app.include_router(sentinel_router, prefix="/api")
 
 
 @app.get("/")

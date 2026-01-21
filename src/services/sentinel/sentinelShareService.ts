@@ -10,8 +10,19 @@ import {
 import type { UpdateReceiptStatusOptions } from "@/types/sentinel";
 
 /**
- * Base URL for SentinelShare API
- * In production, this should be configured via environment variables
+ * Base URL for the SentinelShare API receipts endpoint.
+ *
+ * Configuration:
+ * - Environment variable: VITE_SENTINEL_API_URL
+ * - Expected value: Base URL or path for the SentinelShare receipts endpoint,
+ *   e.g. "https://violet-vault-sentinel.herokuapp.com/api/receipts" or "/api/receipts".
+ * - If VITE_SENTINEL_API_URL is not set, the service falls back to "/api/receipts".
+ *
+ * This endpoint is typically a PostgreSQL-backed service (e.g., hosted on Heroku)
+ * that provides cross-app transaction matching data.
+ *
+ * In production, VITE_SENTINEL_API_URL should be set in the environment
+ * configuration to point to the correct regional or specific Heroku instance.
  */
 const API_BASE_URL = import.meta.env.VITE_SENTINEL_API_URL || "/api/receipts";
 
