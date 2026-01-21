@@ -80,7 +80,7 @@
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react-dom": "^19.2.3",
     "react-is": "^19.2.0",
     "react-router-dom": "^7.9.4",
     "react-swipeable": "^7.0.2",
