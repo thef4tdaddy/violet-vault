@@ -44,7 +44,7 @@ interface PaycheckStatsDisplayProps {
  * Statistics summary component
  */
 export const PaycheckStatsDisplay: React.FC<PaycheckStatsDisplayProps> = ({ paycheckStats }) => (
-  <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-gray-200 rounded-xl p-4">
+  <div className="bg-linear-to-r from-green-50 to-blue-50 border border-gray-200 rounded-xl p-4">
     <h3 className="font-semibold text-gray-900 flex items-center mb-3">
       {React.createElement(getIcon("TrendingUp"), {
         className: "h-4 w-4 mr-2 text-green-600",
@@ -89,10 +89,15 @@ interface PaycheckHistoryItemProps {
 /**
  * Helper functions for paycheck formatting
  */
-const formatDate = (date: string | Date | null | undefined) => {
-  if (!date) return "Invalid Date";
+const formatDate = (
+  date: string | Date | null | undefined,
+  fallbackDate?: string | Date | null
+) => {
+  const finalDate = date || fallbackDate;
+  if (!finalDate) return "Invalid Date";
   try {
-    const d = typeof date === "string" ? new Date(date) : date;
+    const d = typeof finalDate === "string" ? new Date(finalDate) : finalDate;
+    if (isNaN(d.getTime())) return "Invalid Date";
     return d.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -104,10 +109,12 @@ const formatDate = (date: string | Date | null | undefined) => {
 };
 
 const getModeLabel = (mode?: string) => {
+  if (!mode) return "Standard";
   return mode === "allocate" ? "Standard" : "Proportional";
 };
 
 const getModeColor = (mode?: string) => {
+  if (!mode) return "text-gray-600 bg-gray-50";
   return mode === "allocate" ? "text-green-600 bg-green-50" : "text-blue-600 bg-blue-50";
 };
 
@@ -131,7 +138,9 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
           {React.createElement(getIcon("User"), {
             className: "h-4 w-4 text-gray-500 mr-2",
           })}
-          <span className="font-medium text-gray-900">{paycheck.payerName}</span>
+          <span className="font-medium text-gray-900">
+            {paycheck.payerName || (paycheck as { merchant?: string }).merchant || "Unknown Payer"}
+          </span>
           <span
             className={`ml-2 px-2 py-1 text-xs rounded-md ${getModeColor(paycheck.allocationMode)}`}
           >
@@ -148,8 +157,8 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
           {React.createElement(getIcon("Calendar"), {
             className: "h-3 w-3 mr-1",
           })}
-          <span>{formatDate(paycheck.processedAt)}</span>
-          <span className="ml-3">by {paycheck.processedBy}</span>
+          <span>{formatDate(paycheck.processedAt, (paycheck as { date?: string }).date)}</span>
+          <span className="ml-3">by {paycheck.processedBy || "System"}</span>
         </div>
         <div>
           <span className="text-green-600">
@@ -163,7 +172,7 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
         </div>
       </div>
 
-      {paycheck.allocations && paycheck.allocations.length > 0 && (
+      {Array.isArray(paycheck.allocations) && paycheck.allocations.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-100">
           <div className="text-xs text-gray-500">
             Allocated to {paycheck.allocations.length} envelope
@@ -171,7 +180,11 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
             <span className="ml-1">
               {paycheck.allocations
                 .slice(0, 3)
-                .map((alloc) => alloc.envelopeName)
+                .map(
+                  (alloc) =>
+                    (alloc as { envelopeName?: string; name?: string }).envelopeName ||
+                    (alloc as { name?: string }).name
+                )
                 .join(", ")}
               {paycheck.allocations.length > 3 && ` and ${paycheck.allocations.length - 3} more`}
             </span>
@@ -195,9 +208,14 @@ export const PaycheckHistoryItemCard: React.FC<PaycheckHistoryItemProps> = ({
             type="button"
             onClick={() => onDeletePaycheck(paycheck)}
             disabled={deletingPaycheckId === paycheck.id}
-            className="text-sm text-red-600 disabled:opacity-60"
+            className="p-1 text-red-600 hover:bg-red-50 rounded-md transition-all"
+            title="Delete historical paycheck"
           >
-            {deletingPaycheckId === paycheck.id ? "Deleting..." : "Delete"}
+            {deletingPaycheckId === paycheck.id ? (
+              <div className="animate-spin h-3.5 w-3.5 border-2 border-red-600/30 border-t-red-600 rounded-full"></div>
+            ) : (
+              React.createElement(getIcon("Trash2"), { className: "h-3.5 w-3.5" })
+            )}
           </Button>
         )}
       </div>

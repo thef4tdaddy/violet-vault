@@ -19,7 +19,9 @@ export const useDashboardCalculations = (
     }, 0);
 
     const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
-      const amount = parseFloat(String(goal?.currentAmount || "0")) || 0;
+      // Use currentBalance (v2.0 standard) with fallback to currentAmount (legacy)
+      const currentVal = goal?.currentBalance ?? goal?.currentAmount ?? 0;
+      const amount = parseFloat(String(currentVal || "0")) || 0;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
 

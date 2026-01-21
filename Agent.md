@@ -30,6 +30,7 @@
 ### Testing
 
 - **Mandatory 80%+ coverage** for all new/modified code (Frontend & Backend)
+- **Always verify existence of corresponding tests for any files touched**; if they don't exist, create them immediately.
 - **Vitest** (Frontend), **pytest** (Python), **go test** (Go)
 - Run `npm run test:run` before PRs
 
@@ -66,4 +67,6 @@ Refer to GitHub Epic [#1463](https://github.com/thef4tdaddy/violet-vault/issues/
 
 ---
 
-_Last Updated: January 18, 2026_
+### Update Info
+
+_Last Updated: January 21, 2026_

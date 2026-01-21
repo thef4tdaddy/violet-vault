@@ -130,13 +130,10 @@ export const DashboardHeader = ({ debtStats, handleAddDebt }: DashboardHeaderPro
     <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">
       <div>
         <h2 className="font-black text-black text-xl flex items-center">
-          <div className="relative mr-4">
-            <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
-            <div className="relative bg-red-500 p-3 rounded-2xl">
-              {React.createElement(getIcon("CreditCard"), {
-                className: "h-6 w-6 text-white",
-              })}
-            </div>
+          <div className="mr-4 bg-red-500 p-3 rounded-2xl shadow-md">
+            {React.createElement(getIcon("CreditCard"), {
+              className: "h-6 w-6 text-white",
+            })}
           </div>
           <span className="text-2xl">D</span>EBT&nbsp;&nbsp;<span className="text-2xl">T</span>
           RACKING
@@ -149,7 +146,7 @@ export const DashboardHeader = ({ debtStats, handleAddDebt }: DashboardHeaderPro
       <div className="flex flex-row gap-3">
         <Button
           onClick={handleAddDebt}
-          className="btn btn-primary border-2 border-black flex items-center"
+          className="btn btn-primary bg-purple-600 hover:bg-purple-700 border-2 border-black flex items-center"
           data-tour="add-debt"
         >
           {React.createElement(getIcon("Plus"), {

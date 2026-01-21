@@ -98,17 +98,17 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
         <div className="flex space-x-2">
           <Button
             onClick={() => onEdit(goal)}
-            className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all"
+            className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all"
             title="Edit goal"
           >
-            {React.createElement(getIcon("Pencil"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Pencil"), { className: "h-3.5 w-3.5" })}
           </Button>
           <Button
             onClick={() => onDelete(goal)}
-            className="p-2 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 hover:border-rose-300 rounded-lg transition-all"
+            className="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all"
             title="Delete goal"
           >
-            {React.createElement(getIcon("XCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Trash2"), { className: "h-3.5 w-3.5" })}
           </Button>
         </div>
       </div>
@@ -137,9 +137,11 @@ const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({
             <span className="text-gray-600">Current:</span>
             <div className="font-bold text-green-600">${currentAmount.toFixed(2)}</div>
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="text-gray-600">Target:</span>
-            <div className="font-bold">${targetAmount.toFixed(2)}</div>
+            <div className="font-bold text-xs sm:text-sm truncate" title={targetAmount.toFixed(2)}>
+              ${targetAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </div>
           </div>
         </div>
 

@@ -159,7 +159,9 @@ import {
 
   // Loading & Progress
   Loader2,
-
+  BookOpen,
+  BookText,
+  Pencil,
   // Debt Types (matching constants/debts.js)
   Scale, // For Chapter 13
 } from "lucide-react";
@@ -211,6 +213,10 @@ export const ICON_REGISTRY = {
   Edit: Edit,
   edit2: Edit,
   Edit2: Edit,
+  pencil: Pencil,
+  Pencil: Pencil,
+  "pencil-line": PencilLine,
+  PencilLine: PencilLine,
   trash: Trash2,
   Trash2: Trash2,
   search: Search,
@@ -321,6 +327,8 @@ export const ICON_REGISTRY = {
   // Education & Work (matching debt constants)
   GraduationCap: GraduationCap,
   Book: Book,
+  BookOpen: BookOpen,
+  BookText: BookText,
   Laptop: Laptop,
   Briefcase: Briefcase,
 
@@ -380,7 +388,6 @@ export const ICON_REGISTRY = {
   Share: Share,
   ExternalLink: ExternalLink,
   SplitSquareHorizontal: SplitSquareHorizontal,
-  PencilLine: PencilLine,
 
   // Loading & Progress
   Loader2: Loader2,

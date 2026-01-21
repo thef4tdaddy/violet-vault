@@ -24,6 +24,7 @@
 - Commit changes frequently
 
 - **Mandatory 80%+ test coverage for all new/modified code (Front & Back)**
+- **Always verify existence of corresponding tests for any files touched; if they don't exist, create them.**
 - Data Flow: Firebase → Dexie → TanStack Query
 - State: React Context (Auth) / Zustand (UI only)
 - **TypeScript strict** - Zero `any` types allowed

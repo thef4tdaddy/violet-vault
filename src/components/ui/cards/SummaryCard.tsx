@@ -158,7 +158,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
 
   return (
     <div
-      className={`bg-gradient-to-br ${config.gradient} p-4 rounded-lg text-white transition-all duration-200 ${
+      className={`bg-linear-to-br ${config.gradient} p-4 rounded-lg text-white transition-all duration-200 ${
         onClick ? "cursor-pointer hover:shadow-lg hover:scale-105" : ""
       } ${alert ? "ring-2 ring-white ring-opacity-50" : ""} ${className}`}
       onClick={onClick}

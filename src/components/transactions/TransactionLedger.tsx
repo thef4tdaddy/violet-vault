@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import TransactionSummaryCards from "./TransactionSummaryCards";
 import StandardFilters, { type FilterConfig } from "../ui/StandardFilters";
@@ -146,6 +146,7 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
       title="Transaction Ledger"
       subtitle={formatLedgerSummary(transactions.length, netCashFlow)}
       icon="BookOpen"
+      className="mb-8"
       actions={
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:justify-end">
           <Button
@@ -159,7 +160,7 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
           </Button>
           <Button
             onClick={onAddTransaction}
-            className="btn btn-primary border-2 border-black flex items-center justify-center shadow-lg"
+            className="btn btn-primary bg-purple-600 hover:bg-purple-700 text-white border-2 border-black flex items-center justify-center shadow-lg transition-all"
             data-tour="add-transaction"
           >
             {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
@@ -288,11 +289,23 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     handleFilterChange,
   } = ledger;
 
-  // Normalize data using utility functions
-  const transactionsList = normalizeTransactions(ledgerTransactions as unknown[]);
-  const paginatedList = normalizeTransactions(ledgerPaginatedTransactions as unknown[]);
-  const envelopesList = normalizeEnvelopes(ledgerEnvelopes as unknown[]);
-  const layoutTransactionsNormalized = normalizeTransactions(layoutTransactions as unknown[]);
+  // Normalize data using utility functions with memoization to prevent re-computation freezes
+  const transactionsList = useMemo(
+    () => normalizeTransactions(ledgerTransactions as unknown[]),
+    [ledgerTransactions]
+  );
+  const paginatedList = useMemo(
+    () => normalizeTransactions(ledgerPaginatedTransactions as unknown[]),
+    [ledgerPaginatedTransactions]
+  );
+  const envelopesList = useMemo(
+    () => normalizeEnvelopes(ledgerEnvelopes as unknown[]),
+    [ledgerEnvelopes]
+  );
+  const layoutTransactionsNormalized = useMemo(
+    () => normalizeTransactions(layoutTransactions as unknown[]),
+    [layoutTransactions]
+  );
 
   const transactionsForSuggestionsSource =
     layoutTransactionsNormalized.length > 0 ? layoutTransactionsNormalized : transactionsList;
