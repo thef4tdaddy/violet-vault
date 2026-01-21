@@ -118,7 +118,7 @@ const StandardFilters = ({
   };
 
   return (
-    <div className="glassmorphism rounded-xl border border-white/20 ring-1 ring-gray-800/10 shadow-lg">
+    <div className="glassmorphism rounded-xl border-2 border-black ring-1 ring-gray-800/10 shadow-lg">
       <div className="flex flex-wrap items-center justify-between gap-3 p-4">
         <div className="flex items-center space-x-2">
           {React.createElement(getIcon("Filter"), {
