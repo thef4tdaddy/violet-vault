@@ -29,25 +29,25 @@ const EnvelopeActivitySummary = React.memo(({ envelope }: { envelope: EnvelopeFo
   // If type is "liability", "bill", "debt", etc. it will skip this block
   if (envelope.envelopeType === ENVELOPE_TYPES.VARIABLE) {
     return (
-      <div className="grid grid-cols-3 gap-3 py-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-4">
         {/* Spent Box */}
         <div className="flex flex-col items-start justify-center bg-rose-50 rounded-lg p-3 border border-rose-200">
-          <p className="text-sm font-medium text-rose-700 mb-1">Spent (30d)</p>
-          <p className="text-lg font-bold text-rose-700 whitespace-nowrap">
+          <p className="text-xs sm:text-sm font-medium text-rose-700 mb-1">Spent (30d)</p>
+          <p className="text-base sm:text-lg font-bold text-rose-700 whitespace-nowrap">
             ${(envelope.totalSpent ?? 0).toFixed(2)}
           </p>
         </div>
         {/* Monthly Budget Box */}
         <div className="flex flex-col items-start justify-center bg-sky-50 rounded-lg p-3 border border-sky-200">
-          <p className="text-sm font-medium text-sky-700 mb-1">Monthly Budget</p>
-          <p className="text-lg font-bold text-sky-700 whitespace-nowrap">
+          <p className="text-xs sm:text-sm font-medium text-sky-700 mb-1">Monthly Budget</p>
+          <p className="text-base sm:text-lg font-bold text-sky-700 whitespace-nowrap">
             ${(envelope.monthlyBudget || 0).toFixed(2)}
           </p>
         </div>
         {/* Biweekly Box */}
         <div className="flex flex-col items-start justify-center bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-          <p className="text-sm font-medium text-emerald-700 mb-1">Biweekly</p>
-          <p className="text-lg font-bold text-emerald-700 whitespace-nowrap">
+          <p className="text-xs sm:text-sm font-medium text-emerald-700 mb-1">Biweekly</p>
+          <p className="text-base sm:text-lg font-bold text-emerald-700 whitespace-nowrap">
             ${((envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER).toFixed(2)}
           </p>
         </div>

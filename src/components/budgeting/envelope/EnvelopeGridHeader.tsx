@@ -56,8 +56,8 @@ export const EnvelopeGridHeader: React.FC<EnvelopeGridHeaderProps> = ({
 
       {/* Right side - View Mode Toggle */}
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700">View Mode:</span>
-        <div className="flex gap-2 bg-white rounded-lg p-1 border-2 border-black">
+        <div className="flex items-center gap-2 bg-white rounded-lg p-1 border-2 border-black">
+          <span className="text-sm font-medium text-gray-700 ml-2">View Mode:</span>
           <Button
             onClick={() => setViewMode("overview")}
             className={`px-5 py-2 text-sm rounded-md transition-colors font-medium border-0 ${

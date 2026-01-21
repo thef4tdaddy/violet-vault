@@ -175,9 +175,9 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
       }
     >
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1 text-center">
           <p className={`${config.textMain} text-sm`}>{label}</p>
-          <p className={`text-2xl font-bold ${config.textValue}`}>{value}</p>
+          <p className={`text-3xl font-bold ${config.textValue}`}>{value}</p>
           {subtext && <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>}
         </div>
         {Icon &&

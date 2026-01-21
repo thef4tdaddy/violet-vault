@@ -149,6 +149,7 @@ interface ModalContentProps {
   onDelete: () => void;
   onCancel: () => void;
   onSubmit: () => void;
+  hideActions?: boolean;
 }
 
 /**
@@ -168,6 +169,7 @@ export const ModalContent = ({
   onDelete,
   onCancel,
   onSubmit,
+  hideActions = false,
 }: ModalContentProps) => {
   return (
     <div className="space-y-6">
@@ -220,15 +222,17 @@ export const ModalContent = ({
       <AdditionalSettings formData={formData} canEdit={canEdit} onUpdateField={onUpdateField} />
 
       {/* Action Buttons */}
-      <ActionButtons
-        canDelete={canDelete}
-        isUnassignedCash={isUnassignedCash}
-        canSubmit={canSubmit}
-        isLoading={isLoading}
-        onDelete={onDelete}
-        onCancel={onCancel}
-        onSubmit={onSubmit}
-      />
+      {!hideActions && (
+        <ActionButtons
+          canDelete={canDelete}
+          isUnassignedCash={isUnassignedCash}
+          canSubmit={canSubmit}
+          isLoading={isLoading}
+          onDelete={onDelete}
+          onCancel={onCancel}
+          onSubmit={onSubmit}
+        />
+      )}
     </div>
   );
 };

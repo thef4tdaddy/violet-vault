@@ -30,13 +30,13 @@ const variantClasses = {
   primary:
     "bg-gradient-to-br from-purple-500 to-purple-600 text-white border-2 border-black hover:-translate-y-0.5 hover:shadow-lg focus:ring-purple-200",
   secondary:
-    "bg-slate-100 text-slate-700 border-2 border-black hover:bg-slate-200 hover:-translate-y-0.5 focus:ring-slate-200",
+    "bg-slate-100 text-black border-2 border-black hover:bg-slate-200 hover:-translate-y-0.5 focus:ring-slate-200",
   success:
     "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-2 border-black hover:-translate-y-0.5 hover:shadow-lg focus:ring-emerald-200",
   danger:
     "bg-gradient-to-br from-red-500 to-red-600 text-white border-2 border-black hover:-translate-y-0.5 hover:shadow-lg focus:ring-red-200",
   ghost:
-    "bg-transparent text-slate-700 border-2 border-transparent hover:bg-slate-100 focus:ring-slate-200",
+    "bg-transparent text-black border-2 border-transparent hover:bg-slate-100 focus:ring-slate-200",
   link: "bg-transparent text-purple-600 border-none hover:text-purple-700 hover:underline focus:ring-purple-200",
 };
 

@@ -101,7 +101,7 @@ export const useSummaryMetrics = (
       {
         key: "savings-total",
         icon: "Target",
-        label: "Savings Total",
+        label: "Savings & Supplemental",
         value: totalSavingsBalance,
         variant: "info",
       },

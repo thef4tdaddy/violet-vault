@@ -121,7 +121,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
       {paydayPrediction && (
         <PaydayPrediction
           prediction={paydayPrediction}
-          className="mb-0"
+          className="mb-6"
           onProcessPaycheck={handleProcessPaycheck}
           onPrepareEnvelopes={handlePrepareEnvelopes}
         />

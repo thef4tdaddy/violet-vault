@@ -43,6 +43,28 @@ const getDateString = (daysAgo) => {
   return date.toISOString().split("T")[0];
 };
 
+// Helper to generate OFX content
+const generateOFX = (transactions) => {
+  const header = `OFXHEADER:100\nDATA:OFXSGML\nVERSION:102\nSECURITY:NONE\nENCODING:USASCII\nCHARSET:1252\nCOMPRESSION:NONE\nOLDFILEUID:NONE\nNEWFILEUID:NONE\n\n<OFX>\n<SIGNONMSGSRSV1>\n<SONRS>\n<STATUS>\n<CODE>0\n<SEVERITY>INFO\n</STATUS>\n<DTSERVER>${new Date()
+    .toISOString()
+    .replace(/[-T:.Z]/g, "")
+    .slice(
+      0,
+      14
+    )}\n<LANGUAGE>ENG\n</SONRS>\n</SIGNONMSGSRSV1>\n<BANKMSGSRSV1>\n<STMTTRNRS>\n<TRNUID>1\n<STATUS>\n<CODE>0\n<SEVERITY>INFO\n</STATUS>\n<STMTRS>\n<CURDEF>USD\n<BANKACCTFROM>\n<BANKID>123456789\n<ACCTID>987654321\n<ACCTTYPE>CHECKING\n</BANKACCTFROM>\n<BANKTRANLIST>\n<DTSTART>${getDateString(30).replace(/-/g, "")}000000\n<DTEND>${getDateString(0).replace(/-/g, "")}000000\n`;
+
+  const txnItems = transactions
+    .map((t) => {
+      const dateStr = t.date.replace(/-/g, "") + "120000";
+      return `<STMTTRN>\n<TRNTYPE>${t.amount < 0 ? "DEBIT" : "CREDIT"}\n<DTPOSTED>${dateStr}\n<TRNAMT>${t.amount}\n<FITID>${t.id}\n<NAME>${t.merchant || t.description}\n<MEMO>${t.description}\n</STMTTRN>\n`;
+    })
+    .join("");
+
+  const footer = `</BANKTRANLIST>\n<LEDGERBAL>\n<BALAMT>5000.00\n<DTASOF>${getDateString(0).replace(/-/g, "")}000000\n</LEDGERBAL>\n</STMTRS>\n</STMTTRNRS>\n</BANKMSGSRSV1>\n</OFX>`;
+
+  return header + txnItems + footer;
+};
+
 /**
  * v2.0 DATA DEFINITION
  */
@@ -632,6 +654,13 @@ coreEnvIds.forEach((envId, idx) => {
 // Sort transactions by date descending
 transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+// SPLIT DATA:
+// 1. Most recent 20 transactions -> OFX file (for import testing)
+// 2. The rest -> Budget JSON (as historical data)
+// This ensures the transactions in the OFX are NEW/DIFFERENT from what's in the backup.
+const importTxns = transactions.slice(0, 20);
+const budgetTxns = transactions.slice(20);
+
 /**
  * ASSEMBLY & OUTPUT
  */
@@ -639,7 +668,7 @@ transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 const outputV2 = {
   budget: budgetMetadata,
   envelopes,
-  transactions,
+  transactions: budgetTxns, // Only historical transactions in backup
   budgetCommits,
   budgetChanges,
   // Meta fields expected by the app
@@ -653,26 +682,21 @@ const outputV2 = {
 };
 
 const outputPathList = [
-  path.join(__dirname, "violet-vault-test-budget-enhanced.json"),
-  path.join(__dirname, "violet-vault-transactions-recent.json"),
+  path.join(__dirname, "../data/violet-vault-budget.json"),
+  path.join(__dirname, "../data/violet-vault-transactions.ofx"),
 ];
 
-// Main export file
+// 1. Main Budget Backup (Historical Data)
 fs.writeFileSync(outputPathList[0], JSON.stringify(outputV2, null, 2));
 
-// Snippet of recent data
-const recentData = {
-  generatedAt: new Date().toISOString(),
-  transactions: transactions.slice(0, 20),
-};
-fs.writeFileSync(outputPathList[1], JSON.stringify(recentData, null, 2));
+// 2. Importable Transactions (New Data not in backup)
+const ofxContent = generateOFX(importTxns);
+fs.writeFileSync(outputPathList[1], ofxContent);
 
 console.log(`\n🌌 Violet Vault v2.0 "Viable" Data Generated!`);
-console.log(
-  `   - Envelopes: ${envelopes.length} (Standard, Savings Goals, Supplemental, Liabilities, Bills)`
-);
-console.log(
-  `   - Transactions: ${transactions.length} (Income with allocations, Scheduled expenses, History)`
-);
-console.log(`   - Schema Level: v2.0.0 (Dexie Unified Model)`);
-console.log(`   - Output: ${outputPathList[0]}\n`);
+console.log(`   - Envelopes: ${envelopes.length}`);
+console.log(`   - Backup Transactions: ${budgetTxns.length} (Historical data)`);
+console.log(`   - Importable Transactions: ${importTxns.length} (New data in OFX)`);
+console.log(`   - Schema Level: v2.0.0 (Unified Model)`);
+console.log(`   - Output Budget: ${outputPathList[0]}`);
+console.log(`   - Output OFX: ${outputPathList[1]}\n`);

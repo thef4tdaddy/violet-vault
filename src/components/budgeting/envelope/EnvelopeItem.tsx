@@ -72,6 +72,16 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = React.memo(
     return (
       <div
         {...swipeHandlers}
+        onClick={(e) => {
+          // Prevent click if clicking swipe actions or buttons
+          if (
+            (e.target as HTMLElement).closest("button") ||
+            (e.target as HTMLElement).closest(".swipe-action")
+          ) {
+            return;
+          }
+          onSelect?.(envelope.id);
+        }}
         className={getButtonClasses(
           `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope as never)} ${
             isSelected ? "ring-2 ring-purple-500" : ""
@@ -85,15 +95,30 @@ const EnvelopeItem: React.FC<EnvelopeItemProps> = React.memo(
           envelope={envelope}
           isCollapsed={isCollapsed}
           onSelect={onSelect}
+          // Hide action buttons in overview mode
           onEdit={
-            onEdit as
-              | ((envelope: { id: string; name: string; category: string; color?: string }) => void)
-              | undefined
+            isCollapsed
+              ? undefined
+              : (onEdit as
+                  | ((envelope: {
+                      id: string;
+                      name: string;
+                      category: string;
+                      color?: string;
+                    }) => void)
+                  | undefined)
           }
           onViewHistory={
-            onViewHistory as
-              | ((envelope: { id: string; name: string; category: string; color?: string }) => void)
-              | undefined
+            isCollapsed
+              ? undefined
+              : (onViewHistory as
+                  | ((envelope: {
+                      id: string;
+                      name: string;
+                      category: string;
+                      color?: string;
+                    }) => void)
+                  | undefined)
           }
           onToggleCollapse={() => {}} // Disabled when viewMode controls collapse
         />

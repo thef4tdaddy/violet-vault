@@ -15,6 +15,7 @@ interface EnvelopeModalHeaderProps {
   lock?: LockDocument | null;
   onBreakLock?: () => void;
   onClose?: () => void;
+  actions?: React.ReactNode;
 }
 
 const EnvelopeModalHeader = ({
@@ -27,6 +28,7 @@ const EnvelopeModalHeader = ({
   lock = null,
   onBreakLock,
   onClose,
+  actions,
 }: EnvelopeModalHeaderProps) => {
   return (
     <>
@@ -55,6 +57,9 @@ const EnvelopeModalHeader = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Custom Actions */}
+            {actions && <div className="flex items-center gap-2 mr-2">{actions}</div>}
+
             {/* Lock Controls */}
             {isLocked && !isOwnLock && isExpired && (
               <Button

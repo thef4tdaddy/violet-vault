@@ -1,5 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "@/components/ui";
+import { getIcon } from "@/utils";
 import useEnvelopeEdit from "@/hooks/budgeting/envelopes/useEnvelopeEdit";
 import logger from "@/utils/core/common/logger";
 import { useMobileDetection } from "@/hooks/platform/common/useMobileDetection";
@@ -24,6 +26,67 @@ interface EditEnvelopeModalProps {
   currentUser?: { userName: string; userColor: string };
   _forceMobileMode?: boolean;
 }
+
+// Helper: Get save button color based on envelope type
+const getSaveButtonColor = (isUnassignedCash: boolean, envelopeType?: string): string => {
+  if (isUnassignedCash) return "bg-green-600 hover:bg-green-700";
+  switch (envelopeType) {
+    case "bill":
+    case "liability":
+      return "bg-blue-600 hover:bg-blue-700";
+    case "savings":
+    case "goal":
+    case "sinking_fund":
+      return "bg-emerald-600 hover:bg-emerald-700";
+    default:
+      return "bg-orange-500 hover:bg-orange-600";
+  }
+};
+
+// Helper: Render action buttons for modal header
+const renderActionButtons = ({
+  canDelete,
+  isUnassignedCash,
+  handleDeleteClick,
+  handleSubmit,
+  canSubmit,
+  isLoading,
+  envelopeType,
+}: {
+  canDelete: boolean;
+  isUnassignedCash: boolean;
+  handleDeleteClick: () => void;
+  handleSubmit: () => void;
+  canSubmit: boolean;
+  isLoading: boolean;
+  envelopeType?: string;
+}) => (
+  <>
+    {canDelete && !isUnassignedCash && (
+      <Button
+        type="button"
+        onClick={handleDeleteClick}
+        className="bg-red-500/20 hover:bg-red-500/30 text-red-100 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center h-8"
+      >
+        {React.createElement(getIcon("Trash2"), {
+          className: "h-3 w-3 mr-1",
+        })}
+        Delete
+      </Button>
+    )}
+    <Button
+      type="button"
+      onClick={handleSubmit}
+      disabled={!canSubmit || isLoading}
+      className={`px-4 py-1.5 text-white rounded-lg text-sm font-medium transition-colors flex items-center h-8 ${getSaveButtonColor(isUnassignedCash, envelopeType)} disabled:opacity-50 disabled:cursor-not-allowed`}
+    >
+      {React.createElement(getIcon("Save"), {
+        className: "h-3.5 w-3.5 mr-1.5",
+      })}
+      {isLoading ? "Saving..." : "Save"}
+    </Button>
+  </>
+);
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -135,9 +198,20 @@ const EditEnvelopeModal = ({
     );
   }
 
-  const modalContent = (
+  const actionButtons = renderActionButtons({
+    canDelete,
+    isUnassignedCash,
+    handleDeleteClick,
+    handleSubmit,
+    canSubmit,
+    isLoading,
+    envelopeType: formData.envelopeType,
+  });
+
+  /* Desktop Modal Content */
+  const desktopModalStructure = (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100] overflow-y-auto">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-100 overflow-y-auto">
         <div
           ref={modalRef}
           className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-2 border-black my-auto"
@@ -152,10 +226,11 @@ const EditEnvelopeModal = ({
             lock={lock}
             onBreakLock={breakLock}
             onClose={handleClose}
+            actions={actionButtons}
           />
 
           <div className="flex-1 p-6 overflow-y-auto">
-            <ModalContent {...modalProps} />
+            <ModalContent {...modalProps} hideActions={true} />
           </div>
         </div>
       </div>
@@ -171,7 +246,7 @@ const EditEnvelopeModal = ({
   );
 
   // Render modal at document root to avoid z-index/overflow issues
-  return createPortal(modalContent, document.body);
+  return createPortal(desktopModalStructure, document.body);
 };
 
 export default EditEnvelopeModal;
