@@ -1,7 +1,7 @@
 {
   "name": "violetvault",
   "private": true,
-  "version": "2.0.0-beta.16",
+  "version": "2.0.0-beta.17",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
   "license": "CC-BY-NC-SA-4.0",
@@ -144,8 +144,8 @@
       "gofmt -w"
     ],
     "*.py": [
-      "ruff check --fix",
-      "ruff format"
+      "bash -c 'if [ -f ./.venv/bin/ruff ]; then ./.venv/bin/ruff check --fix \"$@\"; else ruff check --fix \"$@\"; fi' --",
+      "bash -c 'if [ -f ./.venv/bin/ruff ]; then ./.venv/bin/ruff format \"$@\"; else ruff format \"$@\"; fi' --"
     ]
   },
   "overrides": {
