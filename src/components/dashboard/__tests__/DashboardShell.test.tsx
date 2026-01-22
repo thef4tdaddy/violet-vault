@@ -4,7 +4,6 @@ import DashboardShell from "../DashboardShell";
 import "@testing-library/jest-dom";
 
 describe("DashboardShell", () => {
-
   describe("Rendering", () => {
     it("should render the dashboard shell container", () => {
       render(<DashboardShell />);
@@ -12,14 +11,14 @@ describe("DashboardShell", () => {
       expect(shell).toBeInTheDocument();
     });
 
-    it("should apply glassmorphism styling", () => {
+    it("should apply hard lines styling", () => {
       render(<DashboardShell />);
       const shell = screen.getByTestId("dashboard-shell");
-      expect(shell).toHaveClass("bg-purple-100/40");
-      expect(shell).toHaveClass("backdrop-blur-sm");
+      expect(shell).toHaveClass("bg-white");
       expect(shell).toHaveClass("border-2");
       expect(shell).toHaveClass("border-black");
       expect(shell).toHaveClass("rounded-lg");
+      expect(shell).not.toHaveClass("backdrop-blur-sm");
     });
 
     it("should render top row when slots provided", () => {
@@ -34,13 +33,9 @@ describe("DashboardShell", () => {
       expect(topRow).toBeInTheDocument();
     });
 
-    it("should not render top row elements when no slots provided", () => {
+    it("should not render top row when no slots provided", () => {
       render(<DashboardShell />);
-      const topRow = screen.getByTestId("dashboard-top-row");
-      expect(topRow).toBeInTheDocument();
-      expect(screen.queryByTestId("dashboard-logo")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("dashboard-profile")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("dashboard-payday-banner")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("dashboard-top-row")).not.toBeInTheDocument();
     });
 
     it("should render children in content grid", () => {
@@ -172,8 +167,7 @@ describe("DashboardShell", () => {
       render(<DashboardShell className="my-custom-class" />);
       const shell = screen.getByTestId("dashboard-shell");
       expect(shell).toHaveClass("my-custom-class");
-      expect(shell).toHaveClass("bg-purple-100/40");
-      expect(shell).toHaveClass("backdrop-blur-sm");
+      expect(shell).toHaveClass("bg-white");
     });
   });
 

@@ -50,7 +50,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
 }) => {
   return (
     <div
-      className={`bg-purple-100/40 backdrop-blur-sm border-2 border-black rounded-lg p-4 md:p-6 ${className}`}
+      className={`bg-white border-2 border-black rounded-lg p-4 md:p-6 ${className}`}
       data-testid="dashboard-shell"
     >
       {/* Top Row - Logo, Profile, PaydayBanner */}
