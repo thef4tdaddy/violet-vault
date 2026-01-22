@@ -92,11 +92,13 @@ export const formatCurrency = (amount: number) => {
 /**
  * Format date for display
  */
-export const formatDisplayDate = (dateString: string) => {
+export const formatDisplayDate = (
+  dateString: string | Date | number | undefined | null
+): string => {
   if (!dateString) return "No date";
 
   try {
-    const date = new Date(dateString);
+    const date = dateString instanceof Date ? dateString : new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "short",
@@ -104,7 +106,7 @@ export const formatDisplayDate = (dateString: string) => {
       timeZone: "UTC",
     }).format(date);
   } catch {
-    return dateString;
+    return String(dateString);
   }
 };
 

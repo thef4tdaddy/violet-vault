@@ -174,6 +174,27 @@ const useReceipts = () => {
   const getReceiptsForTransaction = (transactionId: string) =>
     (receiptsQuery.data || []).filter((r) => r.transactionId === transactionId);
 
+  // SentinelShare matching utilities
+  const getPendingMatchReceipts = () =>
+    (receiptsQuery.data || []).filter(
+      (r) => !r.transactionId && r.processingStatus === "completed"
+    );
+
+  const getReceiptMatchStats = () => {
+    const allReceipts = receiptsQuery.data || [];
+    const linked = allReceipts.filter((r) => r.transactionId);
+    const unlinked = allReceipts.filter((r) => !r.transactionId);
+    const pending = unlinked.filter((r) => r.processingStatus === "completed");
+
+    return {
+      total: allReceipts.length,
+      linked: linked.length,
+      unlinked: unlinked.length,
+      pendingMatch: pending.length,
+      linkRate: allReceipts.length > 0 ? Math.round((linked.length / allReceipts.length) * 100) : 0,
+    };
+  };
+
   return {
     receipts: receiptsQuery.data || [],
     isLoading: receiptsQuery.isLoading,
@@ -196,6 +217,10 @@ const useReceipts = () => {
     getReceiptsByDateRange,
     getUnlinkedReceipts,
     getReceiptsForTransaction,
+
+    // SentinelShare matching utilities
+    getPendingMatchReceipts,
+    getReceiptMatchStats,
 
     refetch: receiptsQuery.refetch,
     invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.receipts }),

@@ -68,6 +68,8 @@ export const queryKeys = {
     "transaction",
     transactionId,
   ],
+  unlinkedReceipts: () => [...queryKeys.receipts, "unlinked"],
+  receiptMatches: (receiptId: EntityId) => [...queryKeys.receipts, "matches", receiptId],
 
   // Analytics
   analytics: ["analytics"],
