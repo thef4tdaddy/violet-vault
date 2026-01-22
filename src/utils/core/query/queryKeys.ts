@@ -73,6 +73,8 @@ export const queryKeys = {
 
   // Analytics
   analytics: ["analytics"],
+  analyticsPredictions: (request?: Record<string, unknown>) =>
+    [...queryKeys.analytics, "predictions", request] as const,
   analyticsSpending: (period: string) => [...queryKeys.analytics, "spending", period],
   analyticsTrends: (period: string) => [...queryKeys.analytics, "trends", period],
   analyticsCategories: (period: string) => [...queryKeys.analytics, "categories", period],

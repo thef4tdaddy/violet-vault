@@ -231,27 +231,45 @@ echo -e "${BLUE}Running Python Backend Checks...${NC}"
 
 if [ -f "pyproject.toml" ] && [ -n "$(find api -name "*.py" -print -quit 2>/dev/null)" ]; then
     # Define python executable paths
-    RUFF_CMD="ruff"
-    MYPY_CMD="mypy"
     PYTEST_CMD="pytest"
     
-    if [ -f ".venv/bin/ruff" ]; then
+    # Check for ruff and setup command
+    if command -v "ruff" &> /dev/null; then
+        RUFF_CMD="ruff"
+    elif [ -f ".venv/bin/ruff" ]; then
         RUFF_CMD=".venv/bin/ruff"
-    fi
-    if [ -f ".venv/bin/mypy" ]; then
-        MYPY_CMD=".venv/bin/mypy"
-    fi
-    if [ -f ".venv/bin/pytest" ]; then
-        PYTEST_CMD=".venv/bin/pytest"
+    elif python3 -m ruff --version &> /dev/null; then
+        RUFF_CMD="python3 -m ruff"
+    else
+        RUFF_CMD=""
     fi
 
-    # Ruff format
-    if command -v "$RUFF_CMD" &> /dev/null || [ -f "$RUFF_CMD" ]; then
-        if [ "$FIX_MODE" = true ]; then
-            run_check "ruff format" "$RUFF_CMD format api/"
-        else
-            run_check "ruff format" "$RUFF_CMD format --check api/"
-        fi
+    # Check for mypy and setup command
+    if command -v "mypy" &> /dev/null; then
+        MYPY_CMD="mypy"
+    elif [ -f ".venv/bin/mypy" ]; then
+        MYPY_CMD=".venv/bin/mypy"
+    elif python3 -m mypy --version &> /dev/null; then
+        MYPY_CMD="python3 -m mypy"
+    else
+        MYPY_CMD=""
+    fi
+
+    # Check for pytest and setup command
+    if command -v "pytest" &> /dev/null; then
+        PYTEST_CMD="pytest"
+    elif [ -f ".venv/bin/pytest" ]; then
+        PYTEST_CMD=".venv/bin/pytest"
+    elif python3 -m pytest --version &> /dev/null; then
+        PYTEST_CMD="python3 -m pytest"
+    else
+        PYTEST_CMD=""
+    fi
+
+    # Ruff format and lint
+    if [ -n "$RUFF_CMD" ]; then
+        # Always format by default, matching Prettier/Go behavior
+        run_check "ruff format" "$RUFF_CMD format api/"
         
         # Ruff lint
         if [ "$FIX_MODE" = true ]; then
@@ -264,14 +282,14 @@ if [ -f "pyproject.toml" ] && [ -n "$(find api -name "*.py" -print -quit 2>/dev/
     fi
 
     # Mypy type checking
-    if command -v "$MYPY_CMD" &> /dev/null || [ -f "$MYPY_CMD" ]; then
+    if [ -n "$MYPY_CMD" ]; then
         run_check "mypy" "$MYPY_CMD -p api"
     else
         echo -e "  ${YELLOW}mypy (skipped - not installed)${NC}"
     fi
 
     # Pytest
-    if command -v "$PYTEST_CMD" &> /dev/null || [ -f "$PYTEST_CMD" ]; then
+    if [ -n "$PYTEST_CMD" ]; then
         if [ -d "api/__tests__" ] || ls api/test_*.py 1> /dev/null 2>&1; then
             run_check "pytest" "$PYTEST_CMD --cov=api --cov-report=term-missing api/"
         else
