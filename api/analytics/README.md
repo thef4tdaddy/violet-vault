@@ -17,11 +17,13 @@ The VioletVault Analytics API provides intelligent financial predictions and ins
 Calculates daily/weekly spending rate and predicts if user will exceed budget before next payday.
 
 **Inputs**: Anonymized spending statistics
+
 - Total spent in period
-- Budget allocated for period  
+- Budget allocated for period
 - Days elapsed and remaining
 
 **Outputs**:
+
 - Velocity score (0-100)
 - Daily spending rate
 - Projected total spending
@@ -34,11 +36,13 @@ Calculates daily/weekly spending rate and predicts if user will exceed budget be
 Analyzes historical bill patterns and predicts upcoming bills based on trends.
 
 **Inputs**: Anonymized historical bill data
+
 - Bill amounts
 - Due dates (ISO format)
 - Categories (no merchant names)
 
 **Outputs**:
+
 - Predicted upcoming bills
 - Predicted amounts and dates
 - Confidence scores
@@ -49,12 +53,14 @@ Analyzes historical bill patterns and predicts upcoming bills based on trends.
 Overall financial health indicator based on multiple factors.
 
 **Inputs**: Anonymized budget metrics
+
 - Spending velocity score
 - Bill coverage ratio
 - Savings rate
 - Envelope utilization
 
 **Outputs**:
+
 - Overall health score (0-100)
 - Letter grade (A-F)
 - Detailed breakdown (spending pace, bill preparedness, savings health, budget utilization)
@@ -187,10 +193,10 @@ const { data, isLoading, error } = useAnalyticsQuery({
 });
 
 // Or use convenience hooks
-import { 
-  useSpendingVelocity, 
-  useBillPredictions, 
-  useBudgetHealth 
+import {
+  useSpendingVelocity,
+  useBillPredictions,
+  useBudgetHealth
 } from '@/hooks/platform/analytics/queries/useAnalyticsQuery';
 
 const { data: velocity } = useSpendingVelocity(spendingStats);
@@ -245,9 +251,9 @@ def test_perfect_pacing() -> None:
         "daysElapsed": 15,
         "daysRemaining": 15,
     }
-    
+
     result = calculate_spending_velocity(stats)
-    
+
     assert result["velocityScore"] == 100
     assert result["severity"] == "success"
     assert not result["willExceedBudget"]
@@ -339,5 +345,6 @@ None required - service is stateless and uses no external APIs.
 ## Support
 
 For issues or questions:
+
 - GitHub Issues: https://github.com/thef4tdaddy/violet-vault/issues
 - Label: `backend`, `analytics`
