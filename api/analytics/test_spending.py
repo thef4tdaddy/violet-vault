@@ -4,7 +4,7 @@ Tests for Spending Velocity Analytics
 
 import unittest
 
-from api.analytics.spending import SpendingStats, calculate_spending_velocity
+from api.analytics.spending import calculate_spending_velocity
 
 
 class TestSpendingVelocity(unittest.TestCase):

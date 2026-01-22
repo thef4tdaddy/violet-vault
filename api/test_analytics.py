@@ -7,6 +7,7 @@ import os
 import sys
 import unittest
 from datetime import datetime, timedelta
+from http.server import BaseHTTPRequestHandler
 from io import BytesIO
 from typing import Any, cast
 from unittest.mock import MagicMock
@@ -23,12 +24,14 @@ spec = importlib.util.spec_from_file_location(
 if spec and spec.loader:
     analytics_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(analytics_module)
-    handler = analytics_module.handler
+    spec.loader.exec_module(analytics_module)
+    # Cast to BaseHTTPRequestHandler for Mypy to understand it's a class
+    handler: type[BaseHTTPRequestHandler] = analytics_module.handler
 else:
     raise ImportError("Could not load analytics.py module")
 
 
-class MockAnalyticsHandler(handler):
+class MockAnalyticsHandler(handler):  # type: ignore
     """Mock handler for testing analytics endpoint"""
 
     def __init__(self, rfile: BytesIO, wfile: BytesIO, *args: Any, **kwargs: Any) -> None:
@@ -209,7 +212,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_empty_request(self) -> None:
         """Test with empty request body (valid but no data)"""
-        payload = {}
+        payload: dict[str, Any] = {}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
@@ -268,7 +271,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_response_headers(self) -> None:
         """Test response includes proper headers"""
-        payload = {}
+        payload: dict[str, Any] = {}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
