@@ -80,6 +80,12 @@ export const queryKeys = {
   syncStatus: () => [...queryKeys.sync, "status"],
   cloudData: () => [...queryKeys.sync, "cloudData"],
   syncActivity: () => [...queryKeys.sync, "activity"],
+
+  // SentinelShare - Cross-app transaction matching
+  sentinelShare: ["sentinelShare"],
+  sentinelReceipts: (filters = {}) => [...queryKeys.sentinelShare, "receipts", filters],
+  sentinelReceiptById: (id) => [...queryKeys.sentinelShare, "receipt", id],
+  sentinelPendingReceipts: () => [...queryKeys.sentinelShare, "pending"],
 };
 
 /**
