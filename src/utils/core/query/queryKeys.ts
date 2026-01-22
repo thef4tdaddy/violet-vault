@@ -71,6 +71,8 @@ export const queryKeys = {
 
   // Analytics
   analytics: ["analytics"],
+  analyticsPredictions: (request?: Record<string, unknown>) =>
+    [...queryKeys.analytics, "predictions", request] as const,
   analyticsSpending: (period: string) => [...queryKeys.analytics, "spending", period],
   analyticsTrends: (period: string) => [...queryKeys.analytics, "trends", period],
   analyticsCategories: (period: string) => [...queryKeys.analytics, "categories", period],
@@ -116,6 +118,16 @@ export const queryKeys = {
     rule: (id: EntityId) => [...queryKeys.autoFunding.all, "rule", id],
     history: (limit?: number) => [...queryKeys.autoFunding.all, "history", limit].filter(Boolean),
   },
+
+  // SentinelShare - Cross-app transaction matching
+  sentinelShare: ["sentinelShare"],
+  sentinelReceipts: (filters: FilterParams = {}) => [
+    ...queryKeys.sentinelShare,
+    "receipts",
+    filters,
+  ],
+  sentinelReceiptById: (id: EntityId) => [...queryKeys.sentinelShare, "receipt", id],
+  sentinelPendingReceipts: () => [...queryKeys.sentinelShare, "pending"],
 };
 
 /**

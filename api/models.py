@@ -3,7 +3,7 @@ Data Models for VioletVault Analytics Service
 Mirrors the TypeScript/Zod schemas from the frontend
 """
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -140,6 +140,150 @@ class IntegrityAuditResult(BaseModel):
     """
 
     violations: list[IntegrityViolation] = Field(..., description="List of all violations found")
-    summary: dict = Field(..., description="Summary statistics (counts by severity and type)")
+    summary: dict[str, Any] = Field(
+        ..., description="Summary statistics (counts by severity and type)"
+    )
     timestamp: str = Field(..., description="When the audit was performed (ISO format)")
-    snapshotSize: dict = Field(..., description="Size of the data snapshot analyzed")
+    snapshotSize: dict[str, int] = Field(
+        ..., description="Size of the data snapshot analyzed"
+    )
+
+
+# ============================================================================
+# Analytics Models - For Dashboard Predictions and Insights
+# ============================================================================
+
+
+class SpendingStats(BaseModel):
+    """Input statistics for spending velocity calculation"""
+
+    totalSpent: float = Field(..., description="Total amount spent in period")
+    budgetAllocated: float = Field(..., description="Total budget allocated for period")
+    daysElapsed: int = Field(..., gt=0, description="Days elapsed in period")
+    daysRemaining: int = Field(..., ge=0, description="Days remaining in period")
+
+
+class HistoricalBill(BaseModel):
+    """Historical bill data point"""
+
+    amount: float = Field(..., gt=0, description="Bill amount")
+    dueDate: str = Field(..., description="Bill due date (ISO format)")
+    category: str = Field(..., min_length=1, description="Bill category")
+
+
+class HealthMetrics(BaseModel):
+    """Input metrics for health score calculation"""
+
+    spendingVelocityScore: int = Field(..., ge=0, le=100, description="Velocity score (0-100)")
+    billCoverageRatio: float = Field(..., ge=0, description="Budget/bills ratio")
+    savingsRate: float = Field(..., description="Savings as % of income")
+    envelopeUtilization: float = Field(..., ge=0, description="Budget utilization ratio")
+
+
+class AnalyticsRequest(BaseModel):
+    """
+    Request for analytics predictions
+    Contains anonymized statistics only - no E2EE data
+    """
+
+    spendingStats: SpendingStats | None = Field(None, description="Spending velocity stats")
+    historicalBills: list[HistoricalBill] | None = Field(None, description="Bill history")
+    healthMetrics: HealthMetrics | None = Field(None, description="Health metrics")
+
+
+class SpendingVelocityResult(BaseModel):
+    """Result of spending velocity calculation"""
+
+    velocityScore: int = Field(..., ge=0, le=100, description="Velocity score (0-100)")
+    dailyRate: float = Field(..., description="Average daily spending rate")
+    projectedTotal: float = Field(..., description="Projected total spending")
+    budgetAllocated: float = Field(..., description="Budget allocated")
+    willExceedBudget: bool = Field(..., description="Whether budget will be exceeded")
+    daysUntilExceeded: int | None = Field(None, description="Days until budget exceeded")
+    recommendation: str = Field(..., description="Spending recommendation")
+    severity: str = Field(..., description="Severity level (success/warning/error)")
+
+
+class BillFrequency(BaseModel):
+    """Detected frequency pattern for a bill"""
+
+    intervalDays: int = Field(..., description="Days between bills")
+    confidence: int = Field(..., ge=0, le=100, description="Confidence level (0-100)")
+    pattern: str = Field(..., description="Pattern name (monthly, weekly, etc)")
+
+
+class PredictedBill(BaseModel):
+    """Predicted upcoming bill"""
+
+    category: str = Field(..., description="Bill category")
+    predictedAmount: float = Field(..., description="Predicted bill amount")
+    predictedDate: str = Field(..., description="Predicted due date (ISO format)")
+    confidence: int = Field(..., ge=0, le=100, description="Prediction confidence (0-100)")
+    frequency: BillFrequency | None = Field(None, description="Detected frequency pattern")
+
+
+class BillPredictionResult(BaseModel):
+    """Result of bill prediction analysis"""
+
+    predictedBills: list[PredictedBill] = Field(..., description="Predicted upcoming bills")
+    totalPredictedAmount: float = Field(..., description="Total predicted amount")
+    nextBillDate: str | None = Field(None, description="Next bill due date")
+    message: str = Field(..., description="Summary message")
+
+
+class HealthScoreBreakdown(BaseModel):
+    """Detailed breakdown of health score components"""
+
+    spendingPace: int = Field(..., ge=0, le=100, description="Spending pace score")
+    billPreparedness: int = Field(..., ge=0, le=100, description="Bill preparedness score")
+    savingsHealth: int = Field(..., ge=0, le=100, description="Savings health score")
+    budgetUtilization: int = Field(..., ge=0, le=100, description="Budget utilization score")
+
+
+class BudgetHealthResult(BaseModel):
+    """Result of budget health analysis"""
+
+    overallScore: int = Field(..., ge=0, le=100, description="Overall health score (0-100)")
+    breakdown: HealthScoreBreakdown = Field(..., description="Score breakdown")
+    grade: str = Field(..., description="Letter grade (A-F)")
+    summary: str = Field(..., description="Summary message")
+    recommendations: list[str] = Field(..., description="Improvement recommendations")
+    strengths: list[str] = Field(..., description="Financial strengths")
+    concerns: list[str] = Field(..., description="Areas of concern")
+
+
+class AnalyticsResponse(BaseModel):
+    """
+    Response from analytics endpoint
+    Contains predictions and insights
+    """
+
+    success: bool = Field(..., description="Whether request was successful")
+    spendingVelocity: SpendingVelocityResult | None = Field(
+        None, description="Spending velocity analysis"
+    )
+    billPredictions: BillPredictionResult | None = Field(None, description="Bill predictions")
+    budgetHealth: BudgetHealthResult | None = Field(None, description="Budget health score")
+    error: str | None = Field(None, description="Error message if failed")
+
+
+class SentinelReceipt(BaseModel):
+    """
+    SentinelShare receipt entity for cross-app matching
+    Mirrors src/domain/schemas/sentinel.ts
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    id: str = Field(..., min_length=1)
+    amount: float
+    merchant: str = Field(..., min_length=1)
+    date: str = Field(..., description="ISO datetime")
+    category: str | None = None
+    description: str | None = None
+    status: Literal["pending", "matched", "ignored"] = Field(default="pending")
+    createdAt: str = Field(..., description="ISO datetime")
+    updatedAt: str = Field(..., description="ISO datetime")
+    matchedTransactionId: str | None = None
+    sourceApp: str | None = None
+    metadata: dict | None = Field(default_factory=lambda: {})

@@ -1,10 +1,4 @@
 {
-  "ignoreBuildCommand": "bash scripts/vercel-ignore-build.sh",
-  "build": {
-    "env": {
-      "GENERATE_SOURCEMAP": "true"
-    }
-  },
   "git": {
     "deploymentEnabled": {
       "main": true,
