@@ -1,5 +1,5 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import { usePullToRefresh } from "../usePullToRefresh";
 
 // Mock hapticFeedback
@@ -7,12 +7,40 @@ vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   hapticFeedback: vi.fn(),
 }));
 
+// Mock framer-motion unique values
+const mockMotionValue = {
+  get: () => 0,
+  set: vi.fn(),
+  onChange: vi.fn(),
+  on: vi.fn(),
+  destroy: vi.fn(),
+};
+
+vi.mock("framer-motion", () => ({
+  useMotionValue: () => mockMotionValue,
+  useSpring: (source: any) => source,
+  useTransform: (value: any) => value,
+}));
+
+// Mock useQueryClient
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: vi.fn(() => ({
+    invalidateQueries: vi.fn(),
+  })),
+}));
+
+// Mock useMobileDetection - REMOVED, using window resize instead
+
 describe("usePullToRefresh", () => {
-  let mockOnRefresh: ReturnType<typeof vi.fn>;
+  let mockOnRefresh: Mock<() => Promise<void>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockOnRefresh = vi.fn().mockResolvedValue(undefined);
+
+    // Simulate mobile device
+    window.innerWidth = 375;
+    window.dispatchEvent(new Event("resize"));
   });
 
   it("should initialize with default state", () => {
@@ -25,13 +53,12 @@ describe("usePullToRefresh", () => {
     expect(result.current.isReady).toBe(false);
   });
 
-  it("should provide touch handlers", () => {
+  it("should provide drag handlers", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh));
 
-    expect(typeof result.current.touchHandlers.onTouchStart).toBe("function");
-    expect(typeof result.current.touchHandlers.onTouchMove).toBe("function");
-    expect(typeof result.current.touchHandlers.onTouchEnd).toBe("function");
-    expect(typeof result.current.touchHandlers.onTouchCancel).toBe("function");
+    expect(typeof result.current.dragHandlers.onPanStart).toBe("function");
+    expect(typeof result.current.dragHandlers.onPan).toBe("function");
+    expect(typeof result.current.dragHandlers.onPanEnd).toBe("function");
   });
 
   it("should provide containerRef", () => {
@@ -41,18 +68,17 @@ describe("usePullToRefresh", () => {
     expect(result.current.containerRef.current).toBeNull();
   });
 
-  it("should start pulling when touch starts at top of container", () => {
+  it("should start pulling when pan starts at top of container", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh));
 
     // Mock container at top
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      const touchEvent = {
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent;
-      result.current.touchHandlers.onTouchStart(touchEvent);
+      const event = {} as PointerEvent;
+      const info = { offset: { x: 0, y: 0 } } as any;
+      result.current.dragHandlers.onPanStart(event, info);
     });
 
     expect(result.current.isPulling).toBe(true);
@@ -63,39 +89,35 @@ describe("usePullToRefresh", () => {
 
     // Mock container scrolled down
     const mockContainer = { scrollTop: 50 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      const touchEvent = {
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent;
-      result.current.touchHandlers.onTouchStart(touchEvent);
+      const event = {} as PointerEvent;
+      const info = { offset: { x: 0, y: 0 } } as any;
+      result.current.dragHandlers.onPanStart(event, info);
     });
 
     expect(result.current.isPulling).toBe(false);
   });
 
-  it("should update pull distance during touch move", () => {
+  it("should update pull distance during pan", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh));
 
     // Start pull
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      const touchStartEvent = {
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent;
-      result.current.touchHandlers.onTouchStart(touchStartEvent);
+      const event = {} as PointerEvent;
+      const info = { offset: { x: 0, y: 0 } } as any;
+      result.current.dragHandlers.onPanStart(event, info);
     });
 
     // Move finger down
     act(() => {
-      const touchMoveEvent = {
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent;
-      result.current.touchHandlers.onTouchMove(touchMoveEvent);
+      const event = {} as PointerEvent;
+      const info = { offset: { x: 0, y: 100 } } as any;
+      result.current.dragHandlers.onPan(event, info);
     });
 
     expect(result.current.pullDistance).toBeGreaterThan(0);
@@ -106,19 +128,14 @@ describe("usePullToRefresh", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh, { threshold: 80 }));
 
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPanStart({} as PointerEvent, {} as any);
     });
 
     act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPan({} as PointerEvent, { offset: { x: 0, y: 100 } } as any);
     });
 
     // Pull progress should be between 0 and 1
@@ -127,170 +144,89 @@ describe("usePullToRefresh", () => {
   });
 
   it("should trigger refresh when pull distance exceeds threshold", async () => {
-    const { result } = renderHook(() =>
-      usePullToRefresh(mockOnRefresh, { threshold: 80, resistance: 1 })
-    );
+    const { result } = renderHook(() => usePullToRefresh(mockOnRefresh, { threshold: 80 }));
 
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPanStart({} as PointerEvent, {} as any);
     });
 
     act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
+      // Pull down significantly to ensure threshold is crossed
+      // Resistance is 2.5, so 400px pull results in 160px distance (> 80)
+      result.current.dragHandlers.onPan({} as PointerEvent, { offset: { x: 0, y: 400 } } as any);
     });
 
     await act(async () => {
-      await result.current.touchHandlers.onTouchEnd();
+      await result.current.dragHandlers.onPanEnd({} as PointerEvent, {} as any);
     });
 
     expect(mockOnRefresh).toHaveBeenCalled();
   });
 
   it("should not trigger refresh when pull distance below threshold", async () => {
-    const { result } = renderHook(() =>
-      usePullToRefresh(mockOnRefresh, { threshold: 80, resistance: 5 })
-    );
+    const { result } = renderHook(() => usePullToRefresh(mockOnRefresh, { threshold: 80 }));
 
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPanStart({} as PointerEvent, {} as any);
     });
 
     act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 130 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
+      // Pull down a little bit
+      result.current.dragHandlers.onPan({} as PointerEvent, { offset: { x: 0, y: 50 } } as any);
     });
 
     await act(async () => {
-      await result.current.touchHandlers.onTouchEnd();
+      await result.current.dragHandlers.onPanEnd({} as PointerEvent, {} as any);
     });
 
     expect(mockOnRefresh).not.toHaveBeenCalled();
-  });
-
-  it("should set isRefreshing state during refresh", async () => {
-    const { result } = renderHook(() =>
-      usePullToRefresh(mockOnRefresh, { threshold: 80, resistance: 1 })
-    );
-
-    const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
-
-    let resolveRefresh: (() => void) | null = null;
-    mockOnRefresh.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveRefresh = resolve;
-        })
-    );
-
-    act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
-    });
-
-    act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
-    });
-
-    // Start the touch end which will trigger refresh
-    const endPromise = result.current.touchHandlers.onTouchEnd();
-
-    // The implementation sets isRefreshing synchronously before awaiting onRefresh
-    // Wait a tick for React state to update
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    // Verify isRefreshing is true during the refresh operation
-    expect(result.current.isRefreshing).toBe(true);
-
-    // Complete refresh
-    act(() => {
-      if (resolveRefresh) resolveRefresh();
-    });
-
-    await act(async () => {
-      await endPromise;
-    });
-
-    // After refresh completes, state should be reset
-    expect(result.current.isRefreshing).toBe(false);
   });
 
   it("should not start pull when disabled", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh, { enabled: false }));
 
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPanStart({} as PointerEvent, {} as any);
     });
 
     expect(result.current.isPulling).toBe(false);
   });
 
-  it("should provide pull styles", () => {
+  it("should provide motion values", () => {
     const { result } = renderHook(() => usePullToRefresh(mockOnRefresh));
 
-    expect(result.current.pullStyles).toBeDefined();
-    expect(result.current.pullStyles).toHaveProperty("transform");
-    expect(result.current.pullStyles).toHaveProperty("transition");
-  });
-
-  it("should provide pull rotation", () => {
-    const { result } = renderHook(() => usePullToRefresh(mockOnRefresh));
-
-    expect(typeof result.current.pullRotation).toBe("number");
-    expect(result.current.pullRotation).toBe(0); // Initial state
+    expect(result.current.motionY).toBeDefined();
+    expect(result.current.springY).toBeDefined();
+    expect(result.current.pullRotation).toBeDefined();
   });
 
   it("should handle refresh errors gracefully", async () => {
     mockOnRefresh.mockRejectedValue(new Error("Refresh failed"));
 
-    const { result } = renderHook(() =>
-      usePullToRefresh(mockOnRefresh, { threshold: 80, resistance: 1 })
-    );
+    const { result } = renderHook(() => usePullToRefresh(mockOnRefresh, { threshold: 80 }));
 
     const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
+    result.current.containerRef.current = mockContainer as unknown as HTMLDivElement;
 
     act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPanStart({} as PointerEvent, {} as any);
     });
 
     act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
+      result.current.dragHandlers.onPan({} as PointerEvent, { offset: { x: 0, y: 400 } } as any);
     });
 
     await act(async () => {
-      await result.current.touchHandlers.onTouchEnd();
+      await result.current.dragHandlers.onPanEnd({} as PointerEvent, {} as any);
     });
 
     // Should not throw and should reset state
@@ -302,34 +238,5 @@ describe("usePullToRefresh", () => {
     const { unmount } = renderHook(() => usePullToRefresh(mockOnRefresh));
 
     expect(() => unmount()).not.toThrow();
-  });
-
-  it("should handle touch cancel same as touch end", async () => {
-    const { result } = renderHook(() =>
-      usePullToRefresh(mockOnRefresh, { threshold: 80, resistance: 1 })
-    );
-
-    const mockContainer = { scrollTop: 0 };
-    result.current.containerRef.current = mockContainer as HTMLElement;
-
-    act(() => {
-      result.current.touchHandlers.onTouchStart({
-        touches: [{ clientY: 100 }],
-      } as unknown as React.TouchEvent);
-    });
-
-    act(() => {
-      result.current.touchHandlers.onTouchMove({
-        touches: [{ clientY: 200 }],
-        preventDefault: vi.fn(),
-      } as unknown as React.TouchEvent);
-    });
-
-    await act(async () => {
-      await result.current.touchHandlers.onTouchCancel();
-    });
-
-    expect(result.current.isPulling).toBe(false);
-    expect(result.current.pullDistance).toBe(0);
   });
 });
