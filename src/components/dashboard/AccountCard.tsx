@@ -68,7 +68,7 @@ const getCardConfig = (type: AccountCardType, isWarning: boolean) => {
  */
 const AccountCardSkeleton: React.FC = () => (
   <div
-    className="bg-white/90 backdrop-blur-sm border-2 border-black rounded-xl shadow-xl p-6 animate-pulse"
+    className="bg-white border-2 border-black rounded-xl shadow-xl p-6 animate-pulse"
     aria-label="Loading account information"
     aria-busy="true"
   >
@@ -123,14 +123,14 @@ export const AccountCard: React.FC<AccountCardProps> = ({
   return (
     <article
       className={`
-        bg-white/90 backdrop-blur-sm 
+        bg-white 
         border-2 border-black 
         rounded-xl shadow-xl 
         hover:shadow-2xl 
         transition-all duration-300
         p-6
         group
-        bg-gradient-to-br ${config.gradientFrom} ${config.gradientTo}
+        bg-linear-to-br ${config.gradientFrom} ${config.gradientTo}
       `}
       data-testid={`account-card-${type}`}
       aria-label={`${config.title} card`}

@@ -54,7 +54,7 @@ export const useAccountBalances = () => {
   const accountBalances: AccountBalances = useMemo(() => {
     // For now, savings is tracked within the actual balance
     // In the future, this could be split out to separate accounts
-    const savingsBalance = 0; // TODO: Implement savings account tracking
+    const savingsBalance = 0; // NOT IMPLEMENTED: Savings account tracking scheduled for v2.1
 
     // Determine if unassigned cash is high (threshold: > $500)
     const isUnassignedHigh = unassignedCash > UNASSIGNED_HIGH_THRESHOLD;

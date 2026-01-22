@@ -141,8 +141,9 @@ describe("AccountCard", () => {
       // Should render skeleton with animation and accessibility attributes
       const skeleton = container.querySelector(".animate-pulse");
       expect(skeleton).toBeInTheDocument();
-      expect(skeleton).toHaveClass("bg-white/90");
-      expect(skeleton).toHaveClass("backdrop-blur-sm");
+      expect(skeleton).toHaveClass("bg-white");
+      expect(skeleton).toHaveClass("border-2");
+      expect(skeleton).toHaveClass("border-black");
       expect(skeleton).toHaveAttribute("aria-label", "Loading account information");
       expect(skeleton).toHaveAttribute("aria-busy", "true");
     });
