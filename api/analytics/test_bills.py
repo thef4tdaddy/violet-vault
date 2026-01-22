@@ -22,9 +22,7 @@ class TestBillPrediction(unittest.TestCase):
 
     def test_insufficient_data(self) -> None:
         """Test with only one bill (insufficient data)"""
-        bills: list[dict] = [
-            {"amount": 100.0, "dueDate": "2024-01-01", "category": "electricity"}
-        ]
+        bills: list[dict] = [{"amount": 100.0, "dueDate": "2024-01-01", "category": "electricity"}]
 
         result = predict_bills(bills)
 
@@ -37,9 +35,7 @@ class TestBillPrediction(unittest.TestCase):
         for i in range(4):
             # Bills going back in time: -15, -45, -75, -105 days
             date = datetime.now() - timedelta(days=15 + i * 30)
-            bills.append(
-                {"amount": 150.0, "dueDate": date.isoformat(), "category": "electricity"}
-            )
+            bills.append({"amount": 150.0, "dueDate": date.isoformat(), "category": "electricity"})
 
         result = predict_bills(bills)
 
@@ -111,9 +107,7 @@ class TestBillPrediction(unittest.TestCase):
         # Add weekly subscription bills (last one 3 days ago)
         for i in range(5):
             date = datetime.now() - timedelta(days=3 + i * 7)
-            bills.append(
-                {"amount": 20.0, "dueDate": date.isoformat(), "category": "subscription"}
-            )
+            bills.append({"amount": 20.0, "dueDate": date.isoformat(), "category": "subscription"})
 
         result = predict_bills(bills)
 
@@ -170,17 +164,13 @@ class TestBillPrediction(unittest.TestCase):
 
         for i in range(5):
             weekly_date = base_date + timedelta(days=i * 7)
-            bills.append(
-                {"amount": 25.0, "dueDate": weekly_date.isoformat(), "category": "weekly"}
-            )
+            bills.append({"amount": 25.0, "dueDate": weekly_date.isoformat(), "category": "weekly"})
 
         result = predict_bills(bills)
 
         if result.predictedBills:
             # Next bill date should match the first predicted bill
-            self.assertEqual(
-                result.nextBillDate, result.predictedBills[0].predictedDate
-            )
+            self.assertEqual(result.nextBillDate, result.predictedBills[0].predictedDate)
 
     def test_confidence_with_irregular_pattern(self) -> None:
         """Test confidence score is lower for irregular patterns"""

@@ -7,8 +7,9 @@ import os
 import sys
 import unittest
 from datetime import datetime, timedelta
+from http.server import BaseHTTPRequestHandler
 from io import BytesIO
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock
 
 # Add parent directory to path for imports
@@ -28,7 +29,13 @@ else:
     raise ImportError("Could not load analytics.py module")
 
 
-class MockAnalyticsHandler(handler):
+if TYPE_CHECKING:
+    BaseHandler = BaseHTTPRequestHandler
+else:
+    BaseHandler = handler
+
+
+class MockAnalyticsHandler(BaseHandler):
     """Mock handler for testing analytics endpoint"""
 
     def __init__(self, rfile: BytesIO, wfile: BytesIO, *args: Any, **kwargs: Any) -> None:
@@ -42,6 +49,9 @@ class MockAnalyticsHandler(handler):
 
     def finish(self) -> None:
         self.wfile.flush()
+
+
+PayloadType = dict[str, Any]
 
 
 class TestAnalyticsEndpoint(unittest.TestCase):
@@ -100,7 +110,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_spending_velocity_only(self) -> None:
         """Test analytics with only spending velocity data"""
-        payload = {
+        payload: PayloadType = {
             "spendingStats": {
                 "totalSpent": 500.0,
                 "budgetAllocated": 1000.0,
@@ -132,7 +142,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
             date = base_date + timedelta(days=i * 30)
             bills.append({"amount": 150.0, "dueDate": date.isoformat(), "category": "utilities"})
 
-        payload = {"historicalBills": bills}
+        payload: PayloadType = {"historicalBills": bills}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
@@ -150,7 +160,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_budget_health_only(self) -> None:
         """Test analytics with only health metrics"""
-        payload = {
+        payload: PayloadType = {
             "healthMetrics": {
                 "spendingVelocityScore": 85,
                 "billCoverageRatio": 1.2,
@@ -182,7 +192,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
             date = base_date + timedelta(days=i * 30)
             bills.append({"amount": 100.0, "dueDate": date.isoformat(), "category": "utilities"})
 
-        payload = {
+        payload: PayloadType = {
             "spendingStats": {
                 "totalSpent": 600.0,
                 "budgetAllocated": 1000.0,
@@ -209,7 +219,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_empty_request(self) -> None:
         """Test with empty request body (valid but no data)"""
-        payload = {}
+        payload: PayloadType = {}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
@@ -233,7 +243,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_invalid_data_structure(self) -> None:
         """Test with invalid data structure"""
-        payload = {
+        payload: PayloadType = {
             "spendingStats": {
                 "totalSpent": "not-a-number",  # Invalid type
                 "budgetAllocated": 1000.0,
@@ -251,7 +261,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_negative_days_elapsed(self) -> None:
         """Test validation rejects negative days elapsed"""
-        payload = {
+        payload: PayloadType = {
             "spendingStats": {
                 "totalSpent": 500.0,
                 "budgetAllocated": 1000.0,
@@ -268,7 +278,7 @@ class TestAnalyticsEndpoint(unittest.TestCase):
 
     def test_response_headers(self) -> None:
         """Test response includes proper headers"""
-        payload = {}
+        payload: PayloadType = {}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 

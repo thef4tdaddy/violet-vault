@@ -84,14 +84,10 @@ def calculate_spending_velocity(stats: dict) -> SpendingVelocityResult:
         recommendation = "Good pacing, but watch your spending to stay within budget."
         severity = "success"
     elif velocity_score >= 40:
-        recommendation = (
-            "Warning: You're spending faster than ideal. Consider reducing expenses."
-        )
+        recommendation = "Warning: You're spending faster than ideal. Consider reducing expenses."
         severity = "warning"
     else:
-        recommendation = (
-            "Critical: High spending velocity detected. Immediate action recommended."
-        )
+        recommendation = "Critical: High spending velocity detected. Immediate action recommended."
         severity = "error"
 
     return SpendingVelocityResult(
