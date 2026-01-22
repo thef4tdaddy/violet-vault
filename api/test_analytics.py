@@ -24,7 +24,9 @@ spec = importlib.util.spec_from_file_location(
 if spec and spec.loader:
     analytics_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(analytics_module)
-    handler = analytics_module.handler
+    spec.loader.exec_module(analytics_module)
+    # Cast to BaseHTTPRequestHandler for Mypy to understand it's a class
+    handler: type[BaseHTTPRequestHandler] = analytics_module.handler
 else:
     raise ImportError("Could not load analytics.py module")
 
