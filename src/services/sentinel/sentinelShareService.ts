@@ -2,7 +2,7 @@
  * SentinelShare API Service
  * Handles communication with the PostgreSQL API endpoint for cross-app transaction matching
  */
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import {
   SentinelReceiptsResponseSchema,
   type SentinelReceiptsResponseType,

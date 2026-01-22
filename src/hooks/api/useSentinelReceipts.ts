@@ -11,47 +11,33 @@
  */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useCallback } from "react";
-import { useAuthenticationManager } from "@/hooks/auth";
-import { queryKeys } from "@/utils/query/queryKeys";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { queryKeys } from "@/utils/core/common/queryClient";
 import { sentinelShareService } from "@/services/sentinel/sentinelShareService";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 import type { SentinelReceipt, UpdateReceiptStatusOptions } from "@/types/sentinel";
-
-/**
- * Hook options for useSentinelReceipts
- */
-export interface UseSentinelReceiptsOptions {
-  /** Number of retry attempts on failure (default: 3) */
-  retry?: boolean | number;
-  /** Enable/disable the hook (default: auto based on auth) */
-  enabled?: boolean;
-}
 
 /**
  * Hook for managing SentinelShare receipts with automatic polling
  *
- * @param options - Configuration options
- * @returns Hook result containing receipts data, loading states, and methods
- *
- * @example
- * ```tsx
- * const {
- *   receipts,
- *   pendingReceipts,
- *   isLoading,
- *   updateStatus
- * } = useSentinelReceipts();
- *
- * // Mark a receipt as matched
- * await updateStatus('receipt-id', 'matched', 'transaction-id');
- * ```
+ * @returns {Object} Hook result containing receipts data, loading states, and methods
+ * @returns {SentinelReceipt[]} receipts - Array of all receipts
+ * @returns {boolean} isLoading - Initial loading state
+ * @returns {boolean} isFetching - Background fetching state
+ * @returns {Error | null} error - Error object if request failed
+ * @returns {Function} refetch - Manually trigger a refetch
+ * @returns {Function} updateStatus - Update receipt status with optimistic updates
  */
+export interface UseSentinelReceiptsOptions {
+  retry?: boolean | number;
+}
+
 export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuthenticationManager();
+  const { user } = useAuth();
 
-  // Only enable polling when user is authenticated (or explicitly enabled)
-  const isEnabled = options.enabled ?? isAuthenticated;
+  // Only enable polling when user is authenticated
+  const isEnabled = Boolean(user);
 
   /**
    * Main query for fetching receipts with polling
@@ -81,11 +67,11 @@ export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
    * Mutation for updating receipt status with optimistic updates
    */
   const updateStatusMutation = useMutation({
-    mutationFn: async (mutationOptions: UpdateReceiptStatusOptions) => {
-      await sentinelShareService.updateStatus(mutationOptions);
-      return mutationOptions;
+    mutationFn: async (options: UpdateReceiptStatusOptions) => {
+      await sentinelShareService.updateStatus(options);
+      return options;
     },
-    onMutate: async (mutationOptions: UpdateReceiptStatusOptions) => {
+    onMutate: async (options: UpdateReceiptStatusOptions) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.sentinelReceipts() });
 
@@ -100,11 +86,11 @@ export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
           if (!old) return [];
 
           return old.map((receipt) => {
-            if (receipt.id === mutationOptions.receiptId) {
+            if (receipt.id === options.receiptId) {
               return {
                 ...receipt,
-                status: mutationOptions.status,
-                matchedTransactionId: mutationOptions.matchedTransactionId,
+                status: options.status,
+                matchedTransactionId: options.matchedTransactionId,
                 updatedAt: new Date().toISOString(),
               };
             }
@@ -126,10 +112,10 @@ export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
         source: "useSentinelReceipts",
       });
     },
-    onSuccess: (mutationOptions) => {
+    onSuccess: (options) => {
       logger.debug("Successfully updated receipt status", {
-        receiptId: mutationOptions.receiptId,
-        status: mutationOptions.status,
+        receiptId: options.receiptId,
+        status: options.status,
         source: "useSentinelReceipts",
       });
     },
@@ -140,14 +126,14 @@ export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
   });
 
   /**
-   * Clear cache when user becomes unauthenticated
+   * Stop polling when user logs out
    */
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!user) {
       // Clear the cache when user logs out
       queryClient.removeQueries({ queryKey: queryKeys.sentinelShare });
     }
-  }, [isAuthenticated, queryClient]);
+  }, [user, queryClient]);
 
   /**
    * Derived data: Filter receipts by status

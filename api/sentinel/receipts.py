@@ -1,14 +1,3 @@
-"""
-SentinelShare Receipts API
-PostgreSQL-backed endpoint for cross-app transaction matching
-
-Features:
-- Connection pooling for performance
-- Prepared statements for SQL injection prevention
-- Graceful error handling
-- SSL support for Heroku PostgreSQL
-"""
-
 import logging
 import os
 from collections.abc import Generator
@@ -44,27 +33,6 @@ class Base(DeclarativeBase):
 
 # SQLAlchemy Model
 class ReceiptDB(Base):
-    """
-    SQLAlchemy model for SentinelShare receipts stored in PostgreSQL.
-
-    This model represents receipts from external applications (like SentinelShare)
-    that can be matched against transactions in VioletVault.
-
-    Attributes:
-        id: Unique receipt identifier
-        amount: Transaction amount
-        merchant: Merchant or vendor name
-        date: Transaction date
-        category: Optional receipt category
-        description: Optional receipt description
-        status: Current status (pending, matched, ignored)
-        created_at: Timestamp when receipt was created
-        updated_at: Timestamp when receipt was last updated
-        matched_transaction_id: ID of matched VioletVault transaction
-        source_app: Source application that created the receipt
-        metadata_json: Additional metadata as JSON
-    """
-
     __tablename__ = "receipts"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
@@ -95,18 +63,6 @@ router = APIRouter(prefix="/receipts", tags=["sentinel"])
 
 # Dependency
 def get_db() -> Generator[Session, None, None]:
-    """
-    Database session dependency.
-
-    Provides a SQLAlchemy session for each request and ensures
-    proper cleanup after the request is complete.
-
-    Yields:
-        Session: A SQLAlchemy database session
-
-    Raises:
-        HTTPException: 503 if database is not configured
-    """
     if not SessionLocal:
         raise HTTPException(status_code=503, detail="Database connection not configured")
     db = SessionLocal()
@@ -118,23 +74,7 @@ def get_db() -> Generator[Session, None, None]:
 
 @router.get("/", response_model=dict[str, Any])
 def get_receipts(db: Annotated[Session, Depends(get_db)]) -> dict[str, Any]:
-    """
-    Fetch all receipts from PostgreSQL.
-
-    Returns all SentinelShare receipts ordered by creation date (newest first).
-    The response includes a list of receipts and the total count.
-
-    Args:
-        db: SQLAlchemy database session (injected by FastAPI)
-
-    Returns:
-        dict containing:
-            - receipts: List of receipt objects with camelCase keys
-            - total: Total number of receipts
-
-    Raises:
-        HTTPException: 500 if database query fails
-    """
+    """Fetch all receipts from Postgres"""
     try:
         receipts = db.query(ReceiptDB).all()
         return {
@@ -166,27 +106,7 @@ def get_receipts(db: Annotated[Session, Depends(get_db)]) -> dict[str, Any]:
 def update_receipt_status(
     receipt_id: str, payload: dict[str, Any], db: Annotated[Session, Depends(get_db)]
 ) -> dict[str, str]:
-    """
-    Update receipt status (matched/ignored/pending).
-
-    Updates the status of a receipt and optionally links it to a
-    matched VioletVault transaction.
-
-    Args:
-        receipt_id: Unique identifier of the receipt to update
-        payload: Dictionary containing:
-            - status: New status (matched, ignored, or pending)
-            - matchedTransactionId: Optional ID of matched transaction
-        db: SQLAlchemy database session (injected by FastAPI)
-
-    Returns:
-        dict containing status: "success" if update succeeded
-
-    Raises:
-        HTTPException: 404 if receipt not found
-        HTTPException: 400 if status is invalid
-        HTTPException: 500 if database update fails
-    """
+    """Update receipt status (matched/ignored)"""
     try:
         receipt = db.query(ReceiptDB).filter(ReceiptDB.id == receipt_id).first()
         if not receipt:
