@@ -7,7 +7,6 @@ import json
 import os
 import sys
 from http.server import BaseHTTPRequestHandler
-from typing import Any
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -53,9 +52,33 @@ class handler(BaseHTTPRequestHandler):
         """Handle POST requests - analytics calculations"""
         try:
             # Read and parse request body
-            content_length = int(self.headers.get("Content-Length", 0))
+            # Read and parse request body
+            content_length_header = self.headers.get("Content-Length")
+            if not content_length_header:
+                self._send_error(400, "Missing Content-Length header")
+                return
+
+            try:
+                content_length = int(content_length_header)
+            except ValueError:
+                self._send_error(400, "Invalid Content-Length header")
+                return
+
+            if content_length == 0:
+                self._send_error(400, "Empty request body")
+                return
+
             body = self.rfile.read(content_length)
-            request_data: dict[str, Any] = json.loads(body)
+
+            try:
+                request_data = json.loads(body)
+            except json.JSONDecodeError as e:
+                self._send_error(400, f"Invalid JSON: {str(e)}")
+                return
+
+            if not isinstance(request_data, dict):
+                self._send_error(400, "Request body must be a JSON object")
+                return
 
             # Validate request with Pydantic
             try:
@@ -82,15 +105,8 @@ class handler(BaseHTTPRequestHandler):
 
             # Predict bills if historical data provided
             if analytics_request.historicalBills:
-                from api.analytics.bills import HistoricalBill as HistBillType
-
-                historical_bills_data: list[HistBillType] = [
-                    {
-                        "amount": bill.amount,
-                        "dueDate": bill.dueDate,
-                        "category": bill.category,
-                    }
-                    for bill in analytics_request.historicalBills
+                historical_bills_data = [
+                    bill.model_dump() for bill in analytics_request.historicalBills
                 ]
                 bill_prediction_result = predict_bills(historical_bills_data)
 

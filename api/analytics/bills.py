@@ -3,67 +3,41 @@ Bill Prediction Analytics
 Analyzes historical bill patterns and predicts upcoming bills
 """
 
-from datetime import datetime, timedelta
-from typing import TypedDict
+from datetime import UTC, datetime, timedelta
+
+from api.models import (
+    BillFrequency,
+    BillPredictionResult,
+    HistoricalBill,
+    PredictedBill,
+)
 
 
-class HistoricalBill(TypedDict):
-    """Historical bill data point"""
-
-    amount: float
-    dueDate: str  # ISO date string
-    category: str
-
-
-class BillFrequency(TypedDict):
-    """Detected frequency pattern for a bill"""
-
-    intervalDays: int
-    confidence: int  # 0-100
-    pattern: str  # "monthly", "biweekly", "quarterly", etc.
-
-
-class PredictedBill(TypedDict):
-    """Predicted upcoming bill"""
-
-    category: str
-    predictedAmount: float
-    predictedDate: str  # ISO date string
-    confidence: int  # 0-100
-    frequency: BillFrequency | None
-
-
-class BillPredictionResult(TypedDict):
-    """Result of bill prediction analysis"""
-
-    predictedBills: list[PredictedBill]
-    totalPredictedAmount: float
-    nextBillDate: str | None
-    message: str
-
-
-def predict_bills(historical_bills: list[HistoricalBill]) -> BillPredictionResult:
+def predict_bills(historical_bills_data: list[dict]) -> BillPredictionResult:
     """
     Predict upcoming bills based on historical patterns
 
     Args:
-        historical_bills: List of historical bill payments (anonymized)
+        historical_bills_data: List of historical bill payments (anonymized)
 
     Returns:
         Predictions for upcoming bills with confidence scores
     """
-    if not historical_bills:
-        return {
-            "predictedBills": [],
-            "totalPredictedAmount": 0.0,
-            "nextBillDate": None,
-            "message": "No historical bill data available for predictions",
-        }
+    if not historical_bills_data:
+        return BillPredictionResult(
+            predictedBills=[],
+            totalPredictedAmount=0.0,
+            nextBillDate=None,
+            message="No historical bill data available for predictions",
+        )
+
+    # Validate inputs
+    historical_bills = [HistoricalBill(**b) for b in historical_bills_data]
 
     # Group bills by category
     bills_by_category: dict[str, list[HistoricalBill]] = {}
     for bill in historical_bills:
-        category = bill["category"]
+        category = bill.category
         if category not in bills_by_category:
             bills_by_category[category] = []
         bills_by_category[category].append(bill)
@@ -77,16 +51,14 @@ def predict_bills(historical_bills: list[HistoricalBill]) -> BillPredictionResul
             continue
 
         # Sort bills by date
-        sorted_bills = sorted(bills, key=lambda b: b["dueDate"])
+        sorted_bills = sorted(bills, key=lambda b: b.dueDate)
 
         # Calculate intervals between bills
         intervals: list[int] = []
         for i in range(len(sorted_bills) - 1):
             try:
-                date1 = datetime.fromisoformat(sorted_bills[i]["dueDate"].replace("Z", "+00:00"))
-                date2 = datetime.fromisoformat(
-                    sorted_bills[i + 1]["dueDate"].replace("Z", "+00:00")
-                )
+                date1 = datetime.fromisoformat(sorted_bills[i].dueDate.replace("Z", "+00:00"))
+                date2 = datetime.fromisoformat(sorted_bills[i + 1].dueDate.replace("Z", "+00:00"))
                 interval = (date2 - date1).days
                 if interval > 0:
                     intervals.append(interval)
@@ -100,37 +72,39 @@ def predict_bills(historical_bills: list[HistoricalBill]) -> BillPredictionResul
         frequency = _detect_frequency(intervals)
 
         # Calculate average amount
-        amounts = [b["amount"] for b in sorted_bills]
+        amounts = [b.amount for b in sorted_bills]
         avg_amount = sum(amounts) / len(amounts)
 
         # Predict next bill date
         try:
-            last_date = datetime.fromisoformat(
-                sorted_bills[-1]["dueDate"].replace("Z", "+00:00")
-            )
-            next_date = last_date + timedelta(days=frequency["intervalDays"])
+            last_date = datetime.fromisoformat(sorted_bills[-1].dueDate.replace("Z", "+00:00"))
+            next_date = last_date + timedelta(days=frequency.intervalDays)
 
             # Only predict bills that are in the future
             now = datetime.now()
+            # Making now offset-aware if next_date is offset-aware
+            if next_date.tzinfo is not None and now.tzinfo is None:
+                now = now.replace(tzinfo=UTC)
+
             if next_date > now:
                 predicted_bills.append(
-                    {
-                        "category": category,
-                        "predictedAmount": round(avg_amount, 2),
-                        "predictedDate": next_date.isoformat(),
-                        "confidence": frequency["confidence"],
-                        "frequency": frequency,
-                    }
+                    PredictedBill(
+                        category=category,
+                        predictedAmount=round(avg_amount, 2),
+                        predictedDate=next_date.isoformat(),
+                        confidence=frequency.confidence,
+                        frequency=frequency,
+                    )
                 )
         except (ValueError, AttributeError):
             continue
 
     # Sort by predicted date
-    predicted_bills.sort(key=lambda b: b["predictedDate"])
+    predicted_bills.sort(key=lambda b: b.predictedDate)
 
     # Calculate totals
-    total_predicted_amount = sum(b["predictedAmount"] for b in predicted_bills)
-    next_bill_date = predicted_bills[0]["predictedDate"] if predicted_bills else None
+    total_predicted_amount = sum(b.predictedAmount for b in predicted_bills)
+    next_bill_date = predicted_bills[0].predictedDate if predicted_bills else None
 
     # Generate message
     if predicted_bills:
@@ -138,12 +112,12 @@ def predict_bills(historical_bills: list[HistoricalBill]) -> BillPredictionResul
     else:
         message = "No upcoming bills predicted based on available data"
 
-    return {
-        "predictedBills": predicted_bills,
-        "totalPredictedAmount": round(total_predicted_amount, 2),
-        "nextBillDate": next_bill_date,
-        "message": message,
-    }
+    return BillPredictionResult(
+        predictedBills=predicted_bills,
+        totalPredictedAmount=round(total_predicted_amount, 2),
+        nextBillDate=next_bill_date,
+        message=message,
+    )
 
 
 def _detect_frequency(intervals: list[int]) -> BillFrequency:
@@ -157,7 +131,7 @@ def _detect_frequency(intervals: list[int]) -> BillFrequency:
         Detected frequency with confidence score
     """
     if not intervals:
-        return {"intervalDays": 30, "confidence": 0, "pattern": "unknown"}
+        return BillFrequency(intervalDays=30, confidence=0, pattern="unknown")
 
     # Calculate average interval
     avg_interval = sum(intervals) / len(intervals)
@@ -200,4 +174,4 @@ def _detect_frequency(intervals: list[int]) -> BillFrequency:
     else:
         pattern = f"{interval_days}-day cycle"
 
-    return {"intervalDays": interval_days, "confidence": confidence, "pattern": pattern}
+    return BillFrequency(intervalDays=interval_days, confidence=confidence, pattern=pattern)

@@ -5,7 +5,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/core/common/queryClient";
-import logger from "@/utils/common/logger";
+import logger from "@/utils/core/common/logger";
 
 // ============================================================================
 // Types - Mirror Python Pydantic models
@@ -143,7 +143,7 @@ async function fetchAnalytics(request: AnalyticsRequest): Promise<AnalyticsRespo
  */
 export function useAnalyticsQuery(request: AnalyticsRequest) {
   return useQuery({
-    queryKey: queryKeys.analytics(request),
+    queryKey: queryKeys.analyticsPredictions(request as unknown as Record<string, unknown>),
     queryFn: () => fetchAnalytics(request),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

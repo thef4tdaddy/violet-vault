@@ -3,32 +3,10 @@ Spending Velocity Analytics
 Calculates daily/weekly spending rates and predicts budget overruns
 """
 
-from typing import TypedDict
+from api.models import SpendingStats, SpendingVelocityResult
 
 
-class SpendingStats(TypedDict):
-    """Input statistics for spending velocity calculation"""
-
-    totalSpent: float
-    budgetAllocated: float
-    daysElapsed: int
-    daysRemaining: int
-
-
-class SpendingVelocityResult(TypedDict):
-    """Result of spending velocity calculation"""
-
-    velocityScore: int  # 0-100, where 100 is perfect pacing
-    dailyRate: float
-    projectedTotal: float
-    budgetAllocated: float
-    willExceedBudget: bool
-    daysUntilExceeded: int | None
-    recommendation: str
-    severity: str  # "success", "warning", "error"
-
-
-def calculate_spending_velocity(stats: SpendingStats) -> SpendingVelocityResult:
+def calculate_spending_velocity(stats: dict) -> SpendingVelocityResult:
     """
     Calculate spending velocity and predict budget overruns
 
@@ -38,23 +16,26 @@ def calculate_spending_velocity(stats: SpendingStats) -> SpendingVelocityResult:
     Returns:
         Velocity analysis with predictions and recommendations
     """
-    total_spent = stats["totalSpent"]
-    budget_allocated = stats["budgetAllocated"]
-    days_elapsed = stats["daysElapsed"]
-    days_remaining = stats["daysRemaining"]
+    # Parse input into Pydantic model for validation
+    stats_model = SpendingStats(**stats)
+
+    total_spent = stats_model.totalSpent
+    budget_allocated = stats_model.budgetAllocated
+    days_elapsed = stats_model.daysElapsed
+    days_remaining = stats_model.daysRemaining
 
     # Avoid division by zero
     if days_elapsed <= 0:
-        return {
-            "velocityScore": 100,
-            "dailyRate": 0.0,
-            "projectedTotal": 0.0,
-            "budgetAllocated": budget_allocated,
-            "willExceedBudget": False,
-            "daysUntilExceeded": None,
-            "recommendation": "No spending data available yet",
-            "severity": "success",
-        }
+        return SpendingVelocityResult(
+            velocityScore=100,
+            dailyRate=0.0,
+            projectedTotal=0.0,
+            budgetAllocated=budget_allocated,
+            willExceedBudget=False,
+            daysUntilExceeded=None,
+            recommendation="No spending data available yet",
+            severity="success",
+        )
 
     # Calculate daily spending rate
     daily_rate = total_spent / days_elapsed
@@ -113,13 +94,13 @@ def calculate_spending_velocity(stats: SpendingStats) -> SpendingVelocityResult:
         )
         severity = "error"
 
-    return {
-        "velocityScore": velocity_score,
-        "dailyRate": round(daily_rate, 2),
-        "projectedTotal": round(projected_total, 2),
-        "budgetAllocated": budget_allocated,
-        "willExceedBudget": will_exceed_budget,
-        "daysUntilExceeded": days_until_exceeded,
-        "recommendation": recommendation,
-        "severity": severity,
-    }
+    return SpendingVelocityResult(
+        velocityScore=velocity_score,
+        dailyRate=round(daily_rate, 2),
+        projectedTotal=round(projected_total, 2),
+        budgetAllocated=budget_allocated,
+        willExceedBudget=will_exceed_budget,
+        daysUntilExceeded=days_until_exceeded,
+        recommendation=recommendation,
+        severity=severity,
+    )

@@ -16,9 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import from the analytics.py file (not the analytics/ directory)
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
-    "analytics_handler",
-    os.path.join(os.path.dirname(__file__), "analytics.py")
+    "analytics_handler", os.path.join(os.path.dirname(__file__), "analytics.py")
 )
 if spec and spec.loader:
     analytics_module = importlib.util.module_from_spec(spec)
@@ -66,12 +66,9 @@ class TestAnalyticsEndpoint(unittest.TestCase):
         input_file = BytesIO(input_content)
         output_file = BytesIO()
 
-        try:
-            MockAnalyticsHandler(
-                input_file, output_file, MagicMock(), self.mock_client_address, self.mock_server
-            )
-        except Exception:
-            pass
+        MockAnalyticsHandler(
+            input_file, output_file, MagicMock(), self.mock_client_address, self.mock_server
+        )
 
         return output_file.getvalue()
 

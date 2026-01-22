@@ -3,54 +3,27 @@ Budget Health Score Analytics
 Calculates overall financial health indicators
 """
 
-from typing import TypedDict
+from api.models import BudgetHealthResult, HealthMetrics, HealthScoreBreakdown
 
 
-class HealthMetrics(TypedDict):
-    """Input metrics for health score calculation"""
-
-    spendingVelocityScore: int  # 0-100
-    billCoverageRatio: float  # Allocated budget / predicted bills
-    savingsRate: float  # Percentage of income saved
-    envelopeUtilization: float  # Percentage of budgeted funds utilized
-
-
-class HealthScoreBreakdown(TypedDict):
-    """Detailed breakdown of health score components"""
-
-    spendingPace: int  # 0-100
-    billPreparedness: int  # 0-100
-    savingsHealth: int  # 0-100
-    budgetUtilization: int  # 0-100
-
-
-class BudgetHealthResult(TypedDict):
-    """Result of budget health analysis"""
-
-    overallScore: int  # 0-100
-    breakdown: HealthScoreBreakdown
-    grade: str  # A, B, C, D, F
-    summary: str
-    recommendations: list[str]
-    strengths: list[str]
-    concerns: list[str]
-
-
-def calculate_budget_health(metrics: HealthMetrics) -> BudgetHealthResult:
+def calculate_budget_health(metrics_data: dict) -> BudgetHealthResult:
     """
     Calculate overall budget health score
 
     Args:
-        metrics: Anonymized budget health metrics
+        metrics_data: Anonymized budget health metrics
 
     Returns:
         Health score with detailed breakdown and recommendations
     """
+    # Validate input
+    metrics = HealthMetrics(**metrics_data)
+
     # Calculate individual component scores
-    spending_pace_score = metrics["spendingVelocityScore"]
+    spending_pace_score = metrics.spendingVelocityScore
 
     # Bill preparedness: How well bills are covered
-    bill_coverage = metrics["billCoverageRatio"]
+    bill_coverage = metrics.billCoverageRatio
     if bill_coverage >= 1.5:
         bill_preparedness_score = 100
     elif bill_coverage >= 1.0:
@@ -63,7 +36,7 @@ def calculate_budget_health(metrics: HealthMetrics) -> BudgetHealthResult:
         bill_preparedness_score = int(bill_coverage * 60)
 
     # Savings health: Percentage of income saved
-    savings_rate = metrics["savingsRate"]
+    savings_rate = metrics.savingsRate
     if savings_rate >= 0.20:  # 20%+ is excellent
         savings_health_score = 100
     elif savings_rate >= 0.10:  # 10-20% is good
@@ -76,7 +49,7 @@ def calculate_budget_health(metrics: HealthMetrics) -> BudgetHealthResult:
         savings_health_score = 0
 
     # Budget utilization: Sweet spot is 70-90%
-    utilization = metrics["envelopeUtilization"]
+    utilization = metrics.envelopeUtilization
     if 0.70 <= utilization <= 0.90:
         utilization_score = 100
     elif utilization < 0.70:
@@ -146,20 +119,20 @@ def calculate_budget_health(metrics: HealthMetrics) -> BudgetHealthResult:
     # Generate summary
     summary = _generate_summary(grade, overall_score)
 
-    return {
-        "overallScore": overall_score,
-        "breakdown": {
-            "spendingPace": spending_pace_score,
-            "billPreparedness": bill_preparedness_score,
-            "savingsHealth": savings_health_score,
-            "budgetUtilization": utilization_score,
-        },
-        "grade": grade,
-        "summary": summary,
-        "recommendations": recommendations,
-        "strengths": strengths,
-        "concerns": concerns,
-    }
+    return BudgetHealthResult(
+        overallScore=overall_score,
+        breakdown=HealthScoreBreakdown(
+            spendingPace=spending_pace_score,
+            billPreparedness=bill_preparedness_score,
+            savingsHealth=savings_health_score,
+            budgetUtilization=utilization_score,
+        ),
+        grade=grade,
+        summary=summary,
+        recommendations=recommendations,
+        strengths=strengths,
+        concerns=concerns,
+    )
 
 
 def _generate_summary(grade: str, score: int) -> str:
