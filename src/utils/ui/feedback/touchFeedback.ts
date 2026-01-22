@@ -6,7 +6,7 @@
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
 
-import React from "react";
+import type { TouchEvent } from "react";
 
 export type HapticFeedbackType =
   | "light"
@@ -170,7 +170,7 @@ export const useTouchFeedback = (
   hapticType: HapticFeedbackType = "tap",
   touchType: TouchFeedbackType = "primary"
 ) => {
-  const handleTouchStart = (_event: React.TouchEvent) => {
+  const handleTouchStart = (_event: TouchEvent) => {
     hapticFeedback(10, hapticType);
   };
 
