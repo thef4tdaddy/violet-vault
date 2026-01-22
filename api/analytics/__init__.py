@@ -6,8 +6,16 @@ Shared types and utilities for analytics endpoints
 from typing import Any, TypedDict
 
 from api.analytics.audit import EnvelopeIntegrityAuditor
+from api.analytics.bills import predict_bills
+from api.analytics.health import calculate_budget_health
+from api.analytics.spending import calculate_spending_velocity
 
-__all__ = ["EnvelopeIntegrityAuditor"]
+__all__ = [
+    "EnvelopeIntegrityAuditor",
+    "calculate_spending_velocity",
+    "predict_bills",
+    "calculate_budget_health",
+]
 
 
 class PaycheckEntry(TypedDict, total=False):

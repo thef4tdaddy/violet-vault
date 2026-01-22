@@ -19,7 +19,7 @@ const AccountsHeader = ({
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex-1 min-w-0">
         <h3 className="font-black text-black text-xl flex items-center tracking-wide">
-          <div className="relative mr-2 sm:mr-4 flex-shrink-0">
+          <div className="relative mr-2 sm:mr-4 shrink-0">
             <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-cyan-500 p-3 rounded-2xl">
               {React.createElement(getIcon("CreditCard"), {
@@ -49,7 +49,7 @@ const AccountsHeader = ({
         </p>
       </div>
 
-      <div className="flex gap-2 flex-shrink-0">
+      <div className="flex gap-2 shrink-0">
         <Button
           onClick={onToggleBalances}
           className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-black hover:border-cyan-200 transition-colors"

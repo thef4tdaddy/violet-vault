@@ -60,6 +60,7 @@ export * from "./bug-report";
 
 // API Response Schemas & Types
 export * from "./api-responses";
+export * from "./analytics";
 
 // Import/Export Schemas & Types
 export * from "./import-export";
