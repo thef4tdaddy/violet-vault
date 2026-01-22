@@ -144,9 +144,7 @@ class IntegrityAuditResult(BaseModel):
         ..., description="Summary statistics (counts by severity and type)"
     )
     timestamp: str = Field(..., description="When the audit was performed (ISO format)")
-    snapshotSize: dict[str, int] = Field(
-        ..., description="Size of the data snapshot analyzed"
-    )
+    snapshotSize: dict[str, int] = Field(..., description="Size of the data snapshot analyzed")
 
 
 # ============================================================================

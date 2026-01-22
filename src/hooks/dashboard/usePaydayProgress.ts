@@ -84,14 +84,26 @@ export const usePaydayProgress = (): PaydayProgressData => {
     }
 
     const now = new Date();
-    const intervalMs = paydayPrediction.intervalDays * 24 * 60 * 60 * 1000;
-    const lastPayday = new Date(paydayPrediction.nextPayday.getTime() - intervalMs);
+    let lastPayday: Date;
+
+    const entry = paycheckHistory[0];
+    // Use actual last paycheck date if available, otherwise calculate theoretical previous payday
+    if (entry && entry.date) {
+      lastPayday = entry.date instanceof Date ? entry.date : new Date(entry.date);
+    } else {
+      const intervalMs = paydayPrediction.intervalDays * 24 * 60 * 60 * 1000;
+      lastPayday = new Date(paydayPrediction.nextPayday.getTime() - intervalMs);
+    }
+
     const totalCycleMs = paydayPrediction.nextPayday.getTime() - lastPayday.getTime();
     const elapsedMs = now.getTime() - lastPayday.getTime();
 
+    // Ensure valid cycle duration
+    if (totalCycleMs <= 0) return 0;
+
     const percentage = Math.max(0, Math.min(100, (elapsedMs / totalCycleMs) * 100));
     return percentage;
-  }, [paydayPrediction]);
+  }, [paydayPrediction, paycheckHistory]);
 
   // Calculate safe-to-spend amount
   const safeToSpend = useMemo(() => {
