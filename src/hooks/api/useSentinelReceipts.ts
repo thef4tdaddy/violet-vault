@@ -33,6 +33,16 @@ export interface UseSentinelReceiptsOptions {
   retry?: boolean | number;
 }
 
+/**
+ * Provides polling, caching, and mutation helpers for managing SentinelShare receipts.
+ *
+ * @param options - Optional settings; `retry` controls the query retry behaviour (boolean or number).
+ * @returns An object exposing:
+ *  - Data: `receipts` (array of receipts), `pendingReceipts`, `matchedReceipts`, `ignoredReceipts`.
+ *  - Status flags: `isLoading`, `isFetching`, `isError`, `error`, `isPolling`.
+ *  - Mutation state: `isUpdating`, `updateError`.
+ *  - Methods: `refetch`, `updateStatus(receiptId, status, matchedTransactionId?)`, `getReceiptById(id)`, `getReceiptsByMerchant(merchant)`, `getReceiptsByDateRange(startDate, endDate)`.
+ */
 export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
