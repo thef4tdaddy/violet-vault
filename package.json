@@ -1,7 +1,7 @@
 {
   "name": "violetvault",
   "private": true,
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-alpha.5",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
   "license": "CC-BY-NC-SA-4.0",
@@ -72,6 +72,7 @@
     "dexie": "^4.0.11",
     "esbuild": "^0.27.0",
     "firebase": "^12.4.0",
+    "framer-motion": "^12.27.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.0.0",
     "lightningcss": "^1.30.1",
@@ -144,8 +145,8 @@
       "gofmt -w"
     ],
     "*.py": [
-      "ruff check --fix",
-      "ruff format"
+      "bash scripts/lint-python.sh check --fix",
+      "bash scripts/lint-python.sh format"
     ]
   },
   "overrides": {

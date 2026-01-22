@@ -1,37 +1,51 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import { createPortal } from "react-dom";
+import { motion, MotionValue } from "framer-motion";
 import { getIcon } from "@/utils";
 import usePullToRefresh from "@/hooks/platform/mobile/usePullToRefresh";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
+ * Context to share pull-to-refresh state between Provider and Modal
+ */
+interface PullToRefreshContextType {
+  isPulling: boolean;
+  isRefreshing: boolean;
+  pullProgress: number;
+  pullRotation: MotionValue<number>;
+  isReady: boolean;
+}
+
+const PullToRefreshContext = createContext<PullToRefreshContextType | null>(null);
+
+/**
+ * Hook to consume pull-to-refresh context
+ */
+const usePullToRefreshContext = () => {
+  const context = useContext(PullToRefreshContext);
+  if (!context) {
+    throw new Error("usePullToRefreshContext must be used within GlobalPullToRefreshProvider");
+  }
+  return context;
+};
+
+/**
  * Global Pull-to-Refresh Modal
  * Shows as a centered modal when user pulls down on mobile
- * Works app-wide from MainLayout
+ * Consumes state from context
  */
 const GlobalPullToRefresh: React.FC = () => {
-  const queryClient = useQueryClient();
-
-  const refreshData = async () => {
-    await queryClient.invalidateQueries();
-  };
-
-  const { isPulling, isRefreshing, pullProgress, pullRotation, isReady } = usePullToRefresh(
-    refreshData,
-    {
-      threshold: 80,
-      enabled: true,
-    }
-  );
+  const { isPulling, isRefreshing, pullProgress, pullRotation, isReady } =
+    usePullToRefreshContext();
 
   // Only show modal if pulling or refreshing
   if (!isPulling && !isRefreshing) return null;
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
+      className="fixed inset-0 z-200 pointer-events-none flex items-center justify-center"
       style={{
-        opacity: isPulling ? pullProgress : 1,
+        opacity: isPulling ? Math.min(pullProgress * 1.5, 1) : 1,
       }}
     >
       {/* Modal backdrop */}
@@ -48,18 +62,19 @@ const GlobalPullToRefresh: React.FC = () => {
               })}
             </div>
           ) : (
-            <div
-              className={`transition-all duration-200 ${
-                isReady ? "text-green-600 scale-110" : "text-purple-600"
+            <motion.div
+              className={`transition-colors duration-200 ${
+                isReady ? "text-green-600" : "text-purple-600"
               }`}
               style={{
-                transform: `rotate(${pullRotation}deg)`,
+                rotate: pullRotation,
+                scale: isReady ? 1.1 : 1,
               }}
             >
               {React.createElement(getIcon("ArrowDown"), {
                 className: "w-12 h-12",
               })}
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -72,7 +87,7 @@ const GlobalPullToRefresh: React.FC = () => {
         {!isRefreshing && (
           <div className="mt-4 w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className={`h-full transition-all duration-150 ${
+              className={`h-full transition-colors duration-150 ${
                 isReady ? "bg-green-500" : "bg-purple-500"
               }`}
               style={{
@@ -98,16 +113,40 @@ export const GlobalPullToRefreshProvider: React.FC<{ children: React.ReactNode }
     await queryClient.invalidateQueries();
   };
 
-  const { containerRef, pullStyles } = usePullToRefresh(refreshData, {
+  const {
+    containerRef,
+    dragHandlers,
+    springY,
+    isPulling,
+    isRefreshing,
+    pullProgress,
+    pullRotation,
+    isReady,
+  } = usePullToRefresh(refreshData, {
     threshold: 80,
     enabled: true,
   });
 
+  const contextValue: PullToRefreshContextType = {
+    isPulling,
+    isRefreshing,
+    pullProgress,
+    pullRotation,
+    isReady,
+  };
+
   return (
-    <div ref={containerRef} style={pullStyles} className="min-h-screen">
-      {children}
-      <GlobalPullToRefresh />
-    </div>
+    <PullToRefreshContext.Provider value={contextValue}>
+      <motion.div
+        ref={containerRef}
+        style={{ y: springY }}
+        {...dragHandlers}
+        className="min-h-screen"
+      >
+        {children}
+        <GlobalPullToRefresh />
+      </motion.div>
+    </PullToRefreshContext.Provider>
   );
 };
 

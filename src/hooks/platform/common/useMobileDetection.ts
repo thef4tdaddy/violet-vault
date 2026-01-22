@@ -8,7 +8,12 @@ import { useState, useEffect } from "react";
  * @returns {boolean} - True if screen width is below breakpoint
  */
 export const useMobileDetection = (breakpoint = 640) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < breakpoint;
+    }
+    return false;
+  });
 
   useEffect(() => {
     const checkIsMobile = () => {
