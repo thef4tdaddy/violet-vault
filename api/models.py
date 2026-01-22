@@ -265,3 +265,25 @@ class AnalyticsResponse(BaseModel):
     billPredictions: BillPredictionResult | None = Field(None, description="Bill predictions")
     budgetHealth: BudgetHealthResult | None = Field(None, description="Budget health score")
     error: str | None = Field(None, description="Error message if failed")
+
+
+class SentinelReceipt(BaseModel):
+    """
+    SentinelShare receipt entity for cross-app matching
+    Mirrors src/domain/schemas/sentinel.ts
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    id: str = Field(..., min_length=1)
+    amount: float
+    merchant: str = Field(..., min_length=1)
+    date: str = Field(..., description="ISO datetime")
+    category: str | None = None
+    description: str | None = None
+    status: Literal["pending", "matched", "ignored"] = Field(default="pending")
+    createdAt: str = Field(..., description="ISO datetime")
+    updatedAt: str = Field(..., description="ISO datetime")
+    matchedTransactionId: str | None = None
+    sourceApp: str | None = None
+    metadata: dict | None = Field(default_factory=lambda: {})
