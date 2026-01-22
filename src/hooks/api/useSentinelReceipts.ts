@@ -14,6 +14,7 @@ import { useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { queryKeys } from "@/utils/core/common/queryClient";
 import { sentinelShareService } from "@/services/sentinel/sentinelShareService";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import logger from "@/utils/core/common/logger";
 import type { SentinelReceipt, UpdateReceiptStatusOptions } from "@/types/sentinel";
 
@@ -35,6 +36,7 @@ export interface UseSentinelReceiptsOptions {
 export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   // Only enable polling when user is authenticated
   const isEnabled = Boolean(user);
@@ -108,11 +110,21 @@ export function useSentinelReceipts(options: UseSentinelReceiptsOptions = {}) {
         queryClient.setQueryData(queryKeys.sentinelReceipts(), context.previousReceipts);
       }
 
+      // Show error toast notification
+      showErrorToast(`Failed to update receipt: ${error instanceof Error ? error.message : "Unknown error"}`);
+
       logger.error("Failed to update receipt status", error, {
         source: "useSentinelReceipts",
       });
     },
     onSuccess: (options) => {
+      // Show success toast notification
+      const statusMessage =
+        options.status === "matched"
+          ? "Receipt matched to transaction successfully"
+          : "Receipt marked as ignored";
+      showSuccessToast(statusMessage);
+
       logger.debug("Successfully updated receipt status", {
         receiptId: options.receiptId,
         status: options.status,
