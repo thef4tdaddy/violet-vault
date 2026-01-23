@@ -411,11 +411,6 @@ describe("ActivitySnapshot", () => {
   // Styling Tests
   // ========================================================================
   describe("Styling", () => {
-    it("should have glassmorphism styling", () => {
-      const { container } = renderComponent();
-      expect(container.querySelector(".glassmorphism")).toBeInTheDocument();
-    });
-
     it("should have proper border styling", () => {
       const { container } = renderComponent();
       expect(container.querySelector(".border-2")).toBeInTheDocument();
@@ -427,9 +422,11 @@ describe("ActivitySnapshot", () => {
       expect(container.querySelector(".rounded-2xl")).toBeInTheDocument();
     });
 
-    it("should have backdrop blur", () => {
+    it("should have hard lines shadow", () => {
       const { container } = renderComponent();
-      expect(container.querySelector(".backdrop-blur-sm")).toBeInTheDocument();
+      expect(
+        container.querySelector(".shadow-\\[8px_8px_0px_0px_rgba\\(0\\,0\\,0\\,1\\)\\]")
+      ).toBeInTheDocument();
     });
   });
 

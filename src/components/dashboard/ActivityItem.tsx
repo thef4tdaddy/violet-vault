@@ -9,41 +9,15 @@
 
 import React from "react";
 import { getIcon } from "@/utils/ui/icons";
+import {
+  type ActivityItem as ActivityItemData,
+  type ActivityType,
+  type BillStatus,
+} from "@/hooks/dashboard/useRecentActivity";
 
-/** Activity type options */
-export type ActivityType = "transaction" | "bill" | "paycheck";
-
-/** Bill status options */
-export type BillStatus = "overdue" | "due-soon" | "upcoming";
-
-/** Allocation status options */
+/** Allocation status options for paychecks */
 export type AllocationStatus = "allocated" | "partial" | "unallocated";
-
-/** Activity item data interface */
-export interface ActivityItemData {
-  /** Unique identifier */
-  id: string;
-  /** Type of activity */
-  type: ActivityType;
-  /** Display date for the activity */
-  date: Date;
-  /** Primary display text (merchant/bill name/payer) */
-  title: string;
-  /** Activity amount (positive for income, negative for expense) */
-  amount: number;
-  /** Optional category/description */
-  category?: string;
-  /** Whether the amount is income */
-  isIncome: boolean;
-  /** Status for bills (overdue, due-soon, upcoming) */
-  billStatus?: BillStatus;
-  /** Whether a bill has been paid */
-  isPaid?: boolean;
-  /** Allocation status for paychecks */
-  allocationStatus?: AllocationStatus;
-  /** Original data reference */
-  originalData?: unknown;
-}
+// Joe: Aligning with primary hook types to resolve TS mismatch.
 
 /** ActivityItem component props */
 export interface ActivityItemProps {
@@ -155,32 +129,6 @@ const getAllocationStatusIcon = (status: AllocationStatus | undefined): React.Re
 };
 
 /**
- * Get background color classes based on activity type and status
- */
-const getBackgroundClasses = (
-  type: ActivityType,
-  isIncome: boolean,
-  billStatus: BillStatus | undefined
-): string => {
-  if (type === "bill") {
-    switch (billStatus) {
-      case "overdue":
-        return "bg-red-50 border-red-200";
-      case "due-soon":
-        return "bg-yellow-50 border-yellow-200";
-      default:
-        return "bg-purple-50 border-purple-200";
-    }
-  }
-
-  if (type === "paycheck" || isIncome) {
-    return "bg-green-50 border-green-200";
-  }
-
-  return "bg-gray-50 border-gray-200";
-};
-
-/**
  * Get icon background color classes
  */
 const getIconBackgroundClasses = (
@@ -200,10 +148,10 @@ const getIconBackgroundClasses = (
   }
 
   if (type === "paycheck" || isIncome) {
-    return "bg-green-100 text-green-600";
+    return "bg-white border-2 border-black text-green-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]";
   }
 
-  return "bg-red-100 text-red-600";
+  return "bg-white border-2 border-black text-red-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]";
 };
 
 /**
@@ -249,7 +197,6 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ item, onClick, className = 
     }
   };
 
-  const bgClasses = getBackgroundClasses(type, isIncome, billStatus);
   const iconBgClasses = getIconBackgroundClasses(type, isIncome, billStatus);
   const amountClasses = getAmountClasses(type, isIncome);
 
@@ -260,10 +207,9 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ item, onClick, className = 
       onClick={handleClick}
       onKeyDown={onClick ? handleKeyDown : undefined}
       className={`
-        flex items-center justify-between p-3 rounded-lg border
-        transition-all duration-200
-        ${bgClasses}
-        ${onClick ? "cursor-pointer hover:shadow-md hover:scale-[1.01]" : ""}
+        flex items-center justify-between p-4 rounded-xl border-2 border-black
+        transition-all duration-200 bg-white
+        ${onClick ? "cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none" : ""}
         ${className}
       `}
       data-testid={`activity-item-${id}`}

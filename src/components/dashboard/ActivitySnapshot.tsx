@@ -40,8 +40,10 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, icon, onViewAll, c
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
-        <div className="glassmorphism rounded-full p-1.5 border border-purple-300">{icon}</div>
-        <h4 className="font-black text-black text-sm">
+        <div className="bg-white rounded-full p-1.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">
+          {icon}
+        </div>
+        <h4 className="font-black text-black text-sm tracking-tight">
           <span className="text-base">{title.charAt(0)}</span>
           {title.slice(1).toUpperCase()}
           {typeof count === "number" && count > 0 && (
@@ -132,10 +134,10 @@ interface WidgetHeaderProps {
 const WidgetHeader: React.FC<WidgetHeaderProps> = ({ isLoading, onRefresh }) => {
   return (
     <div className="flex items-center justify-between mb-6">
-      <h3 className="font-black text-black text-base flex items-center gap-2">
-        <ActivityIcon className="h-5 w-5 text-purple-600" />
+      <h3 className="font-black text-black text-lg flex items-center gap-2 tracking-tighter">
+        <ActivityIcon className="h-5 w-5 text-black" />
         <span>
-          <span className="text-lg">A</span>CTIVITY <span className="text-lg">S</span>NAPSHOT
+          <span className="text-xl">A</span>CTIVITY <span className="text-xl">S</span>NAPSHOT
         </span>
       </h3>
       {!isLoading && (
@@ -144,11 +146,11 @@ const WidgetHeader: React.FC<WidgetHeaderProps> = ({ isLoading, onRefresh }) => 
           tabIndex={0}
           onClick={onRefresh}
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onRefresh()}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-px active:translate-y-px active:shadow-none"
           aria-label="Refresh activity"
           title="Refresh"
         >
-          <RefreshCwIcon className="h-4 w-4 text-gray-500" />
+          <RefreshCwIcon className="h-4 w-4" />
         </span>
       )}
     </div>
@@ -228,9 +230,15 @@ const ActivitySnapshot: React.FC<ActivitySnapshotProps> = ({
     navigate("/app/paycheck", { state: { highlightId: item.id } });
   };
 
-  const handleViewAllTransactions = (): void => navigate("/app/transactions");
-  const handleViewAllBills = (): void => navigate("/app/bills");
-  const handleViewAllPaychecks = (): void => navigate("/app/paycheck");
+  const handleViewAllTransactions = (): void => {
+    navigate("/app/transactions");
+  };
+  const handleViewAllBills = (): void => {
+    navigate("/app/bills");
+  };
+  const handleViewAllPaychecks = (): void => {
+    navigate("/app/paycheck");
+  };
 
   // Check if there's any activity at all
   const hasNoActivity =
@@ -239,9 +247,8 @@ const ActivitySnapshot: React.FC<ActivitySnapshotProps> = ({
   return (
     <div
       className={`
-        glassmorphism rounded-2xl p-6 
-        border-2 border-black ring-1 ring-gray-800/10
-        bg-white/90 backdrop-blur-sm shadow-xl
+        bg-white rounded-2xl p-6 
+        border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]
         ${className}
       `}
       data-testid="activity-snapshot"

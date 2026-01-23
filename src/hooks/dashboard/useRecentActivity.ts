@@ -217,6 +217,7 @@ export const useRecentActivity = (
     daysAhead: billDaysAhead,
     sortBy: "dueDate",
     sortOrder: "asc",
+    enabled,
   });
 
   // Fetch paycheck history

@@ -111,7 +111,8 @@ describe("ActivityItem", () => {
         date: new Date("2025-01-10"),
       };
       const { container } = render(<ActivityItem item={overdueItem} />);
-      expect(container.querySelector(".bg-red-50")).toBeInTheDocument();
+      expect(container.querySelector(".border-black")).toBeInTheDocument();
+      expect(container.querySelector(".text-red-600")).toBeInTheDocument();
     });
 
     it("should render due-soon bill with yellow indicator", () => {
@@ -120,12 +121,14 @@ describe("ActivityItem", () => {
         billStatus: "due-soon",
       };
       const { container } = render(<ActivityItem item={dueSoonItem} />);
-      expect(container.querySelector(".bg-yellow-50")).toBeInTheDocument();
+      expect(container.querySelector(".border-black")).toBeInTheDocument();
+      expect(container.querySelector(".text-yellow-600")).toBeInTheDocument();
     });
 
     it("should render upcoming bill with default styling", () => {
       const { container } = render(<ActivityItem item={billItem} />);
-      expect(container.querySelector(".bg-purple-50")).toBeInTheDocument();
+      expect(container.querySelector(".border-black")).toBeInTheDocument();
+      expect(container.querySelector(".bg-white")).toBeInTheDocument();
     });
 
     it("should render paid bill with check icon", () => {
@@ -189,7 +192,8 @@ describe("ActivityItem", () => {
 
     it("should have green styling for paychecks", () => {
       const { container } = render(<ActivityItem item={paycheckItem} />);
-      expect(container.querySelector(".bg-green-50")).toBeInTheDocument();
+      expect(container.querySelector(".bg-white")).toBeInTheDocument();
+      expect(container.querySelector(".text-green-600")).toBeInTheDocument();
     });
   });
 
@@ -245,7 +249,7 @@ describe("ActivityItem", () => {
     });
 
     it("should display formatted date for other dates", () => {
-      const pastDate = new Date("2025-01-10");
+      const pastDate = new Date("2025-01-10T12:00:00");
       const pastItem: ActivityItemData = {
         id: "txn-past",
         type: "transaction",
