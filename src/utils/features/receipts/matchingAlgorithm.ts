@@ -370,12 +370,21 @@ export const isHighConfidenceMatch = (
 };
 
 /**
- * Get display color for confidence level
+ * Get display color for confidence level (0-100 or 0-1 scale)
+ * Resilient to both percentage (0-100) and decimal (0-1) input formats.
+ *
+ * @param confidence - Match confidence score
+ * @returns Color name for UI mapping
  */
 export const getConfidenceColor = (confidence: number): string => {
-  if (confidence >= CONFIDENCE_LEVELS.HIGH) return "green";
-  if (confidence >= CONFIDENCE_LEVELS.MEDIUM) return "yellow";
-  if (confidence >= CONFIDENCE_LEVELS.LOW) return "orange";
+  if (confidence == null || isNaN(confidence)) return "gray";
+
+  // Resilient normalization: if value is effectively 0-1, treat as fraction of 100
+  const normalized = confidence <= 1.0 && confidence > 0 ? confidence * 100 : confidence;
+
+  if (normalized >= CONFIDENCE_LEVELS.HIGH) return "green";
+  if (normalized >= CONFIDENCE_LEVELS.MEDIUM) return "yellow";
+  if (normalized >= CONFIDENCE_LEVELS.LOW) return "orange";
   return "gray";
 };
 

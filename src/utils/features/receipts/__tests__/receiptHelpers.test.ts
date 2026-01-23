@@ -33,7 +33,7 @@ describe("receiptHelpers", () => {
     it("should render low confidence indicator", () => {
       const result = render(renderConfidenceIndicator("date", "low"));
       const icon = result.container.querySelector("svg");
-      expect(icon).toHaveClass("text-red-600");
+      expect(icon).toHaveClass("text-orange-600");
     });
 
     it("should render default confidence indicator for unknown values", () => {
@@ -311,10 +311,15 @@ describe("receiptHelpers", () => {
       expect(getConfidenceColor(0.7)).toBe("yellow");
     });
 
-    it("should return red for confidence < 0.6", () => {
-      expect(getConfidenceColor(0.5)).toBe("red");
-      expect(getConfidenceColor(0.1)).toBe("red");
-      expect(getConfidenceColor(0)).toBe("red");
+    it("should return orange for low confidence (>= 0.4)", () => {
+      expect(getConfidenceColor(0.4)).toBe("orange");
+      expect(getConfidenceColor(0.5)).toBe("orange");
+    });
+
+    it("should return gray for very low confidence (< 0.4)", () => {
+      expect(getConfidenceColor(0.3)).toBe("gray");
+      expect(getConfidenceColor(0.1)).toBe("gray");
+      expect(getConfidenceColor(0)).toBe("gray");
     });
 
     it("should return gray for invalid inputs", () => {

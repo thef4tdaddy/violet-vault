@@ -4,6 +4,7 @@
  */
 import React from "react";
 import { getIcon } from "@/utils/ui/icons";
+import { getConfidenceColor as getConsolidatedColor } from "./matchingAlgorithm";
 
 // Define types
 interface ReceiptData {
@@ -125,13 +126,10 @@ export const getConfidenceDescription = (confidence: number) => {
 
 /**
  * Get confidence level color for UI
+ * @deprecated Use getConfidenceColor from matchingAlgorithm.ts for consolidated logic
  */
 export const getConfidenceColor = (confidence: number) => {
-  if (confidence == null || isNaN(confidence)) return "gray";
-
-  if (confidence >= 0.8) return "green";
-  if (confidence >= 0.6) return "yellow";
-  return "red";
+  return getConsolidatedColor(confidence);
 };
 
 /**
@@ -239,7 +237,7 @@ export const renderConfidenceIndicator = (_field: string, confidence: Confidence
   const confidenceMap: Record<ConfidenceLevel, { color: string; iconName: string }> = {
     high: { color: "text-green-600", iconName: "CheckCircle" },
     medium: { color: "text-yellow-600", iconName: "CheckCircle" },
-    low: { color: "text-red-600", iconName: "XCircle" },
+    low: { color: "text-orange-600", iconName: "XCircle" },
     none: { color: "text-gray-400", iconName: "XCircle" },
   };
 
