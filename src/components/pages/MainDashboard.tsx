@@ -6,6 +6,8 @@ import PaydayBanner from "../dashboard/PaydayBanner";
 import RecentTransactionsWidget from "../dashboard/RecentTransactionsWidget";
 import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
+import QuickActions from "../dashboard/QuickActions";
+import InsightsWidget from "../dashboard/InsightsWidget";
 
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
@@ -184,6 +186,10 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
 
   return (
     <DashboardShell paydayBanner={<PaydayBanner />}>
+      <div className="md:col-span-2 lg:col-span-3">
+        <QuickActions setActiveView={setActiveView} />
+      </div>
+
       <AccountOverview
         balances={{
           ...accountBalances,
@@ -205,6 +211,10 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
           transactions={getRecentTransactions(transactions, 10) as never}
           getEnvelopeOptions={getEnvelopeOptions}
         />
+      </div>
+
+      <div className="md:col-span-2 lg:col-span-3">
+        <InsightsWidget />
       </div>
 
       <ReconcileTransactionModal
