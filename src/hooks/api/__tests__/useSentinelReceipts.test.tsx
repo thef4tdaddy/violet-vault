@@ -24,6 +24,16 @@ vi.mock("../../../services/sentinel/sentinelShareService", () => ({
   },
 }));
 
+const mockUpdateStatus = vi.fn();
+
+vi.mock("../useSentinelReceiptMutations", () => ({
+  useSentinelReceiptMutations: () => ({
+    updateStatus: mockUpdateStatus,
+    isUpdating: false,
+    updateError: null,
+  }),
+}));
+
 vi.mock("@/utils/core/common/logger", () => ({
   default: {
     debug: vi.fn(),
@@ -97,21 +107,14 @@ describe("useSentinelReceipts Hook", () => {
     expect(result.current.pendingReceipts[0].status).toBe("pending");
   });
 
-  it("should update receipt status with optimistic updates", async () => {
-    vi.mocked(sentinelShareService.updateStatus).mockResolvedValue(undefined);
-
+  it("should delegate updateStatus to useSentinelReceiptMutations", async () => {
     const { result } = renderHook(() => useSentinelReceipts(), { wrapper });
 
     await waitFor(() => expect(result.current.receipts).toHaveLength(1));
 
     await result.current.updateStatus("receipt-1", "matched", "trans-123");
 
-    // Verify service call
-    expect(sentinelShareService.updateStatus).toHaveBeenCalledWith({
-      receiptId: "receipt-1",
-      status: "matched",
-      matchedTransactionId: "trans-123",
-    });
+    expect(mockUpdateStatus).toHaveBeenCalledWith("receipt-1", "matched", "trans-123");
   });
 
   it("should handle fetch errors", async () => {

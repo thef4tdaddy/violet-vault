@@ -95,6 +95,15 @@ export const TOAST_MESSAGES = {
     NETWORK_ERROR: "Network error - please check your connection",
     UNEXPECTED_ERROR: "An unexpected error occurred",
   },
+
+  // SentinelShare
+  SENTINEL: {
+    RECEIPT_MATCHED: "Receipt matched to transaction successfully",
+    RECEIPT_IGNORED: "Receipt marked as ignored",
+    RECEIPT_UPDATE_FAILED: "Failed to update receipt",
+    RECEIPTS_SYNCED: "Receipts synced from SentinelShare",
+    RECEIPTS_SYNC_FAILED: "Failed to sync receipts from SentinelShare",
+  },
 };
 
 /**
