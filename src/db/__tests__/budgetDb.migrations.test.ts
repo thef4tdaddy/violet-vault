@@ -17,9 +17,9 @@ vi.mock("@/utils/common/logger", () => ({
 
 describe("VioletVaultDB - Schema Tests (v2.0)", () => {
   describe("Schema Version Management", () => {
-    it("should have correct current version (v11 - v2.0 baseline)", () => {
+    it("should have correct current version (v12 - v2.0 baseline + Receipts)", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(11); // Version 11 is the v2.0 baseline
+      expect(db.verno).toBe(12); // Version 12 is the v2.0 baseline + Receipts
       expect(db.name).toBe("VioletVault");
     });
 
@@ -61,9 +61,9 @@ describe("VioletVaultDB - Schema Tests (v2.0)", () => {
   });
 
   describe("v2.0 Fresh Start - No Migration Support", () => {
-    it("should use version 11 as baseline", () => {
+    it("should use version 12 as baseline", () => {
       const db = new VioletVaultDB();
-      expect(db.verno).toBe(11);
+      expect(db.verno).toBe(12);
     });
 
     it("should have unified envelope types", () => {
@@ -114,8 +114,8 @@ describe("VioletVaultDB - Schema Tests (v2.0)", () => {
         expect(db.isOpen()).toBe(true);
         await db.close();
         expect(db.isOpen()).toBe(false);
-      } catch (error) {
-        expect(error.message).toContain("IndexedDB");
+      } catch (error: unknown) {
+        expect(error instanceof Error ? error.message : String(error)).toContain("baseline");
       }
     });
   });

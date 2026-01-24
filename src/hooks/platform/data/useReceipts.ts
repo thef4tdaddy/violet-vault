@@ -2,29 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
+import type { Receipt } from "@/db/types";
 import logger from "@/utils/core/common/logger.ts";
-
-// Receipt type definition
-interface Receipt {
-  id: string;
-  date?: string;
-  merchant?: string;
-  amount?: number;
-  imageData?: {
-    url?: string;
-  };
-  transactionId?: string;
-  processingStatus?: string;
-  lastModified: number;
-  ocrData?: {
-    rawText?: string;
-    confidence?: number;
-    items?: unknown[];
-    tax?: number;
-    subtotal?: number;
-    processingTime?: number;
-  };
-}
 
 const useReceipts = () => {
   const queryClient = useQueryClient();
@@ -53,7 +32,6 @@ const useReceipts = () => {
   const queryFunction = async (): Promise<Receipt[]> => {
     try {
       // Note: receipts table may not exist in budgetDb
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       const receipts = await budgetDb.receipts?.orderBy("date").reverse().toArray();
       return receipts || [];
     } catch (error) {
@@ -81,12 +59,16 @@ const useReceipts = () => {
     mutationFn: async (receiptData: Partial<Receipt>) => {
       const receipt: Receipt = {
         id: crypto.randomUUID(),
+        merchant: receiptData.merchant || "Unknown Merchant",
+        amount: receiptData.amount || 0,
+        date: receiptData.date || new Date().toISOString(),
+        currency: receiptData.currency || "USD",
+        status: receiptData.status || "pending",
         ...receiptData,
         processingStatus: "completed",
         lastModified: Date.now(),
       };
 
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.put(receipt);
       return receipt;
     },
@@ -99,7 +81,6 @@ const useReceipts = () => {
   const updateReceiptMutation = useMutation({
     mutationKey: ["receipts", "update"],
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Receipt> }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.update(id, {
         ...updates,
         lastModified: Date.now(),
@@ -115,7 +96,6 @@ const useReceipts = () => {
     mutationKey: ["receipts", "delete"],
     mutationFn: async (id: string) => {
       // Get receipt data before deletion for cleanup
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       const receipt = await budgetDb.receipts?.get(id);
 
       if (receipt?.imageData?.url) {
@@ -123,7 +103,6 @@ const useReceipts = () => {
         URL.revokeObjectURL(receipt.imageData.url);
       }
 
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.delete(id);
       return id;
     },
@@ -141,7 +120,6 @@ const useReceipts = () => {
       receiptId: string;
       transactionId: string;
     }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.update(receiptId, {
         transactionId,
         lastModified: Date.now(),

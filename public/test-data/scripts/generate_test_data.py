@@ -288,7 +288,7 @@ def generate_data() -> dict[str, Any]:
         {
             "id": "sa-transit",
             "name": "Transit Benefit",
-            "type": "Transit",
+            "type": "other",  # SupplementalAccountTypeSchema requires "other" for Transit
             "bal": 125,
             "cont": 1500,
         },
@@ -309,7 +309,9 @@ def generate_data() -> dict[str, Any]:
                 "name": sa["name"],
                 "category": "Supplemental",
                 "type": "supplemental",
-                "accountType": sa["type"],
+                "accountType": sa["type"]
+                if sa["type"] in ["FSA", "HSA", "529", "IRA", "401K"]
+                else "other",
                 "archived": False,
                 "currentBalance": sa["bal"],
                 "annualContribution": sa["cont"],
@@ -440,6 +442,7 @@ def generate_data() -> dict[str, Any]:
             m_list_txn: list[str] = merchants["groceries"]
             desc_txn: str = "Groceries"
             amt_txn: float = random.uniform(40, 150)
+            merchant_txn: str = random.choice(m_list_txn)
 
             if cat_idx == 0:
                 pass  # Default
@@ -487,7 +490,7 @@ def generate_data() -> dict[str, Any]:
                     "lastModified": get_timestamp(days_ago_txn),
                     "createdAt": get_timestamp(days_ago_txn),
                     "description": desc_txn,
-                    "merchant": random.choice(m_list_txn),
+                    "merchant": merchant_txn,
                 }
             )
             txn_count += 1
@@ -498,15 +501,15 @@ def generate_data() -> dict[str, Any]:
             pay_amt: float = 3250.00
 
             # Detailed allocations for the history component
-            allocs: list[dict[str, Any]] = [
-                {"envelopeId": "env-rent", "envelopeName": "Rent", "amount": 1100.00},
-                {"envelopeId": "env-groceries", "envelopeName": "Groceries", "amount": 400.00},
-                {"envelopeId": "env-gas", "envelopeName": "Gas & Fuel", "amount": 150.00},
-                {"envelopeId": "env-emergency", "envelopeName": "Emergency Fund", "amount": 500.00},
-                {"envelopeId": "goal-wedding", "envelopeName": "Summer Wedding", "amount": 250.00},
-            ]
+            allocs: dict[str, float] = {
+                "env-rent": 1100.00,
+                "env-groceries": 400.00,
+                "env-gas": 150.00,
+                "env-emergency": 500.00,
+                "goal-wedding": 250.00,
+            }
 
-            total_alloc: float = sum(a["amount"] for a in allocs)
+            total_alloc: float = sum(allocs.values())
 
             transactions.append(
                 {
@@ -598,6 +601,7 @@ def main() -> None:
         "budget": data["budget"],
         "envelopes": data["envelopes"],
         "transactions": data["transactions"],
+        "allTransactions": data["transactions"],  # Required for v2.0 ingestion
         "budgetCommits": [],
         "budgetChanges": [],
         "exportMetadata": {

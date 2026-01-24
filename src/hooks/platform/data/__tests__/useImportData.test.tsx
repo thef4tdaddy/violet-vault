@@ -43,7 +43,9 @@ vi.mock("../../../../db/budgetDb", () => ({
     budget: { clear: vi.fn(), bulkAdd: vi.fn() },
     budgetCommits: { clear: vi.fn(), bulkAdd: vi.fn() },
     budgetChanges: { clear: vi.fn(), bulkAdd: vi.fn() },
+    tables: [],
   },
+  clearData: vi.fn(),
 }));
 
 const createWrapper = () => {
@@ -61,7 +63,10 @@ describe("useImportData", () => {
   const mockUser = { userName: "testuser", budgetId: "123" };
   const mockData = {
     envelopes: [{ id: "1", name: "Groceries", type: "standard" }],
-    transactions: [],
+    allTransactions: [{ id: "t1", amount: -10, type: "expense" }],
+    budget: [{ id: "metadata", unassignedCash: 100 }],
+    budgetCommits: [{ hash: "abc", message: "test" }],
+    budgetChanges: [{ id: 1, commitHash: "abc", entityType: "envelope" }],
   };
 
   const mockShowSuccess = vi.fn();
@@ -100,7 +105,8 @@ describe("useImportData", () => {
       await result.current.executeImport(mockData);
     });
 
-    expect(budgetDb.envelopes.clear).toHaveBeenCalled();
+    const { clearData } = await import("../../../../db/budgetDb");
+    expect(clearData).toHaveBeenCalled();
     expect(budgetDb.envelopes.bulkAdd).toHaveBeenCalledWith(mockData.envelopes);
     expect(mockShowSuccess).toHaveBeenCalledWith("Data imported successfully");
   });
@@ -127,7 +133,8 @@ describe("useImportData", () => {
   });
 
   it("should handle errors during import", async () => {
-    vi.mocked(budgetDb.envelopes.clear).mockRejectedValue(new Error("DB error"));
+    const { clearData } = await import("../../../../db/budgetDb");
+    vi.mocked(clearData).mockRejectedValue(new Error("DB error"));
 
     const { result } = renderHook(() => useImportData(), {
       wrapper: createWrapper(),

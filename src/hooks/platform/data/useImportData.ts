@@ -5,7 +5,8 @@ import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useConfirm } from "@/hooks/platform/ux/useConfirm";
 import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
 import { validateImportedData } from "@/utils/data/dataManagement/validationUtils";
-import { budgetDb } from "@/db/budgetDb";
+import { budgetDb, clearData } from "@/db/budgetDb";
+import { queryKeys } from "@/utils/core/query/queryKeys";
 import { Transaction, Envelope, BudgetRecord, BudgetCommit, BudgetChange } from "@/db/types";
 import logger from "@/utils/core/common/logger";
 
@@ -52,53 +53,40 @@ export const useImportData = () => {
   const performImport = useCallback(
     async (data: ImportDataStructure) => {
       try {
-        await budgetDb.transaction(
-          "rw",
-          [
-            budgetDb.envelopes,
-            budgetDb.transactions,
-            budgetDb.budget,
-            budgetDb.budgetCommits,
-            budgetDb.budgetChanges,
-          ],
-          async () => {
-            await budgetDb.envelopes.clear();
-            await budgetDb.transactions.clear();
-            await budgetDb.budget.clear();
-            await budgetDb.budgetCommits.clear();
-            await budgetDb.budgetChanges.clear();
+        await budgetDb.transaction("rw", budgetDb.tables, async () => {
+          // Full wipe of ALL data before import (Issue #154)
+          await clearData();
 
-            // Cast to validation types or any to satisfy Dexie
-            if (data.envelopes?.length) {
-              await budgetDb.envelopes.bulkAdd(data.envelopes as unknown as Envelope[]);
-            }
-            if (data.allTransactions?.length) {
-              await budgetDb.transactions.bulkAdd(data.allTransactions as unknown as Transaction[]);
-            }
-
-            // Import metadata
-            if (data.budget?.length) {
-              await budgetDb.budget.bulkAdd(data.budget as unknown as BudgetRecord[]);
-            }
-
-            // Import history if available
-            if (data.budgetCommits?.length) {
-              await budgetDb.budgetCommits.bulkAdd(data.budgetCommits as unknown as BudgetCommit[]);
-            }
-            if (data.budgetChanges?.length) {
-              await budgetDb.budgetChanges.bulkAdd(data.budgetChanges as unknown as BudgetChange[]);
-            }
+          // Cast to validation types or any to satisfy Dexie
+          if (data.envelopes?.length) {
+            await budgetDb.envelopes.bulkAdd(data.envelopes as unknown as Envelope[]);
           }
-        );
+          if (data.allTransactions?.length) {
+            await budgetDb.transactions.bulkAdd(data.allTransactions as unknown as Transaction[]);
+          }
+
+          // Import metadata
+          if (data.budget?.length) {
+            await budgetDb.budget.bulkAdd(data.budget as unknown as BudgetRecord[]);
+          }
+
+          // Import history if available
+          if (data.budgetCommits?.length) {
+            await budgetDb.budgetCommits.bulkAdd(data.budgetCommits as unknown as BudgetCommit[]);
+          }
+          if (data.budgetChanges?.length) {
+            await budgetDb.budgetChanges.bulkAdd(data.budgetChanges as unknown as BudgetChange[]);
+          }
+        });
 
         // Invalidate all related queries to force fresh data in UI
-        await queryClient.invalidateQueries({ queryKey: ["envelopes"] });
-        await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-        await queryClient.invalidateQueries({ queryKey: ["budget-metadata"] });
-        await queryClient.invalidateQueries({ queryKey: ["unassigned-cash"] });
-        await queryClient.invalidateQueries({ queryKey: ["actual-balance"] });
-        await queryClient.invalidateQueries({ queryKey: ["budget-commits"] });
-        await queryClient.invalidateQueries({ queryKey: ["budget-changes"] });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.unassignedCash() });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.actualBalance() });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
         showSuccessToast("Data imported successfully");
       } catch (error) {

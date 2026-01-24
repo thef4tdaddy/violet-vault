@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { VioletVaultDB } from "../budgetDb";
-import type { Envelope, Transaction, BudgetCommit, BudgetChange } from "../types";
+import type { Envelope, Transaction, BudgetRecord } from "../types";
 
 // Mock logger
 vi.mock("@/utils/common/logger", () => ({
@@ -33,7 +33,7 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
   describe("Database Initialization & Schema", () => {
     it("should initialize database with correct name and version", () => {
       expect(testDb.name).toBe("VioletVault");
-      expect(testDb.verno).toBe(11);
+      expect(testDb.verno).toBe(12);
     });
 
     it("should have all required tables defined", () => {
@@ -51,7 +51,7 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
       ];
 
       requiredTables.forEach((tableName) => {
-        expect(testDb[tableName]).toBeDefined();
+        expect((testDb as any)[tableName]).toBeDefined();
       });
     });
   });
@@ -64,6 +64,9 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
       type: "standard",
       archived: false,
       lastModified: Date.now(),
+      currentBalance: 0,
+      color: "#000000",
+      autoAllocate: false,
     };
 
     it("should perform basic CRUD on envelopes", async () => {
@@ -95,6 +98,7 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
       type: "expense",
       lastModified: Date.now(),
       description: "Test transaction",
+      isScheduled: false,
     };
 
     it("should perform basic CRUD on transactions", async () => {
@@ -128,6 +132,9 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
             type: "standard",
             archived: false,
             lastModified: Date.now(),
+            currentBalance: 0,
+            color: "#000000",
+            autoAllocate: false,
           },
         },
       ];
@@ -153,6 +160,62 @@ describe("VioletVaultDB - Comprehensive Tests", () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
+    });
+  });
+
+  describe("Metadata & Summary Operations", () => {
+    it("should manage unassigned cash", async () => {
+      const { setUnassignedCash, getUnassignedCash } = await import("../budgetDb");
+
+      await setUnassignedCash(100.5);
+      const amount = await getUnassignedCash();
+      expect(amount).toBe(100.5);
+    });
+
+    it("should manage actual balance", async () => {
+      const { setActualBalance, getActualBalance } = await import("../budgetDb");
+
+      await setActualBalance(2500.0);
+      const balance = await getActualBalance();
+      expect(balance).toBe(2500.0);
+    });
+  });
+
+  describe("Maintenance Operations", () => {
+    it("should clear all data", async () => {
+      const { clearData } = await import("../budgetDb");
+
+      await testDb.envelopes.add({
+        id: "env-to-clear",
+        name: "Clear Me",
+        category: "Test",
+        type: "standard",
+        archived: false,
+        lastModified: Date.now(),
+        currentBalance: 10,
+        color: "#000",
+        autoAllocate: false,
+      } as Envelope);
+
+      await clearData();
+
+      const env = await testDb.envelopes.get("env-to-clear");
+      expect(env).toBeUndefined();
+    });
+  });
+
+  describe("Query Helpers", () => {
+    it("should use queryHelpers for common operations", async () => {
+      const { queryHelpers } = await import("../budgetDb");
+
+      const activeEnvelopes = await queryHelpers.getActiveEnvelopes();
+      expect(Array.isArray(activeEnvelopes)).toBe(true);
+
+      const categoryEnvelopes = await queryHelpers.getEnvelopesByCategory("Needs");
+      expect(Array.isArray(categoryEnvelopes)).toBe(true);
+
+      const recentTxns = await queryHelpers.getRecentTransactions(7);
+      expect(Array.isArray(recentTxns)).toBe(true);
     });
   });
 });

@@ -17,6 +17,7 @@ import {
   OfflineRequestQueueEntry,
   AutoFundingRule,
   ExecutionRecord,
+  Receipt,
 } from "./types";
 import {
   EnvelopeSchema,
@@ -45,6 +46,7 @@ export class VioletVaultDB extends Dexie {
   offlineRequestQueue!: Table<OfflineRequestQueueEntry, number>;
   autoFundingRules!: Table<AutoFundingRule, string>;
   autoFundingHistory!: Table<ExecutionRecord, string>;
+  receipts!: Table<Receipt, string>;
 
   constructor() {
     super("VioletVault");
@@ -134,6 +136,11 @@ export class VioletVaultDB extends Dexie {
       debts: null,
       savingsGoals: null,
       paycheckHistory: null,
+    });
+
+    // Version 12: Add receipts table for SentinelShare integration
+    this.version(12).stores({
+      receipts: "id, date, merchant, amount, transactionId, lastModified",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -233,6 +240,7 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.transactions);
     addTimestampHooks(this.autoFundingRules);
     addTimestampHooks(this.autoFundingHistory);
+    addTimestampHooks(this.receipts);
 
     // Audit log hook
     this.auditLog.hook("creating", (_primKey: number, obj: AuditLogEntry, _trans: unknown) => {
@@ -767,6 +775,7 @@ export const clearData = async (): Promise<void> => {
     budgetDb.offlineRequestQueue.clear(),
     budgetDb.autoFundingRules.clear(),
     budgetDb.autoFundingHistory.clear(),
+    budgetDb.receipts.clear(),
   ]);
 };
 
