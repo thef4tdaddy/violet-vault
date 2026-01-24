@@ -1,11 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/core/common/logger.ts";
+import { useReceiptMutations } from "./useReceiptMutations";
 
 // Receipt type definition
-interface Receipt {
+export interface Receipt {
   id: string;
   date?: string;
   merchant?: string;
@@ -28,6 +29,7 @@ interface Receipt {
 
 const useReceipts = () => {
   const queryClient = useQueryClient();
+  const mutations = useReceiptMutations();
 
   // Event listeners for data import and sync invalidation
   useEffect(() => {
@@ -52,7 +54,6 @@ const useReceipts = () => {
 
   const queryFunction = async (): Promise<Receipt[]> => {
     try {
-      // Note: receipts table may not exist in budgetDb
       // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       const receipts = await budgetDb.receipts?.orderBy("date").reverse().toArray();
       return receipts || [];
@@ -76,112 +77,33 @@ const useReceipts = () => {
     enabled: true,
   });
 
-  const addReceiptMutation = useMutation({
-    mutationKey: ["receipts", "add"],
-    mutationFn: async (receiptData: Partial<Receipt>) => {
-      const receipt: Receipt = {
-        id: crypto.randomUUID(),
-        ...receiptData,
-        processingStatus: "completed",
-        lastModified: Date.now(),
-      };
-
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
-      await budgetDb.receipts?.put(receipt);
-      return receipt;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.receipts });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
-    },
-  });
-
-  const updateReceiptMutation = useMutation({
-    mutationKey: ["receipts", "update"],
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Receipt> }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
-      await budgetDb.receipts?.update(id, {
-        ...updates,
-        lastModified: Date.now(),
-      });
-      return { id, ...updates };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.receipts });
-    },
-  });
-
-  const deleteReceiptMutation = useMutation({
-    mutationKey: ["receipts", "delete"],
-    mutationFn: async (id: string) => {
-      // Get receipt data before deletion for cleanup
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
-      const receipt = await budgetDb.receipts?.get(id);
-
-      if (receipt?.imageData?.url) {
-        // Clean up object URL
-        URL.revokeObjectURL(receipt.imageData.url);
-      }
-
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
-      await budgetDb.receipts?.delete(id);
-      return id;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.receipts });
-    },
-  });
-
-  const linkReceiptToTransactionMutation = useMutation({
-    mutationKey: ["receipts", "linkTransaction"],
-    mutationFn: async ({
-      receiptId,
-      transactionId,
-    }: {
-      receiptId: string;
-      transactionId: string;
-    }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
-      await budgetDb.receipts?.update(receiptId, {
-        transactionId,
-        lastModified: Date.now(),
-      });
-      return { receiptId, transactionId };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.receipts });
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
-    },
-  });
+  const allReceipts = receiptsQuery.data || [];
 
   // Utility functions
-  const getReceiptById = (id: string) => (receiptsQuery.data || []).find((r) => r.id === id);
+  const getReceiptById = (id: string) => allReceipts.find((r) => r.id === id);
 
   const getReceiptsByMerchant = (merchant: string) =>
-    (receiptsQuery.data || []).filter(
+    allReceipts.filter(
       (r) => r.merchant && r.merchant.toLowerCase().includes(merchant.toLowerCase())
     );
 
   const getReceiptsByDateRange = (startDate: string, endDate: string) =>
-    (receiptsQuery.data || []).filter((r) => {
+    allReceipts.filter((r) => {
       if (!r.date) return false;
       const receiptDate = new Date(r.date);
       return receiptDate >= new Date(startDate) && receiptDate <= new Date(endDate);
     });
 
-  const getUnlinkedReceipts = () => (receiptsQuery.data || []).filter((r) => !r.transactionId);
+  const getUnlinkedReceipts = () => allReceipts.filter((r) => !r.transactionId);
 
   const getReceiptsForTransaction = (transactionId: string) =>
-    (receiptsQuery.data || []).filter((r) => r.transactionId === transactionId);
+    allReceipts.filter((r) => r.transactionId === transactionId);
 
   // SentinelShare matching utilities
   const getPendingMatchReceipts = () =>
-    (receiptsQuery.data || []).filter(
-      (r) => !r.transactionId && r.processingStatus === "completed"
-    );
+    allReceipts.filter((r) => !r.transactionId && r.processingStatus === "completed");
 
   const getReceiptMatchStats = () => {
-    const allReceipts = receiptsQuery.data || [];
     const linked = allReceipts.filter((r) => r.transactionId);
     const unlinked = allReceipts.filter((r) => !r.transactionId);
     const pending = unlinked.filter((r) => r.processingStatus === "completed");
@@ -196,20 +118,13 @@ const useReceipts = () => {
   };
 
   return {
-    receipts: receiptsQuery.data || [],
+    receipts: allReceipts,
     isLoading: receiptsQuery.isLoading,
     isFetching: receiptsQuery.isFetching,
     isError: receiptsQuery.isError,
     error: receiptsQuery.error,
 
-    addReceipt: addReceiptMutation.mutate,
-    addReceiptAsync: addReceiptMutation.mutateAsync,
-    updateReceipt: updateReceiptMutation.mutate,
-    updateReceiptAsync: updateReceiptMutation.mutateAsync,
-    deleteReceipt: deleteReceiptMutation.mutate,
-    deleteReceiptAsync: deleteReceiptMutation.mutateAsync,
-    linkReceiptToTransaction: linkReceiptToTransactionMutation.mutate,
-    linkReceiptToTransactionAsync: linkReceiptToTransactionMutation.mutateAsync,
+    ...mutations,
 
     // Utility functions
     getReceiptById,

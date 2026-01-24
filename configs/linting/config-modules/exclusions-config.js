@@ -442,4 +442,17 @@ export default [
       "enforce-ui-library/enforce-ui-library": "off",
     },
   },
+  {
+    // Test files - relax rules to allow for common testing patterns and legacy code
+    files: ["**/*.test.{js,jsx,ts,tsx}", "**/__tests__/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "no-console": "off",
+      "max-lines": "off",
+      "max-lines-per-function": "off",
+      "max-statements": "off",
+      complexity: "off",
+      "@typescript-eslint/no-explicit-any": "off", // Mocks often need any
+      "react/display-name": "off", // Mock components don't need display names
+    },
+  },
 ];

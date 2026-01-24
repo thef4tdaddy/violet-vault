@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import {
   renderConfidenceIndicator,
   formatFileSize,
@@ -37,7 +38,7 @@ describe("receiptHelpers", () => {
     });
 
     it("should render default confidence indicator for unknown values", () => {
-      const result = render(renderConfidenceIndicator("field", "unknown"));
+      const result = render(renderConfidenceIndicator("field", "none" as any));
       const icon = result.container.querySelector("svg");
       expect(icon).toHaveClass("text-gray-400");
     });
@@ -105,11 +106,11 @@ describe("receiptHelpers", () => {
     it("should reject data with invalid total", () => {
       const invalidData = {
         merchant: "Test Store",
-        total: "invalid",
+        total: NaN, // Using NaN instead of string to match ReceiptData type while testing invalidity
         date: "2024-01-01",
       };
 
-      const result = validateReceiptData(invalidData);
+      const result = validateReceiptData(invalidData as any);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Valid total amount is required");
     });
@@ -139,9 +140,9 @@ describe("receiptHelpers", () => {
     });
 
     it("should handle invalid inputs", () => {
-      expect(formatCurrency(null)).toBe("$0.00");
-      expect(formatCurrency(undefined)).toBe("$0.00");
-      expect(formatCurrency("invalid")).toBe("$0.00");
+      expect(formatCurrency(null as any)).toBe("$0.00");
+      expect(formatCurrency(undefined as any)).toBe("$0.00");
+      expect(formatCurrency("invalid" as any)).toBe("$0.00");
     });
   });
 
@@ -167,7 +168,7 @@ describe("receiptHelpers", () => {
     });
 
     it("should return false for null data", () => {
-      expect(isReceiptDataComplete(null)).toBe(false);
+      expect(isReceiptDataComplete(null as any)).toBe(false);
     });
   });
 
@@ -295,8 +296,8 @@ describe("receiptHelpers", () => {
 
     it("should handle invalid inputs", () => {
       expect(getConfidenceDescription(NaN)).toBe("Unknown");
-      expect(getConfidenceDescription(null)).toBe("Unknown");
-      expect(getConfidenceDescription(undefined)).toBe("Unknown");
+      expect(getConfidenceDescription(null as any)).toBe("Unknown");
+      expect(getConfidenceDescription(undefined as any)).toBe("Unknown");
     });
   });
 
@@ -314,9 +315,6 @@ describe("receiptHelpers", () => {
     it("should return orange for low confidence (>= 0.4)", () => {
       expect(getConfidenceColor(0.4)).toBe("orange");
       expect(getConfidenceColor(0.5)).toBe("orange");
-    });
-
-    it("should return gray for very low confidence (< 0.4)", () => {
       expect(getConfidenceColor(0.3)).toBe("gray");
       expect(getConfidenceColor(0.1)).toBe("gray");
       expect(getConfidenceColor(0)).toBe("gray");
@@ -324,8 +322,8 @@ describe("receiptHelpers", () => {
 
     it("should return gray for invalid inputs", () => {
       expect(getConfidenceColor(NaN)).toBe("gray");
-      expect(getConfidenceColor(null)).toBe("gray");
-      expect(getConfidenceColor(undefined)).toBe("gray");
+      expect(getConfidenceColor(null as any)).toBe("gray");
+      expect(getConfidenceColor(undefined as any)).toBe("gray");
     });
   });
 
