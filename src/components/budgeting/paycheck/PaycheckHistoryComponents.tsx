@@ -44,7 +44,7 @@ interface PaycheckStatsDisplayProps {
  * Statistics summary component
  */
 export const PaycheckStatsDisplay: React.FC<PaycheckStatsDisplayProps> = ({ paycheckStats }) => (
-  <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-gray-200 rounded-xl p-4">
+  <div className="bg-linear-to-r from-green-50 to-blue-50 border border-gray-200 rounded-xl p-4">
     <h3 className="font-semibold text-gray-900 flex items-center mb-3">
       {React.createElement(getIcon("TrendingUp"), {
         className: "h-4 w-4 mr-2 text-green-600",

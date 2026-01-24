@@ -4,6 +4,7 @@
  */
 import React from "react";
 import { getIcon } from "@/utils/ui/icons";
+import { getConfidenceColor as getConsolidatedColor } from "./matchingAlgorithm";
 
 // Define types
 interface ReceiptData {
@@ -92,11 +93,13 @@ export const formatCurrency = (amount: number) => {
 /**
  * Format date for display
  */
-export const formatDisplayDate = (dateString: string) => {
+export const formatDisplayDate = (
+  dateString: string | Date | number | undefined | null
+): string => {
   if (!dateString) return "No date";
 
   try {
-    const date = new Date(dateString);
+    const date = dateString instanceof Date ? dateString : new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "short",
@@ -104,7 +107,7 @@ export const formatDisplayDate = (dateString: string) => {
       timeZone: "UTC",
     }).format(date);
   } catch {
-    return dateString;
+    return String(dateString);
   }
 };
 
@@ -123,13 +126,10 @@ export const getConfidenceDescription = (confidence: number) => {
 
 /**
  * Get confidence level color for UI
+ * @deprecated Use getConfidenceColor from matchingAlgorithm.ts for consolidated logic
  */
 export const getConfidenceColor = (confidence: number) => {
-  if (confidence == null || isNaN(confidence)) return "gray";
-
-  if (confidence >= 0.8) return "green";
-  if (confidence >= 0.6) return "yellow";
-  return "red";
+  return getConsolidatedColor(confidence);
 };
 
 /**
@@ -237,7 +237,7 @@ export const renderConfidenceIndicator = (_field: string, confidence: Confidence
   const confidenceMap: Record<ConfidenceLevel, { color: string; iconName: string }> = {
     high: { color: "text-green-600", iconName: "CheckCircle" },
     medium: { color: "text-yellow-600", iconName: "CheckCircle" },
-    low: { color: "text-red-600", iconName: "XCircle" },
+    low: { color: "text-orange-600", iconName: "XCircle" },
     none: { color: "text-gray-400", iconName: "XCircle" },
   };
 
