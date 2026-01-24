@@ -19,7 +19,9 @@ export interface BillQueryOptions {
   category?: string;
   sortBy?: string;
   sortOrder?: string;
+  enabled?: boolean;
 }
+// Joe: Adding enabled flag for conditional fetching in TanStack Query.
 
 // Phase 2 Migration: Bills are now Scheduled Transactions
 // A bill is a scheduled expense transaction with isScheduled=true
@@ -229,7 +231,7 @@ export const useBillsQuery = (options: BillQueryOptions = {}) => {
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData,
     initialData: undefined,
-    enabled: true,
+    enabled: options.enabled !== false,
   });
 };
 export const useUpcomingBillsQuery = (daysAhead = 30, billsData: BillTransaction[] = []) => {
