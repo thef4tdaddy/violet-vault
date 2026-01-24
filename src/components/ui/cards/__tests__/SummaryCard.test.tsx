@@ -1,3 +1,8 @@
+/**
+ * @vitest-environment jsdom
+ */
+import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach } from "vitest";
@@ -193,7 +198,7 @@ describe("SummaryCard", () => {
     it("should have gradient background", () => {
       const { container } = render(<SummaryCard label="Test" value="100" />);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass("bg-gradient-to-br");
+      expect(card).toHaveClass("bg-linear-to-br");
     });
 
     it("should have transition effects", () => {

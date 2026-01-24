@@ -64,7 +64,7 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
               {txn.description}
             </div>
             {txn.notes && (
-              <div className="text-xs text-gray-500 overflow-y-auto max-h-16 pr-2 mt-1 whitespace-pre-wrap break-words">
+              <div className="text-xs text-gray-500 overflow-y-auto max-h-16 pr-2 mt-1 whitespace-pre-wrap wrap-break-word">
                 {txn.notes}
               </div>
             )}
@@ -89,7 +89,7 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
           return (
             <div className="flex items-center min-w-0">
               <div
-                className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
+                className="w-3 h-3 rounded-full mr-2 shrink-0"
                 style={{ backgroundColor: color }}
               />
               <span className={`${className} truncate`}>{name}</span>
@@ -121,12 +121,12 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
                 e.stopPropagation();
                 onSplit(txn);
               }}
-              className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors whitespace-nowrap shrink-0"
               title="Split transaction"
               aria-label="Split transaction"
             >
               {React.createElement(getIcon("SplitSquareHorizontal"), {
-                className: "h-4 w-4 flex-shrink-0",
+                className: "h-4 w-4 shrink-0",
               })}
               <span className="hidden xl:inline font-semibold">Split</span>
             </Button>
@@ -135,11 +135,11 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
                 e.stopPropagation();
                 onHistoryClick(txn);
               }}
-              className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors whitespace-nowrap shrink-0"
               title="View history"
               aria-label="View history"
             >
-              {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4 flex-shrink-0" })}
+              {React.createElement(getIcon("ClockHistory"), { className: "h-4 w-4 shrink-0" })}
               <span className="hidden xl:inline font-semibold">History</span>
             </Button>
             <Button
@@ -147,11 +147,11 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
                 e.stopPropagation();
                 onEdit(txn);
               }}
-              className="flex items-center gap-1.5 px-2 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors whitespace-nowrap shrink-0"
               title="Edit transaction"
               aria-label="Edit transaction"
             >
-              {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4 flex-shrink-0" })}
+              {React.createElement(getIcon("PencilLine"), { className: "h-4 w-4 shrink-0" })}
               <span className="hidden xl:inline font-semibold">Edit</span>
             </Button>
             <Button
@@ -159,11 +159,11 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
                 e.stopPropagation();
                 onDeleteClick(txn);
               }}
-              className="flex items-center gap-1.5 px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors whitespace-nowrap shrink-0"
               title="Delete transaction"
               aria-label="Delete transaction"
             >
-              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 flex-shrink-0" })}
+              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 shrink-0" })}
               <span className="hidden xl:inline font-semibold">Delete</span>
             </Button>
           </div>

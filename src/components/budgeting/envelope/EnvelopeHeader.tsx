@@ -38,7 +38,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
             onToggleCollapse();
           }, "light")}
           className={getButtonClasses(
-            "md:hidden flex-shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
+            "md:hidden shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
             "small"
           )}
           aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
@@ -53,7 +53,7 @@ export const EnvelopeHeader: React.FC<EnvelopeHeaderProps> = React.memo(
             {/* Color indicator */}
             {envelope.color && (
               <div
-                className="w-3 h-3 rounded-full flex-shrink-0"
+                className="w-3 h-3 rounded-full shrink-0"
                 style={{ backgroundColor: envelope.color }}
                 title={`Color: ${envelope.color}`}
               />
