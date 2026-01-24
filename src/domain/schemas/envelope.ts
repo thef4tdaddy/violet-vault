@@ -113,6 +113,8 @@ export const LiabilityEnvelopeSchema = EnvelopeBaseSchema.extend({
   originalBalance: z.number().nonnegative().nullable().optional(),
   creditor: z.string().min(1, "Creditor is required").max(100).optional(),
   isPaid: z.boolean().default(false),
+  monthlyBudget: z.number().min(0).optional(),
+  biweeklyAllocation: z.number().min(0).optional(),
   // Backward compatibility & Extended properties
   envelopeId: z.string().optional(),
   isRecurring: z.boolean().optional(),

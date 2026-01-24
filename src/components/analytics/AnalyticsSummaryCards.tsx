@@ -1,4 +1,6 @@
-import { MetricCard } from "../primitives/cards/MetricCard";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 interface SummaryMetrics {
   totalExpenses?: number;
@@ -118,14 +120,29 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }: { summaryMetrics?: Summa
             : undefined;
 
         return (
-          <MetricCard
+          <PageSummaryCard
             key={card.key}
-            icon={card.icon}
-            title={card.title}
-            value={val as number | string}
-            subtitle={card.subtitle}
-            variant={card.variant}
-            format={fmt}
+            icon={getIcon(card.icon as string)}
+            label={card.title}
+            value={
+              fmt === "currency"
+                ? formatCurrency(val as number)
+                : fmt === "percentage"
+                  ? `${(val as number).toFixed(1)}%`
+                  : String(val)
+            }
+            subtext={card.subtitle}
+            color={
+              card.variant === "info"
+                ? "blue"
+                : card.variant === "danger"
+                  ? "red"
+                  : card.variant === "success"
+                    ? "green"
+                    : card.variant === "warning"
+                      ? "orange"
+                      : "blue"
+            }
             onClick={() => {}}
           />
         );

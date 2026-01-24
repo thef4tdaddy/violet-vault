@@ -1,6 +1,5 @@
 import React from "react";
-import { Card } from "./Card";
-import { getIcon } from "@/utils";
+import { getIcon, type IconComponent } from "@/utils";
 
 export interface MetricCardProps {
   title: string;
@@ -52,13 +51,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   loading = false,
   onClick,
 }) => {
-  // Variant colors
-  const variantColors = {
-    default: "text-purple-600",
-    success: "text-emerald-600",
-    warning: "text-amber-600",
-    danger: "text-red-600",
-    info: "text-cyan-600",
+  // Variant background colors for circles
+  const variantBgColors = {
+    default: "bg-purple-600",
+    success: "bg-emerald-600",
+    warning: "bg-amber-600",
+    danger: "bg-red-600",
+    info: "bg-cyan-600",
   };
 
   // Format value based on format type
@@ -131,48 +130,72 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     );
   };
 
-  const Icon = icon ? getIcon(icon) : null;
+  const Icon: IconComponent | null = icon ? getIcon(icon) : null;
 
   // Loading state skeleton
   if (loading) {
     return (
-      <Card variant="default" padding="md">
+      <div className="bg-white rounded-2xl p-6 hard-border h-full flex flex-col justify-between">
         <div className="animate-pulse">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-5 w-5 bg-gray-300 rounded"></div>
-            <div className="h-4 bg-gray-300 rounded w-24"></div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-24"></div>
           </div>
-          <div className="h-8 bg-gray-300 rounded w-32 mb-2"></div>
-          {subtitle && <div className="h-3 bg-gray-300 rounded w-20"></div>}
+          <div className="h-10 bg-gray-200 rounded w-32 mb-2"></div>
+          {subtitle && <div className="h-3 bg-gray-200 rounded w-20"></div>}
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card variant="default" padding="md" onClick={onClick}>
-      <div className="space-y-3">
-        {/* Icon and Title */}
-        <div className="flex items-center gap-3">
+    <div
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      className={`bg-white rounded-2xl p-6 hard-border h-full flex flex-col justify-between transition-all duration-300 active:scale-95 ${onClick ? "cursor-pointer hover:bg-gray-50 shadow-lg" : ""}`}
+    >
+      <div className="space-y-4">
+        {/* Icon (Circular) and Title */}
+        <div className="flex items-center gap-4">
           {Icon && (
-            <div className="flex-shrink-0">
+            <div
+              data-testid="metric-card-icon-container"
+              className={`shrink-0 h-12 w-12 rounded-full ${variantBgColors[variant]} flex items-center justify-center shadow-md border border-white/20`}
+            >
               {React.createElement(Icon, {
-                className: `h-5 w-5 ${variantColors[variant]}`,
+                className: "h-6 w-6 text-white",
+                "data-testid": "mock-icon",
               })}
             </div>
           )}
-          <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+          <h3 className="text-sm font-black uppercase tracking-wider text-gray-500">{title}</h3>
         </div>
 
         {/* Value and Change */}
-        <div className="flex items-baseline justify-between gap-4">
-          <div className="text-3xl font-bold text-gray-900">{formatValue(value)}</div>
+        <div className="flex flex-col gap-1">
+          <div className="text-3xl font-black text-black tracking-tight">{formatValue(value)}</div>
           {getChangeIndicator()}
         </div>
-
-        {/* Subtitle */}
-        {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
       </div>
-    </Card>
+
+      {/* Subtitle */}
+      {subtitle && (
+        <p className="text-xs font-bold text-gray-400 mt-4 pt-4 border-t border-gray-100 flex items-center">
+          {React.createElement(getIcon("Info"), { className: "h-3 w-3 mr-1" })}
+          {subtitle}
+        </p>
+      )}
+    </div>
   );
 };

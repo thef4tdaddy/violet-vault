@@ -22,7 +22,7 @@ const RecentTransactionsWidget = ({
   }
 
   return (
-    <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
+    <div className="bg-white rounded-2xl p-6 hard-border shadow-lg">
       <h3 className="font-black text-black text-base mb-4">
         <span className="text-lg">R</span>ECENT <span className="text-lg">T</span>RANSACTIONS
       </h3>

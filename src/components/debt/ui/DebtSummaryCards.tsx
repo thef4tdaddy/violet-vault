@@ -1,4 +1,6 @@
-import { MetricCard } from "../../primitives/cards/MetricCard";
+import PageSummaryCard from "../../ui/PageSummaryCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 import type { DebtStats } from "@/types/debt";
 
 interface DebtSummaryCardsProps {
@@ -13,37 +15,33 @@ interface DebtSummaryCardsProps {
 const DebtSummaryCards = ({ stats, onDueSoonClick }: DebtSummaryCardsProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <MetricCard
-        icon="DollarSign"
-        title="Total Debt"
-        value={stats.totalDebt}
-        variant="danger"
-        format="currency"
-        subtitle={`${stats.activeDebtCount} active debts`}
+      <PageSummaryCard
+        icon={getIcon("DollarSign")}
+        label="Total Debt"
+        value={formatCurrency(stats.totalDebt)}
+        color="red"
+        subtext={`${stats.activeDebtCount} active debts`}
       />
-      <MetricCard
-        icon="TrendingDown"
-        title="Monthly Payments"
-        value={stats.totalMonthlyPayments}
-        variant="warning"
-        format="currency"
-        subtitle="Required minimum payments"
+      <PageSummaryCard
+        icon={getIcon("TrendingDown")}
+        label="Monthly Payments"
+        value={formatCurrency(stats.totalMonthlyPayments)}
+        color="orange"
+        subtext="Required minimum payments"
       />
-      <MetricCard
-        icon="Percent"
-        title="Avg Interest Rate"
-        value={stats.averageInterestRate}
-        variant="info"
-        format="percentage"
-        subtitle="Weighted by balance"
+      <PageSummaryCard
+        icon={getIcon("Percent")}
+        label="Avg Interest Rate"
+        value={`${stats.averageInterestRate.toFixed(2)}%`}
+        color="blue"
+        subtext="Weighted by balance"
       />
-      <MetricCard
-        icon="Calendar"
-        title="Due Soon"
-        value={stats.dueSoonAmount}
-        variant="warning"
-        format="currency"
-        subtitle={`${stats.dueSoonCount} payments this week`}
+      <PageSummaryCard
+        icon={getIcon("Calendar")}
+        label="Due Soon"
+        value={formatCurrency(stats.dueSoonAmount)}
+        color="orange"
+        subtext={`${stats.dueSoonCount} payments this week`}
         onClick={stats.dueSoonCount > 0 ? onDueSoonClick : undefined}
       />
     </div>

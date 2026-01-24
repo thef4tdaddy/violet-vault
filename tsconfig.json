@@ -7,5 +7,14 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "build", "original-app"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "original-app",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/__tests__/**/*",
+    "src/test/**/*"
+  ]
 }

@@ -2,19 +2,17 @@ import React from "react";
 import { getIcon } from "@/utils";
 import Button from "../ui/buttons/Button";
 
-interface AccountsHeaderProps {
-  totalValue: number;
-  showBalances: boolean;
-  onToggleBalances: () => void;
-  onAddAccount: () => void;
-}
-
 const AccountsHeader = ({
   totalValue,
+  onAddAccount,
   showBalances,
   onToggleBalances,
-  onAddAccount,
-}: AccountsHeaderProps) => {
+}: {
+  totalValue: number;
+  onAddAccount: () => void;
+  showBalances?: boolean;
+  onToggleBalances?: () => void;
+}) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex-1 min-w-0">
@@ -44,8 +42,19 @@ const AccountsHeader = ({
             </div>
           </div>
         </h3>
-        <p className="text-sm text-purple-900 mt-1 font-medium ml-12 sm:ml-16">
-          Total: ${totalValue.toFixed(2)}
+        <p className="text-sm text-purple-900 mt-1 font-medium ml-12 sm:ml-16 flex items-center">
+          Total: {showBalances ? `$${totalValue.toFixed(2)}` : "****"}
+          {onToggleBalances && (
+            <Button
+              onClick={onToggleBalances}
+              className="ml-2 p-1 text-purple-900/60 hover:text-purple-900 transition-colors"
+              title={showBalances ? "Hide balances" : "Show balances"}
+            >
+              {React.createElement(getIcon(showBalances ? "Eye" : "EyeOff"), {
+                className: "h-3.5 w-3.5",
+              })}
+            </Button>
+          )}
         </p>
       </div>
 
@@ -62,7 +71,7 @@ const AccountsHeader = ({
         </Button>
         <Button
           onClick={onAddAccount}
-          className="btn btn-primary border-2 border-black text-sm flex items-center"
+          className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black shadow-lg"
         >
           {React.createElement(getIcon("Plus"), { className: "h-3 w-3 mr-1" })}
           Add Account

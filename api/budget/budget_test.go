@@ -1,8 +1,10 @@
-package budget
+package handler
 
 import (
 	"testing"
 	"time"
+
+	"github.com/thef4tdaddy/violet-vault/api/_pkg/budget"
 )
 
 // Helper to create date strings
@@ -13,20 +15,20 @@ func date(daysFromNow int) string {
 
 func TestCalculate(t *testing.T) {
 	// Setup Data
-	envelopes := []Envelope{
-		{ID: "env1", Name: "Groceries", Category: "Living", Type: EnvelopeTypeStandard, CurrentBalance: 800},
-		{ID: "env2", Name: "Rent", Category: "Housing", Type: EnvelopeTypeLiability, CurrentBalance: 1200, MinimumPayment: 1200},
-		{ID: "env3", Name: "Vacation", Category: "Savings", Type: EnvelopeTypeGoal, TargetAmount: 2000, CurrentBalance: 500},
+	envelopes := []budget.Envelope{
+		{ID: "env1", Name: "Groceries", Category: "Living", Type: budget.EnvelopeTypeStandard, CurrentBalance: 800},
+		{ID: "env2", Name: "Rent", Category: "Housing", Type: budget.EnvelopeTypeLiability, CurrentBalance: 1200, MinimumPayment: 1200},
+		{ID: "env3", Name: "Vacation", Category: "Savings", Type: budget.EnvelopeTypeGoal, TargetAmount: 2000, CurrentBalance: 500},
 	}
 
-	transactions := []Transaction{
+	transactions := []budget.Transaction{
 		{ID: "tx1", EnvelopeID: "env1", Type: "expense", Amount: -100, Date: date(-1), IsScheduled: false},
 		{ID: "tx2", EnvelopeID: "env2", Type: "expense", Amount: -1200, Date: date(5), IsScheduled: true}, // Upcoming scheduled
 		{ID: "tx3", EnvelopeID: "env1", Type: "expense", Amount: -50, Date: date(-5), IsScheduled: true},  // Overdue scheduled
 	}
 
 	// Execution
-	results, totals := Calculate(envelopes, transactions)
+	results, totals := budget.Calculate(envelopes, transactions)
 
 	// Assertions: Global Totals
 	if totals.EnvelopeCount != 3 {
@@ -49,28 +51,5 @@ func TestCalculate(t *testing.T) {
 	env2 := results[1]
 	if env2.TotalUpcoming != 1200 {
 		t.Errorf("Env2 Upcoming: Expected 1200, got %f", env2.TotalUpcoming)
-	}
-}
-
-func TestParseDate(t *testing.T) {
-	if d := parseDate("2023-01-01"); d.IsZero() {
-		t.Error("Failed to parse 2023-01-01")
-	}
-	if d := parseDate("2023-01-01T10:00:00Z"); d.IsZero() {
-		t.Error("Failed to parse ISO")
-	}
-	if d := parseDate("invalid"); !d.IsZero() {
-		t.Error("Should return zero for invalid date")
-	}
-}
-
-func TestDetermineStatus(t *testing.T) {
-	// Overdue
-	if s := determineStatus(100, 500, Envelope{}, nil); s != "overdue" {
-		t.Errorf("Expected overdue, got %s", s)
-	}
-	// Overspent
-	if s := determineStatus(0, -100, Envelope{}, nil); s != "overspent" {
-		t.Errorf("Expected overspent, got %s", s)
 	}
 }

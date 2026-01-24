@@ -111,7 +111,7 @@ export class WebSocketSignalingService {
    */
   public sendSignal(type: WebSocketSignalType, metadata?: Record<string, unknown>): void {
     if (!this.ws || this.status !== "connected") {
-      logger.warn("Cannot send signal - WebSocket not connected", { type });
+      logger.debug("Cannot send signal - WebSocket not connected", { type });
       return;
     }
 

@@ -2,30 +2,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
+import type { Receipt } from "@/db/types";
 import logger from "@/utils/core/common/logger.ts";
 import { useReceiptMutations } from "./useReceiptMutations";
-
-// Receipt type definition
-export interface Receipt {
-  id: string;
-  date?: string;
-  merchant?: string;
-  amount?: number;
-  imageData?: {
-    url?: string;
-  };
-  transactionId?: string;
-  processingStatus?: string;
-  lastModified: number;
-  ocrData?: {
-    rawText?: string;
-    confidence?: number;
-    items?: unknown[];
-    tax?: number;
-    subtotal?: number;
-    processingTime?: number;
-  };
-}
 
 const useReceipts = () => {
   const queryClient = useQueryClient();
@@ -54,14 +33,10 @@ const useReceipts = () => {
 
   const queryFunction = async (): Promise<Receipt[]> => {
     try {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       const receipts = await budgetDb.receipts?.orderBy("date").reverse().toArray();
       return receipts || [];
     } catch (error) {
-      logger.warn("Dexie query failed", {
-        error: (error as Error).message,
-        source: "useReceipts",
-      });
+      logger.error("Failed to fetch receipts from Dexie", { error });
       return [];
     }
   };
@@ -77,32 +52,51 @@ const useReceipts = () => {
     enabled: true,
   });
 
-  const allReceipts = receiptsQuery.data || [];
+  const allReceipts: Receipt[] = receiptsQuery.data || [];
 
   // Utility functions
-  const getReceiptById = (id: string) => allReceipts.find((r) => r.id === id);
+  const getReceiptById = (id: string) => allReceipts.find((r: Receipt) => r.id === id);
 
   const getReceiptsByMerchant = (merchant: string) =>
     allReceipts.filter(
-      (r) => r.merchant && r.merchant.toLowerCase().includes(merchant.toLowerCase())
+      (r: Receipt) => r.merchant && r.merchant.toLowerCase().includes(merchant.toLowerCase())
     );
 
-  const getReceiptsByDateRange = (startDate: string, endDate: string) =>
-    allReceipts.filter((r) => {
-      if (!r.date) return false;
+  const getReceiptsByDateRange = (startDate: Date, endDate: Date) =>
+    allReceipts.filter((r: Receipt) => {
       const receiptDate = new Date(r.date);
-      return receiptDate >= new Date(startDate) && receiptDate <= new Date(endDate);
+      return receiptDate >= startDate && receiptDate <= endDate;
     });
 
-  const getUnlinkedReceipts = () => allReceipts.filter((r) => !r.transactionId);
+  const getReceiptsByEnvelope = (envelopeId: string) =>
+    allReceipts.filter((r: Receipt) => r.envelopeId === envelopeId);
+
+  const getPendingReceipts = () => allReceipts.filter((r: Receipt) => !r.isProcessed);
+
+  const getMatchedReceipts = () => allReceipts.filter((r: Receipt) => r.isProcessed);
+
+  const getHighConfidenceReceipts = (threshold = 0.8) =>
+    allReceipts.filter((r: Receipt) => ((r.confidence as number) || 0) >= threshold);
+
+  const getLowConfidenceReceipts = (threshold = 0.5) =>
+    allReceipts.filter((r: Receipt) => ((r.confidence as number) || 0) < threshold);
+
+  const getCategorizedReceipts = () => allReceipts.filter((r: Receipt) => !!r.category);
+
+  const getUncategorizedReceipts = () => allReceipts.filter((r: Receipt) => !r.category);
+
+  const getReceiptsWithTotal = (minTotal: number) =>
+    allReceipts.filter((r: Receipt) => ((r.total as number) || 0) >= minTotal);
+
+  const getUnlinkedReceipts = () => allReceipts.filter((r: Receipt) => !r.transactionId);
 
   const getReceiptsForTransaction = (transactionId: string) =>
-    allReceipts.filter((r) => r.transactionId === transactionId);
+    allReceipts.filter((r: Receipt) => r.transactionId === transactionId);
+
+  const getPendingMatchReceipts = () =>
+    allReceipts.filter((r: Receipt) => !r.transactionId && r.processingStatus === "completed");
 
   // SentinelShare matching utilities
-  const getPendingMatchReceipts = () =>
-    allReceipts.filter((r) => !r.transactionId && r.processingStatus === "completed");
-
   const getReceiptMatchStats = () => {
     const linked = allReceipts.filter((r) => r.transactionId);
     const unlinked = allReceipts.filter((r) => !r.transactionId);
@@ -130,6 +124,14 @@ const useReceipts = () => {
     getReceiptById,
     getReceiptsByMerchant,
     getReceiptsByDateRange,
+    getReceiptsByEnvelope,
+    getPendingReceipts,
+    getMatchedReceipts,
+    getHighConfidenceReceipts,
+    getLowConfidenceReceipts,
+    getCategorizedReceipts,
+    getUncategorizedReceipts,
+    getReceiptsWithTotal,
     getUnlinkedReceipts,
     getReceiptsForTransaction,
 

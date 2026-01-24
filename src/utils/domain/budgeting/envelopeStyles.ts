@@ -5,6 +5,7 @@ import {
 } from "@/constants/categories";
 
 interface EnvelopeWithType {
+  type?: string;
   envelopeType?: EnvelopeType;
   category?: string;
 }
@@ -17,11 +18,35 @@ interface EnvelopeWithStatus extends EnvelopeWithType {
  * Get styling based on envelope type
  */
 export const getEnvelopeTypeStyle = (envelope: EnvelopeWithType): string => {
-  const envelopeType =
-    envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "");
+  let envelopeType =
+    envelope.envelopeType ||
+    (envelope.type as EnvelopeType) ||
+    AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "");
+
+  // Map liability types to bill styling
+  const liabilityTypes = [
+    "liability",
+    "credit_card",
+    "mortgage",
+    "auto",
+    "student",
+    "personal",
+    "business",
+    "other",
+    "chapter13",
+  ];
+
+  if (liabilityTypes.includes(envelopeType)) {
+    envelopeType = "bill";
+  }
+
   const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
   if (!config) {
+    // Fallback to variable/standard if type config missing
+    if (envelopeType === "standard") {
+      return "border-orange-500 bg-orange-50";
+    }
     return "border-gray-200 bg-gray-50";
   }
 

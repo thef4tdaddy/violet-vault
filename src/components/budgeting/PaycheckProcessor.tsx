@@ -60,7 +60,7 @@ const PaycheckProcessor: React.FC<PaycheckProcessorProps> = ({
       <PaycheckHeader />
 
       {/* Process New Paycheck Section */}
-      <div className="glassmorphism rounded-3xl p-8">
+      <div className="glassmorphism rounded-3xl p-8 border-2 border-black">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
           <PaycheckForm processor={processor} />

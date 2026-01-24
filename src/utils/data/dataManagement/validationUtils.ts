@@ -18,6 +18,9 @@ interface CurrentUser {
  */
 export type ValidatedImportData = ImportedData & {
   allTransactions: Record<string, unknown>[];
+  budget?: unknown[];
+  budgetCommits?: unknown[];
+  budgetChanges?: unknown[];
 };
 
 export interface ValidationResult {

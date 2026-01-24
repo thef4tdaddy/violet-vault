@@ -50,11 +50,9 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             ref={ref}
             id={inputId}
             disabled={disabled}
-            className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-offset-2 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed ${
+            className={`w-full p-3 hard-border rounded-lg focus:ring-2 focus:ring-offset-2 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed ${
               icon ? "pl-10" : ""
-            } ${
-              error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-            } ${className}`}
+            } ${error ? "border-red-500 focus:ring-red-500" : "focus:ring-brand-500"} ${className}`}
             {...props}
           />
         </div>

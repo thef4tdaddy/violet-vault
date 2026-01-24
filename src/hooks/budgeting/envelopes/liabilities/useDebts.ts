@@ -10,22 +10,30 @@ import type { LiabilityEnvelope } from "@/db/types";
 // Query function for fetching debts
 const fetchDebtsWithMigration = async () => {
   try {
-    const envelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
-    const debts = envelopes as LiabilityEnvelope[];
+    // Broaden search to include all liability-related types from unified schema
+    const allEnvelopes = await budgetDb.envelopes.toArray();
+    const liabilityTypes = ["liability", "credit_card", "student", "auto", "personal", "mortgage"];
+    const debts = allEnvelopes.filter((env) =>
+      liabilityTypes.includes(env.type)
+    ) as LiabilityEnvelope[];
 
-    // One-time migration: Fix debts with undefined status
-    const debtsNeedingStatus = debts.filter((debt) => !debt.status);
-    if (debtsNeedingStatus.length > 0) {
-      logger.info(`🔧 Fixing ${debtsNeedingStatus.length} debts with undefined status`);
-      for (const debt of debtsNeedingStatus) {
-        // Explicitly cast to Record<string, unknown> to allow partial updates of legacy data
+    // One-time migration: Fix debts with undefined status or normalize types
+    const needsUpdate = debts.filter((debt) => !debt.status || debt.type !== "liability");
+    if (needsUpdate.length > 0) {
+      logger.info(`🔧 Normalizing ${needsUpdate.length} debts`);
+      for (const debt of needsUpdate) {
         await budgetDb.updateEnvelope(debt.id, {
-          status: "active",
+          status: debt.status || "active",
+          // We keep the original type for sub-categorization but ensure internal logic treats as liability
+          // In v2.0, we actually want to keep granular types but ensure they are retrieved
+          lastModified: Date.now(),
         } as Partial<LiabilityEnvelope>);
-        logger.debug(`✅ Updated debt "${debt.name}" status to active`);
       }
-      const updatedEnvelopes = await budgetDb.envelopes.where("type").equals("liability").toArray();
-      return updatedEnvelopes as LiabilityEnvelope[];
+      // Re-fetch after updates
+      const updatedEnvelopes = await budgetDb.envelopes.toArray();
+      return updatedEnvelopes.filter((env) =>
+        liabilityTypes.includes(env.type)
+      ) as LiabilityEnvelope[];
     }
 
     return debts || [];

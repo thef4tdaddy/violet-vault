@@ -56,10 +56,10 @@ const AccountCardHeader = ({ account, typeInfo, onEdit, onDelete }: AccountCardH
       </Button>
       <Button
         onClick={() => onDelete(account.id)}
-        className="p-2 text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 hover:border-rose-300 rounded-lg transition-all"
+        className="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all"
         title="Delete account"
       >
-        {React.createElement(getIcon("XCircle"), { className: "h-3.5 w-3.5" })}
+        {React.createElement(getIcon("Trash2"), { className: "h-3.5 w-3.5" })}
       </Button>
     </div>
   </div>

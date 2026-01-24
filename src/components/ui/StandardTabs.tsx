@@ -162,9 +162,9 @@ const getNavClass = (variant: VariantType): string => {
 const getColoredTabStyles = (isActive: boolean, color: ColorType): string => {
   const colors = COLOR_CONFIG[color];
   if (isActive) {
-    return `${colors.bright} rounded-t-lg shadow-sm relative z-10`;
+    return `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-2 border-black`;
   }
-  return `${colors.pastel} rounded-t-lg relative hover:brightness-110 transition-all`;
+  return `bg-purple-50/80 ${colors.pastel.split(" ").find((c) => c.startsWith("text-"))} rounded-t-lg relative hover:bg-white/90 transition-all border border-gray-400`;
 };
 
 const getColoredCountStyles = (isActive: boolean, color: ColorType): string => {
@@ -237,17 +237,17 @@ const StandardTabs = ({
         ))}
       </div>
 
-      {/* Scroll masks to hide partial tabs on mobile */}
+      {/* Scroll masks - blend with purple container (bg-purple-100/40) */}
       <div
         className="absolute right-0 top-0 bottom-0 w-12 pointer-events-none z-10"
         style={{
-          background: "linear-gradient(to left, white, transparent)",
+          background: "linear-gradient(to left, rgba(243, 232, 255, 1), transparent)",
         }}
       />
       <div
         className="absolute left-0 top-0 bottom-0 w-12 pointer-events-none z-10"
         style={{
-          background: "linear-gradient(to right, white, transparent)",
+          background: "linear-gradient(to right, rgba(243, 232, 255, 1), transparent)",
         }}
       />
     </nav>
@@ -290,13 +290,8 @@ const TabButton = forwardRef<HTMLButtonElement, TabButtonProps>(
         flex items-center gap-2 transition-all duration-200
         flex-[0_0_50%] sm:flex-[0_0_auto]
         ${tabStyles}
-        ${isActive && variant === "colored" ? "border-2 border-black" : ""}
       `.trim()}
-        style={
-          isActive && variant === "colored"
-            ? { border: "2px solid black", scrollSnapAlign: "center" }
-            : { scrollSnapAlign: "center" }
-        }
+        style={{ scrollSnapAlign: "center" }}
       >
         {Icon && React.createElement(Icon, { className: config.iconSize })}
         {tab.label}

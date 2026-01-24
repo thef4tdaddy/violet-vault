@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/utils/core/common/queryClient";
 import { budgetDb } from "@/db/budgetDb";
-import { Receipt } from "./useReceipts";
+import type { Receipt } from "@/db/types";
 
 export const useReceiptMutations = () => {
   const queryClient = useQueryClient();
@@ -11,12 +11,16 @@ export const useReceiptMutations = () => {
     mutationFn: async (receiptData: Partial<Receipt>) => {
       const receipt: Receipt = {
         id: crypto.randomUUID(),
+        merchant: "Unknown Merchant",
+        amount: 0,
+        date: new Date().toISOString(),
+        currency: "USD",
+        status: "pending",
         ...receiptData,
         processingStatus: "completed",
         lastModified: Date.now(),
-      };
+      } as Receipt;
 
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.put(receipt);
       return receipt;
     },
@@ -29,7 +33,6 @@ export const useReceiptMutations = () => {
   const updateReceiptMutation = useMutation({
     mutationKey: ["receipts", "update"],
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Receipt> }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.update(id, {
         ...updates,
         lastModified: Date.now(),
@@ -44,14 +47,12 @@ export const useReceiptMutations = () => {
   const deleteReceiptMutation = useMutation({
     mutationKey: ["receipts", "delete"],
     mutationFn: async (id: string) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       const receipt = await budgetDb.receipts?.get(id);
 
       if (receipt?.imageData?.url) {
         URL.revokeObjectURL(receipt.imageData.url);
       }
 
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.delete(id);
       return id;
     },
@@ -69,7 +70,6 @@ export const useReceiptMutations = () => {
       receiptId: string;
       transactionId: string;
     }) => {
-      // @ts-expect-error - receipts table might not be defined in budgetDb types yet
       await budgetDb.receipts?.update(receiptId, {
         transactionId,
         lastModified: Date.now(),

@@ -10,6 +10,7 @@ import {
   handleNewUserSetup,
   processJoinBudget,
 } from "./authHelpers";
+import { identifyUser, clearUser } from "@/utils/core/common/sentry";
 import type {
   LoginResult,
   LogoutResult,
@@ -101,6 +102,13 @@ export const useAuth = () => {
             result.isNewUser || false
           );
         }
+        // Ensure security manager is also unlocked
+        securityManager.unlockSession();
+
+        // Identify user in Sentry
+        identifyUser(result.user.userName || result.user.id || "anonymous", {
+          budgetId: result.user.budgetId,
+        });
       } else {
         context.setError(result.error ?? "Login failed");
       }
@@ -123,6 +131,8 @@ export const useAuth = () => {
     onSuccess: () => {
       context.clearAuth();
       queryClient.clear();
+      // Clear Sentry user
+      clearUser();
     },
   });
 

@@ -128,7 +128,6 @@ const DesktopTransactionTable: React.FC<DesktopTransactionTableProps> = ({
               {React.createElement(getIcon("SplitSquareHorizontal"), {
                 className: "h-4 w-4 shrink-0",
               })}
-              <span className="hidden xl:inline font-semibold">Split</span>
             </Button>
             <Button
               onClick={(e) => {

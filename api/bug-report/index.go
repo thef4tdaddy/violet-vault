@@ -1,4 +1,4 @@
-package bug_report
+package handler
 
 import (
 	"bytes"

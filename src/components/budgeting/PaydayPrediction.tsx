@@ -16,13 +16,6 @@ const getConfidenceColor = (confidence: number): string => {
   return "gray";
 };
 
-const getUrgencyStyle = (daysUntil: number): string => {
-  if (daysUntil === 0) return "bg-purple-50 border-purple-200";
-  if (daysUntil === 1) return "bg-emerald-50 border-emerald-200";
-  if (daysUntil >= 2 && daysUntil <= 3) return "bg-amber-50 border-amber-200";
-  return "bg-gray-50 border-gray-200";
-};
-
 const getPaydayIcon = (daysUntil: number): React.ReactElement => {
   if (daysUntil === 0) {
     return React.createElement(getIcon("Calendar"), {
@@ -90,7 +83,7 @@ const PredictionHeader = ({
 }: PredictionHeaderProps) => (
   <div className="flex items-start justify-between">
     <div className="flex items-start space-x-3">
-      <div className="flex-shrink-0 mt-0.5">{getPaydayIcon(daysUntil)}</div>
+      <div className="shrink-0 mt-0.5">{getPaydayIcon(daysUntil)}</div>
       <div className="flex-1 min-w-0">
         <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
         <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>
@@ -102,7 +95,7 @@ const PredictionHeader = ({
       </div>
     </div>
     {prediction.confidence < 60 && (
-      <div className="flex-shrink-0 ml-2">
+      <div className="shrink-0 ml-2">
         {React.createElement(getIcon("AlertCircle"), {
           className: "h-4 w-4 text-amber-500",
           title: "Low confidence prediction",
@@ -265,9 +258,7 @@ const PaydayPrediction = ({
   const confidenceColor = getConfidenceColor(prediction.confidence);
 
   return (
-    <div
-      className={`glassmorphism rounded-2xl p-4 border ${daysUntil !== null ? getUrgencyStyle(daysUntil) : ""} ${className}`}
-    >
+    <div className={`bg-white rounded-2xl p-6 hard-border shadow-lg ${className}`}>
       <PredictionHeader
         prediction={prediction}
         daysUntil={daysUntil ?? 0}

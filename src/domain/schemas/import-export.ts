@@ -25,6 +25,9 @@ export const ImportedDataSchema = z
   .object({
     envelopes: z.array(z.any()), // Required for valid backup
     transactions: z.array(z.any()).optional(),
+    budget: z.array(z.any()).optional(),
+    budgetCommits: z.array(z.any()).optional(),
+    budgetChanges: z.array(z.any()).optional(),
     exportMetadata: ExportMetadataSchema.optional(),
     // Deprecated fields kept for backward compatibility during v2.0 transition
     bills: z.array(z.any()).optional().default([]),

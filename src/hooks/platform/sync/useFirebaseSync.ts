@@ -2,11 +2,19 @@ import { useCallback, useEffect, useState } from "react";
 import useUiStore, { type UiStore } from "@/stores/ui/uiStore";
 import logger from "@/utils/core/common/logger";
 import { useToastHelpers } from "@/utils/core/common/toastHelpers";
+import { FirebaseSyncProvider } from "@/services/sync/providers/firebaseSyncProvider";
 
 interface FirebaseSyncService {
-  start: (config: unknown) => void;
+  start: (config: FirebaseSyncConfig) => void;
   forceSync: () => Promise<unknown>;
   isRunning: boolean;
+}
+
+interface FirebaseSyncConfig {
+  budgetId: string;
+  encryptionKey: CryptoKey;
+  currentUser: User;
+  provider: FirebaseSyncProvider;
 }
 
 // Interface for budget operations available in legacy store
@@ -71,10 +79,11 @@ const useFirebaseSync = ({
     logger.info("🔄 Auto-initializing chunked Firebase sync...");
 
     // Start the cloud sync service with config
-    const config = {
+    const config: FirebaseSyncConfig = {
       budgetId,
       encryptionKey,
       currentUser,
+      provider: new FirebaseSyncProvider(),
     };
     firebaseSync.start(config);
 
@@ -90,14 +99,14 @@ const useFirebaseSync = ({
     if (!firebaseSync || !currentUser || !budgetId) return;
 
     // Ensure the sync service is running with current config
-    const config = {
-      budgetId,
-      encryptionKey,
-      currentUser,
-    };
-
     // Make sure service is started (idempotent)
-    if (!firebaseSync.isRunning) {
+    if (!firebaseSync.isRunning && encryptionKey) {
+      const config: FirebaseSyncConfig = {
+        budgetId,
+        encryptionKey,
+        currentUser,
+        provider: new FirebaseSyncProvider(),
+      };
       firebaseSync.start(config);
     }
 

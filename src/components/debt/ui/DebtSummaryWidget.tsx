@@ -22,16 +22,13 @@ const DebtSummaryWidget = ({ onNavigateToDebts }: DebtSummaryWidgetProps) => {
   }
 
   return (
-    <div className="glassmorphism rounded-2xl p-4 border border-white/20 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white rounded-2xl p-6 hard-border shadow-lg transition-all duration-200">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-bold text-gray-900 flex items-center">
-          <div className="relative mr-3">
-            <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
-            <div className="relative bg-red-500 p-2 rounded-2xl">
-              {createElement(getIcon("TrendingDown"), {
-                className: "h-4 w-4 text-white",
-              })}
-            </div>
+          <div className="mr-3 bg-red-500 p-2 rounded-2xl shadow-md">
+            {createElement(getIcon("TrendingDown"), {
+              className: "h-4 w-4 text-white",
+            })}
           </div>
           Debt Summary
         </h3>
@@ -39,9 +36,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }: DebtSummaryWidgetProps) => {
         {onNavigateToDebts && (
           <Button
             onClick={onNavigateToDebts}
-            className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
+            className="text-base text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all flex items-center font-bold"
           >
-            View All
+            Manage Active Debts
             {React.createElement(getIcon("ArrowRight"), {
               className: "h-4 w-4 ml-1",
             })}

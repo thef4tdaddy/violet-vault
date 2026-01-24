@@ -76,7 +76,10 @@ const AccountCardDetails = ({
     </div>
 
     <div className="mt-2 text-xs text-gray-500">
-      Last updated: {new Date(account.lastUpdated).toLocaleDateString()}
+      Last updated:{" "}
+      {account.lastUpdated && !isNaN(new Date(account.lastUpdated).getTime())
+        ? new Date(account.lastUpdated).toLocaleDateString()
+        : "Never"}
     </div>
   </>
 );

@@ -1,27 +1,29 @@
-package budget
+package handler
 
 import (
 	"testing"
 	"time"
+
+	"github.com/thef4tdaddy/violet-vault/api/_pkg/budget"
 )
 
 // BenchmarkCalculate benchmarks the core Calculate function
 func BenchmarkCalculate(b *testing.B) {
 	// Setup test data
-	envelopes := make([]Envelope, 100)
-	transactions := make([]Transaction, 1000)
+	envelopes := make([]budget.Envelope, 100)
+	transactions := make([]budget.Transaction, 1000)
 
 	for i := 0; i < 100; i++ {
-		envelopes[i] = Envelope{
+		envelopes[i] = budget.Envelope{
 			ID:             formatBenchID("env", i),
 			Name:           "Test Envelope",
 			CurrentBalance: 1000.0,
-			Type:           EnvelopeTypeStandard,
+			Type:           budget.EnvelopeTypeStandard,
 		}
 	}
 
 	for i := 0; i < 1000; i++ {
-		transactions[i] = Transaction{
+		transactions[i] = budget.Transaction{
 			ID:         formatBenchID("tx", i),
 			EnvelopeID: formatBenchID("env", i%100),
 			Type:       "expense",
@@ -33,47 +35,7 @@ func BenchmarkCalculate(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = Calculate(envelopes, transactions)
-	}
-}
-
-// BenchmarkProcessBatch benchmarks batch processing
-func BenchmarkProcessBatch(b *testing.B) {
-	requests := make([]BatchItem, 10)
-
-	for i := 0; i < 10; i++ {
-		envelopes := make([]Envelope, 10)
-		transactions := make([]Transaction, 100)
-
-		for j := 0; j < 10; j++ {
-			envelopes[j] = Envelope{
-				ID:             formatBenchID("env", i*10+j),
-				CurrentBalance: 1000.0,
-				Type:           EnvelopeTypeStandard,
-			}
-		}
-
-		for j := 0; j < 100; j++ {
-			transactions[j] = Transaction{
-				ID:         formatBenchID("tx", i*100+j),
-				EnvelopeID: formatBenchID("env", i*10+(j%10)),
-				Type:       "expense",
-				Amount:     -50.0,
-				Date:       date(-j),
-			}
-		}
-
-		requests[i] = BatchItem{
-			UserID:       formatBenchID("user", i),
-			Envelopes:    envelopes,
-			Transactions: transactions,
-		}
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, _ = ProcessBatch(requests)
+		_, _ = budget.Calculate(envelopes, transactions)
 	}
 }
 

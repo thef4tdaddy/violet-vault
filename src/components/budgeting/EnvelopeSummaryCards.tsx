@@ -1,4 +1,6 @@
-import { MetricCard } from "../primitives/cards/MetricCard";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 interface EnvelopeTotals {
   totalBalance: number;
@@ -23,7 +25,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: "Wallet",
       title: "Total Allocated",
       value: totals.totalAllocated || 0,
-      variant: "warning" as const, // orange mapped to warning
+      color: "purple" as const,
       subtitle: `${totals.envelopeCount || 0} envelopes`,
     },
     {
@@ -31,7 +33,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: "DollarSign",
       title: "Balance / After Bills",
       value: totals.totalBalance || 0,
-      variant: (balanceAfterBills < 0 ? "danger" : "success") as "danger" | "success",
+      color: (balanceAfterBills < 0 ? "red" : "green") as "red" | "green",
       subtitle: `$${balanceAfterBills.toFixed(2)} after bills`,
     },
     {
@@ -39,7 +41,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: "CreditCard",
       title: "Total Spent",
       value: totals.totalSpent || 0,
-      variant: "info" as const, // indigo mapped to info
+      color: "blue" as const,
       subtitle: "All envelope spending",
     },
     {
@@ -47,7 +49,7 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
       icon: "Calendar",
       title: "Biweekly Need",
       value: totals.totalBiweeklyNeed || 0,
-      variant: "warning" as const, // amber mapped to warning
+      color: "orange" as const,
       subtitle: `${totals.billsDueCount || 0} bills due`,
     },
   ];
@@ -55,14 +57,13 @@ const EnvelopeSummaryCards = ({ totals = {} as EnvelopeTotals }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <MetricCard
+        <PageSummaryCard
           key={card.key}
-          icon={card.icon}
-          title={card.title}
-          value={card.value}
-          subtitle={card.subtitle}
-          variant={card.variant}
-          format="currency"
+          icon={getIcon(card.icon)}
+          label={card.title}
+          value={formatCurrency(card.value)}
+          subtext={card.subtitle}
+          color={card.color}
           onClick={undefined}
         />
       ))}

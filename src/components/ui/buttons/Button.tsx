@@ -87,17 +87,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Base classes
     const baseClasses =
-      "font-semibold transition-all duration-200 border-2 border-black focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rounded-lg";
+      "font-semibold transition-all duration-200 hard-border focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rounded-lg";
 
     // Variant-specific classes
     const variantClasses = {
       primary: `${colorClasses[color]}`,
-      secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300 border-2 border-black",
+      secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
       destructive: "bg-red-600 hover:bg-red-700 text-white",
       icon: "p-3 bg-transparent hover:bg-gray-100 text-gray-700 border-0",
       ghost: "bg-transparent hover:bg-gray-100 text-gray-700 border-0",
-      outline: "bg-transparent hover:bg-gray-50 text-gray-700 border-2 border-gray-300",
-      default: "bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300",
+      outline: "bg-transparent hover:bg-gray-50 text-gray-700",
+      default: "bg-white hover:bg-gray-50 text-gray-700",
     };
 
     // Floating button styles (circular icon button)

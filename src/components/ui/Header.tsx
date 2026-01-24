@@ -31,7 +31,7 @@ const Header = memo(
     }, []);
     return (
       <div
-        className="rounded-3xl mb-6 py-2 backdrop-blur-md border-2 border-black shadow-2xl"
+        className="rounded-3xl mb-6 py-2 backdrop-blur-md hard-border shadow-2xl"
         style={{
           background: "rgba(255, 254, 255, 0.95)", // Using your logo's white #fffeff
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
@@ -49,7 +49,7 @@ const Header = memo(
                       (window.location.hostname.includes("vercel.app") &&
                         !window.location.hostname.includes("violet-vault-production"))
                     ? "border-red-500" // Preview/staging environments
-                    : "border-purple-600" // Production
+                    : "border-brand-600" // Production
               }`}
             >
               <img
@@ -102,7 +102,7 @@ const Header = memo(
 
               <button
                 onClick={() => onShowSettings()}
-                className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
+                className="btn flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-bold hard-border bg-white text-black hover:bg-gray-100 transition-all shadow-md active:scale-95"
                 title="Open Settings Dashboard"
               >
                 {React.createElement(getIcon("Settings"), {

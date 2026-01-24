@@ -70,8 +70,8 @@ const BottomNavigationBar: React.FC = () => {
         className="
           pointer-events-auto
           w-[calc(100%-1.5rem)] max-w-xl
-          bg-violet-100/90 backdrop-blur-xl border border-violet-200
-          rounded-3xl shadow-[0_12px_30px_rgba(88,28,135,0.22)]
+          bg-brand-100/90 backdrop-blur-xl border border-brand-200
+          rounded-3xl shadow-[0_12px_30px_rgba(109,40,217,0.22)]
         "
         style={{ minHeight: "76px" }}
       >
@@ -111,7 +111,7 @@ const BottomNavigationBar: React.FC = () => {
               ref={leftFadeRef}
               className="
               absolute left-0 top-0 bottom-0 w-12
-              bg-gradient-to-r from-violet-200 via-violet-200/80 to-transparent
+              bg-linear-to-r from-brand-200 via-brand-200/80 to-transparent
               pointer-events-none opacity-0 transition-opacity duration-300
               backdrop-blur-sm
             "
@@ -122,7 +122,7 @@ const BottomNavigationBar: React.FC = () => {
               ref={rightFadeRef}
               className="
               absolute right-0 top-0 bottom-0 w-12
-              bg-gradient-to-l from-violet-200 via-violet-200/80 to-transparent
+              bg-linear-to-l from-brand-200 via-brand-200/80 to-transparent
               pointer-events-none transition-opacity duration-300
               backdrop-blur-sm
             "

@@ -1,5 +1,7 @@
 import React from "react";
-import { MetricCard } from "../primitives/cards/MetricCard";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 // Minimal transaction interface for summary calculations
 interface TransactionForSummary {
@@ -28,36 +30,33 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ trans
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <MetricCard
-        icon="TrendingDown"
-        title="Monthly Spend"
-        value={totalExpenses}
-        variant="danger"
-        format="currency"
-        subtitle={`${transactions.filter((t) => t.amount < 0).length} expenses`}
+      <PageSummaryCard
+        icon={getIcon("TrendingDown")}
+        label="Monthly Spend"
+        value={formatCurrency(totalExpenses)}
+        color="red"
+        subtext={`${transactions.filter((t) => t.amount < 0).length} expenses`}
       />
-      <MetricCard
-        icon="TrendingUp"
-        title="Income"
-        value={totalIncome}
-        variant="success"
-        format="currency"
-        subtitle={`${transactions.filter((t) => t.amount > 0).length} deposits`}
+      <PageSummaryCard
+        icon={getIcon("TrendingUp")}
+        label="Income"
+        value={formatCurrency(totalIncome)}
+        color="green"
+        subtext={`${transactions.filter((t) => t.amount > 0).length} deposits`}
       />
-      <MetricCard
-        icon="BarChart"
-        title="Net Flow"
-        value={netCashFlow}
-        variant={netCashFlow >= 0 ? "info" : "warning"}
-        format="currency"
-        subtitle={netCashFlow >= 0 ? "Positive flow" : "Deficit"}
+      <PageSummaryCard
+        icon={getIcon("BarChart")}
+        label="Net Flow"
+        value={formatCurrency(netCashFlow)}
+        color={netCashFlow >= 0 ? "blue" : "orange"}
+        subtext={netCashFlow >= 0 ? "Positive flow" : "Deficit"}
       />
-      <MetricCard
-        icon="Hash"
-        title="Transactions"
+      <PageSummaryCard
+        icon={getIcon("Hash")}
+        label="Transactions"
         value={transactionCount}
-        variant="info" // blue mapped to info
-        subtitle="This period"
+        color="blue"
+        subtext="This period"
       />
     </div>
   );

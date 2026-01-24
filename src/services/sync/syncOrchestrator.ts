@@ -5,6 +5,7 @@ import { autoBackupService } from "@/utils/features/sync/autoBackupService";
 import { offlineRequestQueueService } from "./offlineRequestQueueService";
 import { websocketSignalingService } from "./websocketSignalingService";
 import { syncManager } from "./SyncManager";
+import { captureError } from "@/utils/core/common/sentry";
 import type { SafeUnknown, TypedResponse } from "@/types/firebase";
 import type { WebSocketSignalMessage } from "@/types/sync";
 
@@ -155,6 +156,10 @@ export class SyncOrchestrator {
           error: error instanceof Error ? error.message : String(error),
           priority,
         });
+        captureError(error instanceof Error ? error : new Error(String(error)), {
+          source: "SyncOrchestrator",
+          priority,
+        });
       });
   }
 
@@ -240,11 +245,10 @@ export class SyncOrchestrator {
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      syncHealthMonitor.recordSyncFailure(
-        syncId,
-        error instanceof Error ? error : new Error(errorMessage)
-      );
+      const err = error instanceof Error ? error : new Error(errorMessage);
+      syncHealthMonitor.recordSyncFailure(syncId, err);
       logger.error("SyncOrchestrator: Unexpected error", { error: errorMessage });
+      captureError(err, { source: "SyncOrchestrator", syncId });
       return {
         success: false,
         timestamp: Date.now(),

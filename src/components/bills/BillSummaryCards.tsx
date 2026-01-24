@@ -1,4 +1,6 @@
-import { MetricCard } from "../primitives/cards/MetricCard";
+import { getIcon } from "@/utils/ui/icons/index";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import { formatCurrency } from "@/utils/domain/accounts/accountHelpers";
 
 interface BillTotals {
   total?: number;
@@ -58,15 +60,25 @@ const BillSummaryCards = ({ totals = {} }: BillSummaryCardsProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <MetricCard
+        <PageSummaryCard
           key={card.key}
-          icon={card.icon}
-          title={card.title}
-          value={card.value}
-          subtitle={card.subtitle}
-          variant={card.variant}
-          format="currency"
+          icon={getIcon(card.icon)}
+          label={card.title}
+          value={formatCurrency(card.value)}
+          subtext={card.subtitle}
+          color={
+            card.variant === "info"
+              ? "blue"
+              : card.variant === "danger"
+                ? "red"
+                : card.variant === "success"
+                  ? "green"
+                  : card.variant === "warning"
+                    ? "orange"
+                    : "blue"
+          }
           onClick={() => {}}
+          data-testid="summary-card"
         />
       ))}
     </div>

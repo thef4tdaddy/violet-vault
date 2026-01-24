@@ -38,7 +38,7 @@ const UserIndicator = memo(
                   setShowDropdown(!showDropdown);
                 }
               }}
-              className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 ring-1 ring-gray-800/10 backdrop-blur-sm hover:bg-white/20 transition-all"
+              className="flex items-center bg-white rounded-2xl px-5 py-3 shadow-xl hard-border hover:bg-gray-50 transition-all font-bold"
             >
               <div
                 className="w-3 h-3 rounded-full mr-3 shadow-sm ring-2 ring-white/50"
@@ -58,9 +58,9 @@ const UserIndicator = memo(
             {showDropdown && !onOpenSettings && (
               <>
                 {/* Backdrop */}
-                <div className="fixed inset-0 z-[100]" onClick={() => setShowDropdown(false)} />
+                <div className="fixed inset-0 z-100" onClick={() => setShowDropdown(false)} />
                 {/* Dropdown Menu */}
-                <div className="absolute top-full mt-2 right-0 z-[110] bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
+                <div className="absolute top-full mt-2 right-0 z-110 bg-white rounded-xl shadow-xl border-2 border-black ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                   <Button
                     onClick={() => {
                       // Note: onOpenSettings is undefined here since we're in !onOpenSettings block

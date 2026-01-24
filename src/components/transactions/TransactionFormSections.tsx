@@ -225,7 +225,7 @@ export const TransactionDetailsFields = ({
                     category: smartSuggestion.category,
                   })
                 }
-                className="px-3 py-1 text-xs bg-emerald-600 text-white border-2 border-black rounded-lg hover:bg-emerald-700"
+                className="px-3 py-1 text-xs bg-purple-600 text-white border-2 border-black rounded-lg hover:bg-purple-700"
                 disabled={!!editingTransaction && !canEdit}
               >
                 Apply
@@ -468,7 +468,7 @@ export const TransactionFormActions = ({
       <Button
         type="submit"
         disabled={!!editingTransaction && !canEdit}
-        className={`flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center ${
+        className={`flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center border-2 border-black shadow-lg ${
           editingTransaction && !canEdit ? "cursor-not-allowed" : ""
         }`}
       >

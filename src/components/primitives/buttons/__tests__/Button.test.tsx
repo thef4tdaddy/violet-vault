@@ -60,7 +60,7 @@ describe("Button", () => {
     it("should render with secondary variant", () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole("button", { name: /secondary/i });
-      expect(button).toHaveClass("bg-slate-100", "text-slate-700");
+      expect(button).toHaveClass("bg-slate-100", "text-black");
     });
 
     it("should render with success variant", () => {

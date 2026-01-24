@@ -109,7 +109,7 @@ export const useReceiptToTransaction = (receiptData: ReceiptData) => {
         amount: receiptData.total,
         date: receiptData.date,
         transactionId: transaction.id?.toString(),
-        imageData: { url: receiptData.imageData },
+        imageData: receiptData.imageData ? { url: receiptData.imageData } : undefined,
         ocrData: {
           rawText: receiptData.rawText,
           confidence: receiptData.confidence,

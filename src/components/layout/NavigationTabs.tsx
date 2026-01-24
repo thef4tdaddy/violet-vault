@@ -141,10 +141,10 @@ const NavigationTabs = memo(() => {
   const pendingCount = pendingReceipts?.length || 0;
 
   return (
-    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 hidden sm:block lg:static z-50 overflow-hidden relative">
+    <div className="bg-brand-50 rounded-3xl mb-6 lg:shadow-xl hard-border hidden sm:block lg:static z-50 overflow-hidden relative">
       <nav
         ref={navRef}
-        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-3 lg:py-2"
+        className="flex justify-evenly lg:justify-around items-stretch overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 h-full"
       >
         {tabs.map((tab) => (
           <NavButton
@@ -162,11 +162,11 @@ const NavigationTabs = memo(() => {
       {/* Mobile scroll indicators - only show on small screens */}
       <div
         ref={rightFadeRef}
-        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-white/60 via-white/20 to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
+        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-brand-100/40 via-transparent to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
       ></div>
       <div
         ref={leftFadeRef}
-        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-white/60 via-white/20 to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
+        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-brand-100/40 via-transparent to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
       ></div>
     </div>
   );

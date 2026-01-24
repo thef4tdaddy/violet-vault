@@ -213,3 +213,31 @@ export interface DatabaseStats {
   lastOptimized: number;
   offlineQueue?: number;
 }
+
+// Receipt interface for SentinelShare integration
+export interface Receipt {
+  id: string;
+  merchant: string;
+  amount: number;
+  date: string; // ISO
+  currency: string;
+  receiptUrl?: string;
+  transactionId?: string;
+  status: "pending" | "matched" | "ignored";
+  processingStatus?: string;
+  imageData?: {
+    url: string;
+    [key: string]: unknown;
+  };
+  ocrData?: {
+    rawText?: string;
+    confidence?: number;
+    items?: unknown[];
+    tax?: number;
+    subtotal?: number;
+    processingTime?: number;
+  };
+  lastModified: number;
+  userId?: string;
+  [key: string]: unknown;
+}

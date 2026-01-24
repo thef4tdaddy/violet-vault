@@ -22,8 +22,9 @@
 
 - Create GH issues for bugs (label: `bug`) and features (label: `enhancement`, `roadmap`)
 - Commit changes frequently
-- Run `prettier` before committing
+
 - **Mandatory 80%+ test coverage for all new/modified code (Front & Back)**
+- **Always verify existence of corresponding tests for any files touched; if they don't exist, create them.**
 - Data Flow: Firebase → Dexie → TanStack Query
 - State: React Context (Auth) / Zustand (UI only)
 - **TypeScript strict** - Zero `any` types allowed
@@ -56,4 +57,4 @@ Use `full_salvo.sh` for multi-language verification.
 
 ---
 
-_Last Updated: January 18, 2026_
+Last Updated: January 19, 2026

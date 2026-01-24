@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { useUnassignedCash } from "@/hooks/budgeting/metadata/useBudgetMetadata";
+import {
+  useUnassignedCash,
+  useActualBalance,
+  useBudgetMetadataQuery,
+} from "@/hooks/budgeting/metadata/useBudgetMetadata";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
 import {
@@ -35,6 +39,8 @@ export const useSummaryMetrics = (
   const { unassignedCash } = useUnassignedCash();
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
+  const { actualBalance } = useActualBalance();
+  const { supplementalAccounts = [] } = useBudgetMetadataQuery();
 
   // Calculate totals
   const metrics = useMemo(() => {
@@ -43,13 +49,22 @@ export const useSummaryMetrics = (
       0
     );
 
-    const totalSavingsBalance = savingsGoals.reduce(
-      (sum: number, goal: { currentAmount?: number | string }) =>
-        sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
+    const supplementalBalance = (supplementalAccounts as Array<{ currentBalance?: number }>).reduce(
+      (sum: number, acc) => sum + (acc.currentBalance || 0),
       0
     );
 
-    const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+    const totalSavingsBalance =
+      savingsGoals.reduce(
+        (sum: number, goal: { currentAmount?: number | string }) =>
+          sum + (typeof goal.currentAmount === "number" ? goal.currentAmount : 0),
+        0
+      ) + supplementalBalance;
+
+    const virtualTotal = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+    const bankBalance = actualBalance || 0;
+    const diff = Math.abs(virtualTotal - bankBalance);
+    const hasMismatch = diff > 0.01;
 
     // Calculate biweekly needs using existing utility
     const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);
@@ -61,9 +76,12 @@ export const useSummaryMetrics = (
         key: "total-cash",
         icon: "Wallet",
         label: "Total Cash",
-        value: totalCash,
-        variant: "default",
+        value: bankBalance,
+        variant: hasMismatch ? "warning" : "default",
         onClick: onTotalCashClick,
+        subtitle: hasMismatch
+          ? `Bank: $${bankBalance.toFixed(2)} / Virtual: $${virtualTotal.toFixed(2)}`
+          : "Matches bank balance (Click to update)",
         ariaLabel: "Set actual balance",
         dataTour: "actual-balance",
       },
@@ -74,12 +92,16 @@ export const useSummaryMetrics = (
         value: unassignedCash,
         variant: unassignedCash < 0 ? "danger" : "success",
         onClick: onUnassignedCashClick,
+        subtitle:
+          unassignedCash < 0
+            ? "⚠️ Overspending - Click to fix"
+            : "Click to distribute unassigned funds",
         ariaLabel: "Distribute unassigned cash",
       },
       {
         key: "savings-total",
         icon: "Target",
-        label: "Savings Total",
+        label: "Savings & Supplemental",
         value: totalSavingsBalance,
         variant: "info",
       },
@@ -94,7 +116,15 @@ export const useSummaryMetrics = (
     ];
 
     return summaryMetrics;
-  }, [envelopes, savingsGoals, unassignedCash, onUnassignedCashClick, onTotalCashClick]);
+  }, [
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    actualBalance,
+    onUnassignedCashClick,
+    onTotalCashClick,
+    supplementalAccounts,
+  ]);
 
   return {
     metrics,

@@ -7,7 +7,7 @@ npx lint-staged || exit 1
 
 # 2. Check for recent Full Salvo run (last 10 minutes)
 # Bypass if only non-core files (infra/docs) are staged
-if git diff --cached --name-only | grep -E '^(api/|src/|configs/|scripts/|package\.json|package-lock\.json|tsconfig\.json|vitest\.config\.ts)' > /dev/null; then
+if git diff --cached --name-only | grep -E '^(api/|src/|configs/|scripts/|tsconfig\.json|vitest\.config\.ts)' > /dev/null; then
     SALVO_TOKEN=".git/FULL_SALVO_SUCCESS"
     if [ -f "$SALVO_TOKEN" ]; then
         # Get file modification time

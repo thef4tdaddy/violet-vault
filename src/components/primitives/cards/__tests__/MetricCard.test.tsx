@@ -1,5 +1,6 @@
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { MetricCard } from "../MetricCard";
 
@@ -125,41 +126,33 @@ describe("MetricCard", () => {
 
   describe("Variants", () => {
     it("should apply default variant color", () => {
-      const { container } = render(<MetricCard title="Test" value={100} icon="DollarSign" />);
-      const icon = container.querySelector(".text-purple-600");
-      expect(icon).toBeInTheDocument();
+      render(<MetricCard title="Test" value={100} icon="DollarSign" />);
+      const iconContainer = screen.getByTestId("metric-card-icon-container");
+      expect(iconContainer).toHaveClass("bg-purple-600");
     });
 
     it("should apply success variant color", () => {
-      const { container } = render(
-        <MetricCard title="Test" value={100} icon="DollarSign" variant="success" />
-      );
-      const icon = container.querySelector(".text-emerald-600");
-      expect(icon).toBeInTheDocument();
+      render(<MetricCard title="Test" value={100} icon="DollarSign" variant="success" />);
+      const iconContainer = screen.getByTestId("metric-card-icon-container");
+      expect(iconContainer).toHaveClass("bg-emerald-600");
     });
 
     it("should apply warning variant color", () => {
-      const { container } = render(
-        <MetricCard title="Test" value={100} icon="DollarSign" variant="warning" />
-      );
-      const icon = container.querySelector(".text-amber-600");
-      expect(icon).toBeInTheDocument();
+      render(<MetricCard title="Test" value={100} icon="DollarSign" variant="warning" />);
+      const iconContainer = screen.getByTestId("metric-card-icon-container");
+      expect(iconContainer).toHaveClass("bg-amber-600");
     });
 
     it("should apply danger variant color", () => {
-      const { container } = render(
-        <MetricCard title="Test" value={100} icon="DollarSign" variant="danger" />
-      );
-      const icon = container.querySelector(".text-red-600");
-      expect(icon).toBeInTheDocument();
+      render(<MetricCard title="Test" value={100} icon="DollarSign" variant="danger" />);
+      const iconContainer = screen.getByTestId("metric-card-icon-container");
+      expect(iconContainer).toHaveClass("bg-red-600");
     });
 
     it("should apply info variant color", () => {
-      const { container } = render(
-        <MetricCard title="Test" value={100} icon="DollarSign" variant="info" />
-      );
-      const icon = container.querySelector(".text-cyan-600");
-      expect(icon).toBeInTheDocument();
+      render(<MetricCard title="Test" value={100} icon="DollarSign" variant="info" />);
+      const iconContainer = screen.getByTestId("metric-card-icon-container");
+      expect(iconContainer).toHaveClass("bg-cyan-600");
     });
   });
 
@@ -190,7 +183,7 @@ describe("MetricCard", () => {
       const user = userEvent.setup();
 
       render(<MetricCard title="Test" value={100} onClick={handleClick} />);
-      const card = screen.getByRole("button");
+      const card = screen.getByRole("button", { name: /test/i });
 
       await user.click(card);
       expect(handleClick).toHaveBeenCalledTimes(1);
@@ -201,7 +194,7 @@ describe("MetricCard", () => {
       const user = userEvent.setup();
 
       render(<MetricCard title="Test" value={100} onClick={handleClick} />);
-      const card = screen.getByRole("button");
+      const card = screen.getByRole("button", { name: /test/i });
 
       card.focus();
       await user.keyboard("{Enter}");
@@ -227,7 +220,7 @@ describe("MetricCard", () => {
       expect(screen.getByText("$123,456.78")).toBeInTheDocument();
       expect(screen.getByText("+5.2%")).toBeInTheDocument();
       expect(screen.getByText("Last 30 days")).toBeInTheDocument();
-      expect(screen.getByTestId("mock-icon")).toBeInTheDocument();
+      expect(screen.getAllByTestId("mock-icon")).toHaveLength(2);
       expect(screen.getByTestId("trending-up-icon")).toBeInTheDocument();
     });
   });

@@ -71,7 +71,7 @@ const SavingsGoals = ({
         <div className="flex flex-row gap-3">
           <Button
             onClick={openAddForm}
-            className="btn btn-primary border-2 border-black flex items-center"
+            className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors border-2 border-black shadow-lg"
           >
             {React.createElement(getIcon("Plus"), {
               className: "h-4 w-4 mr-2",
