@@ -2,6 +2,7 @@ import React, { memo, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getIcon } from "@/utils";
 import { getButtonClasses, hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
+import { useSentinelReceipts } from "@/hooks/api/useSentinelReceipts";
 
 interface NavButtonProps {
   active: boolean;
@@ -9,6 +10,7 @@ interface NavButtonProps {
   icon: React.ElementType;
   label: string;
   viewKey: string;
+  badgeCount?: number;
 }
 
 interface TabItem {
@@ -135,6 +137,9 @@ const NavigationTabs = memo(() => {
 
   const activeView = getCurrentView();
 
+  const { pendingReceipts } = useSentinelReceipts();
+  const pendingCount = pendingReceipts?.length || 0;
+
   return (
     <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 hidden sm:block lg:static z-50 overflow-hidden relative">
       <nav
@@ -149,6 +154,7 @@ const NavigationTabs = memo(() => {
             icon={tab.icon}
             label={tab.label}
             viewKey={tab.key}
+            badgeCount={tab.key === "transactions" ? pendingCount : undefined}
           />
         ))}
       </nav>
@@ -156,71 +162,89 @@ const NavigationTabs = memo(() => {
       {/* Mobile scroll indicators - only show on small screens */}
       <div
         ref={rightFadeRef}
-        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/60 via-white/20 to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
+        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-white/60 via-white/20 to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
       ></div>
       <div
         ref={leftFadeRef}
-        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/60 via-white/20 to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
+        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-linear-to-r from-white/60 via-white/20 to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
       ></div>
     </div>
   );
 });
 
-const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }: NavButtonProps) => (
-  <Link
-    to={to}
-    aria-current={active ? "page" : undefined}
-    data-view={viewKey}
-    data-tab={viewKey}
-    onClick={() => hapticFeedback(10, "light")}
-    className={getButtonClasses(
-      `flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
-        active
-          ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
-          : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
-      }`,
-      "tab"
-    )}
-    style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
-  >
-    <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
-    <span className="text-center lg:text-left leading-tight">
-      {/* Responsive label display with better text truncation */}
-      <span className="hidden lg:inline truncate">{label}</span>
-      {/* Medium screens (tablets) - show abbreviated labels for long words */}
-      <span className="hidden md:inline lg:hidden text-xs truncate max-w-[60px] overflow-hidden">
-        {label === "Supplemental"
-          ? "Extra"
-          : label === "Analytics"
-            ? "Stats"
-            : label === "Debt Tracking"
-              ? "Debts"
-              : label === "Add Paycheck"
-                ? "Paycheck"
-                : label === "Manage Bills"
-                  ? "Bills"
-                  : label === "Savings Goals"
-                    ? "Savings"
-                    : label.split(" ")[0]}
-      </span>
-      {/* Small screens - show optimized short labels */}
-      <span className="md:hidden text-xs truncate max-w-[50px] overflow-hidden whitespace-nowrap">
-        {label === "Supplemental"
-          ? "Extra"
-          : label === "Analytics"
-            ? "Chart"
+const NavLabel = memo(({ label }: { label: string }) => (
+  <span className="text-center lg:text-left leading-tight">
+    {/* Responsive label display with better text truncation */}
+    <span className="hidden lg:inline truncate">{label}</span>
+    {/* Medium screens (tablets) - show abbreviated labels for long words */}
+    <span className="hidden md:inline lg:hidden text-xs truncate max-w-[60px] overflow-hidden">
+      {label === "Supplemental"
+        ? "Extra"
+        : label === "Analytics"
+          ? "Stats"
+          : label === "Debt Tracking"
+            ? "Debts"
             : label === "Add Paycheck"
-              ? "Pay"
+              ? "Paycheck"
               : label === "Manage Bills"
                 ? "Bills"
                 : label === "Savings Goals"
-                  ? "Save"
-                  : label === "Debt Tracking"
-                    ? "Debt"
-                    : label.split(" ")[0]}
-      </span>
+                  ? "Savings"
+                  : label.split(" ")[0]}
     </span>
-  </Link>
+    {/* Small screens - show optimized short labels */}
+    <span className="md:hidden text-xs truncate max-w-[50px] overflow-hidden whitespace-nowrap">
+      {label === "Supplemental"
+        ? "Extra"
+        : label === "Analytics"
+          ? "Chart"
+          : label === "Add Paycheck"
+            ? "Pay"
+            : label === "Manage Bills"
+              ? "Bills"
+              : label === "Savings Goals"
+                ? "Save"
+                : label === "Debt Tracking"
+                  ? "Debt"
+                  : label.split(" ")[0]}
+    </span>
+  </span>
 ));
+
+NavLabel.displayName = "NavLabel";
+
+const NavButton = memo(
+  ({ active, to, icon: _Icon, label, viewKey, badgeCount }: NavButtonProps) => (
+    <Link
+      to={to}
+      aria-current={active ? "page" : undefined}
+      data-view={viewKey}
+      data-tab={viewKey}
+      onClick={() => hapticFeedback(10, "light")}
+      className={getButtonClasses(
+        `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
+          active
+            ? "border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 ring-1 ring-purple-300"
+            : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
+        }`,
+        "tab"
+      )}
+      style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
+    >
+      <div className="relative">
+        <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
+        {badgeCount !== undefined && badgeCount > 0 && (
+          <span
+            className="absolute -top-2 -right-4 lg:-top-2 lg:right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-black rounded-full border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+            aria-label={`${badgeCount} pending items`}
+          >
+            {badgeCount > 99 ? "99+" : badgeCount}
+          </span>
+        )}
+      </div>
+      <NavLabel label={label} />
+    </Link>
+  )
+);
 
 export default NavigationTabs;
