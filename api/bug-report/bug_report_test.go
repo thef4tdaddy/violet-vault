@@ -147,3 +147,22 @@ func TestHandler_MissingMetadata(t *testing.T) {
 		t.Errorf("Expected 400 for empty payload, got %d", resp.StatusCode)
 	}
 }
+
+func TestScrubPII(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"Error in transaction 550e8400-e29b-41d4-a716-446655440000", "Error in transaction [REDACTED_ID]"},
+		{"Amount is $125.50", "Amount is [REDACTED_AMOUNT]"},
+		{"Contact test@example.com for help", "Contact [REDACTED_EMAIL] for help"},
+		{"Mixed: ID 550e8400-e29b-41d4-a716-446655440000 and $50.00", "Mixed: ID [REDACTED_ID] and [REDACTED_AMOUNT]"},
+	}
+
+	for _, tt := range tests {
+		got := scrubPII(tt.input)
+		if got != tt.expected {
+			t.Errorf("scrubPII(%q) = %q, want %q", tt.input, got, tt.expected)
+		}
+	}
+}

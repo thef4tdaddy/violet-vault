@@ -11,7 +11,60 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"regexp"
+
+	"github.com/getsentry/sentry-go"
 )
+
+func init() {
+	dsn := os.Getenv("SENTRY_DSN")
+	if dsn == "" {
+		return
+	}
+
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:              dsn,
+		Environment:      os.Getenv("SENTRY_ENVIRONMENT"),
+		Release:          os.Getenv("SENTRY_RELEASE"),
+		TracesSampleRate: 1.0,
+		BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
+			// Redact sensitive data from message and exceptions
+			event.Message = scrubPII(event.Message)
+			for i := range event.Exception {
+				event.Exception[i].Value = scrubPII(event.Exception[i].Value)
+			}
+			// Redact request data
+			if event.Request != nil {
+				event.Request.Cookies = ""
+				event.Request.Env = nil
+				event.Request.Data = scrubPII(event.Request.Data)
+			}
+			return event
+		},
+	})
+	if err != nil {
+		log.Printf("sentry.Init: %s", err)
+	}
+}
+
+var (
+	idRegex     = regexp.MustCompile(`[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
+	amountRegex = regexp.MustCompile(`[+-]?\$?\d+\.\d{2}\b`)
+	emailRegex  = regexp.MustCompile(`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)
+)
+
+func scrubPII(text string) string {
+	if text == "" {
+		return text
+	}
+
+	text = idRegex.ReplaceAllString(text, "[REDACTED_ID]")
+	text = amountRegex.ReplaceAllString(text, "[REDACTED_AMOUNT]")
+	text = emailRegex.ReplaceAllString(text, "[REDACTED_EMAIL]")
+
+	return text
+}
 
 // BugReportPayload represents the incoming bug report data from the frontend
 type BugReportPayload struct {
@@ -122,6 +175,10 @@ func getAllowedOrigin(r *http.Request) string {
 
 // Handler is the Vercel serverless function entry point
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// Enable Sentry recovery and flushing
+	defer sentry.Flush(2 * time.Second)
+	defer sentry.Recover()
+
 	// Set CORS headers only for allowed origins
 	if allowedOrigin := getAllowedOrigin(r); allowedOrigin != "" {
 		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)

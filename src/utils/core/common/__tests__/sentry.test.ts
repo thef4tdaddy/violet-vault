@@ -142,6 +142,47 @@ describe("sentry.ts", () => {
       expect(result?.request?.headers?.["authorization"]).toBeUndefined();
       expect(result?.request?.headers?.["user-agent"]).toBe("Mozilla");
     });
+
+    it("should scrub PII from error messages and context", () => {
+      initSentry();
+      const beforeSend = vi.mocked(Sentry.init).mock.calls[0][0].beforeSend!;
+
+      const piiEvent = {
+        message: "Error processing transaction 550e8400-e29b-41d4-a716-446655440000 for $125.50",
+        exception: {
+          values: [{ value: "Failed to send to test@example.com" }],
+        },
+        extra: {
+          amount: "$50.00",
+          id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+          raw: "SomeBase64OrCipherTextThatIsLongerThan32Chars==",
+        },
+        breadcrumbs: [
+          { message: "User clicked button for $10.00" },
+          { data: { targetId: "550e8400-e29b-41d4-a716-446655440000" } },
+        ],
+      } as any;
+
+      const result = beforeSend(piiEvent, {} as any) as any;
+
+      // Check message
+      expect(result.message).toContain("[REDACTED_ID]");
+      expect(result.message).toContain("[REDACTED_AMOUNT]");
+      expect(result.message).not.toContain("550e8400");
+      expect(result.message).not.toContain("125.50");
+
+      // Check exception
+      expect(result.exception.values[0].value).toBe("Failed to send to [REDACTED_EMAIL]");
+
+      // Check extra
+      expect(result.extra.amount).toBe("[REDACTED_AMOUNT]");
+      expect(result.extra.id).toBe("[REDACTED_ID]");
+      expect(result.extra.raw).toBe("[REDACTED_BLOB]");
+
+      // Check breadcrumbs
+      expect(result.breadcrumbs[0].message).toBe("User clicked button for [REDACTED_AMOUNT]");
+      expect(result.breadcrumbs[1].data.targetId).toBe("[REDACTED_ID]");
+    });
   });
 
   describe("Helper Functions", () => {

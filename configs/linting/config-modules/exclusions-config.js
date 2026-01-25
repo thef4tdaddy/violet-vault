@@ -409,6 +409,7 @@ export default [
     files: ["src/utils/core/common/sentry.ts"],
     rules: {
       complexity: "off", // Multiple filtering conditions needed for noise reduction
+      "max-statements": "off", // Sentry event filtering requires many sequential scrubbing steps
     },
   },
   {

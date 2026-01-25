@@ -1,16 +1,78 @@
-"""
-VioletVault Analytics API
-FastAPI application providing analytics endpoints for the frontend
-"""
-
+import os
+import re
 from typing import Any
 
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 from api.analytics import EnvelopeIntegrityAuditor
 from api.models import AuditSnapshot, IntegrityAuditResult
 from api.sentinel.receipts import router as sentinel_router
+
+
+# Sentry PII Scrubbing
+def scrub_pii(text: str) -> str:
+    if not text:
+        return text
+    # 1. Redact IDs (UUIDs)
+    text = re.sub(
+        r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+        "[REDACTED_ID]",
+        text,
+        flags=re.IGNORECASE,
+    )
+    # 2. Redact Amounts ($100.00, 100.00)
+    text = re.sub(r"[+-]?\$?\d+\.\d{2}\b", "[REDACTED_AMOUNT]", text)
+    # 3. Redact Emails
+    text = re.sub(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", "[REDACTED_EMAIL]", text)
+    return text
+
+
+def before_send(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any] | None:
+    # Redact sensitive data from message and exceptions
+    if "message" in event:
+        # Event message can be str or None
+        msg = event.get("message")
+        if msg:
+            event["message"] = scrub_pii(str(msg))
+
+    if "exception" in event:
+        exc_container = event.get("exception")
+        if isinstance(exc_container, dict) and "values" in exc_container:
+            for exc in exc_container["values"]:
+                if isinstance(exc, dict) and "value" in exc and exc["value"]:
+                    exc["value"] = scrub_pii(str(exc["value"]))
+
+    # Redact request data
+    if "request" in event:
+        req = event["request"]
+        if isinstance(req, dict):
+            # Clear cookies and environment variables
+            req["cookies"] = ""
+            if "env" in req:
+                req["env"] = None
+
+            if "data" in req:
+                # Python SDK sometimes puts dicts or strings in 'data'
+                data_str = str(req["data"])
+                req["data"] = scrub_pii(data_str)
+
+    return event
+
+
+# Initialize Sentry
+dsn = os.getenv("SENTRY_DSN")
+if dsn:
+    sentry_sdk.init(
+        dsn=dsn,
+        integrations=[FastApiIntegration()],
+        environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
+        release=os.getenv("SENTRY_RELEASE"),
+        traces_sample_rate=1.0,
+        before_send=before_send,  # type: ignore[arg-type]
+    )
 
 # Create FastAPI app
 app = FastAPI(

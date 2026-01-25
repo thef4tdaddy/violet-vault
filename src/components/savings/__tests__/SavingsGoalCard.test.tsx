@@ -33,6 +33,13 @@ describe("SavingsGoalCard", () => {
     createdAt: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     envelopeType: "savings",
+    // Added missing DetailedSavingsGoal properties
+    category: "savings",
+    archived: false,
+    lastModified: Date.now(),
+    autoAllocate: true,
+    type: "goal",
+    icon: "Target",
   };
 
   const priorities = [{ value: "high", label: "High Priority", color: "text-red-600" }];

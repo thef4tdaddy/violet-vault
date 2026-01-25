@@ -97,10 +97,38 @@ const getSentryConfig = (): SentryConfig => {
 };
 
 /**
- * Filter Sentry events to reduce noise
- * - Filters out INFO/DEBUG level messages
- * - Filters out CORS errors from cross-origin iframes
- * - Removes sensitive data from requests
+ * Redact sensitive information from strings (PII, amounts, IDs)
+ */
+const maskPII = (text: string): string => {
+  if (!text) return text;
+
+  let masked = text;
+
+  // 1. Redact UUIDs (Common ID format for EnvelopeID, TransactionID)
+  // Match standard UUID v4/v5
+  masked = masked.replace(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+    "[REDACTED_ID]"
+  );
+
+  // 2. Redact common email patterns
+  masked = masked.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED_EMAIL]");
+
+  // 3. Redact Currency Amounts ($100.00, 100.00, -100.00)
+  // More specific to avoid matching hex digits in IDs:
+  // Requires either a currency symbol OR a decimal point with exactly 2 digits
+  masked = masked.replace(/[+-]?\$\d+(?:\.\d{2})?\b/g, "[REDACTED_AMOUNT]"); // With $
+  masked = masked.replace(/\b[+-]?\d+\.\d{2}\b/g, "[REDACTED_AMOUNT]"); // Decimal without $
+
+  // 4. Redact potential cipher text (long base64/hex strings > 40 chars)
+  // Increased threshold and improved boundary handling to include padding
+  masked = masked.replace(/\b[A-Za-z0-9+/]{40,}(?:==|)?(?!\w)/g, "[REDACTED_BLOB]");
+
+  return masked;
+};
+
+/**
+ * Filter Sentry events to reduce noise and enforce E2EE privacy
  */
 const filterSentryEvent = (
   event: Sentry.ErrorEvent,
@@ -108,10 +136,10 @@ const filterSentryEvent = (
 ): Sentry.ErrorEvent | null => {
   // Filter out non-error messages (INFO, DEBUG level)
   if (event.level === "info" || event.level === "debug") {
-    return null; // Don't send INFO/DEBUG messages to Sentry
+    return null;
   }
 
-  // Filter out CORS errors from cross-origin iframes (Firebase, etc.)
+  // General noise suppression (CORS, etc.)
   if (event.message) {
     const message = event.message.toLowerCase();
     if (
@@ -121,32 +149,45 @@ const filterSentryEvent = (
       message.includes("cross-origin") ||
       (message.includes("firebase") && message.includes("cors"))
     ) {
-      return null; // Don't send CORS iframe errors to Sentry
+      return null;
     }
+    // Scrub message
+    event.message = maskPII(event.message);
   }
 
-  // Filter out CORS errors from exception messages
-  if (event.exception) {
-    const exceptionMessage = event.exception.values?.[0]?.value?.toLowerCase() || "";
-    if (
-      exceptionMessage.includes("blocked a frame") ||
-      exceptionMessage.includes("access control checks") ||
-      exceptionMessage.includes("protocols, domains, and ports must match") ||
-      exceptionMessage.includes("cross-origin")
-    ) {
-      return null; // Don't send CORS iframe errors to Sentry
-    }
+  // Scrub exceptions
+  if (event.exception?.values) {
+    event.exception.values = event.exception.values.map((ex) => ({
+      ...ex,
+      value: ex.value ? maskPII(ex.value) : ex.value,
+    }));
+  }
+
+  // Scrub breadcrumbs
+  if (event.breadcrumbs) {
+    event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => ({
+      ...breadcrumb,
+      message: breadcrumb.message ? maskPII(breadcrumb.message) : breadcrumb.message,
+      data: breadcrumb.data
+        ? JSON.parse(maskPII(JSON.stringify(breadcrumb.data)))
+        : breadcrumb.data,
+    }));
+  }
+
+  // Scrub extra context
+  if (event.extra) {
+    const extraStr = JSON.stringify(event.extra);
+    event.extra = JSON.parse(maskPII(extraStr));
   }
 
   // Remove sensitive data from requests
   if (event.request) {
-    // Remove cookies and headers that might contain sensitive data
     if (event.request.cookies) {
       delete event.request.cookies;
     }
+
     if (event.request.headers) {
-      // Keep only safe headers
-      const safeHeaders = ["user-agent", "accept", "accept-language"];
+      const safeHeaders = ["user-agent", "accept", "accept-language", "referer"];
       const filteredHeaders: Record<string, string> = {};
       for (const [key, value] of Object.entries(event.request.headers)) {
         if (safeHeaders.includes(key.toLowerCase())) {
@@ -155,7 +196,13 @@ const filterSentryEvent = (
       }
       event.request.headers = filteredHeaders;
     }
+
+    // Explicitly redact URL query params if they look like they contain PII
+    if (event.request.url) {
+      event.request.url = maskPII(event.request.url);
+    }
   }
+
   return event;
 };
 
