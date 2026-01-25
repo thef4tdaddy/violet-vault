@@ -32,6 +32,8 @@ interface ImportMetaEnv {
   readonly VITE_CLOUDFLARE_WORKER_URL?: string;
   readonly VITE_APP_VERSION?: string;
   readonly VITE_NODE_ENV?: string;
+  readonly VITE_GO_API_URL?: string;
+  readonly VITE_PY_API_URL?: string;
 
   // Standard Vite variables
   readonly MODE: string;

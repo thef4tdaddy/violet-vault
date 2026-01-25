@@ -5,7 +5,7 @@ import {
   analyticsResponseSchema,
 } from "@/domain/schemas";
 
-const ANALYTICS_API_URL = import.meta.env.VITE_ANALYTICS_API_URL || "/api/analytics";
+import { pyClient } from "@/utils/core/api/client";
 
 /**
  * Hook to fetch analytics predictions from the Python backend
@@ -14,19 +14,7 @@ const ANALYTICS_API_URL = import.meta.env.VITE_ANALYTICS_API_URL || "/api/analyt
 export const useAnalytics = () => {
   const mutation = useMutation({
     mutationFn: async (requestData: AnalyticsRequest): Promise<AnalyticsResponse> => {
-      const response = await fetch(ANALYTICS_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Analytics API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await pyClient.post<AnalyticsResponse>("/", requestData);
 
       // Validate response with Zod
       const result = analyticsResponseSchema.safeParse(data);
