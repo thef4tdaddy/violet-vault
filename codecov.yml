@@ -7,8 +7,8 @@ coverage:
     project:
       default:
         target: 80%
-        threshold: 0.5%
-        informational: true # Don't block yet, just report progress
+        threshold: 1%
+        informational: false # Block if threshold is not met
         base: auto
 
     # NEW CODE coverage (strict)
@@ -42,3 +42,16 @@ ignore:
 parsers:
   javascript:
     enable_partials: false
+
+flags:
+  frontend:
+    paths:
+      - src/
+  go-backend:
+    paths:
+      - api/
+      - "!api/**/*.py"
+  python-backend:
+    paths:
+      - api/
+      - "!api/**/*.go"

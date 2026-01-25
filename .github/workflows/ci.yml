@@ -174,7 +174,7 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Go Test"
-            go test ./... -v > ../go_test.log 2>&1 && GOTEST_RES=0 || GOTEST_RES=$?
+            go test ./... -v -coverprofile=../go_coverage.out -covermode=atomic > ../go_test.log 2>&1 && GOTEST_RES=0 || GOTEST_RES=$?
             echo "STATUS_GOTEST:$GOTEST_RES"
             if [ $GOTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
@@ -182,6 +182,16 @@ jobs:
             exit $EXIT_CODE
           }
         continue-on-error: true
+
+      - name: Upload Go Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./go_coverage.out
+          flags: go-backend
+          name: violet-vault-go
+          fail_ci_if_error: false
 
       # 3. Python Backend
       - name: Python Backend Checks
@@ -210,10 +220,34 @@ jobs:
             echo "STATUS_MYPY:$MYPY_RES"
             if [ $MYPY_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
+
+            # Unit Tests with Coverage
+            echo "::group::Pytest"
+            pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
+            echo "STATUS_PYTEST:$PYTEST_RES"
+            if [ $PYTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
             
             exit $EXIT_CODE
           }
         continue-on-error: true
+
+      - name: Upload Python Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./api_coverage.xml
+          flags: python-backend
+          name: violet-vault-python
+          fail_ci_if_error: false
+
+      - name: Upload Python test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./api_junit.xml
 
       # --- Reporting ---
       - name: Generate CI Report
@@ -243,6 +277,7 @@ jobs:
               go_fmt: 'go_fmt.log',
               go_vet: 'go_vet.log',
               go_test: 'go_test.log',
+              pytest: 'pytest.log',
               ruff_fmt: 'ruff_format.log',
               ruff_lint: 'ruff_lint.log',
               mypy: 'mypy.log'
@@ -276,7 +311,8 @@ jobs:
                 // Python
                 { key: 'STATUS_RUFF_FMT', name: 'Ruff (Fmt)', log: logContents.ruff_fmt, outcomeKey: 'OUTCOME_PYTHON', type: 'warning' },
                 { key: 'STATUS_RUFF_LINT', name: 'Ruff (Lint)', log: logContents.ruff_lint, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' },
-                { key: 'STATUS_MYPY', name: 'Mypy (Type)', log: logContents.mypy, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' }
+                { key: 'STATUS_MYPY', name: 'Mypy (Type)', log: logContents.mypy, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' },
+                { key: 'STATUS_PYTEST', name: 'Pytest (Unit)', log: logContents.pytest, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' }
             ];
 
             let toolRows = [];

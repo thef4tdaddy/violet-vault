@@ -1,0 +1,35 @@
+# CodeRabbit Configuration
+# Documentation: https://docs.coderabbit.ai/getting-started/configure-coderabbit/
+
+# General project settings
+language: "en-US"
+
+# Custom instructions for the AI reviewer
+reviews:
+  # Design & Philosophy
+  profile: |
+    Follow the "Hard Line" design philosophy:
+    - High contrast, thick borders (2px+), hard shadows (no blur).
+    - Use curated HSL palettes, no generic colors.
+    - Premium typography (Inter, Outfit).
+    - Glassmorphism with thick black borders.
+
+  # Coding Standards & Security
+  instructions: |
+    - **TypeScript Strictly No `any`**: Flag any usage of the `any` type in TypeScript files. Require proper interfaces or unknown/never.
+    - **E2EE Privacy**: Ensure no core budgeting data (envelopes, transactions, amounts) is ever logged or processed in a way that leaks it to the server unencrypted.
+    - **Backends (Go/Python)**: Monitor for potential PII leakage or unencrypted storage of financial raw data.
+    - **Architecture**: Enforce the use of TanStack Query for server state and ensure no server data lives in Zustand.
+    - **Imports**: Ensure @/ path aliases are used for all local imports.
+
+# AI Review triggers
+# Enable automated reviews on every PR
+enable_on_pr: true
+
+# Advanced settings
+# Ignore specific files
+ignore:
+  - "**/dist/**"
+  - "**/node_modules/**"
+  - "**/*.min.js"
+  - "**/vendor/**"
