@@ -22,6 +22,15 @@ reviews:
     - **Architecture**: Enforce the use of TanStack Query for server state and ensure no server data lives in Zustand.
     - **Imports**: Ensure @/ path aliases are used for all local imports.
 
+  review_status: true
+  auto_review:
+    enabled: true
+    ignore_paths:
+      - "**/__tests__/**"
+      - "**/mocks/**"
+      - "**/*.test.ts"
+      - "**/*.test.tsx"
+
 # AI Review triggers
 # Enable automated reviews on every PR
 enable_on_pr: true
@@ -33,3 +42,9 @@ ignore:
   - "**/node_modules/**"
   - "**/*.min.js"
   - "**/vendor/**"
+  - "**/__tests__/**"
+  - "**/mocks/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/coverage/**"
+  - "**/*.lock"
