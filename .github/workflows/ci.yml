@@ -7,9 +7,9 @@ permissions:
 
 on:
   push:
-    branches: [main, develop, "feat/dashboard-redux"]
+    branches: [main, develop, "feat/**"]
   pull_request:
-    branches: [main, develop, "feat/dashboard-redux", "feat/polygot-rewrite", "copilot/**"]
+    branches: [main, develop, "feat/**", "feat/polygot-rewrite", "copilot/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}

@@ -2,7 +2,7 @@ name: Bundle Size Monitor
 
 on:
   pull_request:
-    branches: [main, develop, nightly, "feat/dashboard-redux"]
+    branches: [main, develop, nightly, "feat/**"]
   workflow_dispatch:
 
 # Prevent duplicate runs

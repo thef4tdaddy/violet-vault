@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened, ready_for_review]
   push:
-    branches: [main, develop, "feat/dashboard-redux"]
+    branches: [main, develop, "feat/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
