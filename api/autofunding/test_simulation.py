@@ -9,15 +9,15 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.autofunding.models import (
+from api.autofunding.models import (  # noqa: E402
     AutoFundingContext,
     AutoFundingContextData,
     AutoFundingRule,
     EnvelopeData,
     RuleConfig,
 )
-from api.autofunding.rules import RULE_TYPES, TRIGGER_TYPES
-from api.autofunding.simulation import (
+from api.autofunding.rules import RULE_TYPES, TRIGGER_TYPES  # noqa: E402
+from api.autofunding.simulation import (  # noqa: E402
     calculate_transfer_impact,
     plan_rule_transfers,
     simulate_rule_execution,
@@ -33,8 +33,8 @@ def test_simulate_fixed_amount_rule() -> None:
         id="rule1",
         name="Groceries Top-up",
         description="Fill groceries envelope",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -79,8 +79,8 @@ def test_simulate_priority_fill_rule() -> None:
         id="rule2",
         name="Rent Priority Fill",
         description="Fill rent to monthly amount",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=2,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -125,8 +125,8 @@ def test_simulate_split_remainder_rule() -> None:
         id="rule3",
         name="Split Remaining",
         description="Split remaining funds",
-        type=RULE_TYPES["SPLIT_REMAINDER"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["SPLIT_REMAINDER"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=3,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -173,8 +173,8 @@ def test_simulate_multiple_rules() -> None:
             id="rule1",
             name="Groceries Top-up",
             description="",
-            type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-            trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+            type=RULE_TYPES["FIXED_AMOUNT"],
+            trigger=TRIGGER_TYPES["MANUAL"],
             priority=1,
             enabled=True,
             createdAt="2024-01-01T00:00:00.000Z",
@@ -195,8 +195,8 @@ def test_simulate_multiple_rules() -> None:
             id="rule2",
             name="Rent Priority Fill",
             description="",
-            type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore  # type: ignore
-            trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore  # type: ignore
+            type=RULE_TYPES["PRIORITY_FILL"],
+            trigger=TRIGGER_TYPES["MANUAL"],
             priority=2,
             enabled=True,
             createdAt="2024-01-01T00:00:00.000Z",
@@ -248,8 +248,8 @@ def test_calculate_transfer_impact() -> None:
                 id="rule1",
                 name="Test",
                 description="",
-                type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore  # type: ignore
-                trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore  # type: ignore
+                type=RULE_TYPES["FIXED_AMOUNT"],
+                trigger=TRIGGER_TYPES["MANUAL"],
                 priority=1,
                 enabled=True,
                 createdAt="2024-01-01T00:00:00.000Z",

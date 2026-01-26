@@ -86,3 +86,4 @@ export class APIClient {
 // Pre-configured clients for easier use
 export const goClient = new APIClient("go-backend");
 export const pyClient = new APIClient("py-analytics");
+export const ocrClient = new APIClient("py-ocr");

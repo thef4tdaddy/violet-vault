@@ -11,8 +11,8 @@ from pathlib import Path
 # Add parent directory to path to import api modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from api.analytics import EnvelopeIntegrityAuditor
-from api.models import AuditSnapshot
+from api.analytics import EnvelopeIntegrityAuditor  # noqa: E402
+from api.models import AuditSnapshot  # noqa: E402
 
 
 def run_audit_check(snapshot_file: str, expected_violations: dict) -> bool:

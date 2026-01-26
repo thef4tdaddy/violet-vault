@@ -16,7 +16,7 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import from the analytics.py file (not the analytics/ directory)
-import importlib.util
+import importlib.util  # noqa: E402
 
 spec = importlib.util.spec_from_file_location(
     "analytics_handler", os.path.join(os.path.dirname(__file__), "analytics.py")

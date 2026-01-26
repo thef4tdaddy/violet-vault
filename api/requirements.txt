@@ -7,6 +7,12 @@ pydantic==2.5.0
 python-multipart==0.0.18
 sentry-sdk[fastapi]==2.1.0
 
+# OCR Dependencies
+pytesseract==0.3.13
+opencv-python-headless==4.10.0.84
+Pillow==10.4.0
+numpy==1.26.4
+
 # Dev Dependencies
 sqlalchemy==2.0.25
 psycopg2-binary==2.9.9

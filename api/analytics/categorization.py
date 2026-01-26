@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from . import ErrorResponse, MerchantSuggestion
+from . import ErrorResponse, MerchantSuggestion  # noqa: E402
 
 # Merchant pattern matchers (ported from suggestionUtils.ts)
 MERCHANT_PATTERNS = {

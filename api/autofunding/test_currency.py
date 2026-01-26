@@ -9,7 +9,11 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.autofunding.currency import calculate_percentage_amount, round_currency, split_amount
+from api.autofunding.currency import (  # noqa: E402
+    calculate_percentage_amount,
+    round_currency,
+    split_amount,
+)
 
 
 def test_round_currency_standard_cases() -> None:

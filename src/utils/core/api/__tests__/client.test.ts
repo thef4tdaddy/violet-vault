@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { APIClient, setTestRetryOptions } from "../client";
+import { APIClient, setTestRetryOptions, goClient, pyClient, ocrClient } from "../client";
 import { clearCircuitBreakers } from "../circuitBreaker";
 import { serialize } from "../messagePack";
 
@@ -72,5 +72,23 @@ describe("APIClient", () => {
     const result = await client.get("/test", { maxAttempts: 2 });
     expect(result).toEqual({ data: "ok" });
     expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("should export pre-configured goClient", () => {
+    expect(goClient).toBeInstanceOf(APIClient);
+  });
+
+  it("should export pre-configured pyClient", () => {
+    expect(pyClient).toBeInstanceOf(APIClient);
+  });
+
+  it("should export pre-configured ocrClient", () => {
+    expect(ocrClient).toBeInstanceOf(APIClient);
+  });
+
+  it("should allow ocrClient to make requests", async () => {
+    const result = await ocrClient.post("/receipts/extract", { image_base64: "test" });
+    expect(result).toEqual({ data: "test" });
+    expect(global.fetch).toHaveBeenCalled();
   });
 });

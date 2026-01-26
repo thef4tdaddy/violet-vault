@@ -3,7 +3,7 @@
  * Resolves API endpoints for polyglot microservices based on environment.
  */
 
-export type ServiceName = "go-backend" | "py-analytics";
+export type ServiceName = "go-backend" | "py-analytics" | "py-ocr";
 
 /**
  * Helper to get environment variables defensively.
@@ -30,6 +30,11 @@ export const resolveServiceUrl = (service: ServiceName): string => {
     case "py-analytics":
       if (env.PY_API_URL) return env.PY_API_URL;
       return env.PROD ? "/api/analytics" : "http://localhost:8000/api";
+
+    case "py-ocr":
+      // OCR service runs on same Python backend as analytics
+      if (env.PY_API_URL) return env.PY_API_URL;
+      return env.PROD ? "/api" : "http://localhost:8000/api";
 
     default:
       throw new Error(`Unknown service: ${service}`);

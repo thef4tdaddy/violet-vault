@@ -1,12 +1,17 @@
 import logging
 import os
+import re
 from collections.abc import Generator
 from datetime import datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import ValidationError
 from sqlalchemy import JSON, DateTime, Float, String, Text, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+
+from api.sentinel.models import OCRRequest, OCRResponse
+from api.sentinel.ocr_engine import ReceiptExtractor
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -132,3 +137,91 @@ def update_receipt_status(
         logger.error("Failed to update receipt: %s", str(e))
         db.rollback()
         raise HTTPException(status_code=500, detail="Failed to update receipt") from e
+
+
+# OCR Extraction Engine (singleton)
+ocr_extractor = ReceiptExtractor()
+
+
+def scrub_pii_from_error(error_message: str) -> str:
+    """
+    Remove potential PII from error messages before logging.
+
+    Args:
+        error_message: Raw error message
+
+    Returns:
+        Scrubbed error message
+    """
+    # Remove base64 data
+    scrubbed = re.sub(
+        r"image_base64['\"]?\s*:\s*['\"]?[A-Za-z0-9+/=]{20,}",
+        "image_base64: [REDACTED]",
+        error_message,
+    )
+    # Remove file paths
+    scrubbed = re.sub(r"/[a-zA-Z0-9_\-./]+", "[PATH]", scrubbed)
+    return scrubbed
+
+
+@router.post("/extract", response_model=OCRResponse)
+def extract_receipt_data(request: OCRRequest) -> OCRResponse:
+    """
+    Extract structured receipt data from base64-encoded image.
+
+    Args:
+        request: OCR request with base64 image and options
+
+    Returns:
+        OCR response with extracted data or error
+
+    Example:
+        ```json
+        {
+            "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+            "options": {
+                "language": "eng",
+                "preprocessing": true,
+                "psm": 6,
+                "oem": 3
+            }
+        }
+        ```
+    """
+    try:
+        # Validate Tesseract availability on first request
+        if not ocr_extractor.validate_tesseract_available():
+            raise HTTPException(
+                status_code=503,
+                detail="OCR service unavailable. Tesseract is not installed or not in PATH.",
+            )
+
+        # Extract receipt data
+        extracted_data, metadata = ocr_extractor.extract(request.image_base64, request.options)
+
+        return OCRResponse(success=True, data=extracted_data, error=None, metadata=metadata)
+
+    except ValidationError as e:
+        logger.warning(f"Validation error: {e}")
+        return OCRResponse(success=False, data=None, error=f"Invalid request: {e}", metadata={})
+
+    except ValueError as e:
+        error_msg = str(e)
+        logger.warning(f"Invalid input: {error_msg}")
+        return OCRResponse(success=False, data=None, error=error_msg, metadata={})
+
+    except RuntimeError as e:
+        error_msg = str(e)
+        logger.error(f"Runtime error: {error_msg}")
+        return OCRResponse(success=False, data=None, error=error_msg, metadata={})
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        error_msg = str(e)
+        scrubbed_error = scrub_pii_from_error(error_msg)
+        logger.error(f"OCR extraction failed: {scrubbed_error}")
+        return OCRResponse(
+            success=False, data=None, error="OCR extraction failed. Please try again.", metadata={}
+        )

@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from . import ErrorResponse, PaycheckEntry, PaydayPrediction
+from . import ErrorResponse, PaycheckEntry, PaydayPrediction  # noqa: E402
 
 
 def predict_next_payday(paychecks: list[PaycheckEntry]) -> PaydayPrediction:

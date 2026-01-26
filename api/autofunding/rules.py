@@ -5,10 +5,10 @@ Pure functions for rule processing and validation
 """
 
 from .currency import calculate_percentage_amount
-from .models import AutoFundingContext, AutoFundingRule
+from .models import AutoFundingContext, AutoFundingRule, RuleType, TriggerType
 
 # Rule Types
-RULE_TYPES = {
+RULE_TYPES: dict[str, RuleType] = {
     "FIXED_AMOUNT": "fixed_amount",
     "PERCENTAGE": "percentage",
     "CONDITIONAL": "conditional",
@@ -17,7 +17,7 @@ RULE_TYPES = {
 }
 
 # Trigger Types
-TRIGGER_TYPES = {
+TRIGGER_TYPES: dict[str, TriggerType] = {
     "MANUAL": "manual",
     "INCOME_DETECTED": "income_detected",
     "MONTHLY": "monthly",
