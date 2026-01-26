@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { execSync } from "child_process";
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 
 // Get git commit information at build time
 const getGitInfo = () => {
@@ -68,7 +69,15 @@ export default defineConfig(() => {
   const enableDebugBuild = isStagedBranch && isProduction;
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "violet-vault-frontend-main",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
+    ],
     // Avoid multiple copies of React which can cause
     // "Invalid hook call" errors during development
     resolve: {
