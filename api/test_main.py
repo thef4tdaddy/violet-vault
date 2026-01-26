@@ -1,6 +1,14 @@
 from typing import Any
 
-from api.main import before_send, scrub_pii
+import pytest
+from fastapi.testclient import TestClient
+
+from api.main import app, before_send, scrub_pii
+
+
+@pytest.fixture
+def client() -> TestClient:
+    return TestClient(app)
 
 
 def test_scrub_pii() -> None:
@@ -30,3 +38,16 @@ def test_before_send_redaction() -> None:
     assert result["exception"]["values"][0]["value"] == "Failed to process [REDACTED_AMOUNT]"
     assert result["request"]["data"] == "[REDACTED_EMAIL] touched [REDACTED_AMOUNT]"
     assert result["request"]["cookies"] == ""
+
+
+def test_health_check(client: TestClient) -> None:
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"
+
+
+def test_warm_up(client: TestClient) -> None:
+    response = client.get("/api/warm")
+    assert response.status_code == 200
+    assert response.json()["status"] == "warmed"
+    assert "Analytics API" in response.json()["service"]

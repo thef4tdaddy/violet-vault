@@ -132,6 +132,15 @@ def audit_envelope_integrity(snapshot: AuditSnapshot) -> IntegrityAuditResult:
         raise HTTPException(status_code=500, detail=f"Audit failed: {str(e)}") from e
 
 
+@app.get("/api/warm")
+async def warm_up() -> dict[str, str]:
+    """
+    Lightweight warm-up endpoint to mitigate cold starts.
+    Used by CI or external monitoring to keep the service warm during peak traffic.
+    """
+    return {"status": "warmed", "service": "VioletVault Analytics API"}
+
+
 @app.get("/health")
 def health_check() -> dict[str, Any]:
     """
