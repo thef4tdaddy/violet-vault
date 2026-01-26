@@ -31,9 +31,9 @@
     "build:dev": "vite build --config vite.config.js --mode development",
     "preview": "vite preview --config vite.config.js",
     "preview:staging": "vite preview --config vite.config.js --mode staging",
-    "lint": "eslint . --config configs/linting/eslint.config.js --max-warnings 0 --cache",
-    "lint:fix": "eslint . --config configs/linting/eslint.config.js --fix --cache",
-    "lint:json": "mkdir -p docs/audits && eslint . --config configs/linting/eslint.config.js --format json --cache > docs/audits/lint-results.json || true",
+    "lint": "eslint . --config eslint.config.js --max-warnings 0 --cache",
+    "lint:fix": "eslint . --config eslint.config.js --fix --cache",
+    "lint:json": "mkdir -p docs/audits && eslint . --config eslint.config.js --format json --cache > docs/audits/lint-results.json || true",
     "lint:audit": "npm run lint:json && bash scripts/audit/sort-lint-audit.sh",
     "tsc:check": "tsc --noEmit",
     "tsc:watch": "tsc --noEmit --watch",
@@ -44,8 +44,8 @@
     "typecheck:strict:audit": "npm run typecheck:strict && bash scripts/audit/sort-typecheck-strict-audit.sh",
     "audit:full": "npm run lint:audit && npm run typecheck:audit && npm run typecheck:strict:audit && bash scripts/audit/generate-markdown-report.sh",
     "typecheck:sw": "tsc --noEmit --project configs/typescript/tsconfig.sw.json",
-    "format": "prettier --config ./configs/linting/prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "format:check": "prettier --config ./configs/linting/prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format": "prettier --config prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --config prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "prepare": "husky",
     "commit": "git add . && git commit",
     "check-commit": "commitlint --config ./configs/linting/commitlint.config.cjs --from HEAD~1 --to HEAD --verbose",
@@ -61,6 +61,7 @@
     "backup:data": "node scripts/backup-data.js"
   },
   "dependencies": {
+    "@highlight-run/react": "^20.0.1",
     "@msgpack/msgpack": "^3.1.2",
     "@sentry/react": "^10.27.0",
     "@sentry/tracing": "^7.120.4",
@@ -72,6 +73,7 @@
     "dexie": "^4.0.11",
     "esbuild": "^0.27.0",
     "firebase": "^12.4.0",
+    "highlight.run": "^9.18.23",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.0.0",
     "lightningcss": "^1.30.1",
@@ -93,7 +95,6 @@
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "^8.1.0",
-    "@codecov/vite-plugin": "^1.9.1",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@rollup/plugin-commonjs": "^29.0.0",
@@ -134,11 +135,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "eslint --config configs/linting/eslint.config.js --fix --no-warn-ignored",
-      "prettier --config configs/linting/prettier.config.js --write"
+      "eslint --config eslint.config.js --fix --no-warn-ignored",
+      "prettier --config prettier.config.js --write"
     ],
     "*.{json,md,yml,yaml,css,scss}": [
-      "prettier --config configs/linting/prettier.config.js --write"
+      "prettier --config prettier.config.js --write"
     ],
     "*.go": [
       "gofmt -w"
