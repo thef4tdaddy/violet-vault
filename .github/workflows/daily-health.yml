@@ -17,7 +17,7 @@ on:
           - production
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -28,8 +28,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # TODO: Alpha now targets develop post-v2.0 merge.
-          ref: ${{ (inputs.context || 'alpha') == 'alpha' && 'develop' || (inputs.context == 'beta' && 'develop' || github.ref) }}
+          fetch-depth: 0
+          ref: ${{ github.ref }}
 
       # --- Setup Environments ---
       - name: Setup Node.js
@@ -39,7 +39,6 @@ jobs:
           cache: "npm"
 
       - name: Setup Go
-        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
         if: hashFiles('api/go.sum') != ''
         uses: actions/setup-go@v5
         with:
@@ -47,7 +46,6 @@ jobs:
           cache-dependency-path: api/go.sum
 
       - name: Setup Python
-        # TODO (v2.0): Once polyglot is standard across all branches, this conditional can be removed.
         if: hashFiles('requirements.txt', 'pyproject.toml', 'api/requirements.txt') != ''
         uses: actions/setup-python@v5
         with:
@@ -57,6 +55,14 @@ jobs:
       # --- Install Dependencies ---
       - name: Install Node Deps
         run: npm ci
+
+      - name: Security Audit
+        continue-on-error: true
+        id: security_audit
+        run: |
+          npm audit --audit-level=high > npm-audit.txt 2>&1 || true
+          VULNS=$(grep -c "high" npm-audit.txt || echo "0")
+          echo "vulns=$VULNS" >> $GITHUB_OUTPUT
 
       - name: Install Python Deps
         run: |
@@ -72,6 +78,7 @@ jobs:
             pip install -r api/requirements.txt
           fi
           pip install pytest pytest-cov
+          cd ..
 
       - name: Install Go Deps
         if: hashFiles('api/go.mod') != ''
@@ -80,9 +87,43 @@ jobs:
           go mod download
           cd ..
 
+      # --- Housekeeping ---
+      - name: Stale Branch Cleanup
+        id: cleanup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🧹 Housekeeping: Stale Branch Cleanup"
+
+          # Protected: main, develop, feat/*, archive/*, dependabot/*, lighthouse-reports
+          PROTECTED_REGEX="^(main|develop|feat/|archive/|dependabot/|lighthouse-reports)"
+          CUTOFF_DATE=$(date -d "72 hours ago" +%s)
+
+          DELETED_BRANCHES=""
+
+          # Get all remote branches
+          ALL_BRANCHES=$(git branch -r | sed 's/origin\///' | tr -d ' ' | grep -v "HEAD")
+
+          for BRANCH in $ALL_BRANCHES; do
+            if [[ $BRANCH =~ $PROTECTED_REGEX ]]; then
+              continue
+            fi
+            
+            LAST_COMMIT_DATE=$(git log -1 --format=%ct "origin/$BRANCH" 2>/dev/null || echo "0")
+            if [ "$LAST_COMMIT_DATE" -lt "$CUTOFF_DATE" ] && [ "$LAST_COMMIT_DATE" -ne "0" ]; then
+              echo "🗑️ Deleting stale branch: $BRANCH"
+              git push origin --delete "$BRANCH" || echo "   ⚠️ Failed to delete $BRANCH"
+              DELETED_BRANCHES="$DELETED_BRANCHES $BRANCH"
+            fi
+          done
+
+          echo "deleted_branches=$DELETED_BRANCHES" >> $GITHUB_OUTPUT
+
       # --- Build ---
-      - name: Build Frontend
+      - name: Build Frontend & Bundle Analysis
         id: build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: npm run build
 
       # --- Tests & Coverage ---
@@ -168,10 +209,13 @@ jobs:
 
             // Gather Statuses
             const contextName = '${{ inputs.context || 'scheduled' }}';
+            const branchName = context.ref.replace('refs/heads/', '');
             const buildStatus = '${{ steps.build.outcome }}';
             const feStatus = '${{ steps.test_frontend.outputs.status }}' || 'skipped';
             const goStatus = '${{ steps.test_go.outputs.status }}' || 'skipped';
             const pyStatus = '${{ steps.test_python.outputs.status }}' || 'skipped';
+            const deletedBranches = '${{ steps.cleanup.outputs.deleted_branches }}'.trim();
+            const securityVulns = '${{ steps.security_audit.outputs.vulns }}' || '0';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
             // Get coverage percentages
@@ -188,84 +232,89 @@ jobs:
             const title = `Daily Health: ${dateStr} - ${emoji}`;
 
             let body = `## ${emoji} Daily Health Check: ${dateStr}\n\n`;
-            body += `**Context**: ${contextName}\n`;
+            body += `**Branch**: \`${branchName}\`\n`;
             body += `**Workflow Run**: [View Logs](${runUrl})\n\n`;
 
-            // Add Coverage Table (always show)
-            body += `## 📊 Test Coverage\n\n`;
+            // Add Coverage Table
+            body += `## 📊 System Health Metrics\n\n`;
             body += `| Suite | Coverage | Status |\n`;
             body += `|-------|----------|--------|\n`;
             body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
             body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
             body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-            body += `\n**Coverage Reports**: [Download artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
+            body += `\n**Coverage & Analysis**: [Codecov Dashboard](https://app.codecov.io/gh/${context.repo.owner}/${context.repo.repo})\n\n`;
 
-            body += `### Status Breakdown\n`;
+            body += `### Infrastructure Status\n`;
             body += `- **Build**: ${buildStatus === 'success' ? '✅ Pass' : '❌ FAIL'}\n`;
-            body += `- **Frontend Tests**: ${feStatus === 'success' ? '✅ Pass' : (feStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
-            body += `- **Go Tests**: ${goStatus === 'success' ? '✅ Pass' : (goStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
-            body += `- **Python Tests**: ${pyStatus === 'success' ? '✅ Pass' : (pyStatus === 'failure' ? '❌ FAIL' : '⚪ Skipped')}\n`;
+            body += `- **Security Audit**: ${securityVulns === '0' ? '✅ 0 High Vulns' : `⚠️ ${securityVulns} High Vulns`}\n`;
+            body += `- **Stale Branches Removed**: ${deletedBranches ? `🧹 \`${deletedBranches}\`` : '✅ None'}\n\n`;
 
-            // Frontend Coverage Parsing (JSON)
+            // Combined Worst Offenders (across all languages)
+            const allOffenders = [];
+
+            // 1. Frontend Offenders
             if (fs.existsSync('coverage/coverage-summary.json')) {
                try {
                    const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
-                   const total = coverage.total.lines.pct;
-                   body += `\n### Frontend Coverage Details\n`;
-                   body += `- **Total**: ${total}%\n`;
-                   
-                   // Find worst offenders
-                   const lowCovFiles = [];
                    for (const [filepath, metrics] of Object.entries(coverage)) {
-                       if (filepath === 'total') continue;
-                       if (filepath.includes('config') || filepath.includes('.d.ts')) continue;
-                       
+                       if (filepath === 'total' || filepath.includes('config') || filepath.includes('.d.ts')) continue;
                        if (metrics.lines.pct < 80) {
-                           lowCovFiles.push({ file: filepath, pct: metrics.lines.pct });
+                           allOffenders.push({ file: filepath, pct: metrics.lines.pct, lang: 'TypeScript' });
                        }
                    }
-                   
-                   lowCovFiles.sort((a, b) => a.pct - b.pct);
-                   
-                   if (lowCovFiles.length > 0) {
-                       body += `\n**Lowest Coverage Files:**\n`;
-                       for (const item of lowCovFiles.slice(0, 5)) {
-                           body += `- \`${item.file}\`: ${item.pct}%\n`;
-                       }
-
-                       // Create Tasks for worst 3 frontend offenders
-                       // When frontend < 80%: Only create frontend issues (focus on core app)
-                       // When frontend >= 80%: Create frontend + backend issues (TODO: implement backend parsing)
-                       const candidates = lowCovFiles.slice(0, 3);
-                       for (const item of candidates) {
-                           const parts = item.file.split('/');
-                           const basename = parts[parts.length - 1];
-                           const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-                           
-                           const existing = await github.rest.search.issuesAndPullRequests({
-                               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "Improve coverage for ${basename}"`
-                           });
-                           
-                           if (existing.data.total_count === 0) {
-                               await github.rest.issues.create({
-                                   owner: context.repo.owner,
-                                   repo: context.repo.repo,
-                                   title: issueTitle,
-                                   body: `Automated Coverage Task\n\nFile: \`${item.file}\`\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
-                                   labels: ['coverage-gap', 'help-wanted', 'automated']
-                               });
-                           }
-                       }
-                       
-                       // TODO: When frontend >= 80%, also parse and create issues for backend worst offenders
-                       // This requires parsing Go coverage.out and Python coverage.json for file-level coverage
-                   }
-               } catch (e) {
-                   console.error("Error parsing FE coverage", e);
-               }
+               } catch (e) { console.error("FE parse error", e); }
             }
 
-            body += `\n---\n*VioletVault Health Bot*`;
+            // 2. Python Offenders
+            if (fs.existsSync('api/coverage.json')) {
+               try {
+                   const coverage = JSON.parse(fs.readFileSync('api/coverage.json', 'utf8'));
+                   for (const [filepath, metrics] of Object.entries(coverage.files)) {
+                       const pct = metrics.summary.percent_covered;
+                       if (pct < 80) {
+                           allOffenders.push({ file: filepath, pct: pct, lang: 'Python' });
+                       }
+                   }
+               } catch (e) { console.error("PY parse error", e); }
+            }
+
+            // 3. Go (TODO: Add file-level parsing if needed, currently using summary)
+
+            // Select Top 3 Worst Offenders
+            allOffenders.sort((a, b) => a.pct - b.pct);
+            const top3 = allOffenders.slice(0, 3);
+
+            if (top3.length > 0) {
+                body += `### 📉 Coverage Gap: Top 3 Offenders\n`;
+                for (const item of top3) {
+                    body += `- \`${item.file}\` (${item.lang}): **${item.pct.toFixed(2)}%**\n`;
+                }
+
+                // Issue creation (Only on develop)
+                if (branchName === 'develop') {
+                    for (const item of top3) {
+                        const parts = item.file.split('/');
+                        const basename = parts[parts.length - 1];
+                        const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+                        
+                        const existing = await github.rest.search.issuesAndPullRequests({
+                            q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${issueTitle}"`
+                        });
+                        
+                        if (existing.data.total_count === 0) {
+                            await github.rest.issues.create({
+                                owner: context.repo.owner,
+                                repo: context.repo.repo,
+                                title: issueTitle,
+                                body: `Automated Coverage Task\n\nFile: \`${item.file}\` (${item.lang})\nCurrent Coverage: **${item.pct}%**\n\nPlease add tests.`,
+                                labels: ['coverage-gap', 'help-wanted', 'automated']
+                            });
+                        }
+                    }
+                }
+            }
+
+            body += `\n---\n*VioletVault Sentinel Health Bot*`;
 
             await github.rest.issues.create({
               owner: context.repo.owner,
