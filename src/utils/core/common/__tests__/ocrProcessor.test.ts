@@ -5,10 +5,10 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { OCRProcessor, ocrProcessor, processReceiptImage, preloadOCR } from "../ocrProcessor";
-import { ocrClient } from "@/utils/core/api/client";
+import { ocrClient } from "../../api/client";
 
 // Mock logger
-vi.mock("@/utils/core/common/logger", () => ({
+vi.mock("../logger", () => ({
   default: {
     error: vi.fn(),
     warn: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock("@/utils/core/common/logger", () => ({
 }));
 
 // Mock ocrClient
-vi.mock("@/utils/core/api/client", () => ({
+vi.mock("../../api/client", () => ({
   ocrClient: {
     post: vi.fn(),
   },

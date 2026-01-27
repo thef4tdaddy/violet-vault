@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import { processReceiptImage } from "@/utils/core/common/ocrProcessor";
+import { resizeImage } from "@/utils/core/common/imageUtils";
 import logger from "@/utils/core/common/logger";
 
 // Define types for the hook
@@ -26,7 +27,7 @@ export interface ExtendedReceiptData extends ReceiptData {
   processingTime: number;
 }
 
-interface ReceiptProcessedData {
+export interface ReceiptProcessedData {
   merchant: string | null;
   total: string | null;
   date: string | null;
@@ -95,13 +96,6 @@ export const useReceiptScanner = (onReceiptProcessed?: OnReceiptProcessedCallbac
       try {
         // Create preview URL
         const imageUrl = URL.createObjectURL(file);
-        const newUploadedImage: UploadedImage = {
-          file,
-          url: imageUrl,
-          name: file.name,
-          size: file.size,
-        };
-        setUploadedImage(newUploadedImage);
 
         logger.info("🧾 Processing receipt image...", {
           fileName: file.name,
@@ -109,8 +103,20 @@ export const useReceiptScanner = (onReceiptProcessed?: OnReceiptProcessedCallbac
           fileType: file.type,
         });
 
+        // Client-side resizing to improve upload speed and stay within server limits
+        const resizedBlob = await resizeImage(file);
+        const resizedFile = new File([resizedBlob], file.name, { type: file.type });
+
+        const newUploadedImage: UploadedImage = {
+          file: resizedFile,
+          url: imageUrl,
+          name: file.name,
+          size: resizedFile.size,
+        };
+        setUploadedImage(newUploadedImage);
+
         // Process with OCR
-        const result = await processReceiptImage(file);
+        const result = await processReceiptImage(resizedFile);
 
         setExtractedData(result);
         logger.info("✅ Receipt processing completed", {

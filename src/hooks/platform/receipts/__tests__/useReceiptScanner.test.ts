@@ -1,11 +1,17 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { useReceiptScanner } from "../useReceiptScanner";
-import { processReceiptImage } from "@/utils/core/common/ocrProcessor";
+import { processReceiptImage } from "../../../../utils/core/common/ocrProcessor";
 
 // Mock the OCR processor
-vi.mock("@/utils/core/common/ocrProcessor");
-vi.mock("@/utils/core/common/logger");
+vi.mock("../../../../utils/core/common/ocrProcessor");
+vi.mock("../../../../utils/core/common/logger");
+vi.mock("../../../../utils/core/common/imageUtils", () => ({
+  resizeImage: vi.fn((file) => Promise.resolve(file)),
+}));
 
 describe("useReceiptScanner", () => {
   const mockOnReceiptProcessed = vi.fn();
