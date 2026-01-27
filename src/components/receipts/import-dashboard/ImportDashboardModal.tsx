@@ -79,6 +79,8 @@ export const ImportDashboardModal: React.FC = () => {
           hard-border
           overflow-hidden
           shadow-2xl
+          flex flex-col
+          safe-area-inset-top safe-area-inset-bottom
         "
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1}

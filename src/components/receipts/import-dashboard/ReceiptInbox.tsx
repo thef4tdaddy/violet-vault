@@ -92,7 +92,7 @@ const ReceiptInbox: React.FC<ReceiptInboxProps> = ({
   if (isLoading) {
     return (
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20 md:pb-0 ${className}`}
         data-testid="receipt-inbox-loading"
         aria-busy="true"
         aria-label="Loading receipts"
@@ -117,7 +117,7 @@ const ReceiptInbox: React.FC<ReceiptInboxProps> = ({
   if (!shouldVirtualize) {
     return (
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20 md:pb-0 ${className}`}
         data-testid="receipt-inbox"
         data-virtualized="false"
       >
@@ -143,7 +143,7 @@ const ReceiptInbox: React.FC<ReceiptInboxProps> = ({
   return (
     <div
       ref={parentRef}
-      className={`overflow-auto ${className}`}
+      className={`overflow-auto pb-20 md:pb-0 ${className}`}
       data-testid="receipt-inbox"
       data-virtualized="true"
       style={{ height: "100%", width: "100%" }}

@@ -7,7 +7,7 @@ import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
 
 // Mock the ImportDashboard component
 vi.mock("../ImportDashboard", () => ({
-  ImportDashboard: ({ onClose, preloadedFile }: { onClose: () => void; preloadedFile: File | null }) => (
+  default: ({ onClose, preloadedFile }: { onClose: () => void; preloadedFile: File | null }) => (
     <div data-testid="import-dashboard-content">
       <button onClick={onClose} data-testid="dashboard-close">
         Dashboard Close
@@ -295,6 +295,8 @@ describe("ImportDashboardModal", () => {
       expect(modalContent).toHaveClass("w-full", "h-full");
       expect(modalContent).toHaveClass("md:w-[95vw]", "md:h-[90vh]");
       expect(modalContent).toHaveClass("rounded-none", "md:rounded-3xl");
+      expect(modalContent).toHaveClass("flex", "flex-col");
+      expect(modalContent).toHaveClass("safe-area-inset-top", "safe-area-inset-bottom");
     });
   });
 });

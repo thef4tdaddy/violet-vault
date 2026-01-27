@@ -2,6 +2,7 @@ import React from "react";
 import { getIcon } from "@/utils/ui/icons";
 import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
 import { useOCRJobStatus } from "@/hooks/platform/receipts/useOCRJobStatus";
+import ErrorState from "./ErrorState";
 
 const Calendar = getIcon("Calendar");
 const DollarSign = getIcon("DollarSign");
@@ -85,26 +86,42 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
   const statusStyles = getStatusStyles(receipt.status);
 
   // Poll for status if this is a scan that might be processing
-  const { status: jobStatus, progress } = useOCRJobStatus(
-    receipt.source === "ocr" ? receipt.id : ""
-  );
+  const {
+    status: jobStatus,
+    progress,
+    error,
+  } = useOCRJobStatus(receipt.source === "ocr" ? receipt.id : "");
 
   // Determine effective status (merge prop status with polled status)
   const isProcessing =
     receipt.status === "processing" || ["queued", "processing", "extracting"].includes(jobStatus);
 
+  const isFailed = receipt.status === "failed" || jobStatus === "failed";
+
   const handleClick = () => {
-    if (onClick && !isProcessing) {
+    if (onClick && !isProcessing && !isFailed) {
       onClick(receipt);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (onClick && !isProcessing && (e.key === "Enter" || e.key === " ")) {
+    if (onClick && !isProcessing && !isFailed && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       onClick(receipt);
     }
   };
+
+  if (isFailed) {
+    return (
+      <div className={`p-1 ${className}`}>
+        <ErrorState
+          title="Processing Failed"
+          message={error?.message || "Could not extract receipt data."}
+          className="h-full bg-white shadow-xl"
+        />
+      </div>
+    );
+  }
 
   return (
     <div

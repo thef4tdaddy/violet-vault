@@ -8,6 +8,7 @@ import { useUnifiedReceipts } from "@/hooks/platform/receipts/useUnifiedReceipts
 import { useReceiptMatching } from "@/hooks/platform/receipts/useReceiptMatching";
 import { useReceiptMutations } from "@/hooks/platform/data/useReceiptMutations";
 import { useReceiptScanner } from "@/hooks/platform/receipts/useReceiptScanner";
+import { useOfflineReceiptQueue } from "@/hooks/platform/receipts/useOfflineReceiptQueue";
 import type { ImportMode, DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { ReceiptProcessedData } from "@/hooks/platform/receipts/useReceiptScanner";
 import type { Receipt } from "@/db/types";
@@ -71,6 +72,35 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     addReceipt(convertOCRDataToReceipt(data) as Receipt);
   });
 
+  // Offline Queue Hook
+  const {
+    addToQueue,
+    retryQueue,
+    pendingCount: offlineCount,
+    isOnline,
+    isSyncing,
+  } = useOfflineReceiptQueue(handleFileUpload);
+
+  // Wrapped upload handler that checks connectivity
+  const handleFileSelected = useCallback(
+    (file: File) => {
+      if (!isOnline) {
+        addToQueue(file);
+      } else {
+        handleFileUpload(file);
+      }
+    },
+    [isOnline, addToQueue, handleFileUpload]
+  );
+
+  const handleReceiptProcessed = useCallback(
+    (data: ReceiptProcessedData) => {
+      addReceipt(convertOCRDataToReceipt(data) as Receipt);
+      setShowOCRScanner(false);
+    },
+    [addReceipt]
+  );
+
   // Auto-trigger OCR scanner if a file is preloaded (e.g. from PWA share)
   useEffect(() => {
     if (preloadedFile) {
@@ -78,6 +108,32 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
       handleFileUpload(preloadedFile);
     }
   }, [preloadedFile, handleFileUpload]);
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case "d":
+          setSelectedMode("digital");
+          break;
+        case "s":
+          setSelectedMode("scan");
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const { sentinelReceipts, ocrReceipts, isLoading, error } = useUnifiedReceipts();
   const {
@@ -99,16 +155,8 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
 
   const pendingCounts = {
     digital: sentinelReceipts.filter((r) => r.status === "pending").length,
-    scan: ocrReceipts.filter((r) => r.status === "pending").length,
+    scan: ocrReceipts.filter((r) => r.status === "pending").length + offlineCount,
   };
-
-  const handleReceiptProcessed = useCallback(
-    (data: ReceiptProcessedData) => {
-      addReceipt(convertOCRDataToReceipt(data) as Receipt);
-      setShowOCRScanner(false);
-    },
-    [addReceipt]
-  );
 
   const handleReceiptClick = useCallback(
     (dashboardReceipt: DashboardReceiptItem) => {
@@ -178,6 +226,32 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
             </div>
           )}
 
+          {offlineCount > 0 && (
+            <div
+              className="mb-6 p-4 bg-amber-100 border-2 border-amber-500 rounded-lg shadow-[4px_4px_0px_0px_rgba(245,158,11,1)] flex items-center justify-between"
+              data-testid="offline-banner"
+            >
+              <div>
+                <h2 className="font-mono font-black uppercase text-amber-900 text-sm mb-1">
+                  {isOnline ? "Syncing Offline Receipts" : "Offline Mode Active"}
+                </h2>
+                <p className="font-mono text-xs text-amber-800">
+                  {isOnline
+                    ? `Uploading ${offlineCount} pending receipts...`
+                    : `${offlineCount} receipts queued. Connect to internet to sync.`}
+                </p>
+              </div>
+              {isOnline && !isSyncing && (
+                <button
+                  onClick={() => retryQueue()}
+                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 border border-amber-600 rounded text-xs font-bold text-amber-900 transition-colors"
+                >
+                  Sync Now
+                </button>
+              )}
+            </div>
+          )}
+
           <ReceiptInbox
             receipts={filteredReceipts}
             mode={selectedMode}
@@ -191,7 +265,10 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
               <h2 className="font-mono font-black uppercase tracking-tight text-black text-xl mb-4">
                 Add New Scan
               </h2>
-              <ScanUploadZone onFileSelected={handleFileUpload} isProcessing={isProcessing} />
+              <ScanUploadZone
+                onFileSelected={handleFileSelected}
+                isProcessing={isProcessing || isSyncing}
+              />
             </div>
           )}
         </main>

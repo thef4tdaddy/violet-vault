@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ImportDashboard from "../ImportDashboard";
@@ -635,6 +635,46 @@ describe("ImportDashboard", () => {
       expect(mocks.hapticFeedback).toHaveBeenCalledWith(20, "success");
       expect(mocks.showSuccess).toHaveBeenCalled();
       expect(mocks.closeDashboard).toHaveBeenCalled();
+    });
+  });
+
+  describe("Keyboard Shortcuts", () => {
+    it("should switch to scan mode when 's' key is pressed", () => {
+      renderWithProvider(<ImportDashboard initialMode="digital" />);
+
+      act(() => {
+        fireEvent.keyDown(window, { key: "s" });
+      });
+
+      expect(screen.getByText("Scanned receipts from uploaded images")).toBeInTheDocument();
+      expect(screen.getByTestId("import-mode-scan")).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("should switch to digital mode when 'd' key is pressed", () => {
+      renderWithProvider(<ImportDashboard initialMode="scan" />);
+
+      act(() => {
+        fireEvent.keyDown(window, { key: "d" });
+      });
+
+      expect(screen.getByText("Digital receipts from connected apps")).toBeInTheDocument();
+      expect(screen.getByTestId("import-mode-digital")).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("should not switch modes when typing in an input", () => {
+      renderWithProvider(<ImportDashboard initialMode="digital" />);
+
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      input.focus();
+
+      act(() => {
+        fireEvent.keyDown(window, { key: "s" });
+      });
+
+      // Should still be in digital mode
+      expect(screen.getByText("Digital receipts from connected apps")).toBeInTheDocument();
+      document.body.removeChild(input);
     });
   });
 });

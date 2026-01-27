@@ -47,6 +47,16 @@ describe("ImportSidebar", () => {
       const sidebar = screen.getByTestId("import-sidebar");
       expect(sidebar).toHaveClass("custom-class");
     });
+
+    it("should have responsive layout classes", () => {
+      render(<ImportSidebar {...defaultProps} />);
+      const sidebar = screen.getByTestId("import-sidebar");
+
+      // Mobile: Row layout, fixed at bottom
+      expect(sidebar).toHaveClass("flex-row", "md:flex-col");
+      expect(sidebar).toHaveClass("justify-around", "md:justify-start");
+      expect(sidebar).toHaveClass("border-t-2", "md:border-t-0");
+    });
   });
 
   describe("Active state styling", () => {
@@ -144,6 +154,12 @@ describe("ImportSidebar", () => {
       // No count badges should be visible
       const badges = screen.queryByLabelText(/pending.*receipts/i);
       expect(badges).not.toBeInTheDocument();
+
+      // Mobile dots should also not be visible
+      const dots = screen
+        .queryAllByRole("none", { hidden: true })
+        .filter((el) => el.classList.contains("bg-red-500"));
+      expect(dots).toHaveLength(0);
     });
 
     it("should display badge for only one mode if other is zero", () => {
