@@ -3,6 +3,7 @@ import { Button } from "@/components/ui";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getIcon } from "@/utils";
 import logger from "@/utils/core/common/logger";
+import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
 
 /**
  * Shared data interface
@@ -25,6 +26,7 @@ const ShareTargetHandler: React.FC = () => {
   const [sharedData, setSharedData] = useState<SharedData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const openImportDashboard = useImportDashboardStore((state) => state.open);
 
   const handleSharedContent = useCallback(async () => {
     setIsProcessing(true);
@@ -45,19 +47,33 @@ const ShareTargetHandler: React.FC = () => {
         url,
         timestamp: new Date().toISOString(),
         hasFiles: false,
+        files: [] as File[],
       };
 
-      // Check if there are files in the form data (for POST requests)
+      // Check if there are files in the location state (passed from SW or router)
+      const locationState = location.state as any;
+      if (locationState?.files && Array.isArray(locationState.files)) {
+        data.files = locationState.files;
+        data.hasFiles = data.files.length > 0;
+      }
+
+      // Check for files in the search params as a indicator (legacy/mock support)
       if (window.location.href.includes("files=")) {
         data.hasFiles = true;
       }
 
-      setSharedData(data as SharedData);
+      setSharedData(data as any);
 
       // Auto-redirect to appropriate section after showing preview
       setTimeout(() => {
-        if (data.hasFiles || (data.text && data.text.includes("csv"))) {
-          // Likely financial data file
+        if (data.hasFiles) {
+          // Files shared (likely receipt images) - open import dashboard
+          navigate("/app/dashboard");
+          // Small delay to ensure navigation completes before opening modal
+          const firstFile = data.files.length > 0 ? data.files[0] : undefined;
+          setTimeout(() => openImportDashboard({ preloadFile: firstFile }), 100);
+        } else if (data.text && data.text.includes("csv")) {
+          // CSV file data - use transaction import modal
           navigate("/app/transactions", {
             state: {
               importData: data,

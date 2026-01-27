@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import ImportSidebar from "./ImportSidebar";
 import ReceiptInbox from "./ReceiptInbox";
 import OCRScanner from "@/components/sentinel/OCRScanner";
@@ -48,6 +48,14 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
 }) => {
   const [selectedMode, setSelectedMode] = useState<ImportMode>(initialMode);
   const [showOCRScanner, setShowOCRScanner] = useState(false);
+
+  // Auto-trigger OCR scanner if a file is preloaded (e.g. from PWA share)
+  useEffect(() => {
+    if (preloadedFile) {
+      setSelectedMode("scan");
+      setShowOCRScanner(true);
+    }
+  }, [preloadedFile]);
 
   const { sentinelReceipts, ocrReceipts, isLoading, error } = useUnifiedReceipts();
   const {
@@ -149,6 +157,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
 
       {showOCRScanner && (
         <OCRScanner
+          preloadedFile={preloadedFile}
           onReceiptProcessed={handleReceiptProcessed}
           onClose={() => setShowOCRScanner(false)}
         />

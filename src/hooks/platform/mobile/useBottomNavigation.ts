@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getIcon } from "@/utils";
+import { useUnifiedReceipts } from "@/hooks/platform/receipts/useUnifiedReceipts";
 
 /**
  * Hook for bottom navigation state management
@@ -24,6 +25,9 @@ export const useBottomNavigation = () => {
 
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
+
+  const { pendingReceipts } = useUnifiedReceipts();
+  const pendingCount = pendingReceipts.length;
 
   // Define navigation items with icons and paths
   // Order: Dashboard > Envelopes > Bills > Transactions > rest
@@ -56,6 +60,7 @@ export const useBottomNavigation = () => {
         icon: getIcon("BookOpen"),
         label: "Transactions",
         priority: 2, // Show on medium screens
+        badgeCount: pendingCount,
       },
       {
         key: "savings",
@@ -93,7 +98,7 @@ export const useBottomNavigation = () => {
         priority: 4, // Show on extra large screens
       },
     ],
-    []
+    [pendingCount]
   );
 
   // Get current active item based on URL

@@ -1,6 +1,17 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useBottomNavigation } from "../useBottomNavigation";
+import { useUnifiedReceipts } from "../../../hooks/platform/receipts/useUnifiedReceipts";
+
+// Mock hooks
+vi.mock("../../../hooks/platform/receipts/useUnifiedReceipts", () => ({
+  useUnifiedReceipts: vi.fn(() => ({
+    pendingReceipts: [],
+    allReceipts: [],
+    isLoading: false,
+    error: null,
+  })),
+}));
 
 // Mock react-router-dom location
 let mockPathname = "/app/dashboard";
@@ -208,5 +219,50 @@ describe("useBottomNavigation", () => {
     const secondItems = result.current.navigationItems;
 
     expect(firstItems).toBe(secondItems);
+  });
+
+  it("should include badgeCount for transactions if pending receipts exist", () => {
+    vi.mocked(useUnifiedReceipts).mockReturnValue({
+      pendingReceipts: [{}, {}] as any, // 2 pending receipts
+      allReceipts: [],
+      isLoading: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => useBottomNavigation());
+    const transactionsItem = result.current.navigationItems.find(
+      (item) => item.key === "transactions"
+    );
+
+    expect(transactionsItem).toHaveProperty("badgeCount", 2);
+  });
+
+  it("should update navigation items when pending receipts count changes", () => {
+    // Start with 0
+    vi.mocked(useUnifiedReceipts).mockReturnValue({
+      pendingReceipts: [],
+      allReceipts: [],
+      isLoading: false,
+      error: null,
+    });
+
+    const { result, rerender } = renderHook(() => useBottomNavigation());
+    let transactionsItem = result.current.navigationItems.find(
+      (item) => item.key === "transactions"
+    );
+    expect(transactionsItem?.badgeCount).toBe(0);
+
+    // Update to 5
+    vi.mocked(useUnifiedReceipts).mockReturnValue({
+      pendingReceipts: new Array(5).fill({}),
+      allReceipts: [],
+      isLoading: false,
+      error: null,
+    });
+
+    rerender();
+
+    transactionsItem = result.current.navigationItems.find((item) => item.key === "transactions");
+    expect(transactionsItem?.badgeCount).toBe(5);
   });
 });

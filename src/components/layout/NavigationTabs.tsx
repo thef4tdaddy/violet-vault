@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { getIcon } from "@/utils";
 import { getButtonClasses, hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 import { useSentinelReceipts } from "@/hooks/api/useSentinelReceipts";
+import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
 
 interface NavButtonProps {
   active: boolean;
@@ -214,37 +215,50 @@ const NavLabel = memo(({ label }: { label: string }) => (
 NavLabel.displayName = "NavLabel";
 
 const NavButton = memo(
-  ({ active, to, icon: _Icon, label, viewKey, badgeCount }: NavButtonProps) => (
-    <Link
-      to={to}
-      aria-current={active ? "page" : undefined}
-      data-view={viewKey}
-      data-tab={viewKey}
-      onClick={() => hapticFeedback(10, "light")}
-      className={getButtonClasses(
-        `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
-          active
-            ? "border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 ring-1 ring-purple-300"
-            : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
-        }`,
-        "tab"
-      )}
-      style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
-    >
-      <div className="relative">
-        <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
-        {badgeCount !== undefined && badgeCount > 0 && (
-          <span
-            className="absolute -top-2 -right-4 lg:-top-2 lg:right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-black rounded-full border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
-            aria-label={`${badgeCount} pending items`}
-          >
-            {badgeCount > 99 ? "99+" : badgeCount}
-          </span>
+  ({ active, to, icon: _Icon, label, viewKey, badgeCount }: NavButtonProps) => {
+    const openImportDashboard = useImportDashboardStore((state) => state.open);
+
+    const handleBadgeClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      hapticFeedback(15, "medium");
+      openImportDashboard();
+    };
+
+    return (
+      <Link
+        to={to}
+        aria-current={active ? "page" : undefined}
+        data-view={viewKey}
+        data-tab={viewKey}
+        onClick={() => hapticFeedback(10, "light")}
+        className={getButtonClasses(
+          `shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
+            active
+              ? "border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 ring-1 ring-purple-300"
+              : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
+          }`,
+          "tab"
         )}
-      </div>
-      <NavLabel label={label} />
-    </Link>
-  )
+        style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
+      >
+        <div className="relative">
+          <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
+          {badgeCount !== undefined && badgeCount > 0 && (
+            <button
+              type="button"
+              onClick={handleBadgeClick}
+              className="absolute -top-2 -right-4 lg:-top-2 lg:right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 hover:bg-red-600 text-white text-[10px] font-black rounded-full border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-colors"
+              aria-label={`${badgeCount} pending receipts - click to open import dashboard`}
+            >
+              {badgeCount > 99 ? "99+" : badgeCount}
+            </button>
+          )}
+        </div>
+        <NavLabel label={label} />
+      </Link>
+    );
+  }
 );
 
 export default NavigationTabs;

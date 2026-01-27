@@ -2,8 +2,13 @@ import { render, screen, waitFor } from "../../../test/test-utils";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
 import TransactionLedger from "../TransactionLedger";
+import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { QueryClient } from "@tanstack/react-query";
+import { useImportDashboardStore } from "../../../stores/ui/importDashboardStore";
+import { useSentinelReceipts } from "../../../hooks/api/useSentinelReceipts";
+import { useLayoutData } from "../../../hooks/platform/ux/layout/useLayoutData";
+import { useSmartSuggestions } from "../../../hooks/platform/analytics/useSmartSuggestions";
 
 // ============================================================================
 // Standardized Mocking Strategy: Use @/ Aliases for EVERYTHING
@@ -65,6 +70,32 @@ const MOCK_LEDGER_DATA = {
 
 vi.mock("@/hooks/budgeting/transactions/useTransactionLedger", () => ({
   useTransactionLedger: vi.fn(() => MOCK_LEDGER_DATA),
+}));
+
+vi.mock("@/stores/ui/importDashboardStore", () => ({
+  useImportDashboardStore: vi.fn(),
+}));
+
+vi.mock("@/hooks/api/useSentinelReceipts", () => ({
+  useSentinelReceipts: vi.fn(() => ({
+    pendingReceipts: [],
+    isLoading: false,
+    error: null,
+  })),
+}));
+
+vi.mock("@/hooks/platform/ux/layout/useLayoutData", () => ({
+  useLayoutData: vi.fn(() => ({
+    budget: null,
+    bills: { bills: [] },
+    transactions: [],
+  })),
+}));
+
+vi.mock("@/hooks/platform/analytics/useSmartSuggestions", () => ({
+  useSmartSuggestions: vi.fn(() => ({
+    suggestTransactionCategory: vi.fn(),
+  })),
 }));
 
 // 2. Component Mocks (Use @/ aliases)
@@ -238,6 +269,48 @@ describe("TransactionLedger (Surgical Reset)", () => {
       expect(screen.getByTestId("transaction-2")).toBeInTheDocument();
       expect(screen.getByText("Grocery Store")).toBeInTheDocument();
       expect(screen.getByText("Gas Station")).toBeInTheDocument();
+    });
+
+    it("should render Import Receipts button", () => {
+      renderLedger();
+      expect(screen.getByText("Import Receipts")).toBeInTheDocument();
+    });
+
+    it("should render pending receipts badge when count > 0", () => {
+      vi.mocked(useSentinelReceipts).mockReturnValue({
+        pendingReceipts: new Array(5).fill({}),
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderLedger();
+      expect(screen.getByText("5")).toBeInTheDocument();
+    });
+
+    it("should not render badge when count is 0", () => {
+      vi.mocked(useSentinelReceipts).mockReturnValue({
+        pendingReceipts: [],
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderLedger();
+      expect(screen.queryByText("0")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Import Dashboard Actions", () => {
+    it("should open import dashboard when button is clicked", async () => {
+      const mockOpen = vi.fn();
+      vi.mocked(useImportDashboardStore).mockImplementation((selector: any) =>
+        selector ? selector({ open: mockOpen }) : mockOpen
+      );
+
+      renderLedger();
+      const importButton = screen.getByText("Import Receipts");
+      await userEvent.click(importButton);
+
+      expect(mockOpen).toHaveBeenCalled();
     });
   });
 

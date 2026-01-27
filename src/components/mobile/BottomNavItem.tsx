@@ -10,15 +10,33 @@ interface BottomNavItemProps {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   isActive: boolean;
+  badgeCount?: number;
+  onBadgeClick?: (e: React.MouseEvent) => void;
 }
 
 /**
  * Individual navigation item for bottom navigation bar
  * Touch-optimized with haptic feedback and smooth animations
  */
-const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, isActive }) => {
+const BottomNavItem: React.FC<BottomNavItemProps> = ({
+  to,
+  icon: Icon,
+  label,
+  isActive,
+  badgeCount = 0,
+  onBadgeClick,
+}) => {
   const handleClick = (): void => {
     hapticFeedback(10, "light");
+  };
+
+  const handleBadgeClickInternal = (e: React.MouseEvent) => {
+    if (onBadgeClick) {
+      e.preventDefault();
+      e.stopPropagation();
+      hapticFeedback(15, "medium");
+      onBadgeClick(e);
+    }
   };
 
   return (
@@ -48,6 +66,26 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ to, icon: Icon, label, is
       >
         <Icon className="w-5 h-5" />
       </div>
+
+      {/* Badge for pending receipts */}
+      {badgeCount > 0 && (
+        <button
+          onClick={handleBadgeClickInternal}
+          className="
+            absolute top-1 right-2
+            min-w-[18px] h-[18px] px-1
+            bg-red-500 text-white text-[10px] font-black
+            rounded-full flex items-center justify-center
+            border-2 border-brand-100
+            shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+            z-10 animate-in zoom-in-50 duration-200
+          "
+          data-testid="bottom-nav-badge"
+          aria-label={`${badgeCount} pending receipts`}
+        >
+          {badgeCount > 9 ? "9+" : badgeCount}
+        </button>
+      )}
 
       {/* Label with conditional visibility */}
       <span

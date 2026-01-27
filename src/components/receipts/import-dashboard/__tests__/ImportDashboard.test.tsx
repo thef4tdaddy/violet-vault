@@ -33,8 +33,9 @@ vi.mock("@/hooks/platform/data/useReceiptMutations", () => ({
   }),
 }));
 vi.mock("@/components/sentinel/OCRScanner", () => ({
-  default: ({ onClose }: { onClose: () => void }) => (
+  default: ({ onClose, preloadedFile }: { onClose: () => void; preloadedFile?: File | null }) => (
     <div data-testid="ocr-scanner-mock">
+      {preloadedFile && <div data-testid="preloaded-file-indicator">{preloadedFile.name}</div>}
       <button onClick={onClose}>Close Scanner</button>
     </div>
   ),
@@ -467,6 +468,29 @@ describe("ImportDashboard", () => {
 
       const main = container.querySelector("main");
       expect(main).toBeInTheDocument();
+    });
+  });
+
+  describe("Preloaded file handling", () => {
+    it("should auto-trigger OCR scanner when a preloadedFile is provided", () => {
+      const mockFile = new File(["test"], "receipt.jpg", { type: "image/jpeg" });
+      renderWithProvider(<ImportDashboard preloadedFile={mockFile} />);
+
+      // OCR scanner should appear automatically
+      expect(screen.getByTestId("ocr-scanner-mock")).toBeInTheDocument();
+      expect(screen.getByTestId("preloaded-file-indicator")).toHaveTextContent("receipt.jpg");
+    });
+
+    it("should switch to scan mode when a preloadedFile is provided", () => {
+      const mockFile = new File(["test"], "receipt.jpg", { type: "image/jpeg" });
+      renderWithProvider(<ImportDashboard preloadedFile={mockFile} />);
+
+      // Should show scan mode description
+      expect(screen.getByText("Scanned receipts from uploaded images")).toBeInTheDocument();
+
+      // Sidebar should show scan mode as active
+      const scanButton = screen.getByTestId("import-mode-scan");
+      expect(scanButton).toHaveAttribute("aria-pressed", "true");
     });
   });
 });
