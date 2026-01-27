@@ -11,6 +11,9 @@ import { useReceiptScanner } from "@/hooks/platform/receipts/useReceiptScanner";
 import type { ImportMode, DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { ReceiptProcessedData } from "@/hooks/platform/receipts/useReceiptScanner";
 import type { Receipt } from "@/db/types";
+import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
+import { hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
+import useToast from "@/hooks/platform/ux/useToast";
 
 interface ImportDashboardProps {
   initialMode?: ImportMode;
@@ -54,6 +57,14 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
   const [showOCRScanner, setShowOCRScanner] = useState(false);
 
   const { addReceipt } = useReceiptMutations();
+  const { showSuccess } = useToast();
+  const closeDashboard = useImportDashboardStore((state) => state.close);
+
+  const handleMatchSuccess = useCallback(() => {
+    hapticFeedback(20, "success");
+    showSuccess("Receipt Linked", "The receipt has been successfully linked to the transaction.");
+    closeDashboard();
+  }, [showSuccess, closeDashboard]);
 
   // Integrated scanner for in-page zone
   const { isProcessing, handleFileUpload } = useReceiptScanner((data) => {
@@ -79,7 +90,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     isLinking,
     isLinkingAndUpdating,
     getMatchSuggestionsForReceipt,
-  } = useReceiptMatching();
+  } = useReceiptMatching({ onMatchSuccess: handleMatchSuccess });
 
   const filteredReceipts =
     selectedMode === "digital"

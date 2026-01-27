@@ -5,27 +5,55 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ImportDashboard from "../ImportDashboard";
-import * as useUnifiedReceiptsModule from "@/hooks/platform/receipts/useUnifiedReceipts";
-import * as useReceiptScannerModule from "@/hooks/platform/receipts/useReceiptScanner";
-import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
-import type { SentinelReceipt } from "@/types/sentinel";
-import type { ReceiptProcessedData } from "@/hooks/platform/receipts/useReceiptScanner";
+import * as useUnifiedReceiptsModule from "../../../../hooks/platform/receipts/useUnifiedReceipts";
+import * as useReceiptScannerModule from "../../../../hooks/platform/receipts/useReceiptScanner";
+import type { DashboardReceiptItem } from "../../../../types/import-dashboard.types";
+import type { SentinelReceipt } from "../../../../types/sentinel";
+import type { ReceiptProcessedData } from "../../../../hooks/platform/receipts/useReceiptScanner";
+import type { Receipt } from "../../../../db/types";
+import { useReceiptMatching } from "../../../../hooks/platform/receipts/useReceiptMatching";
+
+// Mock feedback and store
+const mocks = vi.hoisted(() => ({
+  showSuccess: vi.fn(),
+  hapticFeedback: vi.fn(),
+  closeDashboard: vi.fn(),
+}));
+
+vi.mock("../../../../hooks/platform/ux/useToast", () => ({
+  default: () => ({
+    showSuccess: mocks.showSuccess,
+    showError: vi.fn(),
+  }),
+}));
+
+vi.mock("../../../../utils/ui/feedback/touchFeedback", () => ({
+  hapticFeedback: mocks.hapticFeedback,
+}));
+
+vi.mock("../../../../stores/ui/importDashboardStore", () => ({
+  useImportDashboardStore: vi.fn((fn) => fn({ close: mocks.closeDashboard })),
+}));
 
 // Mock hooks
-vi.mock("@/hooks/platform/receipts/useUnifiedReceipts");
-vi.mock("@/hooks/platform/receipts/useReceiptScanner");
-vi.mock("@/hooks/platform/receipts/useReceiptMatching", () => ({
-  useReceiptMatching: () => ({
+vi.mock("../../../../hooks/platform/receipts/useUnifiedReceipts");
+vi.mock("../../../../hooks/platform/receipts/useReceiptScanner");
+vi.mock("../../../../hooks/platform/receipts/useReceiptMatching", () => ({
+  useReceiptMatching: vi.fn((options: any = {}) => ({
     showConfirmModal: false,
     selectedMatch: null,
     openMatchConfirmation: vi.fn(),
     closeMatchConfirmation: vi.fn(),
-    confirmLinkOnly: vi.fn(),
-    confirmLinkAndUpdate: vi.fn(),
+    confirmLinkOnly: vi.fn(() => {
+      if (options.onMatchSuccess) options.onMatchSuccess();
+    }),
+    confirmLinkAndUpdate: vi.fn(() => {
+      if (options.onMatchSuccess) options.onMatchSuccess();
+    }),
     isLinking: false,
     isLinkingAndUpdating: false,
     getMatchSuggestionsForReceipt: vi.fn(() => []),
-  }),
+  })),
 }));
 vi.mock("@/hooks/platform/data/useReceiptMutations", () => ({
   useReceiptMutations: () => ({
@@ -109,6 +137,7 @@ describe("ImportDashboard", () => {
     sentinelReceipts: mockSentinelReceipts,
     ocrReceipts: mockOcrReceipts,
     isLoading: false,
+    isError: false,
     error: null,
   };
 
@@ -255,6 +284,7 @@ describe("ImportDashboard", () => {
       vi.mocked(useUnifiedReceiptsModule.useUnifiedReceipts).mockReturnValue({
         ...defaultMockReturn,
         sentinelReceipts: mixedReceipts,
+        isError: false,
       });
 
       renderWithProvider(<ImportDashboard />);
@@ -283,6 +313,7 @@ describe("ImportDashboard", () => {
       vi.mocked(useUnifiedReceiptsModule.useUnifiedReceipts).mockReturnValue({
         ...defaultMockReturn,
         sentinelReceipts: [mockSentinelReceipts[0]],
+        isError: false,
       });
 
       rerender(
@@ -544,6 +575,66 @@ describe("ImportDashboard", () => {
       // Sidebar should show scan mode as active
       const scanButton = screen.getByTestId("import-mode-scan");
       expect(scanButton).toHaveAttribute("aria-pressed", "true");
+    });
+  });
+
+  describe("Receipt matching flow", () => {
+    it("should open match confirmation when a receipt is clicked", () => {
+      const mockOpenMatch = vi.fn();
+      const mockReceipt = mockSentinelReceipts[0];
+
+      vi.mocked(useUnifiedReceiptsModule.useUnifiedReceipts).mockReturnValue(defaultMockReturn);
+
+      // Re-mock useReceiptMatching for this specific test
+      vi.mocked(useReceiptMatching).mockReturnValue({
+        ...vi.mocked(useReceiptMatching)(),
+        getMatchSuggestionsForReceipt: vi.fn(() => [{ transactionId: "t1" } as any]),
+        openMatchConfirmation: mockOpenMatch,
+      } as any);
+
+      renderWithProvider(<ImportDashboard />);
+
+      const receiptCard = screen.getByText("Amazon");
+      fireEvent.click(receiptCard);
+
+      expect(mockOpenMatch).toHaveBeenCalled();
+    });
+
+    it("should trigger success feedback and close dashboard on match success", () => {
+      // Mock useReceiptMatching to call onMatchSuccess immediately on confirmLinkOnly
+      vi.mocked(useReceiptMatching).mockImplementation(
+        (options: any) =>
+          ({
+            showConfirmModal: true,
+            selectedMatch: { receipt: { id: "r1" } } as any,
+            confirmLinkOnly: () => {
+              if (options.onMatchSuccess) options.onMatchSuccess();
+            },
+            // We need to provide dummy implementations for other methods used by the component
+            openMatchConfirmation: vi.fn(),
+            closeMatchConfirmation: vi.fn(),
+            confirmLinkAndUpdate: vi.fn(),
+            isLinking: false,
+            isLinkingAndUpdating: false,
+            getMatchSuggestionsForReceipt: vi.fn(() => []),
+          }) as any
+      );
+
+      renderWithProvider(<ImportDashboard />);
+
+      // Match modal should be open (mocked)
+      expect(screen.getByTestId("match-modal-mock")).toBeInTheDocument();
+
+      // We need a way to trigger the confirm action in our mock
+      // Since confirmation happens inside the modal which we mocked,
+      // we can just call it from the hook.
+      // In a real test we'd click the button in the modal.
+      const hookReturn = vi.mocked(useReceiptMatching).mock.results[0].value;
+      hookReturn.confirmLinkOnly();
+
+      expect(mocks.hapticFeedback).toHaveBeenCalledWith(20, "success");
+      expect(mocks.showSuccess).toHaveBeenCalled();
+      expect(mocks.closeDashboard).toHaveBeenCalled();
     });
   });
 });
