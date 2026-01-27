@@ -6,11 +6,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ImportDashboard from "../ImportDashboard";
 import * as useUnifiedReceiptsModule from "@/hooks/platform/receipts/useUnifiedReceipts";
+import * as useReceiptScannerModule from "@/hooks/platform/receipts/useReceiptScanner";
 import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { SentinelReceipt } from "@/types/sentinel";
+import type { ReceiptProcessedData } from "@/hooks/platform/receipts/useReceiptScanner";
 
 // Mock hooks
 vi.mock("@/hooks/platform/receipts/useUnifiedReceipts");
+vi.mock("@/hooks/platform/receipts/useReceiptScanner");
 vi.mock("@/hooks/platform/receipts/useReceiptMatching", () => ({
   useReceiptMatching: () => ({
     showConfirmModal: false,
@@ -37,6 +40,20 @@ vi.mock("@/components/sentinel/OCRScanner", () => ({
     <div data-testid="ocr-scanner-mock">
       {preloadedFile && <div data-testid="preloaded-file-indicator">{preloadedFile.name}</div>}
       <button onClick={onClose}>Close Scanner</button>
+    </div>
+  ),
+}));
+vi.mock("../ScanUploadZone", () => ({
+  default: ({
+    onFileSelected,
+    isProcessing,
+  }: {
+    onFileSelected: (f: File) => void;
+    isProcessing: boolean;
+  }) => (
+    <div data-testid="scan-upload-zone-mock">
+      {isProcessing && <div data-testid="processing-indicator">Processing...</div>}
+      <button onClick={() => onFileSelected(new File([], "test-ui.jpg"))}>Upload Mock</button>
     </div>
   ),
 }));
@@ -103,6 +120,23 @@ describe("ImportDashboard", () => {
     });
 
     vi.mocked(useUnifiedReceiptsModule.useUnifiedReceipts).mockReturnValue(defaultMockReturn);
+
+    vi.mocked(useReceiptScannerModule.useReceiptScanner).mockReturnValue({
+      isProcessing: false,
+      uploadedImage: null,
+      extractedData: null,
+      error: null,
+      showImagePreview: false,
+      fileInputRef: { current: null } as any,
+      cameraInputRef: { current: null } as any,
+      handleFileUpload: vi.fn(),
+      handleDrop: vi.fn(),
+      handleDragOver: vi.fn(),
+      handleFileInputChange: vi.fn(),
+      handleConfirmReceipt: vi.fn(),
+      resetScanner: vi.fn(),
+      toggleImagePreview: vi.fn(),
+    } as any);
   });
 
   const renderWithProvider = (ui: React.ReactElement) => {
@@ -139,6 +173,15 @@ describe("ImportDashboard", () => {
 
       const dashboard = screen.getByTestId("import-dashboard");
       expect(dashboard).toHaveClass("custom-class");
+    });
+
+    it("should call onClose when close button is clicked", () => {
+      const mockClose = vi.fn();
+      renderWithProvider(<ImportDashboard onClose={mockClose} />);
+
+      const closeBtn = screen.getByTestId("close-dashboard-button");
+      fireEvent.click(closeBtn);
+      expect(mockClose).toHaveBeenCalled();
     });
   });
 
@@ -474,11 +517,21 @@ describe("ImportDashboard", () => {
   describe("Preloaded file handling", () => {
     it("should auto-trigger OCR scanner when a preloadedFile is provided", () => {
       const mockFile = new File(["test"], "receipt.jpg", { type: "image/jpeg" });
+      const mockHandleFileUpload = vi.fn();
+
+      vi.mocked(useReceiptScannerModule.useReceiptScanner).mockReturnValue({
+        handleFileUpload: mockHandleFileUpload,
+      } as any);
+
       renderWithProvider(<ImportDashboard preloadedFile={mockFile} />);
 
-      // OCR scanner should appear automatically
-      expect(screen.getByTestId("ocr-scanner-mock")).toBeInTheDocument();
-      expect(screen.getByTestId("preloaded-file-indicator")).toHaveTextContent("receipt.jpg");
+      // handleFileUpload should be called automatically
+      expect(mockHandleFileUpload).toHaveBeenCalledWith(mockFile);
+    });
+
+    it("should render ScanUploadZone in scan mode", () => {
+      renderWithProvider(<ImportDashboard initialMode="scan" />);
+      expect(screen.getByTestId("scan-upload-zone-mock")).toBeInTheDocument();
     });
 
     it("should switch to scan mode when a preloadedFile is provided", () => {

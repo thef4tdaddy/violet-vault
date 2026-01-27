@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ImportSidebar from "./ImportSidebar";
 import ReceiptInbox from "./ReceiptInbox";
+import ScanUploadZone from "./ScanUploadZone";
 import OCRScanner from "@/components/sentinel/OCRScanner";
 import MatchConfirmationModal from "@/components/receipts/MatchConfirmationModal";
 import { useUnifiedReceipts } from "@/hooks/platform/receipts/useUnifiedReceipts";
 import { useReceiptMatching } from "@/hooks/platform/receipts/useReceiptMatching";
 import { useReceiptMutations } from "@/hooks/platform/data/useReceiptMutations";
+import { useReceiptScanner } from "@/hooks/platform/receipts/useReceiptScanner";
 import type { ImportMode, DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { ReceiptProcessedData } from "@/hooks/platform/receipts/useReceiptScanner";
 import type { Receipt } from "@/db/types";
@@ -44,18 +46,27 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
   initialMode = "digital",
   className = "",
   preloadedFile = null,
+  // onClose is used for the modal container, but if we need a close button here
+  // we can add one in the header. For now, acknowledging it to suppress warning.
   onClose,
 }) => {
   const [selectedMode, setSelectedMode] = useState<ImportMode>(initialMode);
   const [showOCRScanner, setShowOCRScanner] = useState(false);
 
+  const { addReceipt } = useReceiptMutations();
+
+  // Integrated scanner for in-page zone
+  const { isProcessing, handleFileUpload } = useReceiptScanner((data) => {
+    addReceipt(convertOCRDataToReceipt(data) as Receipt);
+  });
+
   // Auto-trigger OCR scanner if a file is preloaded (e.g. from PWA share)
   useEffect(() => {
     if (preloadedFile) {
       setSelectedMode("scan");
-      setShowOCRScanner(true);
+      handleFileUpload(preloadedFile);
     }
-  }, [preloadedFile]);
+  }, [preloadedFile, handleFileUpload]);
 
   const { sentinelReceipts, ocrReceipts, isLoading, error } = useUnifiedReceipts();
   const {
@@ -69,7 +80,6 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     isLinkingAndUpdating,
     getMatchSuggestionsForReceipt,
   } = useReceiptMatching();
-  const { addReceipt } = useReceiptMutations();
 
   const filteredReceipts =
     selectedMode === "digital"
@@ -119,15 +129,27 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
         </aside>
 
         <main className="flex-1 min-w-0">
-          <header className="mb-6">
-            <h1 className="font-mono font-black uppercase tracking-tight text-black text-3xl mb-2">
-              Import Receipts
-            </h1>
-            <p className="font-mono text-sm text-gray-700">
-              {selectedMode === "digital"
-                ? "Digital receipts from connected apps"
-                : "Scanned receipts from uploaded images"}
-            </p>
+          <header className="mb-6 flex justify-between items-start">
+            <div>
+              <h1 className="font-mono font-black uppercase tracking-tight text-black text-3xl mb-2">
+                Import Receipts
+              </h1>
+              <p className="font-mono text-sm text-gray-700">
+                {selectedMode === "digital"
+                  ? "Digital receipts from connected apps"
+                  : "Scanned receipts from uploaded images"}
+              </p>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-2 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                aria-label="Close dashboard"
+                data-testid="close-dashboard-button"
+              >
+                <div className="w-6 h-6 flex items-center justify-center font-black">✕</div>
+              </button>
+            )}
           </header>
 
           {error && (
@@ -152,6 +174,15 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
             onReceiptClick={handleReceiptClick}
             onEmptyAction={handleEmptyAction}
           />
+
+          {selectedMode === "scan" && (
+            <div className="mt-8 border-t-2 border-black/5 pt-8">
+              <h2 className="font-mono font-black uppercase tracking-tight text-black text-xl mb-4">
+                Add New Scan
+              </h2>
+              <ScanUploadZone onFileSelected={handleFileUpload} isProcessing={isProcessing} />
+            </div>
+          )}
         </main>
       </div>
 
