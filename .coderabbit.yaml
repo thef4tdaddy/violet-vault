@@ -32,21 +32,9 @@ reviews:
       - "**/mocks/**"
       - "**/*.test.ts"
       - "**/*.test.tsx"
-
-# AI Review triggers
-# Enable automated reviews on every PR
-enable_on_pr: true
-
-# Advanced settings
-# Ignore specific files
-ignore:
-  - "**/dist/**"
-  - "**/node_modules/**"
-  - "**/*.min.js"
-  - "**/vendor/**"
-  - "**/__tests__/**"
-  - "**/mocks/**"
-  - "**/*.test.ts"
-  - "**/*.test.tsx"
-  - "**/coverage/**"
-  - "**/*.lock"
+      - "**/dist/**"
+      - "**/node_modules/**"
+      - "**/*.min.js"
+      - "**/vendor/**"
+      - "**/coverage/**"
+      - "**/*.lock"
