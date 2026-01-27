@@ -113,6 +113,7 @@ import {
   UtensilsCrossed,
   Coffee,
   ShoppingCart,
+  Store,
 
   // Documents & Files
   FileText,
@@ -121,6 +122,7 @@ import {
   Upload,
   Download,
   PencilLine,
+  Inbox,
 
   // Time & Calendar
   Clock,
@@ -348,6 +350,7 @@ export const ICON_REGISTRY = {
   UtensilsCrossed: UtensilsCrossed,
   Coffee: Coffee,
   ShoppingCart: ShoppingCart,
+  Store: Store,
 
   // Documents & Files (matching debt constants)
   FileText: FileText,
@@ -355,6 +358,7 @@ export const ICON_REGISTRY = {
   Receipt: Receipt,
   Upload: Upload,
   Download: Download,
+  Inbox: Inbox,
 
   // Time & Calendar
   Clock: Clock,

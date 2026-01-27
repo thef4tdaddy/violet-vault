@@ -232,6 +232,9 @@ export interface Receipt {
   ocrData?: {
     rawText?: string;
     confidence?: number;
+    merchantConfidence?: number;
+    totalConfidence?: number;
+    dateConfidence?: number;
     items?: unknown[];
     tax?: number;
     subtotal?: number;
