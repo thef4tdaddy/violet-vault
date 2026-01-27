@@ -32,6 +32,7 @@ import useOnboardingStore from "@/stores/ui/onboardingStore";
 import { CorruptionRecoveryModal } from "@/components/modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "@/components/auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "@/components/security/LocalDataSecurityWarning";
+import { ImportDashboardModal } from "@/components/receipts/import-dashboard/ImportDashboardModal";
 import AppRoutes from "./AppRoutes";
 import { viewToPathMap } from "./routeConfig";
 import BottomNavigationBar from "@/components/mobile/BottomNavigationBar";
@@ -230,6 +231,7 @@ const MainLayout = ({ firebaseSync }: MainLayoutProps): ReactNode => {
         onSubmit={handleRotationPasswordChange}
         onClose={dismissRotation}
       />
+      <ImportDashboardModal />
       <ToastContainer toasts={toasts as ToastItem[]} removeToast={removeToast} />
     </>
   );

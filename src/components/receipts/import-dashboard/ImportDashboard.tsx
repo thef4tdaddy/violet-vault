@@ -13,6 +13,8 @@ import type { Receipt } from "@/db/types";
 interface ImportDashboardProps {
   initialMode?: ImportMode;
   className?: string;
+  preloadedFile?: File | null;
+  onClose?: () => void;
 }
 
 /**
@@ -41,6 +43,8 @@ function convertOCRDataToReceipt(data: ReceiptProcessedData): Partial<Receipt> {
 const ImportDashboard: React.FC<ImportDashboardProps> = ({
   initialMode = "digital",
   className = "",
+  preloadedFile = null,
+  onClose,
 }) => {
   const [selectedMode, setSelectedMode] = useState<ImportMode>(initialMode);
   const [showOCRScanner, setShowOCRScanner] = useState(false);
