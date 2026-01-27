@@ -117,9 +117,9 @@ export function useUnifiedReceipts() {
     });
   }, [sentinelData, ocrData]);
 
-  // Filter by status
+  // Filter by status (pending or processing)
   const pendingReceipts = useMemo(
-    () => allReceipts.filter((r) => r.status === "pending"),
+    () => allReceipts.filter((r) => r.status === "pending" || r.status === "processing"),
     [allReceipts]
   );
 

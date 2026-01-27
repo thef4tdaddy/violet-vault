@@ -1,6 +1,7 @@
 import React from "react";
 import { getIcon } from "@/utils/ui/icons";
 import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
+import { useOCRJobStatus } from "@/hooks/platform/receipts/useOCRJobStatus";
 
 const Calendar = getIcon("Calendar");
 const DollarSign = getIcon("DollarSign");
@@ -83,14 +84,23 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
   const confidenceStyles = getConfidenceStyles(receipt.matchConfidence);
   const statusStyles = getStatusStyles(receipt.status);
 
+  // Poll for status if this is a scan that might be processing
+  const { status: jobStatus, progress } = useOCRJobStatus(
+    receipt.source === "ocr" ? receipt.id : ""
+  );
+
+  // Determine effective status (merge prop status with polled status)
+  const isProcessing =
+    receipt.status === "processing" || ["queued", "processing", "extracting"].includes(jobStatus);
+
   const handleClick = () => {
-    if (onClick) {
+    if (onClick && !isProcessing) {
       onClick(receipt);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (onClick && (e.key === "Enter" || e.key === " ")) {
+    if (onClick && !isProcessing && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       onClick(receipt);
     }
@@ -104,19 +114,24 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
         ${confidenceStyles}
         shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
         transition-all
-        ${onClick ? "cursor-pointer hover:shadow-none hover:translate-x-1 hover:translate-y-1" : ""}
+        ${isProcessing ? "animate-[pulse_3s_ease-in-out_infinite] ring-2 ring-blue-400 ring-offset-2" : ""}
+        ${onClick && !isProcessing ? "cursor-pointer hover:shadow-none hover:translate-x-1 hover:translate-y-1" : ""}
         ${className}
       `}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
+      role={onClick && !isProcessing ? "button" : undefined}
+      tabIndex={onClick && !isProcessing ? 0 : undefined}
       data-testid="receipt-card"
       data-receipt-id={receipt.id}
+      data-status={jobStatus}
       aria-label={`Receipt from ${receipt.merchant} for ${formatCurrency(receipt.amount)}`}
     >
       {/* Source badge */}
-      <div className="absolute top-3 right-3">
+      <div className="absolute top-3 right-3 flex gap-2">
+        {isProcessing && (
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-600 border-t-transparent" />
+        )}
         <span
           className={`
             px-2 py-1 rounded border border-black
@@ -134,7 +149,7 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
         <div className="flex items-start gap-2 mb-3">
           <Store className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" aria-hidden="true" />
           <h3 className="font-mono font-black uppercase tracking-tight text-black text-lg leading-tight">
-            {receipt.merchant}
+            {isProcessing ? "Processing..." : receipt.merchant}
           </h3>
         </div>
 
@@ -142,33 +157,52 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
         <div className="flex items-center gap-2 mb-2">
           <DollarSign className="h-4 w-4 text-purple-600" aria-hidden="true" />
           <span className="font-mono font-bold text-xl text-black">
-            {formatCurrency(receipt.amount)}
+            {isProcessing ? "---" : formatCurrency(receipt.amount)}
           </span>
         </div>
 
         {/* Date */}
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="h-4 w-4 text-purple-600" aria-hidden="true" />
-          <span className="font-mono text-sm text-gray-700">{formatDate(receipt.date)}</span>
+          <span className="font-mono text-sm text-gray-700">
+            {isProcessing ? "---" : formatDate(receipt.date)}
+          </span>
         </div>
 
-        {/* Status badge */}
-        <div className="flex items-center justify-between">
-          <span
-            className={`
-              px-2 py-1 rounded border border-black
-              font-mono text-xs font-black uppercase tracking-wide
-              ${statusStyles.bg} ${statusStyles.text}
-            `}
-          >
-            {statusStyles.label}
-          </span>
+        {/* Status badge / Progress Bar */}
+        <div className="flex items-center justify-between w-full">
+          {isProcessing ? (
+            <div className="w-full flex flex-col gap-1">
+              <div className="flex justify-between text-[10px] font-mono font-bold uppercase text-blue-700">
+                <span>{jobStatus}</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="w-full h-2 bg-blue-100 border border-black rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-600 transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              <span
+                className={`
+                  px-2 py-1 rounded border border-black
+                  font-mono text-xs font-black uppercase tracking-wide
+                  ${statusStyles.bg} ${statusStyles.text}
+                `}
+              >
+                {statusStyles.label}
+              </span>
 
-          {/* Confidence indicator text (if applicable) */}
-          {receipt.matchConfidence !== undefined && receipt.matchConfidence >= 0.6 && (
-            <span className="font-mono text-xs font-bold text-gray-600">
-              {Math.round(receipt.matchConfidence * 100)}% match
-            </span>
+              {/* Confidence indicator text (if applicable) */}
+              {receipt.matchConfidence !== undefined && receipt.matchConfidence >= 0.6 && (
+                <span className="font-mono text-xs font-bold text-gray-600">
+                  {Math.round(receipt.matchConfidence * 100)}% match
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>

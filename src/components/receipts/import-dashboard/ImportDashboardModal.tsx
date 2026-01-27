@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
-import { ImportDashboard } from "./ImportDashboard";
+import ImportDashboard from "./ImportDashboard";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
 /**

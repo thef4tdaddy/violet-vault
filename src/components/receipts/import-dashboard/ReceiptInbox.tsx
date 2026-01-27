@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import ReceiptCard from "./ReceiptCard";
 import EmptyState from "./EmptyState";
@@ -120,9 +121,20 @@ const ReceiptInbox: React.FC<ReceiptInboxProps> = ({
         data-testid="receipt-inbox"
         data-virtualized="false"
       >
-        {receipts.map((receipt) => (
-          <ReceiptCard key={receipt.id} receipt={receipt} onClick={onReceiptClick} />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {receipts.map((receipt) => (
+            <motion.div
+              layout
+              key={receipt.id}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.1 } }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <ReceiptCard receipt={receipt} onClick={onReceiptClick} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     );
   }
