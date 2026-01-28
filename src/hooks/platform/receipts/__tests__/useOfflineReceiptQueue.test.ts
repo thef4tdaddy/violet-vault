@@ -112,9 +112,8 @@ describe("useOfflineReceiptQueue", () => {
 
   it("should process queue when retry is called or network recovers", async () => {
     const onUploadMock = vi.fn().mockResolvedValue(true);
-    const { result } = renderHook(() => useOfflineReceiptQueue(onUploadMock));
 
-    // Seed DB
+    // Seed DB before rendering hook so initial updateCount discovers it
     await mockDb.uploads.add({
       id: "test-id",
       file: new Blob(["test"], { type: "image/jpeg" }),
@@ -123,6 +122,11 @@ describe("useOfflineReceiptQueue", () => {
       retryCount: 0,
     });
 
+    const { result } = renderHook(() => useOfflineReceiptQueue(onUploadMock));
+
+    // Wait for initial updateCount to discover the item
+    await waitFor(() => expect(result.current.pendingCount).toBe(1), { timeout: 5000 });
+
     // Go Online to trigger auto-sync
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
     await act(async () => {
@@ -130,7 +134,7 @@ describe("useOfflineReceiptQueue", () => {
     });
 
     // Wait for the sync to happen
-    await waitFor(() => expect(onUploadMock).toHaveBeenCalled());
+    await waitFor(() => expect(onUploadMock).toHaveBeenCalled(), { timeout: 5000 });
 
     // After success, item is deleted
     expect(mockDb.uploads.delete).toHaveBeenCalledWith("test-id");
@@ -141,6 +145,9 @@ describe("useOfflineReceiptQueue", () => {
     const onUploadMock = vi.fn().mockRejectedValue(new Error("Upload failed"));
     const { result } = renderHook(() => useOfflineReceiptQueue(onUploadMock));
 
+    // Wait for initial updateCount to complete
+    await waitFor(() => expect(mockDb.uploads.count).toHaveBeenCalled());
+
     // Seed DB
     await mockDb.uploads.add({
       id: "fail-id",
@@ -150,13 +157,16 @@ describe("useOfflineReceiptQueue", () => {
       retryCount: 0,
     });
 
+    // Wait for the hook to discover the item
+    await waitFor(() => expect(result.current.pendingCount).toBe(1), { timeout: 5000 });
+
     // Go Online to trigger auto-sync
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
     await act(async () => {
       window.dispatchEvent(new Event("online"));
     });
 
-    await waitFor(() => expect(onUploadMock).toHaveBeenCalled());
+    await waitFor(() => expect(onUploadMock).toHaveBeenCalled(), { timeout: 5000 });
 
     // Verify update called
     expect(mockDb.uploads.update).toHaveBeenCalledWith("fail-id", {
