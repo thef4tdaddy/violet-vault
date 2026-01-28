@@ -72,8 +72,12 @@ vi.mock("@/hooks/budgeting/transactions/useTransactionLedger", () => ({
   useTransactionLedger: vi.fn(() => MOCK_LEDGER_DATA),
 }));
 
+const mockOpen = vi.fn();
 vi.mock("@/stores/ui/importDashboardStore", () => ({
-  useImportDashboardStore: vi.fn(),
+  useImportDashboardStore: vi.fn((selector) => {
+    const store = { open: mockOpen, close: vi.fn(), isOpen: false, preloadedFile: null };
+    return selector ? selector(store) : store;
+  }),
 }));
 
 vi.mock("@/hooks/api/useSentinelReceipts", () => ({
@@ -273,18 +277,21 @@ describe("TransactionLedger (Surgical Reset)", () => {
 
     it("should render Import Receipts button", () => {
       renderLedger();
-      expect(screen.getByText("Import Receipts")).toBeInTheDocument();
+      // The button shows "Import Receipts" with the receipt icon
+      expect(screen.getByRole("button", { name: /Import Receipts/i })).toBeInTheDocument();
     });
 
     it("should render pending receipts badge when count > 0", () => {
       vi.mocked(useSentinelReceipts).mockReturnValue({
-        pendingReceipts: new Array(5).fill({}),
+        pendingReceipts: new Array(5).fill({ id: "test", merchant: "Test", amount: 10, status: "pending" }),
         isLoading: false,
         error: null,
       } as any);
 
       renderLedger();
-      expect(screen.getByText("5")).toBeInTheDocument();
+      // The badge is rendered as a span with absolute positioning on the Import Receipts button
+      const badge = screen.getByText("5");
+      expect(badge).toBeInTheDocument();
     });
 
     it("should not render badge when count is 0", () => {
@@ -301,16 +308,16 @@ describe("TransactionLedger (Surgical Reset)", () => {
 
   describe("Import Dashboard Actions", () => {
     it("should open import dashboard when button is clicked", async () => {
-      const mockOpen = vi.fn();
+      const localMockOpen = vi.fn();
       vi.mocked(useImportDashboardStore).mockImplementation((selector: any) =>
-        selector ? selector({ open: mockOpen }) : mockOpen
+        selector ? selector({ open: localMockOpen, close: vi.fn(), isOpen: false, preloadedFile: null }) : localMockOpen
       );
 
       renderLedger();
-      const importButton = screen.getByText("Import Receipts");
+      const importButton = screen.getByRole("button", { name: /Import Receipts/i });
       await userEvent.click(importButton);
 
-      expect(mockOpen).toHaveBeenCalled();
+      expect(localMockOpen).toHaveBeenCalled();
     });
   });
 

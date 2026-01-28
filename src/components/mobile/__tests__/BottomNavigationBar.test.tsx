@@ -68,6 +68,6 @@ describe("BottomNavigationBar", () => {
 
   it("passes badgeCount to Transactions item", () => {
     render(<BottomNavigationBar />);
-    expect(screen.getByTestId("badge-Transactions")).toHaveTextContent("3");
+    expect(screen.getByTestId("bottom-nav-badge")).toHaveTextContent("3");
   });
 });
