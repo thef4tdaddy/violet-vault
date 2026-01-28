@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@/test/test-utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useOCRJobStatus } from "../useOCRJobStatus";

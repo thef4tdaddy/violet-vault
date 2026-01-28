@@ -14,6 +14,14 @@ interface SharedData {
   url: string | null;
   timestamp: string;
   hasFiles: boolean;
+  files: File[];
+}
+
+/**
+ * Location state interface
+ */
+interface ShareTargetLocationState {
+  files?: File[];
 }
 
 /**
@@ -51,7 +59,7 @@ const ShareTargetHandler: React.FC = () => {
       };
 
       // Check if there are files in the location state (passed from SW or router)
-      const locationState = location.state as any;
+      const locationState = location.state as ShareTargetLocationState | null;
       if (locationState?.files && Array.isArray(locationState.files)) {
         data.files = locationState.files;
         data.hasFiles = data.files.length > 0;
@@ -62,7 +70,7 @@ const ShareTargetHandler: React.FC = () => {
         data.hasFiles = true;
       }
 
-      setSharedData(data as any);
+      setSharedData(data);
 
       // Auto-redirect to appropriate section after showing preview
       setTimeout(() => {

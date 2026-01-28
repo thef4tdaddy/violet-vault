@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@/test/test-utils";
 import { describe, it, expect, vi } from "vitest";
 import ReceiptCard from "../ReceiptCard";
 import type { DashboardReceiptItem } from "@/types/import-dashboard.types";

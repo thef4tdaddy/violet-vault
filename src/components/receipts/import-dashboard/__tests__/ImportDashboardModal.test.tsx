@@ -9,7 +9,7 @@ import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
 vi.mock("../ImportDashboard", () => ({
   default: ({ onClose, preloadedFile }: { onClose: () => void; preloadedFile: File | null }) => (
     <div data-testid="import-dashboard-content">
-      <button onClick={onClose} data-testid="dashboard-close">
+      <button type="button" onClick={onClose} data-testid="dashboard-close">
         Dashboard Close
       </button>
       {preloadedFile && <div data-testid="preloaded-file">{preloadedFile.name}</div>}
@@ -20,7 +20,7 @@ vi.mock("../ImportDashboard", () => ({
 // Mock ModalCloseButton
 vi.mock("@/components/ui/ModalCloseButton", () => ({
   default: ({ onClick, ariaLabel }: { onClick: () => void; ariaLabel?: string }) => (
-    <button onClick={onClick} aria-label={ariaLabel} data-testid="modal-close-button">
+    <button type="button" onClick={onClick} aria-label={ariaLabel} data-testid="modal-close-button">
       X
     </button>
   ),

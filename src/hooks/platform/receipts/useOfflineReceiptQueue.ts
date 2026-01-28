@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { captureError } from "@/utils/core/common/sentry";
+import { logger } from "@/utils/core/common/logger";
 import useToast from "@/hooks/platform/ux/useToast";
 import { db } from "@/db/offlineReceiptsDB";
 
@@ -16,7 +17,9 @@ interface UseOfflineReceiptQueueReturn {
 export const useOfflineReceiptQueue = (
   onUpload: (file: File) => Promise<void>
 ): UseOfflineReceiptQueueReturn => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator !== "undefined" ? navigator.onLine : true
+  );
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const { showSuccess, showError } = useToast();
@@ -57,7 +60,7 @@ export const useOfflineReceiptQueue = (
 
   // Process queue
   const retryQueue = useCallback(async () => {
-    if (!navigator.onLine || isSyncing) return;
+    if (!isOnline || isSyncing) return;
 
     setIsSyncing(true);
     try {
@@ -80,7 +83,10 @@ export const useOfflineReceiptQueue = (
           // Delete from DB on success
           await db.uploads.delete(item.id);
         } catch (err) {
-          console.error("Failed to sync item", item.id, err);
+          logger.error("Failed to sync item", {
+            id: item.id,
+            error: err instanceof Error ? err.message : String(err),
+          });
           // Update retry count or status if needed, leaving as pending for now to retry later
           await db.uploads.update(item.id, {
             retryCount: item.retryCount + 1,
@@ -101,7 +107,7 @@ export const useOfflineReceiptQueue = (
     } finally {
       setIsSyncing(false);
     }
-  }, [isSyncing, onUpload, showSuccess, showError]);
+  }, [isOnline, isSyncing, onUpload, showSuccess, showError]);
 
   // Add to queue
   const addToQueue = useCallback(
@@ -122,7 +128,7 @@ export const useOfflineReceiptQueue = (
         showSuccess("Saved Offline", "Receipt queued for upload when back online.");
 
         // Auto-process if online
-        if (navigator.onLine) {
+        if (isOnline) {
           retryQueue();
         }
       } catch (error) {
@@ -130,7 +136,7 @@ export const useOfflineReceiptQueue = (
         showError("Offline Storage Error", "Could not save receipt offline.");
       }
     },
-    [showSuccess, showError, retryQueue]
+    [isOnline, showSuccess, showError, retryQueue]
   );
 
   // Auto-sync when coming back online
@@ -138,8 +144,7 @@ export const useOfflineReceiptQueue = (
     if (isOnline) {
       retryQueue();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOnline]);
+  }, [isOnline, retryQueue]);
 
   return {
     addToQueue,

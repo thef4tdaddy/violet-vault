@@ -193,7 +193,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
               <h1 className="font-mono font-black uppercase tracking-tight text-black text-3xl mb-2">
                 Import Receipts
               </h1>
-              <p className="font-mono text-sm text-gray-700">
+              <p className="font-mono text-sm text-purple-900">
                 {selectedMode === "digital"
                   ? "Digital receipts from connected apps"
                   : "Scanned receipts from uploaded images"}
@@ -201,6 +201,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
             </div>
             {onClose && (
               <button
+                type="button"
                 onClick={onClose}
                 className="p-2 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                 aria-label="Close dashboard"
@@ -243,8 +244,9 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
               </div>
               {isOnline && !isSyncing && (
                 <button
+                  type="button"
                   onClick={() => retryQueue()}
-                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 border border-amber-600 rounded text-xs font-bold text-amber-900 transition-colors"
+                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 border-2 border-black rounded text-xs font-bold text-amber-900 transition-colors"
                 >
                   Sync Now
                 </button>

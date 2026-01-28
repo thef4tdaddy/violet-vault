@@ -46,7 +46,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           onClick={onRetry}
           disabled={isRetrying}
           variant="outline"
-          className="bg-white border-red-300 text-red-800 hover:bg-red-50"
+          className="bg-white border-2 border-black text-red-800 hover:bg-red-50"
           data-testid="error-retry-button"
         >
           {isRetrying ? (

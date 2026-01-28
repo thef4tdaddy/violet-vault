@@ -70,6 +70,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({
       {/* Badge for pending receipts */}
       {badgeCount > 0 && (
         <button
+          type="button"
           onClick={handleBadgeClickInternal}
           className="
             absolute top-1 right-2

@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act } from "@/test/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useBottomNavigation } from "../useBottomNavigation";
 import { useUnifiedReceipts } from "../../../hooks/platform/receipts/useUnifiedReceipts";
