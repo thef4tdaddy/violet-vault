@@ -8,7 +8,9 @@ import ModalCloseButton from "@/components/ui/ModalCloseButton";
  * Provides backdrop, close handlers, and focus management
  */
 export const ImportDashboardModal: React.FC = () => {
-  const { isOpen, close, preloadedFile } = useImportDashboardStore();
+  const isOpen = useImportDashboardStore((state) => state.isOpen);
+  const close = useImportDashboardStore((state) => state.close);
+  const preloadedFile = useImportDashboardStore((state) => state.preloadedFile);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 

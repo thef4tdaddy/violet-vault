@@ -245,6 +245,7 @@ const NavButton = memo(
         <div className="relative">
           <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
           {badgeCount !== undefined && badgeCount > 0 && (
+            // eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Badge overlay requires custom styling
             <button
               type="button"
               onClick={handleBadgeClick}

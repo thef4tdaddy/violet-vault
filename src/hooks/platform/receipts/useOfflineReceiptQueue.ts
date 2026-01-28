@@ -47,7 +47,11 @@ export const useOfflineReceiptQueue = (
         if (isMounted) setPendingCount(count);
       } catch (e) {
         // Suppress errors during unmount/test teardown
-        if (isMounted) console.error("Failed to count pending uploads", e);
+        if (isMounted) {
+          logger.error("Failed to count pending uploads", {
+            error: e instanceof Error ? e.message : String(e),
+          });
+        }
       }
     };
 

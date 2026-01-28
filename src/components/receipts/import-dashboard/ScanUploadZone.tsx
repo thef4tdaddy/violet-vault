@@ -1,7 +1,6 @@
 import React, { useRef, useState, useCallback } from "react";
-import { getIcon } from "@/utils";
+import { getIcon, IconComponent } from "@/utils";
 import { Button } from "@/components/ui/buttons";
-import { LucideIcon } from "lucide-react";
 
 interface ScanUploadZoneProps {
   onFileSelected: (file: File) => void;
@@ -70,9 +69,9 @@ const ScanUploadZone: React.FC<ScanUploadZoneProps> = ({
     [onFileSelected]
   );
 
-  const ImagePlusIcon = getIcon("ImagePlus") as LucideIcon;
-  const CameraIcon = getIcon("Camera") as LucideIcon;
-  const LoaderIcon = getIcon("Loader2") as LucideIcon;
+  const ImagePlusIcon = getIcon("ImagePlus") as IconComponent;
+  const CameraIcon = getIcon("Camera") as IconComponent;
+  const LoaderIcon = getIcon("Loader2") as IconComponent;
 
   return (
     <div

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useBottomNavigation } from "@/hooks/platform/mobile/useBottomNavigation";
 import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
+import { useUnifiedReceipts } from "@/hooks/platform/receipts/useUnifiedReceipts";
 import BottomNavItem from "./BottomNavItem";
 
 /**
@@ -10,6 +11,8 @@ import BottomNavItem from "./BottomNavItem";
 const BottomNavigationBar: React.FC = () => {
   const { isVisible, getVisibleItems, isItemActive } = useBottomNavigation();
   const openImportDashboard = useImportDashboardStore((state) => state.open);
+  const { pendingReceipts } = useUnifiedReceipts();
+  const pendingCount = pendingReceipts.length;
 
   const navRef = useRef<HTMLElement>(null);
   const leftFadeRef = useRef<HTMLDivElement>(null);
@@ -102,7 +105,7 @@ const BottomNavigationBar: React.FC = () => {
                 icon={item.icon}
                 label={item.label}
                 isActive={isItemActive(item.key)}
-                badgeCount={item.key === "transactions" ? (item as any).badgeCount : 0}
+                badgeCount={item.key === "transactions" ? pendingCount : 0}
                 onBadgeClick={item.key === "transactions" ? () => openImportDashboard() : undefined}
               />
             ))}

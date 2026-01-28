@@ -110,7 +110,7 @@ const ShareTargetHandler: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [location.search, navigate, setIsProcessing, setError, setSharedData]);
+  }, [location.search, location.state, navigate, openImportDashboard, setIsProcessing, setError, setSharedData]);
 
   useEffect(() => {
     // Check if this is a share target request
