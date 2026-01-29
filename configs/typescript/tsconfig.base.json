@@ -6,6 +6,8 @@
     "skipLibCheck": true,
     "allowJs": false,
     "checkJs": false,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
 
     /* Module resolution */
     "moduleResolution": "node",

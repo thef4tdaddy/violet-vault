@@ -111,6 +111,8 @@ mkdir -p "$FAILED_CHECKS_TRACKER_DIR"
 if [ "$RETRY_FAILED_MODE" = false ]; then
   # Use a more robust cleanup
   rm -f "$FAILED_CHECKS_TRACKER_DIR"/*.fail "$ERROR_DIR"/*.txt 2>/dev/null
+  # Cleanup nested/old mypy caches to ensure consolidation
+  rm -rf api/sentinel/.mypy_cache 2>/dev/null
 fi
 
 # Helper to determine if a check should be run
@@ -283,7 +285,7 @@ if [ -f "pyproject.toml" ] && [ -n "$(find api -name "*.py" -print -quit 2>/dev/
 
     # Mypy type checking
     if [ -n "$MYPY_CMD" ]; then
-        run_check "mypy" "$MYPY_CMD -p api"
+        run_check "mypy" "$MYPY_CMD -p api --cache-dir=.mypy_cache"
     else
         echo -e "  ${YELLOW}mypy (skipped - not installed)${NC}"
     fi

@@ -57,6 +57,9 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 strict_equality = true
+sqlite_cache = true
+cache_fine_grained = true
+cache_dir = ".mypy_cache"
 
 [[tool.mypy.overrides]]
 module = "http.server"
