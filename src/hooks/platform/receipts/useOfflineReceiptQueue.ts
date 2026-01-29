@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { captureError } from "@/utils/core/common/sentry";
 import { logger } from "@/utils/core/common/logger";
 import useToast from "@/hooks/platform/ux/useToast";
@@ -21,6 +21,7 @@ export const useOfflineReceiptQueue = (
     typeof navigator !== "undefined" ? navigator.onLine : true
   );
   const [isSyncing, setIsSyncing] = useState(false);
+  const syncInProgressRef = useRef(false);
   const [pendingCount, setPendingCount] = useState(0);
   const { showSuccess, showError } = useToast();
 
@@ -64,14 +65,14 @@ export const useOfflineReceiptQueue = (
 
   // Process queue
   const retryQueue = useCallback(async () => {
-    if (!isOnline || isSyncing) return;
+    if (!isOnline || syncInProgressRef.current) return;
 
+    syncInProgressRef.current = true;
     setIsSyncing(true);
     try {
       const pendingItems = await db.uploads.where("status").equals("pending").toArray();
 
       if (pendingItems.length === 0) {
-        setIsSyncing(false);
         return;
       }
 
@@ -109,9 +110,10 @@ export const useOfflineReceiptQueue = (
     } catch (error) {
       captureError(error as Error, { tags: { component: "OfflineQueueSync" } });
     } finally {
+      syncInProgressRef.current = false;
       setIsSyncing(false);
     }
-  }, [isOnline, isSyncing, onUpload, showSuccess, showError]);
+  }, [isOnline, onUpload, showSuccess, showError]);
 
   // Add to queue
   const addToQueue = useCallback(

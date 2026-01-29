@@ -283,7 +283,12 @@ describe("TransactionLedger (Surgical Reset)", () => {
 
     it("should render pending receipts badge when count > 0", () => {
       vi.mocked(useSentinelReceipts).mockReturnValue({
-        pendingReceipts: new Array(5).fill({ id: "test", merchant: "Test", amount: 10, status: "pending" }),
+        pendingReceipts: new Array(5).fill({
+          id: "test",
+          merchant: "Test",
+          amount: 10,
+          status: "pending",
+        }),
         isLoading: false,
         error: null,
       } as any);
@@ -310,7 +315,9 @@ describe("TransactionLedger (Surgical Reset)", () => {
     it("should open import dashboard when button is clicked", async () => {
       const localMockOpen = vi.fn();
       vi.mocked(useImportDashboardStore).mockImplementation((selector: any) =>
-        selector ? selector({ open: localMockOpen, close: vi.fn(), isOpen: false, preloadedFile: null }) : localMockOpen
+        selector
+          ? selector({ open: localMockOpen, close: vi.fn(), isOpen: false, preloadedFile: null })
+          : localMockOpen
       );
 
       renderLedger();

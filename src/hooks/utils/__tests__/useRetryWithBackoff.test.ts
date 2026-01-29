@@ -80,6 +80,8 @@ describe("useRetryWithBackoff", () => {
     let executePromise: Promise<any>;
     await act(async () => {
       executePromise = result.current.execute(mockFn);
+      // Suppress unhandled rejection as we handle it later with rejects.toThrow
+      executePromise.catch(() => {});
     });
 
     // 1st Attempt

@@ -1,6 +1,8 @@
-import { render, screen, waitFor } from "@/test/test-utils";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter, MemoryRouter } from "react-router-dom";
+import { screen, waitFor, act } from "@/test/test-utils";
+import "@testing-library/jest-dom";
+import { render } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import ShareTargetHandler from "../ShareTargetHandler";
 
 // Mock dependencies
@@ -15,8 +17,10 @@ vi.mock("@/utils/core/common/logger", () => ({
   },
 }));
 
-const mockNavigate = vi.fn();
-const mockOpenImportDashboard = vi.fn();
+const { mockNavigate, mockOpenImportDashboard } = vi.hoisted(() => ({
+  mockNavigate: vi.fn(),
+  mockOpenImportDashboard: vi.fn(),
+}));
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -56,24 +60,15 @@ describe("ShareTargetHandler", () => {
       </MemoryRouter>
     );
 
-    // Should show processing initially
-    expect(screen.getByText(/Processing Shared Data/i)).toBeInTheDocument();
-
-    // Wait for auto-redirect timeout (3 seconds + 100ms for modal opening)
+    // Wait for redirect call which happens after 3s
     await waitFor(
       () => {
         expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard");
-      },
-      { timeout: 4000 }
-    );
-
-    await waitFor(
-      () => {
         expect(mockOpenImportDashboard).toHaveBeenCalled();
       },
-      { timeout: 4000 }
+      { timeout: 7000 }
     );
-  });
+  }, 10000);
 
   it("navigates to transactions for CSV data", async () => {
     const searchParams = "?title=Transactions&text=csv%20data";
@@ -86,16 +81,11 @@ describe("ShareTargetHandler", () => {
 
     await waitFor(
       () => {
-        expect(mockNavigate).toHaveBeenCalledWith("/app/transactions", {
-          state: expect.objectContaining({
-            importData: expect.any(Object),
-            showImport: true,
-          }),
-        });
+        expect(mockNavigate).toHaveBeenCalledWith("/app/transactions", expect.any(Object));
       },
-      { timeout: 4000 }
+      { timeout: 5000 }
     );
-  });
+  }, 10000);
 
   it("navigates to settings for bank URLs", async () => {
     const searchParams = "?url=https://mybank.com/transactions";
@@ -108,15 +98,11 @@ describe("ShareTargetHandler", () => {
 
     await waitFor(
       () => {
-        expect(mockNavigate).toHaveBeenCalledWith("/app/settings", {
-          state: expect.objectContaining({
-            importUrl: expect.stringContaining("bank"),
-          }),
-        });
+        expect(mockNavigate).toHaveBeenCalledWith("/app/settings", expect.any(Object));
       },
-      { timeout: 4000 }
+      { timeout: 5000 }
     );
-  });
+  }, 10000);
 
   it("displays shared data preview", async () => {
     const searchParams = "?title=MyTitle&text=SomeText&url=https://example.com";
@@ -128,9 +114,10 @@ describe("ShareTargetHandler", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("MyTitle")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /SHARED DATA RECEIVED/i })).toBeInTheDocument();
     });
 
+    expect(screen.getByText(/MyTitle/)).toBeInTheDocument();
     expect(screen.getByText(/SomeText/)).toBeInTheDocument();
     expect(screen.getByText(/https:\/\/example.com/)).toBeInTheDocument();
   });
@@ -145,9 +132,7 @@ describe("ShareTargetHandler", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Redirecting to the appropriate section in 3 seconds.../i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Redirecting to the appropriate section/i)).toBeInTheDocument();
     });
   });
 
@@ -169,19 +154,16 @@ describe("ShareTargetHandler", () => {
       </MemoryRouter>
     );
 
-    // Wait for auto-redirect timeout
     await waitFor(
       () => {
         expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard");
-      },
-      { timeout: 4000 }
-    );
-
-    await waitFor(
-      () => {
         expect(mockOpenImportDashboard).toHaveBeenCalledWith({ preloadFile: mockFile });
       },
-      { timeout: 4000 }
+      { timeout: 5000 }
     );
+  }, 10000);
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 });

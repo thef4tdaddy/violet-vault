@@ -86,9 +86,15 @@ const buildCardClassName = (
   onClick: ((receipt: DashboardReceiptItem) => void) | undefined,
   className: string
 ): string => {
-  const baseClasses = "group relative bg-white border-2 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all";
-  const processingClasses = isProcessing ? "animate-[pulse_3s_ease-in-out_infinite] ring-2 ring-blue-400 ring-offset-2" : "";
-  const interactiveClasses = onClick && !isProcessing ? "cursor-pointer hover:shadow-none hover:translate-x-1 hover:translate-y-1" : "";
+  const baseClasses =
+    "group relative bg-white border-2 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all";
+  const processingClasses = isProcessing
+    ? "animate-[pulse_3s_ease-in-out_infinite] ring-2 ring-blue-400 ring-offset-2"
+    : "";
+  const interactiveClasses =
+    onClick && !isProcessing
+      ? "cursor-pointer hover:shadow-none hover:translate-x-1 hover:translate-y-1"
+      : "";
 
   return `${baseClasses} ${confidenceStyles} ${processingClasses} ${interactiveClasses} ${className}`;
 };

@@ -1,13 +1,16 @@
 /**
  * @vitest-environment jsdom
  */
-import { renderHook, waitFor } from "@/test/test-utils";
+import { renderHook, waitFor, act } from "@/test/test-utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useOCRJobStatus } from "../useOCRJobStatus";
 
 // Mock the OCR status service
-const mockFetchOCRStatus = vi.fn();
+const { mockFetchOCRStatus } = vi.hoisted(() => ({
+  mockFetchOCRStatus: vi.fn(),
+}));
+
 vi.mock("@/services/ocr/ocrStatusService", () => ({
   fetchOCRStatus: mockFetchOCRStatus,
 }));
@@ -16,7 +19,6 @@ describe("useOCRJobStatus", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
-    vi.useFakeTimers();
     vi.clearAllMocks();
     mockFetchOCRStatus.mockResolvedValue({ status: "idle", progress: 0 });
     queryClient = new QueryClient({
@@ -29,7 +31,6 @@ describe("useOCRJobStatus", () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
     queryClient.clear();
   });
 
@@ -51,15 +52,13 @@ describe("useOCRJobStatus", () => {
     const { result } = renderHook(() => useOCRJobStatus("receipt-123"), { wrapper });
 
     // Initial fetch
-    await waitFor(() => expect(result.current.status).toBe("processing"));
+    await waitFor(() => expect(result.current.status).toBe("processing"), { timeout: 5000 });
     expect(result.current.progress).toBe(20);
 
-    // Fast-forward time to trigger next poll (2s)
-    vi.advanceTimersByTime(2000);
-    await waitFor(() => expect(result.current.progress).toBe(50));
+    // Wait for next poll (2s real time)
+    await waitFor(() => expect(result.current.progress).toBe(50), { timeout: 5000 });
 
-    // Fast-forward again
-    vi.advanceTimersByTime(2000);
-    await waitFor(() => expect(result.current.status).toBe("completed"));
+    // Wait for completion
+    await waitFor(() => expect(result.current.status).toBe("completed"), { timeout: 5000 });
   });
 });

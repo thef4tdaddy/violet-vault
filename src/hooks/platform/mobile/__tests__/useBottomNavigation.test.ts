@@ -1,10 +1,10 @@
 import { renderHook, act } from "@/test/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useBottomNavigation } from "../useBottomNavigation";
-import { useUnifiedReceipts } from "../../../hooks/platform/receipts/useUnifiedReceipts";
+import { useUnifiedReceipts } from "@/hooks/platform/receipts/useUnifiedReceipts";
 
 // Mock hooks
-vi.mock("../../../hooks/platform/receipts/useUnifiedReceipts", () => ({
+vi.mock("@/hooks/platform/receipts/useUnifiedReceipts", () => ({
   useUnifiedReceipts: vi.fn(() => ({
     pendingReceipts: [],
     allReceipts: [],
@@ -14,24 +14,27 @@ vi.mock("../../../hooks/platform/receipts/useUnifiedReceipts", () => ({
 }));
 
 // Mock react-router-dom location
-let mockPathname = "/app/dashboard";
+const { mockLocationState } = vi.hoisted(() => ({
+  mockLocationState: { pathname: "/app/dashboard" },
+}));
+
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
-    useLocation: () => ({ pathname: mockPathname }),
+    useLocation: () => mockLocationState,
   };
 });
 
 // Mock utils
-vi.mock("../../../utils", () => ({
+vi.mock("@/utils", () => ({
   getIcon: vi.fn((name) => `Icon-${name}`),
 }));
 
 describe("useBottomNavigation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockPathname = "/app/dashboard";
+    mockLocationState.pathname = "/app/dashboard";
     // Reset window width
     Object.defineProperty(window, "innerWidth", {
       writable: true,
@@ -60,7 +63,7 @@ describe("useBottomNavigation", () => {
   });
 
   it("should identify active item based on location", () => {
-    mockPathname = "/app/envelopes";
+    mockLocationState.pathname = "/app/envelopes";
 
     const { result } = renderHook(() => useBottomNavigation());
 
@@ -68,7 +71,7 @@ describe("useBottomNavigation", () => {
   });
 
   it("should default to dashboard when path not found", () => {
-    mockPathname = "/unknown";
+    mockLocationState.pathname = "/unknown";
 
     const { result } = renderHook(() => useBottomNavigation());
 
@@ -76,7 +79,7 @@ describe("useBottomNavigation", () => {
   });
 
   it("should show navigation on mobile in app routes", () => {
-    mockPathname = "/app/dashboard";
+    mockLocationState.pathname = "/app/dashboard";
 
     Object.defineProperty(window, "innerWidth", {
       writable: true,
@@ -90,7 +93,7 @@ describe("useBottomNavigation", () => {
   });
 
   it("should hide navigation on desktop", () => {
-    mockPathname = "/app/dashboard";
+    mockLocationState.pathname = "/app/dashboard";
 
     Object.defineProperty(window, "innerWidth", {
       writable: true,
@@ -104,7 +107,7 @@ describe("useBottomNavigation", () => {
   });
 
   it("should hide navigation outside app routes", () => {
-    mockPathname = "/login";
+    mockLocationState.pathname = "/login";
 
     const { result } = renderHook(() => useBottomNavigation());
 
@@ -117,20 +120,20 @@ describe("useBottomNavigation", () => {
     const visibleItems = result.current.getVisibleItems(5);
 
     expect(visibleItems.length).toBeLessThanOrEqual(5);
-    expect(visibleItems.every((item) => item.priority)).toBe(true);
+    expect(visibleItems.every((item: any) => item.priority)).toBe(true);
   });
 
   it("should prioritize priority 1 items", () => {
     const { result } = renderHook(() => useBottomNavigation());
 
     const visibleItems = result.current.getVisibleItems(3);
-    const priority1Count = visibleItems.filter((item) => item.priority === 1).length;
+    const priority1Count = visibleItems.filter((item: any) => item.priority === 1).length;
 
     expect(priority1Count).toBeGreaterThan(0);
   });
 
   it("should check if item is active", () => {
-    mockPathname = "/app/dashboard";
+    mockLocationState.pathname = "/app/dashboard";
 
     const { result } = renderHook(() => useBottomNavigation());
 
@@ -205,7 +208,7 @@ describe("useBottomNavigation", () => {
     ];
 
     paths.forEach((path) => {
-      mockPathname = path;
+      mockLocationState.pathname = path;
       const { result } = renderHook(() => useBottomNavigation());
       expect(result.current.activeItem).toBeTruthy();
     });
@@ -231,7 +234,7 @@ describe("useBottomNavigation", () => {
 
     const { result } = renderHook(() => useBottomNavigation());
     const transactionsItem = result.current.navigationItems.find(
-      (item) => item.key === "transactions"
+      (item: any) => item.key === "transactions"
     );
 
     expect(transactionsItem).toHaveProperty("badgeCount", 2);
@@ -248,7 +251,7 @@ describe("useBottomNavigation", () => {
 
     const { result, rerender } = renderHook(() => useBottomNavigation());
     let transactionsItem = result.current.navigationItems.find(
-      (item) => item.key === "transactions"
+      (item: any) => item.key === "transactions"
     );
     expect(transactionsItem?.badgeCount).toBe(0);
 
@@ -262,7 +265,9 @@ describe("useBottomNavigation", () => {
 
     rerender();
 
-    transactionsItem = result.current.navigationItems.find((item) => item.key === "transactions");
+    transactionsItem = result.current.navigationItems.find(
+      (item: any) => item.key === "transactions"
+    );
     expect(transactionsItem?.badgeCount).toBe(5);
   });
 });

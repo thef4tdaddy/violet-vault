@@ -8,10 +8,12 @@ import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { SentinelReceipt } from "@/types/sentinel";
 
 // Mock useOCRJobStatus hook
-const mockUseOCRJobStatus = vi.fn(() => ({
-  status: "idle",
-  progress: 0,
-  error: null,
+const { mockUseOCRJobStatus } = vi.hoisted(() => ({
+  mockUseOCRJobStatus: vi.fn(() => ({
+    status: "idle",
+    progress: 0,
+    error: null,
+  })),
 }));
 
 vi.mock("@/hooks/platform/receipts/useOCRJobStatus", () => ({
@@ -153,7 +155,7 @@ describe("ReceiptCard", () => {
 
       // Should show error state instead of regular card
       expect(screen.getByText("Processing Failed")).toBeInTheDocument();
-      expect(screen.getByText("Could not extract receipt data.")).toBeInTheDocument();
+      expect(screen.getByText("Processing failed")).toBeInTheDocument();
     });
   });
 

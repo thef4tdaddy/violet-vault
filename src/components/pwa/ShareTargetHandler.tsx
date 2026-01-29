@@ -65,8 +65,8 @@ const ShareTargetHandler: React.FC = () => {
         data.hasFiles = data.files.length > 0;
       }
 
-      // Check for files in the search params as a indicator (legacy/mock support)
-      if (window.location.href.includes("files=")) {
+      // Check for files in the search params as an indicator (legacy/mock support)
+      if (urlParams.has("files")) {
         data.hasFiles = true;
       }
 
@@ -110,7 +110,15 @@ const ShareTargetHandler: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [location.search, location.state, navigate, openImportDashboard, setIsProcessing, setError, setSharedData]);
+  }, [
+    location.search,
+    location.state,
+    navigate,
+    openImportDashboard,
+    setIsProcessing,
+    setError,
+    setSharedData,
+  ]);
 
   useEffect(() => {
     // Check if this is a share target request
@@ -129,7 +137,7 @@ const ShareTargetHandler: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
         <div className="text-center max-w-md mx-auto">
           <div className="glassmorphism rounded-lg p-6 border-2 border-black bg-white/80 backdrop-blur-sm mb-6">
             <div className="mb-4">
@@ -158,7 +166,7 @@ const ShareTargetHandler: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
       <div className="text-center max-w-md mx-auto">
         {/* Logo */}
         <div className="mb-8">
@@ -211,7 +219,7 @@ const ShareTargetHandler: React.FC = () => {
                 {sharedData?.text && (
                   <div>
                     <span className="font-medium text-gray-600">Content:</span>
-                    <span className="ml-2 text-gray-800 break-words">
+                    <span className="ml-2 text-gray-800 wrap-break-word">
                       {sharedData.text.length > 100
                         ? `${sharedData.text.substring(0, 100)}...`
                         : sharedData.text}

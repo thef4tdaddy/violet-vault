@@ -5,6 +5,7 @@ import BottomNavigationBar from "../BottomNavigationBar";
 import React from "react";
 import { useBottomNavigation } from "../../../hooks/platform/mobile/useBottomNavigation";
 import { useImportDashboardStore } from "../../../stores/ui/importDashboardStore";
+import { useUnifiedReceipts } from "../../../hooks/platform/receipts/useUnifiedReceipts";
 
 // Mock hooks
 vi.mock("@/hooks/platform/mobile/useBottomNavigation", () => ({
@@ -15,10 +16,14 @@ vi.mock("@/stores/ui/importDashboardStore", () => ({
   useImportDashboardStore: vi.fn(),
 }));
 
+vi.mock("@/hooks/platform/receipts/useUnifiedReceipts", () => ({
+  useUnifiedReceipts: vi.fn(),
+}));
+
 vi.mock("../BottomNavItem", () => ({
   default: ({ label, badgeCount }: any) => (
     <div data-testid={`nav-item-${label}`}>
-      {label} {badgeCount > 0 && <span data-testid={`badge-${label}`}>{badgeCount}</span>}
+      {label} {badgeCount > 0 && <span data-testid="bottom-nav-badge">{badgeCount}</span>}
     </div>
   ),
 }));
@@ -46,6 +51,9 @@ describe("BottomNavigationBar", () => {
     (useImportDashboardStore as any).mockImplementation((selector: any) =>
       selector ? selector({ open: vi.fn() }) : vi.fn()
     );
+    (useUnifiedReceipts as any).mockReturnValue({
+      pendingReceipts: [{}, {}, {}], // 3 items
+    });
   });
 
   it("renders nothing when not visible", () => {

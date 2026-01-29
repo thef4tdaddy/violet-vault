@@ -45,17 +45,9 @@ function convertOCRDataToReceipt(data: ReceiptProcessedData): Partial<Receipt> {
 }
 
 /**
- * ImportDashboard - Main unified receipt import interface
- * Phase 3: Integrated with OCRScanner and MatchConfirmationModal
+ * Custom hook for ImportDashboard logic to keep component clean
  */
-const ImportDashboard: React.FC<ImportDashboardProps> = ({
-  initialMode = "digital",
-  className = "",
-  preloadedFile = null,
-  // onClose is used for the modal container, but if we need a close button here
-  // we can add one in the header. For now, acknowledging it to suppress warning.
-  onClose,
-}) => {
+function useImportDashboard(initialMode: ImportMode, preloadedFile: File | null) {
   const [selectedMode, setSelectedMode] = useState<ImportMode>(
     preloadedFile ? "scan" : initialMode
   );
@@ -67,16 +59,14 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
 
   const handleMatchSuccess = useCallback(() => {
     hapticFeedback(20, "success");
-    showSuccess("Receipt Linked", "The receipt has been successfully linked to the transaction.");
+    showSuccess("Receipt Linked", "The receipt has been successfully linked.");
     closeDashboard();
   }, [showSuccess, closeDashboard]);
 
-  // Integrated scanner for in-page zone
   const { isProcessing, handleFileUpload } = useReceiptScanner((data) => {
     addReceipt(convertOCRDataToReceipt(data) as Receipt);
   });
 
-  // Offline Queue Hook
   const {
     addToQueue,
     retryQueue,
@@ -85,13 +75,12 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     isSyncing,
   } = useOfflineReceiptQueue(handleFileUpload);
 
-  // Wrapped upload handler that checks connectivity
   const handleFileSelected = useCallback(
     (file: File) => {
-      if (!isOnline) {
-        addToQueue(file);
-      } else {
+      if (isOnline) {
         handleFileUpload(file);
+      } else {
+        addToQueue(file);
       }
     },
     [isOnline, addToQueue, handleFileUpload]
@@ -105,17 +94,6 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     [addReceipt]
   );
 
-  // Auto-trigger OCR scanner if a file is preloaded (e.g. from PWA share)
-  useEffect(() => {
-    if (preloadedFile) {
-      handleFileUpload(preloadedFile);
-    }
-  }, [preloadedFile, handleFileUpload]);
-
-  // Keyboard shortcuts (D = Digital, S = Scan)
-  useImportDashboardKeyboard(setSelectedMode);
-
-  const { sentinelReceipts, ocrReceipts, isLoading, error } = useUnifiedReceipts();
   const {
     showConfirmModal,
     selectedMatch,
@@ -128,11 +106,13 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     getMatchSuggestionsForReceipt,
   } = useReceiptMatching({ onMatchSuccess: handleMatchSuccess });
 
+  const { sentinelReceipts, ocrReceipts, isLoading, error } = useUnifiedReceipts();
+
   const filteredReceipts = useMemo(
     () =>
-      selectedMode === "digital"
-        ? sentinelReceipts.filter((r) => r.status === "pending")
-        : ocrReceipts.filter((r) => r.status === "pending"),
+      (selectedMode === "digital" ? sentinelReceipts : ocrReceipts).filter(
+        (r) => r.status === "pending"
+      ),
     [selectedMode, sentinelReceipts, ocrReceipts]
   );
 
@@ -144,16 +124,61 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
     [sentinelReceipts, ocrReceipts, offlineCount]
   );
 
-  const handleReceiptClick = useCallback(
-    (dashboardReceipt: DashboardReceiptItem) => {
-      const receipt = dashboardReceipt.rawData as Receipt;
-      const suggestions = getMatchSuggestionsForReceipt(receipt);
-      if (suggestions.length > 0) openMatchConfirmation(receipt, suggestions[0]);
-    },
-    [openMatchConfirmation, getMatchSuggestionsForReceipt]
-  );
+  useEffect(() => {
+    if (preloadedFile) handleFileUpload(preloadedFile);
+  }, [preloadedFile, handleFileUpload]);
 
-  const handleEmptyAction = useCallback(() => selectedMode === "scan" && setShowOCRScanner(true), [selectedMode]);
+  useImportDashboardKeyboard(setSelectedMode);
+
+  return {
+    selectedMode,
+    setSelectedMode,
+    showOCRScanner,
+    setShowOCRScanner,
+    isProcessing,
+    isSyncing,
+    offlineCount,
+    isOnline,
+    retryQueue,
+    error,
+    filteredReceipts,
+    pendingCounts,
+    isLoading,
+    handleFileSelected,
+    handleReceiptProcessed,
+    showConfirmModal,
+    selectedMatch,
+    confirmLinkOnly,
+    confirmLinkAndUpdate,
+    closeMatchConfirmation,
+    isLinking,
+    isLinkingAndUpdating,
+    handleReceiptClick: useCallback(
+      (dashboardReceipt: DashboardReceiptItem) => {
+        const receipt = dashboardReceipt.rawData as Receipt;
+        const suggestions = getMatchSuggestionsForReceipt(receipt);
+        if (suggestions.length > 0) openMatchConfirmation(receipt, suggestions[0]);
+      },
+      [openMatchConfirmation, getMatchSuggestionsForReceipt]
+    ),
+    handleEmptyAction: useCallback(() => {
+      if (selectedMode === "scan") {
+        setShowOCRScanner(true);
+      }
+    }, [selectedMode]),
+  };
+}
+
+/**
+ * ImportDashboard - Main unified receipt import interface
+ */
+const ImportDashboard: React.FC<ImportDashboardProps> = ({
+  initialMode = "digital",
+  className = "",
+  preloadedFile = null,
+  onClose,
+}) => {
+  const logic = useImportDashboard(initialMode, preloadedFile);
 
   return (
     <>
@@ -163,61 +188,59 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({
       >
         <aside className="lg:w-64 shrink-0">
           <ImportSidebar
-            selectedMode={selectedMode}
-            onModeChange={setSelectedMode}
-            pendingCounts={pendingCounts}
+            selectedMode={logic.selectedMode}
+            onModeChange={logic.setSelectedMode}
+            pendingCounts={logic.pendingCounts}
           />
         </aside>
 
         <main className="flex-1 min-w-0">
           <ImportDashboardHeader
-            selectedMode={selectedMode}
+            selectedMode={logic.selectedMode}
             onClose={onClose}
-            offlineCount={offlineCount}
-            isOnline={isOnline}
-            isSyncing={isSyncing}
-            retryQueue={retryQueue}
-            error={error}
+            offlineCount={logic.offlineCount}
+            isOnline={logic.isOnline}
+            isSyncing={logic.isSyncing}
+            retryQueue={logic.retryQueue}
+            error={logic.error}
           />
-
           <ReceiptInbox
-            receipts={filteredReceipts}
-            mode={selectedMode}
-            isLoading={isLoading}
-            onReceiptClick={handleReceiptClick}
-            onEmptyAction={handleEmptyAction}
+            receipts={logic.filteredReceipts}
+            mode={logic.selectedMode}
+            isLoading={logic.isLoading}
+            onReceiptClick={logic.handleReceiptClick}
+            onEmptyAction={logic.handleEmptyAction}
           />
-
-          {selectedMode === "scan" && (
+          {logic.selectedMode === "scan" && (
             <div className="mt-8 border-t-2 border-black/5 pt-8">
               <h2 className="font-mono font-black uppercase tracking-tight text-black text-xl mb-4">
                 Add New Scan
               </h2>
               <ScanUploadZone
-                onFileSelected={handleFileSelected}
-                isProcessing={isProcessing || isSyncing}
+                onFileSelected={logic.handleFileSelected}
+                isProcessing={logic.isProcessing || logic.isSyncing}
               />
             </div>
           )}
         </main>
       </div>
 
-      {showOCRScanner && (
+      {logic.showOCRScanner && (
         <OCRScanner
           preloadedFile={preloadedFile}
-          onReceiptProcessed={handleReceiptProcessed}
-          onClose={() => setShowOCRScanner(false)}
+          onReceiptProcessed={logic.handleReceiptProcessed}
+          onClose={() => logic.setShowOCRScanner(false)}
         />
       )}
 
-      {showConfirmModal && selectedMatch && (
+      {logic.showConfirmModal && logic.selectedMatch && (
         <MatchConfirmationModal
-          selectedMatch={selectedMatch}
-          onLinkOnly={confirmLinkOnly}
-          onLinkAndUpdate={confirmLinkAndUpdate}
-          onClose={closeMatchConfirmation}
-          isLinking={isLinking}
-          isLinkingAndUpdating={isLinkingAndUpdating}
+          selectedMatch={logic.selectedMatch}
+          onLinkOnly={logic.confirmLinkOnly}
+          onLinkAndUpdate={logic.confirmLinkAndUpdate}
+          onClose={logic.closeMatchConfirmation}
+          isLinking={logic.isLinking}
+          isLinkingAndUpdating={logic.isLinkingAndUpdating}
         />
       )}
     </>

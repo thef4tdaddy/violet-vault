@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@/test/test-utils";
+import { render, screen, fireEvent, act } from "@/test/test-utils";
+import "@testing-library/jest-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import NavigationTabs from "../NavigationTabs";
@@ -18,6 +19,13 @@ describe("NavigationTabs", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
+    // Set a desktop width for tests
+    Object.defineProperty(window, "innerWidth", {
+      writable: true,
+      configurable: true,
+      value: 1200,
+    });
+
     const { useSentinelReceipts } = await import("@/hooks/api/useSentinelReceipts");
     (useSentinelReceipts as any).mockReturnValue({
       pendingReceipts: [{ id: "1" }, { id: "2" }, { id: "3" }],
@@ -30,50 +38,37 @@ describe("NavigationTabs", () => {
   });
 
   it("renders all navigation tabs", () => {
-    render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    act(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
+    render(<NavigationTabs />);
 
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("Envelopes")).toBeInTheDocument();
-    expect(screen.getByText("Bills")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Dashboard/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Envelopes/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Bills/i })).toBeInTheDocument();
   });
 
   it("displays pending receipt badge on transactions tab", () => {
-    render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    render(<NavigationTabs />);
 
-    const badge = screen.getByLabelText(/3 pending receipts/i);
+    const badge = screen.getByRole("button", { name: /pending receipts/i });
     expect(badge).toBeInTheDocument();
     expect(badge).toHaveTextContent("3");
   });
 
   it("opens import dashboard modal when badge is clicked", () => {
-    render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    render(<NavigationTabs />);
 
-    const badge = screen.getByLabelText(/3 pending receipts/i);
+    const badge = screen.getByRole("button", { name: /pending receipts/i });
     fireEvent.click(badge);
 
     expect(mockOpenImportDashboard).toHaveBeenCalled();
   });
 
   it("prevents navigation when badge is clicked", () => {
-    const { container } = render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    const { container } = render(<NavigationTabs />);
 
-    const badge = screen.getByLabelText(/3 pending receipts/i);
+    const badge = screen.getByRole("button", { name: /pending receipts/i });
     const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
     const preventDefaultSpy = vi.spyOn(clickEvent, "preventDefault");
 
@@ -89,13 +84,9 @@ describe("NavigationTabs", () => {
       pendingReceipts: [],
     });
 
-    render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    render(<NavigationTabs />);
 
-    expect(screen.queryByLabelText(/pending receipts/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /pending receipts/i })).not.toBeInTheDocument();
   });
 
   it("displays 99+ for more than 99 pending receipts", async () => {
@@ -105,13 +96,9 @@ describe("NavigationTabs", () => {
       pendingReceipts: mockReceipts,
     });
 
-    render(
-      <BrowserRouter>
-        <NavigationTabs />
-      </BrowserRouter>
-    );
+    render(<NavigationTabs />);
 
-    const badge = screen.getByLabelText(/pending receipts/i);
+    const badge = screen.getByRole("button", { name: /pending receipts/i });
     expect(badge).toHaveTextContent("99+");
   });
 });

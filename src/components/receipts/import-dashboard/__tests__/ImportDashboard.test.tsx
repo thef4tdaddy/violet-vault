@@ -67,7 +67,9 @@ vi.mock("@/components/sentinel/OCRScanner", () => ({
   default: ({ onClose, preloadedFile }: { onClose: () => void; preloadedFile?: File | null }) => (
     <div data-testid="ocr-scanner-mock">
       {preloadedFile && <div data-testid="preloaded-file-indicator">{preloadedFile.name}</div>}
-      <button type="button" onClick={onClose}>Close Scanner</button>
+      <button type="button" onClick={onClose}>
+        Close Scanner
+      </button>
     </div>
   ),
 }));
@@ -81,7 +83,9 @@ vi.mock("../ScanUploadZone", () => ({
   }) => (
     <div data-testid="scan-upload-zone-mock">
       {isProcessing && <div data-testid="processing-indicator">Processing...</div>}
-      <button type="button" onClick={() => onFileSelected(new File([], "test-ui.jpg"))}>Upload Mock</button>
+      <button type="button" onClick={() => onFileSelected(new File([], "test-ui.jpg"))}>
+        Upload Mock
+      </button>
     </div>
   ),
 }));

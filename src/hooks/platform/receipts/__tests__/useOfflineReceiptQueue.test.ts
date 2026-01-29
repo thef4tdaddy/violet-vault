@@ -148,17 +148,14 @@ describe("useOfflineReceiptQueue", () => {
     // Wait for initial updateCount to complete
     await waitFor(() => expect(mockDb.uploads.count).toHaveBeenCalled());
 
-    // Seed DB
-    await mockDb.uploads.add({
-      id: "fail-id",
-      file: new Blob(["test"], { type: "image/jpeg" }),
-      filename: "fail.jpg",
-      status: "pending",
-      retryCount: 0,
+    // Add item via addToQueue to ensure hook state updates
+    const file = new File(["test"], "fail.jpg", { type: "image/jpeg" });
+    await act(async () => {
+      await result.current.addToQueue(file);
     });
 
-    // Wait for the hook to discover the item
-    await waitFor(() => expect(result.current.pendingCount).toBe(1), { timeout: 5000 });
+    // Verify item is in queue
+    expect(result.current.pendingCount).toBe(1);
 
     // Go Online to trigger auto-sync
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
@@ -168,8 +165,8 @@ describe("useOfflineReceiptQueue", () => {
 
     await waitFor(() => expect(onUploadMock).toHaveBeenCalled(), { timeout: 5000 });
 
-    // Verify update called
-    expect(mockDb.uploads.update).toHaveBeenCalledWith("fail-id", {
+    // Verify update called with the correct ID (from crypto.randomUUID mock)
+    expect(mockDb.uploads.update).toHaveBeenCalledWith("test-uuid", {
       retryCount: 1,
     });
 

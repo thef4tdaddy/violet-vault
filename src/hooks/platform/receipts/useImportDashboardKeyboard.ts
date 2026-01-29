@@ -4,9 +4,7 @@ import { useEffect } from "react";
  * Keyboard shortcuts for import dashboard
  * D = Digital mode, S = Scan mode
  */
-export const useImportDashboardKeyboard = (
-  setSelectedMode: (mode: "digital" | "scan") => void
-) => {
+export const useImportDashboardKeyboard = (setSelectedMode: (mode: "digital" | "scan") => void) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input
