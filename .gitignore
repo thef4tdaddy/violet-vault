@@ -36,6 +36,14 @@ dev-dist
 CLAUDE.local.md
 .env.development
 
+# Service Worker files (generated at build time)
+sw.js
+sw.js.map
+**/sw.js
+**/sw.js.map
+registerSW.js
+**/registerSW.js
+
 # Build and lint artifacts
 tsc-output.txt
 eslint-output.txt
@@ -49,6 +57,41 @@ docs/audits/sorted-typecheck-report.txt
 docs/audits/typecheck-strict-results.txt
 docs/audits/sorted-typecheck-strict-report.txt
 .audit-metrics.json
+.salvo_errors/
 
 # Test coverage
 coverage/
+.coverage
+.coverage.*
+coverage.json
+coverage.xml
+api/coverage.out
+htmlcov/
+
+# Go build artifacts
+api/*.test
+api/*.exe
+api/*.dll
+api/*.so
+api/*.dylib
+api/bin/
+api/pkg/
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+api/venv/
+api/env/
+.Python
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt

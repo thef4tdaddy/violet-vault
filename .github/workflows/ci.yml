@@ -9,7 +9,7 @@ on:
   push:
     branches: [main, develop, "feat/**"]
   pull_request:
-    branches: [main, develop, "feat/**", "copilot/**"]
+    branches: [main, develop, "feat/**", "feat/polygot-rewrite", "copilot/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
@@ -108,16 +108,42 @@ jobs:
             if [ $TSC_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
             
-            # Unit Tests
+            # Unit Tests with Coverage
             echo "::group::Vitest"
-            npm run test:run > vitest.log 2>&1 && VITEST_RES=0 || VITEST_RES=$?
+            npm run test:coverage > vitest.log 2>&1 && VITEST_RES=0 || VITEST_RES=$?
             echo "STATUS_VITEST:$VITEST_RES"
             if [ $VITEST_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
+            
+            # Build for Bundle Analysis
+            echo "::group::Build"
+            npm run build > build.log 2>&1 && BUILD_RES=0 || BUILD_RES=$?
+            echo "STATUS_BUILD:$BUILD_RES"
+            if [ $BUILD_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
 
             exit $EXIT_CODE
           }
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         continue-on-error: true
+
+      - name: Upload Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./coverage/coverage-final.json
+          flags: frontend
+          name: violet-vault-frontend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/junit.xml
 
       # 2. Go Backend
       - name: Go Backend Checks
@@ -197,7 +223,7 @@ jobs:
 
             # Unit Tests with Coverage - Run from root for absolute imports
             echo "::group::Pytest"
-            pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
+            python -m pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
             echo "STATUS_PYTEST:$PYTEST_RES"
             if [ $PYTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
