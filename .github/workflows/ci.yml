@@ -7,9 +7,9 @@ permissions:
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, "feat/**"]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, "feat/**", "copilot/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
@@ -148,7 +148,7 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Go Test"
-            go test ./... -v > ../go_test.log 2>&1 && GOTEST_RES=0 || GOTEST_RES=$?
+            go test ./... -v -coverprofile=../go_coverage.out -covermode=atomic > ../go_test.log 2>&1 && GOTEST_RES=0 || GOTEST_RES=$?
             echo "STATUS_GOTEST:$GOTEST_RES"
             if [ $GOTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
@@ -156,6 +156,16 @@ jobs:
             exit $EXIT_CODE
           }
         continue-on-error: true
+
+      - name: Upload Go Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./go_coverage.out
+          flags: go-backend
+          name: violet-vault-go
+          fail_ci_if_error: false
 
       # 3. Python Backend
       - name: Python Backend Checks
@@ -184,10 +194,34 @@ jobs:
             echo "STATUS_MYPY:$MYPY_RES"
             if [ $MYPY_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
+
+            # Unit Tests with Coverage - Run from root for absolute imports
+            echo "::group::Pytest"
+            pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
+            echo "STATUS_PYTEST:$PYTEST_RES"
+            if [ $PYTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
+            echo "::endgroup::"
             
             exit $EXIT_CODE
           }
         continue-on-error: true
+
+      - name: Upload Python Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./api_coverage.xml
+          flags: python-backend
+          name: violet-vault-python
+          fail_ci_if_error: false
+
+      - name: Upload Python test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./api_junit.xml
 
       # --- Reporting ---
       - name: Generate CI Report
@@ -202,9 +236,24 @@ jobs:
           script: |
             const fs = require('fs');
             const date = new Date().toLocaleDateString();
+            const { owner, repo } = context.repo;
 
             function stripAnsi(str) {
               return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+            }
+
+            // Helper to get PR number even on push events
+            async function getPRNumber() {
+              if (context.payload.pull_request) return context.payload.pull_request.number;
+              
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner,
+                repo,
+                head: `${owner}:${context.ref.replace('refs/heads/', '')}`,
+                state: 'open'
+              });
+              
+              return pullRequests.length > 0 ? pullRequests[0].number : null;
             }
 
             const logs = {
@@ -217,6 +266,7 @@ jobs:
               go_fmt: 'go_fmt.log',
               go_vet: 'go_vet.log',
               go_test: 'go_test.log',
+              pytest: 'pytest.log',
               ruff_fmt: 'ruff_format.log',
               ruff_lint: 'ruff_lint.log',
               mypy: 'mypy.log'
@@ -240,7 +290,7 @@ jobs:
                 { key: 'STATUS_PRETTIER', name: 'Prettier (Fmt)', log: logContents.prettier, outcomeKey: 'OUTCOME_FRONTEND', type: 'warning' },
                 { key: 'STATUS_ESLINT', name: 'ESLint (Lint)', log: logContents.eslint, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
                 { key: 'STATUS_TSC', name: 'TypeScript (Type)', log: logContents.tsc, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
-                { key: 'STATUS_VITEST', name: 'Vitest (Unit)', log: logContents.vitest, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },
+                { key: 'STATUS_VITEST', name: 'Vitest (Unit)', log: logContents.vitest, outcomeKey: 'OUTCOME_FRONTEND', type: 'critical' },Channel
 
                 // Go
                 { key: 'STATUS_GOFMT', name: 'Go Format', log: logContents.go_fmt, outcomeKey: 'OUTCOME_GO', type: 'warning' },
@@ -250,7 +300,8 @@ jobs:
                 // Python
                 { key: 'STATUS_RUFF_FMT', name: 'Ruff (Fmt)', log: logContents.ruff_fmt, outcomeKey: 'OUTCOME_PYTHON', type: 'warning' },
                 { key: 'STATUS_RUFF_LINT', name: 'Ruff (Lint)', log: logContents.ruff_lint, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' },
-                { key: 'STATUS_MYPY', name: 'Mypy (Type)', log: logContents.mypy, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' }
+                { key: 'STATUS_MYPY', name: 'Mypy (Type)', log: logContents.mypy, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' },
+                { key: 'STATUS_PYTEST', name: 'Pytest (Unit)', log: logContents.pytest, outcomeKey: 'OUTCOME_PYTHON', type: 'critical' }
             ];
 
             let toolRows = [];
@@ -262,25 +313,6 @@ jobs:
                 // Determine status from log marker if possible, else use step outcome
                 let statusIcon = '⚪'; // Skipped/Unknown
                 let outcome = 'SKIPPED';
-                
-                // Basic check if log exists and implies execution
-                // We'll rely on the STATUS_ marker in the stdout/log if captured, 
-                // but since we piped to file, we might check the file content or just rely on 'outcomeKey' env var for block-level failure
-                // SentinelShare pattern matches the log content for STATUS_ code. 
-                
-                // Since we piped stdout to file, the STATUS_ echo is actually NOT in the file (it was echoed to main stdout in script).
-                // Correction: In my script I did `cmd > log 2>&1`. The `echo STATUS` was outside the redirect.
-                // So we cannot find STATUS in `logContents`. We must rely on the overall Step Outcome for the block, 
-                // OR we have to trust that if one failed, the step outcome is failure.
-                
-                // But wait, the previous code had `STATUS_` in the log because of `tee`.
-                // Here I am NOT using tee. I am redirecting. 
-                // However, I need to know WHICH tool failed in the block.
-                // LIMITATION: Use the log content to see if it looks like a failure?
-                // BETTER: Just inspect the log length or content.
-                
-                // For this implementation, let's assume if the step failed and the log has error-y words, it failed.
-                // Actually, let's just use the `outcomeKey`. If the block failed, mark all tools in that block as '?' or check logs.
                 
                 const stepOutcome = process.env[tool.outcomeKey];
                 
@@ -295,19 +327,13 @@ jobs:
                     statusIcon = '⚪';
                     outcome = 'SKIPPED';
                 } else {
-                    // Block failed. Did THIS tool fail?
-                    // Simple heuristic: if log contains "Error" or exit code, or just default to FAIL for criticals in failed block
-                    // Proper way: use `tee` in the bash script so the marker is in the log, OR grep the file.
-                    // For now, assume FAIL if block failed and log isn't empty.
                     if (tool.log && tool.log.length > 0) {
-                         // Check for failure keywords
                          if (tool.log.includes('FAIL') || tool.log.includes('Error') || tool.log.includes('error') || tool.log.includes('failed')) {
                              statusIcon = '❌';
                              outcome = 'FAIL';
                              hasCriticalFailure = true;
                              failures.push(tool.name);
                          } else {
-                             // Maybe this specific tool passed but another in the block failed?
                              statusIcon = '✅'; 
                              outcome = 'PASS';
                          }
@@ -316,7 +342,6 @@ jobs:
                         outcome = 'UNKNOWN';
                     }
                     
-                    // Override for known setup failure
                     if (tool.outcomeKey === 'OUTCOME_SETUP' && stepOutcome === 'failure') {
                          statusIcon = '❌';
                          outcome = 'FAIL';
@@ -354,14 +379,40 @@ jobs:
 
             const body = `### ${icon} Polyglot CI Report: ${date}\n\n${summaryTable}\n\n---\n${details}`;
 
-            if (context.eventName === 'pull_request') {
+            const prNumber = await getPRNumber();
+            if (prNumber) {
+                // Find and delete old comments from this bot
+                const comments = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                });
+                
+                const botComments = comments.data.filter(c => 
+                  c.user.type === 'Bot' && 
+                  c.body.includes('Polyglot CI Report:')
+                );
+
+                for (const comment of botComments) {
+                  try {
+                    await github.rest.issues.deleteComment({
+                      owner,
+                      repo,
+                      comment_id: comment.id,
+                    });
+                  } catch (e) {
+                    console.error(`Failed to delete comment ${comment.id}: ${e.message}`);
+                  }
+                }
+
                 await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
+                    owner,
+                    repo,
+                    issue_number: prNumber,
                     body: body
                 });
             } else {
+                console.log('No PR found for this run, logging to console instead:');
                 console.log(body);
             }
 
