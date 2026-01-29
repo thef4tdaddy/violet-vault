@@ -7,13 +7,20 @@ import { useEffect } from "react";
 export const useImportDashboardKeyboard = (setSelectedMode: (mode: "digital" | "scan") => void) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input
-      if (
-        document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA" ||
-        (document.activeElement as HTMLElement)?.isContentEditable
-      ) {
-        return;
+      // Ignore if user is typing in an input, textarea, or contentEditable element
+      const target = e.target;
+
+      if (target instanceof HTMLElement) {
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable ||
+          target.closest("select") ||
+          target.getAttribute("role") === "textbox" ||
+          target.getAttribute("role") === "searchbox"
+        ) {
+          return;
+        }
       }
 
       switch (e.key.toLowerCase()) {

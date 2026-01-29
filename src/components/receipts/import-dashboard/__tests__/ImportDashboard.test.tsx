@@ -108,7 +108,8 @@ describe("ImportDashboard", () => {
     status: "pending",
     createdAt: "2026-01-20T10:00:00Z",
     updatedAt: "2026-01-20T10:00:00Z",
-  };
+    lastModified: 1737367200000,
+  } as any;
 
   const createMockReceipt = (
     id: string,
@@ -646,8 +647,10 @@ describe("ImportDashboard", () => {
     it("should switch to scan mode when 's' key is pressed", () => {
       renderWithProvider(<ImportDashboard initialMode="digital" />);
 
+      // We need to trigger on an element that isn't an input/textarea to ensure the handler catches it
+      // Since our handler is on window, we can trigger on body or create a dummy element
       act(() => {
-        fireEvent.keyDown(window, { key: "s" });
+        fireEvent.keyDown(document.body, { key: "s", bubbles: true });
       });
 
       expect(screen.getByText("Scanned receipts from uploaded images")).toBeInTheDocument();
@@ -673,7 +676,7 @@ describe("ImportDashboard", () => {
       input.focus();
 
       act(() => {
-        fireEvent.keyDown(window, { key: "s" });
+        fireEvent.keyDown(input, { key: "s", bubbles: true });
       });
 
       // Should still be in digital mode

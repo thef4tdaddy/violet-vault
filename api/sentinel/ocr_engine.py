@@ -9,7 +9,7 @@ import time
 from typing import Any
 
 import cv2
-import pytesseract  # type: ignore
+import pytesseract
 
 from api.sentinel.models import ExtractedReceiptData, OCROptions
 from api.sentinel.parser import ReceiptParser

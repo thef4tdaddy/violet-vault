@@ -10,6 +10,99 @@ interface ScanUploadZoneProps {
 }
 
 /**
+ * sub-components for cleaner structure
+ */
+
+const ProcessingContent: React.FC<{ LoaderIcon: IconComponent }> = ({ LoaderIcon }) => (
+  <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
+    <div className="mb-6 p-4 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <LoaderIcon className="h-12 w-12 text-purple-600 animate-spin" />
+    </div>
+    <h3 className="text-lg font-black text-black uppercase tracking-tight font-mono">
+      Processing Receipt...
+    </h3>
+    <p className="text-sm font-bold text-purple-900 uppercase tracking-wide font-mono mt-2">
+      Extracting merchant and total
+    </p>
+  </div>
+);
+
+const IdleContent: React.FC<{
+  isDragging: boolean;
+  ImagePlusIcon: IconComponent;
+  CameraIcon: IconComponent;
+  acceptedFormats: string[];
+  maxFileSizeMB: number;
+  isProcessing: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  cameraInputRef: React.RefObject<HTMLInputElement | null>;
+}> = ({
+  isDragging,
+  ImagePlusIcon,
+  CameraIcon,
+  acceptedFormats,
+  maxFileSizeMB,
+  isProcessing,
+  fileInputRef,
+  cameraInputRef,
+}) => (
+  <>
+    <div className="mb-6 p-4 border-2 border-black bg-white group-hover:scale-110 transition-transform duration-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-active:shadow-none group-active:translate-x-[2px] group-active:translate-y-[2px]">
+      <ImagePlusIcon className={`h-12 w-12 ${isDragging ? "text-purple-600" : "text-black"}`} />
+    </div>
+
+    <h3 className="text-lg font-black text-black uppercase tracking-tight font-mono mb-2">
+      {isDragging ? "Drop to Upload" : "Drop Receipt or Click to Upload"}
+    </h3>
+
+    <p className="text-xs font-bold text-purple-900/60 uppercase tracking-widest font-mono mb-8">
+      {acceptedFormats
+        .map((f) => {
+          const subtype = f.split("/")[1];
+          return subtype === "*" ? "IMAGES" : subtype.toUpperCase();
+        })
+        .join(", ")}{" "}
+      (MAX {maxFileSizeMB}MB)
+    </p>
+
+    <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+      <Button
+        onClick={(e) => {
+          if (isProcessing) return;
+          e.stopPropagation();
+          fileInputRef.current?.click();
+        }}
+        variant="secondary"
+        disabled={isProcessing}
+        className="flex-1 border-2 border-black bg-purple-600 text-white font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] active:translate-x-[4px] active:translate-y-[4px] disabled:opacity-50 disabled:cursor-wait disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-mono text-xs"
+      >
+        Browse Files
+      </Button>
+      <Button
+        onClick={(e) => {
+          if (isProcessing) return;
+          e.stopPropagation();
+          cameraInputRef.current?.click();
+        }}
+        disabled={isProcessing}
+        className="flex-1 border-2 border-black bg-black text-white font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] active:translate-x-[4px] active:translate-y-[4px] disabled:opacity-50 disabled:cursor-wait disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-mono text-xs flex items-center justify-center gap-2"
+      >
+        <CameraIcon className="h-4 w-4" />
+        Capture
+      </Button>
+    </div>
+
+    <div className="mt-8 flex items-center gap-4 text-purple-900/40">
+      <div className="h-px w-12 bg-current" />
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] font-mono">
+        Secure Local Processing
+      </span>
+      <div className="h-px w-12 bg-current" />
+    </div>
+  </>
+);
+
+/**
  * ScanUploadZone - Premium drag-and-drop upload zone for the Import Dashboard
  * Implements "Hard Lines" high-contrast aesthetic.
  */
@@ -109,65 +202,18 @@ const ScanUploadZone: React.FC<ScanUploadZoneProps> = ({
       />
 
       {isProcessing ? (
-        <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-          <div className="mb-6 p-4 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <LoaderIcon className="h-12 w-12 text-purple-600 animate-spin" />
-          </div>
-          <h3 className="text-lg font-black text-black uppercase tracking-tight font-mono">
-            Processing Receipt...
-          </h3>
-          <p className="text-sm font-bold text-purple-900 uppercase tracking-wide font-mono mt-2">
-            Extracting merchant and total
-          </p>
-        </div>
+        <ProcessingContent LoaderIcon={LoaderIcon} />
       ) : (
-        <>
-          <div className="mb-6 p-4 border-2 border-black bg-white group-hover:scale-110 transition-transform duration-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-active:shadow-none group-active:translate-x-[2px] group-active:translate-y-[2px]">
-            <ImagePlusIcon
-              className={`h-12 w-12 ${isDragging ? "text-purple-600" : "text-black"}`}
-            />
-          </div>
-
-          <h3 className="text-lg font-black text-black uppercase tracking-tight font-mono mb-2">
-            {isDragging ? "Drop to Upload" : "Drop Receipt or Click to Upload"}
-          </h3>
-
-          <p className="text-xs font-bold text-purple-900/60 uppercase tracking-widest font-mono mb-8">
-            {acceptedFormats.map((f) => f.split("/")[1].toUpperCase()).join(", ")} (MAX{" "}
-            {maxFileSizeMB}MB)
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-              variant="secondary"
-              className="flex-1 border-2 border-black bg-purple-600 text-white font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] active:translate-x-[4px] active:translate-y-[4px] transition-all font-mono text-xs"
-            >
-              Browse Files
-            </Button>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                cameraInputRef.current?.click();
-              }}
-              className="flex-1 border-2 border-black bg-black text-white font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] active:translate-x-[4px] active:translate-y-[4px] transition-all font-mono text-xs flex items-center justify-center gap-2"
-            >
-              <CameraIcon className="h-4 w-4" />
-              Capture
-            </Button>
-          </div>
-
-          <div className="mt-8 flex items-center gap-4 text-purple-900/40">
-            <div className="h-px w-12 bg-current" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] font-mono">
-              Secure Local Processing
-            </span>
-            <div className="h-px w-12 bg-current" />
-          </div>
-        </>
+        <IdleContent
+          isDragging={isDragging}
+          ImagePlusIcon={ImagePlusIcon}
+          CameraIcon={CameraIcon}
+          acceptedFormats={acceptedFormats}
+          maxFileSizeMB={maxFileSizeMB}
+          isProcessing={isProcessing}
+          fileInputRef={fileInputRef}
+          cameraInputRef={cameraInputRef}
+        />
       )}
     </div>
   );

@@ -132,6 +132,10 @@
   border: 2px solid #000000;
 }
 
+@utility bg-radial-dots {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+}
+
 @layer base {
   body {
     background-color: #4c1d95; /* Deep purple brand-900 for that inlaid look */

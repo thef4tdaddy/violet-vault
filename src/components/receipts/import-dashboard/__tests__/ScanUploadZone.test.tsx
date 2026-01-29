@@ -39,8 +39,10 @@ describe("ScanUploadZone", () => {
     // Check if clicking the zone does NOT trigger file input when processing
     const zone = screen.getByTestId("scan-upload-zone");
     fireEvent.click(zone);
-    // Note: We can't easily check if fileInputRef.current?.click() WASN'T called without more complex mocking,
-    // but the presence of the processing text confirms we are in the right branch.
+
+    // Confirm buttons are unmounted during processing for cleaner UI
+    expect(screen.queryByRole("button", { name: /browse files/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /capture/i })).not.toBeInTheDocument();
   });
 
   it("handles drag over and drag leave states", () => {
@@ -144,5 +146,17 @@ describe("ScanUploadZone", () => {
 
     const input = screen.getByTestId("file-input") as HTMLInputElement;
     expect(input.accept).toBe("image/webp");
+  });
+
+  it('displays "IMAGES" when wildcard format is provided', () => {
+    render(
+      <ScanUploadZone
+        onFileSelected={mockOnFileSelected}
+        isProcessing={false}
+        acceptedFormats={["image/*"]}
+      />
+    );
+
+    expect(screen.getByText(/IMAGES/i)).toBeInTheDocument();
   });
 });

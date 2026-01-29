@@ -155,9 +155,17 @@ function useImportDashboard(initialMode: ImportMode, preloadedFile: File | null)
     isLinkingAndUpdating,
     handleReceiptClick: useCallback(
       (dashboardReceipt: DashboardReceiptItem) => {
-        const receipt = dashboardReceipt.rawData as Receipt;
-        const suggestions = getMatchSuggestionsForReceipt(receipt);
-        if (suggestions.length > 0) openMatchConfirmation(receipt, suggestions[0]);
+        const { rawData } = dashboardReceipt;
+
+        // Type guard to ensure we have a valid local Receipt object
+        const isLocalReceipt = (data: unknown): data is Receipt => {
+          return !!data && typeof data === "object" && "lastModified" in data;
+        };
+
+        if (isLocalReceipt(rawData)) {
+          const suggestions = getMatchSuggestionsForReceipt(rawData);
+          if (suggestions.length > 0) openMatchConfirmation(rawData, suggestions[0]);
+        }
       },
       [openMatchConfirmation, getMatchSuggestionsForReceipt]
     ),

@@ -108,12 +108,17 @@ const SourceBadge: React.FC<{ source: "sentinel" | "ocr"; isProcessing: boolean 
 }) => (
   <div className="absolute top-3 right-3 flex gap-2">
     {isProcessing && (
-      <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-600 border-t-transparent" />
+      <div
+        className="animate-spin rounded-full h-4 w-4 border-2 border-purple-600 border-t-transparent"
+        role="status"
+        aria-label="Processing"
+      />
     )}
     <span
       className={`px-2 py-1 rounded border border-black font-mono text-[10px] font-black uppercase tracking-widest ${
         source === "sentinel" ? "bg-purple-200 text-purple-900" : "bg-cyan-200 text-cyan-900"
       }`}
+      role="status"
       aria-label={`Source: ${source}`}
     >
       {source === "sentinel" ? "DGTL" : "SCAN"}
@@ -220,8 +225,9 @@ const ReceiptCard: React.FC<ReceiptCardProps> = ({ receipt, onClick, className =
       className={buildCardClassName(confidenceStyles, isProcessing, onClick, className)}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      role={onClick && !isProcessing ? "button" : undefined}
-      tabIndex={onClick && !isProcessing ? 0 : undefined}
+      role={onClick ? "button" : undefined}
+      aria-disabled={isProcessing || isFailed}
+      tabIndex={onClick && !isProcessing && !isFailed ? 0 : -1}
       data-testid="receipt-card"
       data-receipt-id={receipt.id}
       data-status={jobStatus}

@@ -125,7 +125,7 @@ describe("useOfflineReceiptQueue", () => {
     const { result } = renderHook(() => useOfflineReceiptQueue(onUploadMock));
 
     // Wait for initial updateCount to discover the item
-    await waitFor(() => expect(result.current.pendingCount).toBe(1), { timeout: 5000 });
+    await waitFor(() => expect(result.current.pendingCount).toBe(1));
 
     // Go Online to trigger auto-sync
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
@@ -134,7 +134,7 @@ describe("useOfflineReceiptQueue", () => {
     });
 
     // Wait for the sync to happen
-    await waitFor(() => expect(onUploadMock).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(onUploadMock).toHaveBeenCalled());
 
     // After success, item is deleted
     expect(mockDb.uploads.delete).toHaveBeenCalledWith("test-id");
@@ -163,7 +163,7 @@ describe("useOfflineReceiptQueue", () => {
       window.dispatchEvent(new Event("online"));
     });
 
-    await waitFor(() => expect(onUploadMock).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(onUploadMock).toHaveBeenCalled());
 
     // Verify update called with the correct ID (from crypto.randomUUID mock)
     expect(mockDb.uploads.update).toHaveBeenCalledWith("test-uuid", {

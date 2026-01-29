@@ -84,7 +84,7 @@ const ImportDashboardHeader: React.FC<ImportDashboardHeaderProps> = ({
             // eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Sync button requires custom banner styling
             <button
               type="button"
-              onClick={() => retryQueue()}
+              onClick={retryQueue}
               className="px-3 py-1 bg-amber-200 hover:bg-amber-300 border-2 border-black rounded text-xs font-bold text-amber-900 transition-colors"
             >
               Sync Now

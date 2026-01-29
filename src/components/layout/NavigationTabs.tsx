@@ -4,6 +4,7 @@ import { getIcon } from "@/utils";
 import { getButtonClasses, hapticFeedback } from "@/utils/ui/feedback/touchFeedback";
 import { useSentinelReceipts } from "@/hooks/api/useSentinelReceipts";
 import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
+import { BadgeButton } from "@/components/primitives/buttons/BadgeButton";
 
 interface NavButtonProps {
   active: boolean;
@@ -244,17 +245,12 @@ const NavButton = memo(
       >
         <div className="relative">
           <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 shrink-0" />
-          {badgeCount !== undefined && badgeCount > 0 && (
-            // eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Badge overlay requires custom styling
-            <button
-              type="button"
-              onClick={handleBadgeClick}
-              className="absolute -top-2 -right-4 lg:-top-2 lg:right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 hover:bg-red-600 text-white text-[10px] font-black rounded-full border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-colors"
-              aria-label={`${badgeCount} pending receipts - click to open import dashboard`}
-            >
-              {badgeCount > 99 ? "99+" : badgeCount}
-            </button>
-          )}
+          <BadgeButton
+            count={badgeCount ?? 0}
+            onClick={handleBadgeClick}
+            positionClass="-top-2 -right-4 lg:-top-2 lg:right-0"
+            aria-label={`${badgeCount} pending receipts - click to open import dashboard`}
+          />
         </div>
         <NavLabel label={label} />
       </Link>

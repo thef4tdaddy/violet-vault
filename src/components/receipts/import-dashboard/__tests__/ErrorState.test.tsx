@@ -45,6 +45,16 @@ describe("ErrorState", () => {
     expect(button).toHaveTextContent(/retrying/i);
   });
 
+  it("should not be disabled when isRetrying is false", () => {
+    const mockRetry = vi.fn();
+    render(<ErrorState message="Error" onRetry={mockRetry} isRetrying={false} />);
+
+    const button = screen.getByRole("button");
+    expect(button).not.toBeDisabled();
+    expect(button).not.toHaveTextContent(/retrying/i);
+    expect(button).toHaveTextContent(/try again/i);
+  });
+
   it("should apply custom className", () => {
     render(<ErrorState message="Error" className="custom-error-class" />);
     expect(screen.getByTestId("error-state")).toHaveClass("custom-error-class");

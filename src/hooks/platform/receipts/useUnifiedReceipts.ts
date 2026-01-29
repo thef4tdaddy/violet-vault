@@ -77,16 +77,17 @@ export function adaptOcrReceipt(receipt: Receipt): DashboardReceiptItem {
 }
 
 /**
- * Hook that provides unified receipts from both Sentinel and OCR sources
+ * Hook that provides unified receipts from both Sentinel (Digital) and Local OCR (Scan) sources.
+ * Normalizes data into DashboardReceiptItem format for consistent UI rendering.
  *
  * @returns {Object} Hook result containing:
- *  - allReceipts: All receipts from both sources
- *  - pendingReceipts: Receipts with "pending" status
- *  - sentinelReceipts: Only Sentinel receipts
- *  - ocrReceipts: Only OCR receipts
- *  - isLoading: True if either source is loading
- *  - isError: True if either source has an error
- *  - error: Error object from either source
+ *  - allReceipts: All receipts from both sources, sorted by date (newest first)
+ *  - pendingReceipts: Receipts with "pending" or "processing" status
+ *  - sentinelReceipts: Unified items sourced from SentinelShare
+ *  - ocrReceipts: Unified items sourced from Local OCR scanner
+ *  - isLoading: Combined loading state for both data sources
+ *  - isError: Combined error state
+ *  - error: The most recent error encountered from either source
  */
 export function useUnifiedReceipts() {
   // Fetch from both sources

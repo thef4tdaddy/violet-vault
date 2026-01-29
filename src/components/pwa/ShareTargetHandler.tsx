@@ -166,8 +166,8 @@ const ShareTargetHandler: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
-      <div className="text-center max-w-md mx-auto">
+    <div className="min-h-screen bg-white bg-radial-dots bg-size-[24px_24px] text-gray-800 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white hard-border rounded-2xl p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
         {/* Logo */}
         <div className="mb-8">
           <div className="w-20 h-20 bg-purple-600 rounded-2xl mx-auto mb-4 flex items-center justify-center border-4 border-black shadow-xl">
