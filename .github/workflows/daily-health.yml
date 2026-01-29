@@ -182,20 +182,26 @@ jobs:
         if: hashFiles('api/**/*.py') != ''
         continue-on-error: true
         run: |
+          set +e
           source .venv/bin/activate
+          echo "🚀 Starting Python tests..."
           # Run pytest with coverage (add JSON report) - Run from root for absolute imports
           python -m pytest api --cov=api --cov-report=term-missing --cov-report=html --cov-report=json > python-test.txt 2>&1
           exit_code=$?
+          set -e
+
+          echo "📊 Pytest exit code: $exit_code"
+          cat python-test.txt
 
           # Extract coverage percentage from root-level coverage.json
           if [ -f "coverage.json" ]; then
-            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data['totals']['percent_covered'])" 2>/dev/null || echo "0")
+            COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(data.get('totals', {}).get('percent_covered', 0))" 2>/dev/null || echo "0")
             echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           else
+            echo "⚠️ coverage.json not found"
             echo "coverage=0" >> $GITHUB_OUTPUT
           fi
 
-          cat python-test.txt
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
 
@@ -270,9 +276,10 @@ jobs:
 
                 for (const b of branchesToChecks) {
                     try {
-                        const response = await fetch(`https://api.codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
+                        const response = await fetch(`https://codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
                             headers: { 'Authorization': `bearer ${token}` }
                         });
+                        if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
                         const data = await response.json();
                         const coverage = data.last_updated_totals?.coverage;
                         if (coverage !== undefined) {

@@ -223,7 +223,7 @@ jobs:
 
             # Unit Tests with Coverage - Run from root for absolute imports
             echo "::group::Pytest"
-            pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
+            python -m pytest api/ --cov=api --cov-report=xml:api_coverage.xml --junitxml=api_junit.xml > pytest.log 2>&1 && PYTEST_RES=0 || PYTEST_RES=$?
             echo "STATUS_PYTEST:$PYTEST_RES"
             if [ $PYTEST_RES -ne 0 ]; then EXIT_CODE=1; fi
             echo "::endgroup::"
