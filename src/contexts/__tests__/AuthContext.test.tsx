@@ -1,4 +1,3 @@
-/** @vitest-environment jsdom */
 import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import React, { ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

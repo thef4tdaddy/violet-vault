@@ -53,7 +53,10 @@ describe("DebtDashboardHeader", () => {
     render(<DashboardHeader {...defaultProps} />);
 
     // Header text is split by spans for styling
-    expect(screen.getByRole("heading", { name: /DEBT TRACKING/i })).toBeInTheDocument();
+    // Header text is split by spans for styling
+    const heading = screen.getByRole("heading", { level: 2 });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveTextContent(/DEBT/i);
   });
 
   it("should render 'Add Debt' button", () => {

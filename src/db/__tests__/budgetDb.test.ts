@@ -1,5 +1,4 @@
 /**
- * @jest-environment jsdom
  */
 import { describe, it, expect, vi } from "vitest";
 import { budgetDb, queryHelpers, VioletVaultDB } from "../budgetDb";

@@ -1,5 +1,4 @@
 /**
- * @vitest-environment jsdom
  */
 import { renderHook, waitFor, act } from "@/test/test-utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

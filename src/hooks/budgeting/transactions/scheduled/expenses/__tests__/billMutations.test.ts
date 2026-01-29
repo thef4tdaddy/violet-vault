@@ -3,7 +3,6 @@
  * Minimal test suite - validates core bill functionality
  * TODO: Expand test coverage incrementally
  *
- * @vitest-environment jsdom
  */
 import { describe, it, expect } from "vitest";
 import { validateBill } from "@/domain/schemas/bill";

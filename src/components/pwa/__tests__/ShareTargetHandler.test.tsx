@@ -121,7 +121,9 @@ describe("ShareTargetHandler", () => {
 
     await act(async () => {});
 
-    expect(screen.getByRole("heading", { name: /SHARED DATA RECEIVED/i })).toBeInTheDocument();
+    const heading = screen.getByRole("heading", { level: 2 });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveTextContent(/SHARED DATA RECEIVED/i);
     expect(screen.getByText(/MyTitle/)).toBeInTheDocument();
   });
 

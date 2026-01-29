@@ -432,6 +432,30 @@ jobs:
 
             const prNumber = await getPRNumber();
             if (prNumber) {
+                // Find and delete old comments from this bot
+                const comments = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                });
+                
+                const botComments = comments.data.filter(c => 
+                  c.user.type === 'Bot' && 
+                  c.body.includes('Polyglot CI Report:')
+                );
+
+                for (const comment of botComments) {
+                  try {
+                    await github.rest.issues.deleteComment({
+                      owner,
+                      repo,
+                      comment_id: comment.id,
+                    });
+                  } catch (e) {
+                    console.error(`Failed to delete comment ${comment.id}: ${e.message}`);
+                  }
+                }
+
                 await github.rest.issues.createComment({
                     owner,
                     repo,
