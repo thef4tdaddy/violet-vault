@@ -1,13 +1,34 @@
 /**
- * @vitest-environment jsdom
  */
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@/test/test-utils";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import ReceiptCard from "../ReceiptCard";
 import type { DashboardReceiptItem } from "@/types/import-dashboard.types";
 import type { SentinelReceipt } from "@/types/sentinel";
 
+// Mock useOCRJobStatus hook
+const { mockUseOCRJobStatus } = vi.hoisted(() => ({
+  mockUseOCRJobStatus: vi.fn(() => ({
+    status: "idle",
+    progress: 0,
+    error: null,
+  })),
+}));
+
+vi.mock("@/hooks/platform/receipts/useOCRJobStatus", () => ({
+  useOCRJobStatus: mockUseOCRJobStatus,
+}));
+
 describe("ReceiptCard", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Reset to default idle state
+    mockUseOCRJobStatus.mockReturnValue({
+      status: "idle",
+      progress: 0,
+      error: null,
+    });
+  });
   const mockSentinelReceipt: SentinelReceipt = {
     id: "sentinel-1",
     merchant: "Amazon",
@@ -79,9 +100,7 @@ describe("ReceiptCard", () => {
       bgClass: string;
     }> = [
       { status: "pending", label: "PENDING", bgClass: "bg-amber-100" },
-      { status: "processing", label: "PROCESSING", bgClass: "bg-blue-100" },
       { status: "matched", label: "MATCHED", bgClass: "bg-green-100" },
-      { status: "failed", label: "FAILED", bgClass: "bg-red-100" },
       { status: "ignored", label: "IGNORED", bgClass: "bg-gray-100" },
     ];
 
@@ -98,6 +117,44 @@ describe("ReceiptCard", () => {
         expect(badge).toBeInTheDocument();
         expect(badge).toHaveClass(bgClass);
       });
+    });
+
+    it("should display processing status correctly", () => {
+      mockUseOCRJobStatus.mockReturnValue({
+        status: "processing",
+        progress: 50,
+        error: null,
+      });
+
+      const receipt: DashboardReceiptItem = {
+        ...baseDashboardReceipt,
+        status: "processing",
+      };
+
+      render(<ReceiptCard receipt={receipt} />);
+
+      // Should show progress bar instead of status badge
+      expect(screen.getByText("processing")).toBeInTheDocument();
+      expect(screen.getByText("50%")).toBeInTheDocument();
+    });
+
+    it("should display failed status correctly", () => {
+      mockUseOCRJobStatus.mockReturnValue({
+        status: "failed",
+        progress: 0,
+        error: { message: "Processing failed" } as Error,
+      });
+
+      const receipt: DashboardReceiptItem = {
+        ...baseDashboardReceipt,
+        status: "failed",
+      };
+
+      render(<ReceiptCard receipt={receipt} />);
+
+      // Should show error state instead of regular card
+      expect(screen.getByText("Processing Failed")).toBeInTheDocument();
+      expect(screen.getByText("Processing failed")).toBeInTheDocument();
     });
   });
 

@@ -64,3 +64,7 @@ cache_dir = ".mypy_cache"
 [[tool.mypy.overrides]]
 module = "http.server"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytesseract"
+ignore_missing_imports = true

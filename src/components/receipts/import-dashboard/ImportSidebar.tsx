@@ -32,7 +32,18 @@ const ImportSidebar: React.FC<ImportSidebarProps> = ({
   ];
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`} data-testid="import-sidebar">
+    <div
+      className={`
+        flex flex-row md:flex-col
+        justify-around md:justify-start
+        gap-2 md:gap-4
+        bg-white md:bg-transparent
+        p-2 md:p-0
+        border-t-2 md:border-t-0 border-black
+        ${className}
+      `}
+      data-testid="import-sidebar"
+    >
       {modes.map((mode) => {
         const Icon = mode.icon;
         const isActive = selectedMode === mode.id;
@@ -45,8 +56,11 @@ const ImportSidebar: React.FC<ImportSidebarProps> = ({
             variant={isActive ? "primary" : "ghost"}
             color={isActive ? "purple" : "blue"}
             className={`
-              group relative flex items-center justify-between
-              w-full h-auto p-0
+              group relative flex items-center justify-center md:justify-between
+              flex-1 md:flex-none
+              h-12 md:h-auto
+              min-h-[44px]
+              p-0
               ${
                 isActive
                   ? "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
@@ -57,12 +71,12 @@ const ImportSidebar: React.FC<ImportSidebarProps> = ({
             aria-pressed={isActive}
           >
             {/* Main content */}
-            <div className="flex items-center gap-3 p-4">
+            <div className="flex items-center gap-2 md:gap-3 p-2 md:p-4">
               <Icon
                 className={`h-5 w-5 ${isActive ? "text-white" : "text-purple-600"}`}
                 aria-hidden="true"
               />
-              <span className="font-mono font-black uppercase tracking-tight text-sm">
+              <span className="font-mono font-black uppercase tracking-tight text-xs md:text-sm">
                 {mode.label}
               </span>
             </div>
@@ -71,6 +85,7 @@ const ImportSidebar: React.FC<ImportSidebarProps> = ({
             {mode.count > 0 && (
               <div
                 className={`
+                  hidden md:block
                   mr-4 px-2 py-1 rounded-md border border-black
                   font-bold text-xs
                   ${isActive ? "bg-white text-purple-600" : "bg-purple-100 text-purple-700"}
@@ -79,6 +94,14 @@ const ImportSidebar: React.FC<ImportSidebarProps> = ({
               >
                 {mode.count}
               </div>
+            )}
+
+            {/* Mobile Count badge dot */}
+            {mode.count > 0 && (
+              <div
+                className="md:hidden absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 border border-white"
+                aria-hidden="true"
+              />
             )}
           </Button>
         );

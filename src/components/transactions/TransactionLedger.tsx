@@ -28,6 +28,8 @@ import type { User, Transaction, Envelope } from "../../types/finance";
 import { useSmartSuggestions } from "@/hooks/platform/analytics/useSmartSuggestions";
 import type { TransactionForStats } from "@/utils/features/analytics/categoryHelpers";
 import { getIcon } from "@/utils";
+import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
+import { useSentinelReceipts } from "@/hooks/api/useSentinelReceipts";
 
 // Types used in interface definitions
 
@@ -40,6 +42,8 @@ interface TransactionLedgerViewProps {
   netCashFlow: number;
   onAddTransaction: () => void;
   onImportTransactions: () => void;
+  onOpenImportDashboard?: () => void;
+  pendingReceiptCount?: number;
   filters: FilterState;
   filterConfigs: FilterConfig[];
   defaultFilters: FilterState;
@@ -100,6 +104,8 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
   netCashFlow,
   onAddTransaction,
   onImportTransactions,
+  onOpenImportDashboard,
+  pendingReceiptCount = 0,
   filters,
   filterConfigs,
   defaultFilters,
@@ -149,6 +155,22 @@ const TransactionLedgerContent: React.FC<TransactionLedgerViewProps> = ({
       className="mb-8"
       actions={
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:justify-end">
+          {onOpenImportDashboard && (
+            <Button
+              onClick={onOpenImportDashboard}
+              className="flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg border-2 border-black shadow-lg transition-colors relative"
+            >
+              {React.createElement(getIcon("Receipt"), {
+                className: "h-4 w-4 mr-2",
+              })}
+              Import Receipts
+              {pendingReceiptCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex items-center justify-center min-w-[20px] h-[20px] px-1 bg-red-500 text-white text-[10px] font-black rounded-full border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  {pendingReceiptCount > 99 ? "99+" : pendingReceiptCount}
+                </span>
+              )}
+            </Button>
+          )}
           <Button
             onClick={onImportTransactions}
             className="flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg border-2 border-black shadow-lg transition-colors"
@@ -289,6 +311,11 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     handleFilterChange,
   } = ledger;
 
+  // Import dashboard modal and receipt count
+  const openImportDashboard = useImportDashboardStore((state) => state.open);
+  const { pendingReceipts } = useSentinelReceipts();
+  const pendingCount = pendingReceipts?.length || 0;
+
   // Normalize data using utility functions with memoization to prevent re-computation freezes
   const transactionsList = useMemo(
     () => normalizeTransactions(ledgerTransactions as unknown[]),
@@ -397,6 +424,8 @@ const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       netCashFlow={netCashFlow}
       onAddTransaction={() => setShowAddModal(true)}
       onImportTransactions={() => setShowImportModal(true)}
+      onOpenImportDashboard={openImportDashboard}
+      pendingReceiptCount={pendingCount}
       filters={filters}
       filterConfigs={filterConfigs}
       defaultFilters={defaultTransactionFilters}

@@ -15,13 +15,14 @@ import ScannerActionButtons from "./components/ScannerActionButtons";
 interface OCRScannerProps {
   onReceiptProcessed: (data: ReceiptProcessedData) => void;
   onClose: () => void;
+  preloadedFile?: File | null;
 }
 
 /**
  * OCRScanner - Sentinel-Enhanced Receipt Scanning UI
  * Implements "Hard Lines" high-contrast aesthetic with 2.1 architecture
  */
-const OCRScanner = ({ onReceiptProcessed, onClose }: OCRScannerProps) => {
+const OCRScanner = ({ onReceiptProcessed, onClose, preloadedFile = null }: OCRScannerProps) => {
   const {
     isProcessing,
     uploadedImage,
@@ -29,6 +30,7 @@ const OCRScanner = ({ onReceiptProcessed, onClose }: OCRScannerProps) => {
     error,
     fileInputRef,
     cameraInputRef,
+    handleFileUpload,
     handleDrop,
     handleDragOver,
     handleFileInputChange,
@@ -37,6 +39,13 @@ const OCRScanner = ({ onReceiptProcessed, onClose }: OCRScannerProps) => {
   } = useReceiptScanner((data) => {
     onReceiptProcessed(data);
   });
+
+  // Handle preloaded file if provided (e.g. from PWA Share Target)
+  React.useEffect(() => {
+    if (preloadedFile && !uploadedImage && !isProcessing) {
+      handleFileUpload(preloadedFile);
+    }
+  }, [preloadedFile, handleFileUpload, uploadedImage, isProcessing]);
 
   const modalRef = useModalAutoScroll(true);
 

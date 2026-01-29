@@ -38,10 +38,11 @@ export interface ReceiptWithSuggestions extends Receipt {
 export interface UseReceiptMatchingOptions {
   minConfidence?: number;
   maxResults?: number;
+  onMatchSuccess?: () => void;
 }
 
 export const useReceiptMatching = (options: UseReceiptMatchingOptions = {}) => {
-  const { minConfidence = CONFIDENCE_LEVELS.MINIMUM, maxResults = 5 } = options;
+  const { minConfidence = CONFIDENCE_LEVELS.MINIMUM, maxResults = 5, onMatchSuccess } = options;
 
   const { receipts } = useReceipts();
   const { transactions } = useTransactionQuery({ limit: 500 });
@@ -57,7 +58,10 @@ export const useReceiptMatching = (options: UseReceiptMatchingOptions = {}) => {
   }, []);
 
   const { linkOnlyMutation, linkAndUpdateMutation, dismissMatchMutation } =
-    useReceiptMatchingMutations(resetSelection);
+    useReceiptMatchingMutations(() => {
+      resetSelection();
+      if (onMatchSuccess) onMatchSuccess();
+    });
 
   const unlinkedReceipts = useMemo(() => {
     return (receipts as Receipt[]).filter(

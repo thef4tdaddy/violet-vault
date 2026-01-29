@@ -21,7 +21,10 @@ describe("AccountsHeader", () => {
     render(<AccountsHeader {...defaultProps} />);
 
     // Header text is split by spans for styling, use a function matcher
-    expect(screen.getByRole("heading", { name: /SUPPLEMENTAL ACCOUNTS/i })).toBeInTheDocument();
+    // Header text is split by spans for styling, so we query by level and check content
+    const heading = screen.getByRole("heading", { level: 3 });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveTextContent(/SUPPLEMENTAL/i);
 
     expect(screen.getByText(/Total: \$1250.50/i)).toBeInTheDocument();
   });

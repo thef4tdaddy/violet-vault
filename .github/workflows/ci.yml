@@ -260,11 +260,25 @@ jobs:
           OUTCOME_SETUP: ${{ steps.setup_deps.outcome }}
         with:
           script: |
-            const fs = require('fs');
             const date = new Date().toLocaleDateString();
+            const { owner, repo } = context.repo;
 
             function stripAnsi(str) {
               return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+            }
+
+            // Helper to get PR number even on push events
+            async function getPRNumber() {
+              if (context.payload.pull_request) return context.payload.pull_request.number;
+              
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner,
+                repo,
+                head: `${owner}:${context.ref.replace('refs/heads/', '')}`,
+                state: 'open'
+              });
+              
+              return pullRequests.length > 0 ? pullRequests[0].number : null;
             }
 
             const logs = {
@@ -416,14 +430,40 @@ jobs:
 
             const body = `### ${icon} Polyglot CI Report: ${date}\n\n${summaryTable}\n\n---\n${details}`;
 
-            if (context.eventName === 'pull_request') {
+            const prNumber = await getPRNumber();
+            if (prNumber) {
+                // Find and delete old comments from this bot
+                const comments = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                });
+                
+                const botComments = comments.data.filter(c => 
+                  c.user.type === 'Bot' && 
+                  c.body.includes('Polyglot CI Report:')
+                );
+
+                for (const comment of botComments) {
+                  try {
+                    await github.rest.issues.deleteComment({
+                      owner,
+                      repo,
+                      comment_id: comment.id,
+                    });
+                  } catch (e) {
+                    console.error(`Failed to delete comment ${comment.id}: ${e.message}`);
+                  }
+                }
+
                 await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
+                    owner,
+                    repo,
+                    issue_number: prNumber,
                     body: body
                 });
             } else {
+                console.log('No PR found for this run, logging to console instead:');
                 console.log(body);
             }
 

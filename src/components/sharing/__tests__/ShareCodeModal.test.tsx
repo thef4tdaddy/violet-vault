@@ -138,10 +138,12 @@ describe("ShareCodeModal", () => {
 
   describe("Copy to Clipboard", () => {
     beforeEach(() => {
-      Object.assign(navigator, {
-        clipboard: {
+      Object.defineProperty(navigator, "clipboard", {
+        value: {
           writeText: vi.fn().mockResolvedValue(undefined),
         },
+        writable: true,
+        configurable: true,
       });
     });
 

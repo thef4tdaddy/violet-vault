@@ -155,4 +155,34 @@ describe("OCRScanner", () => {
     fireEvent.click(retryButton);
     expect(mockResetScanner).toHaveBeenCalled();
   });
+
+  it("should auto-trigger handleFileUpload when preloadedFile is provided", () => {
+    const mockFile = new File(["test"], "preloaded_receipt.jpg", { type: "image/jpeg" });
+    const mockHandleFileUpload = vi.fn();
+
+    vi.mocked(useReceiptScanner).mockReturnValue({
+      isProcessing: false,
+      uploadedImage: null,
+      extractedData: null,
+      error: null,
+      fileInputRef: { current: null } as any,
+      cameraInputRef: { current: null } as any,
+      handleFileUpload: mockHandleFileUpload,
+      handleDrop: vi.fn(),
+      handleDragOver: vi.fn(),
+      handleFileInputChange: vi.fn(),
+      handleConfirmReceipt: vi.fn(),
+      resetScanner: vi.fn(),
+    } as any);
+
+    render(
+      <OCRScanner
+        onReceiptProcessed={mockOnReceiptProcessed}
+        onClose={mockOnClose}
+        preloadedFile={mockFile}
+      />
+    );
+
+    expect(mockHandleFileUpload).toHaveBeenCalledWith(mockFile);
+  });
 });
