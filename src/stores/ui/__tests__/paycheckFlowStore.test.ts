@@ -198,6 +198,71 @@ describe("paycheckFlowStore", () => {
       });
       expect(result.current.paycheckAmountCents).toBe(200000);
     });
+
+    it("should reject invalid paycheck amounts (negative)", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      // Set valid amount first
+      act(() => {
+        result.current.setPaycheckAmountCents(250000);
+      });
+      expect(result.current.paycheckAmountCents).toBe(250000);
+
+      // Try to set invalid amount (should be rejected)
+      act(() => {
+        result.current.setPaycheckAmountCents(-100);
+      });
+
+      // State should remain unchanged
+      expect(result.current.paycheckAmountCents).toBe(250000);
+    });
+
+    it("should reject invalid paycheck amounts (below minimum)", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPaycheckAmountCents(50); // Below $1.00 minimum
+      });
+
+      // State should remain null (not set)
+      expect(result.current.paycheckAmountCents).toBeNull();
+    });
+
+    it("should reject invalid paycheck amounts (above maximum)", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      // Set valid amount first
+      act(() => {
+        result.current.setPaycheckAmountCents(250000);
+      });
+
+      act(() => {
+        result.current.setPaycheckAmountCents(200_000_000); // Above $1M maximum
+      });
+
+      // State should remain at previous valid value
+      expect(result.current.paycheckAmountCents).toBe(250000);
+    });
+
+    it("should accept minimum valid amount ($1.00)", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPaycheckAmountCents(100); // $1.00 (minimum)
+      });
+
+      expect(result.current.paycheckAmountCents).toBe(100);
+    });
+
+    it("should accept maximum valid amount ($1,000,000)", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPaycheckAmountCents(100_000_000); // $1M (maximum)
+      });
+
+      expect(result.current.paycheckAmountCents).toBe(100_000_000);
+    });
   });
 
   describe("Allocation strategy", () => {
@@ -290,15 +355,68 @@ describe("paycheckFlowStore", () => {
       expect(result.current.allocations).toEqual(allocations2);
     });
 
-    it("should handle empty allocations array", () => {
+    it("should reject empty allocations array (validation fails)", () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
 
+      // Set valid allocations first
       act(() => {
         result.current.setAllocations([{ envelopeId: "env_1", amountCents: 100000 }]);
+      });
+      expect(result.current.allocations).toHaveLength(1);
+
+      // Try to set empty array (should be rejected by validation)
+      act(() => {
         result.current.setAllocations([]);
       });
 
+      // State should remain at previous valid value
+      expect(result.current.allocations).toHaveLength(1);
+    });
+
+    it("should reject allocations with negative amounts", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      const invalidAllocations = [
+        { envelopeId: "env_1", amountCents: 100000 },
+        { envelopeId: "env_2", amountCents: -50000 }, // Invalid: negative
+      ];
+
+      act(() => {
+        result.current.setAllocations(invalidAllocations);
+      });
+
+      // State should remain empty (not set)
       expect(result.current.allocations).toEqual([]);
+    });
+
+    it("should reject allocations with missing envelope IDs", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      const invalidAllocations = [
+        { envelopeId: "", amountCents: 100000 }, // Invalid: empty envelope ID
+      ];
+
+      act(() => {
+        result.current.setAllocations(invalidAllocations as any);
+      });
+
+      // State should remain empty
+      expect(result.current.allocations).toEqual([]);
+    });
+
+    it("should accept allocations with zero amounts", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      const allocations = [
+        { envelopeId: "env_1", amountCents: 250000 },
+        { envelopeId: "env_2", amountCents: 0 }, // Zero is valid (non-negative)
+      ];
+
+      act(() => {
+        result.current.setAllocations(allocations);
+      });
+
+      expect(result.current.allocations).toEqual(allocations);
     });
   });
 

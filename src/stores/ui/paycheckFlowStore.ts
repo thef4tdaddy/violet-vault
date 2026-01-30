@@ -1,14 +1,19 @@
 import { create } from "zustand";
 import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import {
+  validatePaycheckAmountSafe,
+  validateAllocationsSafe,
+  formatValidationError,
+  type AllocationStrategy,
+} from "@/utils/core/validation/paycheckWizardValidation";
+import logger from "@/utils/core/common/logger";
 
 // Types
 interface Allocation {
   envelopeId: string;
   amountCents: number;
 }
-
-type AllocationStrategy = "last" | "even" | "smart" | "manual";
 
 interface PaycheckFlowState {
   // Modal state
@@ -81,6 +86,19 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
 
         setPaycheckAmountCents: (amountCents: number) =>
           set((state) => {
+            // Validate amount before setting
+            const result = validatePaycheckAmountSafe(amountCents);
+
+            if (!result.success) {
+              const errorMessage = formatValidationError(result.error);
+              logger.error("Invalid paycheck amount", {
+                reason: "validation_failed",
+                error: errorMessage,
+              });
+              // Don't update state if validation fails
+              return;
+            }
+
             state.paycheckAmountCents = amountCents;
           }),
 
@@ -91,6 +109,20 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
 
         setAllocations: (allocations: Allocation[]) =>
           set((state) => {
+            // Validate allocations before setting
+            const result = validateAllocationsSafe(allocations);
+
+            if (!result.success) {
+              const errorMessage = formatValidationError(result.error);
+              logger.error("Invalid allocations", {
+                reason: "validation_failed",
+                error: errorMessage,
+                allocationCount: allocations.length,
+              });
+              // Don't update state if validation fails
+              return;
+            }
+
             state.allocations = allocations;
           }),
 
