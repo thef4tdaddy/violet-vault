@@ -104,7 +104,7 @@ class TestPredictionAlgorithm:
             HistoricalSession(date="2025-12-15", amount_cents=250000, ratios=[0.50, 0.50]),
         ]
 
-        confidence = calculate_consistency_score(sessions, 2)
+        confidence = calculate_consistency_score(sessions, 2, "biweekly_consistent")
         assert confidence >= 0.9  # Should be very high
 
     def test_consistency_score_inconsistent_pattern(self) -> None:
@@ -115,7 +115,7 @@ class TestPredictionAlgorithm:
             HistoricalSession(date="2025-12-15", amount_cents=250000, ratios=[0.50, 0.50]),
         ]
 
-        confidence = calculate_consistency_score(sessions, 2)
+        confidence = calculate_consistency_score(sessions, 2, "biweekly_consistent")
         assert confidence <= 0.6  # Should be lower
 
     def test_pattern_detection_biweekly(self) -> None:

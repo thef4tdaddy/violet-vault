@@ -45,11 +45,18 @@ class PredictionRequest(BaseModel):
     historical_sessions: list[HistoricalSession] = Field(..., min_length=3, max_length=50)
     current_month: int = Field(..., ge=1, le=12, description="1-12 for seasonal detection")
     num_envelopes: int = Field(..., gt=0, le=200)
+    paycheck_frequency: str | None = Field(None, description="Optional: weekly, biweekly, monthly")
 
     @validator("historical_sessions")
     def validate_history(cls, v: list[HistoricalSession]) -> list[HistoricalSession]:
         if len(v) < 3:
             raise ValueError("Need at least 3 historical paychecks for prediction")
+        return v
+
+    @validator("paycheck_frequency")
+    def validate_frequency(cls, v: str | None) -> str | None:
+        if v is not None and v not in ["weekly", "biweekly", "monthly"]:
+            raise ValueError("Frequency must be one of: weekly, biweekly, monthly")
         return v
 
 
@@ -86,6 +93,7 @@ def predict_allocations(
     historical_sessions: list[HistoricalSession],
     current_month: int,
     num_envelopes: int,
+    paycheck_frequency: str | None = None,
 ) -> PredictionResponse:
     """
     Predict optimal allocation based on historical patterns.
@@ -94,6 +102,9 @@ def predict_allocations(
     - Operates on ratios only (no identifiable data)
     - No envelope names, user IDs, or transaction descriptions
     - Ephemeral execution (no database writes)
+
+    Args:
+        paycheck_frequency: Optional hint for better predictions (weekly, biweekly, monthly)
     """
 
     if len(historical_sessions) < 3:
@@ -144,8 +155,11 @@ def predict_allocations(
             else:
                 allocations_cents[sorted_indices[i]] -= 1
 
-    # Calculate confidence based on pattern consistency
-    confidence = calculate_consistency_score(sessions, num_envelopes)
+    # Detect pattern (using frequency hint if provided)
+    pattern_type = detect_pattern_type(sessions, paycheck_frequency)
+
+    # Calculate confidence (boosted if frequency hint matches pattern)
+    confidence = calculate_consistency_score(sessions, num_envelopes, pattern_type, paycheck_frequency)
 
     return PredictionResponse(
         suggested_allocations_cents=allocations_cents,
@@ -153,7 +167,7 @@ def predict_allocations(
         reasoning=ReasoningInfo(
             based_on="historical_patterns",
             data_points=len(sessions),
-            pattern_type=detect_pattern_type(sessions),
+            pattern_type=pattern_type,
             seasonal_adjustment=current_month in [11, 12, 1, 2],
         ),
         model_version="v1.0.0",
@@ -195,10 +209,17 @@ def apply_seasonal_adjustments(
     return adjusted
 
 
-def calculate_consistency_score(sessions: list[HistoricalSession], num_envelopes: int) -> float:
+def calculate_consistency_score(
+    sessions: list[HistoricalSession],
+    num_envelopes: int,
+    pattern_type: str,
+    paycheck_frequency: str | None = None,
+) -> float:
     """
     Calculate confidence score based on pattern consistency.
     Higher score = more consistent historical allocations.
+
+    Boosts confidence by 10% if paycheck_frequency hint matches detected pattern.
     """
     if len(sessions) < 2:
         return 0.5
@@ -216,15 +237,31 @@ def calculate_consistency_score(sessions: list[HistoricalSession], num_envelopes
 
     # Convert to confidence score (0.0 to 1.0)
     # Using exponential decay: confidence = e^(-10 * variance)
-    confidence = min(1.0, max(0.3, 2.718 ** (-10 * avg_variance)))
+    base_confidence = min(1.0, max(0.3, 2.718 ** (-10 * avg_variance)))
+
+    # Boost confidence if frequency hint matches detected pattern
+    hint_boost = 0.0
+    if paycheck_frequency and "_consistent" in pattern_type:
+        hint_boost = 0.1  # 10% boost for matching hint
+
+    # Penalty if hint conflicts with detected pattern
+    hint_penalty = 0.0
+    if paycheck_frequency and "_inconsistent" in pattern_type:
+        hint_penalty = 0.05  # 5% penalty for conflicting hint
+
+    confidence = base_confidence + hint_boost - hint_penalty
+    confidence = min(1.0, max(0.0, confidence))  # Clamp to [0.0, 1.0]
     confidence_val: float = float(round(confidence, 2))
     return confidence_val
 
 
-def detect_pattern_type(sessions: list[HistoricalSession]) -> str:
+def detect_pattern_type(sessions: list[HistoricalSession], frequency_hint: str | None = None) -> str:
     """
     Detect paycheck frequency pattern.
     Returns: 'biweekly_consistent', 'monthly_consistent', 'irregular'
+
+    If frequency_hint is provided, uses it to validate/override detected pattern.
+    Appends '_consistent' if hint matches data, '_inconsistent' if conflicting.
     """
     if len(sessions) < 2:
         return "insufficient_data"
@@ -239,13 +276,34 @@ def detect_pattern_type(sessions: list[HistoricalSession]) -> str:
 
     avg_interval = sum(intervals) / len(intervals)
 
-    # Classify based on average interval
-    if 12 <= avg_interval <= 16:
-        return "biweekly_consistent"
+    # Auto-detect pattern from intervals
+    detected = ""
+    if 5 <= avg_interval <= 9:
+        detected = "weekly"
+    elif 12 <= avg_interval <= 16:
+        detected = "biweekly"
     elif 28 <= avg_interval <= 32:
-        return "monthly_consistent"
+        detected = "monthly"
     else:
+        detected = "irregular"
+
+    # If user provided hint, use it with consistency flag
+    if frequency_hint:
+        # Check if hint matches detected pattern
+        if frequency_hint == detected:
+            return f"{frequency_hint}_consistent"
+        elif detected == "irregular":
+            # If data is irregular, trust the user's hint
+            return f"{frequency_hint}_consistent"
+        else:
+            # Hint conflicts with data, still use hint but flag inconsistency
+            return f"{frequency_hint}_inconsistent"
+
+    # No hint provided, use auto-detection
+    if detected == "irregular":
         return "irregular"
+    else:
+        return f"{detected}_consistent"
 
 
 class handler(BaseHTTPRequestHandler):
@@ -287,6 +345,7 @@ class handler(BaseHTTPRequestHandler):
                 request.historical_sessions,
                 request.current_month,
                 request.num_envelopes,
+                request.paycheck_frequency,
             )
 
             # PRIVACY: Log only non-sensitive metadata
