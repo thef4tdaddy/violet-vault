@@ -41,6 +41,9 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedStrategy, setSelectedStrategy] = useState<string | null>(null);
+  const [paycheckFrequency, setPaycheckFrequency] = useState<"weekly" | "biweekly" | "monthly">(
+    "biweekly"
+  );
 
   // Calculate remaining amount
   const remainingCents = useMemo(() => {
@@ -64,7 +67,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
         currentBalanceCents: env.currentBalance || 0,
       }));
 
-      const result = await allocateEvenSplit(paycheckAmountCents, envelopeData);
+      const result = await allocateEvenSplit(paycheckAmountCents, envelopeData, paycheckFrequency);
 
       setLocalAllocations(
         result.allocations.map((a) => ({
@@ -244,6 +247,49 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
     <div className="max-w-4xl mx-auto">
       <div className="bg-white hard-border rounded-lg p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <h2 className="text-xl font-black text-slate-900 mb-6">HOW DO YOU WANT TO ALLOCATE?</h2>
+
+        {/* Paycheck Frequency Selector */}
+        <div className="mb-6 p-4 bg-slate-50 hard-border rounded-lg">
+          <label className="block text-sm font-bold text-slate-900 mb-3">PAYCHECK FREQUENCY</label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setPaycheckFrequency("weekly")}
+              className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
+                paycheckFrequency === "weekly"
+                  ? "bg-fuchsia-500 text-white border-fuchsia-600"
+                  : "bg-white text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              WEEKLY
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaycheckFrequency("biweekly")}
+              className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
+                paycheckFrequency === "biweekly"
+                  ? "bg-fuchsia-500 text-white border-fuchsia-600"
+                  : "bg-white text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              BIWEEKLY
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaycheckFrequency("monthly")}
+              className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
+                paycheckFrequency === "monthly"
+                  ? "bg-fuchsia-500 text-white border-fuchsia-600"
+                  : "bg-white text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              MONTHLY
+            </button>
+          </div>
+          <p className="text-xs text-slate-600 mt-2">
+            This adjusts monthly targets for SPLIT EVENLY strategy
+          </p>
+        </div>
 
         {/* Quick Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">

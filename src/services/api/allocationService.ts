@@ -118,15 +118,21 @@ export async function allocatePaycheck(request: unknown): Promise<AllocationResu
 /**
  * Allocate using Even Split strategy
  * Distributes funds weighted by monthly targets
+ *
+ * @param paycheckAmountCents - Paycheck amount in cents
+ * @param envelopes - Envelope data with targets and balances
+ * @param paycheckFrequency - Optional frequency (weekly, biweekly, monthly) to adjust targets
  */
 export async function allocateEvenSplit(
   paycheckAmountCents: number,
-  envelopes: AllocationRequest["envelopes"]
+  envelopes: AllocationRequest["envelopes"],
+  paycheckFrequency?: "weekly" | "biweekly" | "monthly"
 ): Promise<AllocationResult> {
   return allocatePaycheck({
     strategy: "even_split",
     paycheckAmountCents,
     envelopes,
+    paycheckFrequency,
   });
 }
 

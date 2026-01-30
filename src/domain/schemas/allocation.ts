@@ -53,6 +53,11 @@ export const AllocationRequestSchema = z.object({
     .int("Paycheck amount must be an integer")
     .positive("Paycheck amount must be greater than 0")
     .max(10_000_000, "Paycheck amount cannot exceed $100,000"),
+  paycheckFrequency: z
+    .enum(["weekly", "biweekly", "monthly"], {
+      error: "Frequency must be one of: weekly, biweekly, monthly",
+    })
+    .optional(),
   envelopes: z
     .array(EnvelopeAllocationSchema)
     .min(1, "At least one envelope is required")
