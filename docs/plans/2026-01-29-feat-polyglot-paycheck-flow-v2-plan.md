@@ -14,6 +14,7 @@ Transform the paycheck allocation experience into a premium, conversational wiza
 
 **Epic**: #156
 **Sub-Issues**:
+
 - **Infrastructure**: #1833 (Zustand Store ✅), #1843 (Zod Validation)
 - **Frontend**: #157 (Entry Point), #1785 (Wizard Container), #1837 (Amount Entry), #162 (Smart Allocation UI), #1838 (Review Step), #161 (Success Screen)
 - **Backend**: #1786 (Go Engine), #1787 (Python Predictor)
@@ -25,6 +26,7 @@ Transform the paycheck allocation experience into a premium, conversational wiza
 ### Executive Summary
 
 This is a **full-stack polyglot feature** spanning:
+
 - **Frontend**: React 19 wizard with Zustand state management, Framer Motion animations, IndexedDB persistence
 - **Backend**: Go allocation engine (<1ms performance), Python ML prediction service (privacy-preserving)
 - **Privacy**: E2EE compliant, blinded calculations, zero-persistence analytics
@@ -67,6 +69,7 @@ The implementation involves 6 coordinated components across multiple technologie
 ### High-Level Approach
 
 Build a **multi-step conversational wizard** that:
+
 1. Detects when user gets paid (±3 days of expected date)
 2. Presents prominent "GOT PAID?" entry point on dashboard
 3. Guides user through 3-4 wizard steps with smooth animations
@@ -78,18 +81,21 @@ Build a **multi-step conversational wizard** that:
 ### Key Capabilities
 
 **Smart Allocation Options**:
+
 - **Use Last Split**: Clone ratios from previous paycheck (scaled to new amount)
 - **Split Evenly**: Distribute based on monthly funding targets (weighted)
 - **Smart Split**: AI-powered suggestions from Python prediction service (blinded)
 - **Manual Override**: User can always customize individual allocations
 
 **Privacy-First Architecture**:
+
 - **Blinded Calculations**: Server receives only numbers (amounts, ratios), never envelope names or user identity
 - **Zero-Persistence Analytics**: Python service processes data in ephemeral sessions, no logs
 - **Client-Side Encryption**: All sensitive data encrypted before IndexedDB storage
 - **No Tracking**: Analytics track interactions (clicks, time), not financial amounts
 
 **Performance**:
+
 - **<1ms Allocation**: Go engine calculates splits for 100+ envelopes in under 1 millisecond
 - **Cents-Perfect Math**: Integer-based calculations avoid floating-point errors
 - **Offline Support**: IndexedDB + TanStack Query mutations persistence for reliability
@@ -170,12 +176,14 @@ Build a **multi-step conversational wizard** that:
 **Critical Architecture Decision**: Paychecks are NOT a separate entity type. They are **Transaction** records with type `"income"` and special paycheck-specific fields.
 
 **Why This Matters**:
+
 - Single source of truth for financial data
 - Consistent querying and reporting
 - Unified transaction history
 - Leverages existing Transaction schema validation
 
 **Transaction Schema for Paychecks** (`src/domain/schemas/transaction.ts`):
+
 ```typescript
 {
   // Required Transaction fields
@@ -204,6 +212,7 @@ Build a **multi-step conversational wizard** that:
 ```
 
 **Example Paycheck Transaction**:
+
 ```typescript
 {
   id: "txn_paycheck_2026_01_15",
@@ -230,6 +239,7 @@ Build a **multi-step conversational wizard** that:
 ```
 
 **Recurring Paycheck Support**:
+
 - Use `recurrenceRule` field with iCal RRule syntax ([RFC 5545](https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html))
 - Python prediction service can detect patterns and suggest recurrence rules
 - Common patterns:
@@ -241,6 +251,7 @@ Build a **multi-step conversational wizard** that:
 #### Zod Validation Integration (#1843)
 
 **Critical Requirement**: All financial data MUST be validated using Zod schemas before:
+
 - Setting state in Zustand store
 - Sending to API endpoints
 - Creating Transaction records
@@ -249,10 +260,12 @@ Build a **multi-step conversational wizard** that:
 **Validation Layers**:
 
 1. **Wizard Input Validation** (`paycheckWizardValidation.ts`):
+
    ```typescript
    // Paycheck amount validation
    const PaycheckAmountSchema = z.object({
-     amountCents: z.number()
+     amountCents: z
+       .number()
        .int("Amount must be in whole cents")
        .positive("Amount must be positive")
        .min(100, "Minimum $1.00")
@@ -265,18 +278,18 @@ Build a **multi-step conversational wizard** that:
      amountCents: z.number().int().nonnegative(),
    });
 
-   const AllocationsArraySchema = z.array(AllocationSchema)
-     .refine(
-       (allocations, ctx) => {
-         const total = ctx.parent.paycheckAmountCents;
-         const sum = allocations.reduce((s, a) => s + a.amountCents, 0);
-         return sum === total; // MUST sum exactly
-       },
-       { message: "Allocations must sum to exact paycheck amount" }
-     );
+   const AllocationsArraySchema = z.array(AllocationSchema).refine(
+     (allocations, ctx) => {
+       const total = ctx.parent.paycheckAmountCents;
+       const sum = allocations.reduce((s, a) => s + a.amountCents, 0);
+       return sum === total; // MUST sum exactly
+     },
+     { message: "Allocations must sum to exact paycheck amount" }
+   );
    ```
 
 2. **Store Action Validation**:
+
    ```typescript
    setPaycheckAmountCents: (amountCents: number) => {
      const result = PaycheckAmountSchema.safeParse({ amountCents });
@@ -284,11 +297,14 @@ Build a **multi-step conversational wizard** that:
        logger.error("Invalid paycheck amount", result.error);
        return; // Don't update state
      }
-     set((state) => { state.paycheckAmountCents = amountCents; });
-   }
+     set((state) => {
+       state.paycheckAmountCents = amountCents;
+     });
+   };
    ```
 
 3. **Transaction Creation Validation**:
+
    ```typescript
    const createPaycheckTransaction = (wizardData: PaycheckWizardData): Transaction => {
      // Build Transaction object
@@ -314,11 +330,13 @@ Build a **multi-step conversational wizard** that:
    - Both validate responses before client consumes
 
 **Privacy Compliance**:
+
 - Validation happens **client-side** (no data leaves browser during validation)
 - API requests are **blinded** (only numbers, no envelope names or user identity)
 - Validation errors **never log sensitive data** (amounts, allocations)
 
 **Validation Dependencies**:
+
 - #1843 (Zod Validation) must complete before #1785, #1837, #162, #1838
 - All wizard steps depend on validation infrastructure
 - Transaction creation requires validation helper functions
@@ -330,13 +348,14 @@ Build a **multi-step conversational wizard** that:
 **Purpose**: Privacy-first local storage for paycheck history to enable smart pre-fill and autocomplete in Amount Entry Step (#1837).
 
 **localStorage Schema**:
+
 ```typescript
 interface PaycheckHistoryEntry {
-  payerName: string;              // Employer name
-  lastAmountCents: number;        // Most recent paycheck amount
-  lastDate: string;               // ISO date of last paycheck
-  totalCount: number;             // Number of paychecks received
-  averageAmountCents: number;     // Rolling average
+  payerName: string; // Employer name
+  lastAmountCents: number; // Most recent paycheck amount
+  lastDate: string; // ISO date of last paycheck
+  totalCount: number; // Number of paychecks received
+  averageAmountCents: number; // Rolling average
   frequency?: "weekly" | "biweekly" | "semi-monthly" | "monthly";
 }
 
@@ -345,36 +364,34 @@ interface PaycheckHistoryEntry {
 ```
 
 **Service Methods**:
+
 ```typescript
 export class PaycheckHistoryService {
-  private static STORAGE_KEY = 'violet-vault-paycheck-history';
+  private static STORAGE_KEY = "violet-vault-paycheck-history";
   private static MAX_ENTRIES = 50;
 
   // Get all history entries
-  static getHistory(): PaycheckHistoryEntry[]
+  static getHistory(): PaycheckHistoryEntry[];
 
   // Get history for specific employer
-  static getByPayerName(name: string): PaycheckHistoryEntry | null
+  static getByPayerName(name: string): PaycheckHistoryEntry | null;
 
   // Add or update paycheck entry
-  static addOrUpdate(entry: {
-    payerName: string;
-    amountCents: number;
-    date: string;
-  }): void
+  static addOrUpdate(entry: { payerName: string; amountCents: number; date: string }): void;
 
   // Get recent employer names for autocomplete
-  static getRecentPayers(limit = 10): string[]
+  static getRecentPayers(limit = 10): string[];
 
   // Detect pay frequency from historical patterns
-  static detectFrequency(payerName: string): string | null
+  static detectFrequency(payerName: string): string | null;
 
   // Clear all history (privacy)
-  static clear(): void
+  static clear(): void;
 }
 ```
 
 **Privacy Guarantees**:
+
 - ✅ **100% Client-Side**: All data stored in browser localStorage, never synced to server
 - ✅ **Minimal Data**: Only stores employer name, amount, date, count, average
 - ✅ **User Control**: Can be cleared anytime via browser storage settings
@@ -382,6 +399,7 @@ export class PaycheckHistoryService {
 - ✅ **No Tracking**: History never sent to analytics or external services
 
 **Integration with Amount Entry Step**:
+
 1. User types employer name → autocomplete suggests from `getRecentPayers()`
 2. User selects employer → `getByPayerName()` retrieves history
 3. If history found → pre-fill amount with `lastAmountCents`
@@ -389,6 +407,7 @@ export class PaycheckHistoryService {
 5. On wizard success → `addOrUpdate()` saves new paycheck data
 
 **Testing**:
+
 - Unit tests for all service methods
 - Edge cases: duplicate employers, malformed data, storage quota exceeded
 - Integration tests with AmountEntryStep component
@@ -397,20 +416,24 @@ export class PaycheckHistoryService {
 ### Component Breakdown
 
 #### 1. Entry Point (#157)
+
 **File**: `src/components/dashboard/GotPaidCTA.tsx`
 
 **Responsibilities**:
+
 - Display prominent "GOT PAID?" button on dashboard
 - Calculate visibility based on expected pay date (±3 days)
 - Route to wizard on click
 - Visual: Slate-50 bg, fuchsia-500 borders, dollar emoji with pulse animation
 
 **Integration Points**:
+
 - Dashboard layout (top of page or QuickActions bar)
 - User settings (expected pay date)
 - Paycheck history (for date calculation)
 
 **Technical Details**:
+
 ```tsx
 // Pseudo-code structure
 interface GotPaidCTAProps {
@@ -437,6 +460,7 @@ const isVisible = useMemo(() => {
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Button visible when user has Paycheck envelope
 - [ ] Button visible within ±3 days of expected pay date
 - [ ] Button hidden outside pay window (if expected date configured)
@@ -445,9 +469,11 @@ const isVisible = useMemo(() => {
 - [ ] 80%+ test coverage
 
 #### 2. Wizard Container (#1785)
+
 **File**: `src/components/budgeting/paycheck-flow/PaycheckWizardModal.tsx`
 
 **Responsibilities**:
+
 - Multi-step navigation with [BACK]/[CONTINUE] buttons
 - Zustand state management (current step, form data, allocations)
 - IndexedDB persistence (resume on page refresh)
@@ -455,31 +481,32 @@ const isVisible = useMemo(() => {
 - Progress indicator (Step X of Y)
 
 **State Management**:
+
 ```typescript
 // src/stores/ui/paycheckFlowStore.ts
 interface PaycheckFlowState {
   // Modal state
-  isOpen: boolean
-  currentStep: number  // 0-indexed
+  isOpen: boolean;
+  currentStep: number; // 0-indexed
 
   // Form data
-  paycheckAmount: number | null  // cents
-  selectedStrategy: 'last' | 'even' | 'smart' | 'manual'
+  paycheckAmount: number | null; // cents
+  selectedStrategy: "last" | "even" | "smart" | "manual";
   allocations: Array<{
-    envelopeId: string
-    amountCents: number
-  }>
-  payerName: string | null                 // Employer/payer name (optional)
+    envelopeId: string;
+    amountCents: number;
+  }>;
+  payerName: string | null; // Employer/payer name (optional)
 
   // Actions
-  openWizard: () => void
-  closeWizard: () => void
-  nextStep: () => void
-  prevStep: () => void
-  setPaycheckAmount: (amount: number) => void
-  setPayerName: (name: string | null) => void
-  setAllocations: (allocs: Allocation[]) => void
-  reset: () => void
+  openWizard: () => void;
+  closeWizard: () => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  setPaycheckAmount: (amount: number) => void;
+  setPayerName: (name: string | null) => void;
+  setAllocations: (allocs: Allocation[]) => void;
+  reset: () => void;
 }
 
 // Middleware stack
@@ -490,7 +517,7 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
         // ... state and actions
       })),
       {
-        name: 'paycheck-flow-storage',
+        name: "paycheck-flow-storage",
         storage: createJSONStorage(() => indexedDBStorage),
         version: 1,
 
@@ -498,17 +525,18 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
         partialize: (state) => ({
           currentStep: state.currentStep,
           selectedStrategy: state.selectedStrategy,
-          payerName: state.payerName,  // OK to persist (helps with autocomplete)
+          payerName: state.payerName, // OK to persist (helps with autocomplete)
           // DO NOT persist paycheckAmount or allocations (privacy)
-        })
+        }),
       }
     ),
-    { name: 'PaycheckFlowStore' }
+    { name: "PaycheckFlowStore" }
   )
-)
+);
 ```
 
 **Step Sequence**:
+
 1. **Step 0**: Amount Entry
    - Optional payee/employer name input (text field)
    - Autocomplete from local history (last 10 employers)
@@ -535,6 +563,7 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
    - Confetti animation
 
 **Technical Details**:
+
 ```tsx
 // Animation configuration
 const stepVariants = {
@@ -574,6 +603,7 @@ const transition = {
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Fluid multi-step navigation (forward/backward)
 - [ ] State persists between steps (survives page refresh)
 - [ ] Responsive design matching "Hard Lines" aesthetic
@@ -583,15 +613,18 @@ const transition = {
 - [ ] 80%+ test coverage for state transitions
 
 #### 3. Go Allocation Engine (#1786)
+
 **File**: `api/paycheck/allocate.go`
 
 **Responsibilities**:
+
 - High-speed biweekly income distribution calculation
 - Cents-perfect integer math (no floating point errors)
 - Dust/remainder distribution using largest remainder method
 - Support for multiple allocation strategies
 
 **API Contract**:
+
 ```go
 // Request
 type AllocationRequest struct {
@@ -626,6 +659,7 @@ type AllocationResult struct {
 **Allocation Strategies**:
 
 **Even Split**:
+
 ```go
 // Distribute based on monthly targets (weighted)
 func evenSplit(total int64, envelopes []EnvelopeAllocation) []int64 {
@@ -667,6 +701,7 @@ func evenSplit(total int64, envelopes []EnvelopeAllocation) []int64 {
 ```
 
 **Last Split**:
+
 ```go
 // Apply historical ratios to new amount
 func lastSplit(total int64, ratios []float64) []int64 {
@@ -698,6 +733,7 @@ func lastSplit(total int64, ratios []float64) []int64 {
 ```
 
 **Target First**:
+
 ```go
 // Prioritize envelopes with funding targets (bills first)
 func targetFirst(total int64, envelopes []EnvelopeAllocation) []int64 {
@@ -740,11 +776,13 @@ func targetFirst(total int64, envelopes []EnvelopeAllocation) []int64 {
 ```
 
 **Performance Requirements**:
+
 - <1ms execution time for 100 envelopes
 - <10ms for 1000 envelopes (soft limit)
 - Benchmark tests in CI/CD to catch regressions
 
 **Testing Strategy**:
+
 ```go
 // Property-based testing
 func TestAllocationSumProperty(t *testing.T) {
@@ -777,6 +815,7 @@ func BenchmarkAllocationEngine(b *testing.B) {
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Cents-perfect math (no floating point errors)
 - [ ] Sum of allocations always equals paycheck amount exactly
 - [ ] Unit tests for dust/rounding handling (all edge cases)
@@ -785,9 +824,11 @@ func BenchmarkAllocationEngine(b *testing.B) {
 - [ ] 90%+ test coverage
 
 #### 4. Python Prediction Service (#1787)
+
 **File**: `api/analytics/paycheck_prediction.py`
 
 **Responsibilities**:
+
 - Suggest optimal allocation splits based on historical patterns
 - **CRITICAL**: Blinded/anonymized processing only
 - Detect biweekly/monthly allocation patterns
@@ -797,6 +838,7 @@ func BenchmarkAllocationEngine(b *testing.B) {
 **Privacy Architecture**:
 
 **Request Payload (Anonymized)**:
+
 ```json
 {
   "paycheck_cents": 250000,
@@ -804,20 +846,21 @@ func BenchmarkAllocationEngine(b *testing.B) {
     {
       "date": "2026-01-15",
       "amount_cents": 240000,
-      "ratios": [0.50, 0.25, 0.15, 0.10]
+      "ratios": [0.5, 0.25, 0.15, 0.1]
     },
     {
       "date": "2025-12-31",
       "amount_cents": 250000,
-      "ratios": [0.48, 0.27, 0.15, 0.10]
+      "ratios": [0.48, 0.27, 0.15, 0.1]
     }
   ],
-  "current_month": 1,  // January (for seasonal detection)
+  "current_month": 1, // January (for seasonal detection)
   "num_envelopes": 4
 }
 ```
 
 **Key Privacy Protections**:
+
 - ❌ NO user IDs
 - ❌ NO envelope names
 - ❌ NO transaction descriptions
@@ -827,6 +870,7 @@ func BenchmarkAllocationEngine(b *testing.B) {
 - ✅ No database writes
 
 **Response Payload**:
+
 ```json
 {
   "suggested_allocations_cents": [125000, 62500, 37500, 25000],
@@ -843,38 +887,40 @@ func BenchmarkAllocationEngine(b *testing.B) {
 ```
 
 **Client-Side Mapping**:
+
 ```typescript
 // Client maintains envelope order securely
 const envelopes = [
-  { id: 'env_1', name: 'Rent' },
-  { id: 'env_2', name: 'Groceries' },
-  { id: 'env_3', name: 'Car' },
-  { id: 'env_4', name: 'Savings' }
-]
+  { id: "env_1", name: "Rent" },
+  { id: "env_2", name: "Groceries" },
+  { id: "env_3", name: "Car" },
+  { id: "env_4", name: "Savings" },
+];
 
 // Send anonymized request
 const request = {
   paycheck_cents: 250000,
-  historical_sessions: history.map(h => ({
+  historical_sessions: history.map((h) => ({
     date: h.date,
     amount_cents: h.amount,
-    ratios: h.allocations.map(a => a.amount / h.amount)
+    ratios: h.allocations.map((a) => a.amount / h.amount),
   })),
-  num_envelopes: envelopes.length
-}
+  num_envelopes: envelopes.length,
+};
 
 // Receive anonymized response
-const response = await fetchPrediction(request)
+const response = await fetchPrediction(request);
 
 // Map back to named envelopes
 const allocations = envelopes.map((env, i) => ({
   envelopeId: env.id,
   envelopeName: env.name,
-  amountCents: response.suggested_allocations_cents[i]
-}))
+  amountCents: response.suggested_allocations_cents[i],
+}));
 ```
 
 **Prediction Algorithm**:
+
 ```python
 def predict_allocations(
     paycheck_cents: int,
@@ -950,6 +996,7 @@ def predict_allocations(
 ```
 
 **Seasonal Adjustments**:
+
 ```python
 def apply_seasonal_adjustments(
     ratios: List[float],
@@ -986,6 +1033,7 @@ def apply_seasonal_adjustments(
 ```
 
 **Error Handling**:
+
 ```python
 class InsufficientDataError(Exception):
     """Raised when < 3 historical paychecks available"""
@@ -1023,6 +1071,7 @@ async def predict_paycheck(request: PredictionRequest):
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Suggestions return numerical allocations (cents) matching paycheck total
 - [ ] Seasonal adjustments correctly detect patterns (Winter/Summer)
 - [ ] Zero storage of user data (verify no database writes)
@@ -1032,9 +1081,11 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] 85%+ test coverage including privacy validation
 
 #### 5. Smart Allocation Step (#162)
+
 **File**: `src/components/budgeting/paycheck-flow/steps/AllocationStrategyStep.tsx`
 
 **Responsibilities**:
+
 - Present quick action buttons for allocation strategies
 - Fetch predictions from Python service (blinded)
 - Display real-time "Remaining to Allocate" counter
@@ -1043,21 +1094,15 @@ async def predict_paycheck(request: PredictionRequest):
 - Validate allocations sum to paycheck amount
 
 **UI Layout**:
+
 ```tsx
 <div className="space-y-6">
   {/* Quick Actions */}
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <Button
-      onClick={handleLastSplit}
-      disabled={!hasHistory}
-      className="border-2 border-black"
-    >
+    <Button onClick={handleLastSplit} disabled={!hasHistory} className="border-2 border-black">
       USE LAST SPLIT
     </Button>
-    <Button
-      onClick={handleEvenSplit}
-      className="border-2 border-black"
-    >
+    <Button onClick={handleEvenSplit} className="border-2 border-black">
       SPLIT EVENLY
     </Button>
     <Button
@@ -1071,20 +1116,18 @@ async def predict_paycheck(request: PredictionRequest):
   </div>
 
   {/* Real-time Counter */}
-  <div className={cn(
-    "p-4 rounded-lg border-2 border-black",
-    remaining === 0 ? "bg-green-100" : "bg-red-100"
-  )}>
+  <div
+    className={cn(
+      "p-4 rounded-lg border-2 border-black",
+      remaining === 0 ? "bg-green-100" : "bg-red-100"
+    )}
+  >
     <div className="text-center">
       <div className="text-sm font-bold uppercase">
         {remaining === 0 ? "Fully Allocated ✓" : "Remaining to Allocate"}
       </div>
-      <div className="text-3xl font-black">
-        ${Math.abs(remaining / 100).toFixed(2)}
-      </div>
-      {remaining < 0 && (
-        <div className="text-xs text-red-600">Over by this amount</div>
-      )}
+      <div className="text-3xl font-black">${Math.abs(remaining / 100).toFixed(2)}</div>
+      {remaining < 0 && <div className="text-xs text-red-600">Over by this amount</div>}
     </div>
   </div>
 
@@ -1102,31 +1145,32 @@ async def predict_paycheck(request: PredictionRequest):
 
   {/* Validation Error */}
   {validationError && (
-    <div className="p-3 rounded border-2 border-red-500 bg-red-50">
-      {validationError}
-    </div>
+    <div className="p-3 rounded border-2 border-red-500 bg-red-50">{validationError}</div>
   )}
 </div>
 ```
 
 **Allocation Card Component**:
+
 ```tsx
 function AllocationCard({ allocation, isUnderfunded, onChange }: Props) {
-  const [localValue, setLocalValue] = useState(allocation.amountCents)
+  const [localValue, setLocalValue] = useState(allocation.amountCents);
 
   // Debounced update to store
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(allocation.envelopeId, localValue)
-    }, 300)
-    return () => clearTimeout(timeout)
-  }, [localValue])
+      onChange(allocation.envelopeId, localValue);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [localValue]);
 
   return (
-    <div className={cn(
-      "p-4 rounded-lg border-2 border-black",
-      isUnderfunded && "animate-pulse ring-2 ring-fuchsia-500"
-    )}>
+    <div
+      className={cn(
+        "p-4 rounded-lg border-2 border-black",
+        isUnderfunded && "animate-pulse ring-2 ring-fuchsia-500"
+      )}
+    >
       <div className="flex items-center justify-between mb-2">
         <span className="font-bold">{allocation.envelopeName}</span>
         {isUnderfunded && <span className="text-fuchsia-600">⚠️</span>}
@@ -1140,88 +1184,91 @@ function AllocationCard({ allocation, isUnderfunded, onChange }: Props) {
       />
 
       <div className="text-xs text-gray-500 mt-1">
-        {(localValue / paycheckAmount * 100).toFixed(1)}% of paycheck
+        {((localValue / paycheckAmount) * 100).toFixed(1)}% of paycheck
       </div>
     </div>
-  )
+  );
 }
 ```
 
 **Smart Split Integration**:
+
 ```typescript
 async function handleSmartSplit() {
-  setFetchingPrediction(true)
+  setFetchingPrediction(true);
 
   try {
     // Prepare anonymized request
     const request = {
       paycheck_cents: paycheckAmount,
-      historical_sessions: paycheckHistory.map(h => ({
+      historical_sessions: paycheckHistory.map((h) => ({
         date: h.date,
         amount_cents: h.amount,
-        ratios: h.allocations.map(a => a.amount / h.amount)
+        ratios: h.allocations.map((a) => a.amount / h.amount),
       })),
       current_month: new Date().getMonth() + 1,
-      num_envelopes: envelopes.length
-    }
+      num_envelopes: envelopes.length,
+    };
 
     // Fetch from Python service (blinded)
-    const response = await fetch('/api/analytics/paycheck-prediction', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    })
+    const response = await fetch("/api/analytics/paycheck-prediction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
 
     if (!response.ok) {
-      throw new Error('Prediction failed')
+      throw new Error("Prediction failed");
     }
 
-    const prediction = await response.json()
+    const prediction = await response.json();
 
     // Map back to named envelopes
     const allocations = envelopes.map((env, i) => ({
       envelopeId: env.id,
       envelopeName: env.name,
-      amountCents: prediction.suggested_allocations_cents[i]
-    }))
+      amountCents: prediction.suggested_allocations_cents[i],
+    }));
 
     // Update store
-    setAllocations(allocations)
+    setAllocations(allocations);
 
     // Show explainability
     toast.success(
       `Smart split based on ${prediction.reasoning.data_points} past paychecks (${(prediction.confidence * 100).toFixed(0)}% confidence)`,
       { duration: 5000 }
-    )
+    );
   } catch (error) {
-    console.error('Smart split failed:', error)
+    console.error("Smart split failed:", error);
 
     // Fallback to even split
-    toast.error('Smart predictions unavailable. Using even split.')
-    handleEvenSplit()
+    toast.error("Smart predictions unavailable. Using even split.");
+    handleEvenSplit();
   } finally {
-    setFetchingPrediction(false)
+    setFetchingPrediction(false);
   }
 }
 ```
 
 **Underfunded Detection**:
+
 ```typescript
 function isUnderfunded(allocation: Allocation): boolean {
-  const envelope = envelopes.find(e => e.id === allocation.envelopeId)
-  if (!envelope) return false
+  const envelope = envelopes.find((e) => e.id === allocation.envelopeId);
+  if (!envelope) return false;
 
   // Check if envelope is a bill with funding target
-  if (envelope.category !== 'Bill') return false
-  if (!envelope.fundingTarget) return false
+  if (envelope.category !== "Bill") return false;
+  if (!envelope.fundingTarget) return false;
 
   // Check if current balance + allocation < target
-  const newBalance = envelope.currentBalance + allocation.amountCents
-  return newBalance < envelope.fundingTarget
+  const newBalance = envelope.currentBalance + allocation.amountCents;
+  return newBalance < envelope.fundingTarget;
 }
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Quick action buttons correctly apply strategies
 - [ ] [USE LAST SPLIT] disabled if no history exists
 - [ ] [SMART SPLIT] shows loading state during fetch
@@ -1232,9 +1279,11 @@ function isUnderfunded(allocation: Allocation): boolean {
 - [ ] 80%+ unit test coverage
 
 #### 6. Success Screen (#161)
+
 **File**: `src/components/budgeting/paycheck-flow/steps/SuccessStep.tsx`
 
 **Responsibilities**:
+
 - Display allocation summary with clear breakdown
 - Show monthly completion percentage
 - Motivational messaging ("82% to your goal!")
@@ -1242,32 +1291,29 @@ function isUnderfunded(allocation: Allocation): boolean {
 - [BACK TO DASHBOARD] button with query invalidation
 
 **UI Layout**:
+
 ```tsx
 function SuccessStep() {
-  const allocations = usePaycheckFlowStore(s => s.allocations)
-  const envelopes = useEnvelopes()
+  const allocations = usePaycheckFlowStore((s) => s.allocations);
+  const envelopes = useEnvelopes();
 
   useEffect(() => {
     // Trigger confetti on mount
     confetti({
       particleCount: 100,
       spread: 70,
-      origin: { y: 0.6 }
-    })
-  }, [])
+      origin: { y: 0.6 },
+    });
+  }, []);
 
-  const monthlyCompletion = calculateMonthlyCompletion(envelopes, allocations)
-  const topAllocations = allocations
-    .sort((a, b) => b.amountCents - a.amountCents)
-    .slice(0, 5)
+  const monthlyCompletion = calculateMonthlyCompletion(envelopes, allocations);
+  const topAllocations = allocations.sort((a, b) => b.amountCents - a.amountCents).slice(0, 5);
 
   return (
     <div className="space-y-6">
       {/* Hero Message */}
       <div className="text-center">
-        <h1 className="text-4xl font-black uppercase mb-2">
-          Paycheck Allocated! 🎉
-        </h1>
+        <h1 className="text-4xl font-black uppercase mb-2">Paycheck Allocated! 🎉</h1>
         <p className="text-lg text-gray-600">
           You're {monthlyCompletion}% of the way to your monthly goals!
         </p>
@@ -1278,22 +1324,18 @@ function SuccessStep() {
         <h2 className="text-xl font-black uppercase mb-4">Summary</h2>
 
         {topAllocations.map((alloc) => {
-          const envelope = envelopes.find(e => e.id === alloc.envelopeId)
-          const isCovered = envelope &&
-            (envelope.currentBalance + alloc.amountCents >= envelope.fundingTarget)
+          const envelope = envelopes.find((e) => e.id === alloc.envelopeId);
+          const isCovered =
+            envelope && envelope.currentBalance + alloc.amountCents >= envelope.fundingTarget;
 
           return (
             <div key={alloc.envelopeId} className="flex justify-between items-center py-2">
               <span className="font-bold">{envelope?.name}</span>
               <span className="text-lg">
-                {isCovered ? (
-                  <>Covered ✅</>
-                ) : (
-                  <>+${(alloc.amountCents / 100).toFixed(2)}</>
-                )}
+                {isCovered ? <>Covered ✅</> : <>+${(alloc.amountCents / 100).toFixed(2)}</>}
               </span>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -1320,74 +1362,75 @@ function SuccessStep() {
         BACK TO DASHBOARD
       </Button>
     </div>
-  )
+  );
 }
 ```
 
 **Monthly Completion Calculation**:
+
 ```typescript
-function calculateMonthlyCompletion(
-  envelopes: Envelope[],
-  allocations: Allocation[]
-): number {
+function calculateMonthlyCompletion(envelopes: Envelope[], allocations: Allocation[]): number {
   // Filter envelopes with funding targets
-  const envelopesWithTargets = envelopes.filter(e => e.fundingTarget && e.fundingTarget > 0)
+  const envelopesWithTargets = envelopes.filter((e) => e.fundingTarget && e.fundingTarget > 0);
 
-  if (envelopesWithTargets.length === 0) return 100
+  if (envelopesWithTargets.length === 0) return 100;
 
-  let totalCompletion = 0
+  let totalCompletion = 0;
 
   for (const env of envelopesWithTargets) {
-    const allocation = allocations.find(a => a.envelopeId === env.id)
-    const newBalance = env.currentBalance + (allocation?.amountCents || 0)
+    const allocation = allocations.find((a) => a.envelopeId === env.id);
+    const newBalance = env.currentBalance + (allocation?.amountCents || 0);
 
-    const completion = Math.min(100, (newBalance / env.fundingTarget!) * 100)
-    totalCompletion += completion
+    const completion = Math.min(100, (newBalance / env.fundingTarget!) * 100);
+    totalCompletion += completion;
   }
 
-  return Math.round(totalCompletion / envelopesWithTargets.length)
+  return Math.round(totalCompletion / envelopesWithTargets.length);
 }
 ```
 
 **Confetti Configuration**:
+
 ```typescript
-import confetti from 'canvas-confetti'
+import confetti from "canvas-confetti";
 
 // Respect prefers-reduced-motion
 function triggerConfetti() {
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReducedMotion) return
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReducedMotion) return;
 
   confetti({
     particleCount: 100,
     spread: 70,
     origin: { y: 0.6 },
-    colors: ['#ec4899', '#8b5cf6', '#06b6d4', '#10b981']
-  })
+    colors: ["#ec4899", "#8b5cf6", "#06b6d4", "#10b981"],
+  });
 }
 ```
 
 **Dashboard Navigation**:
+
 ```typescript
 function handleBackToDashboard() {
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
-  const resetWizard = usePaycheckFlowStore(s => s.reset)
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const resetWizard = usePaycheckFlowStore((s) => s.reset);
 
   // Invalidate queries to refresh dashboard
-  queryClient.invalidateQueries({ queryKey: ['envelopes'] })
-  queryClient.invalidateQueries({ queryKey: ['user', 'balance'] })
-  queryClient.invalidateQueries({ queryKey: ['paycheck', 'history'] })
+  queryClient.invalidateQueries({ queryKey: ["envelopes"] });
+  queryClient.invalidateQueries({ queryKey: ["user", "balance"] });
+  queryClient.invalidateQueries({ queryKey: ["paycheck", "history"] });
 
   // Reset wizard state
-  resetWizard()
+  resetWizard();
 
   // Navigate to dashboard
-  navigate('/dashboard')
+  navigate("/dashboard");
 }
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Summary data accurate based on allocations
 - [ ] "Covered ✅" shows when balance ≥ funding target
 - [ ] "+$X" shows delta amount when not covered
@@ -1401,6 +1444,7 @@ function handleBackToDashboard() {
 #### "Hard Lines" Aesthetic Standards
 
 **Core Principles** (from [docs/shared-ui/design-standards.md](docs/shared-ui/design-standards.md:1)):
+
 - Thick black borders: `border-2 border-black` on all major UI components
 - Sharp corners: Use `rounded-lg` (8px) max, no excessive rounding
 - Color palette: Slate-50/Brand-600 (fuchsia-500/purple-600) with high contrast
@@ -1408,6 +1452,7 @@ function handleBackToDashboard() {
 - Typography: ALL CAPS headers with `font-black`, enlarged first letters
 
 **Component Templates**:
+
 ```tsx
 // Wizard Container
 <div className="
@@ -1453,6 +1498,7 @@ function handleBackToDashboard() {
 ```
 
 **Glassmorphism Integration**:
+
 ```css
 .glassmorphic-wizard {
   backdrop-filter: blur(12px);
@@ -1463,6 +1509,7 @@ function handleBackToDashboard() {
 ```
 
 **Animation Standards**:
+
 - Spring physics: `stiffness: 300, damping: 30`
 - Transition duration: 200-300ms
 - Easing: `ease-in-out` for smooth feel
@@ -1472,22 +1519,27 @@ function handleBackToDashboard() {
 ### Implementation Phases
 
 #### Phase 1: Foundation (Week 1-2)
+
 **Goal**: Set up core infrastructure, validation, and routing
 
 **Sub-Issues**: #1833 (Zustand Store ✅), #1843 (Zod Validation)
 
 **Tasks**:
+
 1. ✅ **COMPLETED** - Set up Zustand store with middleware (#1833):
+
    ```
    src/stores/ui/paycheckFlowStore.ts           # ✅ Done
    src/stores/ui/__tests__/paycheckFlowStore.test.ts  # ✅ Done (37 tests, 100% passing)
    ```
 
 2. **Create Zod validation schemas** (#1843) - **CRITICAL DEPENDENCY**:
+
    ```
    src/utils/core/validation/paycheckWizardValidation.ts
    src/utils/core/validation/__tests__/paycheckWizardValidation.test.ts
    ```
+
    - Paycheck amount validation (min $1, max $1M, cents precision)
    - Allocations validation (sum must equal paycheck, non-negative)
    - Strategy validation (enum: "last" | "even" | "smart" | "manual")
@@ -1495,6 +1547,7 @@ function handleBackToDashboard() {
    - **Blocks**: All wizard step components depend on this
 
 3. Create feature directory structure:
+
    ```
    src/components/budgeting/paycheck-flow/
      ├── PaycheckWizardModal.tsx
@@ -1517,6 +1570,7 @@ function handleBackToDashboard() {
 6. Set up TanStack Query mutations for paycheck submission
 
 **Deliverables**:
+
 - [x] Zustand store with persist + devtools + immer (#1833 ✅)
 - [ ] Zod validation schemas for all wizard data (#1843)
 - [ ] Validation integrated into store actions
@@ -1527,6 +1581,7 @@ function handleBackToDashboard() {
 - [ ] 90%+ test coverage (store + validation)
 
 **Success Criteria**:
+
 - User can click "GOT PAID?" and see wizard modal
 - Wizard state persists on page refresh
 - **All financial data validated before state updates**
@@ -1535,10 +1590,13 @@ function handleBackToDashboard() {
 - Browser back button navigates steps correctly
 
 #### Phase 2: Go Allocation Engine (Week 2-3)
+
 **Goal**: Build high-performance backend calculation service
 
 **Tasks**:
+
 1. Create Go service structure:
+
    ```
    api/paycheck/
      ├── allocate.go         # Main handler
@@ -1563,6 +1621,7 @@ function handleBackToDashboard() {
 5. Deploy to Vercel Functions
 
 **Deliverables**:
+
 - [ ] Go service deployed and accessible
 - [ ] All three allocation strategies working
 - [ ] 90%+ test coverage
@@ -1570,14 +1629,17 @@ function handleBackToDashboard() {
 - [ ] API documentation in code comments
 
 **Success Criteria**:
+
 - `/api/paycheck/allocate` endpoint functional
 - Allocations always sum to exact paycheck amount (no rounding errors)
 - Performance benchmarks green in CI/CD
 
 #### Phase 3: Frontend Wizard Flow (Week 3-4)
+
 **Goal**: Build interactive multi-step wizard UI
 
 **Tasks**:
+
 1. Implement wizard container with AnimatePresence transitions
 
 2. Build Step 1 (Amount Entry):
@@ -1606,6 +1668,7 @@ function handleBackToDashboard() {
    - Screen reader labels
 
 **Deliverables**:
+
 - [ ] All wizard steps functional
 - [ ] Smooth transitions between steps
 - [ ] Real-time validation working
@@ -1614,16 +1677,20 @@ function handleBackToDashboard() {
 - [ ] Accessibility audit passing
 
 **Success Criteria**:
+
 - User can complete full wizard flow
 - Allocations validate correctly
 - Animations smooth (60fps)
 - Keyboard navigation works end-to-end
 
 #### Phase 4: Python Prediction Service (Week 4-5)
+
 **Goal**: Build privacy-preserving ML prediction service
 
 **Tasks**:
+
 1. Create Python service structure:
+
    ```
    api/analytics/
      ├── paycheck_prediction.py     # Main endpoint
@@ -1658,6 +1725,7 @@ function handleBackToDashboard() {
    - Explainability UI (show reasoning)
 
 **Deliverables**:
+
 - [ ] Python service deployed and functional
 - [ ] Privacy audit passed (no PII in logs/database)
 - [ ] 85%+ test coverage
@@ -1666,15 +1734,18 @@ function handleBackToDashboard() {
 - [ ] API documentation
 
 **Success Criteria**:
+
 - [SMART SPLIT] returns allocations matching paycheck total
 - Confidence scores reflect pattern consistency
 - Service handles errors gracefully (insufficient data, timeout)
 - Network inspection confirms no envelope names in payload
 
 #### Phase 5: Success Screen & Polish (Week 5-6)
+
 **Goal**: Complete user experience with celebration and refinement
 
 **Tasks**:
+
 1. Build Success Step:
    - Allocation summary
    - Monthly completion percentage
@@ -1710,6 +1781,7 @@ function handleBackToDashboard() {
    - Sticky navigation buttons
 
 **Deliverables**:
+
 - [ ] Success screen complete with confetti
 - [ ] Query invalidation working
 - [ ] All loading/error states designed
@@ -1718,15 +1790,18 @@ function handleBackToDashboard() {
 - [ ] Visual regression tests passing
 
 **Success Criteria**:
+
 - Confetti triggers on success (with reduced-motion support)
 - Dashboard updates immediately after allocation
 - Mobile experience smooth on iOS/Android
 - No layout shifts or jank
 
 #### Phase 6: Testing & Documentation (Week 6-7)
+
 **Goal**: Ensure quality and prepare for launch
 
 **Tasks**:
+
 1. Comprehensive testing:
    - Unit tests (80%+ coverage target)
    - Integration tests (wizard flow end-to-end)
@@ -1760,6 +1835,7 @@ function handleBackToDashboard() {
    - Rollback plan documented
 
 **Deliverables**:
+
 - [ ] 80%+ overall test coverage
 - [ ] All documentation complete
 - [ ] Code reviews approved
@@ -1768,15 +1844,18 @@ function handleBackToDashboard() {
 - [ ] Deployment checklist complete
 
 **Success Criteria**:
+
 - All tests passing in CI/CD
 - Documentation reviewed and approved
 - Security/privacy audit passed
 - Ready for production deployment
 
 #### Phase 7: Launch & Monitoring (Week 7-8)
+
 **Goal**: Deploy to production and monitor success
 
 **Tasks**:
+
 1. Beta deployment:
    - Deploy behind feature flag
    - Enable for 10% of users
@@ -1804,6 +1883,7 @@ function handleBackToDashboard() {
    - Maintain and support
 
 **Deliverables**:
+
 - [ ] Beta deployment successful
 - [ ] User feedback collected
 - [ ] Full rollout complete
@@ -1811,6 +1891,7 @@ function handleBackToDashboard() {
 - [ ] Post-mortem document written
 
 **Success Criteria**:
+
 - No critical bugs in production
 - User engagement metrics positive
 - Performance targets met
@@ -1823,16 +1904,19 @@ function handleBackToDashboard() {
 ### E2EE Compliance
 
 **Encryption at Rest**:
+
 - **IndexedDB**: Wizard state encrypted with user's master key before storage
 - **Firestore**: Paycheck history encrypted client-side before upload
 - **Server**: No sensitive data stored (ephemeral only)
 
 **Encryption in Transit**:
+
 - **HTTPS**: All API requests over TLS 1.3
 - **WebSocket**: Metadata signals only (no financial data)
 - **Payload Sanitization**: Envelope names stripped before transmission
 
 **Key Management**:
+
 - User master key derived from auth session
 - Never sent to server
 - Stored in browser secure context only
@@ -1921,6 +2005,7 @@ function handleBackToDashboard() {
 ### Privacy Audit Checklist
 
 **Before Deployment**:
+
 - [ ] Network payload inspection (no envelope names)
 - [ ] Server logs review (no PII)
 - [ ] Database query audit (no sensitive writes)
@@ -1929,6 +2014,7 @@ function handleBackToDashboard() {
 - [ ] HTTPS enforced (no HTTP fallback)
 
 **Ongoing Monitoring**:
+
 - [ ] Automated PII detection in logs
 - [ ] Rate limiting on prediction endpoint
 - [ ] Anomaly detection for unusual requests
@@ -1937,6 +2023,7 @@ function handleBackToDashboard() {
 ### Zero-Persistence Validation
 
 **Python Service Contract**:
+
 ```python
 # CRITICAL: Enforce zero persistence
 @app.post("/api/analytics/paycheck-prediction")
@@ -1957,6 +2044,7 @@ async def predict_paycheck(request: PredictionRequest):
 ```
 
 **Verification**:
+
 - Code review for database writes
 - Integration tests mock database to catch writes
 - Manual inspection of database after test runs
@@ -1970,12 +2058,14 @@ async def predict_paycheck(request: PredictionRequest):
 **Approach**: Run all allocation logic and predictions entirely in browser using JavaScript/TypeScript.
 
 **Pros**:
+
 - ✅ Maximum privacy (no data ever leaves client)
 - ✅ Works offline by default
 - ✅ Simpler deployment (no backend services)
 - ✅ Zero server costs
 
 **Cons**:
+
 - ❌ Performance bottleneck for complex calculations
 - ❌ Limited ML capabilities (TensorFlow.js has constraints)
 - ❌ Larger JS bundle size
@@ -1989,11 +2079,13 @@ async def predict_paycheck(request: PredictionRequest):
 **Approach**: Use either Go or Python for all backend logic instead of polyglot.
 
 **Pros**:
+
 - ✅ Simpler maintenance (one language)
 - ✅ Fewer dependencies
 - ✅ Easier onboarding for developers
 
 **Cons**:
+
 - ❌ Go lacks ML ecosystem (no scikit-learn, pandas equivalent)
 - ❌ Python slower than Go for financial calculations
 - ❌ Compromise on either performance or ML quality
@@ -2005,11 +2097,13 @@ async def predict_paycheck(request: PredictionRequest):
 **Approach**: Build wizard without IndexedDB persistence, start fresh each time.
 
 **Pros**:
+
 - ✅ Simpler state management
 - ✅ No storage quota concerns
 - ✅ Faster initial implementation
 
 **Cons**:
+
 - ❌ User loses progress on page refresh
 - ❌ No resume capability if interrupted
 - ❌ Higher abandonment rate (research shows 20% reduction with persistence)
@@ -2021,11 +2115,13 @@ async def predict_paycheck(request: PredictionRequest):
 **Approach**: Send full envelope names and transaction history to server for richer ML predictions.
 
 **Pros**:
+
 - ✅ Better prediction quality (more context)
 - ✅ Can correlate with category names
 - ✅ Easier to debug and improve models
 
 **Cons**:
+
 - ❌ Violates privacy-first principle
 - ❌ User trust erosion
 - ❌ Regulatory compliance risks (GDPR, CCPA)
@@ -2038,11 +2134,13 @@ async def predict_paycheck(request: PredictionRequest):
 **Approach**: Skip [USE LAST SPLIT], [SPLIT EVENLY], [SMART SPLIT] buttons, require manual allocation.
 
 **Pros**:
+
 - ✅ Simpler implementation
 - ✅ No backend prediction service needed
 - ✅ Fewer edge cases to handle
 
 **Cons**:
+
 - ❌ High cognitive load (20+ envelopes = 20+ decisions)
 - ❌ Slow user flow (5-10 minutes per paycheck)
 - ❌ Misses opportunity to leverage historical patterns
@@ -2057,6 +2155,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Functional Requirements
 
 #### Entry Point (#157)
+
 - [ ] "GOT PAID?" button visible on dashboard when conditions met
 - [ ] Button shows when user has Paycheck envelope configured
 - [ ] Button shows within ±3 days of expected pay date (if configured)
@@ -2067,6 +2166,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Button accessible via keyboard (Enter/Space to activate)
 
 #### Wizard Container (#1785)
+
 - [ ] Modal opens on entry point click
 - [ ] Multi-step navigation works forward/backward
 - [ ] [BACK] button enabled on steps 1-3, navigates to previous step
@@ -2080,6 +2180,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Responsive design (mobile + tablet + desktop)
 
 #### Amount Entry (Step 1)
+
 - [ ] Input accepts dollar amounts with formatting ($1,234.56)
 - [ ] Validation: minimum $0.01, maximum $1,000,000
 - [ ] Validation: only 2 decimal places allowed
@@ -2090,6 +2191,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] [CONTINUE] button disabled until valid amount entered
 
 #### Allocation Strategy (Step 2 - #162)
+
 - [ ] Three quick action buttons visible: [USE LAST SPLIT], [SPLIT EVENLY], [SMART SPLIT]
 - [ ] [USE LAST SPLIT] disabled if no paycheck history
 - [ ] [USE LAST SPLIT] applies ratios from last paycheck to new amount
@@ -2109,6 +2211,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Validation error message shown if allocations ≠ total
 
 #### Review & Adjust (Step 3)
+
 - [ ] Summary of all allocations displayed
 - [ ] Total allocation amount matches paycheck amount exactly
 - [ ] User can adjust individual allocations before submission
@@ -2118,6 +2221,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Error handling if submission fails (show retry button)
 
 #### Success Screen (Step 4 - #161)
+
 - [ ] Allocation summary displayed with top 5 envelopes
 - [ ] "Covered ✅" shown for envelopes meeting funding targets
 - [ ] "+$X" shown for envelopes not meeting targets
@@ -2130,6 +2234,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Wizard state reset after navigation
 
 #### Go Allocation Engine (#1786)
+
 - [ ] `/api/paycheck/allocate` endpoint functional
 - [ ] Accepts JSON payload with paycheck_cents, strategy, envelopes
 - [ ] Returns allocations array matching paycheck total exactly
@@ -2144,6 +2249,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Handles edge cases: $0.01, $999,999.99, prime numbers
 
 #### Python Prediction Service (#1787)
+
 - [ ] `/api/analytics/paycheck-prediction` endpoint functional
 - [ ] Accepts anonymized JSON payload (no envelope names)
 - [ ] Returns allocations array matching paycheck total exactly
@@ -2159,6 +2265,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Non-Functional Requirements
 
 #### Performance
+
 - [ ] Wizard modal lazy-loaded (not in main bundle)
 - [ ] Initial wizard render <200ms
 - [ ] Step transitions smooth 60fps
@@ -2172,6 +2279,7 @@ async def predict_paycheck(request: PredictionRequest):
   - CLS <0.1
 
 #### Accessibility
+
 - [ ] All interactive elements keyboard accessible
 - [ ] Focus visible and logical order
 - [ ] Screen reader labels on all inputs
@@ -2184,6 +2292,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Tested with NVDA/JAWS screen readers
 
 #### Security & Privacy
+
 - [ ] HTTPS enforced (no HTTP fallback)
 - [ ] Network payloads inspected (no envelope names)
 - [ ] Python service logs contain no PII
@@ -2196,6 +2305,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Dependency scan passing (no known CVEs)
 
 #### Browser Compatibility
+
 - [ ] Chrome 100+ (desktop + mobile)
 - [ ] Firefox 100+
 - [ ] Safari 15+ (desktop + iOS)
@@ -2203,6 +2313,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] No critical bugs on older browsers (graceful degradation)
 
 #### Mobile Responsiveness
+
 - [ ] Wizard usable on 320px width (iPhone SE)
 - [ ] Single-column layout on mobile
 - [ ] Sticky [BACK]/[CONTINUE] buttons on mobile
@@ -2213,6 +2324,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Quality Gates
 
 #### Code Quality
+
 - [ ] TypeScript strict mode enabled
 - [ ] ESLint passing (no warnings)
 - [ ] Prettier formatted
@@ -2222,6 +2334,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Cyclomatic complexity <10
 
 #### Testing
+
 - [ ] 80%+ overall test coverage
 - [ ] 90%+ coverage for Go allocation engine
 - [ ] 85%+ coverage for Python prediction service
@@ -2235,6 +2348,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Property-based tests for financial calculations
 
 #### Documentation
+
 - [ ] API documentation (request/response examples)
 - [ ] Component documentation (props, usage)
 - [ ] Storybook stories for key components
@@ -2244,6 +2358,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] User guide (how to use wizard)
 
 #### Performance Benchmarks
+
 - [ ] Go allocation engine benchmarks passing
 - [ ] Frontend bundle size within limits
 - [ ] Lighthouse CI passing
@@ -2256,21 +2371,25 @@ async def predict_paycheck(request: PredictionRequest):
 ### Primary Metrics (P0)
 
 **Adoption Rate**:
+
 - **Target**: 60% of users who receive paychecks use wizard within 1 month
 - **Measurement**: `(users who completed wizard) / (users with paycheck transactions)`
 - **Success**: ≥60% adoption
 
 **Completion Rate**:
+
 - **Target**: 85% of users who start wizard complete it
 - **Measurement**: `(wizard completions) / (wizard starts)`
 - **Success**: ≥85% completion (industry standard: 70%)
 
 **Time to Allocate**:
+
 - **Target**: Reduce allocation time by 50% (from 5-10 min to 2-5 min)
 - **Measurement**: Time from wizard open to success screen
 - **Success**: Median time ≤5 minutes
 
 **Allocation Accuracy**:
+
 - **Target**: 100% of allocations sum to exact paycheck amount (no rounding errors)
 - **Measurement**: `(exact allocations) / (total allocations)`
 - **Success**: 100% (zero tolerance for math errors)
@@ -2278,21 +2397,25 @@ async def predict_paycheck(request: PredictionRequest):
 ### Secondary Metrics (P1)
 
 **Smart Split Usage**:
+
 - **Target**: 40% of users try [SMART SPLIT] at least once
 - **Measurement**: `(users who clicked SMART SPLIT) / (total wizard users)`
 - **Success**: ≥40%
 
 **Repeat Usage**:
+
 - **Target**: 70% of users return to wizard for next paycheck
 - **Measurement**: `(users with 2+ wizard completions) / (users with 1+ completion)`
 - **Success**: ≥70%
 
 **Error Rate**:
+
 - **Target**: <5% of wizard sessions encounter errors
 - **Measurement**: `(sessions with errors) / (total sessions)`
 - **Success**: ≤5%
 
 **Performance**:
+
 - **Target**: Go allocation <1ms, Python prediction <500ms
 - **Measurement**: P95 latency from monitoring
 - **Success**: P95 within targets
@@ -2300,11 +2423,13 @@ async def predict_paycheck(request: PredictionRequest):
 ### User Satisfaction (P2)
 
 **NPS (Net Promoter Score)**:
+
 - **Target**: NPS ≥50 (from post-wizard survey)
 - **Measurement**: Survey after 3rd wizard completion
 - **Success**: NPS ≥50 (excellent)
 
 **Feature Rating**:
+
 - **Target**: 4.5/5 stars average rating
 - **Measurement**: In-app rating prompt after success screen
 - **Success**: ≥4.5 stars
@@ -2312,11 +2437,13 @@ async def predict_paycheck(request: PredictionRequest):
 ### Business Impact (P2)
 
 **User Retention**:
+
 - **Target**: 10% increase in 30-day retention for wizard users
 - **Measurement**: Cohort analysis (wizard users vs. non-wizard users)
 - **Success**: Wizard users have ≥10% higher retention
 
 **Engagement**:
+
 - **Target**: 15% increase in overall app sessions
 - **Measurement**: Average sessions per user per month
 - **Success**: ≥15% increase
@@ -2328,6 +2455,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Technical Dependencies
 
 **Frontend**:
+
 - React 19.2.0 ✅ (already in project)
 - Zustand 5.0.9 ✅ (already in project)
 - Framer Motion 12.27.0 ✅ (already in project)
@@ -2336,12 +2464,14 @@ async def predict_paycheck(request: PredictionRequest):
 - **NEW**: `canvas-confetti` (need to install)
 
 **Backend**:
+
 - Go 1.22+ ✅ (Vercel Functions support)
 - Python 3.12+ ✅ (Vercel Functions support)
 - **NEW**: `shopspring/decimal` (Go library for cents-perfect math)
 - **NEW**: FastAPI + Pydantic (Python prediction service)
 
 **Infrastructure**:
+
 - Vercel Functions ✅ (already deployed)
 - Firestore ✅ (already configured)
 - IndexedDB ✅ (browser native)
@@ -2349,11 +2479,13 @@ async def predict_paycheck(request: PredictionRequest):
 ### Data Prerequisites
 
 **User Settings**:
+
 - [ ] Expected pay date field (optional)
 - [ ] Paycheck envelope configured
 - [ ] At least 1 active envelope (other than Paycheck)
 
 **Historical Data** (for Smart Split):
+
 - [ ] Paycheck history table/collection in Firestore
 - [ ] At least 3 past paycheck allocations for predictions
 - [ ] Envelope funding targets configured
@@ -2378,6 +2510,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### High-Risk Areas
 
 #### Risk 1: Privacy Compliance Violation
+
 **Likelihood**: Low
 **Impact**: Critical
 **Risk Score**: Medium
@@ -2385,6 +2518,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Accidental logging of envelope names or user PII in Python service could violate privacy-first principle and user trust.
 
 **Mitigation**:
+
 1. Code review checklist includes privacy verification
 2. Integration tests mock database to catch writes
 3. Network payload inspection in tests
@@ -2394,6 +2528,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Contingency**: If privacy violation discovered post-launch, immediately disable service and notify users.
 
 #### Risk 2: Financial Calculation Error
+
 **Likelihood**: Low
 **Impact**: Critical
 **Risk Score**: Medium
@@ -2401,6 +2536,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Rounding errors or incorrect dust distribution could cause allocations to not sum to paycheck amount, eroding user trust.
 
 **Mitigation**:
+
 1. Property-based testing (1000+ random test cases)
 2. Benchmark tests in CI/CD catch regressions
 3. Cents-perfect integer math (no floats)
@@ -2410,6 +2546,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Contingency**: If math error discovered, rollback immediately and notify affected users with correction flow.
 
 #### Risk 3: Performance Degradation
+
 **Likelihood**: Medium
 **Impact**: High
 **Risk Score**: High
@@ -2417,6 +2554,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Go allocation engine or Python prediction service slower than targets, causing user frustration.
 
 **Mitigation**:
+
 1. Benchmark tests with hard thresholds (<1ms, <500ms)
 2. Load testing before launch (100 concurrent users)
 3. Caching of prediction results (client-side)
@@ -2428,6 +2566,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Medium-Risk Areas
 
 #### Risk 4: Browser Compatibility Issues
+
 **Likelihood**: Medium
 **Impact**: Medium
 **Risk Score**: Medium
@@ -2435,6 +2574,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Wizard doesn't work correctly on older browsers or specific mobile devices.
 
 **Mitigation**:
+
 1. Cross-browser testing (Chrome, Firefox, Safari, Edge)
 2. Mobile testing on real devices (iOS/Android)
 3. Graceful degradation for missing features
@@ -2443,6 +2583,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Contingency**: Feature detection with warning message for unsupported browsers.
 
 #### Risk 5: State Persistence Corruption
+
 **Likelihood**: Medium
 **Impact**: Medium
 **Risk Score**: Medium
@@ -2450,6 +2591,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: IndexedDB state becomes corrupted, causing wizard to fail on resume.
 
 **Mitigation**:
+
 1. Try-catch on state hydration with fallback to reset
 2. Version migrations for schema changes
 3. State validation on load
@@ -2458,6 +2600,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Contingency**: Clear corrupted state and start fresh, inform user progress was lost.
 
 #### Risk 6: ML Prediction Quality
+
 **Likelihood**: Medium
 **Impact**: Low
 **Risk Score**: Low
@@ -2465,6 +2608,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Smart Split suggestions don't match user expectations, reducing trust in feature.
 
 **Mitigation**:
+
 1. Confidence score displayed to user
 2. Explainability UI (show reasoning)
 3. Manual override always available
@@ -2475,6 +2619,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Low-Risk Areas
 
 #### Risk 7: Animation Performance on Low-End Devices
+
 **Likelihood**: High
 **Impact**: Low
 **Risk Score**: Low
@@ -2482,6 +2627,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Description**: Framer Motion transitions laggy on old phones.
 
 **Mitigation**:
+
 1. Use GPU-accelerated properties (transform, opacity)
 2. Reduce animation complexity on low-end devices
 3. `prefers-reduced-motion` support
@@ -2495,35 +2641,43 @@ async def predict_paycheck(request: PredictionRequest):
 ### Engineering Resources
 
 **Frontend Engineers**: 2 FTEs
+
 - Primary: Wizard UI, state management, animations
 - Secondary: Testing, accessibility, performance
 
 **Backend Engineers**: 1 FTE
+
 - Primary: Go allocation engine, Python prediction service
 - Secondary: API design, monitoring, deployment
 
 **QA Engineer**: 0.5 FTE
+
 - Testing all flows, edge cases, browser compatibility
 
 **Design Review**: 0.2 FTE (part-time)
+
 - Ensure "Hard Lines" aesthetic consistency
 
 **Security Review**: 0.1 FTE (one-time)
+
 - Privacy architecture audit before launch
 
 ### Infrastructure
 
 **Vercel Functions**:
+
 - Go allocation endpoint: ~1000 invocations/day
 - Python prediction endpoint: ~500 invocations/day
 - Estimated cost: $5-10/month (within free tier likely)
 
 **Firestore**:
+
 - Paycheck history writes: ~1000/day
 - Envelope reads: ~10,000/day
 - Estimated cost: $2-5/month (within existing quota)
 
 **Monitoring**:
+
 - Sentry (error tracking)
 - Datadog (performance monitoring)
 - Estimated cost: $0 (within existing plans)
@@ -2533,6 +2687,7 @@ async def predict_paycheck(request: PredictionRequest):
 **Total Effort**: 6-8 weeks (1.5-2 sprints)
 
 **Phase Breakdown**:
+
 1. Foundation (Week 1-2): 2 weeks
 2. Go Engine (Week 2-3): 1.5 weeks
 3. Frontend Wizard (Week 3-4): 1.5 weeks
@@ -2542,6 +2697,7 @@ async def predict_paycheck(request: PredictionRequest):
 7. Launch (Week 7-8): 1 week
 
 **Critical Path**:
+
 - Zustand store → Wizard UI → Go Engine → Python Service
 - Any delay in foundation or Go engine blocks downstream work
 
@@ -2554,22 +2710,26 @@ async def predict_paycheck(request: PredictionRequest):
 ### v2.2 Enhancements
 
 **Advanced Allocation Strategies**:
+
 - **Goal-Based Allocation**: Prioritize envelopes with savings goals
 - **Debt Payoff Strategy**: Extra payments to highest-interest debts
 - **Flex Allocation**: Adjust based on current balances and spending trends
 - **Custom Rules**: User-defined allocation rules (e.g., "Always allocate 10% to savings")
 
 **Recurring Allocation Templates**:
+
 - Save allocation strategies as templates
 - Quick-apply templates to future paychecks
 - Share templates with other users (community library)
 
 **Predictive Insights**:
+
 - "You're $200 short on Rent this month" warnings
 - "You usually spend $X on Groceries, allocate more?"
 - Seasonal spending forecasts (holidays, vacations)
 
 **Multi-Paycheck Support**:
+
 - Handle multiple paychecks in one period (e.g., two jobs)
 - Combine paychecks into single allocation
 - Split allocations across paychecks
@@ -2577,16 +2737,19 @@ async def predict_paycheck(request: PredictionRequest):
 ### Technical Debt & Refactoring
 
 **Go Engine Optimization**:
+
 - Migrate from `float64` to `shopspring/decimal` for all money operations
 - Benchmark regression testing in CI/CD
 - Explore WASM compilation for client-side execution
 
 **Python Service Evolution**:
+
 - Federated learning (train models on-device)
 - Differential privacy for aggregate insights
 - Model versioning and A/B testing
 
 **State Management Cleanup**:
+
 - Migrate from Zustand to Jotai (if team prefers)
 - Unified state architecture across all wizards
 - Improved testing utilities
@@ -2594,11 +2757,13 @@ async def predict_paycheck(request: PredictionRequest):
 ### Internationalization
 
 **Currency Support**:
+
 - Multi-currency allocation (EUR, GBP, CAD, AUD)
 - Exchange rate handling for international users
 - Locale-specific number formatting
 
 **Language Support**:
+
 - Spanish translation (high priority)
 - French, German, Portuguese (medium priority)
 - RTL languages (Arabic, Hebrew) for global reach
@@ -2606,11 +2771,13 @@ async def predict_paycheck(request: PredictionRequest):
 ### Platform Expansion
 
 **Mobile Native Apps**:
+
 - iOS app with Swift UI wizard
 - Android app with Jetpack Compose wizard
 - Shared Go/Python backend services
 
 **Integrations**:
+
 - Direct deposit import (partner with payroll providers)
 - Bank account linking (Plaid integration)
 - Calendar sync for expected pay dates
@@ -2622,6 +2789,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### Technical Documentation
 
 **API Documentation**:
+
 - [ ] Go allocation engine OpenAPI spec
 - [ ] Python prediction service OpenAPI spec
 - [ ] Request/response examples for all endpoints
@@ -2629,12 +2797,14 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Rate limiting and quotas
 
 **Architecture Documentation**:
+
 - [ ] Privacy architecture diagram (blinded calculation flow)
 - [ ] Component hierarchy diagram (wizard steps)
 - [ ] State management flow (Zustand → IndexedDB → Firestore)
 - [ ] Data flow diagram (client → backend → client)
 
 **Code Documentation**:
+
 - [ ] Inline comments for complex logic
 - [ ] JSDoc/TSDoc for public functions
 - [ ] Go package documentation
@@ -2643,6 +2813,7 @@ async def predict_paycheck(request: PredictionRequest):
 ### User Documentation
 
 **User Guide**:
+
 - [ ] How to allocate a paycheck (step-by-step)
 - [ ] Understanding allocation strategies
 - [ ] What is Smart Split and how it works
@@ -2650,6 +2821,7 @@ async def predict_paycheck(request: PredictionRequest):
 - [ ] Troubleshooting common issues
 
 **Help Center Articles**:
+
 - [ ] "What is the Paycheck Wizard?"
 - [ ] "How does Smart Split protect my privacy?"
 - [ ] "Why don't my allocations add up?" (math explanation)
@@ -2658,12 +2830,14 @@ async def predict_paycheck(request: PredictionRequest):
 ### Developer Documentation
 
 **Setup Guide**:
+
 - [ ] Local development environment setup
 - [ ] Running Go/Python services locally
 - [ ] Testing strategy and running tests
 - [ ] Deployment process
 
 **Contributing Guide**:
+
 - [ ] Code style and conventions
 - [ ] Git workflow (branch naming, commit messages)
 - [ ] Pull request template
@@ -2676,17 +2850,20 @@ async def predict_paycheck(request: PredictionRequest):
 ### Local Resources
 
 **Architecture**:
+
 - [docs/architecture/Client-State-Management.md](docs/architecture/Client-State-Management.md:1) - Zustand patterns
 - [docs/shared-ui/design-standards.md](docs/shared-ui/design-standards.md:1) - "Hard Lines" aesthetic
 - [docs/testing/polyglot-backend-testing.md](docs/testing/polyglot-backend-testing.md:1) - Backend testing guide
 
 **Existing Patterns**:
+
 - [src/components/receipts/import-dashboard/](src/components/receipts/import-dashboard/) - Sentinel wizard pattern
 - [src/stores/ui/importDashboardStore.ts](src/stores/ui/importDashboardStore.ts:1) - Zustand store example
 - [api/budget/index.go](api/budget/index.go:1) - Go service structure
 - [api/analytics/prediction.py](api/analytics/prediction.py:1) - Python service structure
 
 **Institutional Learnings**:
+
 - React Error #185 Prevention (CRITICAL: Never use `get()` in store actions)
 - Privacy-first E2EE patterns
 - Financial calculation best practices
@@ -2695,31 +2872,37 @@ async def predict_paycheck(request: PredictionRequest):
 ### External Resources
 
 **Financial Calculations**:
+
 - [Floats Don't Work For Storing Cents | Modern Treasury](https://www.moderntreasury.com/journal/floats-dont-work-for-storing-cents)
 - [shopspring/decimal - Go Package](https://pkg.go.dev/github.com/shopspring/decimal)
 - [Largest Remainder Method | Sage 50](http://help.sage50.na.sage.com/en-us/2017/sage50us/Content/PR01/Allocation_Method.htm)
 
 **Privacy & Security**:
+
 - [Privacy Laws 2026 | SecurePrivacy](https://secureprivacy.ai/blog/privacy-laws-2026)
 - [Zero-Knowledge Architecture | Medium](https://medium.com/@rosgluk/zero-knowledge-architecture-privacy-by-design-ba8993fa27d7)
 - [E2EE in Finance | Fullestop](https://www.fullestop.com/blog/privacy-first-social-apps-how-end-to-end-encryption-and-user-control-protect-your-data)
 
 **Wizard UX**:
+
 - [Wizard UI Pattern Explained | Eleken](https://www.eleken.co/blog-posts/wizard-ui-pattern-explained)
 - [Multi-Step Form Best Practices | Growform](https://www.growform.co/must-follow-ux-best-practices-when-designing-a-multi-step-form/)
 - [8 Multi-Step Form Examples | Webstacks](https://www.webstacks.com/blog/multi-step-form)
 
 **Framework Documentation**:
+
 - [Zustand Official Docs](https://zustand.docs.pmnd.rs)
 - [Framer Motion Docs](https://motion.dev)
 - [TanStack Query v5 Docs](https://tanstack.com/query/v5)
 - [Dexie.js Docs](https://dexie.org)
 
 **AI/ML Integration**:
+
 - [Banking AI Predictions 2026 | SAS](https://www.sas.com/en_us/news/press-releases/2025/december/banking-predictions-2026.html)
 - [FastAPI for ML | NVIDIA](https://developer.nvidia.com/blog/building-a-machine-learning-microservice-with-fastapi/)
 
 **Performance**:
+
 - [IndexedDB Performance | RxDB](https://rxdb.info/slow-indexeddb.html)
 - [Go Benchmarking Guide | BetterStack](https://betterstack.com/community/guides/scaling-go/golang-benchmarking/)
 
@@ -2730,17 +2913,19 @@ async def predict_paycheck(request: PredictionRequest):
 The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** questions that must be answered before implementation begins:
 
 ### 1. Python Service Historical Data Source
+
 **Question**: How does the Python service access "historical allocations" if it never receives envelope names or user identity? Is the client sending anonymized past allocation ratios in the request payload?
 
 **Current Plan**: Client sends last 12 paycheck allocation ratios as unlabeled array in request payload.
 
 **Example Request**:
+
 ```json
 {
   "paycheck_cents": 250000,
   "historical_sessions": [
-    {"date": "2026-01-15", "amount_cents": 240000, "ratios": [0.5, 0.3, 0.2]},
-    {"date": "2025-12-31", "amount_cents": 250000, "ratios": [0.48, 0.27, 0.25]}
+    { "date": "2026-01-15", "amount_cents": 240000, "ratios": [0.5, 0.3, 0.2] },
+    { "date": "2025-12-31", "amount_cents": 250000, "ratios": [0.48, 0.27, 0.25] }
   ],
   "current_month": 1,
   "num_envelopes": 3
@@ -2752,9 +2937,11 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 2. Wizard Step Definition
+
 **Question**: What are the exact steps in the wizard flow?
 
 **Current Plan**:
+
 - **Step 0**: Amount Entry
 - **Step 1**: Allocation Strategy Selection
 - **Step 2**: Review & Adjust (optional)
@@ -2765,6 +2952,7 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 3. Entry Point Routing
+
 **Question**: Which route is correct: `/app/paycheck/flow` or `/vault/wizard/paycheck`?
 
 **Current Plan**: `/vault/wizard/paycheck` is canonical. `/app/paycheck/flow` redirects for backward compatibility.
@@ -2774,6 +2962,7 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 4. IndexedDB Encryption
+
 **Question**: Must wizard state in IndexedDB be encrypted per E2EE standards?
 
 **Current Plan**: Yes. Sensitive data (paycheck amount, allocation details) encrypted with user's master key. Only `currentStep` and `selectedStrategy` persisted in plaintext.
@@ -2783,6 +2972,7 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 5. "Last Split" Pattern Definition
+
 **Question**: Does [USE LAST SPLIT] apply (a) absolute amounts or (b) ratios scaled to new amount?
 
 **Current Plan**: (b) Ratios scaled to new amount.
@@ -2794,6 +2984,7 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 6. Remainder Distribution
+
 **Question**: Which envelope gets the remainder penny from rounding?
 
 **Current Plan**: Largest remainder method. Distribute dust to envelopes with highest fractional remainders.
@@ -2803,6 +2994,7 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 7. Transaction Creation Atomicity
+
 **Question**: How does allocation create transactions? What if creation partially fails?
 
 **Current Plan**: Single batch API call to `/api/paycheck/allocate` with server-side atomic transaction. All-or-nothing guarantee.
@@ -2812,9 +3004,11 @@ The SpecFlow analyzer identified 30 questions. Below are the **8 CRITICAL** ques
 ---
 
 ### 8. Expected Pay Date Calculation
+
 **Question**: How is "expected pay date" determined for entry point visibility?
 
 **Current Plan**: Two options:
+
 1. User manually sets expected pay date in settings
 2. System infers from average of last 3 paychecks' date intervals
 

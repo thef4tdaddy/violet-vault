@@ -23,9 +23,7 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
       </div>
 
       {/* Success Message */}
-      <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-        PAYCHECK ALLOCATED!
-      </h2>
+      <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">PAYCHECK ALLOCATED!</h2>
       <p className="text-lg text-slate-600 mb-8">
         Your $2,500.00 paycheck has been successfully distributed across your envelopes.
       </p>
@@ -65,7 +63,7 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
       </div>
 
       {/* Action Button */}
-      <button
+      <Button
         onClick={onFinish}
         className="
           px-12 py-4
@@ -85,7 +83,7 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
         "
       >
         BACK TO DASHBOARD
-      </button>
+      </Button>
 
       {/* Placeholder note */}
       <div className="mt-8 p-4 bg-amber-50 hard-border rounded-lg">

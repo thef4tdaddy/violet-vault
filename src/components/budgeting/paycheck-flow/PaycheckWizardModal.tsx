@@ -285,7 +285,7 @@ export const PaycheckWizardModal: React.FC = () => {
           <div className="flex justify-between items-center">
             {/* Back Button */}
             {!isFirstStep && !isLastStep && (
-              <button
+              <Button
                 onClick={previousStep}
                 className="
                   px-6 py-3
@@ -305,14 +305,14 @@ export const PaycheckWizardModal: React.FC = () => {
                 aria-label="Go back to previous step"
               >
                 ← BACK
-              </button>
+              </Button>
             )}
 
             {isFirstStep && <div />}
 
             {/* Continue/Finish Button - Hidden on last step (handled by step component) */}
             {!isLastStep && (
-              <button
+              <Button
                 onClick={nextStep}
                 className="
                   px-8 py-3
@@ -333,7 +333,7 @@ export const PaycheckWizardModal: React.FC = () => {
                 aria-label="Continue to next step"
               >
                 CONTINUE →
-              </button>
+              </Button>
             )}
           </div>
         </div>

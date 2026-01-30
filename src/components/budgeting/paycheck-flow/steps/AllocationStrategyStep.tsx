@@ -20,23 +20,23 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = () => {
 
         {/* Quick Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <button className="p-6 bg-purple-50 hard-border rounded-lg hover:bg-purple-100 transition-all text-left">
+          <Button className="p-6 bg-purple-50 hard-border rounded-lg hover:bg-purple-100 transition-all text-left">
             <div className="text-2xl mb-2">🔄</div>
             <div className="font-black text-slate-900 mb-1">USE LAST SPLIT</div>
             <div className="text-sm text-slate-600">Same as your previous paycheck</div>
-          </button>
+          </Button>
 
-          <button className="p-6 bg-blue-50 hard-border rounded-lg hover:bg-blue-100 transition-all text-left">
+          <Button className="p-6 bg-blue-50 hard-border rounded-lg hover:bg-blue-100 transition-all text-left">
             <div className="text-2xl mb-2">⚖️</div>
             <div className="font-black text-slate-900 mb-1">SPLIT EVENLY</div>
             <div className="text-sm text-slate-600">Weighted by monthly targets</div>
-          </button>
+          </Button>
 
-          <button className="p-6 bg-fuchsia-50 hard-border rounded-lg hover:bg-fuchsia-100 transition-all text-left">
+          <Button className="p-6 bg-fuchsia-50 hard-border rounded-lg hover:bg-fuchsia-100 transition-all text-left">
             <div className="text-2xl mb-2">✨</div>
             <div className="font-black text-slate-900 mb-1">SMART SPLIT</div>
             <div className="text-sm text-slate-600">AI-powered suggestions</div>
-          </button>
+          </Button>
         </div>
 
         {/* Allocation Grid Placeholder */}
@@ -75,8 +75,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = () => {
         <p className="text-sm text-amber-900">
           <strong>🚧 Placeholder Component</strong>
           <br />
-          Full implementation coming in Issue #162 with Go engine integration and smart
-          suggestions.
+          Full implementation coming in Issue #162 with Go engine integration and smart suggestions.
         </p>
       </div>
     </div>

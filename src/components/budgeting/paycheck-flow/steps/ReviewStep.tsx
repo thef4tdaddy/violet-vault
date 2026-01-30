@@ -32,9 +32,7 @@ const ReviewStep: React.FC<ReviewStepProps> = () => {
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-slate-600">Allocation Status</span>
-            <span className="px-3 py-1 bg-green-500 text-white font-bold rounded">
-              ✓ Complete
-            </span>
+            <span className="px-3 py-1 bg-green-500 text-white font-bold rounded">✓ Complete</span>
           </div>
         </div>
 

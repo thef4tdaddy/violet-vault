@@ -249,7 +249,8 @@ export const createPaycheckTransaction = (
     actualBalanceAfter: options?.actualBalanceAfter || null,
 
     // Description
-    description: options?.description || `Paycheck allocation (${wizardData.selectedStrategy} strategy)`,
+    description:
+      options?.description || `Paycheck allocation (${wizardData.selectedStrategy} strategy)`,
     notes: null,
 
     // Transaction metadata

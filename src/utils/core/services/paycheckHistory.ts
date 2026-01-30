@@ -174,7 +174,9 @@ export class PaycheckHistoryService {
    * @param payerName - Employer name
    * @returns Detected frequency or null if not enough data
    */
-  static detectFrequency(payerName: string): "weekly" | "biweekly" | "semi-monthly" | "monthly" | null {
+  static detectFrequency(
+    payerName: string
+  ): "weekly" | "biweekly" | "semi-monthly" | "monthly" | null {
     const entry = this.getByPayerName(payerName);
     if (!entry || entry.totalCount < 2) {
       return null; // Need at least 2 paychecks to detect pattern

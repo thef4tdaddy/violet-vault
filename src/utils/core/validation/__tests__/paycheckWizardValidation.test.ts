@@ -34,15 +34,21 @@ describe("paycheckWizardValidation", () => {
     });
 
     it("rejects negative amounts", () => {
-      expect(() => PaycheckAmountSchema.parse({ amountCents: -100 })).toThrow("Amount must be positive");
+      expect(() => PaycheckAmountSchema.parse({ amountCents: -100 })).toThrow(
+        "Amount must be positive"
+      );
     });
 
     it("rejects zero amounts", () => {
-      expect(() => PaycheckAmountSchema.parse({ amountCents: 0 })).toThrow("Amount must be positive");
+      expect(() => PaycheckAmountSchema.parse({ amountCents: 0 })).toThrow(
+        "Amount must be positive"
+      );
     });
 
     it("rejects amounts below minimum ($1.00)", () => {
-      expect(() => PaycheckAmountSchema.parse({ amountCents: 99 })).toThrow("Minimum paycheck is $1.00");
+      expect(() => PaycheckAmountSchema.parse({ amountCents: 99 })).toThrow(
+        "Minimum paycheck is $1.00"
+      );
       expect(() => PaycheckAmountSchema.parse({ amountCents: 50 })).toThrow();
     });
 
@@ -84,15 +90,15 @@ describe("paycheckWizardValidation", () => {
     });
 
     it("rejects negative amounts", () => {
-      expect(() =>
-        AllocationItemSchema.parse({ envelopeId: "env_1", amountCents: -100 })
-      ).toThrow("Amount cannot be negative");
+      expect(() => AllocationItemSchema.parse({ envelopeId: "env_1", amountCents: -100 })).toThrow(
+        "Amount cannot be negative"
+      );
     });
 
     it("rejects fractional cents", () => {
-      expect(() =>
-        AllocationItemSchema.parse({ envelopeId: "env_1", amountCents: 100.5 })
-      ).toThrow("Amount must be in whole cents");
+      expect(() => AllocationItemSchema.parse({ envelopeId: "env_1", amountCents: 100.5 })).toThrow(
+        "Amount must be in whole cents"
+      );
     });
 
     it("rejects non-number amounts", () => {
@@ -437,9 +443,7 @@ describe("paycheckWizardValidation", () => {
       };
 
       // Should not throw if TransactionSchema validation passes
-      expect(() =>
-        createPaycheckTransaction(wizardData, "user_123", "env_paycheck")
-      ).not.toThrow();
+      expect(() => createPaycheckTransaction(wizardData, "user_123", "env_paycheck")).not.toThrow();
     });
 
     it("sets correct transaction type and amount sign", () => {

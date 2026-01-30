@@ -576,7 +576,7 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
       expect(stored.state.currentStep).toBe(2);
@@ -590,7 +590,7 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
       expect(stored.state.selectedStrategy).toBe("smart");
@@ -604,7 +604,7 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
       expect(stored.state.payerName).toBe("Acme Corp");
@@ -618,7 +618,7 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
 
@@ -637,7 +637,7 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
 
