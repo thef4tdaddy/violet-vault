@@ -13,7 +13,7 @@ func TestEvenSplitStrategy(t *testing.T) {
 			{ID: "savings", MonthlyTargetCents: 100000},  // $1000 (40%)
 		}
 
-		allocations := EvenSplitStrategy(250000, envelopes) // $2500
+		allocations := EvenSplitStrategy(250000, envelopes, "") // $2500
 
 		// Verify allocations sum to exact paycheck amount
 		var total int64
@@ -45,7 +45,7 @@ func TestEvenSplitStrategy(t *testing.T) {
 			{ID: "c", MonthlyTargetCents: 33334},
 		}
 
-		allocations := EvenSplitStrategy(100000, envelopes) // $1000
+		allocations := EvenSplitStrategy(100000, envelopes, "") // $1000
 
 		// Verify exact sum
 		var total int64
@@ -64,7 +64,7 @@ func TestEvenSplitStrategy(t *testing.T) {
 			{ID: "c", MonthlyTargetCents: 0},
 		}
 
-		allocations := EvenSplitStrategy(300000, envelopes) // $3000
+		allocations := EvenSplitStrategy(300000, envelopes, "") // $3000
 
 		// Should split evenly: $1000 each
 		var total int64
@@ -84,7 +84,7 @@ func TestEvenSplitStrategy(t *testing.T) {
 	})
 
 	t.Run("handles empty envelopes", func(t *testing.T) {
-		allocations := EvenSplitStrategy(250000, []Envelope{})
+		allocations := EvenSplitStrategy(250000, []Envelope{}, "")
 		if len(allocations) != 0 {
 			t.Errorf("Expected 0 allocations for empty envelopes, got %d", len(allocations))
 		}
@@ -95,7 +95,7 @@ func TestEvenSplitStrategy(t *testing.T) {
 			{ID: "savings", MonthlyTargetCents: 9_999_999},
 		}
 
-		allocations := EvenSplitStrategy(9_999_999, envelopes)
+		allocations := EvenSplitStrategy(9_999_999, envelopes, "")
 
 		var total int64
 		for _, alloc := range allocations {
@@ -317,7 +317,7 @@ func TestCentsPerfectMath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Test Even Split
-			allocations := EvenSplitStrategy(tc.paycheckCents, tc.envelopes)
+			allocations := EvenSplitStrategy(tc.paycheckCents, tc.envelopes, "")
 			var total int64
 			for _, alloc := range allocations {
 				total += alloc.AmountCents
@@ -337,4 +337,115 @@ func TestCentsPerfectMath(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestPaycheckFrequency tests the frequency adjustment feature
+func TestPaycheckFrequency(t *testing.T) {
+	t.Run("biweekly adjusts monthly targets by half", func(t *testing.T) {
+		envelopes := []Envelope{
+			{ID: "rent", MonthlyTargetCents: 200000},    // $2000/month = $1000 biweekly
+			{ID: "groceries", MonthlyTargetCents: 60000}, // $600/month = $300 biweekly
+		}
+
+		allocations := EvenSplitStrategy(250000, envelopes, "biweekly") // $2500
+
+		// Verify exact sum
+		var total int64
+		for _, alloc := range allocations {
+			total += alloc.AmountCents
+		}
+		if total != 250000 {
+			t.Errorf("Total allocated %d does not equal paycheck %d", total, 250000)
+		}
+
+		// With biweekly, targets are halved: $1000 + $300 = $1300 total target
+		// Rent should get ~$1923 ($1000/$1300 * $2500)
+		// Groceries should get ~$577 ($300/$1300 * $2500)
+		rentAlloc := int64(0)
+		groceriesAlloc := int64(0)
+		for _, alloc := range allocations {
+			if alloc.EnvelopeID == "rent" {
+				rentAlloc = alloc.AmountCents
+			} else if alloc.EnvelopeID == "groceries" {
+				groceriesAlloc = alloc.AmountCents
+			}
+		}
+
+		// Allow small tolerance for dust distribution
+		expectedRent := int64(192307) // Roughly (100000 / 130000) * 250000
+		if rentAlloc < expectedRent-10 || rentAlloc > expectedRent+10 {
+			t.Errorf("Rent: expected ~%d, got %d", expectedRent, rentAlloc)
+		}
+
+		expectedGroceries := int64(57693) // Roughly (30000 / 130000) * 250000
+		if groceriesAlloc < expectedGroceries-10 || groceriesAlloc > expectedGroceries+10 {
+			t.Errorf("Groceries: expected ~%d, got %d", expectedGroceries, groceriesAlloc)
+		}
+	})
+
+	t.Run("weekly adjusts monthly targets by quarter", func(t *testing.T) {
+		envelopes := []Envelope{
+			{ID: "rent", MonthlyTargetCents: 200000},    // $2000/month = $500 weekly
+			{ID: "groceries", MonthlyTargetCents: 60000}, // $600/month = $150 weekly
+		}
+
+		allocations := EvenSplitStrategy(100000, envelopes, "weekly") // $1000
+
+		// Verify exact sum
+		var total int64
+		for _, alloc := range allocations {
+			total += alloc.AmountCents
+		}
+		if total != 100000 {
+			t.Errorf("Total allocated %d does not equal paycheck %d", total, 100000)
+		}
+	})
+
+	t.Run("monthly uses full targets unchanged", func(t *testing.T) {
+		envelopes := []Envelope{
+			{ID: "rent", MonthlyTargetCents: 100000},     // $1000
+			{ID: "groceries", MonthlyTargetCents: 50000}, // $500
+		}
+
+		allocationsMonthly := EvenSplitStrategy(250000, envelopes, "monthly")
+		allocationsNoFreq := EvenSplitStrategy(250000, envelopes, "")
+
+		// Monthly and no frequency should produce identical results
+		if len(allocationsMonthly) != len(allocationsNoFreq) {
+			t.Errorf("Different number of allocations")
+		}
+
+		for i := range allocationsMonthly {
+			if allocationsMonthly[i].EnvelopeID != allocationsNoFreq[i].EnvelopeID ||
+				allocationsMonthly[i].AmountCents != allocationsNoFreq[i].AmountCents {
+				t.Errorf("Monthly and no-frequency allocations differ at index %d", i)
+			}
+		}
+	})
+
+	t.Run("unknown frequency is ignored", func(t *testing.T) {
+		envelopes := []Envelope{
+			{ID: "rent", MonthlyTargetCents: 100000},
+		}
+
+		allocations := EvenSplitStrategy(100000, envelopes, "daily") // Unknown frequency
+
+		// Should use full target
+		if allocations[0].AmountCents != 100000 {
+			t.Errorf("Expected 100000 for unknown frequency, got %d", allocations[0].AmountCents)
+		}
+	})
+
+	t.Run("empty frequency string uses monthly targets", func(t *testing.T) {
+		envelopes := []Envelope{
+			{ID: "rent", MonthlyTargetCents: 100000},
+		}
+
+		allocations := EvenSplitStrategy(100000, envelopes, "")
+
+		// Should use full target
+		if allocations[0].AmountCents != 100000 {
+			t.Errorf("Expected 100000 for empty frequency, got %d", allocations[0].AmountCents)
+		}
+	})
 }

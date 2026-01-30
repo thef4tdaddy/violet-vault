@@ -45,7 +45,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	switch req.Strategy {
 	case "even_split":
-		allocations = EvenSplitStrategy(req.PaycheckAmountCents, req.Envelopes)
+		allocations = EvenSplitStrategy(req.PaycheckAmountCents, req.Envelopes, req.PaycheckFrequency)
 	case "last_split":
 		allocations = LastSplitStrategy(req.PaycheckAmountCents, req.Envelopes, req.PreviousAllocation)
 	case "target_first":
@@ -100,6 +100,21 @@ func validateRequest(req *AllocationRequest) error {
 
 	if len(req.Envelopes) > 200 {
 		return &ValidationError{Field: "envelopes", Message: "Maximum 200 envelopes allowed"}
+	}
+
+	// Validate paycheck frequency (if provided)
+	if req.PaycheckFrequency != "" {
+		validFrequencies := []string{"weekly", "biweekly", "monthly"}
+		valid := false
+		for _, f := range validFrequencies {
+			if req.PaycheckFrequency == f {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			return &ValidationError{Field: "paycheckFrequency", Message: "Frequency must be one of: weekly, biweekly, monthly"}
+		}
 	}
 
 	// Validate each envelope

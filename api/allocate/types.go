@@ -15,8 +15,9 @@ type Envelope struct {
 
 // AllocationRequest represents the request payload for allocation
 type AllocationRequest struct {
-	Strategy            string            `json:"strategy"` // "even_split", "last_split", "target_first"
-	PaycheckAmountCents int64             `json:"paycheckAmountCents"`
+	Strategy            string            `json:"strategy"`            // "even_split", "last_split", "target_first"
+	PaycheckAmountCents int64             `json:"paycheckAmountCents"` // Paycheck amount in cents
+	PaycheckFrequency   string            `json:"paycheckFrequency,omitempty"` // "weekly", "biweekly", "monthly"
 	Envelopes           []Envelope        `json:"envelopes"`
 	PreviousAllocation  *[]AllocationItem `json:"previousAllocation,omitempty"` // For last_split
 }

@@ -5,30 +5,61 @@ import (
 	"sort"
 )
 
+// adjustTargetsForFrequency adjusts monthly targets based on paycheck frequency
+// Weekly = monthlyTarget / 4, Biweekly = monthlyTarget / 2, Monthly = monthlyTarget (unchanged)
+func adjustTargetsForFrequency(envelopes []Envelope, frequency string) []Envelope {
+	if frequency == "" || frequency == "monthly" {
+		return envelopes // No adjustment needed for monthly or empty
+	}
+
+	adjusted := make([]Envelope, len(envelopes))
+	for i, env := range envelopes {
+		adjusted[i] = env // Copy all fields
+
+		switch frequency {
+		case "weekly":
+			// Weekly = monthlyTarget / 4 (rounded with +2 for fair rounding)
+			adjusted[i].MonthlyTargetCents = (env.MonthlyTargetCents + 2) / 4
+		case "biweekly":
+			// Biweekly = monthlyTarget / 2 (rounded with +1 for fair rounding)
+			adjusted[i].MonthlyTargetCents = (env.MonthlyTargetCents + 1) / 2
+		default:
+			// Unknown frequency, leave unchanged
+			adjusted[i].MonthlyTargetCents = env.MonthlyTargetCents
+		}
+	}
+
+	return adjusted
+}
+
 // EvenSplitStrategy allocates funds weighted by monthly targets
 // Formula: allocation = (envelope.target / total_targets) * paycheck_amount
-func EvenSplitStrategy(paycheckCents int64, envelopes []Envelope) []AllocationItem {
+// If frequency is provided, adjusts monthly targets before allocation
+func EvenSplitStrategy(paycheckCents int64, envelopes []Envelope, frequency string) []AllocationItem {
 	if len(envelopes) == 0 {
 		return []AllocationItem{}
 	}
 
+	// Adjust targets based on frequency (if provided)
+	adjustedEnvelopes := adjustTargetsForFrequency(envelopes, frequency)
+
 	// Calculate total of all monthly targets
 	var totalTargets int64
-	for _, env := range envelopes {
+	for _, env := range adjustedEnvelopes {
 		totalTargets += env.MonthlyTargetCents
 	}
 
 	// If no targets set, split evenly
 	if totalTargets == 0 {
-		return splitEvenly(paycheckCents, envelopes)
+		return splitEvenly(paycheckCents, adjustedEnvelopes)
 	}
 
 	// Allocate proportionally using integer math
-	allocations := make([]AllocationItem, 0, len(envelopes))
+	allocations := make([]AllocationItem, 0, len(adjustedEnvelopes))
 	var allocated int64
 
 	// First pass: Calculate integer portions
-	for _, env := range envelopes {
+	for _, env := range adjustedEnvelopes {
 		// Calculate: (target / totalTargets) * paycheckCents
 		amount := (env.MonthlyTargetCents * paycheckCents) / totalTargets
 
@@ -44,7 +75,7 @@ func EvenSplitStrategy(paycheckCents int64, envelopes []Envelope) []AllocationIt
 	// Distribute dust using largest remainder method
 	dust := paycheckCents - allocated
 	if dust != 0 {
-		allocations = distributeDust(dust, allocations, envelopes, paycheckCents, totalTargets)
+		allocations = distributeDust(dust, allocations, adjustedEnvelopes, paycheckCents, totalTargets)
 	}
 
 	return allocations
@@ -54,7 +85,7 @@ func EvenSplitStrategy(paycheckCents int64, envelopes []Envelope) []AllocationIt
 func LastSplitStrategy(paycheckCents int64, envelopes []Envelope, previous *[]AllocationItem) []AllocationItem {
 	if previous == nil || len(*previous) == 0 {
 		// Fallback to even split if no previous allocation
-		return EvenSplitStrategy(paycheckCents, envelopes)
+		return EvenSplitStrategy(paycheckCents, envelopes, "")
 	}
 
 	// Calculate total from previous allocation
@@ -64,7 +95,7 @@ func LastSplitStrategy(paycheckCents int64, envelopes []Envelope, previous *[]Al
 	}
 
 	if previousTotal == 0 {
-		return EvenSplitStrategy(paycheckCents, envelopes)
+		return EvenSplitStrategy(paycheckCents, envelopes, "")
 	}
 
 	// Scale previous allocation to new paycheck amount
