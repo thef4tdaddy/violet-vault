@@ -11,6 +11,8 @@ from api.analytics.paycheck_prediction import (
     PredictionRequest,
     apply_seasonal_adjustments,
     calculate_consistency_score,
+    cluster_sessions_by_amount,
+    detect_frequency_from_amount,
     detect_pattern_type,
     predict_allocations,
 )
@@ -286,3 +288,113 @@ class TestPydanticValidation:
                 current_month=1,
                 num_envelopes=201,  # Over limit
             )
+
+
+class TestAmountBasedFrequencyDetection:
+    """Test smart frequency detection from paycheck amount (multi-paycheck household support)"""
+
+    def test_detect_weekly_vs_biweekly_paychecks(self) -> None:
+        """Test detection distinguishes weekly ($500) from biweekly ($1000) paychecks"""
+        # Setup: Multi-paycheck household history over 4 weeks
+        # Person A: $500 every Friday (weekly)
+        # Person B: $1000 every other Friday (biweekly)
+        sessions = [
+            HistoricalSession(
+                date="2026-01-30", amount_cents=50000, ratios=[0.5, 0.5]
+            ),  # Fri - $500 (A)
+            HistoricalSession(
+                date="2026-01-23", amount_cents=50000, ratios=[0.5, 0.5]
+            ),  # Fri - $500 (A)
+            HistoricalSession(
+                date="2026-01-23", amount_cents=100000, ratios=[0.5, 0.5]
+            ),  # Fri - $1000 (B)
+            HistoricalSession(
+                date="2026-01-16", amount_cents=50000, ratios=[0.5, 0.5]
+            ),  # Fri - $500 (A)
+            HistoricalSession(
+                date="2026-01-09", amount_cents=50000, ratios=[0.5, 0.5]
+            ),  # Fri - $500 (A)
+            HistoricalSession(
+                date="2026-01-09", amount_cents=100000, ratios=[0.5, 0.5]
+            ),  # Fri - $1000 (B)
+        ]
+
+        # Test 1: Detect weekly from $520 (similar to $500)
+        weekly_suggestion = detect_frequency_from_amount(52000, sessions)
+        assert weekly_suggestion.suggested_frequency == "weekly"
+        assert weekly_suggestion.confidence >= 0.7
+        assert "weekly" in weekly_suggestion.reasoning.lower()
+
+        # Test 2: Detect biweekly from $1050 (similar to $1000)
+        biweekly_suggestion = detect_frequency_from_amount(105000, sessions)
+        assert biweekly_suggestion.suggested_frequency == "biweekly"
+        assert biweekly_suggestion.confidence >= 0.7
+        assert "biweekly" in biweekly_suggestion.reasoning.lower()
+
+    def test_cluster_sessions_by_amount(self) -> None:
+        """Test amount clustering groups similar paychecks"""
+        sessions = [
+            HistoricalSession(date="2026-01-29", amount_cents=50000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-22", amount_cents=51000, ratios=[0.5, 0.5]),  # ~$500
+            HistoricalSession(date="2026-01-15", amount_cents=100000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-08", amount_cents=102000, ratios=[0.5, 0.5]),  # ~$1000
+        ]
+
+        clusters = cluster_sessions_by_amount(sessions, tolerance=0.10)
+
+        # Should create 2 clusters
+        assert len(clusters) == 2
+
+        # Cluster 1: ~$500 (2 sessions)
+        assert len(clusters[0].sessions) == 2
+        assert 49000 <= clusters[0].average_amount <= 52000
+
+        # Cluster 2: ~$1000 (2 sessions)
+        assert len(clusters[1].sessions) == 2
+        assert 99000 <= clusters[1].average_amount <= 103000
+
+    def test_insufficient_data_returns_low_confidence(self) -> None:
+        """Test graceful handling with < 3 paychecks"""
+        sessions = [
+            HistoricalSession(date="2026-01-15", amount_cents=50000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-08", amount_cents=50000, ratios=[0.5, 0.5]),
+        ]
+
+        suggestion = detect_frequency_from_amount(50000, sessions)
+
+        # Should return suggestion but with low confidence
+        assert suggestion.confidence < 0.5
+        assert (
+            "insufficient" in suggestion.reasoning.lower()
+            or suggestion.suggested_frequency == "biweekly"
+        )
+
+    def test_no_matching_cluster_returns_default(self) -> None:
+        """Test when amount doesn't match any cluster"""
+        sessions = [
+            HistoricalSession(date="2026-01-15", amount_cents=50000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-08", amount_cents=50000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-01", amount_cents=50000, ratios=[0.5, 0.5]),
+        ]
+
+        # Try to match $20000 (very different from $500)
+        suggestion = detect_frequency_from_amount(200000, sessions)
+
+        # Should return default guess with lower confidence
+        assert suggestion.suggested_frequency in ["weekly", "biweekly", "monthly"]
+        assert suggestion.confidence < 0.7
+
+    def test_single_cluster_consistent_frequency(self) -> None:
+        """Test single frequency cluster (no multi-paycheck household)"""
+        sessions = [
+            HistoricalSession(date="2026-01-29", amount_cents=100000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-15", amount_cents=100000, ratios=[0.5, 0.5]),
+            HistoricalSession(date="2026-01-01", amount_cents=100000, ratios=[0.5, 0.5]),
+        ]
+
+        suggestion = detect_frequency_from_amount(102000, sessions)
+
+        # Should detect biweekly from 14-day intervals
+        assert suggestion.suggested_frequency == "biweekly"
+        assert suggestion.confidence >= 0.7
+        assert suggestion.matched_cluster is not None

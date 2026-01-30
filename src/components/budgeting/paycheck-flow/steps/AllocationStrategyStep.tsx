@@ -4,7 +4,7 @@
  * Part of Epic #156: Polyglot Human-Centered Paycheck Flow v2.1
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Button from "@/components/ui/buttons/Button";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
@@ -15,6 +15,7 @@ import {
 } from "@/services/api/allocationService";
 import {
   getPredictionFromHistory,
+  detectFrequencyFromAmount,
   PredictionServiceError,
 } from "@/services/api/predictionService";
 import { PaycheckHistoryService } from "@/utils/core/services/paycheckHistory";
@@ -44,6 +45,53 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   const [paycheckFrequency, setPaycheckFrequency] = useState<"weekly" | "biweekly" | "monthly">(
     "biweekly"
   );
+  const [wasAutoDetected, setWasAutoDetected] = useState(false);
+  const [detectionMessage, setDetectionMessage] = useState<string | null>(null);
+
+  // Auto-detect frequency from amount when component mounts
+  useEffect(() => {
+    const detectFrequency = async () => {
+      if (!paycheckAmountCents) return;
+
+      try {
+        // Get historical paychecks for detection
+        const history = await PaycheckHistoryService.getHistory();
+        if (!history || history.length < 3) {
+          return; // Need at least 3 paychecks for reliable detection
+        }
+
+        // Convert to allocation history format
+        const allocationHistory = history.map((p) => ({
+          date: p.date,
+          amountCents: p.amountCents,
+          envelopeAllocations: p.allocations.map((a) => ({
+            envelopeId: a.envelopeId,
+            amountCents: a.amountCents,
+          })),
+        }));
+
+        const suggestion = await detectFrequencyFromAmount(paycheckAmountCents, allocationHistory);
+
+        // Only auto-select if confidence is high enough
+        if (suggestion.confidence >= 0.7 && suggestion.suggestedFrequency !== "unknown") {
+          setPaycheckFrequency(suggestion.suggestedFrequency as "weekly" | "biweekly" | "monthly");
+          setWasAutoDetected(true);
+          setDetectionMessage(suggestion.reasoning);
+
+          logger.info("Auto-detected paycheck frequency", {
+            frequency: suggestion.suggestedFrequency,
+            confidence: suggestion.confidence,
+            reasoning: suggestion.reasoning,
+          });
+        }
+      } catch (err) {
+        // Silent fail - auto-detection is optional enhancement
+        logger.warn("Frequency auto-detection failed", { error: err });
+      }
+    };
+
+    detectFrequency();
+  }, [paycheckAmountCents]); // Re-run if paycheck amount changes
 
   // Calculate remaining amount
   const remainingCents = useMemo(() => {
@@ -117,11 +165,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
         currentBalanceCents: env.currentBalance || 0,
       }));
 
-      const result = await allocateLastSplit(
-        paycheckAmountCents,
-        envelopeData,
-        previousAllocation
-      );
+      const result = await allocateLastSplit(paycheckAmountCents, envelopeData, previousAllocation);
 
       setLocalAllocations(
         result.allocations.map((a) => ({
@@ -251,11 +295,21 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
 
         {/* Paycheck Frequency Selector */}
         <div className="mb-6 p-4 bg-slate-50 hard-border rounded-lg">
-          <label className="block text-sm font-bold text-slate-900 mb-3">PAYCHECK FREQUENCY</label>
+          <div className="flex items-center justify-between mb-3">
+            <label className="block text-sm font-bold text-slate-900">PAYCHECK FREQUENCY</label>
+            {wasAutoDetected && (
+              <span className="px-2 py-1 bg-fuchsia-100 hard-border rounded text-xs font-bold text-fuchsia-700">
+                ✨ Auto-detected
+              </span>
+            )}
+          </div>
           <div className="flex gap-3">
-            <button
+            <Button
               type="button"
-              onClick={() => setPaycheckFrequency("weekly")}
+              onClick={() => {
+                setPaycheckFrequency("weekly");
+                setWasAutoDetected(false); // Clear auto-detect flag when manually changed
+              }}
               className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
                 paycheckFrequency === "weekly"
                   ? "bg-fuchsia-500 text-white border-fuchsia-600"
@@ -263,10 +317,13 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
               }`}
             >
               WEEKLY
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              onClick={() => setPaycheckFrequency("biweekly")}
+              onClick={() => {
+                setPaycheckFrequency("biweekly");
+                setWasAutoDetected(false);
+              }}
               className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
                 paycheckFrequency === "biweekly"
                   ? "bg-fuchsia-500 text-white border-fuchsia-600"
@@ -274,10 +331,13 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
               }`}
             >
               BIWEEKLY
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              onClick={() => setPaycheckFrequency("monthly")}
+              onClick={() => {
+                setPaycheckFrequency("monthly");
+                setWasAutoDetected(false);
+              }}
               className={`px-4 py-2 hard-border rounded-lg font-bold text-sm transition-all ${
                 paycheckFrequency === "monthly"
                   ? "bg-fuchsia-500 text-white border-fuchsia-600"
@@ -285,11 +345,15 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
               }`}
             >
               MONTHLY
-            </button>
+            </Button>
           </div>
-          <p className="text-xs text-slate-600 mt-2">
-            Helps SPLIT EVENLY and SMART SPLIT calculate appropriate allocations
-          </p>
+          {detectionMessage && wasAutoDetected ? (
+            <p className="text-xs text-fuchsia-600 mt-2 font-semibold">💡 {detectionMessage}</p>
+          ) : (
+            <p className="text-xs text-slate-600 mt-2">
+              Helps SPLIT EVENLY and SMART SPLIT calculate appropriate allocations
+            </p>
+          )}
         </div>
 
         {/* Quick Action Buttons */}
@@ -393,7 +457,9 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
                   >
                     <div className="flex-1">
                       <div className="font-bold text-slate-900">{envelope.name}</div>
-                      <div className="text-sm text-slate-600">{percentage.toFixed(2)}% allocated</div>
+                      <div className="text-sm text-slate-600">
+                        {percentage.toFixed(2)}% allocated
+                      </div>
                     </div>
                     <input
                       type="number"

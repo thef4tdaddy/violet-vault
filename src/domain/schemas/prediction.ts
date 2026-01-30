@@ -104,6 +104,42 @@ export const PredictionErrorSchema = z.object({
 export type PredictionError = z.infer<typeof PredictionErrorSchema>;
 
 /**
+ * Frequency detection request schema (for smart auto-detection from amount)
+ * Maps to Python's FrequencyDetectionRequest Pydantic model
+ */
+export const FrequencyDetectionRequestSchema = z.object({
+  paycheckCents: z
+    .number()
+    .int("Paycheck amount must be an integer")
+    .positive("Paycheck amount must be greater than 0")
+    .max(10_000_000, "Paycheck amount cannot exceed $100,000"),
+  historicalSessions: z
+    .array(HistoricalSessionSchema)
+    .min(1, "Need at least 1 historical paycheck for detection")
+    .max(50, "Maximum 50 historical sessions allowed"),
+});
+
+export type FrequencyDetectionRequest = z.infer<typeof FrequencyDetectionRequestSchema>;
+
+/**
+ * Frequency suggestion response schema
+ * Maps to Python's FrequencySuggestion Pydantic model
+ */
+export const FrequencySuggestionSchema = z.object({
+  suggestedFrequency: z.enum(["weekly", "biweekly", "monthly", "unknown"], {
+    error: "Frequency must be one of: weekly, biweekly, monthly, unknown",
+  }),
+  confidence: z
+    .number()
+    .min(0.0, "Confidence must be between 0.0 and 1.0")
+    .max(1.0, "Confidence must be between 0.0 and 1.0"),
+  reasoning: z.string(),
+  matchedCluster: z.number().int().positive().nullable(),
+});
+
+export type FrequencySuggestion = z.infer<typeof FrequencySuggestionSchema>;
+
+/**
  * Validation helpers
  */
 

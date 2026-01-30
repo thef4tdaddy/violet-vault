@@ -10,9 +10,13 @@ import {
   PredictionRequestSchema,
   PredictionResponseSchema,
   PredictionErrorSchema,
+  FrequencyDetectionRequestSchema,
+  FrequencySuggestionSchema,
   type PredictionRequest,
   type PredictionResponse,
   type PredictionError,
+  type FrequencyDetectionRequest,
+  type FrequencySuggestion,
   type HistoricalSession,
   convertAllocationHistoryToRatios,
   validateHistoricalSessionsConsistency,
@@ -23,6 +27,7 @@ import {
  */
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const PREDICTION_ENDPOINT = "/api/analytics/paycheck-prediction";
+const FREQUENCY_DETECTION_ENDPOINT = "/api/analytics/detect-frequency";
 
 /**
  * API Error class for prediction service errors
@@ -216,5 +221,118 @@ export async function checkPredictionServiceHealth(): Promise<{
     return { available: false };
   } catch {
     return { available: false };
+  }
+}
+
+/**
+ * Detect frequency from paycheck amount using smart clustering
+ *
+ * Perfect for multi-paycheck households:
+ *   - $500 → weekly (Person A)
+ *   - $1000 → biweekly (Person B)
+ *
+ * System learns patterns and auto-suggests frequency based on amount.
+ *
+ * @param paycheckAmountCents - Current paycheck amount to detect frequency for
+ * @param allocationHistory - Historical allocations (with envelope IDs)
+ * @returns Frequency suggestion with confidence score
+ * @throws {PredictionServiceError} If validation fails or API returns error
+ *
+ * @example
+ * ```typescript
+ * const suggestion = await detectFrequencyFromAmount(
+ *   50000, // $500
+ *   [
+ *     {
+ *       date: "2026-01-15",
+ *       amountCents: 50000,
+ *       envelopeAllocations: [...]
+ *     },
+ *     {
+ *       date: "2026-01-08",
+ *       amountCents: 100000, // Different paycheck ($1000 biweekly)
+ *       envelopeAllocations: [...]
+ *     }
+ *   ]
+ * );
+ * // Result: { suggestedFrequency: "weekly", confidence: 0.85, ... }
+ * ```
+ */
+export async function detectFrequencyFromAmount(
+  paycheckAmountCents: number,
+  allocationHistory: Array<{
+    date: string;
+    amountCents: number;
+    envelopeAllocations: Array<{ envelopeId: string; amountCents: number }>;
+  }>
+): Promise<FrequencySuggestion> {
+  // Convert to anonymized historical sessions (privacy-first)
+  const historicalSessions: HistoricalSession[] = allocationHistory.map(
+    convertAllocationHistoryToRatios
+  );
+
+  const request: FrequencyDetectionRequest = {
+    paycheckCents: paycheckAmountCents,
+    historicalSessions,
+  };
+
+  // Validate request with Zod
+  const validationResult = FrequencyDetectionRequestSchema.safeParse(request);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.issues
+      .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
+      .join(", ");
+    throw new PredictionServiceError(`Invalid frequency detection request: ${errors}`, 400);
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${FREQUENCY_DETECTION_ENDPOINT}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+
+    const data = await response.json();
+
+    // Check if response is an error
+    if (!response.ok) {
+      const errorValidation = PredictionErrorSchema.safeParse(data);
+      if (errorValidation.success) {
+        throw new PredictionServiceError(
+          errorValidation.data.error,
+          response.status,
+          errorValidation.data
+        );
+      }
+      throw new PredictionServiceError(
+        `API request failed with status ${response.status}`,
+        response.status
+      );
+    }
+
+    // Validate response with Zod
+    const resultValidation = FrequencySuggestionSchema.safeParse(data);
+
+    if (!resultValidation.success) {
+      const errors = resultValidation.error.issues
+        .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
+        .join(", ");
+      throw new PredictionServiceError(`Invalid API response: ${errors}`, 500);
+    }
+
+    return resultValidation.data;
+  } catch (error) {
+    if (error instanceof PredictionServiceError) {
+      throw error;
+    }
+
+    // Network or other errors
+    throw new PredictionServiceError(
+      `Failed to connect to frequency detection service: ${error instanceof Error ? error.message : "Unknown error"}`,
+      0
+    );
   }
 }

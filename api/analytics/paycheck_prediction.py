@@ -60,6 +60,13 @@ class PredictionRequest(BaseModel):
         return v
 
 
+class FrequencyDetectionRequest(BaseModel):
+    """Request for smart frequency detection from amount"""
+
+    paycheck_cents: int = Field(..., gt=0, le=10_000_000, description="Current paycheck amount")
+    historical_sessions: list[HistoricalSession] = Field(..., min_length=1, max_length=50)
+
+
 class ReasoningInfo(BaseModel):
     based_on: str
     data_points: int
@@ -159,7 +166,9 @@ def predict_allocations(
     pattern_type = detect_pattern_type(sessions, paycheck_frequency)
 
     # Calculate confidence (boosted if frequency hint matches pattern)
-    confidence = calculate_consistency_score(sessions, num_envelopes, pattern_type, paycheck_frequency)
+    confidence = calculate_consistency_score(
+        sessions, num_envelopes, pattern_type, paycheck_frequency
+    )
 
     return PredictionResponse(
         suggested_allocations_cents=allocations_cents,
@@ -255,7 +264,9 @@ def calculate_consistency_score(
     return confidence_val
 
 
-def detect_pattern_type(sessions: list[HistoricalSession], frequency_hint: str | None = None) -> str:
+def detect_pattern_type(
+    sessions: list[HistoricalSession], frequency_hint: str | None = None
+) -> str:
     """
     Detect paycheck frequency pattern.
     Returns: 'biweekly_consistent', 'monthly_consistent', 'irregular'
@@ -304,6 +315,186 @@ def detect_pattern_type(sessions: list[HistoricalSession], frequency_hint: str |
         return "irregular"
     else:
         return f"{detected}_consistent"
+
+
+class AmountCluster(BaseModel):
+    """Represents a cluster of paychecks with similar amounts"""
+
+    average_amount: int = Field(..., description="Average amount in cents for this cluster")
+    sessions: list[HistoricalSession] = Field(..., description="Sessions in this cluster")
+    frequency: str = Field(..., description="Detected frequency (weekly, biweekly, monthly)")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence in detection")
+
+
+def cluster_sessions_by_amount(
+    sessions: list[HistoricalSession], tolerance: float = 0.10
+) -> list[AmountCluster]:
+    """
+    Group historical sessions by similar paycheck amounts.
+
+    Args:
+        sessions: Historical paycheck sessions
+        tolerance: ±% tolerance for clustering (default 10%)
+
+    Returns:
+        List of AmountCluster objects, sorted by cluster size (largest first)
+
+    Example:
+        History: [$500, $500, $1000, $500, $1000, $1000]
+        Tolerance: 10%
+        Result: 2 clusters
+          - Cluster 1: avg=$500, sessions=[3 items]
+          - Cluster 2: avg=$1000, sessions=[3 items]
+    """
+    if len(sessions) < 2:
+        return []
+
+    clusters: list[AmountCluster] = []
+
+    for session in sessions:
+        # Try to find an existing cluster that matches this amount
+        matched_cluster = None
+        for cluster in clusters:
+            # Check if amount is within tolerance of cluster average
+            diff_pct = abs(session.amount_cents - cluster.average_amount) / cluster.average_amount
+            if diff_pct <= tolerance:
+                matched_cluster = cluster
+                break
+
+        if matched_cluster:
+            # Add to existing cluster
+            matched_cluster.sessions.append(session)
+            # Recalculate average
+            total = sum(s.amount_cents for s in matched_cluster.sessions)
+            matched_cluster.average_amount = int(total / len(matched_cluster.sessions))
+        else:
+            # Create new cluster
+            # Detect frequency pattern for this session (if possible)
+            frequency = "unknown"
+            confidence = 0.5
+
+            clusters.append(
+                AmountCluster(
+                    average_amount=session.amount_cents,
+                    sessions=[session],
+                    frequency=frequency,
+                    confidence=confidence,
+                )
+            )
+
+    # For each cluster with 2+ sessions, detect frequency pattern
+    for cluster in clusters:
+        if len(cluster.sessions) >= 2:
+            pattern = detect_pattern_type(cluster.sessions, None)
+
+            # Extract frequency from pattern (e.g., "weekly_consistent" -> "weekly")
+            if "_" in pattern:
+                freq, consistency = pattern.split("_", 1)
+                cluster.frequency = freq
+                cluster.confidence = 0.85 if consistency == "consistent" else 0.6
+            else:
+                cluster.frequency = pattern
+                cluster.confidence = 0.5
+        else:
+            cluster.frequency = "unknown"
+            cluster.confidence = 0.3
+
+    # Sort by cluster size (most sessions first) for better matching
+    clusters.sort(key=lambda c: len(c.sessions), reverse=True)
+
+    return clusters
+
+
+class FrequencySuggestion(BaseModel):
+    """Response for frequency detection from amount"""
+
+    suggested_frequency: str = Field(
+        ..., description="Suggested frequency (weekly, biweekly, monthly)"
+    )
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence in suggestion")
+    reasoning: str = Field(..., description="Human-readable explanation")
+    matched_cluster: int | None = Field(
+        None, description="Average amount of matched cluster (cents)"
+    )
+
+
+def detect_frequency_from_amount(
+    paycheck_cents: int, historical_sessions: list[HistoricalSession]
+) -> FrequencySuggestion:
+    """
+    Smart frequency detection based on paycheck amount clustering.
+
+    Perfect for multi-paycheck households with different frequencies:
+      - $500 weekly paychecks (person A)
+      - $1000 biweekly paychecks (person B)
+
+    Args:
+        paycheck_cents: Amount to match against clusters
+        historical_sessions: Historical paycheck data
+
+    Returns:
+        FrequencySuggestion with frequency, confidence, and reasoning
+
+    Example:
+        Input: $520 (slightly varies from $500)
+        History: [$500, $500, $1000, $500, $1000] with weekly/biweekly patterns
+        Output: FrequencySuggestion(
+            suggested_frequency="weekly",
+            confidence=0.85,
+            reasoning="Matches weekly paycheck cluster (~$500)",
+            matched_cluster=500
+        )
+    """
+    if len(historical_sessions) < 3:
+        # Not enough data, return default guess
+        return FrequencySuggestion(
+            suggested_frequency="biweekly",
+            confidence=0.3,
+            reasoning="Insufficient history (need 3+ paychecks)",
+            matched_cluster=None,
+        )
+
+    # Cluster sessions by amount
+    clusters = cluster_sessions_by_amount(historical_sessions, tolerance=0.15)  # 15% tolerance
+
+    if not clusters:
+        return FrequencySuggestion(
+            suggested_frequency="biweekly",
+            confidence=0.3,
+            reasoning="No patterns detected in history",
+            matched_cluster=None,
+        )
+
+    # Find cluster that matches input amount
+    best_match = None
+    best_diff_pct = float("inf")
+
+    for cluster in clusters:
+        diff_pct = abs(paycheck_cents - cluster.average_amount) / cluster.average_amount
+        if diff_pct < best_diff_pct:
+            best_diff_pct = diff_pct
+            best_match = cluster
+
+    # If best match is within 15% tolerance, use it
+    if best_match and best_diff_pct <= 0.15:
+        # Boost confidence if cluster has many sessions
+        cluster_size_boost = min(0.1, len(best_match.sessions) * 0.02)
+        final_confidence = min(1.0, best_match.confidence + cluster_size_boost)
+
+        return FrequencySuggestion(
+            suggested_frequency=best_match.frequency,
+            confidence=float(round(final_confidence, 2)),
+            reasoning=f"Matches {best_match.frequency} paycheck cluster (~${best_match.average_amount // 100})",
+            matched_cluster=best_match.average_amount,
+        )
+
+    # No close match found, return default
+    return FrequencySuggestion(
+        suggested_frequency="biweekly",
+        confidence=0.4,
+        reasoning=f"Amount doesn't match known patterns (closest: ${best_match.average_amount // 100 if best_match else 0})",
+        matched_cluster=None,
+    )
 
 
 class handler(BaseHTTPRequestHandler):
