@@ -276,13 +276,14 @@ jobs:
 
                 for (const b of branchesToChecks) {
                     try {
-                        const response = await fetch(`https://codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
+                        const response = await fetch(`https://api.codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
                             headers: { 'Authorization': `bearer ${token}` }
                         });
                         if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
                         const data = await response.json();
-                        const coverage = data.last_updated_totals?.coverage;
+                        const coverage = data.head_commit?.totals?.coverage;
                         if (coverage !== undefined) {
+
                             body += `| \`${b}\` | ${parseFloat(coverage).toFixed(1)}% | ${coverage >= 80 ? '✅' : '⚠️'} |\n`;
                         } else {
                             body += `| \`${b}\` | No Data | ❓ |\n`;
