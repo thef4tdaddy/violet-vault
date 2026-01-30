@@ -13,9 +13,12 @@ milestone: v2.1
 Transform the paycheck allocation experience into a premium, conversational wizard that guides users through intelligent income distribution with privacy-first architecture. This epic redesigns how users allocate their paychecks across envelopes using a multi-step wizard with AI-powered suggestions (blinded/anonymized), high-performance backend services in Go and Python, and a "Hard Lines" design aesthetic.
 
 **Epic**: #156
-**Sub-Issues**: #157 (Entry Point), #1785 (Wizard Container), #1786 (Go Engine), #1787 (Python Predictor), #162 (Smart Allocation UI), #161 (Success Screen)
+**Sub-Issues**:
+- **Infrastructure**: #1833 (Zustand Store ✅), #1843 (Zod Validation)
+- **Frontend**: #157 (Entry Point), #1785 (Wizard Container), #1837 (Amount Entry), #162 (Smart Allocation UI), #1838 (Review Step), #161 (Success Screen)
+- **Backend**: #1786 (Go Engine), #1787 (Python Predictor)
 
-**Status**: Planning
+**Status**: In Progress (1/10 sub-issues complete)
 **Priority**: High (🟠)
 **Target Milestone**: v2.1
 
@@ -159,6 +162,166 @@ Build a **multi-step conversational wizard** that:
                     │  - Query invalidate │
                     └─────────────────────┘
 ```
+
+### Data Schema & Validation Architecture
+
+#### Paychecks as Transactions
+
+**Critical Architecture Decision**: Paychecks are NOT a separate entity type. They are **Transaction** records with type `"income"` and special paycheck-specific fields.
+
+**Why This Matters**:
+- Single source of truth for financial data
+- Consistent querying and reporting
+- Unified transaction history
+- Leverages existing Transaction schema validation
+
+**Transaction Schema for Paychecks** (`src/domain/schemas/transaction.ts`):
+```typescript
+{
+  // Required Transaction fields
+  id: string,
+  date: Date | string,
+  amount: number,                           // Total paycheck in cents (positive)
+  type: "income",                           // Always "income" for paychecks
+  envelopeId: string,                       // Primary envelope (e.g., "Paycheck" envelope)
+  category: string,
+  lastModified: number,
+
+  // Paycheck-specific fields (lines 43-48)
+  allocations: Record<string, number>,      // envelopeId -> amountCents mapping
+  unassignedCashBefore: number | null,      // Balance before allocation
+  unassignedCashAfter: number | null,       // Balance after allocation
+  actualBalanceBefore: number | null,       // Actual balance before
+  actualBalanceAfter: number | null,        // Actual balance after
+
+  // Recurring paycheck support (line 42)
+  recurrenceRule: string | null,            // iCal RRule format (e.g., "FREQ=WEEKLY;INTERVAL=2;BYDAY=FR")
+
+  // Additional paycheck metadata
+  paycheckId: string | null,                // Optional identifier
+  payerName: string | null,                 // Employer name
+}
+```
+
+**Example Paycheck Transaction**:
+```typescript
+{
+  id: "txn_paycheck_2026_01_15",
+  date: "2026-01-15",
+  amount: 250000,  // $2,500.00
+  type: "income",
+  envelopeId: "env_paycheck",
+  category: "Salary",
+  lastModified: 1706140800000,
+
+  // Paycheck allocation to 3 envelopes
+  allocations: {
+    "env_rent": 100000,      // $1,000 to Rent
+    "env_groceries": 50000,  // $500 to Groceries
+    "env_savings": 100000,   // $1,000 to Savings
+  },
+
+  // Recurring biweekly on Friday
+  recurrenceRule: "FREQ=WEEKLY;INTERVAL=2;BYDAY=FR",
+
+  payerName: "Acme Corp",
+  paycheckId: "paycheck_biweekly_001",
+}
+```
+
+**Recurring Paycheck Support**:
+- Use `recurrenceRule` field with iCal RRule syntax ([RFC 5545](https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html))
+- Python prediction service can detect patterns and suggest recurrence rules
+- Common patterns:
+  - Weekly: `FREQ=WEEKLY;BYDAY=FR` (every Friday)
+  - Biweekly: `FREQ=WEEKLY;INTERVAL=2;BYDAY=FR` (every other Friday)
+  - Monthly: `FREQ=MONTHLY;BYMONTHDAY=15` (15th of each month)
+  - Semi-monthly: `FREQ=MONTHLY;BYMONTHDAY=1,15` (1st and 15th)
+
+#### Zod Validation Integration (#1843)
+
+**Critical Requirement**: All financial data MUST be validated using Zod schemas before:
+- Setting state in Zustand store
+- Sending to API endpoints
+- Creating Transaction records
+- Persisting to database
+
+**Validation Layers**:
+
+1. **Wizard Input Validation** (`paycheckWizardValidation.ts`):
+   ```typescript
+   // Paycheck amount validation
+   const PaycheckAmountSchema = z.object({
+     amountCents: z.number()
+       .int("Amount must be in whole cents")
+       .positive("Amount must be positive")
+       .min(100, "Minimum $1.00")
+       .max(100_000_000, "Maximum $1,000,000.00"),
+   });
+
+   // Allocation validation
+   const AllocationSchema = z.object({
+     envelopeId: z.string().min(1),
+     amountCents: z.number().int().nonnegative(),
+   });
+
+   const AllocationsArraySchema = z.array(AllocationSchema)
+     .refine(
+       (allocations, ctx) => {
+         const total = ctx.parent.paycheckAmountCents;
+         const sum = allocations.reduce((s, a) => s + a.amountCents, 0);
+         return sum === total; // MUST sum exactly
+       },
+       { message: "Allocations must sum to exact paycheck amount" }
+     );
+   ```
+
+2. **Store Action Validation**:
+   ```typescript
+   setPaycheckAmountCents: (amountCents: number) => {
+     const result = PaycheckAmountSchema.safeParse({ amountCents });
+     if (!result.success) {
+       logger.error("Invalid paycheck amount", result.error);
+       return; // Don't update state
+     }
+     set((state) => { state.paycheckAmountCents = amountCents; });
+   }
+   ```
+
+3. **Transaction Creation Validation**:
+   ```typescript
+   const createPaycheckTransaction = (wizardData: PaycheckWizardData): Transaction => {
+     // Build Transaction object
+     const transaction = {
+       type: "income",
+       amount: wizardData.paycheckAmountCents,
+       allocations: wizardData.allocations.reduce(
+         (acc, a) => ({ ...acc, [a.envelopeId]: a.amountCents }),
+         {}
+       ),
+       recurrenceRule: wizardData.recurrenceRule || null,
+       // ... other fields
+     };
+
+     // Validate against TransactionSchema
+     return TransactionSchema.parse(transaction);
+   };
+   ```
+
+4. **API Boundary Validation**:
+   - Go engine validates allocation request structure (blinded, no envelope names)
+   - Python service validates prediction request structure
+   - Both validate responses before client consumes
+
+**Privacy Compliance**:
+- Validation happens **client-side** (no data leaves browser during validation)
+- API requests are **blinded** (only numbers, no envelope names or user identity)
+- Validation errors **never log sensitive data** (amounts, allocations)
+
+**Validation Dependencies**:
+- #1843 (Zod Validation) must complete before #1785, #1837, #162, #1838
+- All wizard steps depend on validation infrastructure
+- Transaction creation requires validation helper functions
 
 ### Component Breakdown
 
@@ -1230,10 +1393,29 @@ function handleBackToDashboard() {
 ### Implementation Phases
 
 #### Phase 1: Foundation (Week 1-2)
-**Goal**: Set up core infrastructure and routing
+**Goal**: Set up core infrastructure, validation, and routing
+
+**Sub-Issues**: #1833 (Zustand Store ✅), #1843 (Zod Validation)
 
 **Tasks**:
-1. Create feature directory structure:
+1. ✅ **COMPLETED** - Set up Zustand store with middleware (#1833):
+   ```
+   src/stores/ui/paycheckFlowStore.ts           # ✅ Done
+   src/stores/ui/__tests__/paycheckFlowStore.test.ts  # ✅ Done (37 tests, 100% passing)
+   ```
+
+2. **Create Zod validation schemas** (#1843) - **CRITICAL DEPENDENCY**:
+   ```
+   src/utils/core/validation/paycheckWizardValidation.ts
+   src/utils/core/validation/__tests__/paycheckWizardValidation.test.ts
+   ```
+   - Paycheck amount validation (min $1, max $1M, cents precision)
+   - Allocations validation (sum must equal paycheck, non-negative)
+   - Strategy validation (enum: "last" | "even" | "smart" | "manual")
+   - Transaction creation validation (integrate with TransactionSchema)
+   - **Blocks**: All wizard step components depend on this
+
+3. Create feature directory structure:
    ```
    src/components/budgeting/paycheck-flow/
      ├── PaycheckWizardModal.tsx
@@ -1249,28 +1431,28 @@ function handleBackToDashboard() {
      └── __tests__/
    ```
 
-2. Set up Zustand store with middleware:
-   ```
-   src/stores/ui/paycheckFlowStore.ts
-   src/stores/ui/__tests__/paycheckFlowStore.test.ts
-   ```
+4. Add routing for `/vault/wizard/paycheck`
 
-3. Add routing for `/vault/wizard/paycheck`
+5. Create entry point component on dashboard
 
-4. Create entry point component on dashboard
-
-5. Set up TanStack Query mutations for paycheck submission
+6. Set up TanStack Query mutations for paycheck submission
 
 **Deliverables**:
+- [x] Zustand store with persist + devtools + immer (#1833 ✅)
+- [ ] Zod validation schemas for all wizard data (#1843)
+- [ ] Validation integrated into store actions
+- [ ] Transaction creation helper with validation
 - [ ] Feature directory structure created
-- [ ] Zustand store with persist + devtools + immer
 - [ ] Basic routing functional
 - [ ] Entry point button visible on dashboard
-- [ ] 80%+ test coverage for store
+- [ ] 90%+ test coverage (store + validation)
 
 **Success Criteria**:
 - User can click "GOT PAID?" and see wizard modal
 - Wizard state persists on page refresh
+- **All financial data validated before state updates**
+- **Invalid data rejected with clear error messages**
+- **Transaction creation validates against TransactionSchema**
 - Browser back button navigates steps correctly
 
 #### Phase 2: Go Allocation Engine (Week 2-3)
