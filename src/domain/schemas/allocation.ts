@@ -46,7 +46,7 @@ export type PreviousAllocation = z.infer<typeof PreviousAllocationSchema>;
  */
 export const AllocationRequestSchema = z.object({
   strategy: z.enum(["even_split", "last_split", "target_first"], {
-    errorMap: () => ({ message: "Strategy must be one of: even_split, last_split, target_first" }),
+    error: "Strategy must be one of: even_split, last_split, target_first",
   }),
   paycheckAmountCents: z
     .number()

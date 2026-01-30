@@ -9,12 +9,12 @@ PRIVACY GUARANTEE:
 - Ephemeral execution (no database writes)
 """
 
-from datetime import datetime
-from http.server import BaseHTTPRequestHandler
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional
 import json
 import logging
+from datetime import datetime
+from http.server import BaseHTTPRequestHandler
+
+from pydantic import BaseModel, Field, validator
 
 # Configure logging - PRIVACY: Never log request payloads
 logger = logging.getLogger(__name__)
@@ -24,12 +24,13 @@ logger.setLevel(logging.ERROR)  # Only log errors, not request data
 # Request/Response Models (Pydantic for validation)
 class HistoricalSession(BaseModel):
     """Anonymized historical paycheck session - NO ENVELOPE NAMES"""
+
     date: str = Field(..., description="ISO 8601 date string")
     amount_cents: int = Field(..., gt=0, description="Paycheck amount in cents")
-    ratios: List[float] = Field(..., description="Allocation ratios (must sum to ~1.0)")
+    ratios: list[float] = Field(..., description="Allocation ratios (must sum to ~1.0)")
 
-    @validator('ratios')
-    def validate_ratios(cls, v):
+    @validator("ratios")
+    def validate_ratios(cls, v: list[float]) -> list[float]:
         if not v:
             raise ValueError("Ratios cannot be empty")
         if abs(sum(v) - 1.0) > 0.01:
@@ -39,13 +40,14 @@ class HistoricalSession(BaseModel):
 
 class PredictionRequest(BaseModel):
     """PRIVACY-FIRST: Only ratios and amounts, NO identifiable data"""
+
     paycheck_cents: int = Field(..., gt=0, le=10_000_000, description="Current paycheck amount")
-    historical_sessions: List[HistoricalSession] = Field(..., min_items=3, max_items=50)
+    historical_sessions: list[HistoricalSession] = Field(..., min_length=3, max_length=50)
     current_month: int = Field(..., ge=1, le=12, description="1-12 for seasonal detection")
     num_envelopes: int = Field(..., gt=0, le=200)
 
-    @validator('historical_sessions')
-    def validate_history(cls, v):
+    @validator("historical_sessions")
+    def validate_history(cls, v: list[HistoricalSession]) -> list[HistoricalSession]:
         if len(v) < 3:
             raise ValueError("Need at least 3 historical paychecks for prediction")
         return v
@@ -59,7 +61,7 @@ class ReasoningInfo(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    suggested_allocations_cents: List[int]
+    suggested_allocations_cents: list[int]
     confidence: float = Field(..., ge=0.0, le=1.0)
     reasoning: ReasoningInfo
     model_version: str
@@ -69,19 +71,21 @@ class PredictionResponse(BaseModel):
 # Custom Exceptions
 class InsufficientDataError(Exception):
     """Raised when < 3 historical paychecks available"""
+
     pass
 
 
 class InvalidPayloadError(Exception):
     """Raised when request payload is malformed"""
+
     pass
 
 
 def predict_allocations(
     paycheck_cents: int,
-    historical_sessions: List[HistoricalSession],
+    historical_sessions: list[HistoricalSession],
     current_month: int,
-    num_envelopes: int
+    num_envelopes: int,
 ) -> PredictionResponse:
     """
     Predict optimal allocation based on historical patterns.
@@ -97,9 +101,7 @@ def predict_allocations(
 
     # Sort by date (most recent first)
     sessions = sorted(
-        historical_sessions,
-        key=lambda s: datetime.fromisoformat(s.date),
-        reverse=True
+        historical_sessions, key=lambda s: datetime.fromisoformat(s.date), reverse=True
     )
 
     # Calculate weighted average of historical ratios
@@ -109,18 +111,14 @@ def predict_allocations(
 
     avg_ratios = []
     for envelope_idx in range(num_envelopes):
-        weighted_ratio = sum(
-            session.ratios[envelope_idx] * weights[i]
-            for i, session in enumerate(sessions)
-        ) / weight_sum
+        weighted_ratio = (
+            sum(session.ratios[envelope_idx] * weights[i] for i, session in enumerate(sessions))
+            / weight_sum
+        )
         avg_ratios.append(weighted_ratio)
 
     # Apply seasonal adjustments (heuristic-based, not user-specific)
-    seasonal_ratios = apply_seasonal_adjustments(
-        avg_ratios,
-        current_month,
-        num_envelopes
-    )
+    seasonal_ratios = apply_seasonal_adjustments(avg_ratios, current_month, num_envelopes)
 
     # Convert ratios to absolute amounts with cents-perfect math
     allocations_cents = []
@@ -135,14 +133,9 @@ def predict_allocations(
     dust = paycheck_cents - allocated
     if dust != 0:
         remainders = [
-            (paycheck_cents * ratio) - int(paycheck_cents * ratio)
-            for ratio in seasonal_ratios
+            (paycheck_cents * ratio) - int(paycheck_cents * ratio) for ratio in seasonal_ratios
         ]
-        sorted_indices = sorted(
-            range(len(remainders)),
-            key=lambda i: remainders[i],
-            reverse=True
-        )
+        sorted_indices = sorted(range(len(remainders)), key=lambda i: remainders[i], reverse=True)
 
         # Add 1 cent to top N envelopes (or subtract if negative dust)
         for i in range(abs(dust)):
@@ -161,18 +154,16 @@ def predict_allocations(
             based_on="historical_patterns",
             data_points=len(sessions),
             pattern_type=detect_pattern_type(sessions),
-            seasonal_adjustment=current_month in [11, 12, 1, 2]
+            seasonal_adjustment=current_month in [11, 12, 1, 2],
         ),
         model_version="v1.0.0",
-        last_trained_date="2026-01-30"
+        last_trained_date="2026-01-30",
     )
 
 
 def apply_seasonal_adjustments(
-    ratios: List[float],
-    current_month: int,
-    num_envelopes: int
-) -> List[float]:
+    ratios: list[float], current_month: int, num_envelopes: int
+) -> list[float]:
     """
     Adjust ratios based on seasonal patterns.
 
@@ -204,10 +195,7 @@ def apply_seasonal_adjustments(
     return adjusted
 
 
-def calculate_consistency_score(
-    sessions: List[HistoricalSession],
-    num_envelopes: int
-) -> float:
+def calculate_consistency_score(sessions: list[HistoricalSession], num_envelopes: int) -> float:
     """
     Calculate confidence score based on pattern consistency.
     Higher score = more consistent historical allocations.
@@ -229,10 +217,11 @@ def calculate_consistency_score(
     # Convert to confidence score (0.0 to 1.0)
     # Using exponential decay: confidence = e^(-10 * variance)
     confidence = min(1.0, max(0.3, 2.718 ** (-10 * avg_variance)))
-    return round(confidence, 2)
+    confidence_val: float = float(round(confidence, 2))
+    return confidence_val
 
 
-def detect_pattern_type(sessions: List[HistoricalSession]) -> str:
+def detect_pattern_type(sessions: list[HistoricalSession]) -> str:
     """
     Detect paycheck frequency pattern.
     Returns: 'biweekly_consistent', 'monthly_consistent', 'irregular'
@@ -297,7 +286,7 @@ class handler(BaseHTTPRequestHandler):
                 request.paycheck_cents,
                 request.historical_sessions,
                 request.current_month,
-                request.num_envelopes
+                request.num_envelopes,
             )
 
             # PRIVACY: Log only non-sensitive metadata
@@ -306,11 +295,8 @@ class handler(BaseHTTPRequestHandler):
             self._set_headers(200)
             self.wfile.write(result.json().encode())
 
-        except InsufficientDataError as e:
-            self._send_error(
-                400,
-                "Insufficient historical data. Need at least 3 paychecks."
-            )
+        except InsufficientDataError:
+            self._send_error(400, "Insufficient historical data. Need at least 3 paychecks.")
 
         except ValueError as e:
             self._send_error(422, str(e))
@@ -318,10 +304,7 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             # PRIVACY: Log error type ONLY, not request payload
             logger.error(f"Prediction failed: {type(e).__name__}")
-            self._send_error(
-                500,
-                "Prediction service unavailable"
-            )
+            self._send_error(500, "Prediction service unavailable")
 
     def do_GET(self) -> None:
         """Health check endpoint for monitoring"""
@@ -329,7 +312,7 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "status": "healthy",
             "version": "v1.0.0",
-            "endpoint": "POST /api/analytics/paycheck-prediction"
+            "endpoint": "POST /api/analytics/paycheck-prediction",
         }
         self.wfile.write(json.dumps(response).encode())
 

@@ -56,8 +56,8 @@ export async function allocatePaycheck(request: unknown): Promise<AllocationResu
   const validationResult = AllocationRequestSchema.safeParse(request);
 
   if (!validationResult.success) {
-    const errors = validationResult.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
+    const errors = validationResult.error.issues
+      .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
       .join(", ");
     throw new AllocationServiceError(`Invalid allocation request: ${errors}`, 400);
   }
@@ -95,8 +95,8 @@ export async function allocatePaycheck(request: unknown): Promise<AllocationResu
     const resultValidation = AllocationResultSchema.safeParse(data);
 
     if (!resultValidation.success) {
-      const errors = resultValidation.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
+      const errors = resultValidation.error.issues
+        .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
         .join(", ");
       throw new AllocationServiceError(`Invalid API response: ${errors}`, 500);
     }

@@ -21,8 +21,7 @@ export type AllocationStrategy = z.infer<typeof AllocationStrategySchema>;
 export const PaycheckAmountSchema = z.object({
   amountCents: z
     .number({
-      required_error: "Paycheck amount is required",
-      invalid_type_error: "Paycheck amount must be a number",
+      message: "Paycheck amount must be a number",
     })
     .int("Amount must be in whole cents (no fractions)")
     .positive("Amount must be positive")
@@ -40,8 +39,7 @@ export const AllocationItemSchema = z.object({
   envelopeId: z.string().min(1, "Envelope ID is required"),
   amountCents: z
     .number({
-      required_error: "Allocation amount is required",
-      invalid_type_error: "Allocation amount must be a number",
+      message: "Allocation amount must be a number",
     })
     .int("Amount must be in whole cents (no fractions)")
     .nonnegative("Amount cannot be negative"),

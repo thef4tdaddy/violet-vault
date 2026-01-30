@@ -64,8 +64,8 @@ export async function getPrediction(request: unknown): Promise<PredictionRespons
   const validationResult = PredictionRequestSchema.safeParse(request);
 
   if (!validationResult.success) {
-    const errors = validationResult.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
+    const errors = validationResult.error.issues
+      .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
       .join(", ");
     throw new PredictionServiceError(`Invalid prediction request: ${errors}`, 400);
   }
@@ -114,8 +114,8 @@ export async function getPrediction(request: unknown): Promise<PredictionRespons
     const resultValidation = PredictionResponseSchema.safeParse(data);
 
     if (!resultValidation.success) {
-      const errors = resultValidation.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
+      const errors = resultValidation.error.issues
+        .map((err) => `${err.path.map(String).join(".")}: ${err.message}`)
         .join(", ");
       throw new PredictionServiceError(`Invalid API response: ${errors}`, 500);
     }
@@ -210,7 +210,7 @@ export async function checkPredictionServiceHealth(): Promise<{
     }
 
     return { available: false };
-  } catch (error) {
+  } catch {
     return { available: false };
   }
 }

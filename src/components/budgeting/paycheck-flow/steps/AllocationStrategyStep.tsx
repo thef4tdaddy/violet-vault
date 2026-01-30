@@ -5,6 +5,7 @@
  */
 
 import React from "react";
+import Button from "@/components/ui/buttons/Button";
 
 interface AllocationStrategyStepProps {
   onNext: () => void;
@@ -50,7 +51,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = () => {
           </div>
 
           <div className="space-y-3">
-            {["Rent", "Groceries", "Utilities", "Savings"].map((envelope, index) => (
+            {["Rent", "Groceries", "Utilities", "Savings"].map((envelope) => (
               <div
                 key={envelope}
                 className="flex items-center justify-between p-4 bg-white hard-border rounded-lg"

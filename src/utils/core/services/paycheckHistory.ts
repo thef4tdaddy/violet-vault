@@ -119,7 +119,7 @@ export class PaycheckHistoryService {
           lastDate: entry.date,
           totalCount: newCount,
           averageAmountCents: newAverage,
-          frequency: this.detectFrequency(normalized),
+          frequency: this.detectFrequency(normalized) ?? undefined,
         };
       } else {
         // Add new entry

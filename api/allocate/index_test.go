@@ -116,7 +116,7 @@ func TestLastSplitStrategy(t *testing.T) {
 		}
 
 		previous := &[]AllocationItem{
-			{EnvelopeID: "rent", AmountCents: 100000},     // 50% of $2000
+			{EnvelopeID: "rent", AmountCents: 100000},      // 50% of $2000
 			{EnvelopeID: "groceries", AmountCents: 100000}, // 50% of $2000
 		}
 

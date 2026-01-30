@@ -9,6 +9,7 @@ import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 import { PaycheckHistoryService } from "@/utils/core/services/paycheckHistory";
 import { createPaycheckTransaction } from "@/utils/core/validation/paycheckWizardValidation";
 import logger from "@/utils/core/common/logger";
+import Button from "@/components/ui/buttons/Button";
 
 interface ReviewStepProps {
   onNext: () => void;
@@ -31,6 +32,101 @@ const formatCentsToDollarsWithCommas = (cents: number): string => {
   });
 };
 
+const SummaryCard: React.FC<{
+  paycheckAmountCents: number | null;
+  payerName: string | null;
+  totalAllocatedCents: number;
+  isFullyAllocated: boolean;
+  remainingCents: number;
+}> = ({
+  paycheckAmountCents,
+  payerName,
+  totalAllocatedCents,
+  isFullyAllocated,
+  remainingCents,
+}) => (
+  <div
+    className={`hard-border rounded-lg p-6 mb-6 ${isFullyAllocated ? "bg-fuchsia-50" : "bg-amber-50"}`}
+  >
+    <div className="flex justify-between items-center mb-4">
+      <div>
+        <div className="text-sm text-slate-600 mb-1">Total Paycheck</div>
+        <div className="text-3xl font-black text-slate-900">
+          {formatCentsToDollarsWithCommas(paycheckAmountCents || 0)}
+        </div>
+        {payerName && <div className="text-sm text-slate-600 mt-1">from {payerName}</div>}
+      </div>
+      <div className="text-right">
+        <div className="text-sm text-slate-600 mb-1">Allocated</div>
+        <div
+          className={`text-3xl font-black ${isFullyAllocated ? "text-green-600" : "text-amber-600"}`}
+        >
+          {formatCentsToDollarsWithCommas(totalAllocatedCents)}
+        </div>
+        {remainingCents !== 0 && (
+          <div className="text-sm text-amber-700 mt-1 font-bold">
+            {remainingCents > 0 ? "+" : "-"}
+            {formatCentsToDollarsWithCommas(Math.abs(remainingCents))} remaining
+          </div>
+        )}
+      </div>
+    </div>
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-slate-600">Allocation Status</span>
+      <span
+        className={`px-3 py-1 font-bold rounded ${
+          isFullyAllocated ? "bg-green-500 text-white" : "bg-amber-500 text-white"
+        }`}
+      >
+        {isFullyAllocated ? "✓ Complete" : "⚠ Incomplete"}
+      </span>
+    </div>
+  </div>
+);
+
+const AllocationList: React.FC<{
+  allocations: { envelopeId: string; amountCents: number }[];
+  paycheckAmountCents: number | null;
+}> = ({ allocations, paycheckAmountCents }) => {
+  if (allocations.length === 0) {
+    return (
+      <div className="bg-amber-50 hard-border rounded-lg p-6 mb-6 text-center">
+        <p className="text-amber-900 font-bold">⚠️ No allocations yet</p>
+        <p className="text-sm text-amber-700 mt-2">
+          Go back and select an allocation strategy to continue.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 mb-6">
+      {allocations.map((allocation) => {
+        const percent = paycheckAmountCents
+          ? ((allocation.amountCents / paycheckAmountCents) * 100).toFixed(1)
+          : 0;
+
+        return (
+          <div
+            key={allocation.envelopeId}
+            className="flex items-center justify-between p-4 bg-slate-50 hard-border rounded-lg"
+          >
+            <div>
+              <div className="font-bold text-slate-900">{allocation.envelopeId}</div>
+              <div className="text-sm text-slate-600">{percent}% of paycheck</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xl font-black text-slate-900">
+                {formatCentsToDollarsWithCommas(allocation.amountCents)}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
   const paycheckAmountCents = usePaycheckFlowStore((state) => state.paycheckAmountCents);
   const payerName = usePaycheckFlowStore((state) => state.payerName);
@@ -40,25 +136,21 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Calculate totals
   const totalAllocatedCents = allocations.reduce((sum, a) => sum + a.amountCents, 0);
   const isFullyAllocated = totalAllocatedCents === (paycheckAmountCents || 0);
   const remainingCents = (paycheckAmountCents || 0) - totalAllocatedCents;
 
-  /**
-   * Handle confirm and create transaction
-   */
   const handleConfirm = async () => {
     if (!paycheckAmountCents) {
       setError("Paycheck amount is required");
       return;
     }
-
     if (!isFullyAllocated) {
-      setError(`Cannot confirm: $${formatCentsToDollarsWithCommas(remainingCents)} remaining to allocate`);
+      setError(
+        `Cannot confirm: $${formatCentsToDollarsWithCommas(remainingCents)} remaining to allocate`
+      );
       return;
     }
-
     if (allocations.length === 0) {
       setError("At least one allocation is required");
       return;
@@ -68,9 +160,7 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
     setError(null);
 
     try {
-      // Create paycheck transaction
-      // TODO: Get actual userId from auth context
-      const userId = "user_test"; // Temporary placeholder until auth integration
+      const userId = "user_test"; // Temporary placeholder
       const primaryEnvelopeId = allocations[0]?.envelopeId || "env_paycheck";
 
       const transaction = createPaycheckTransaction(
@@ -88,13 +178,8 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
         }
       );
 
-      logger.info("Paycheck transaction created", {
-        transactionId: transaction.id,
-        amountCents: transaction.amount,
-        allocationsCount: allocations.length,
-      });
+      logger.info("Paycheck transaction created", { transactionId: transaction.id });
 
-      // Save to paycheck history (if payer name provided)
       if (payerName) {
         PaycheckHistoryService.addOrUpdate({
           payerName,
@@ -103,18 +188,9 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
         });
       }
 
-      // TODO: Send transaction to API for persistence
-      // await api.transactions.create(transaction);
-
-      // Move to success step
       onNext();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create paycheck transaction";
-      logger.error("Failed to create paycheck transaction", {
-        reason: "creation_error",
-        error: errorMessage,
-      });
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : "Failed to create paycheck transaction");
     } finally {
       setIsSubmitting(false);
     }
@@ -125,107 +201,32 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
       <div className="bg-white hard-border rounded-lg p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <h2 className="text-xl font-black text-slate-900 mb-6">REVIEW YOUR ALLOCATION</h2>
 
-        {/* Summary Card */}
-        <div
-          className={`hard-border rounded-lg p-6 mb-6 ${
-            isFullyAllocated ? "bg-fuchsia-50" : "bg-amber-50"
-          }`}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <div className="text-sm text-slate-600 mb-1">Total Paycheck</div>
-              <div className="text-3xl font-black text-slate-900">
-                {formatCentsToDollarsWithCommas(paycheckAmountCents || 0)}
-              </div>
-              {payerName && (
-                <div className="text-sm text-slate-600 mt-1">from {payerName}</div>
-              )}
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-slate-600 mb-1">Allocated</div>
-              <div
-                className={`text-3xl font-black ${
-                  isFullyAllocated ? "text-green-600" : "text-amber-600"
-                }`}
-              >
-                {formatCentsToDollarsWithCommas(totalAllocatedCents)}
-              </div>
-              {remainingCents !== 0 && (
-                <div className="text-sm text-amber-700 mt-1 font-bold">
-                  {remainingCents > 0 ? "+" : "-"}
-                  {formatCentsToDollarsWithCommas(Math.abs(remainingCents))} remaining
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600">Allocation Status</span>
-            <span
-              className={`px-3 py-1 font-bold rounded ${
-                isFullyAllocated
-                  ? "bg-green-500 text-white"
-                  : "bg-amber-500 text-white"
-              }`}
-            >
-              {isFullyAllocated ? "✓ Complete" : "⚠ Incomplete"}
-            </span>
-          </div>
-        </div>
+        <SummaryCard
+          paycheckAmountCents={paycheckAmountCents}
+          payerName={payerName}
+          totalAllocatedCents={totalAllocatedCents}
+          isFullyAllocated={isFullyAllocated}
+          remainingCents={remainingCents}
+        />
 
-        {/* Allocations List */}
-        {allocations.length > 0 ? (
-          <div className="space-y-3 mb-6">
-            {allocations.map((allocation) => {
-              const percent = paycheckAmountCents
-                ? ((allocation.amountCents / paycheckAmountCents) * 100).toFixed(1)
-                : 0;
+        <AllocationList allocations={allocations} paycheckAmountCents={paycheckAmountCents} />
 
-              return (
-                <div
-                  key={allocation.envelopeId}
-                  className="flex items-center justify-between p-4 bg-slate-50 hard-border rounded-lg"
-                >
-                  <div>
-                    <div className="font-bold text-slate-900">{allocation.envelopeId}</div>
-                    <div className="text-sm text-slate-600">{percent}% of paycheck</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl font-black text-slate-900">
-                      {formatCentsToDollarsWithCommas(allocation.amountCents)}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="bg-amber-50 hard-border rounded-lg p-6 mb-6 text-center">
-            <p className="text-amber-900 font-bold">⚠️ No allocations yet</p>
-            <p className="text-sm text-amber-700 mt-2">
-              Go back and select an allocation strategy to continue.
-            </p>
-          </div>
-        )}
-
-        {/* Error Display */}
         {error && (
           <div className="bg-red-50 hard-border border-red-500 rounded-lg p-4 mb-6">
             <p className="text-red-900 font-bold">⚠️ {error}</p>
           </div>
         )}
 
-        {/* Optional Adjustments Note */}
         {isFullyAllocated && allocations.length > 0 && (
           <div className="bg-blue-50 hard-border rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-900">
               💡 <strong>Ready to confirm?</strong> Once confirmed, your paycheck will be allocated
-              to your envelopes. You can always make adjustments later from your dashboard.
+              to your envelopes.
             </p>
           </div>
         )}
 
-        {/* Confirm Button */}
-        <button
+        <Button
           onClick={handleConfirm}
           disabled={!isFullyAllocated || allocations.length === 0 || isSubmitting}
           className={`
@@ -241,10 +242,9 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
                 : "bg-slate-300 text-slate-500 cursor-not-allowed"
             }
           `}
-          aria-label="Confirm allocation and create paycheck"
         >
           {isSubmitting ? "CREATING PAYCHECK..." : "✓ CONFIRM & CREATE PAYCHECK"}
-        </button>
+        </Button>
       </div>
     </div>
   );

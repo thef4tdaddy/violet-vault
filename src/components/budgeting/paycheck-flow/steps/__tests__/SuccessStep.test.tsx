@@ -337,7 +337,9 @@ describe("SuccessStep", () => {
     it("should display success confirmation message", () => {
       render(<SuccessStep onNext={mockOnNext} onBack={mockOnBack} onFinish={mockOnFinish} />);
 
-      expect(screen.getByText(/Your envelopes have been updated successfully!/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Your envelopes have been updated successfully!/i)
+      ).toBeInTheDocument();
     });
   });
 });
