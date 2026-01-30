@@ -44,7 +44,7 @@ const HistoricalTrendsChart: React.FC<HistoricalTrendsChartProps> = ({ spendingT
               <YAxis />
               <Tooltip
                 formatter={tooltipFormatter}
-                labelFormatter={(month: string | undefined) => `Month: ${month || ""}`}
+                labelFormatter={(label: React.ReactNode) => `Month: ${label || ""}`}
               />
               <Legend />
               <Area

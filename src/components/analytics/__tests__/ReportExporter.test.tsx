@@ -1,43 +1,11 @@
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import "@testing-library/jest-dom/vitest";
-import React from "react";
 import ReportExporter from "../ReportExporter";
-import { useReportExporter } from "@/hooks/platform/analytics/useReportExporter";
 
 // Mock dependencies
 vi.mock("@/utils", () => ({
-  getIcon: vi.fn(() => () => <span data-testid="mock-icon" />),
-}));
-
-vi.mock("@/hooks/platform/ux/useModalAutoScroll", () => ({
-  useModalAutoScroll: vi.fn(() => ({ current: null })),
-}));
-
-const mockHandleExport = vi.fn();
-const mockApplyTemplate = vi.fn();
-const mockSetExportFormat = vi.fn();
-const mockSetExportOptions = vi.fn();
-
-vi.mock("@/hooks/platform/analytics/useReportExporter", () => ({
-  useReportExporter: vi.fn(() => ({
-    exportFormat: "pdf",
-    exportOptions: {
-      includeSummary: true,
-      includeCharts: true,
-      includeTransactions: false,
-      includeEnvelopes: true,
-      includeSavings: true,
-      includeInsights: true,
-      customDateRange: null,
-    },
-    isExporting: false,
-    exportProgress: 0,
-    setExportFormat: mockSetExportFormat,
-    setExportOptions: mockSetExportOptions,
-    handleExport: mockHandleExport,
-    applyTemplate: mockApplyTemplate,
-  })),
+  getIcon: vi.fn(() => () => <div data-testid="icon" />),
 }));
 
 vi.mock("@/components/ui", () => ({
@@ -48,48 +16,54 @@ vi.mock("@/components/ui", () => ({
   ),
 }));
 
-vi.mock("@/components/ui/ModalCloseButton", () => ({
-  default: ({ onClick, disabled }: any) => (
-    <button data-testid="modal-close" onClick={onClick} disabled={disabled}>
-      Close
-    </button>
-  ),
+vi.mock("@/hooks/platform/ux/useModalAutoScroll", () => ({
+  useModalAutoScroll: vi.fn(() => ({ current: null })),
 }));
 
+const mockUseReportExporter = {
+  exportFormat: "pdf",
+  exportOptions: { includeTransactions: true },
+  isExporting: false,
+  exportProgress: 0,
+  setExportFormat: vi.fn(),
+  setExportOptions: vi.fn(),
+  handleExport: vi.fn(),
+  applyTemplate: vi.fn(),
+};
+
+vi.mock("@/hooks/platform/analytics/useReportExporter", () => ({
+  useReportExporter: vi.fn(() => mockUseReportExporter),
+}));
+
+// Mock subcomponents
 vi.mock("../report-exporter/ExportFormatSelector", () => ({
   ExportFormatSelector: ({ onFormatChange }: any) => (
-    <div data-testid="format-selector">
-      <button onClick={() => onFormatChange("csv")}>Change to CSV</button>
-    </div>
+    <div data-testid="format-selector" onClick={() => onFormatChange("csv")} />
   ),
 }));
 
 vi.mock("../report-exporter/ExportTemplates", () => ({
   ExportTemplates: ({ onTemplateSelect }: any) => (
-    <div data-testid="template-selector">
-      <button onClick={() => onTemplateSelect("basic")}>Basic Template</button>
-    </div>
+    <div data-testid="templates" onClick={() => onTemplateSelect("full")} />
   ),
 }));
 
 vi.mock("../report-exporter/ExportOptionsForm", () => ({
   ExportOptionsForm: ({ onOptionChange }: any) => (
-    <div data-testid="options-form">
-      <button onClick={() => onOptionChange("includeTransactions", true)}>
-        Toggle Transactions
-      </button>
-    </div>
+    <div data-testid="options-form" onClick={() => onOptionChange("includeTransactions", true)} />
   ),
 }));
 
 vi.mock("../report-exporter/ExportProgressIndicator", () => ({
-  ExportProgressIndicator: ({ isExporting, progress }: any) => (
-    <div data-testid="progress-indicator">{isExporting ? `Progress: ${progress}%` : "Idle"}</div>
-  ),
+  ExportProgressIndicator: () => <div data-testid="progress" />,
+}));
+
+vi.mock("@/components/ui/ModalCloseButton", () => ({
+  default: ({ onClick }: any) => <button data-testid="close-button" onClick={onClick} />,
 }));
 
 describe("ReportExporter", () => {
-  const mockParams = {
+  const mockProps = {
     analyticsData: {
       balanceData: {},
       categoryData: {},
@@ -98,80 +72,84 @@ describe("ReportExporter", () => {
       savingsData: {},
     },
     balanceData: {},
-    timeFilter: "month",
+    timeFilter: "all",
     onExport: vi.fn(),
     onClose: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset isExporting to false
+    (mockUseReportExporter as any).isExporting = false;
   });
 
   it("renders correctly", () => {
-    render(<ReportExporter {...mockParams} />);
-    // Check heading specifically
-    expect(screen.getByRole("heading", { name: /export report/i })).toBeInTheDocument();
-    expect(screen.getByTestId("format-selector")).toBeInTheDocument();
-    expect(screen.getByTestId("template-selector")).toBeInTheDocument();
-    expect(screen.getByTestId("options-form")).toBeInTheDocument();
+    render(<ReportExporter {...mockProps} />);
+    expect(screen.getByRole("heading", { name: /Export Report/i })).toBeDefined();
+
+    expect(screen.getByTestId("format-selector")).toBeDefined();
+    expect(screen.getByTestId("templates")).toBeDefined();
+    expect(screen.getByTestId("options-form")).toBeDefined();
+    expect(screen.getByTestId("progress")).toBeDefined();
   });
 
-  it("calls onClose when close button is clicked", () => {
-    render(<ReportExporter {...mockParams} />);
-    fireEvent.click(screen.getByTestId("modal-close"));
-    expect(mockParams.onClose).toHaveBeenCalled();
+  it("handles format change", () => {
+    render(<ReportExporter {...mockProps} />);
+    fireEvent.click(screen.getByTestId("format-selector"));
+    expect(mockUseReportExporter.setExportFormat).toHaveBeenCalledWith("csv");
   });
 
-  it("triggers export process when Export button is clicked", () => {
-    render(<ReportExporter {...mockParams} />);
-    const exportButton = screen.getByRole("button", { name: /export report/i });
-    fireEvent.click(exportButton);
-    expect(mockHandleExport).toHaveBeenCalledWith(
-      mockParams.analyticsData,
-      mockParams.balanceData,
-      mockParams.timeFilter,
-      mockParams.onExport,
-      mockParams.onClose
+  it("handles template selection", () => {
+    render(<ReportExporter {...mockProps} />);
+    fireEvent.click(screen.getByTestId("templates"));
+    expect(mockUseReportExporter.applyTemplate).toHaveBeenCalledWith("full");
+  });
+
+  it("handles option change", () => {
+    render(<ReportExporter {...mockProps} />);
+    fireEvent.click(screen.getByTestId("options-form"));
+    expect(mockUseReportExporter.setExportOptions).toHaveBeenCalled();
+
+    // Verify the function passed to setExportOptions
+    const updater = vi.mocked(mockUseReportExporter.setExportOptions).mock.calls[0][0];
+    const result = updater({ existing: true });
+    expect(result).toEqual({ existing: true, includeTransactions: true });
+  });
+
+  it("calls handleExport on export click", () => {
+    render(<ReportExporter {...mockProps} />);
+    // There are two "Export Report" texts: header and button. Button has icon.
+    const exportButtons = screen.getAllByText("Export Report");
+    fireEvent.click(exportButtons[exportButtons.length - 1]);
+    expect(mockUseReportExporter.handleExport).toHaveBeenCalledWith(
+      mockProps.analyticsData,
+      mockProps.balanceData,
+      mockProps.timeFilter,
+      mockProps.onExport,
+      mockProps.onClose
     );
   });
 
-  it("changes format via ExportFormatSelector", () => {
-    render(<ReportExporter {...mockParams} />);
-    fireEvent.click(screen.getByText("Change to CSV"));
-    expect(mockSetExportFormat).toHaveBeenCalledWith("csv");
+  it("calls onClose when clicking close or cancel", () => {
+    render(<ReportExporter {...mockProps} />);
+    fireEvent.click(screen.getByTestId("close-button"));
+    expect(mockProps.onClose).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(mockProps.onClose).toHaveBeenCalledTimes(2);
   });
 
-  it("applies template via ExportTemplates", () => {
-    render(<ReportExporter {...mockParams} />);
-    fireEvent.click(screen.getByText("Basic Template"));
-    expect(mockApplyTemplate).toHaveBeenCalledWith("basic");
-  });
+  it("disables interactions when exporting", () => {
+    (mockUseReportExporter as any).isExporting = true;
+    render(<ReportExporter {...mockProps} />);
 
-  it("updates options via ExportOptionsForm", () => {
-    render(<ReportExporter {...mockParams} />);
-    fireEvent.click(screen.getByText("Toggle Transactions"));
-    expect(mockSetExportOptions).toHaveBeenCalled();
-  });
+    expect(screen.getByText("Exporting...")).toBeDefined();
+    // Buttons should be disabled
+    expect(screen.getByText("Cancel")).toHaveProperty("disabled", true);
+    expect(screen.getByText("Exporting...")).toHaveProperty("disabled", true);
 
-  it("disables buttons and interaction when exporting", () => {
-    vi.mocked(useReportExporter).mockReturnValue({
-      exportFormat: "pdf",
-      exportOptions: {},
-      isExporting: true,
-      exportProgress: 50,
-      setExportFormat: vi.fn(),
-      setExportOptions: vi.fn(),
-      handleExport: vi.fn(),
-      applyTemplate: vi.fn(),
-    } as any);
-
-    render(<ReportExporter {...mockParams} />);
-
-    expect(screen.getByText("Exporting...")).toBeInTheDocument();
-    expect(screen.getByText("Progress: 50%")).toBeInTheDocument();
-
-    // Cancel button should be disabled
-    const cancelButton = screen.getByText("Cancel");
-    expect(cancelButton).toBeDisabled();
+    // Close button should not call onClose when exporting
+    fireEvent.click(screen.getByTestId("close-button"));
+    expect(mockProps.onClose).not.toHaveBeenCalled();
   });
 });
