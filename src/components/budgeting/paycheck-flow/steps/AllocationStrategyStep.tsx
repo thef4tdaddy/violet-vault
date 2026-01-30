@@ -178,7 +178,8 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
       const prediction = await getPredictionFromHistory(
         paycheckAmountCents,
         allocationHistory,
-        envelopes.length
+        envelopes.length,
+        paycheckFrequency
       );
 
       // Map predictions back to envelope IDs
@@ -287,7 +288,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
             </button>
           </div>
           <p className="text-xs text-slate-600 mt-2">
-            This adjusts monthly targets for SPLIT EVENLY strategy
+            Helps SPLIT EVENLY and SMART SPLIT calculate appropriate allocations
           </p>
         </div>
 

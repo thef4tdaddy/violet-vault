@@ -143,6 +143,7 @@ export async function getPrediction(request: unknown): Promise<PredictionRespons
  * @param paycheckAmountCents - Current paycheck amount
  * @param allocationHistory - Historical allocations (with envelope IDs)
  * @param numEnvelopes - Number of envelopes to predict for
+ * @param paycheckFrequency - Optional frequency hint for better predictions
  * @returns Prediction response with suggested allocations
  *
  * @example
@@ -159,7 +160,8 @@ export async function getPrediction(request: unknown): Promise<PredictionRespons
  *       ]
  *     }
  *   ],
- *   2
+ *   2,
+ *   "biweekly"
  * );
  * ```
  */
@@ -170,7 +172,8 @@ export async function getPredictionFromHistory(
     amountCents: number;
     envelopeAllocations: Array<{ envelopeId: string; amountCents: number }>;
   }>,
-  numEnvelopes: number
+  numEnvelopes: number,
+  paycheckFrequency?: "weekly" | "biweekly" | "monthly"
 ): Promise<PredictionResponse> {
   // Convert to anonymized historical sessions (privacy-first)
   const historicalSessions: HistoricalSession[] = allocationHistory.map(
@@ -185,6 +188,7 @@ export async function getPredictionFromHistory(
     historicalSessions,
     currentMonth,
     numEnvelopes,
+    paycheckFrequency,
   });
 }
 

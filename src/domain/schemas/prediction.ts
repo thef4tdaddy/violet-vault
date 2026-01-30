@@ -54,6 +54,11 @@ export const PredictionRequestSchema = z.object({
     .int("Number of envelopes must be an integer")
     .positive("Must have at least 1 envelope")
     .max(200, "Maximum 200 envelopes allowed"),
+  paycheckFrequency: z
+    .enum(["weekly", "biweekly", "monthly"], {
+      error: "Frequency must be one of: weekly, biweekly, monthly",
+    })
+    .optional(),
 });
 
 export type PredictionRequest = z.infer<typeof PredictionRequestSchema>;
