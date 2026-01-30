@@ -323,6 +323,77 @@ Build a **multi-step conversational wizard** that:
 - All wizard steps depend on validation infrastructure
 - Transaction creation requires validation helper functions
 
+#### Local Paycheck History Service
+
+**File**: `src/utils/core/services/paycheckHistory.ts`
+
+**Purpose**: Privacy-first local storage for paycheck history to enable smart pre-fill and autocomplete in Amount Entry Step (#1837).
+
+**localStorage Schema**:
+```typescript
+interface PaycheckHistoryEntry {
+  payerName: string;              // Employer name
+  lastAmountCents: number;        // Most recent paycheck amount
+  lastDate: string;               // ISO date of last paycheck
+  totalCount: number;             // Number of paychecks received
+  averageAmountCents: number;     // Rolling average
+  frequency?: "weekly" | "biweekly" | "semi-monthly" | "monthly";
+}
+
+// Storage key: 'violet-vault-paycheck-history'
+// Max 50 entries, LRU eviction
+```
+
+**Service Methods**:
+```typescript
+export class PaycheckHistoryService {
+  private static STORAGE_KEY = 'violet-vault-paycheck-history';
+  private static MAX_ENTRIES = 50;
+
+  // Get all history entries
+  static getHistory(): PaycheckHistoryEntry[]
+
+  // Get history for specific employer
+  static getByPayerName(name: string): PaycheckHistoryEntry | null
+
+  // Add or update paycheck entry
+  static addOrUpdate(entry: {
+    payerName: string;
+    amountCents: number;
+    date: string;
+  }): void
+
+  // Get recent employer names for autocomplete
+  static getRecentPayers(limit = 10): string[]
+
+  // Detect pay frequency from historical patterns
+  static detectFrequency(payerName: string): string | null
+
+  // Clear all history (privacy)
+  static clear(): void
+}
+```
+
+**Privacy Guarantees**:
+- ✅ **100% Client-Side**: All data stored in browser localStorage, never synced to server
+- ✅ **Minimal Data**: Only stores employer name, amount, date, count, average
+- ✅ **User Control**: Can be cleared anytime via browser storage settings
+- ✅ **No PII**: No sensitive employer details, bank accounts, SSN, or tax data
+- ✅ **No Tracking**: History never sent to analytics or external services
+
+**Integration with Amount Entry Step**:
+1. User types employer name → autocomplete suggests from `getRecentPayers()`
+2. User selects employer → `getByPayerName()` retrieves history
+3. If history found → pre-fill amount with `lastAmountCents`
+4. Show hint: "💡 Last paycheck: $X,XXX.XX on [date] ⏰ [frequency]"
+5. On wizard success → `addOrUpdate()` saves new paycheck data
+
+**Testing**:
+- Unit tests for all service methods
+- Edge cases: duplicate employers, malformed data, storage quota exceeded
+- Integration tests with AmountEntryStep component
+- Privacy compliance validation (no server calls)
+
 ### Component Breakdown
 
 #### 1. Entry Point (#157)
@@ -398,6 +469,7 @@ interface PaycheckFlowState {
     envelopeId: string
     amountCents: number
   }>
+  payerName: string | null                 // Employer/payer name (optional)
 
   // Actions
   openWizard: () => void
@@ -405,6 +477,7 @@ interface PaycheckFlowState {
   nextStep: () => void
   prevStep: () => void
   setPaycheckAmount: (amount: number) => void
+  setPayerName: (name: string | null) => void
   setAllocations: (allocs: Allocation[]) => void
   reset: () => void
 }
@@ -425,6 +498,7 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
         partialize: (state) => ({
           currentStep: state.currentStep,
           selectedStrategy: state.selectedStrategy,
+          payerName: state.payerName,  // OK to persist (helps with autocomplete)
           // DO NOT persist paycheckAmount or allocations (privacy)
         })
       }
@@ -436,9 +510,14 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
 
 **Step Sequence**:
 1. **Step 0**: Amount Entry
-   - Input field for paycheck amount
+   - Optional payee/employer name input (text field)
+   - Autocomplete from local history (last 10 employers)
+   - Smart pre-fill: typing employer name → auto-fill amount from history
+   - Show helpful hint when match found: "💡 Last paycheck: $2,500.00 on Jan 15 ⏰ Usually biweekly"
+   - Input field for paycheck amount (auto-filled if employer match found)
    - Validation: min $0.01, max $1,000,000
    - Auto-format: $1,234.56
+   - Local history tracking (localStorage, privacy-first, never synced)
 
 2. **Step 1**: Allocation Strategy Selection
    - Quick action buttons: [USE LAST SPLIT], [SPLIT EVENLY], [SMART SPLIT]
