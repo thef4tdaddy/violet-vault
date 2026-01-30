@@ -22,6 +22,7 @@ interface PaycheckFlowState {
 
   // Form data
   paycheckAmountCents: number | null; // Store in cents for precision
+  payerName: string | null; // Employer/payer name (optional)
   selectedStrategy: AllocationStrategy | null;
   allocations: Allocation[];
 
@@ -32,6 +33,7 @@ interface PaycheckFlowState {
   previousStep: () => void;
   setStep: (step: number) => void;
   setPaycheckAmountCents: (amountCents: number) => void;
+  setPayerName: (name: string | null) => void;
   setSelectedStrategy: (strategy: AllocationStrategy) => void;
   setAllocations: (allocations: Allocation[]) => void;
   reset: () => void;
@@ -42,6 +44,7 @@ const initialState = {
   isOpen: false,
   currentStep: 0,
   paycheckAmountCents: null,
+  payerName: null,
   selectedStrategy: null,
   allocations: [],
 };
@@ -102,6 +105,11 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
             state.paycheckAmountCents = amountCents;
           }),
 
+        setPayerName: (name: string | null) =>
+          set((state) => {
+            state.payerName = name;
+          }),
+
         setSelectedStrategy: (strategy: AllocationStrategy) =>
           set((state) => {
             state.selectedStrategy = strategy;
@@ -140,6 +148,7 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
         partialize: (state) => ({
           currentStep: state.currentStep,
           selectedStrategy: state.selectedStrategy,
+          payerName: state.payerName, // OK to persist for autocomplete (not sensitive financial data)
           // DO NOT persist paycheckAmountCents or allocations (sensitive financial data)
         }),
 
@@ -166,5 +175,6 @@ export const usePaycheckFlowStore = create<PaycheckFlowState>()(
 export const selectIsOpen = (state: PaycheckFlowState) => state.isOpen;
 export const selectCurrentStep = (state: PaycheckFlowState) => state.currentStep;
 export const selectPaycheckAmountCents = (state: PaycheckFlowState) => state.paycheckAmountCents;
+export const selectPayerName = (state: PaycheckFlowState) => state.payerName;
 export const selectAllocations = (state: PaycheckFlowState) => state.allocations;
 export const selectSelectedStrategy = (state: PaycheckFlowState) => state.selectedStrategy;

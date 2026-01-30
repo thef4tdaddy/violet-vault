@@ -87,6 +87,7 @@ export type AllocationsWithSum = z.infer<typeof AllocationsWithSumSchema>;
  */
 export const PaycheckWizardDataSchema = z.object({
   paycheckAmountCents: PaycheckAmountSchema.shape.amountCents,
+  payerName: z.string().nullable().optional(), // Employer/payer name (optional)
   selectedStrategy: AllocationStrategySchema,
   allocations: AllocationsArraySchema,
 });
@@ -239,7 +240,7 @@ export const createPaycheckTransaction = (
     allocations: allocationsMap,
     recurrenceRule: options?.recurrenceRule || null,
     paycheckId: `paycheck_${Date.now()}`,
-    payerName: options?.payerName || null,
+    payerName: wizardData.payerName || options?.payerName || null,
 
     // Balance tracking
     unassignedCashBefore: options?.unassignedCashBefore || null,

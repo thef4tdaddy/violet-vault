@@ -9,6 +9,7 @@ describe("paycheckFlowStore", () => {
         isOpen: false,
         currentStep: 0,
         paycheckAmountCents: null,
+        payerName: null,
         selectedStrategy: null,
         allocations: [],
       });
@@ -42,6 +43,11 @@ describe("paycheckFlowStore", () => {
     it("should have allocations as empty array", () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
       expect(result.current.allocations).toEqual([]);
+    });
+
+    it("should have payerName as null", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+      expect(result.current.payerName).toBeNull();
     });
   });
 
@@ -265,6 +271,56 @@ describe("paycheckFlowStore", () => {
     });
   });
 
+  describe("Payer name", () => {
+    it("should set payer name", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPayerName("Acme Corp");
+      });
+
+      expect(result.current.payerName).toBe("Acme Corp");
+    });
+
+    it("should update payer name", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPayerName("Acme Corp");
+      });
+      expect(result.current.payerName).toBe("Acme Corp");
+
+      act(() => {
+        result.current.setPayerName("TechCo Inc");
+      });
+      expect(result.current.payerName).toBe("TechCo Inc");
+    });
+
+    it("should allow null payer name", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPayerName("Acme Corp");
+      });
+      expect(result.current.payerName).toBe("Acme Corp");
+
+      act(() => {
+        result.current.setPayerName(null);
+      });
+      expect(result.current.payerName).toBeNull();
+    });
+
+    it("should allow empty string payer name", () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPayerName("");
+      });
+
+      expect(result.current.payerName).toBe("");
+    });
+  });
+
   describe("Allocation strategy", () => {
     it("should set selected strategy to 'last'", () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
@@ -427,6 +483,7 @@ describe("paycheckFlowStore", () => {
       act(() => {
         result.current.openWizard();
         result.current.setPaycheckAmountCents(100000);
+        result.current.setPayerName("Acme Corp");
         result.current.setSelectedStrategy("even");
         result.current.setAllocations([{ envelopeId: "env_1", amountCents: 100000 }]);
         result.current.nextStep();
@@ -436,6 +493,7 @@ describe("paycheckFlowStore", () => {
       expect(result.current.isOpen).toBe(false);
       expect(result.current.currentStep).toBe(0);
       expect(result.current.paycheckAmountCents).toBeNull();
+      expect(result.current.payerName).toBeNull();
       expect(result.current.selectedStrategy).toBeNull();
       expect(result.current.allocations).toEqual([]);
     });
@@ -510,7 +568,7 @@ describe("paycheckFlowStore", () => {
   });
 
   describe("Persistence (Privacy)", () => {
-    it("should persist currentStep", () => {
+    it("should persist currentStep", async () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
 
       act(() => {
@@ -518,13 +576,13 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
-        expect(stored.state.currentStep).toBe(2);
-      }, 100);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+      expect(stored.state.currentStep).toBe(2);
     });
 
-    it("should persist selectedStrategy", () => {
+    it("should persist selectedStrategy", async () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
 
       act(() => {
@@ -532,13 +590,27 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
-        expect(stored.state.selectedStrategy).toBe("smart");
-      }, 100);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+      expect(stored.state.selectedStrategy).toBe("smart");
     });
 
-    it("should NOT persist paycheckAmountCents (sensitive data)", () => {
+    it("should persist payerName (non-sensitive, helps with autocomplete)", async () => {
+      const { result } = renderHook(() => usePaycheckFlowStore());
+
+      act(() => {
+        result.current.setPayerName("Acme Corp");
+      });
+
+      // Wait for persistence
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+      expect(stored.state.payerName).toBe("Acme Corp");
+    });
+
+    it("should NOT persist paycheckAmountCents (sensitive data)", async () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
 
       act(() => {
@@ -546,15 +618,15 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-        // CRITICAL: Sensitive financial data should NOT be persisted
-        expect(stored.state.paycheckAmountCents).toBeUndefined();
-      }, 100);
+      const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+
+      // CRITICAL: Sensitive financial data should NOT be persisted
+      expect(stored.state.paycheckAmountCents).toBeUndefined();
     });
 
-    it("should NOT persist allocations (sensitive data)", () => {
+    it("should NOT persist allocations (sensitive data)", async () => {
       const { result } = renderHook(() => usePaycheckFlowStore());
 
       act(() => {
@@ -565,12 +637,12 @@ describe("paycheckFlowStore", () => {
       });
 
       // Wait for persistence
-      setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-        // CRITICAL: Sensitive financial data should NOT be persisted
-        expect(stored.state.allocations).toBeUndefined();
-      }, 100);
+      const stored = JSON.parse(localStorage.getItem("paycheck-flow-storage") || "{}");
+
+      // CRITICAL: Sensitive financial data should NOT be persisted
+      expect(stored.state.allocations).toBeUndefined();
     });
   });
 
