@@ -166,18 +166,18 @@ describe("autoFixSuggestions", () => {
 
       expect(suggestions).toHaveLength(2);
 
-      // Should transfer from Entertainment first (higher excess)
+      // Should transfer from Dining first (higher excess: 30000)
       expect(suggestions[0]).toMatchObject({
-        fromEnvelopeId: "env_entertainment",
-        toEnvelopeId: "env_rent",
-        amountCents: 25000,
-      });
-
-      // Then from Dining
-      expect(suggestions[1]).toMatchObject({
         fromEnvelopeId: "env_dining",
         toEnvelopeId: "env_rent",
         amountCents: 30000,
+      });
+
+      // Then from Entertainment (excess: 25000)
+      expect(suggestions[1]).toMatchObject({
+        fromEnvelopeId: "env_entertainment",
+        toEnvelopeId: "env_rent",
+        amountCents: 25000,
       });
 
       // Total transfer should be 55000 (still 5000 short)

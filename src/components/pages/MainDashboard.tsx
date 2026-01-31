@@ -9,6 +9,7 @@ import QuickActions from "../dashboard/QuickActions";
 import InsightsWidget from "../dashboard/InsightsWidget";
 import GotPaidCTA from "../dashboard/GotPaidCTA";
 import { PaycheckWizardModal } from "../budgeting/paycheck-flow/PaycheckWizardModal";
+import PaydayBanner from "../dashboard/PaydayBanner";
 
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import useSavingsGoals from "@/hooks/budgeting/envelopes/goals/useSavingsGoals";
@@ -37,7 +38,10 @@ interface DashboardProps {
  * Dashboard Loader - Modular skeleton for the redesign
  */
 const DashboardLoader = () => (
-  <DashboardShell className="animate-pulse">
+  <DashboardShell
+    className="animate-pulse"
+    paydayBanner={<div className="h-48 bg-gray-200 rounded-xl border-2 border-black" />}
+  >
     <div className="md:col-span-2 lg:col-span-3 h-8 bg-gray-200 rounded w-1/2 mb-6" />
     <div className="h-48 bg-gray-200 rounded border-2 border-black" />
     <div className="h-48 bg-gray-200 rounded border-2 border-black" />
@@ -187,7 +191,7 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
 
   return (
     <>
-      <DashboardShell>
+      <DashboardShell paydayBanner={<PaydayBanner />}>
         {/* Got Paid? CTA - Shows when near payday (±3 days) */}
         <div className="md:col-span-2 lg:col-span-3">
           <GotPaidCTA />
@@ -198,31 +202,31 @@ const Dashboard = ({ setActiveView }: DashboardProps) => {
         </div>
 
         <AccountOverview
-        balances={{
-          ...accountBalances,
-          savings: { balance: totalSavingsBalance },
-        }}
-        savingsCount={savingsGoals.length}
-        onUpdateChecking={openReconcileModal}
-        onAllocateUnassigned={() => setActiveView("envelopes")}
-        onTrackSavings={() => setActiveView("savings")}
-      />
-
-      <div className="md:col-span-2 lg:col-span-2 space-y-4">
-        <DebtSummaryWidget onNavigateToDebts={() => setActiveView("debts")} />
-        {analytics?.budgetHealth && <BudgetHealthWidget health={analytics.budgetHealth} />}
-      </div>
-
-      <div className="md:col-span-2 lg:col-span-3">
-        <RecentTransactionsWidget
-          transactions={getRecentTransactions(transactions, 10) as never}
-          getEnvelopeOptions={getEnvelopeOptions}
+          balances={{
+            ...accountBalances,
+            savings: { balance: totalSavingsBalance },
+          }}
+          savingsCount={savingsGoals.length}
+          onUpdateChecking={openReconcileModal}
+          onAllocateUnassigned={() => setActiveView("envelopes")}
+          onTrackSavings={() => setActiveView("savings")}
         />
-      </div>
 
-      <div className="md:col-span-2 lg:col-span-3">
-        <InsightsWidget />
-      </div>
+        <div className="md:col-span-2 lg:col-span-2 space-y-4">
+          <DebtSummaryWidget onNavigateToDebts={() => setActiveView("debts")} />
+          {analytics?.budgetHealth && <BudgetHealthWidget health={analytics.budgetHealth} />}
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-3">
+          <RecentTransactionsWidget
+            transactions={getRecentTransactions(transactions, 10) as never}
+            getEnvelopeOptions={getEnvelopeOptions}
+          />
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-3">
+          <InsightsWidget />
+        </div>
 
         <ReconcileTransactionModal
           isOpen={showReconcileModal}

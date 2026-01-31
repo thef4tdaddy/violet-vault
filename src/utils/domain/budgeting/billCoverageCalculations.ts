@@ -102,10 +102,7 @@ export function formatCentsAsCurrency(cents: number): string {
 /**
  * Calculate coverage percentage
  */
-export function calculateCoveragePercent(
-  projectedBalance: number,
-  billAmount: number
-): number {
+export function calculateCoveragePercent(projectedBalance: number, billAmount: number): number {
   if (billAmount <= 0) return 0;
   return Math.round((projectedBalance / billAmount) * 1000) / 10; // Round to 1 decimal
 }

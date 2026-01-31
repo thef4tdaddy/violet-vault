@@ -10,6 +10,7 @@ import { PaycheckWizardModal } from "../PaycheckWizardModal";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 import * as allocationService from "@/services/api/allocationService";
 import * as predictionService from "@/services/api/predictionService";
+import { AllocationServiceError } from "@/services/api/allocationService";
 
 // Import custom matchers for Vitest
 import "@testing-library/jest-dom";
@@ -63,6 +64,56 @@ vi.mock("@/services/api/predictionService", () => ({
   PredictionServiceError: class Error {
     constructor(public message: string) {}
   },
+}));
+
+// Mock missing hooks for steps
+vi.mock("@/hooks/platform/ux/useToast", () => ({
+  default: vi.fn(() => ({
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+    showWarning: vi.fn(),
+    showInfo: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/usePaycheckFrequencyDetection", () => ({
+  usePaycheckFrequencyDetection: vi.fn(() => ({
+    paycheckFrequency: "biweekly",
+    setPaycheckFrequency: vi.fn(),
+    wasAutoDetected: false,
+    detectionMessage: null,
+    setWasAutoDetected: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/useAllocationStrategies", () => ({
+  useAllocationStrategies: vi.fn(() => ({
+    loading: false,
+    error: null,
+    handleEvenSplit: vi.fn(),
+    handleLastSplit: vi.fn(),
+    handleSmartSplit: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/useBillForecasting", () => ({
+  useBillForecasting: vi.fn(() => ({
+    upcomingBills: [],
+    totalShortage: 0,
+    criticalBills: [],
+    criticalCount: 0,
+    nextPayday: new Date(),
+    daysUntilPayday: 14,
+    isLoading: false,
+  })),
+}));
+
+vi.mock("@/hooks/dashboard/usePaydayProgress", () => ({
+  usePaydayProgress: vi.fn(() => ({
+    daysUntilPayday: 14,
+    formattedPayday: "Feb 14",
+    isLoading: false,
+  })),
 }));
 
 describe("PaycheckWizardModal", () => {

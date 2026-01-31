@@ -1,7 +1,4 @@
-/**
- * Forecasting Service - Issue #1853
- * Bill coverage calculation with Go backend integration and JavaScript fallback
- */
+import logger from "@/utils/core/common/logger";
 
 export interface BillCoverageInput {
   id: string;
@@ -55,9 +52,7 @@ const COVERAGE_ENDPOINT = "/api/forecasting/calculate-coverage";
 /**
  * Calculate bill coverage using Go engine with JavaScript fallback
  */
-export async function calculateBillCoverage(
-  request: CoverageRequest
-): Promise<CoverageResponse> {
+export async function calculateBillCoverage(request: CoverageRequest): Promise<CoverageResponse> {
   try {
     // Try Go engine first
     const response = await fetch(`${API_BASE_URL}${COVERAGE_ENDPOINT}`, {
@@ -70,11 +65,11 @@ export async function calculateBillCoverage(
       return await response.json();
     }
 
-    console.warn(
+    logger.warn(
       `Go forecasting engine failed with status ${response.status}, falling back to JavaScript`
     );
   } catch (error) {
-    console.warn(
+    logger.warn(
       `Go forecasting engine unavailable (${error instanceof Error ? error.message : "unknown error"}), falling back to JavaScript`
     );
   }
@@ -86,9 +81,7 @@ export async function calculateBillCoverage(
 /**
  * JavaScript fallback implementation for bill coverage calculation
  */
-export function calculateBillCoverageJS(
-  request: CoverageRequest
-): CoverageResponse {
+export function calculateBillCoverageJS(request: CoverageRequest): CoverageResponse {
   // Create maps for quick lookup
   const envelopeMap = new Map(request.envelopes.map((e) => [e.id, e]));
   const allocationMap = new Map(request.allocations.map((a) => [a.envelopeId, a.amountCents]));
@@ -101,60 +94,17 @@ export function calculateBillCoverageJS(
     const envelope = envelopeMap.get(bill.envelopeId);
     const allocationAmount = allocationMap.get(bill.envelopeId) || 0;
 
-    if (!envelope) {
-      // Bill has no envelope
-      const result: BillCoverageResult = {
-        billId: bill.id,
-        envelopeId: bill.envelopeId,
-        currentBalance: 0,
-        allocationAmount,
-        projectedBalance: allocationAmount,
-        billAmount: bill.amountCents,
-        shortage: Math.max(0, bill.amountCents - allocationAmount),
-        coveragePercent: 0,
-        status: "uncovered",
-        daysUntilDue: bill.dueDateDays,
-      };
-      results.push(result);
-      totalShortage += result.shortage;
-      criticalCount++;
-      continue;
-    }
-
-    // Calculate coverage
-    const currentBalance = envelope.currentBalanceCents;
-    const projectedBalance = currentBalance + allocationAmount;
-    const billAmount = bill.amountCents;
-    const shortage = Math.max(0, billAmount - projectedBalance);
-    const coveragePercent =
-      billAmount > 0 ? Math.round((projectedBalance / billAmount) * 1000) / 10 : 0;
-
-    // Determine status
-    let status: "covered" | "partial" | "uncovered";
-    if (coveragePercent >= 100) status = "covered";
-    else if (coveragePercent >= 50) status = "partial";
-    else status = "uncovered";
-
-    const result: BillCoverageResult = {
-      billId: bill.id,
-      envelopeId: bill.envelopeId,
-      currentBalance,
-      allocationAmount,
-      projectedBalance,
-      billAmount,
-      shortage,
-      coveragePercent,
-      status,
-      daysUntilDue: bill.dueDateDays,
-    };
-
+    const result = calculateSingleBillCoverage(bill, envelope, allocationAmount);
     results.push(result);
 
-    if (shortage > 0) {
-      totalShortage += shortage;
+    if (result.shortage > 0) {
+      totalShortage += result.shortage;
     }
-    if (status === "uncovered" || (status === "partial" && coveragePercent < 50)) {
-      criticalCount++;
+    if (
+      result.status === "uncovered" ||
+      (result.status === "partial" && result.coveragePercent < 50)
+    ) {
+      criticalCount += 1;
     }
   }
 
@@ -162,5 +112,54 @@ export function calculateBillCoverageJS(
     bills: results,
     totalShortage,
     criticalCount,
+  };
+}
+
+/**
+ * Helper to calculate coverage for a single bill
+ */
+function calculateSingleBillCoverage(
+  bill: BillCoverageInput,
+  envelope: EnvelopeCoverageInput | undefined,
+  allocationAmount: number
+): BillCoverageResult {
+  if (!envelope) {
+    return {
+      billId: bill.id,
+      envelopeId: bill.envelopeId,
+      currentBalance: 0,
+      allocationAmount,
+      projectedBalance: allocationAmount,
+      billAmount: bill.amountCents,
+      shortage: Math.max(0, bill.amountCents - allocationAmount),
+      coveragePercent: 0,
+      status: "uncovered",
+      daysUntilDue: bill.dueDateDays,
+    };
+  }
+
+  const currentBalance = envelope.currentBalanceCents;
+  const projectedBalance = currentBalance + allocationAmount;
+  const billAmount = bill.amountCents;
+  const shortage = Math.max(0, billAmount - projectedBalance);
+  const coveragePercent =
+    billAmount > 0 ? Math.round((projectedBalance / billAmount) * 1000) / 10 : 0;
+
+  let status: "covered" | "partial" | "uncovered";
+  if (coveragePercent >= 100) status = "covered";
+  else if (coveragePercent >= 50) status = "partial";
+  else status = "uncovered";
+
+  return {
+    billId: bill.id,
+    envelopeId: bill.envelopeId,
+    currentBalance,
+    allocationAmount,
+    projectedBalance,
+    billAmount,
+    shortage,
+    coveragePercent,
+    status,
+    daysUntilDue: bill.dueDateDays,
   };
 }

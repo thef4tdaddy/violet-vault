@@ -3,7 +3,7 @@
  * Main container for bill coverage forecasting in paycheck wizard
  */
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useBillForecasting } from "@/hooks/budgeting/paycheck-flow/useBillForecasting";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { BillCoverageItem } from "./BillCoverageItem";
@@ -35,8 +35,15 @@ export function BillForecastingPanel({
     paycheckFrequency,
   });
 
-  const { upcomingBills, totalShortage, criticalBills, nextPayday, daysUntilPayday, isLoading, error } =
-    forecastingResult;
+  const {
+    upcomingBills,
+    totalShortage,
+    criticalBills,
+    nextPayday,
+    daysUntilPayday,
+    isLoading,
+    error,
+  } = forecastingResult;
 
   // Generate auto-fix suggestions
   const autoFixSuggestions = useMemo(() => {
@@ -48,7 +55,8 @@ export function BillForecastingPanel({
       id: env.id,
       name: env.name,
       currentBalance: env.currentBalance || 0,
-      monthlyTarget: env.monthlyBudget || env.monthlyTarget || 0,
+      monthlyTarget:
+        env.monthlyBudget || (env as any).monthlyContribution || (env as any).targetAmount || 0,
       isDiscretionary: env.type === "standard",
       category: env.category || "",
       allocationAmount: allocations.find((a) => a.envelopeId === env.id)?.amountCents || 0,
@@ -155,7 +163,9 @@ export function BillForecastingPanel({
       {upcomingBills.length > 0 && totalShortage === 0 && (
         <div className="mt-4 p-3 bg-green-50 border-2 border-green-500 rounded-lg text-center">
           <div className="font-black text-green-900 uppercase">✅ All Bills Covered</div>
-          <div className="text-xs text-green-700 mt-1">Great job! All upcoming bills are fully funded</div>
+          <div className="text-xs text-green-700 mt-1">
+            Great job! All upcoming bills are fully funded
+          </div>
         </div>
       )}
     </div>

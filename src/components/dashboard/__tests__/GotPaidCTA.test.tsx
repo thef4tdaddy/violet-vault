@@ -181,10 +181,7 @@ describe("GotPaidCTA", () => {
 
       const button = screen.getByTestId("got-paid-cta");
 
-      expect(button).toHaveAttribute(
-        "aria-label",
-        "Start paycheck allocation wizard"
-      );
+      expect(button).toHaveAttribute("aria-label", "Start paycheck allocation wizard");
     });
 
     it("should render dollar emoji", () => {
@@ -283,9 +280,7 @@ describe("GotPaidCTA", () => {
     it("should display subtitle text", () => {
       render(<GotPaidCTA />);
 
-      expect(
-        screen.getByText(/Allocate your paycheck in 60 seconds/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Allocate your paycheck in 60 seconds/i)).toBeInTheDocument();
     });
   });
 });

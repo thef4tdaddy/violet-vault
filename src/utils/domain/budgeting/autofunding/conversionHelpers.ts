@@ -132,11 +132,7 @@ export function convertLastSplitToRules(
   allocation: AllocationResult,
   options: AllocationToRulesOptions = {}
 ): AutoFundingRule[] {
-  const {
-    trigger = "income_detected",
-    enabled = false,
-    baseRuleName = "Last Split",
-  } = options;
+  const { trigger = "income_detected", enabled = false, baseRuleName = "Last Split" } = options;
 
   const rules: AutoFundingRule[] = [];
   const timestamp = new Date().toISOString();
@@ -182,11 +178,7 @@ export function convertTargetFirstToRules(
   paycheckAmountCents: number,
   options: AllocationToRulesOptions = {}
 ): AutoFundingRule[] {
-  const {
-    trigger = "income_detected",
-    enabled = false,
-    baseRuleName = "Target First",
-  } = options;
+  const { trigger = "income_detected", enabled = false, baseRuleName = "Target First" } = options;
 
   const rules: AutoFundingRule[] = [];
   const timestamp = new Date().toISOString();

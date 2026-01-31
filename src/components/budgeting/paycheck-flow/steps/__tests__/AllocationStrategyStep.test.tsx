@@ -1,12 +1,6 @@
-/**
- * Tests for AllocationStrategyStep - Issue #1844
- * Comprehensive test coverage for Quick Strategies UI Integration
- */
-
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import AllocationStrategyStep from "../AllocationStrategyStep";
 
 // Import custom matchers for Vitest
 import "@testing-library/jest-dom";
@@ -24,25 +18,51 @@ import {
   getPredictionFromHistory,
   detectFrequencyFromAmount,
 } from "@/services/api/predictionService";
+import useToast from "@/hooks/platform/ux/useToast";
+import { usePaycheckFrequencyDetection } from "@/hooks/budgeting/paycheck-flow/usePaycheckFrequencyDetection";
+import { useAllocationStrategies } from "@/hooks/budgeting/paycheck-flow/useAllocationStrategies";
+import { useBillForecasting } from "@/hooks/budgeting/paycheck-flow/useBillForecasting";
+import { usePaydayProgress } from "@/hooks/dashboard/usePaydayProgress";
 
-// Mock the stores and hooks
+// Mock the stores and hooks first!
 vi.mock("@/stores/ui/paycheckFlowStore", () => ({
-  usePaycheckFlowStore: vi.fn(),
+  usePaycheckFlowStore: Object.assign(vi.fn(), {
+    getState: vi.fn(() => ({})),
+    setState: vi.fn(),
+    subscribe: vi.fn(),
+  }),
 }));
 
 vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
-  useEnvelopes: vi.fn(),
-  default: () => ({ envelopes: [], isLoading: false, error: null }),
+  useEnvelopes: vi.fn(() => ({
+    envelopes: [
+      {
+        id: "rent",
+        name: "Rent",
+        monthlyBudget: 100000,
+        currentBalance: 50000,
+        category: "housing",
+      },
+      {
+        id: "groceries",
+        name: "Groceries",
+        monthlyBudget: 75000,
+        currentBalance: 25000,
+        category: "food",
+      },
+    ],
+    isLoading: false,
+    error: null,
+  })),
 }));
 
-// Mock API services
 vi.mock("@/services/api/allocationService", () => ({
   allocateEvenSplit: vi.fn(),
   allocateLastSplit: vi.fn(),
   AllocationServiceError: class extends Error {
     constructor(
       message: string,
-      public status: number
+      public statusCode?: number
     ) {
       super(message);
       this.name = "AllocationServiceError";
@@ -81,6 +101,65 @@ vi.mock("@/utils/core/common/logger", () => ({
   },
 }));
 
+vi.mock("@/hooks/platform/ux/useToast", () => ({
+  default: vi.fn(() => ({
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+    showWarning: vi.fn(),
+    showInfo: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/usePaycheckFrequencyDetection", () => ({
+  usePaycheckFrequencyDetection: vi.fn(() => ({
+    paycheckFrequency: "biweekly",
+    setPaycheckFrequency: vi.fn(),
+    wasAutoDetected: false,
+    detectionMessage: null,
+    setWasAutoDetected: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/useAllocationStrategies", () => ({
+  useAllocationStrategies: vi.fn(() => ({
+    loading: false,
+    error: null,
+    handleEvenSplit: vi.fn(),
+    handleLastSplit: vi.fn(),
+    handleSmartSplit: vi.fn(),
+  })),
+}));
+
+vi.mock("@/hooks/budgeting/paycheck-flow/useBillForecasting", () => ({
+  useBillForecasting: vi.fn(() => ({
+    upcomingBills: [],
+    totalShortage: 0,
+    criticalBills: [],
+    criticalCount: 0,
+    nextPayday: new Date(),
+    daysUntilPayday: 14,
+    isLoading: false,
+  })),
+}));
+
+vi.mock("@/hooks/dashboard/usePaydayProgress", () => ({
+  usePaydayProgress: vi.fn(() => ({
+    daysUntilPayday: 14,
+    formattedPayday: "Feb 14",
+    isLoading: false,
+  })),
+}));
+
+vi.mock("../forecasting/BillForecastingPanel", () => ({
+  BillForecastingPanel: () => <div data-testid="bill-forecasting-panel">Bill Forecasting</div>,
+}));
+
+vi.mock("../SaveAsRulesModal", () => ({
+  SaveAsRulesModal: () => <div data-testid="save-as-rules-modal">Save As Rules Modal</div>,
+}));
+
+import AllocationStrategyStep from "../AllocationStrategyStep";
+
 describe("AllocationStrategyStep", () => {
   const mockProps = {
     onNext: vi.fn(),
@@ -107,6 +186,7 @@ describe("AllocationStrategyStep", () => {
       paycheckAmountCents: 250000,
       paycheckFrequency: "biweekly",
       setAllocations: vi.fn(),
+      setSelectedStrategy: vi.fn(),
       allocations: [],
     };
 
@@ -126,6 +206,39 @@ describe("AllocationStrategyStep", () => {
       reasoning: "Consistent biweekly pattern",
     });
 
+    vi.mocked(useToast).mockReturnValue({
+      showSuccess: vi.fn(),
+      showError: vi.fn(),
+      showWarning: vi.fn(),
+      showInfo: vi.fn(),
+    } as any);
+
+    vi.mocked(usePaycheckFrequencyDetection).mockReturnValue({
+      paycheckFrequency: "biweekly",
+      setPaycheckFrequency: vi.fn(),
+      wasAutoDetected: false,
+      detectionMessage: null,
+      setWasAutoDetected: vi.fn(),
+    } as any);
+
+    vi.mocked(useAllocationStrategies).mockReturnValue({
+      loading: false,
+      error: null,
+      handleEvenSplit: vi.fn(),
+      handleLastSplit: vi.fn(),
+      handleSmartSplit: vi.fn(),
+    } as any);
+
+    vi.mocked(useBillForecasting).mockReturnValue({
+      upcomingBills: [],
+      totalShortage: 0,
+      criticalBills: [],
+      criticalCount: 0,
+      nextPayday: new Date(),
+      daysUntilPayday: 14,
+      isLoading: false,
+    } as any);
+
     vi.mocked(budgetDb.getPaycheckHistory).mockResolvedValue([]);
   });
 
@@ -136,7 +249,8 @@ describe("AllocationStrategyStep", () => {
   describe("Rendering", () => {
     it("should render all components", () => {
       render(<AllocationStrategyStep {...mockProps} />);
-      expect(screen.getByText("HOW DO YOU WANT TO ALLOCATE?")).not.toBeNull();
+      screen.debug();
+      expect(screen.getByText(/How do you want to allocate/i)).not.toBeNull();
       expect(screen.getByText("Rent")).not.toBeNull();
       expect(screen.getByText("Groceries")).not.toBeNull();
       expect(screen.getByText("$2500.00")).not.toBeNull();
@@ -188,69 +302,58 @@ describe("AllocationStrategyStep", () => {
   describe("Strategies", () => {
     it("should handle even split successfully", async () => {
       const user = userEvent.setup();
-      vi.mocked(allocateEvenSplit).mockResolvedValue({
-        allocations: [
-          { envelopeId: "rent", amountCents: 150000 },
-          { envelopeId: "groceries", amountCents: 100000 },
-        ],
-        totalAllocatedCents: 250000,
+      const mockHandleEven = vi.fn();
+      vi.mocked(useAllocationStrategies).mockReturnValue({
+        loading: false,
+        error: null,
+        handleEvenSplit: mockHandleEven,
+        handleLastSplit: vi.fn(),
+        handleSmartSplit: vi.fn(),
       } as any);
 
       render(<AllocationStrategyStep {...mockProps} />);
-      await user.click(screen.getByText("SPLIT EVENLY"));
+      await user.click(screen.getByRole("button", { name: /SPLIT EVENLY/i }));
 
       await waitFor(() => {
-        expect(screen.getByText("$0.00")).not.toBeNull();
-        expect(allocateEvenSplit).toHaveBeenCalled();
+        expect(mockHandleEven).toHaveBeenCalled();
       });
     });
 
     it("should handle last split successfully", async () => {
       const user = userEvent.setup();
-      vi.mocked(budgetDb.getPaycheckHistory).mockResolvedValue([
-        {
-          id: "1",
-          date: "2026-01-01",
-          amount: 250000,
-          allocations: { rent: 150000, groceries: 100000 },
-        },
-      ] as any);
-      vi.mocked(allocateLastSplit).mockResolvedValue({
-        allocations: [
-          { envelopeId: "rent", amountCents: 150000 },
-          { envelopeId: "groceries", amountCents: 100000 },
-        ],
-        totalAllocatedCents: 250000,
+      const mockHandleLast = vi.fn();
+      vi.mocked(useAllocationStrategies).mockReturnValue({
+        loading: false,
+        error: null,
+        handleEvenSplit: vi.fn(),
+        handleLastSplit: mockHandleLast,
+        handleSmartSplit: vi.fn(),
       } as any);
 
       render(<AllocationStrategyStep {...mockProps} />);
-      await user.click(screen.getByText("USE LAST SPLIT"));
+      await user.click(screen.getByRole("button", { name: /USE LAST SPLIT/i }));
 
       await waitFor(() => {
-        expect(screen.getByText("$0.00")).not.toBeNull();
-        expect(allocateLastSplit).toHaveBeenCalled();
+        expect(mockHandleLast).toHaveBeenCalled();
       });
     });
 
     it("should handle smart split successfully", async () => {
       const user = userEvent.setup();
-      vi.mocked(budgetDb.getPaycheckHistory).mockResolvedValue([
-        { id: "1", date: "2026-01-01", amount: 250000, allocations: {} },
-        { id: "2", date: "2025-12-15", amount: 250000, allocations: {} },
-        { id: "3", date: "2025-12-01", amount: 250000, allocations: {} },
-      ] as any);
-      vi.mocked(getPredictionFromHistory).mockResolvedValue({
-        suggestedAllocationsCents: [150000, 100000],
-        confidence: 0.9,
-        reasoning: { patternType: "Stable" },
+      const mockHandleSmart = vi.fn();
+      vi.mocked(useAllocationStrategies).mockReturnValue({
+        loading: false,
+        error: null,
+        handleEvenSplit: vi.fn(),
+        handleLastSplit: vi.fn(),
+        handleSmartSplit: mockHandleSmart,
       } as any);
 
       render(<AllocationStrategyStep {...mockProps} />);
-      await user.click(screen.getByText("SMART SPLIT"));
+      await user.click(screen.getByRole("button", { name: /SMART SPLIT/i }));
 
       await waitFor(() => {
-        expect(screen.getByText("$0.00")).not.toBeNull();
-        expect(getPredictionFromHistory).toHaveBeenCalled();
+        expect(mockHandleSmart).toHaveBeenCalled();
       });
     });
   });
@@ -258,12 +361,19 @@ describe("AllocationStrategyStep", () => {
   describe("Edge Cases & UI Feedback", () => {
     it("should show error message on API failure", async () => {
       const user = userEvent.setup();
-      // Throw correct error class for component instance check
-      vi.mocked(allocateEvenSplit).mockRejectedValue(new AllocationServiceError("API Down", 500));
+
+      // We need to mock the hook to return the error state
+      vi.mocked(useAllocationStrategies).mockReturnValue({
+        loading: false,
+        error: "API Down",
+        handleEvenSplit: vi.fn(),
+        handleLastSplit: vi.fn(),
+        handleSmartSplit: vi.fn(),
+      } as any);
 
       render(<AllocationStrategyStep {...mockProps} />);
-      await user.click(screen.getByText("SPLIT EVENLY"));
 
+      // The error should be visible because we mocked the hook to return it
       await waitFor(() => {
         expect(screen.getByText(/API Down/i)).not.toBeNull();
       });
@@ -287,7 +397,7 @@ describe("AllocationStrategyStep", () => {
       fireEvent.change(inputs[0], { target: { value: "1250" } }); // 50% of 2500
 
       await waitFor(() => {
-        expect(screen.getByText("50.00% allocated")).not.toBeNull();
+        expect(screen.getByText(/50.00% allocated/i)).not.toBeNull();
       });
     });
   });

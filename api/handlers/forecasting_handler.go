@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-	"violet-vault/api/services"
+
+	"github.com/thef4tdaddy/violet-vault/api/services"
 )
 
 // CalculateCoverageHandler handles bill coverage calculation requests

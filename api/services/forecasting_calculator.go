@@ -2,15 +2,14 @@ package services
 
 import (
 	"math"
-	"violet-vault/api/models"
 )
 
 // BillCoverageInput represents anonymized bill data for coverage calculation
 type BillCoverageInput struct {
-	ID           string `json:"id"`
-	AmountCents  int64  `json:"amountCents"`
-	DueDateDays  int    `json:"dueDateDays"`  // Days until due (relative)
-	EnvelopeID   string `json:"envelopeId"`
+	ID          string `json:"id"`
+	AmountCents int64  `json:"amountCents"`
+	DueDateDays int    `json:"dueDateDays"` // Days until due (relative)
+	EnvelopeID  string `json:"envelopeId"`
 }
 
 // EnvelopeCoverageInput represents anonymized envelope data
@@ -38,23 +37,23 @@ type CoverageRequest struct {
 
 // BillCoverageResult represents coverage status for a single bill
 type BillCoverageResult struct {
-	BillID            string  `json:"billId"`
-	EnvelopeID        string  `json:"envelopeId"`
-	CurrentBalance    int64   `json:"currentBalance"`
-	AllocationAmount  int64   `json:"allocationAmount"`
-	ProjectedBalance  int64   `json:"projectedBalance"`
-	BillAmount        int64   `json:"billAmount"`
-	Shortage          int64   `json:"shortage"`
-	CoveragePercent   float64 `json:"coveragePercent"`
-	Status            string  `json:"status"` // "covered", "partial", "uncovered"
-	DaysUntilDue      int     `json:"daysUntilDue"`
+	BillID           string  `json:"billId"`
+	EnvelopeID       string  `json:"envelopeId"`
+	CurrentBalance   int64   `json:"currentBalance"`
+	AllocationAmount int64   `json:"allocationAmount"`
+	ProjectedBalance int64   `json:"projectedBalance"`
+	BillAmount       int64   `json:"billAmount"`
+	Shortage         int64   `json:"shortage"`
+	CoveragePercent  float64 `json:"coveragePercent"`
+	Status           string  `json:"status"` // "covered", "partial", "uncovered"
+	DaysUntilDue     int     `json:"daysUntilDue"`
 }
 
 // CoverageResponse is the response from coverage calculation
 type CoverageResponse struct {
-	Bills          []BillCoverageResult `json:"bills"`
-	TotalShortage  int64                `json:"totalShortage"`
-	CriticalCount  int                  `json:"criticalCount"`
+	Bills         []BillCoverageResult `json:"bills"`
+	TotalShortage int64                `json:"totalShortage"`
+	CriticalCount int                  `json:"criticalCount"`
 }
 
 // CalculateBillCoverage calculates coverage status for all bills
@@ -116,7 +115,7 @@ func CalculateBillCoverage(req CoverageRequest) CoverageResponse {
 
 			// Determine status
 			status := "uncovered"
-			if coveragePercent >= 100.0 {
+			if coveragePercent >= 100.0 || billAmount == 0 {
 				status = "covered"
 			} else if coveragePercent >= 50.0 {
 				status = "partial"

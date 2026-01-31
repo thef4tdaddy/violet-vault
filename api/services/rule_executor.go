@@ -3,7 +3,8 @@ package services
 import (
 	"fmt"
 	"sort"
-	"violet-vault/api/models"
+
+	"github.com/thef4tdaddy/violet-vault/api/models"
 )
 
 // ExecuteRules executes all enabled rules in priority order

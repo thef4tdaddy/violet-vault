@@ -37,9 +37,7 @@ export function generateAutoFixSuggestions(
   envelopes: EnvelopeWithAllocation[]
 ): AutoFixSuggestion[] {
   // Filter bills with shortages, sort by shortage amount (critical first)
-  const criticalBills = bills
-    .filter((b) => b.shortage > 0)
-    .sort((a, b) => b.shortage - a.shortage);
+  const criticalBills = bills.filter((b) => b.shortage > 0).sort((a, b) => b.shortage - a.shortage);
 
   if (criticalBills.length === 0) {
     return []; // No shortages to fix
@@ -137,9 +135,7 @@ export function applyAutoFixSuggestions(
   suggestions: AutoFixSuggestion[]
 ): Array<{ envelopeId: string; amountCents: number }> {
   // Create a copy of allocations
-  const updatedAllocations = new Map(
-    allocations.map((a) => [a.envelopeId, a.amountCents])
-  );
+  const updatedAllocations = new Map(allocations.map((a) => [a.envelopeId, a.amountCents]));
 
   // Apply each suggestion
   for (const suggestion of suggestions) {
@@ -152,10 +148,7 @@ export function applyAutoFixSuggestions(
 
     // Increase to target envelope
     const toAmount = updatedAllocations.get(suggestion.toEnvelopeId) || 0;
-    updatedAllocations.set(
-      suggestion.toEnvelopeId,
-      toAmount + suggestion.amountCents
-    );
+    updatedAllocations.set(suggestion.toEnvelopeId, toAmount + suggestion.amountCents);
   }
 
   // Convert back to array

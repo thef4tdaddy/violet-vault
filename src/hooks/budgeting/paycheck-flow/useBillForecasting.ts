@@ -7,8 +7,11 @@ import { useMemo } from "react";
 import { useBillsQuery } from "@/hooks/budgeting/transactions/scheduled/expenses/useBills";
 import { useEnvelopes } from "@/hooks/budgeting/envelopes/useEnvelopes";
 import { usePaydayProgress } from "@/hooks/dashboard/usePaydayProgress";
-import { calculateBillCoverage } from "@/services/forecasting/forecastingService";
-import type { BillCoverageResult } from "@/services/forecasting/forecastingService";
+import { calculateBillCoverageJS } from "@/services/forecasting/forecastingService";
+import type {
+  BillCoverageResult,
+  CoverageResponse,
+} from "@/services/forecasting/forecastingService";
 import { calculateDaysUntilDue } from "@/utils/domain/bills/billCalculations";
 
 export interface UseBillForecastingOptions {
@@ -116,36 +119,22 @@ export function useBillForecasting(options: UseBillForecastingOptions): BillFore
     const billsInput = bills.map((bill) => ({
       id: bill.id,
       amountCents: Math.abs(bill.amount), // Bills are stored as negative
-      dueDateDays: calculateDaysUntilDue(bill.dueDate, new Date()) || 0,
+      dueDateDays: calculateDaysUntilDue(bill.date, new Date()) || 0,
       envelopeId: bill.envelopeId || "",
     }));
 
     const envelopesInput = envelopes.map((env) => ({
       id: env.id,
       currentBalanceCents: env.currentBalance || 0,
-      monthlyTargetCents: env.monthlyBudget || env.monthlyTarget || 0,
+      monthlyTargetCents: env.targetAmount || env.monthlyBudget || 0,
       isDiscretionary: env.type === "standard",
     }));
 
     const allocationsInput = allocations;
 
-    // Call coverage calculation (tries Go first, falls back to JS)
-    const coveragePromise = calculateBillCoverage({
-      bills: billsInput,
-      envelopes: envelopesInput,
-      allocations: allocationsInput,
-      paycheckAmountCents,
-      daysUntilNextPayday: effectiveDaysUntilPayday,
-    });
-
-    // Note: This is synchronous in the JS fallback, async with Go
-    // We're using it synchronously here for simplicity
-    // In production, you might want to use React Query or similar
-    let coverageResponse;
+    let coverageResponse: CoverageResponse;
     try {
-      // For now, use JavaScript fallback directly (sync)
-      // TODO: Integrate async Go engine call with React Query
-      const { calculateBillCoverageJS } = require("@/services/forecasting/forecastingService");
+      // Use standard import instead of forbidden require()
       coverageResponse = calculateBillCoverageJS({
         bills: billsInput,
         envelopes: envelopesInput,
@@ -153,7 +142,7 @@ export function useBillForecasting(options: UseBillForecastingOptions): BillFore
         paycheckAmountCents,
         daysUntilNextPayday: effectiveDaysUntilPayday,
       });
-    } catch (error) {
+    } catch {
       return {
         upcomingBills: [],
         totalShortage: 0,
@@ -167,16 +156,20 @@ export function useBillForecasting(options: UseBillForecastingOptions): BillFore
     }
 
     // Enhance results with names
-    const upcomingBills: BillWithCoverageEnhanced[] = coverageResponse.bills.map((result) => {
-      const bill = bills.find((b) => b.id === result.billId);
-      const envelope = envelopes.find((e) => e.id === result.envelopeId);
+    const upcomingBills: BillWithCoverageEnhanced[] = coverageResponse.bills.map(
+      (result: BillCoverageResult) => {
+        const bill = bills.find((b) => b.id === result.billId);
+        const envelope = envelopes.find((e) => e.id === result.envelopeId);
 
-      return {
-        ...result,
-        billName: bill?.name || "Unknown Bill",
-        envelopeName: envelope?.name || "Unknown Envelope",
-      };
-    });
+        const billName = bill?.description || "Unknown Bill";
+
+        return {
+          ...result,
+          billName,
+          envelopeName: envelope?.name || "Unknown Envelope",
+        };
+      }
+    );
 
     // Identify critical bills
     const criticalBills = upcomingBills.filter(

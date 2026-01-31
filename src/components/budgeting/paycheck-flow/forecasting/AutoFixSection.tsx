@@ -3,7 +3,6 @@
  * Displays auto-fix suggestions and allows one-click application
  */
 
-import React from "react";
 import Button from "@/components/ui/buttons/Button";
 import type { AutoFixSuggestion } from "@/utils/domain/budgeting/autoFixSuggestions";
 import { formatCentsAsCurrency } from "@/utils/domain/budgeting/billCoverageCalculations";
@@ -26,9 +25,7 @@ export function AutoFixSection({ suggestions, onApply, isApplying = false }: Aut
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <span className="text-2xl">💡</span>
-        <h4 className="font-black text-amber-900 uppercase tracking-wide">
-          Auto-Fix Suggestions
-        </h4>
+        <h4 className="font-black text-amber-900 uppercase tracking-wide">Auto-Fix Suggestions</h4>
       </div>
 
       {/* Summary */}

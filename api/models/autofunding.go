@@ -2,17 +2,17 @@ package models
 
 // Rule represents an autofunding rule
 type Rule struct {
-	ID              string      `json:"id"`
-	Name            string      `json:"name"`
-	Description     string      `json:"description,omitempty"`
-	Type            string      `json:"type"`
-	Trigger         string      `json:"trigger"`
-	Priority        int         `json:"priority"`
-	Enabled         bool        `json:"enabled"`
-	Config          RuleConfig  `json:"config"`
-	CreatedAt       string      `json:"createdAt,omitempty"`
-	LastExecuted    *string     `json:"lastExecuted,omitempty"`
-	ExecutionCount  int         `json:"executionCount,omitempty"`
+	ID             string     `json:"id"`
+	Name           string     `json:"name"`
+	Description    string     `json:"description,omitempty"`
+	Type           string     `json:"type"`
+	Trigger        string     `json:"trigger"`
+	Priority       int        `json:"priority"`
+	Enabled        bool       `json:"enabled"`
+	Config         RuleConfig `json:"config"`
+	CreatedAt      string     `json:"createdAt,omitempty"`
+	LastExecuted   *string    `json:"lastExecuted,omitempty"`
+	ExecutionCount int        `json:"executionCount,omitempty"`
 }
 
 // RuleConfig contains the configuration for a rule
@@ -62,9 +62,9 @@ type Allocation struct {
 
 // AutofundingRequest is the request payload for rule execution
 type AutofundingRequest struct {
-	RuleIDs []string           `json:"ruleIds,omitempty"`
-	Trigger string             `json:"trigger"`
-	Context AllocationContext  `json:"context"`
+	RuleIDs []string          `json:"ruleIds,omitempty"`
+	Trigger string            `json:"trigger"`
+	Context AllocationContext `json:"context"`
 }
 
 // AutofundingResponse is the response from rule execution

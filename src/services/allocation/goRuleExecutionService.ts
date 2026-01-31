@@ -1,8 +1,4 @@
-/**
- * Go Rule Execution Service - Issue #1845
- * Type-safe client for Go Autofunding Rule Engine
- * Provides ultra-fast rule execution (<1ms) with JavaScript fallback
- */
+import logger from "@/utils/core/common/logger";
 
 export interface AutofundingRule {
   id: string;
@@ -133,11 +129,11 @@ export async function executeRulesViaGo(
     }
 
     // Log Go engine failure
-    console.warn(
+    logger.warn(
       `Go autofunding engine failed with status ${response.status}, falling back to JavaScript execution`
     );
   } catch (error) {
-    console.warn(
+    logger.warn(
       `Go autofunding engine unavailable (${error instanceof Error ? error.message : "unknown error"}), falling back to JavaScript execution`
     );
   }
@@ -161,9 +157,7 @@ export function executeRulesViaJavaScript(
   const startTime = performance.now();
 
   // Sort by priority (lower = higher priority)
-  const sortedRules = [...rules]
-    .filter((r) => r.enabled)
-    .sort((a, b) => a.priority - b.priority);
+  const sortedRules = [...rules].filter((r) => r.enabled).sort((a, b) => a.priority - b.priority);
 
   const allocations: RuleAllocation[] = [];
   let remainingCash = context.unassignedCash;
@@ -205,11 +199,12 @@ function executeRuleJS(rule: AutofundingRule, context: AllocationContext): RuleA
       return [executePriorityFillJS(rule, context)];
     case "split_remainder":
       return executeSplitRemainderJS(rule, context);
-    case "conditional":
+    case "conditional": {
       const result = executeConditionalJS(rule, context);
       return result ? [result] : [];
+    }
     default:
-      console.warn(`Unknown rule type: ${rule.type}`);
+      logger.warn(`Unknown rule type: ${rule.type}`);
       return [];
   }
 }
@@ -244,10 +239,7 @@ function executePercentageJS(rule: AutofundingRule, context: AllocationContext):
   };
 }
 
-function executePriorityFillJS(
-  rule: AutofundingRule,
-  context: AllocationContext
-): RuleAllocation {
+function executePriorityFillJS(rule: AutofundingRule, context: AllocationContext): RuleAllocation {
   const envelope = context.envelopes.find((e) => e.id === rule.config.targetId);
   if (!envelope) {
     return {

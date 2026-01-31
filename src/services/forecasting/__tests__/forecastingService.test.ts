@@ -2,10 +2,7 @@
  * Tests for Forecasting Service (JavaScript fallback)
  */
 
-import {
-  calculateBillCoverageJS,
-  type CoverageRequest,
-} from "../forecastingService";
+import { calculateBillCoverageJS, type CoverageRequest } from "../forecastingService";
 
 describe("forecastingService", () => {
   describe("calculateBillCoverageJS", () => {

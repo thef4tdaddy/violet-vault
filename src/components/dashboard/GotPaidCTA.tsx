@@ -10,6 +10,7 @@
 import React from "react";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 import { usePaydayProgress } from "@/hooks/dashboard/usePaydayProgress";
+import Button from "@/components/ui/buttons/Button";
 
 interface GotPaidCTAProps {
   /** Optional CSS classes */
@@ -62,7 +63,7 @@ const GotPaidCTA: React.FC<GotPaidCTAProps> = ({ className = "" }) => {
   }
 
   return (
-    <button
+    <Button
       onClick={openWizard}
       className={`
         group relative
@@ -80,11 +81,7 @@ const GotPaidCTA: React.FC<GotPaidCTAProps> = ({ className = "" }) => {
       <div className="flex items-center justify-center gap-4">
         {/* Dollar Icon with Pulse Animation */}
         <div className="relative">
-          <span
-            className="text-4xl animate-pulse"
-            role="img"
-            aria-label="Money"
-          >
+          <span className="text-4xl animate-pulse" role="img" aria-label="Money">
             💵
           </span>
           {/* Subtle glow effect on hover */}
@@ -110,15 +107,11 @@ const GotPaidCTA: React.FC<GotPaidCTAProps> = ({ className = "" }) => {
             stroke="currentColor"
             strokeWidth={3}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         </div>
       </div>
-    </button>
+    </Button>
   );
 };
 

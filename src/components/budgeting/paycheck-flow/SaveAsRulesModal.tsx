@@ -5,7 +5,11 @@
 
 import React, { useState } from "react";
 import Button from "@/components/ui/buttons/Button";
-import { smartConvertAllocationToRules, type AllocationResult } from "@/utils/domain/budgeting/autofunding/conversionHelpers";
+import Select from "@/components/ui/forms/Select";
+import {
+  smartConvertAllocationToRules,
+  type AllocationResult,
+} from "@/utils/domain/budgeting/autofunding/conversionHelpers";
 import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import logger from "@/utils/core/common/logger";
 
@@ -51,7 +55,9 @@ export function SaveAsRulesModal({
       // Simulate save
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      showSuccessToast(`Created ${rules.length} rules from your ${allocation.strategy} allocation!`);
+      showSuccessToast(
+        `Created ${rules.length} rules from your ${allocation.strategy} allocation!`
+      );
       onClose();
     } catch (error) {
       logger.error("Failed to save allocation as rules", { error });
@@ -115,14 +121,16 @@ export function SaveAsRulesModal({
               <label className="block text-sm font-bold text-slate-900 mb-2 uppercase">
                 When should these rules run?
               </label>
-              <select
+              <Select
                 value={trigger}
-                onChange={(e) => setTrigger(e.target.value as "income_detected" | "biweekly")}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setTrigger(e.target.value as "income_detected" | "biweekly")
+                }
                 className="w-full px-4 py-2 border-2 border-black rounded font-medium focus:ring-2 focus:ring-fuchsia-500"
               >
                 <option value="income_detected">When income is detected</option>
                 <option value="biweekly">Every 2 weeks (biweekly)</option>
-              </select>
+              </Select>
             </div>
 
             <div className="flex items-center gap-3 p-4 bg-yellow-50 border-2 border-yellow-500 rounded">

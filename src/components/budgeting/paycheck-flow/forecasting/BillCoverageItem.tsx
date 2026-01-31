@@ -3,7 +3,6 @@
  * Displays individual bill with coverage status and visual indicators
  */
 
-import React from "react";
 import type { BillWithCoverageEnhanced } from "@/hooks/budgeting/paycheck-flow/useBillForecasting";
 import {
   getCoverageIcon,
@@ -38,9 +37,7 @@ export function BillCoverageItem({ bill }: BillCoverageItemProps) {
           <span className="text-lg">{icon}</span>
           <span className="font-bold text-sm text-slate-900">{bill.billName}</span>
         </div>
-        <span className="font-black text-slate-900">
-          {formatCentsAsCurrency(bill.billAmount)}
-        </span>
+        <span className="font-black text-slate-900">{formatCentsAsCurrency(bill.billAmount)}</span>
       </div>
 
       {/* Details */}

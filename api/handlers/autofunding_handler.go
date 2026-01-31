@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-	"violet-vault/api/models"
-	"violet-vault/api/services"
+
+	"github.com/thef4tdaddy/violet-vault/api/models"
+	"github.com/thef4tdaddy/violet-vault/api/services"
 )
 
 // ExecuteAutofundingHandler handles autofunding rule execution requests
@@ -72,9 +73,9 @@ func ExecuteAutofundingHandler(w http.ResponseWriter, r *http.Request) {
 func ExecuteAutofundingWithRulesHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse request with rules embedded
 	var req struct {
-		Rules   []models.Rule              `json:"rules"`
-		Trigger string                     `json:"trigger"`
-		Context models.AllocationContext   `json:"context"`
+		Rules   []models.Rule            `json:"rules"`
+		Trigger string                   `json:"trigger"`
+		Context models.AllocationContext `json:"context"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
