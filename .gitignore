@@ -58,6 +58,7 @@ docs/audits/typecheck-strict-results.txt
 docs/audits/sorted-typecheck-strict-report.txt
 .audit-metrics.json
 .salvo_errors/
+.salvo_stats.json
 
 # Test coverage
 coverage/

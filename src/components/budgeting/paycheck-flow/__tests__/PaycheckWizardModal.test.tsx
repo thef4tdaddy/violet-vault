@@ -3,17 +3,65 @@
  * Part of Issue #1785: Wizard Modal Container
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PaycheckWizardModal } from "../PaycheckWizardModal";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
+import * as allocationService from "@/services/api/allocationService";
+import * as predictionService from "@/services/api/predictionService";
+
+// Import custom matchers for Vitest
+import "@testing-library/jest-dom";
 
 // Mock Framer Motion to avoid animation complexities in tests
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  },
+}));
+
+vi.mock("@/db/budgetDb", () => ({
+  budgetDb: {
+    getPaycheckHistory: vi.fn().mockResolvedValue([]),
+  },
+}));
+
+vi.mock("@/hooks/budgeting/envelopes/useEnvelopes", () => ({
+  useEnvelopes: vi.fn(() => ({
+    envelopes: [
+      { id: "rent", name: "Rent", monthlyBudget: 100000, currentBalance: 50000, type: "standard" },
+      {
+        id: "groceries",
+        name: "Groceries",
+        monthlyBudget: 75000,
+        currentBalance: 25000,
+        type: "standard",
+      },
+    ],
+    isLoading: false,
+    error: null,
+  })),
+}));
+
+vi.mock("@/services/api/allocationService", () => ({
+  allocateEvenSplit: vi.fn(),
+  allocateLastSplit: vi.fn(),
+  AllocationServiceError: class Error {
+    constructor(public message: string) {}
+  },
+}));
+
+vi.mock("@/services/api/predictionService", () => ({
+  getPredictionFromHistory: vi.fn(),
+  detectFrequencyFromAmount: vi.fn().mockResolvedValue({
+    suggestedFrequency: "biweekly",
+    confidence: 0.9,
+    reasoning: { patternType: "consistent" },
+  }),
+  PredictionServiceError: class Error {
+    constructor(public message: string) {}
   },
 }));
 
@@ -38,7 +86,7 @@ describe("PaycheckWizardModal", () => {
     it("should not render when isOpen is false", () => {
       render(<PaycheckWizardModal />);
 
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).toBeNull();
     });
 
     it("should render when isOpen is true", () => {
@@ -48,7 +96,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(screen.getByRole("dialog")).not.toBeNull();
     });
 
     it("should have correct aria attributes when open", () => {
@@ -59,8 +107,8 @@ describe("PaycheckWizardModal", () => {
       render(<PaycheckWizardModal />);
 
       const dialog = screen.getByRole("dialog");
-      expect(dialog).toHaveAttribute("aria-modal", "true");
-      expect(dialog).toHaveAttribute("aria-labelledby", "paycheck-wizard-title");
+      expect(dialog.getAttribute("aria-modal")).toBe("true");
+      expect(dialog.getAttribute("aria-labelledby")).toBe("paycheck-wizard-title");
     });
   });
 
@@ -72,7 +120,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("heading", { name: /enter paycheck amount/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /enter paycheck amount/i })).not.toBeNull();
     });
 
     it("should display step 1 title when on step 1", () => {
@@ -82,7 +130,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("heading", { name: /allocate funds/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /allocate funds/i })).not.toBeNull();
     });
 
     it("should display step 2 title when on step 2", () => {
@@ -92,7 +140,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("heading", { name: /review & confirm/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /review & confirm/i })).not.toBeNull();
     });
 
     it("should display step 3 title when on step 3", () => {
@@ -102,7 +150,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("heading", { name: /success!/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /success!/i })).not.toBeNull();
     });
   });
 
@@ -115,7 +163,7 @@ describe("PaycheckWizardModal", () => {
       render(<PaycheckWizardModal />);
 
       const step2 = screen.getByLabelText(/step 2:/i);
-      expect(step2).toHaveClass("bg-fuchsia-500");
+      expect(step2.classList.contains("bg-fuchsia-500")).toBe(true);
     });
 
     it("should show checkmarks for completed steps", () => {
@@ -126,12 +174,12 @@ describe("PaycheckWizardModal", () => {
       render(<PaycheckWizardModal />);
 
       const step1 = screen.getByLabelText(/step 1:/i);
-      expect(step1).toHaveTextContent("✓");
-      expect(step1).toHaveClass("bg-green-500");
+      expect(step1.textContent).toContain("✓");
+      expect(step1.classList.contains("bg-green-500")).toBe(true);
 
       const step2 = screen.getByLabelText(/step 2:/i);
-      expect(step2).toHaveTextContent("✓");
-      expect(step2).toHaveClass("bg-green-500");
+      expect(step2.textContent).toContain("✓");
+      expect(step2.classList.contains("bg-green-500")).toBe(true);
     });
 
     it("should show step numbers for future steps", () => {
@@ -157,7 +205,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /back/i })).toBeNull();
     });
 
     it("should show BACK button on second step", () => {
@@ -167,7 +215,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("button", { name: /back/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /back/i })).not.toBeNull();
     });
 
     it("should show CONTINUE button on non-last steps", () => {
@@ -177,7 +225,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("button", { name: /continue/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /continue/i })).not.toBeNull();
     });
 
     it("should not show CONTINUE button on last step", () => {
@@ -187,7 +235,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.queryByRole("button", { name: /continue/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /continue/i })).toBeNull();
     });
 
     it("should call nextStep when CONTINUE is clicked", async () => {
@@ -227,7 +275,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByLabelText(/close paycheck wizard/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/close paycheck wizard/i)).not.toBeNull();
     });
 
     it("should call closeWizard when close button is clicked", async () => {
@@ -390,7 +438,7 @@ describe("PaycheckWizardModal", () => {
 
       render(<PaycheckWizardModal />);
 
-      expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 })).not.toBeNull();
     });
 
     it("should have focusable dialog element", () => {
@@ -401,7 +449,7 @@ describe("PaycheckWizardModal", () => {
       render(<PaycheckWizardModal />);
 
       const dialog = screen.getByRole("dialog");
-      expect(dialog).toHaveAttribute("tabindex", "-1");
+      expect(dialog.getAttribute("tabindex")).toBe("-1");
 
       // Verify the dialog can be focused programmatically
       dialog.focus();
@@ -416,7 +464,7 @@ describe("PaycheckWizardModal", () => {
       render(<PaycheckWizardModal />);
 
       const step2 = screen.getByLabelText(/step 2:/i);
-      expect(step2).toHaveAttribute("aria-current", "step");
+      expect(step2.getAttribute("aria-current")).toBe("step");
     });
   });
 });

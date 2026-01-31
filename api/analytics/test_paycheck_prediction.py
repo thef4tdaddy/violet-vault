@@ -157,6 +157,7 @@ class TestPrivacyCompliance:
                 historical_sessions=[],
                 current_month=1,
                 num_envelopes=4,
+                paycheck_frequency=None,
             )
 
     def test_no_envelope_names_in_request(self) -> None:
@@ -255,13 +256,21 @@ class TestPydanticValidation:
         # Too small
         with pytest.raises(ValidationError):
             PredictionRequest(
-                paycheck_cents=0, historical_sessions=[], current_month=1, num_envelopes=1
+                paycheck_cents=0,
+                historical_sessions=[],
+                current_month=1,
+                num_envelopes=1,
+                paycheck_frequency=None,
             )
 
         # Too large
         with pytest.raises(ValidationError):
             PredictionRequest(
-                paycheck_cents=10_000_001, historical_sessions=[], current_month=1, num_envelopes=1
+                paycheck_cents=10_000_001,
+                historical_sessions=[],
+                current_month=1,
+                num_envelopes=1,
+                paycheck_frequency=None,
             )
 
     def test_month_validation(self) -> None:
@@ -274,6 +283,7 @@ class TestPydanticValidation:
                 historical_sessions=[],
                 current_month=13,  # Invalid
                 num_envelopes=1,
+                paycheck_frequency=None,
             )
 
     def test_num_envelopes_validation(self) -> None:
@@ -287,6 +297,7 @@ class TestPydanticValidation:
                 historical_sessions=[],
                 current_month=1,
                 num_envelopes=201,  # Over limit
+                paycheck_frequency=None,
             )
 
 

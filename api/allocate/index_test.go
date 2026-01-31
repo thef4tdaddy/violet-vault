@@ -343,7 +343,7 @@ func TestCentsPerfectMath(t *testing.T) {
 func TestPaycheckFrequency(t *testing.T) {
 	t.Run("biweekly adjusts monthly targets by half", func(t *testing.T) {
 		envelopes := []Envelope{
-			{ID: "rent", MonthlyTargetCents: 200000},    // $2000/month = $1000 biweekly
+			{ID: "rent", MonthlyTargetCents: 200000},     // $2000/month = $1000 biweekly
 			{ID: "groceries", MonthlyTargetCents: 60000}, // $600/month = $300 biweekly
 		}
 
@@ -385,7 +385,7 @@ func TestPaycheckFrequency(t *testing.T) {
 
 	t.Run("weekly adjusts monthly targets by quarter", func(t *testing.T) {
 		envelopes := []Envelope{
-			{ID: "rent", MonthlyTargetCents: 200000},    // $2000/month = $500 weekly
+			{ID: "rent", MonthlyTargetCents: 200000},     // $2000/month = $500 weekly
 			{ID: "groceries", MonthlyTargetCents: 60000}, // $600/month = $150 weekly
 		}
 

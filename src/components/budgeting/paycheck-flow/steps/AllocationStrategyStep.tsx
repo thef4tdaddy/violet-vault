@@ -18,7 +18,7 @@ import {
   detectFrequencyFromAmount,
   PredictionServiceError,
 } from "@/services/api/predictionService";
-import { PaycheckHistoryService } from "@/utils/core/services/paycheckHistory";
+import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/core/common/logger";
 
 interface AllocationStrategyStepProps {
@@ -36,7 +36,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   const paycheckAmountCents = usePaycheckFlowStore((state) => state.paycheckAmountCents);
   const setAllocations = usePaycheckFlowStore((state) => state.setAllocations);
 
-  const { data: envelopes = [] } = useEnvelopes();
+  const { envelopes = [] } = useEnvelopes();
 
   const [allocations, setLocalAllocations] = useState<AllocationItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,20 +54,22 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
       if (!paycheckAmountCents) return;
 
       try {
-        // Get historical paychecks for detection
-        const history = await PaycheckHistoryService.getHistory();
+        // Get historical paychecks for detection from budgetDb instead of summary service
+        const history = await budgetDb.getPaycheckHistory(10);
         if (!history || history.length < 3) {
           return; // Need at least 3 paychecks for reliable detection
         }
 
-        // Convert to allocation history format
+        // Convert Transaction objects to allocation history format
         const allocationHistory = history.map((p) => ({
-          date: p.date,
-          amountCents: p.amountCents,
-          envelopeAllocations: p.allocations.map((a) => ({
-            envelopeId: a.envelopeId,
-            amountCents: a.amountCents,
-          })),
+          date: typeof p.date === "string" ? p.date : p.date.toISOString(),
+          amountCents: p.amount, // Transactions use 'amount' for the total
+          envelopeAllocations: Object.entries(p.allocations || {}).map(
+            ([envelopeId, amountCents]) => ({
+              envelopeId,
+              amountCents,
+            })
+          ),
         }));
 
         const suggestion = await detectFrequencyFromAmount(paycheckAmountCents, allocationHistory);
@@ -111,7 +113,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
     try {
       const envelopeData = envelopes.map((env) => ({
         id: env.id,
-        monthlyTargetCents: env.monthlyTarget || 0,
+        monthlyTargetCents: env.monthlyBudget || 0,
         currentBalanceCents: env.currentBalance || 0,
       }));
 
@@ -147,21 +149,23 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
     setSelectedStrategy("last_split");
 
     try {
-      // Get previous paycheck allocation from history
-      const history = await PaycheckHistoryService.getHistory();
+      // Get previous paycheck allocation from history (budgetDb Transaction)
+      const history = await budgetDb.getPaycheckHistory(1);
       if (!history || history.length === 0) {
         throw new Error("No previous paycheck found. Use a different strategy.");
       }
 
       const lastPaycheck = history[0];
-      const previousAllocation = lastPaycheck.allocations.map((a) => ({
-        envelopeId: a.envelopeId,
-        amountCents: a.amountCents,
-      }));
+      const previousAllocation = Object.entries(lastPaycheck.allocations || {}).map(
+        ([envelopeId, amountCents]) => ({
+          envelopeId,
+          amountCents,
+        })
+      );
 
       const envelopeData = envelopes.map((env) => ({
         id: env.id,
-        monthlyTargetCents: env.monthlyTarget || 0,
+        monthlyTargetCents: env.monthlyBudget || 0,
         currentBalanceCents: env.currentBalance || 0,
       }));
 
@@ -201,22 +205,24 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
     setSelectedStrategy("smart_split");
 
     try {
-      // Get historical paychecks for prediction
-      const history = await PaycheckHistoryService.getHistory();
+      // Get historical paychecks for prediction (budgetDb Transaction)
+      const history = await budgetDb.getPaycheckHistory(20);
       if (!history || history.length < 3) {
         throw new Error(
           "Need at least 3 previous paychecks for smart predictions. Use a different strategy."
         );
       }
 
-      // Convert to allocation history format
+      // Convert Transaction objects to allocation history format
       const allocationHistory = history.map((p) => ({
-        date: p.date,
-        amountCents: p.amountCents,
-        envelopeAllocations: p.allocations.map((a) => ({
-          envelopeId: a.envelopeId,
-          amountCents: a.amountCents,
-        })),
+        date: typeof p.date === "string" ? p.date : p.date.toISOString(),
+        amountCents: p.amount,
+        envelopeAllocations: Object.entries(p.allocations || {}).map(
+          ([envelopeId, amountCents]) => ({
+            envelopeId,
+            amountCents,
+          })
+        ),
       }));
 
       const prediction = await getPredictionFromHistory(
@@ -227,17 +233,18 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
       );
 
       // Map predictions back to envelope IDs
+      const suggestedCents = prediction.suggestedAllocationsCents || [];
       setLocalAllocations(
         envelopes.map((env, idx) => ({
           envelopeId: env.id,
-          amountCents: prediction.suggested_allocations_cents[idx] || 0,
+          amountCents: suggestedCents[idx] || 0,
         }))
       );
 
       logger.info("Smart split prediction successful", {
         strategy: "smart_split",
         confidence: prediction.confidence,
-        reasoning: prediction.reasoning.pattern_type,
+        reasoning: prediction.reasoning.patternType,
       });
     } catch (err) {
       const errorMessage =
