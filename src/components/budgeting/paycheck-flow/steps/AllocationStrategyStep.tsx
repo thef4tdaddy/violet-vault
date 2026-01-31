@@ -20,6 +20,7 @@ import {
 } from "@/services/api/predictionService";
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/core/common/logger";
+import { SaveAsRulesModal } from "../SaveAsRulesModal";
 
 interface AllocationStrategyStepProps {
   onNext: () => void;
@@ -47,6 +48,7 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   );
   const [wasAutoDetected, setWasAutoDetected] = useState(false);
   const [detectionMessage, setDetectionMessage] = useState<string | null>(null);
+  const [showSaveAsRulesModal, setShowSaveAsRulesModal] = useState(false);
 
   // Auto-detect frequency from amount when component mounts
   useEffect(() => {
@@ -483,8 +485,18 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
           </div>
         </div>
 
-        {/* Continue Button */}
-        <div className="mt-6 flex justify-end">
+        {/* Action Buttons */}
+        <div className="mt-6 flex justify-between items-center gap-4">
+          {/* Save as Rules Button - Only show when allocation is complete and not manual */}
+          {remainingCents === 0 && allocations.length > 0 && selectedStrategy && selectedStrategy !== "manual" && (
+            <Button
+              onClick={() => setShowSaveAsRulesModal(true)}
+              className="px-6 py-2 hard-border rounded-lg font-bold bg-white hover:bg-slate-100 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            >
+              💾 Save as Rules
+            </Button>
+          )}
+          <div className="flex-1" />
           <Button
             onClick={handleContinue}
             disabled={remainingCents !== 0 || allocations.length === 0}
@@ -498,6 +510,18 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
           </Button>
         </div>
       </div>
+
+      {/* Save as Rules Modal */}
+      <SaveAsRulesModal
+        isOpen={showSaveAsRulesModal}
+        onClose={() => setShowSaveAsRulesModal(false)}
+        allocation={{
+          allocations: allocations.map((a) => ({ envelopeId: a.envelopeId, amountCents: a.amountCents })),
+          totalAllocatedCents: allocations.reduce((sum, a) => sum + a.amountCents, 0),
+          strategy: selectedStrategy || "manual",
+        }}
+        paycheckAmountCents={paycheckAmountCents || 0}
+      />
     </div>
   );
 };
