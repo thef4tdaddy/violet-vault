@@ -21,6 +21,11 @@ import {
 import { budgetDb } from "@/db/budgetDb";
 import logger from "@/utils/core/common/logger";
 import { SaveAsRulesModal } from "../SaveAsRulesModal";
+import { BillForecastingPanel } from "../forecasting/BillForecastingPanel";
+import type { AutoFixSuggestion } from "@/utils/domain/budgeting/autoFixSuggestions";
+import { applyAutoFixSuggestions } from "@/utils/domain/budgeting/autoFixSuggestions";
+import { useBillForecasting } from "@/hooks/budgeting/paycheck-flow/useBillForecasting";
+import { formatCentsAsCurrency } from "@/utils/domain/budgeting/billCoverageCalculations";
 
 interface AllocationStrategyStepProps {
   onNext: () => void;
@@ -49,6 +54,13 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   const [wasAutoDetected, setWasAutoDetected] = useState(false);
   const [detectionMessage, setDetectionMessage] = useState<string | null>(null);
   const [showSaveAsRulesModal, setShowSaveAsRulesModal] = useState(false);
+
+  // Get bill forecasting results for critical shortage warnings
+  const forecastingResult = useBillForecasting({
+    paycheckAmountCents,
+    allocations,
+    paycheckFrequency,
+  });
 
   // Auto-detect frequency from amount when component mounts
   useEffect(() => {
@@ -266,6 +278,28 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
   const handleContinue = () => {
     if (remainingCents !== 0) return;
 
+    // Check for critical bill shortages
+    const { totalShortage, criticalBills } = forecastingResult;
+
+    if (totalShortage > 0 && criticalBills.length > 0) {
+      // Build warning message
+      const billsList = criticalBills
+        .slice(0, 3) // Show first 3 critical bills
+        .map((b) => `• ${b.billName}: ${formatCentsAsCurrency(b.shortage)} short (due in ${b.daysUntilDue} days)`)
+        .join("\n");
+
+      const moreText = criticalBills.length > 3 ? `\n...and ${criticalBills.length - 3} more` : "";
+
+      const confirmed = window.confirm(
+        `⚠️ WARNING: Bill Coverage Shortage\n\n` +
+          `You have ${formatCentsAsCurrency(totalShortage)} in unpaid bills before your next payday.\n\n` +
+          `Critical bills at risk:\n${billsList}${moreText}\n\n` +
+          `Are you sure you want to continue?`
+      );
+
+      if (!confirmed) return; // User cancelled
+    }
+
     // Save allocations to store
     setAllocations(allocations);
     onNext();
@@ -297,10 +331,25 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
     });
   };
 
+  // Handle auto-fix suggestions from forecasting panel
+  const handleAutoFix = (suggestions: AutoFixSuggestion[]) => {
+    // Apply suggestions to current allocations
+    const updatedAllocations = applyAutoFixSuggestions(allocations, suggestions);
+    setLocalAllocations(updatedAllocations);
+    setSelectedStrategy("auto-fix");
+
+    logger.info("Applied auto-fix suggestions", {
+      suggestionsCount: suggestions.length,
+      updatedAllocations: updatedAllocations.length,
+    });
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white hard-border rounded-lg p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <h2 className="text-xl font-black text-slate-900 mb-6">HOW DO YOU WANT TO ALLOCATE?</h2>
+    <div className="w-full max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-6">
+        {/* Left Column - Allocation Controls */}
+        <div className="bg-white hard-border rounded-lg p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 className="text-xl font-black text-slate-900 mb-6">HOW DO YOU WANT TO ALLOCATE?</h2>
 
         {/* Paycheck Frequency Selector */}
         <div className="mb-6 p-4 bg-slate-50 hard-border rounded-lg">
@@ -488,14 +537,17 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
         {/* Action Buttons */}
         <div className="mt-6 flex justify-between items-center gap-4">
           {/* Save as Rules Button - Only show when allocation is complete and not manual */}
-          {remainingCents === 0 && allocations.length > 0 && selectedStrategy && selectedStrategy !== "manual" && (
-            <Button
-              onClick={() => setShowSaveAsRulesModal(true)}
-              className="px-6 py-2 hard-border rounded-lg font-bold bg-white hover:bg-slate-100 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-            >
-              💾 Save as Rules
-            </Button>
-          )}
+          {remainingCents === 0 &&
+            allocations.length > 0 &&
+            selectedStrategy &&
+            selectedStrategy !== "manual" && (
+              <Button
+                onClick={() => setShowSaveAsRulesModal(true)}
+                className="px-6 py-2 hard-border rounded-lg font-bold bg-white hover:bg-slate-100 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                💾 Save as Rules
+              </Button>
+            )}
           <div className="flex-1" />
           <Button
             onClick={handleContinue}
@@ -509,6 +561,17 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
             CONTINUE →
           </Button>
         </div>
+        </div>
+
+        {/* Right Column - Bill Forecasting */}
+        <div className="lg:sticky lg:top-6 lg:self-start">
+          <BillForecastingPanel
+            paycheckAmountCents={paycheckAmountCents}
+            allocations={allocations}
+            paycheckFrequency={paycheckFrequency}
+            onAutoFix={handleAutoFix}
+          />
+        </div>
       </div>
 
       {/* Save as Rules Modal */}
@@ -516,7 +579,10 @@ const AllocationStrategyStep: React.FC<AllocationStrategyStepProps> = ({ onNext 
         isOpen={showSaveAsRulesModal}
         onClose={() => setShowSaveAsRulesModal(false)}
         allocation={{
-          allocations: allocations.map((a) => ({ envelopeId: a.envelopeId, amountCents: a.amountCents })),
+          allocations: allocations.map((a) => ({
+            envelopeId: a.envelopeId,
+            amountCents: a.amountCents,
+          })),
           totalAllocatedCents: allocations.reduce((sum, a) => sum + a.amountCents, 0),
           strategy: selectedStrategy || "manual",
         }}
