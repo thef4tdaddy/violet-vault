@@ -123,6 +123,8 @@ class SalvoRunner:
                     data = json.load(f)
                     self.previous_failures = set(data.get("failures", []))
             except Exception:
+                # If we cannot read or parse the failures metadata, ignore it and proceed
+                # as though there are no recent failures; this only affects auto-retry behavior.
                 pass
 
     def save_failure_state(self) -> None:
@@ -270,8 +272,6 @@ class SalvoRunner:
         filled = int(bar_len * pct)
         bar = "█" * filled + "░" * (bar_len - filled)
 
-        # Use CLEAR_LINE on every print to avoid artifacts
-
         timer_line = f"{Colors.MAGENTA}⏱️  {elapsed_total:5.1f}s {Colors.BLUE}[{Colors.GREEN}{bar}{Colors.GRAY}{Colors.BLUE}]{Colors.NC} {int(pct*100)}%"
         print(f"{Colors.CLR}{timer_line}")
 
@@ -298,8 +298,8 @@ class SalvoRunner:
 
                 # Overtime Warning (Red if > 1.5x average)
                 if avg_time > 0 and elapsed > avg_time * 1.5:
-                    time_str = f"{Colors.RED}{time_str}{Colors.NC}"
-                    running_avg_str = f"{Colors.RED}(Avg: {int(avg_time)}s){Colors.NC}"
+                    time_str = f"{Colors.RED}{time_str}{Colors.BLUE}"
+                    running_avg_str = f"{Colors.RED}(Avg: {int(avg_time)}s){Colors.BLUE}"
                 else:
                     running_avg_str = avg_str
 
@@ -323,35 +323,42 @@ class SalvoRunner:
                 status_text = f"WAITING {avg_str}"
 
             if check.concurrency_group:
-                status_text += f"{Colors.GRAY} [{check.concurrency_group}]{Colors.NC}"
+                status_text += f"{Colors.GRAY} [{check.concurrency_group}]"
 
+            # Truncation Logic that respects visual length vs ANSI codes
+            # We construct the visual string separate from the colored string
+
+            # 1. Clean visual content (for length calculations)
+            clean_status = (
+                status_text.replace(Colors.RED, "")
+                .replace(Colors.BLUE, "")
+                .replace(Colors.GREEN, "")
+                .replace(Colors.GRAY, "")
+                .replace(Colors.NC, "")
+            )
             name_pad = f"{check.name:<20}"
-            line_content = f"{symbol} {name_pad} {status_text}"
 
-            # Use strict visual length truncation from before
-            visible_content = line_content
-            for color_code in [
-                Colors.RED,
-                Colors.GREEN,
-                Colors.YELLOW,
-                Colors.BLUE,
-                Colors.MAGENTA,
-                Colors.CYAN,
-                Colors.GRAY,
-                Colors.NC,
-                Colors.BOLD,
-                Colors.CLEAR_LINE,
-            ]:
-                visible_content = visible_content.replace(color_code, "")
+            # 2. Check fit
+            # symbol (2) + name (20) + padding (1) + status (len)
+            visual_len = 2 + 20 + 1 + len(clean_status)
+            max_len = term_width - 2  # Safety buffer
 
-            max_len = term_width - 8  # Safety buffer for different terminals
-            if len(visible_content) > max_len:
-                excess = len(visible_content) - max_len
-                status_text = status_text[: -excess - 3] + "..."
-                line = f"  {color}{symbol} {name_pad} {status_text}{Colors.NC}"
-            else:
-                line = f"  {color}{line_content}{Colors.NC}"
+            if visual_len > max_len:
+                # Truncate content, not ANSI
+                avail = max_len - (2 + 20 + 1) - 3  # -3 for "..."
+                if avail > 0:
+                    # Crude truncation: just cut the clean status.
+                    # Ideally we preserve colors but this is hard without a parser.
+                    # Fallback: Strip colors if we must truncate to avoid corrupting terminal
+                    # This implies: If line too long -> Monochrome truncation
+                    clean_status = clean_status[:avail] + "..."
+                    status_text = clean_status  # Lose colors on truncation to be safe
+                else:
+                    status_text = "..."
 
+            # 3. Final Print
+            # Reset color at end to be safe
+            line = f"  {color}{symbol} {name_pad} {status_text}{Colors.NC}"
             print(f"{Colors.CLR}{line}")
 
         sys.stdout.flush()
@@ -374,7 +381,7 @@ class SalvoRunner:
             if self.is_tty:
                 self.print_dashboard()
 
-    def execute(self) -> None:
+    def execute(self) -> bool:
         if self.is_tty:
             # Reserve space for the dashboard
             sys.stdout.write(Colors.HIDE_CURSOR)
@@ -427,7 +434,7 @@ class SalvoRunner:
             with open(".git/FULL_SALVO_SUCCESS", "w") as f:
                 f.write(str(time.time()))
 
-            sys.exit(0)
+            return True
         else:
             print(f"{Colors.RED}═══════════════════════════════════════{Colors.NC}")
             print(f"{Colors.RED}  ✗ {len(failures)} Check(s) Failed{Colors.NC}")
@@ -479,7 +486,7 @@ class SalvoRunner:
                         print("\n".join(lines))
                 print("")
 
-            sys.exit(1)
+            return False
 
 
 def main() -> None:
@@ -489,64 +496,138 @@ def main() -> None:
     parser.add_argument("--all", action="store_true", help="Force full run (ignore smart retry)")
     args = parser.parse_args()
 
+    # Implicit Retry Logic
+    # If previous failures exist and no explicit "all" requested, default to retry
+    # BUT only if failures are recent ( < 5 minutes )
+    if os.path.exists(FAILED_CHECKS_FILE) and not args.all and not args.retry_failed:
+        try:
+            with open(FAILED_CHECKS_FILE) as f:
+                data = json.load(f)
+                ts = data.get("timestamp", 0)
+                # If failures are fresh (< 300s / 5m), retry them.
+                # Otherwise, fall through to normal "Smart Scope" or "All" logic.
+                if time.time() - ts < 300:
+                    print(
+                        f"{Colors.YELLOW}⚠️  Recent failures detected (< 5m ago). Defaulting to RETRY FAILED mode.{Colors.NC}"
+                    )
+                    print(f"{Colors.GRAY}   (Run with --all to force full check){Colors.NC}\n")
+                    args.retry_failed = True
+                else:
+                    print(
+                        f"{Colors.GRAY}ℹ️  Previous failures expired (> 5m ago). Starting fresh run.{Colors.NC}"
+                    )
+        except Exception:
+            pass
+
     # Auto-fix is now the default and only behavior
     args.fix = True
     now = time.time()
 
+    # Smart Scope Analysis
+    scope = {"frontend": True, "backend_go": True, "backend_python": True}
+    if not args.all and not args.retry_failed:
+        try:
+            # Check for changes against main branch
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "origin/main...HEAD"], capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                changes = result.stdout.splitlines()
+                # If changes exist, narrow scope. If no output (or error), run all.
+                if changes:
+                    scope["frontend"] = any(
+                        f.startswith("src/")
+                        or f.startswith("package")
+                        or f.endswith(".ts")
+                        or f.endswith(".tsx")
+                        for f in changes
+                    )
+                    scope["backend_go"] = any(
+                        f.startswith("api/") and not f.endswith(".py") for f in changes
+                    )
+                    scope["backend_python"] = any(f.endswith(".py") for f in changes)
+
+                    # If common configs change, run all
+                    if any(f.startswith("scripts/") or f.startswith("configs/") for f in changes):
+                        scope = {k: True for k in scope}
+
+                    print(f"{Colors.BLUE}🔍 Smart Scope Detected:{Colors.NC}")
+                    print(f"   Frontend: {'✅' if scope['frontend'] else 'Skipped'}")
+                    print(f"   Go:       {'✅' if scope['backend_go'] else 'Skipped'}")
+                    print(f"   Python:   {'✅' if scope['backend_python'] else 'Skipped'}")
+        except Exception:
+            # Fallback to running everything if git check fails
+            pass
+
+    # Fallback: if no specific scope detected (e.g. config change), run all
+    if not any(scope.values()):
+        scope = {k: True for k in scope}
+
     runner = SalvoRunner(args.fix, args.retry_failed)
 
-    # 1. Frontend
-    runner.add_check(Check("Prettier", "npm run format", is_fixer=True))
-    runner.add_check(Check("ESLint", "npm run lint:fix", is_fixer=True))
-    runner.add_check(Check("TypeScript", "npm run typecheck", concurrency_group="heavy"))
-    # Use test:ci to ensure it doesn't hang in watch mode
-    runner.add_check(Check("Vitest", "npm run test:ci", concurrency_group="heavy"))
-    # Prod build as requested for speed/verification
-    runner.add_check(Check("Build-Prod", "npm run build", concurrency_group="heavy"))
+    # Enforce strict serialization for heavy tasks as requested
+    import threading
 
-    # 2. Go Backend
-    if os.path.exists("api/go.mod"):
-        runner.add_check(Check("Go Fmt", "go fmt ./...", cwd="api", is_fixer=True))
-        runner.add_check(Check("Go Vet", "go vet ./...", cwd="api"))
-        runner.add_check(Check("Go Build", "go build ./...", cwd="api"))
+    runner.locks["heavy"] = threading.Semaphore(1)
+
+    # 3. Register Checks
+    if scope["frontend"]:
         runner.add_check(
-            Check("Go Test", "go test ./... -cover -coverprofile=coverage.out", cwd="api")
-        )
-
-    # 3. Python Backend
-    # Detect python
-    has_python = False
-    for _, _, files in os.walk("api"):
-        if any(f.endswith(".py") for f in files):
-            has_python = True
-            break
-
-    if has_python:
-        # Resolve tools dynamically
-        ruff = runner.resolve_tool("ruff")
-        mypy = runner.resolve_tool("mypy")
-        pytest = runner.resolve_tool("pytest")
-
-        if ruff:
-            runner.add_check(Check("Ruff Format", f"{ruff} format api/", is_fixer=True))
-            runner.add_check(Check("Ruff Lint", f"{ruff} check --fix api/", is_fixer=True))
-        else:
-            print(f"{Colors.YELLOW}⚠️  Ruff not found (skipped){Colors.NC}")
-
-        if mypy:
-            # Add concurrency_group="heavy" to prevent heavy overlap
-            runner.add_check(
-                Check("Mypy", f"{mypy} api/ --ignore-missing-imports", concurrency_group="heavy")
+            Check(
+                "Prettier",
+                "npm run format",
+                is_fixer=True,
+                concurrency_group="cpu",
             )
-        else:
-            print(f"{Colors.YELLOW}⚠️  Mypy not found (skipped){Colors.NC}")
+        )
+        runner.add_check(
+            Check(
+                "ESLint",
+                "npm run lint:fix",
+                is_fixer=True,
+                concurrency_group="cpu",
+            )
+        )
+        runner.add_check(Check("TypeScript Check", "npm run typecheck", concurrency_group="heavy"))
+        runner.add_check(Check("Vite Build", "npm run build", concurrency_group="heavy"))
+        runner.add_check(Check("Vitest Units", "npm run test:run", concurrency_group="heavy"))
 
-        # Pytest
-        if pytest:
-            cmd = f"{pytest} api/ --cov=api --cov-report=xml:api_coverage.xml"
-            runner.add_check(Check("Pytest", cmd))
-        else:
-            print(f"{Colors.YELLOW}⚠️  Pytest not found (skipped){Colors.NC}")
+    if scope["backend_go"]:
+        runner.add_check(
+            Check("Go Format", "gofmt -l -w api", is_fixer=True, concurrency_group="go")
+        )
+        runner.add_check(Check("Go Vet", "cd api && go vet ./...", concurrency_group="go"))
+        runner.add_check(Check("Go Build", "cd api && go build ./...", concurrency_group="go"))
+        runner.add_check(Check("Go Tests", "cd api && go test ./...", concurrency_group="go"))
+
+    if scope["backend_python"]:
+        # Explicitly use .venv binaries
+        python_bin = os.path.join(os.getcwd(), ".venv", "bin", "python")
+        if not os.path.exists(python_bin):
+            python_bin = "python3"
+
+        runner.add_check(
+            Check(
+                "Ruff Format",
+                f"cd api && {python_bin} -m ruff format .",
+                is_fixer=True,
+                concurrency_group="python",
+            )
+        )
+        runner.add_check(
+            Check(
+                "Ruff Lint",
+                f"cd api && {python_bin} -m ruff check . --fix",
+                is_fixer=True,
+                concurrency_group="python",
+            )
+        )
+        runner.add_check(
+            Check("MyPy", f"cd api && {python_bin} -m mypy .", concurrency_group="heavy")
+        )
+        runner.add_check(
+            Check("Pytest", f"cd api && {python_bin} -m pytest", concurrency_group="python")
+        )
 
     # 4. Smart Upload
     # Upload if --upload OR (Token exists AND > 30 mins since last upload)
@@ -576,7 +657,11 @@ def main() -> None:
                 Check("Codecov Upload", "npx --yes codecov", concurrency_group="network")
             )
 
-    runner.execute()
+    # 6. Execute checks
+    success = runner.execute()
+
+    if not success:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

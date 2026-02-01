@@ -56,7 +56,10 @@ export function BillForecastingPanel({
       name: env.name,
       currentBalance: env.currentBalance || 0,
       monthlyTarget:
-        env.monthlyBudget || (env as any).monthlyContribution || (env as any).targetAmount || 0,
+        env.monthlyBudget ??
+        (env as { monthlyContribution?: number }).monthlyContribution ??
+        (env as { targetAmount?: number }).targetAmount ??
+        0,
       isDiscretionary: env.type === "standard",
       category: env.category || "",
       allocationAmount: allocations.find((a) => a.envelopeId === env.id)?.amountCents || 0,

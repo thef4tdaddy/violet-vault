@@ -64,6 +64,8 @@ docs/audits/sorted-typecheck-strict-report.txt
 coverage/
 api_coverage.xml
 api/coverage.out
+.coverage
+coverage.out
 
 # Go build artifacts
 api/*.test

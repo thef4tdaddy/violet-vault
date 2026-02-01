@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import numpy as np
-import pytesseract
+import pytesseract  # type: ignore
 import pytest
 from PIL import Image
 

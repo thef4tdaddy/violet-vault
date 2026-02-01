@@ -104,7 +104,7 @@ export default defineConfig(({ mode }) => {
           display: "standalone",
           orientation: "portrait-primary",
           scope: "/",
-          start_url: "/app",
+          start_url: "/app/dashboard",
           categories: ["finance", "productivity", "business"],
           icons: [
             {

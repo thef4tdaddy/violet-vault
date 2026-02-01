@@ -1,7 +1,4 @@
-/**
- * Tests for Auto-Fix Suggestion Algorithm
- */
-
+import { describe, it, expect } from "vitest";
 import {
   generateAutoFixSuggestions,
   applyAutoFixSuggestions,

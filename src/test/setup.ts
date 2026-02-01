@@ -318,3 +318,78 @@ vi.mock("recharts", () => ({
   PolarAngleAxis: vi.fn(() => null),
   PolarRadiusAxis: vi.fn(() => null),
 }));
+
+// Mock Framer Motion to avoid WAAPI issues in Happy DOM
+vi.mock("framer-motion", async () => {
+  const actual = await vi.importActual<typeof import("framer-motion")>("framer-motion");
+  // @ts-ignore
+  const React = await import("react");
+
+  const createMockComponent = (tag: string) => {
+    return React.forwardRef(({ children, ...props }: any, ref: any) => {
+      // Filter out framer-motion specific props
+      const {
+        initial: _initial,
+        animate: _animate,
+        exit: _exit,
+        variants: _variants,
+        transition: _transition,
+        whileInView: _whileInView,
+        viewport: _viewport,
+        onAnimationStart: _onAnimationStart,
+        onAnimationComplete: _onAnimationComplete,
+        onLayoutAnimationStart: _onLayoutAnimationStart,
+        onLayoutAnimationComplete: _onLayoutAnimationComplete,
+        layout: _layout,
+        layoutId: _layoutId,
+        drag: _drag,
+        dragConstraints: _dragConstraints,
+        dragElastic: _dragElastic,
+        dragMomentum: _dragMomentum,
+        dragPropagation: _dragPropagation,
+        dragSnapToOrigin: _dragSnapToOrigin,
+        onDrag: _onDrag,
+        onDragStart: _onDragStart,
+        onDragEnd: _onDragEnd,
+        onDragTransitionEnd: _onDragTransitionEnd,
+        ...validProps
+      } = props;
+      return React.createElement(tag, { ...validProps, ref }, children);
+    });
+  };
+
+  return {
+    __esModule: true,
+    ...actual,
+    AnimatePresence: ({ children }: any) => children,
+    motion: {
+      div: createMockComponent("div"),
+      h1: createMockComponent("h1"),
+      h2: createMockComponent("h2"),
+      h3: createMockComponent("h3"),
+      h4: createMockComponent("h4"),
+      h5: createMockComponent("h5"),
+      h6: createMockComponent("h6"),
+      span: createMockComponent("span"),
+      p: createMockComponent("p"),
+      a: createMockComponent("a"),
+      ul: createMockComponent("ul"),
+      li: createMockComponent("li"),
+      button: createMockComponent("button"),
+      input: createMockComponent("input"),
+      label: createMockComponent("label"),
+      img: createMockComponent("img"),
+      textarea: createMockComponent("textarea"),
+      form: createMockComponent("form"),
+      section: createMockComponent("section"),
+      article: createMockComponent("article"),
+      main: createMockComponent("main"),
+      header: createMockComponent("header"),
+      footer: createMockComponent("footer"),
+      nav: createMockComponent("nav"),
+      aside: createMockComponent("aside"),
+      svg: createMockComponent("svg"),
+      path: createMockComponent("path"),
+    },
+  };
+});

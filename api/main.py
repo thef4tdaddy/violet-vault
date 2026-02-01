@@ -3,16 +3,26 @@ import re
 from typing import Any
 
 import sentry_sdk
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 from api.analytics import EnvelopeIntegrityAuditor
+from api.marketing.status import router as marketing_status_router
 from api.models import AuditSnapshot, IntegrityAuditResult
 from api.sentinel.receipts import router as sentinel_router
 
 
 # Sentry PII Scrubbing
+async def verify_internal_key(x_internal_key: str = Header(None)) -> str:
+    # Simple shared secret for internal audits (in production, use real auth)
+    internal_secret = os.getenv("INTERNAL_AUDIT_KEY")
+    if not internal_secret or x_internal_key != internal_secret:
+        # If no key set in env, fail safe.
+        raise HTTPException(status_code=403, detail="Unauthorized: Internal Audit Only")
+    return x_internal_key
+
+
 def scrub_pii(text: str) -> str:
     if not text:
         return text
@@ -87,7 +97,12 @@ app = FastAPI(
 # For now, allowing all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Production: Replace with specific origins
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:4173",
+        "https://violetvault.vercel.app",
+        "https://violetvault.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -95,6 +110,7 @@ app.add_middleware(
 
 # Route Mounting
 app.include_router(sentinel_router, prefix="/api")
+app.include_router(marketing_status_router, prefix="/api/marketing")
 
 
 @app.get("/")
@@ -104,7 +120,10 @@ def get_root() -> dict[str, str]:
 
 
 @app.post("/audit/envelope-integrity", response_model=IntegrityAuditResult)
-def audit_envelope_integrity(snapshot: AuditSnapshot) -> IntegrityAuditResult:
+def audit_envelope_integrity(
+    snapshot: AuditSnapshot,
+    _: str = Depends(verify_internal_key),
+) -> IntegrityAuditResult:
     """
     Perform envelope integrity audit on budget data snapshot
 
