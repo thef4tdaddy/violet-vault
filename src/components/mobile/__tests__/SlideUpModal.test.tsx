@@ -569,22 +569,33 @@ describe("SlideUpModal", () => {
   });
 
   describe("Content Scrolling", () => {
-    it("should have overflow-y-auto for scrolling content", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} />);
-      const contentArea = container.querySelector(".overflow-y-auto");
-      expect(contentArea).toBeInTheDocument();
+    it("renders modal content inside the dialog", () => {
+      render(<SlideUpModal {...defaultProps} />);
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toContainElement(screen.getByText("Modal Content"));
     });
 
-    it("should have overflow-x-hidden to prevent horizontal scroll", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} />);
-      const contentArea = container.querySelector(".overflow-x-hidden");
-      expect(contentArea).toBeInTheDocument();
+    it("renders modal content consistently regardless of horizontal size", () => {
+      render(
+        <SlideUpModal {...defaultProps}>
+          <div>Wide Modal Content</div>
+        </SlideUpModal>
+      );
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toContainElement(screen.getByText("Wide Modal Content"));
     });
 
-    it("should adjust max-height when title is present", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} title="Test Modal" />);
-      const contentArea = container.querySelector('[style*="max-height"]');
-      expect(contentArea).toBeInTheDocument();
+    it("renders title and content together when title is present", () => {
+      render(<SlideUpModal {...defaultProps} title="Test Modal" />);
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toContainElement(screen.getByText("Test Modal"));
+      expect(dialog).toContainElement(screen.getByText("Modal Content"));
     });
   });
 
