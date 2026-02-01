@@ -46,6 +46,10 @@ export const routeConfig = [
     activeView: "analytics",
   },
   {
+    path: "/app/analytics/allocations",
+    activeView: "allocation-analytics",
+  },
+  {
     path: "/app/automation",
     activeView: "automation",
   },
@@ -66,6 +70,7 @@ export const pathToViewMap = {
   "/app/transactions": "transactions",
   "/app/debts": "debts",
   "/app/analytics": "analytics",
+  "/app/analytics/allocations": "allocation-analytics",
   "/app/automation": "automation",
   "/app/activity": "activity",
 };
@@ -80,6 +85,7 @@ export const viewToPathMap = {
   transactions: "/app/transactions",
   debts: "/app/debts",
   analytics: "/app/analytics",
+  "allocation-analytics": "/app/analytics/allocations",
   automation: "/app/automation",
   activity: "/app/activity",
 };
