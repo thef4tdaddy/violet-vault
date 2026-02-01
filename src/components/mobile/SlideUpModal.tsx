@@ -95,7 +95,11 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ title, onClose, closeFeedback
 );
 
 const DragHandle = ({ handleRef }: { handleRef: React.RefObject<HTMLDivElement | null> }) => (
-  <div ref={handleRef} className="flex justify-center pt-3 pb-2 cursor-pointer">
+  <div
+    ref={handleRef}
+    className="flex justify-center pt-3 pb-2 cursor-pointer"
+    data-testid="drag-handle"
+  >
     <div className="w-12 h-1 bg-gray-300 rounded-full" />
   </div>
 );
@@ -135,6 +139,7 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 }) => (
   <div
     ref={modalRef}
+    data-testid="modal-panel"
     className={`
       fixed bottom-0 left-0 right-0
       bg-white rounded-t-3xl shadow-2xl
