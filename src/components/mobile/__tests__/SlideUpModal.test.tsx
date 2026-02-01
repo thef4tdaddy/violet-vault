@@ -138,40 +138,40 @@ describe("SlideUpModal", () => {
 
   describe("Drag Handle", () => {
     it("should render drag handle by default", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} />);
-      const dragHandle = container.querySelector(".w-12.h-1.bg-gray-300.rounded-full");
+      render(<SlideUpModal {...defaultProps} />);
+      const dragHandle = screen.getByTestId("drag-handle");
       expect(dragHandle).toBeInTheDocument();
     });
 
     it("should render drag handle when showHandle is true", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} showHandle={true} />);
-      const dragHandle = container.querySelector(".w-12.h-1.bg-gray-300.rounded-full");
+      render(<SlideUpModal {...defaultProps} showHandle={true} />);
+      const dragHandle = screen.getByTestId("drag-handle");
       expect(dragHandle).toBeInTheDocument();
     });
 
     it("should not render drag handle when showHandle is false", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} showHandle={false} />);
-      const dragHandle = container.querySelector(".w-12.h-1.bg-gray-300.rounded-full");
+      render(<SlideUpModal {...defaultProps} showHandle={false} />);
+      const dragHandle = screen.queryByTestId("drag-handle");
       expect(dragHandle).not.toBeInTheDocument();
     });
   });
 
   describe("Backdrop", () => {
     it("should render backdrop by default", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} />);
-      const backdrop = container.querySelector(".bg-black\\/50");
+      render(<SlideUpModal {...defaultProps} />);
+      const backdrop = screen.getByTestId("backdrop");
       expect(backdrop).toBeInTheDocument();
     });
 
     it("should render backdrop when backdrop is true", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} backdrop={true} />);
-      const backdrop = container.querySelector(".bg-black\\/50");
+      render(<SlideUpModal {...defaultProps} backdrop={true} />);
+      const backdrop = screen.getByTestId("backdrop");
       expect(backdrop).toBeInTheDocument();
     });
 
     it("should not render backdrop when backdrop is false", () => {
-      const { container } = render(<SlideUpModal {...defaultProps} backdrop={false} />);
-      const backdrop = container.querySelector(".bg-black\\/50");
+      render(<SlideUpModal {...defaultProps} backdrop={false} />);
+      const backdrop = screen.queryByTestId("backdrop");
       expect(backdrop).not.toBeInTheDocument();
     });
 
