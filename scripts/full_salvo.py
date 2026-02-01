@@ -12,7 +12,7 @@ from dataclasses import dataclass
 # Configuration
 ERROR_DIR = ".salvo_errors"
 FAILED_CHECKS_FILE = os.path.join(ERROR_DIR, "failed_checks.json")
-STATS_FILE = os.path.join(ERROR_DIR, "stats.json")
+STATS_FILE = ".salvo_stats.json"
 
 
 # ANSI Colors & Control Codes
@@ -78,14 +78,10 @@ class SalvoRunner:
             shutil.rmtree(ERROR_DIR)
         os.makedirs(ERROR_DIR, exist_ok=True)
 
-        # Load stats
         self.stats = self._load_stats()
 
         # Load previous failures if retrying
         self.previous_failures: set = set()
-        if retry_mode:
-            self._load_previous_failures()
-
         if retry_mode:
             self._load_previous_failures()
 
@@ -250,13 +246,21 @@ class SalvoRunner:
 
         active = [chk for chk in self.checks if chk.status != "SKIPPED"]
         for chk in active:
-            w = self.stats.get(chk.name, 15.0)  # Default 15s for better progress estimation
-            total_weight += w
+            avg = self.stats.get(chk.name, 15.0)
             if chk.status in ("PASS", "FAIL"):
+                # Use actual duration for weight if it was longer than average
+                w = max(avg, chk.duration)
+                total_weight += w
                 done_weight += w
             elif chk.status == "RUNNING" and chk.start_time > 0:
-                # Add partial progress (capped at 100% of weight)
-                done_weight += min(time.time() - chk.start_time, w)
+                elapsed = time.time() - chk.start_time
+                # Inflate total weight if we are running overtime
+                w = max(avg, elapsed)
+                total_weight += w
+                # Progress is actual elapsed capped at 95% of its current calculated weight
+                done_weight += min(elapsed, w * 0.95)
+            else:
+                total_weight += avg
 
         pct = (done_weight / total_weight) if total_weight > 0 else 0.0
         pct = min(1.0, max(0.0, pct))
@@ -359,7 +363,7 @@ class SalvoRunner:
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             futures = {executor.submit(self.run_command, c): c for c in checks}
 
-            while any(f.running() for f in futures):
+            while any(not f.done() for f in futures):
                 if self.is_tty:
                     self.print_dashboard()
                 time.sleep(0.5)  # Throttled refresh to reduce overhead
@@ -475,58 +479,25 @@ class SalvoRunner:
                         print("\n".join(lines))
                 print("")
 
-            print(f"{Colors.YELLOW}💡 Tip: Run with --fix to auto-fix issues{Colors.NC}")
-            print(f"{Colors.YELLOW}   ./scripts/full_salvo.sh --fix{Colors.NC}")
             sys.exit(1)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="VioletVault Full Salvo")
-    parser.add_argument("--fix", action="store_true", help="Auto-fix issues")
     parser.add_argument("--retry-failed", action="store_true", help="Retry only failed checks")
     parser.add_argument("--upload", action="store_true", help="Upload coverage to Codecov")
     parser.add_argument("--all", action="store_true", help="Force full run (ignore smart retry)")
     args = parser.parse_args()
 
-    # Smart Logic Implementation
+    # Auto-fix is now the default and only behavior
+    args.fix = True
     now = time.time()
-
-    # Smart Retry: If no explicit args, check for recent failures
-    if not args.retry_failed and not args.fix and not args.upload and not args.all:
-        if os.path.exists(FAILED_CHECKS_FILE):
-            try:
-                with open(FAILED_CHECKS_FILE) as f:
-                    data = json.load(f)
-                    if now - data.get("timestamp", 0) < 300:  # 5 minutes
-                        args.retry_failed = True
-                        print(
-                            f"{Colors.YELLOW}🔄 Smart Retry: Detected recent failure ({int(now - data.get('timestamp', 0))}s ago). Retrying failed checks...{Colors.NC}"
-                        )
-                        print(f"{Colors.GRAY}   (Pass --all to force full run){Colors.NC}")
-            except Exception:
-                pass
-
-    # Smart Fix: Default to auto-fixing formatting unless disabled (or maybe just keep explicit --fix?)
-    # User said "make the fix smart. prettying smart."
-    # Let's interpret this as: Always auto-fix Prettier/Lint/Ruff if it's safe.
-    # To be safe, we'll just ENABLE fix mode by default if not retrying specific things?
-    # actually, let's keep it explicit but auto-suggest?
-    # User said "make the fix smart". I will enable it by default for this "Smart" run.
-    if not args.fix:
-        args.fix = True  # Enabled by default for smart run
 
     runner = SalvoRunner(args.fix, args.retry_failed)
 
     # 1. Frontend
-    if args.fix:
-        # Prettier first to clean up formatting
-        runner.add_check(Check("Prettier", "npm run format", is_fixer=True))
-        runner.add_check(Check("ESLint", "npm run lint:fix", is_fixer=True))
-    else:
-        # Check only
-        runner.add_check(Check("Prettier", "npm run format"))
-        runner.add_check(Check("ESLint", "npm run lint"))
-
+    runner.add_check(Check("Prettier", "npm run format", is_fixer=True))
+    runner.add_check(Check("ESLint", "npm run lint:fix", is_fixer=True))
     runner.add_check(Check("TypeScript", "npm run typecheck", concurrency_group="heavy"))
     # Use test:ci to ensure it doesn't hang in watch mode
     runner.add_check(Check("Vitest", "npm run test:ci", concurrency_group="heavy"))
@@ -535,8 +506,7 @@ def main() -> None:
 
     # 2. Go Backend
     if os.path.exists("api/go.mod"):
-        if args.fix:
-            runner.add_check(Check("Go Fmt", "go fmt ./...", cwd="api", is_fixer=True))
+        runner.add_check(Check("Go Fmt", "go fmt ./...", cwd="api", is_fixer=True))
         runner.add_check(Check("Go Vet", "go vet ./...", cwd="api"))
         runner.add_check(Check("Go Build", "go build ./...", cwd="api"))
         runner.add_check(
@@ -558,12 +528,8 @@ def main() -> None:
         pytest = runner.resolve_tool("pytest")
 
         if ruff:
-            if args.fix:
-                runner.add_check(Check("Ruff Format", f"{ruff} format api/", is_fixer=True))
-                runner.add_check(Check("Ruff Lint", f"{ruff} check --fix api/", is_fixer=True))
-            else:
-                runner.add_check(Check("Ruff Format", f"{ruff} format --check api/"))
-                runner.add_check(Check("Ruff Lint", f"{ruff} check api/"))
+            runner.add_check(Check("Ruff Format", f"{ruff} format api/", is_fixer=True))
+            runner.add_check(Check("Ruff Lint", f"{ruff} check --fix api/", is_fixer=True))
         else:
             print(f"{Colors.YELLOW}⚠️  Ruff not found (skipped){Colors.NC}")
 

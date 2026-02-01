@@ -52,7 +52,10 @@ const PaydayBanner: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-white/95 to-purple-50/90 backdrop-blur-3xl border-2 border-black rounded-xl shadow-2xl p-6 animate-pulse">
+      <div
+        className="bg-gradient-to-br from-white/95 to-purple-50/90 backdrop-blur-3xl border-2 border-black rounded-xl shadow-2xl p-6 animate-pulse"
+        data-testid="payday-banner"
+      >
         <div className="h-6 bg-gray-300 rounded w-1/3 mb-4"></div>
         <div className="h-8 bg-gray-300 rounded w-1/2 mb-2"></div>
         <div className="h-4 bg-gray-300 rounded w-full"></div>
@@ -63,7 +66,10 @@ const PaydayBanner: React.FC = () => {
   // Error state
   if (hasError) {
     return (
-      <div className="bg-gradient-to-br from-red-50/95 to-red-100/90 backdrop-blur-3xl border-2 border-red-600 rounded-xl shadow-2xl p-6">
+      <div
+        className="bg-gradient-to-br from-red-50/95 to-red-100/90 backdrop-blur-3xl border-2 border-red-600 rounded-xl shadow-2xl p-6"
+        data-testid="payday-banner"
+      >
         <div className="flex items-center">
           {React.createElement(getIcon("AlertTriangle"), {
             className: "h-6 w-6 text-red-600 mr-3",
@@ -79,7 +85,10 @@ const PaydayBanner: React.FC = () => {
   // No payday prediction available
   if (!formattedPayday || daysUntilPayday === null) {
     return (
-      <div className="bg-gradient-to-br from-white/95 to-blue-50/90 backdrop-blur-3xl border-2 border-black rounded-xl shadow-2xl p-6">
+      <div
+        className="bg-gradient-to-br from-white/95 to-blue-50/90 backdrop-blur-3xl border-2 border-black rounded-xl shadow-2xl p-6"
+        data-testid="payday-banner"
+      >
         <div className="flex items-center mb-4">
           {React.createElement(getIcon("Calendar"), {
             className: "h-6 w-6 text-blue-600 mr-3",

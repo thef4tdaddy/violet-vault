@@ -4,6 +4,7 @@ import { useManualSync } from "@/hooks/platform/sync/useManualSync";
 import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import { useImportDashboardStore } from "@/stores/ui/importDashboardStore";
 import { useSentinelReceipts } from "@/hooks/api/useSentinelReceipts";
+import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 
 interface QuickActionsProps {
   setActiveView?: (view: string) => void;
@@ -16,6 +17,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ setActiveView, className = 
   const openImportDashboard = useImportDashboardStore((state) => state.open);
   const { pendingReceipts } = useSentinelReceipts();
   const pendingCount = pendingReceipts?.length || 0;
+  const openPaycheckWizard = usePaycheckFlowStore((state) => state.openWizard);
 
   const handleSync = async () => {
     try {
@@ -61,7 +63,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ setActiveView, className = 
         label="Add Paycheck"
         variant="primary"
         color="success"
-        onClick={() => setActiveView?.("paycheck")}
+        onClick={openPaycheckWizard}
       />
       <QuickActionButton
         icon="RefreshCw"
