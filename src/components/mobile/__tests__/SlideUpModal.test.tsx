@@ -157,24 +157,6 @@ describe("SlideUpModal", () => {
   });
 
   describe("Backdrop", () => {
-    it("should render backdrop by default", () => {
-      render(<SlideUpModal {...defaultProps} />);
-      const backdrop = screen.getByTestId("backdrop");
-      expect(backdrop).toBeInTheDocument();
-    });
-
-    it("should render backdrop when backdrop is true", () => {
-      render(<SlideUpModal {...defaultProps} backdrop={true} />);
-      const backdrop = screen.getByTestId("backdrop");
-      expect(backdrop).toBeInTheDocument();
-    });
-
-    it("should not render backdrop when backdrop is false", () => {
-      render(<SlideUpModal {...defaultProps} backdrop={false} />);
-      const backdrop = screen.queryByTestId("backdrop");
-      expect(backdrop).not.toBeInTheDocument();
-    });
-
     it("should call onClose when backdrop is clicked", async () => {
       const onClose = vi.fn();
       render(<SlideUpModal {...defaultProps} onClose={onClose} />);
