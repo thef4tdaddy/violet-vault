@@ -491,12 +491,26 @@ def main() -> None:
 
     # Implicit Retry Logic
     # If previous failures exist and no explicit "all" requested, default to retry
+    # BUT only if failures are recent ( < 5 minutes )
     if os.path.exists(FAILED_CHECKS_FILE) and not args.all and not args.retry_failed:
-        print(
-            f"{Colors.YELLOW}⚠️  Previous failures detected. Defaulting to RETRY FAILED mode.{Colors.NC}"
-        )
-        print(f"{Colors.GRAY}   (Run with --all to force full check){Colors.NC}\n")
-        args.retry_failed = True
+        try:
+            with open(FAILED_CHECKS_FILE) as f:
+                data = json.load(f)
+                ts = data.get("timestamp", 0)
+                # If failures are fresh (< 300s / 5m), retry them.
+                # Otherwise, fall through to normal "Smart Scope" or "All" logic.
+                if time.time() - ts < 300:
+                    print(
+                        f"{Colors.YELLOW}⚠️  Recent failures detected (< 5m ago). Defaulting to RETRY FAILED mode.{Colors.NC}"
+                    )
+                    print(f"{Colors.GRAY}   (Run with --all to force full check){Colors.NC}\n")
+                    args.retry_failed = True
+                else:
+                    print(
+                        f"{Colors.GRAY}ℹ️  Previous failures expired (> 5m ago). Starting fresh run.{Colors.NC}"
+                    )
+        except Exception:
+            pass
 
     # Auto-fix is now the default and only behavior
     args.fix = True

@@ -45,6 +45,7 @@ export default [
       'original-app/**',
       'playwright.config.ts',
       'src/test/test-helpers.ts',
+      'src/test/setup.ts',
       'vite.config.js',
       'vite.config.ts',
       'vitest.config.ts',

@@ -73,3 +73,71 @@ func TestHandler_CacheLogic(t *testing.T) {
 	// Just ensuring it works; timing assertions are flaky in CI
 	t.Logf("First fetch: %v, Second fetch: %v", duration1, duration2)
 }
+
+func TestHandler_UpstreamFailure(t *testing.T) {
+	// Mock Upstream server returning 500
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer ts.Close()
+
+	// Point to mock server
+	oldAPI := DevToAPI
+	DevToAPI = ts.URL
+	defer func() { DevToAPI = oldAPI }()
+
+	// Ensure cache is empty
+	blogCache.Mutex.Lock()
+	blogCache.Articles = nil
+	blogCache.LastFetch = time.Time{}
+	blogCache.Mutex.Unlock()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/marketing/blog", nil)
+	w := httptest.NewRecorder()
+
+	Handler(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected 503 Service Unavailable, got %d", w.Code)
+	}
+}
+
+func TestHandler_UpstreamInvalidJSON(t *testing.T) {
+	// Mock Upstream server returning garbage
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Not JSON"))
+	}))
+	defer ts.Close()
+
+	// Point to mock server
+	oldAPI := DevToAPI
+	DevToAPI = ts.URL
+	defer func() { DevToAPI = oldAPI }()
+
+	// Ensure cache is empty
+	blogCache.Mutex.Lock()
+	blogCache.Articles = nil
+	blogCache.LastFetch = time.Time{}
+	blogCache.Mutex.Unlock()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/marketing/blog", nil)
+	w := httptest.NewRecorder()
+
+	Handler(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("Expected 503 Service Unavailable (due to JSON error), got %d", w.Code)
+	}
+}
+
+func TestHandler_Options(t *testing.T) {
+	req := httptest.NewRequest(http.MethodOptions, "/api/marketing/blog", nil)
+	w := httptest.NewRecorder()
+
+	Handler(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected 200 for OPTIONS, got %d", w.Code)
+	}
+}

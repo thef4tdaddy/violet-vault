@@ -14,10 +14,11 @@ const fetchGoStatus = async () => {
   return res.json();
 };
 
-const StatusDot: React.FC<{ status: "online" | "offline" | "loading"; label: string }> = ({
-  status,
-  label,
-}) => {
+const StatusDot: React.FC<{
+  status: "online" | "offline" | "loading";
+  label: string;
+  details?: string;
+}> = ({ status, label, details }) => {
   const color =
     status === "online"
       ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
@@ -26,22 +27,30 @@ const StatusDot: React.FC<{ status: "online" | "offline" | "loading"; label: str
         : "bg-red-500";
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800">
+    <div className="group relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 cursor-help">
       <div className={`w-2 h-2 rounded-full ${color}`} />
       <span className="text-xs font-mono font-bold text-slate-400 uppercase">{label}</span>
+
+      {/* Detail Tooltip */}
+      {status === "online" && details && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs font-mono text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl pointer-events-none z-10">
+          {details}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-700" />
+        </div>
+      )}
     </div>
   );
 };
 
 export const MarketingFooter: React.FC = () => {
-  const { status: pyStatus } = useQuery({
+  const { data: pyData, status: pyStatus } = useQuery({
     queryKey: ["status", "python"],
     queryFn: fetchPythonStatus,
     retry: false,
     refetchInterval: 30000,
   });
 
-  const { status: goStatus } = useQuery({
+  const { data: goData, status: goStatus } = useQuery({
     queryKey: ["status", "go"],
     queryFn: fetchGoStatus,
     retry: false,
@@ -68,15 +77,33 @@ export const MarketingFooter: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <StatusDot status={pyState} label="Python Core" />
-          <StatusDot status={goState} label="Go Engine" />
+          <StatusDot
+            status={pyState}
+            label="Python Core"
+            details={pyData?.latency_ms ? `Firestore: ${pyData.latency_ms}ms` : undefined}
+          />
+          <StatusDot
+            status={goState}
+            label="Go Engine"
+            details={goData?.goroutines ? `Goroutines: ${goData.goroutines}` : undefined}
+          />
         </div>
 
         <div className="flex items-center gap-6">
-          <a href="#" className="text-slate-500 hover:text-fuchsia-400 transition-colors">
+          <a
+            href="https://github.com/thef4tdaddy/violet-vault"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-500 hover:text-fuchsia-400 transition-colors"
+            aria-label="GitHub Repository"
+          >
             {React.createElement(getIcon("Github"), { className: "w-5 h-5" })}
           </a>
-          <a href="#" className="text-slate-500 hover:text-fuchsia-400 transition-colors">
+          <a
+            href="/docs"
+            className="text-slate-500 hover:text-fuchsia-400 transition-colors"
+            aria-label="Documentation"
+          >
             {React.createElement(getIcon("FileText"), { className: "w-5 h-5" })}
           </a>
         </div>

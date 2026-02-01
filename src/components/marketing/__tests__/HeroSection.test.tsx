@@ -1,8 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 import { HeroSection } from "../HeroSection";
+
+// Mock the hook
+vi.mock("@/hooks/marketing/useGitHubStats", () => ({
+  useGitHubStats: () => ({
+    data: { stargazers_count: 100, forks_count: 50 },
+    isLoading: false,
+    isError: false,
+  }),
+}));
 
 describe("HeroSection", () => {
   const renderWithRouter = (ui: React.ReactElement) => {
@@ -40,5 +49,11 @@ describe("HeroSection", () => {
   it("renders the version badge", () => {
     renderWithRouter(<HeroSection />);
     expect(screen.getByText("V2.1 POLYGLOT ARCHITECTURE")).toBeInTheDocument();
+  });
+
+  it("renders the GitHub stats badge", () => {
+    renderWithRouter(<HeroSection />);
+    expect(screen.getByText("100 Stars")).toBeInTheDocument();
+    expect(screen.getByText("50 Forks")).toBeInTheDocument();
   });
 });

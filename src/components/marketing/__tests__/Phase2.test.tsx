@@ -35,9 +35,10 @@ describe("ComparisonSection", () => {
 describe("TechStackBar", () => {
   it("renders all tech labels", () => {
     render(<TechStackBar />);
-    expect(screen.getByText("React 19")).toBeInTheDocument();
-    expect(screen.getByText("TypeScript")).toBeInTheDocument();
-    expect(screen.getByText("Go 1.22")).toBeInTheDocument();
-    expect(screen.getByText("Python 3.12")).toBeInTheDocument();
+    // Since we use infinite marquee duplication, there will be multiple instances of each label.
+    expect(screen.getAllByText("React 19").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("TypeScript").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Go 1.22").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Python 3.12").length).toBeGreaterThan(0);
   });
 });

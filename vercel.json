@@ -76,6 +76,18 @@
   },
   "rewrites": [
     {
+      "source": "/api/marketing/blog",
+      "destination": "/api/marketing/blog.go"
+    },
+    {
+      "source": "/api/marketing/go_status",
+      "destination": "/api/marketing/go_status.go"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/main.py"
+    },
+    {
       "source": "/((?!api|assets|favicon.ico|manifest.webmanifest|sw.js|workbox-).*)",
       "destination": "/index.html"
     }

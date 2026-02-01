@@ -4,6 +4,9 @@ import Button from "@/components/ui/buttons/Button";
 
 import { motion, Variants } from "framer-motion";
 
+import { useGitHubStats } from "@/hooks/marketing/useGitHubStats";
+import { getIcon } from "@/utils";
+
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,6 +25,29 @@ const itemVariants: Variants = {
     y: 0,
     transition: { duration: 0.5, ease: "easeOut" },
   },
+};
+
+const GitHubStatsBadge: React.FC = () => {
+  const { data, isLoading, isError } = useGitHubStats();
+
+  if (isLoading || isError || !data) return null;
+
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="inline-flex items-center gap-4 px-4 py-1.5 rounded-full bg-slate-900/50 border border-slate-800 backdrop-blur-sm mb-6 max-w-fit mx-auto"
+    >
+      <div className="flex items-center gap-1.5 text-slate-400">
+        {React.createElement(getIcon("Github"), { className: "w-4 h-4" })}
+        <span className="text-xs font-mono font-bold">{data.stargazers_count} Stars</span>
+      </div>
+      <div className="w-px h-3 bg-slate-800" />
+      <div className="flex items-center gap-1.5 text-slate-400">
+        {React.createElement(getIcon("GitBranch"), { className: "w-4 h-4" })}
+        <span className="text-xs font-mono font-bold">{data.forks_count} Forks</span>
+      </div>
+    </motion.div>
+  );
 };
 
 export const HeroSection: React.FC = () => {
@@ -58,6 +84,9 @@ export const HeroSection: React.FC = () => {
             V2.1 POLYGLOT ARCHITECTURE
           </span>
         </motion.div>
+
+        {/* GitHub Stats Badge */}
+        <GitHubStatsBadge />
 
         {/* Headline */}
         <motion.h1
