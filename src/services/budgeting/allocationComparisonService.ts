@@ -36,10 +36,17 @@ export class AllocationComparisonService {
     const changes: EnvelopeChange[] = [];
 
     // Compare all envelopes in current allocation
-    current.envelopeAllocations.forEach((currentAmount, envelopeId) => {
-      const previousAmount = previous.envelopeAllocations.get(envelopeId) || 0;
+    Object.entries(current.envelopeAllocations).forEach(([envelopeId, currentAmount]) => {
+      const previousAmount = previous.envelopeAllocations[envelopeId] || 0;
       const changeCents = currentAmount - previousAmount;
-      const changePercent = previousAmount > 0 ? (changeCents / previousAmount) * 100 : 100;
+
+      // Handle new envelopes differently from 100% increases
+      const changePercent =
+        previousAmount > 0
+          ? (changeCents / previousAmount) * 100
+          : changeCents > 0
+            ? Infinity // Mark as new envelope
+            : 0;
 
       const trend = this.determineTrend(changeCents);
       const sentiment = this.determineSentiment(envelopeId, changeCents);
@@ -57,8 +64,8 @@ export class AllocationComparisonService {
     });
 
     // Add envelopes that were in previous but not current (removed envelopes)
-    previous.envelopeAllocations.forEach((previousAmount, envelopeId) => {
-      if (!current.envelopeAllocations.has(envelopeId)) {
+    Object.entries(previous.envelopeAllocations).forEach(([envelopeId, previousAmount]) => {
+      if (!current.envelopeAllocations[envelopeId]) {
         changes.push({
           envelopeId,
           envelopeName: envelopeId,
@@ -137,10 +144,10 @@ export class AllocationComparisonService {
    * @returns Allocation snapshot
    */
   static createSnapshotFromHistory(entry: AllocationHistoryEntry): AllocationSnapshot {
-    const envelopeAllocations = new Map<string, number>();
+    const envelopeAllocations: Record<string, number> = {};
 
     entry.allocations.forEach((allocation) => {
-      envelopeAllocations.set(allocation.envelopeId, allocation.amountCents);
+      envelopeAllocations[allocation.envelopeId] = allocation.amountCents;
     });
 
     return {
@@ -163,10 +170,10 @@ export class AllocationComparisonService {
     allocations: ReadonlyArray<{ envelopeId: string; amountCents: number }>,
     payerName?: string | null
   ): AllocationSnapshot {
-    const envelopeAllocations = new Map<string, number>();
+    const envelopeAllocations: Record<string, number> = {};
 
     allocations.forEach((allocation) => {
-      envelopeAllocations.set(allocation.envelopeId, allocation.amountCents);
+      envelopeAllocations[allocation.envelopeId] = allocation.amountCents;
     });
 
     return {

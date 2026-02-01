@@ -8,11 +8,12 @@ import { z } from "zod";
 
 /**
  * Allocation Snapshot Schema
+ * Note: envelopeAllocations uses Record instead of Map for JSON serialization compatibility
  */
 export const AllocationSnapshotSchema = z.object({
   date: z.string().datetime(),
   totalCents: z.number().int().nonnegative(),
-  envelopeAllocations: z.map(z.string(), z.number().int().nonnegative()),
+  envelopeAllocations: z.record(z.string(), z.number().int().nonnegative()),
   frequency: z.enum(["weekly", "biweekly", "semi-monthly", "monthly"]).optional(),
   payerName: z.string().optional(),
 });

@@ -245,6 +245,33 @@ export class PaycheckHistoryService {
     try {
       const history = this.getAllocationHistory();
 
+      // Validate that allocations sum to paycheck amount
+      const allocationTotal = entry.allocations.reduce((sum, a) => sum + a.amountCents, 0);
+      if (allocationTotal !== entry.paycheckAmountCents) {
+        logger.warn("Allocation total does not match paycheck amount", {
+          paycheckAmount: entry.paycheckAmountCents,
+          allocationTotal,
+          difference: entry.paycheckAmountCents - allocationTotal,
+        });
+      }
+
+      // Validate and filter strategy to known types
+      let validatedStrategy: "even_split" | "last_split" | "target_first" | "manual" | undefined;
+      if (
+        entry.strategy &&
+        ["even_split", "last_split", "target_first", "manual"].includes(entry.strategy)
+      ) {
+        validatedStrategy = entry.strategy as
+          | "even_split"
+          | "last_split"
+          | "target_first"
+          | "manual";
+      } else if (entry.strategy) {
+        logger.warn("Unrecognized allocation strategy, storing as undefined", {
+          strategy: entry.strategy,
+        });
+      }
+
       const newEntry = {
         id: `alloc_${Date.now()}_${Math.random().toString(36).substring(7)}`,
         date: new Date().toISOString(),
@@ -254,26 +281,23 @@ export class PaycheckHistoryService {
           envelopeId: a.envelopeId,
           amountCents: a.amountCents,
         })),
-        strategy:
-          entry.strategy &&
-          ["even_split", "last_split", "target_first", "manual"].includes(entry.strategy)
-            ? (entry.strategy as "even_split" | "last_split" | "target_first" | "manual")
-            : undefined,
+        strategy: validatedStrategy,
       };
 
-      history.push(newEntry);
+      // Insert newest entry first and enforce max entries (keep most recent)
+      const updatedHistory = [newEntry, ...history].slice(0, this.MAX_ALLOCATION_HISTORY);
 
-      // Enforce max entries (keep most recent)
-      if (history.length > this.MAX_ALLOCATION_HISTORY) {
-        history.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        history.splice(this.MAX_ALLOCATION_HISTORY);
-      }
-
-      localStorage.setItem(this.ALLOCATION_HISTORY_KEY, JSON.stringify(history));
+      // NOTE: Allocation history is currently stored in plaintext in localStorage.
+      // This is intentionally limited to client-side use only (never synced) and
+      // functions as a convenience cache rather than a canonical financial record.
+      // TODO: When integrating with the app-wide encrypted envelope budgeting
+      // pipeline, migrate this to use the same client-side encryption/decryption
+      // mechanism as other sensitive financial data before persisting.
+      localStorage.setItem(this.ALLOCATION_HISTORY_KEY, JSON.stringify(updatedHistory));
 
       logger.info("Saved allocation history", {
         entryId: newEntry.id,
-        totalEntries: history.length,
+        totalEntries: updatedHistory.length,
       });
     } catch (error) {
       logger.error("Failed to save allocation history", {
