@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 from api.analytics import EnvelopeIntegrityAuditor
+from api.marketing.status import router as marketing_status_router
 from api.models import AuditSnapshot, IntegrityAuditResult
 from api.sentinel.receipts import router as sentinel_router
 
@@ -95,6 +96,7 @@ app.add_middleware(
 
 # Route Mounting
 app.include_router(sentinel_router, prefix="/api")
+app.include_router(marketing_status_router, prefix="/api/marketing")
 
 
 @app.get("/")

@@ -489,23 +489,67 @@ def main() -> None:
     parser.add_argument("--all", action="store_true", help="Force full run (ignore smart retry)")
     args = parser.parse_args()
 
+    # Implicit Retry Logic
+    # If previous failures exist and no explicit "all" requested, default to retry
+    if os.path.exists(FAILED_CHECKS_FILE) and not args.all and not args.retry_failed:
+        print(
+            f"{Colors.YELLOW}⚠️  Previous failures detected. Defaulting to RETRY FAILED mode.{Colors.NC}"
+        )
+        print(f"{Colors.GRAY}   (Run with --all to force full check){Colors.NC}\n")
+        args.retry_failed = True
+
     # Auto-fix is now the default and only behavior
     args.fix = True
     now = time.time()
 
+    # Smart Scope Analysis
+    scope = {"frontend": True, "backend_go": True, "backend_python": True}
+    if not args.all and not args.retry_failed:
+        try:
+            # Check for changes against main branch
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "origin/main...HEAD"], capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                changes = result.stdout.splitlines()
+                # If changes exist, narrow scope. If no output (or error), run all.
+                if changes:
+                    scope["frontend"] = any(
+                        f.startswith("src/")
+                        or f.startswith("package")
+                        or f.endswith(".ts")
+                        or f.endswith(".tsx")
+                        for f in changes
+                    )
+                    scope["backend_go"] = any(
+                        f.startswith("api/") and not f.endswith(".py") for f in changes
+                    )
+                    scope["backend_python"] = any(f.endswith(".py") for f in changes)
+
+                    # If common configs change, run all
+                    if any(f.startswith("scripts/") or f.startswith("configs/") for f in changes):
+                        scope = {k: True for k in scope}
+
+                    print(f"{Colors.BLUE}🔍 Smart Scope Detected:{Colors.NC}")
+                    print(f"   Frontend: {'✅' if scope['frontend'] else 'Skipped'}")
+                    print(f"   Go:       {'✅' if scope['backend_go'] else 'Skipped'}")
+                    print(f"   Python:   {'✅' if scope['backend_python'] else 'Skipped'}")
+        except Exception:
+            # Fallback to running everything if git check fails
+            pass
+
     runner = SalvoRunner(args.fix, args.retry_failed)
 
     # 1. Frontend
-    runner.add_check(Check("Prettier", "npm run format", is_fixer=True))
-    runner.add_check(Check("ESLint", "npm run lint:fix", is_fixer=True))
-    runner.add_check(Check("TypeScript", "npm run typecheck", concurrency_group="heavy"))
-    # Use test:ci to ensure it doesn't hang in watch mode
-    runner.add_check(Check("Vitest", "npm run test:ci", concurrency_group="heavy"))
-    # Prod build as requested for speed/verification
-    runner.add_check(Check("Build-Prod", "npm run build", concurrency_group="heavy"))
+    if scope["frontend"] or args.retry_failed:
+        runner.add_check(Check("Prettier", "npm run format", is_fixer=True))
+        runner.add_check(Check("ESLint", "npm run lint:fix", is_fixer=True))
+        runner.add_check(Check("TypeScript", "npm run typecheck", concurrency_group="heavy"))
+        runner.add_check(Check("Vitest", "npm run test:ci", concurrency_group="heavy"))
+        runner.add_check(Check("Build-Prod", "npm run build", concurrency_group="heavy"))
 
     # 2. Go Backend
-    if os.path.exists("api/go.mod"):
+    if (scope["backend_go"] or args.retry_failed) and os.path.exists("api/go.mod"):
         runner.add_check(Check("Go Fmt", "go fmt ./...", cwd="api", is_fixer=True))
         runner.add_check(Check("Go Vet", "go vet ./...", cwd="api"))
         runner.add_check(Check("Go Build", "go build ./...", cwd="api"))
@@ -514,39 +558,50 @@ def main() -> None:
         )
 
     # 3. Python Backend
-    # Detect python
-    has_python = False
-    for _, _, files in os.walk("api"):
-        if any(f.endswith(".py") for f in files):
-            has_python = True
-            break
+    if scope["backend_python"] or args.retry_failed:
+        # Detect python
+        has_python = False
+        for _, _, files in os.walk("api"):
+            if any(f.endswith(".py") for f in files):
+                has_python = True
+                break
 
-    if has_python:
-        # Resolve tools dynamically
-        ruff = runner.resolve_tool("ruff")
-        mypy = runner.resolve_tool("mypy")
-        pytest = runner.resolve_tool("pytest")
+        if has_python:
+            # Resolve tools dynamically
+            ruff = runner.resolve_tool("ruff")
+            mypy = runner.resolve_tool("mypy")
+            pytest = runner.resolve_tool("pytest")
 
-        if ruff:
-            runner.add_check(Check("Ruff Format", f"{ruff} format api/", is_fixer=True))
-            runner.add_check(Check("Ruff Lint", f"{ruff} check --fix api/", is_fixer=True))
-        else:
-            print(f"{Colors.YELLOW}⚠️  Ruff not found (skipped){Colors.NC}")
+            if ruff:
+                runner.add_check(Check("Ruff Format", f"{ruff} format api/", is_fixer=True))
+                runner.add_check(Check("Ruff Lint", f"{ruff} check --fix api/", is_fixer=True))
+            else:
+                print(f"{Colors.YELLOW}⚠️  Ruff not found (skipped){Colors.NC}")
 
-        if mypy:
-            # Add concurrency_group="heavy" to prevent heavy overlap
-            runner.add_check(
-                Check("Mypy", f"{mypy} api/ --ignore-missing-imports", concurrency_group="heavy")
-            )
-        else:
-            print(f"{Colors.YELLOW}⚠️  Mypy not found (skipped){Colors.NC}")
+            if mypy:
+                runner.add_check(
+                    Check(
+                        "Mypy", f"{mypy} api/ --ignore-missing-imports", concurrency_group="heavy"
+                    )
+                )
+            else:
+                print(f"{Colors.YELLOW}⚠️  Mypy not found (skipped){Colors.NC}")
 
-        # Pytest
-        if pytest:
-            cmd = f"{pytest} api/ --cov=api --cov-report=xml:api_coverage.xml"
-            runner.add_check(Check("Pytest", cmd))
-        else:
-            print(f"{Colors.YELLOW}⚠️  Pytest not found (skipped){Colors.NC}")
+            if pytest:
+                cmd = f"{pytest} api/ --cov=api --cov-report=xml:api_coverage.xml"
+                runner.add_check(Check("Pytest", cmd))
+            else:
+                print(f"{Colors.YELLOW}⚠️  Pytest not found (skipped){Colors.NC}")
+
+    # 4. Smart Upload (Codecov) logic...
+    # (Existing upload logic logic remains, effectively re-included because we didn't slice it out,
+    # but wait - replace_file_content replaces a block. I need to make sure I don't delete the upload logic if it is in the chunk.)
+    # The chunk I am replacing ends at 585 which is main(). The upload logic was lines 551-579.
+    # I should include the upload logic in my replacement or just target lines 492-550.
+    # Let's adjust target to be safe and target the *definition* of checks.
+    # Lines 498-550 cover the checks.
+    # ... Wait, I can't put comments in the "Instruction" or "Thought" inside the tool call.
+    # I will replace the main function body's check definition part.
 
     # 4. Smart Upload
     # Upload if --upload OR (Token exists AND > 30 mins since last upload)
@@ -575,6 +630,8 @@ def main() -> None:
             runner.add_check(
                 Check("Codecov Upload", "npx --yes codecov", concurrency_group="network")
             )
+
+    runner.execute()
 
     runner.execute()
 

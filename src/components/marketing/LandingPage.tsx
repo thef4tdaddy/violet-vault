@@ -2,6 +2,8 @@ import React from "react";
 import { HeroSection } from "./HeroSection";
 import { TechStackBar } from "./TechStackBar";
 import { ComparisonSection } from "./ComparisonSection";
+import { DevBlogGrid } from "./DevBlogGrid";
+import { MarketingFooter } from "./MarketingFooter";
 
 /**
  * Marketing Landing Page Root
@@ -13,11 +15,8 @@ const LandingPage: React.FC = () => {
       <HeroSection />
       <TechStackBar />
       <ComparisonSection />
-      {/* 
-        Phase 3:
-        <DevBlogGrid /> 
-        <MarketingFooter />
-      */}
+      <DevBlogGrid />
+      <MarketingFooter />
     </div>
   );
 };

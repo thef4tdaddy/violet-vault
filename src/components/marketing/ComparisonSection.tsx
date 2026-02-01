@@ -13,6 +13,10 @@ interface ComparisonCardProps {
   isPrimary?: boolean;
 }
 
+import { motion } from "framer-motion";
+
+// ... previous interfaces and ComparisonCard component ...
+
 const ComparisonCard: React.FC<ComparisonCardProps> = ({
   title,
   subtitle,
@@ -26,7 +30,11 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({
   const bgAccent = accentColor === "fuchsia" ? "bg-fuchsia-400" : "bg-cyan-400";
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       className={`relative group flex flex-col p-8 rounded-2xl border-2 backdrop-blur-xl transition-all duration-300 ${
         isPrimary
           ? `bg-slate-900/60 border-slate-700 hover:border-${accentColor}-500 shadow-2xl`
@@ -62,7 +70,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({
           {ctaLabel}
         </Button>
       </Link>
-    </div>
+    </motion.div>
   );
 };
 
@@ -73,7 +81,13 @@ export const ComparisonSection: React.FC = () => {
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[500px] bg-indigo-900/10 -skew-y-6 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16 space-y-4"
+        >
           <h2 className="text-4xl md:text-6xl font-black text-slate-50 tracking-tighter">
             CHOOSE YOUR <span className="text-fuchsia-500">REALITY</span>
           </h2>
@@ -81,7 +95,7 @@ export const ComparisonSection: React.FC = () => {
             Whether you need persistent, encrypted security or just want to test drive the engine at
             hyperspeed.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
           <ComparisonCard
