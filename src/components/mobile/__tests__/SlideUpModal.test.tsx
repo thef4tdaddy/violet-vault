@@ -21,7 +21,13 @@ vi.mock("@/utils", () => ({
 vi.mock("@/utils/ui/feedback/touchFeedback", () => ({
   useTouchFeedback: vi.fn(() => ({
     onTouchStart: vi.fn(),
-    onClick: vi.fn((handler?: () => void) => handler || vi.fn()),
+    onClick: vi.fn((handler?: (...args: unknown[]) => void) => {
+      return (...args: unknown[]) => {
+        if (handler) {
+          handler(...args);
+        }
+      };
+    }),
     className: "mock-touch-feedback-class",
   })),
 }));
