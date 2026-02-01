@@ -11,7 +11,7 @@ import { MarketingFooter } from "./MarketingFooter";
  */
 const LandingPage: React.FC = () => {
   return (
-    <div className="bg-slate-950 min-h-screen text-slate-50 selection:bg-fuchsia-500/30">
+    <div className="bg-slate-950 min-h-screen text-slate-50 selection:bg-fuchsia-500/30 font-sans">
       <HeroSection />
       <TechStackBar />
       <ComparisonSection />

@@ -35,8 +35,10 @@ func TestHandler_CacheLogic(t *testing.T) {
 	defer func() { DevToAPI = oldAPI }()
 
 	// Clear cache
+	blogCache.Mutex.Lock()
 	blogCache.Articles = nil
 	blogCache.LastFetch = time.Time{}
+	blogCache.Mutex.Unlock()
 
 	// First Request (Cache Miss)
 	req1 := httptest.NewRequest(http.MethodGet, "/api/marketing/blog", nil)

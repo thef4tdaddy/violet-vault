@@ -11,6 +11,9 @@ router = APIRouter(prefix="/status", tags=["marketing"])
 async def get_system_status() -> dict[str, Any]:
     """
     Returns the real-time system status for the marketing footer.
+    PUBLIC ENDPOINT: No auth required as this displays generic system health to visitors.
+    Do not expose internal IPs, user data, or sensitive error traces here.
+
     Performs a real connectivity ping to Google's Firestore infrastructure.
     """
     start_time = time.time()

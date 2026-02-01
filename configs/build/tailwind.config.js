@@ -10,6 +10,8 @@ module.exports = {
     "bg-purple-100",
     "border-purple-200",
     "ring-purple-300",
+    "hover:border-fuchsia-500",
+    "hover:border-cyan-500",
   ],
   darkMode: false,
   theme: {

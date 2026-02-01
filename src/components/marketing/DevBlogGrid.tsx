@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getIcon } from "@/utils";
+import { logger } from "@/utils/core/common/logger";
 
 interface DevArticle {
   id: number;
@@ -12,10 +13,15 @@ interface DevArticle {
   tag_list: string[];
 }
 
+const safeUrl = (url: string) => {
+  if (url.startsWith("https://") || url.startsWith("http://")) return url;
+  return "#";
+};
+
 const fetchArticles = async (): Promise<DevArticle[]> => {
   // In development, this might 404 if the Go server isn't running on the same port/proxy
   // For now, we assume the proxy is correctly routed or mapped.
-  const res = await fetch("/api/marketing/blog_proxy");
+  const res = await fetch("/api/marketing/blog");
   if (!res.ok) throw new Error("Failed to fetch articles");
   return res.json();
 };
@@ -42,6 +48,12 @@ export const DevBlogGrid: React.FC = () => {
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
+  React.useEffect(() => {
+    if (error) {
+      logger.error("Failed to fetch blog articles", { error });
+    }
+  }, [error]);
+
   return (
     <div className="py-24 px-4 bg-slate-950 relative">
       <div className="max-w-7xl mx-auto">
@@ -50,7 +62,7 @@ export const DevBlogGrid: React.FC = () => {
             <h2 className="text-4xl font-black text-slate-50 mb-2">
               BUILDING IN <span className="text-fuchsia-500">PUBLIC</span>
             </h2>
-            <p className="text-slate-400 max-w-xl">
+            <p className="text-purple-900 max-w-xl">
               Follow the journey of building an open-source, local-first financial engine. Technical
               deep dives, architectural decisions, and lessons learned.
             </p>
@@ -78,10 +90,10 @@ export const DevBlogGrid: React.FC = () => {
               : articles?.slice(0, 3).map((article) => (
                   <a
                     key={article.id}
-                    href={article.url}
+                    href={safeUrl(article.url)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group block rounded-xl border border-slate-800 bg-slate-900/40 hover:border-fuchsia-500/50 hover:bg-slate-900/80 transition-all duration-300 overflow-hidden"
+                    className="group block rounded-xl border border-white/20 ring-1 ring-gray-800/10 bg-slate-900/40 hover:border-fuchsia-500/50 hover:bg-slate-900/80 transition-all duration-300 overflow-hidden"
                   >
                     <div className="relative h-48 overflow-hidden">
                       {article.cover_image ? (

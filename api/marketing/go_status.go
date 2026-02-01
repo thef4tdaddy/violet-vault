@@ -20,6 +20,7 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	// CORS Headers
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept")
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method == http.MethodOptions {

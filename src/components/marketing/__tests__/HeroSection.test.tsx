@@ -40,8 +40,8 @@ describe("HeroSection", () => {
     expect(launchBtn).toBeInTheDocument();
     expect(launchBtn).toHaveAttribute("href", "/vault/dashboard");
 
-    // Check Hypserspeed Demo button
-    const demoBtn = screen.getByRole("link", { name: /HYPERSPEED DEMO/i });
+    // Check Hyperspeed Demo button
+    const demoBtn = screen.getByRole("link", { name: /Hyperspeed Demo/i });
     expect(demoBtn).toBeInTheDocument();
     expect(demoBtn).toHaveAttribute("href", "/demo");
   });

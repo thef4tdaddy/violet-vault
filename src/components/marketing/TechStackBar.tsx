@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "@/utils";
+import { motion } from "framer-motion";
 
 const TechItem: React.FC<{ label: string; icon: string; color: string }> = ({
   label,
@@ -16,10 +17,6 @@ const TechItem: React.FC<{ label: string; icon: string; color: string }> = ({
   </div>
 );
 
-import { motion } from "framer-motion";
-
-// ... TechItem component ...
-
 export const TechStackBar: React.FC = () => {
   const items = (
     <>
@@ -33,13 +30,15 @@ export const TechStackBar: React.FC = () => {
   );
 
   return (
-    <div className="w-full bg-slate-950 border-y border-slate-900 overflow-hidden">
+    <div className="w-full bg-slate-950 border border-white/20 ring-1 ring-gray-800/10 overflow-hidden">
       <div className="flex py-4 bg-slate-900/20 backdrop-blur-sm">
         {/* Infinite Marquee Container */}
         <div className="flex relative overflow-hidden w-full mask-linear-fade">
           {/* Mask Gradients for fade effect on edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-r from-slate-950 to-transparent pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none" />
+          {/* Left Fade */}
+          <div className="absolute top-0 left-0 bottom-0 w-32 bg-linear-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
+          {/* Right Fade */}
+          <div className="absolute top-0 right-0 bottom-0 w-32 bg-linear-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
 
           <motion.div
             className="flex gap-0 whitespace-nowrap"

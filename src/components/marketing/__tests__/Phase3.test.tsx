@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom";
@@ -16,6 +16,14 @@ const createTestQueryClient = () =>
 
 global.fetch = vi.fn();
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+beforeEach(() => {
+  global.fetch = vi.fn();
+});
+
 describe("DevBlogGrid", () => {
   it("renders loading skeletons initially", () => {
     render(
@@ -23,7 +31,7 @@ describe("DevBlogGrid", () => {
         <DevBlogGrid />
       </QueryClientProvider>
     );
-    // Skeltons are present (checking by existence of animating elements or generic structure)
+    // Skeletons are present (checking by existence of animating elements or generic structure)
     // Here we can check if the heading exists first
     expect(screen.getByText("BUILDING IN")).toBeInTheDocument();
   });

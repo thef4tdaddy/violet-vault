@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { getIcon } from "@/utils";
 import Button from "@/components/ui/buttons/Button";
+import { motion } from "framer-motion";
 
 interface ComparisonCardProps {
   title: string;
@@ -12,8 +13,6 @@ interface ComparisonCardProps {
   accentColor: "fuchsia" | "cyan";
   isPrimary?: boolean;
 }
-
-import { motion } from "framer-motion";
 
 // ... previous interfaces and ComparisonCard component ...
 
@@ -37,7 +36,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`relative group flex flex-col p-8 rounded-2xl border-2 backdrop-blur-xl transition-all duration-300 ${
         isPrimary
-          ? `bg-slate-900/60 border-slate-700 hover:border-${accentColor}-500 shadow-2xl`
+          ? `bg-slate-900/60 border-slate-700 ${accentColor === "fuchsia" ? "hover:border-fuchsia-500" : "hover:border-cyan-500"} shadow-2xl`
           : "bg-slate-900/30 border-slate-800 hover:border-slate-600"
       }`}
     >
@@ -63,7 +62,7 @@ const ComparisonCard: React.FC<ComparisonCardProps> = ({
       <Link to={ctaLink} className="w-full">
         <Button
           variant={isPrimary ? "primary" : "outline"}
-          className={`w-full py-4 font-black tracking-wide text-lg justify-center ${
+          className={`w-full py-4 font-black tracking-wide text-lg justify-center border-2 border-black ${
             !isPrimary ? "border-slate-600 text-slate-300 hover:text-white" : ""
           }`}
         >

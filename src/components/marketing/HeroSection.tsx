@@ -72,7 +72,7 @@ export const HeroSection: React.FC = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 text-center px-4 max-w-5xl mx-auto space-y-8"
+        className="relative z-10 text-center max-w-5xl mx-auto space-y-8 rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm shadow-xl"
       >
         {/* Badge */}
         <motion.div
@@ -80,7 +80,7 @@ export const HeroSection: React.FC = () => {
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-fuchsia-500/30 bg-fuchsia-950/30 backdrop-blur-sm mb-4"
         >
           <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse" />
-          <span className="text-xs font-mono font-bold text-fuchsia-300 tracking-wider">
+          <span className="text-xs font-mono font-bold text-fuchsia-900 tracking-wider">
             V2.1 POLYGLOT ARCHITECTURE
           </span>
         </motion.div>
@@ -91,15 +91,15 @@ export const HeroSection: React.FC = () => {
         {/* Headline */}
         <motion.h1
           variants={itemVariants}
-          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-50 leading-[0.9]"
+          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-black leading-[0.9]"
         >
           YOUR MONEY.
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-slate-600 to-slate-800">
             YOUR PRIVACY.
           </span>
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-purple-500 drop-shadow-[0_0_30px_rgba(192,38,211,0.3)]">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-fuchsia-600 to-purple-700 drop-shadow-[0_0_30px_rgba(192,38,211,0.3)]">
             YOUR VAULT.
           </span>
         </motion.h1>
@@ -107,7 +107,7 @@ export const HeroSection: React.FC = () => {
         {/* Subhead */}
         <motion.p
           variants={itemVariants}
-          className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed"
+          className="text-lg md:text-xl text-purple-900 max-w-2xl mx-auto font-medium leading-relaxed"
         >
           The open-source, local-first financial supervisor. Powered by Go for precision and Python
           for intelligence. Zero data leaves your device unencrypted.
@@ -119,12 +119,12 @@ export const HeroSection: React.FC = () => {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
         >
           <Link to="/vault/dashboard">
-            <Button className="px-8 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black text-lg tracking-wide rounded-lg hard-border shadow-[4px_4px_0px_0px_#000000] transition-transform active:translate-y-1 active:shadow-[2px_2px_0px_0px_#000000]">
+            <Button className="px-8 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black text-lg tracking-wide rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#000000] transition-transform active:translate-y-1 active:shadow-[2px_2px_0px_0px_#000000]">
               LAUNCH VAULT
             </Button>
           </Link>
           <Link to="/demo">
-            <Button className="px-8 py-4 bg-transparent hover:bg-white/5 text-slate-200 font-bold text-lg tracking-wide rounded-lg border-2 border-slate-700 hover:border-slate-50 transition-colors">
+            <Button className="px-8 py-4 bg-transparent text-purple-900 font-bold text-lg tracking-wide rounded-lg border-2 border-black hover:bg-purple-100 transition-colors">
               HYPERSPEED DEMO
             </Button>
           </Link>
