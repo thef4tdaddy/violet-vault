@@ -432,19 +432,20 @@ describe("SlideUpModal", () => {
 
   describe("Custom Classes", () => {
     it("should apply custom className", () => {
-      const { container } = render(
+      render(
         <SlideUpModal {...defaultProps} className="custom-modal-class" />
       );
-      const modalPanel = container.querySelector(".custom-modal-class");
-      expect(modalPanel).toBeInTheDocument();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveClass("custom-modal-class");
     });
 
     it("should apply multiple custom classes", () => {
-      const { container } = render(
+      render(
         <SlideUpModal {...defaultProps} className="class-one class-two" />
       );
-      const modalPanel = container.querySelector(".class-one.class-two");
-      expect(modalPanel).toBeInTheDocument();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveClass("class-one");
+      expect(dialog).toHaveClass("class-two");
     });
   });
 
