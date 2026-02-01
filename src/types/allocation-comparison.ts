@@ -6,11 +6,12 @@
 
 /**
  * Allocation Snapshot - A point-in-time allocation record
+ * Note: Uses Record instead of Map for JSON serialization compatibility with localStorage
  */
 export interface AllocationSnapshot {
   readonly date: string; // ISO date string
   readonly totalCents: number;
-  readonly envelopeAllocations: Map<string, number>; // envelopeId -> amountCents
+  readonly envelopeAllocations: Record<string, number>; // envelopeId -> amountCents
   readonly frequency?: "weekly" | "biweekly" | "semi-monthly" | "monthly";
   readonly payerName?: string;
 }

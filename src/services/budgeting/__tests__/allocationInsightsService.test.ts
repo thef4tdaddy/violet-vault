@@ -12,15 +12,17 @@ describe("AllocationInsightsService", () => {
   let previousSnapshot: AllocationSnapshot;
 
   beforeEach(() => {
-    const currentAllocations = new Map<string, number>();
-    currentAllocations.set("env_savings", 50000);
-    currentAllocations.set("env_rent", 100000);
-    currentAllocations.set("env_dining", 20000);
+    const currentAllocations: Record<string, number> = {
+      env_savings: 50000,
+      env_rent: 100000,
+      env_dining: 20000,
+    };
 
-    const previousAllocations = new Map<string, number>();
-    previousAllocations.set("env_savings", 40000);
-    previousAllocations.set("env_rent", 100000);
-    previousAllocations.set("env_dining", 15000);
+    const previousAllocations: Record<string, number> = {
+      env_savings: 40000,
+      env_rent: 100000,
+      env_dining: 15000,
+    };
 
     currentSnapshot = {
       date: "2024-02-01T00:00:00.000Z",

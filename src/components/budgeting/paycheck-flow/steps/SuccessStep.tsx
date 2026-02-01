@@ -53,7 +53,13 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
     }
 
     const allocationHistory = PaycheckHistoryService.getAllocationHistory();
-    // Get second-most recent (first is the one we just created)
+
+    // NOTE: We assume `allocationHistory` is ordered with the most recent allocation at index 0.
+    // The ReviewStep saves the new allocation to history *before* navigating to this SuccessStep,
+    // so `allocationHistory[0]` is expected to be the allocation just created in this flow run,
+    // and `allocationHistory[1]` is treated as the "previous" allocation used for comparison.
+    // If the save order, history ordering, or persistence timing ever changes, this logic must be
+    // revisited, as the "previous" allocation may no longer be at index 1.
     const previousAllocation = allocationHistory[1];
 
     if (!previousAllocation) {

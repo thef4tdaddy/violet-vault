@@ -80,11 +80,13 @@ export const AllocationComparisonCard: React.FC<AllocationComparisonCardProps> =
         tabIndex={0}
         onClick={() => setIsExpanded(!isExpanded)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === "Enter" || e.key === " " || e.key === "Space") {
             e.preventDefault();
             setIsExpanded(!isExpanded);
           }
         }}
+        aria-expanded={isExpanded}
+        aria-controls="comparison-content"
         className="w-full flex items-center justify-between text-left cursor-pointer"
       >
         <h3 className="font-black text-slate-900">
@@ -97,7 +99,7 @@ export const AllocationComparisonCard: React.FC<AllocationComparisonCardProps> =
 
       {/* Expanded comparison view */}
       {isExpanded && hasChanges && (
-        <div className="mt-4 space-y-3">
+        <div id="comparison-content" className="mt-4 space-y-3">
           {/* Column headers */}
           <div className="grid grid-cols-2 gap-4 pb-2 border-b-2 border-slate-200">
             <div className="font-bold text-slate-700">THIS TIME</div>

@@ -60,10 +60,15 @@ export class AllocationInsightsService {
    * Generate savings-related insight
    * @param changes - Envelope changes
    * @returns Insight or null
+   *
+   * NOTE: Hardcoded threshold of $5 may not be appropriate for all paycheck sizes.
+   * Future enhancement: make thresholds proportional to paycheck amount or user-configurable.
    */
   private static generateSavingsInsight(changes: EnvelopeChange[]): Insight | null {
     const savingsChanges = changes.filter(
       (c) =>
+        c.envelopeName.toLowerCase().includes("savings") ||
+        c.envelopeName.toLowerCase().includes("emergency") ||
         c.envelopeId.toLowerCase().includes("savings") ||
         c.envelopeId.toLowerCase().includes("emergency")
     );
@@ -98,10 +103,16 @@ export class AllocationInsightsService {
    * Generate discretionary spending insight
    * @param changes - Envelope changes
    * @returns Insight or null
+   *
+   * NOTE: Hardcoded threshold of $10 may not be appropriate for all paycheck sizes.
+   * Future enhancement: make thresholds proportional to paycheck amount or user-configurable.
    */
   private static generateDiscretionaryInsight(changes: EnvelopeChange[]): Insight | null {
     const discretionaryChanges = changes.filter(
       (c) =>
+        c.envelopeName.toLowerCase().includes("dining") ||
+        c.envelopeName.toLowerCase().includes("entertainment") ||
+        c.envelopeName.toLowerCase().includes("shopping") ||
         c.envelopeId.toLowerCase().includes("dining") ||
         c.envelopeId.toLowerCase().includes("entertainment") ||
         c.envelopeId.toLowerCase().includes("shopping")
@@ -177,12 +188,21 @@ export class AllocationInsightsService {
       (c) => c.changePercent > 20 && c.changeCents > 1000 && c.trend === "increase"
     );
 
-    if (significantIncreases.length > 0 && significantIncreases.length <= 2) {
-      const envelopes = significantIncreases.map((c) => c.envelopeName).join(" and ");
+    if (significantIncreases.length > 0) {
+      const envelopesLabel =
+        significantIncreases.length <= 2
+          ? significantIncreases.map((c) => c.envelopeName).join(" and ")
+          : "Multiple categories";
+
+      const messageCore =
+        significantIncreases.length <= 2
+          ? `${envelopesLabel} increased significantly.`
+          : `${envelopesLabel} increased significantly (${significantIncreases.length} categories).`;
+
       insights.push({
         type: "suggestion",
         severity: "info",
-        message: `💡 ${envelopes} increased significantly. Make sure this aligns with your budget goals.`,
+        message: `💡 ${messageCore} Make sure this aligns with your budget goals.`,
         envelopeIds: significantIncreases.map((c) => c.envelopeId),
       });
     }

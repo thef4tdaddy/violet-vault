@@ -13,15 +13,17 @@ describe("AllocationComparisonService", () => {
 
   beforeEach(() => {
     // Setup test data
-    const currentAllocations = new Map<string, number>();
-    currentAllocations.set("env_savings", 50000); // $500
-    currentAllocations.set("env_rent", 100000); // $1000
-    currentAllocations.set("env_dining", 20000); // $200
+    const currentAllocations: Record<string, number> = {
+      env_savings: 50000, // $500
+      env_rent: 100000, // $1000
+      env_dining: 20000, // $200
+    };
 
-    const previousAllocations = new Map<string, number>();
-    previousAllocations.set("env_savings", 40000); // $400
-    previousAllocations.set("env_rent", 100000); // $1000
-    previousAllocations.set("env_dining", 15000); // $150
+    const previousAllocations: Record<string, number> = {
+      env_savings: 40000, // $400
+      env_rent: 100000, // $1000
+      env_dining: 15000, // $150
+    };
 
     currentSnapshot = {
       date: "2024-02-01T00:00:00.000Z",
@@ -75,8 +77,10 @@ describe("AllocationComparisonService", () => {
     });
 
     it("should handle new envelopes (not in previous)", () => {
-      const currentWithNew = new Map(currentSnapshot.envelopeAllocations);
-      currentWithNew.set("env_emergency", 30000); // $300 new
+      const currentWithNew: Record<string, number> = {
+        ...currentSnapshot.envelopeAllocations,
+        env_emergency: 30000, // $300 new
+      };
 
       const snapshotWithNew: AllocationSnapshot = {
         ...currentSnapshot,
@@ -91,12 +95,14 @@ describe("AllocationComparisonService", () => {
       const emergencyChange = changes.find((c) => c.envelopeId === "env_emergency");
       expect(emergencyChange?.previousAmount).toBe(0);
       expect(emergencyChange?.currentAmount).toBe(30000);
-      expect(emergencyChange?.changePercent).toBe(100); // New envelope
+      expect(emergencyChange?.changePercent).toBe(Infinity); // New envelope marked as Infinity
     });
 
     it("should handle removed envelopes (not in current)", () => {
-      const previousWithExtra = new Map(previousSnapshot.envelopeAllocations);
-      previousWithExtra.set("env_entertainment", 20000); // $200 removed
+      const previousWithExtra: Record<string, number> = {
+        ...previousSnapshot.envelopeAllocations,
+        env_entertainment: 20000, // $200 removed
+      };
 
       const snapshotWithExtra: AllocationSnapshot = {
         ...previousSnapshot,
@@ -180,8 +186,8 @@ describe("AllocationComparisonService", () => {
 
       expect(snapshot.totalCents).toBe(150000);
       expect(snapshot.payerName).toBe("Acme Corp");
-      expect(snapshot.envelopeAllocations.size).toBe(2);
-      expect(snapshot.envelopeAllocations.get("env_savings")).toBe(50000);
+      expect(Object.keys(snapshot.envelopeAllocations).length).toBe(2);
+      expect(snapshot.envelopeAllocations["env_savings"]).toBe(50000);
     });
 
     it("should handle null payer name", () => {
@@ -212,8 +218,8 @@ describe("AllocationComparisonService", () => {
       expect(snapshot.totalCents).toBe(200000);
       expect(snapshot.payerName).toBe("Acme Corp");
       expect(snapshot.date).toBe("2024-01-01T00:00:00.000Z");
-      expect(snapshot.envelopeAllocations.size).toBe(2);
-      expect(snapshot.envelopeAllocations.get("env_savings")).toBe(50000);
+      expect(Object.keys(snapshot.envelopeAllocations).length).toBe(2);
+      expect(snapshot.envelopeAllocations["env_savings"]).toBe(50000);
     });
   });
 
