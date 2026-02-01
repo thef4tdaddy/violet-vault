@@ -232,12 +232,13 @@ describe("debtApiWrappers", () => {
         expect(result.dueDate).toBeUndefined();
       });
 
-      it("should handle non-standard dueDate types as undefined", async () => {
+      it("should convert non-standard dueDate types from API response to undefined", async () => {
         const mockAddEnvelopeAsync = vi.fn();
         const mockCreateEnvelope = vi.fn();
+        // Mock API returns a numeric dueDate (non-standard)
         const mockAddBillAsync = vi.fn().mockResolvedValue({
           id: "bill-123",
-          dueDate: 12345,
+          dueDate: 12345, // Number instead of string or Date
         });
         const mockUpdateBillAsync = vi.fn();
         const mockCreateTransaction = vi.fn();
@@ -254,6 +255,7 @@ describe("debtApiWrappers", () => {
           amount: 500,
         });
 
+        // Wrapper should convert numeric dueDate from API response to undefined
         expect(result.dueDate).toBeUndefined();
       });
     });
