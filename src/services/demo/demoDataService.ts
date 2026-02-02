@@ -5,45 +5,74 @@
  * for Demo Mode / Sandbox functionality.
  *
  * Data Sources:
- * - /public/test-data/data/violet-vault-budget.json (comprehensive test data)
+ * - /api/demo-factory (Go-based high-performance data generator)
  */
 
 import { VioletVaultDB } from "@/db/budgetDb";
 import { Envelope, Transaction } from "@/db/types";
 import logger from "@/utils/core/common/logger";
 
+interface DemoDataResponse {
+  envelopes: Envelope[];
+  transactions: Transaction[];
+  bills: Envelope[]; // Liability-type envelopes
+  generatedAt: string;
+  recordCount: number;
+  generationTimeMs: number;
+}
+
 interface DemoDataset {
   envelopes?: Envelope[];
   transactions?: Transaction[];
   unassignedCash?: number;
   actualBalance?: number;
-  [key: string]: unknown;
 }
 
 /**
- * Load demo dataset from public test data files
+ * Load demo dataset from Go Mock Data Factory
+ * Generates 10,000+ records in <10ms using the Go backend
  */
 export const loadDemoDataset = async (): Promise<DemoDataset> => {
   try {
-    logger.info("📦 Loading demo dataset...");
+    logger.info("📦 Loading demo dataset from Go Mock Factory...");
 
-    // Fetch the comprehensive test dataset
-    const response = await fetch("/test-data/data/violet-vault-budget.json");
+    // Fetch from Go-based demo factory (10k records)
+    const response = await fetch("/api/demo-factory?count=10000");
 
     if (!response.ok) {
       throw new Error(`Failed to fetch demo data: ${response.statusText}`);
     }
 
-    const data = (await response.json()) as DemoDataset;
+    const data = (await response.json()) as DemoDataResponse;
+
+    // Merge bills (liability envelopes) with regular envelopes
+    const allEnvelopes = [...data.envelopes, ...data.bills];
+
+    // Calculate initial balances from transaction data
+    const totalIncome = data.transactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpenses = data.transactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    const actualBalance = totalIncome - totalExpenses;
 
     logger.info("✅ Demo dataset loaded successfully", {
-      envelopes: data.envelopes?.length ?? 0,
-      transactions: data.transactions?.length ?? 0,
+      envelopes: allEnvelopes.length,
+      transactions: data.transactions.length,
+      generationTime: `${data.generationTimeMs}ms`,
     });
 
-    return data;
+    return {
+      envelopes: allEnvelopes,
+      transactions: data.transactions,
+      unassignedCash: 0,
+      actualBalance,
+    };
   } catch (error) {
-    logger.error("❌ Failed to load demo dataset", error);
+    logger.error("❌ Failed to load demo dataset from Go API", error);
 
     // Return minimal fallback data
     return {
