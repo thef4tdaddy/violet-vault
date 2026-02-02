@@ -22,7 +22,7 @@ from .models import (
 )
 
 fake = Faker()
-Faker.seed(42)  # For reproducibility in tests
+# Note: Seeding should only be done in tests for reproducibility
 
 
 # Category mappings for realistic spending
@@ -197,7 +197,7 @@ def _generate_envelopes(config: SimulationConfig) -> list[GeneratedEnvelope]:
 
 
 def _generate_income_transactions(
-    date: datetime.date,
+    income_date: datetime.date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> list[GeneratedTransaction]:
@@ -210,19 +210,19 @@ def _generate_income_transactions(
 
     if config.income_frequency == IncomeFrequency.WEEKLY:
         # Every Friday
-        if date.weekday() == 4:
+        if income_date.weekday() == 4:
             should_generate = True
             income_amount = config.monthly_income / 4.33
     elif config.income_frequency == IncomeFrequency.BIWEEKLY:
         # Every other Friday starting from start date
-        days_since_start = (date - config.start_date).days
+        days_since_start = (income_date - config.start_date).days
         # Check if it's Friday and on a biweekly schedule
-        if date.weekday() == 4 and (days_since_start % 14 < 7):
+        if income_date.weekday() == 4 and (days_since_start % 14 < 7):
             should_generate = True
             income_amount = config.monthly_income / 2.17
     elif config.income_frequency == IncomeFrequency.MONTHLY:
         # First of the month
-        if date.day == 1:
+        if income_date.day == 1:
             should_generate = True
             income_amount = config.monthly_income
 
@@ -232,13 +232,13 @@ def _generate_income_transactions(
         if target_envelope:
             txn = GeneratedTransaction(
                 id=f"txn-{uuid.uuid4().hex[:12]}",
-                date=date.isoformat(),
+                date=income_date.isoformat(),
                 amount=income_amount,
                 envelopeId=target_envelope.id,
                 category="Income",
                 type="income",
                 lastModified=int(datetime.now().timestamp() * 1000),
-                createdAt=int(datetime.combine(date, datetime.min.time()).timestamp() * 1000),
+                createdAt=int(datetime.combine(income_date, datetime.min.time()).timestamp() * 1000),
                 description="Paycheck",
                 merchant="Employer",
                 isScheduled=False,
@@ -249,7 +249,7 @@ def _generate_income_transactions(
 
 
 def _generate_life_event(
-    date: datetime.date,
+    event_date: datetime.date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> tuple[LifeEvent | None, list[GeneratedTransaction]]:
@@ -336,13 +336,13 @@ def _generate_life_event(
     if envelope:
         txn = GeneratedTransaction(
             id=f"txn-{uuid.uuid4().hex[:12]}",
-            date=date.isoformat(),
+            date=event_date.isoformat(),
             amount=amount,
             envelopeId=envelope.id,
             category=category,
             type=txn_type,  # type: ignore
             lastModified=int(datetime.now().timestamp() * 1000),
-            createdAt=int(datetime.combine(date, datetime.min.time()).timestamp() * 1000),
+            createdAt=int(datetime.combine(event_date, datetime.min.time()).timestamp() * 1000),
             description=description,
             merchant=merchant,
             isScheduled=False,
@@ -350,7 +350,7 @@ def _generate_life_event(
         transactions.append(txn)
 
         event = LifeEvent(
-            date=date.isoformat(),
+            date=event_date.isoformat(),
             type=event_type,
             amount=amount,
             description=description,
@@ -361,7 +361,7 @@ def _generate_life_event(
 
 
 def _generate_daily_expenses(
-    date: datetime.date,
+    expense_date: datetime.date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> list[GeneratedTransaction]:
@@ -442,13 +442,13 @@ def _generate_daily_expenses(
 
         txn = GeneratedTransaction(
             id=f"txn-{uuid.uuid4().hex[:12]}",
-            date=date.isoformat(),
+            date=expense_date.isoformat(),
             amount=amount,
             envelopeId=envelope.id,
             category=category,
             type="expense",
             lastModified=int(datetime.now().timestamp() * 1000),
-            createdAt=int(datetime.combine(date, datetime.min.time()).timestamp() * 1000),
+            createdAt=int(datetime.combine(expense_date, datetime.min.time()).timestamp() * 1000),
             description=description,
             merchant=merchant,
             isScheduled=False,

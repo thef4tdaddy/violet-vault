@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { getIcon } from "@/utils/ui/icons";
 import logger from "@/utils/core/common/logger";
 
+// Animation constants
+const FRAME_INTERVAL_MS = 16; // ~60fps
+
 /**
  * Go Engine Demo Component
  * Showcases the 6,000 tx/sec Go-powered transaction engine
@@ -58,7 +61,7 @@ export const GoEngineDemo: React.FC = () => {
           clearInterval(interval);
           setIsProcessing(false);
         }
-      }, 16); // ~60fps
+      }, FRAME_INTERVAL_MS); // ~60fps
 
       return () => clearInterval(interval);
     } catch (error) {

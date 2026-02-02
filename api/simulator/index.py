@@ -3,6 +3,7 @@ Financial Behavior Simulator API Endpoint
 FastAPI endpoint for generating demo financial data
 """
 
+import logging
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter
@@ -17,6 +18,7 @@ from ..simulator.models import (
 )
 
 router = APIRouter(prefix="/simulator", tags=["simulator"])
+logger = logging.getLogger(__name__)
 
 
 class SimulationRequest(BaseModel):
@@ -102,10 +104,13 @@ async def generate_simulation(request: SimulationRequest) -> SimulationResponse:
         end_time = datetime.now()
         performance_ms = (end_time - start_time).total_seconds() * 1000
 
+        # Log the detailed error internally
+        logger.error(f"Simulation generation failed: {str(e)}", exc_info=True)
+
         return SimulationResponse(
             success=False,
             data=None,
-            error=str(e),
+            error="Failed to generate simulation. Please check your input parameters.",
             performance_ms=performance_ms,
         )
 

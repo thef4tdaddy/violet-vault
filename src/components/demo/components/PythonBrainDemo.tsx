@@ -23,6 +23,11 @@ interface SimulatorResponse {
   };
 }
 
+// Constants for biweekly conversion and confidence calculation
+const BIWEEKLY_PERIODS_PER_MONTH = 2;
+const MIN_CONFIDENCE = 90;
+const CONFIDENCE_RANGE = 10;
+
 /**
  * Python Brain Demo Component
  * Shows ML-powered paycheck split predictions
@@ -74,8 +79,8 @@ export const PythonBrainDemo: React.FC = () => {
           .slice(0, 6)
           .map((env) => ({
             envelope: env.name,
-            amount: Math.round(env.monthlyBudget! / 2), // Biweekly amount
-            confidence: 90 + Math.floor(Math.random() * 10), // 90-99% confidence
+            amount: Math.round(env.monthlyBudget! / BIWEEKLY_PERIODS_PER_MONTH), // Biweekly amount
+            confidence: MIN_CONFIDENCE + Math.floor(Math.random() * CONFIDENCE_RANGE), // 90-99% confidence
           }));
 
         if (realPredictions.length > 0) {
