@@ -165,23 +165,6 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
     return DEBT_TYPES.MORTGAGE as DebtType;
   }
 
-  // Auto loan patterns
-  const autoPatterns = [
-    "auto",
-    "car",
-    "vehicle",
-    "ford credit",
-    "gm financial",
-    "toyota financial",
-    "honda financial",
-    "nissan motor",
-    "subaru financial",
-    "bmw financial",
-  ];
-  if (autoPatterns.some((pattern) => text.includes(pattern))) {
-    return DEBT_TYPES.AUTO as DebtType;
-  }
-
   // Credit card patterns
   const creditCardPatterns = [
     "visa",
@@ -197,6 +180,23 @@ export const AUTO_CLASSIFY_DEBT_TYPE = (creditorName: string, debtName: string):
   ];
   if (creditCardPatterns.some((pattern) => text.includes(pattern))) {
     return DEBT_TYPES.CREDIT_CARD as DebtType;
+  }
+
+  // Auto loan patterns
+  const autoPatterns = [
+    "auto",
+    "car",
+    "vehicle",
+    "ford credit",
+    "gm financial",
+    "toyota financial",
+    "honda financial",
+    "nissan motor",
+    "subaru financial",
+    "bmw financial",
+  ];
+  if (autoPatterns.some((pattern) => text.includes(pattern))) {
+    return DEBT_TYPES.AUTO as DebtType;
   }
 
   // Chapter 13 patterns

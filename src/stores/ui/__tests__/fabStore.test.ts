@@ -1,150 +1,94 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useFABStore } from "../fabStore";
+import { enableMapSet } from "immer";
 
-describe("useFABStore", () => {
-  describe("core state properties", () => {
-    it("should have isVisible property", () => {
-      const state = useFABStore.getState();
-      expect("isVisible" in state).toBe(true);
-      expect(typeof state.isVisible).toBe("boolean");
+enableMapSet();
+
+describe("FAB Store", () => {
+  const initialState = useFABStore.getState();
+
+  beforeEach(() => {
+    useFABStore.setState(initialState);
+  });
+
+  describe("Visibility & Expansion", () => {
+    it("should toggle visibility", () => {
+      useFABStore.getState().setVisibility(false);
+      expect(useFABStore.getState().isVisible).toBe(false);
+
+      useFABStore.getState().setVisibility(true);
+      expect(useFABStore.getState().isVisible).toBe(true);
     });
 
-    it("should have isExpanded property", () => {
-      const state = useFABStore.getState();
-      expect("isExpanded" in state).toBe(true);
-      expect(typeof state.isExpanded).toBe("boolean");
+    it("should collapse when hidden", () => {
+      useFABStore.getState().setExpanded(true);
+      expect(useFABStore.getState().isExpanded).toBe(true);
+
+      useFABStore.getState().setVisibility(false);
+      expect(useFABStore.getState().isVisible).toBe(false);
+      expect(useFABStore.getState().isExpanded).toBe(false);
     });
 
-    it("should have currentScreen property", () => {
-      const state = useFABStore.getState();
-      expect("currentScreen" in state).toBe(true);
-      expect(typeof state.currentScreen).toBe("string");
-    });
+    it("should toggle expansion", () => {
+      useFABStore.getState().toggleExpanded();
+      expect(useFABStore.getState().isExpanded).toBe(true);
 
-    it("should have primaryActions Map", () => {
-      const state = useFABStore.getState();
-      expect(state.primaryActions).toBeInstanceOf(Map);
-    });
-
-    it("should have secondaryActions Map", () => {
-      const state = useFABStore.getState();
-      expect(state.secondaryActions).toBeInstanceOf(Map);
-    });
-
-    it("should have defaultSecondaryActions", () => {
-      const state = useFABStore.getState();
-      expect("defaultSecondaryActions" in state).toBe(true);
-      expect(typeof state.defaultSecondaryActions).toBe("object");
+      useFABStore.getState().toggleExpanded();
+      expect(useFABStore.getState().isExpanded).toBe(false);
     });
   });
 
-  describe("action methods", () => {
-    it("should have setCurrentScreen action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.setCurrentScreen).toBe("function");
-    });
-
-    it("should have setVisibility action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.setVisibility).toBe("function");
-    });
-
-    it("should have setExpanded action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.setExpanded).toBe("function");
-    });
-
-    it("should have toggleExpanded action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.toggleExpanded).toBe("function");
-    });
-
-    it("should have registerPrimaryAction action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.registerPrimaryAction).toBe("function");
-    });
-
-    it("should have unregisterPrimaryAction action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.unregisterPrimaryAction).toBe("function");
-    });
-
-    it("should have registerSecondaryAction action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.registerSecondaryAction).toBe("function");
-    });
-
-    it("should have unregisterSecondaryAction action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.unregisterSecondaryAction).toBe("function");
-    });
-
-    it("should have setDefaultActionHandler action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.setDefaultActionHandler).toBe("function");
-    });
-
-    it("should have clearScreenActions action", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.clearScreenActions).toBe("function");
+  describe("Screen Management", () => {
+    it("should set current screen", () => {
+      useFABStore.getState().setCurrentScreen("profile");
+      expect(useFABStore.getState().currentScreen).toBe("profile");
+      // Changing screen should collapse FAB
+      expect(useFABStore.getState().isExpanded).toBe(false);
     });
   });
 
-  describe("helper methods", () => {
-    it("should have getDebugInfo method", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.getDebugInfo).toBe("function");
+  describe("Action Registration", () => {
+    const mockAction = {
+      id: "test",
+      icon: "Test",
+      label: "Test Action",
+      color: "blue",
+      action: vi.fn(),
+    };
+
+    it("should register and unregister primary action", () => {
+      useFABStore.getState().registerPrimaryAction("test-screen", mockAction);
+      expect(useFABStore.getState().primaryActions.get("test-screen")).toEqual(mockAction);
+
+      useFABStore.getState().unregisterPrimaryAction("test-screen");
+      expect(useFABStore.getState().primaryActions.has("test-screen")).toBe(false);
     });
 
-    it("getDebugInfo should return debug object with expected properties", () => {
-      const state = useFABStore.getState();
-      const debugInfo = state.getDebugInfo();
+    it("should register and unregister secondary action", () => {
+      useFABStore.getState().registerSecondaryAction(mockAction);
+      expect(useFABStore.getState().secondaryActions.get("test")).toEqual(mockAction);
 
-      expect(debugInfo).toHaveProperty("currentScreen");
-      expect(debugInfo).toHaveProperty("isVisible");
-      expect(debugInfo).toHaveProperty("isExpanded");
-      expect(debugInfo).toHaveProperty("primaryActionsCount");
-      expect(debugInfo).toHaveProperty("secondaryActionsCount");
-      expect(debugInfo).toHaveProperty("defaultActionsWithHandlers");
+      useFABStore.getState().unregisterSecondaryAction("test");
+      expect(useFABStore.getState().secondaryActions.has("test")).toBe(false);
     });
 
-    it("getDebugInfo should return correct types", () => {
-      const state = useFABStore.getState();
-      const debugInfo = state.getDebugInfo();
-
-      expect(typeof debugInfo.currentScreen).toBe("string");
-      expect(typeof debugInfo.isVisible).toBe("boolean");
-      expect(typeof debugInfo.isExpanded).toBe("boolean");
-      expect(typeof debugInfo.primaryActionsCount).toBe("number");
-      expect(typeof debugInfo.secondaryActionsCount).toBe("number");
-      expect(typeof debugInfo.defaultActionsWithHandlers).toBe("number");
-    });
-  });
-
-  describe("action calling - basic smoke tests", () => {
-    it("setCurrentScreen should be callable without throwing", () => {
-      const state = useFABStore.getState();
-      // Note: Immer makes state mutations in setCurrentScreen
-      // We test that the action exists and is callable
-      expect(typeof state.setCurrentScreen).toBe("function");
-    });
-
-    it("toggleExpanded should be callable without throwing", () => {
-      const state = useFABStore.getState();
-      expect(typeof state.toggleExpanded).toBe("function");
+    it("should clear screen actions", () => {
+      useFABStore.getState().registerPrimaryAction("test-screen", mockAction);
+      useFABStore.getState().clearScreenActions("test-screen");
+      expect(useFABStore.getState().primaryActions.has("test-screen")).toBe(false);
     });
   });
 
-  describe("store persistence", () => {
-    it("store should be accessible via useFABStore", () => {
-      const store = useFABStore;
-      expect(typeof store.getState).toBe("function");
-    });
+  describe("Default Actions", () => {
+    it("should set default action handler", () => {
+      const handler = vi.fn();
+      useFABStore.getState().setDefaultActionHandler("bug-report", handler);
 
-    it("store.getState should return current state", () => {
-      const state = useFABStore.getState();
-      expect(state).not.toBeNull();
-      expect(typeof state).toBe("object");
+      const debugInfo = useFABStore.getState().getDebugInfo();
+      expect(debugInfo.defaultActionsWithHandlers).toBeGreaterThan(0);
+
+      const action = useFABStore.getState().defaultSecondaryActions["bug-report"];
+      expect(action.action).toBe(handler);
     });
   });
 });
