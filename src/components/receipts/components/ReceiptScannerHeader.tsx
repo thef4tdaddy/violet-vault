@@ -20,7 +20,7 @@ const ReceiptScannerHeader = ({ onClose }: ReceiptScannerHeaderProps) => {
           })}
         </div>
         <div>
-          <h2 className="font-black text-black text-base">
+          <h2 className="font-black text-black text-base" data-testid="header-title">
             <span className="text-lg">R</span>ECEIPT <span className="text-lg">S</span>CANNER
           </h2>
           <p className="text-sm text-purple-900">

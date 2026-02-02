@@ -13,7 +13,7 @@ const ReceiptProcessingState = () => {
           className: "h-8 w-8 text-purple-900 animate-spin",
         })}
       </div>
-      <p className="font-black text-black text-base">
+      <p className="font-black text-black text-base" data-testid="processing-message">
         <span className="text-lg">P</span>ROCESSING <span className="text-lg">R</span>ECEIPT...
       </p>
       <p className="text-sm text-purple-900">Using AI to extract transaction details</p>

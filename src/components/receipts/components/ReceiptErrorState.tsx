@@ -18,7 +18,7 @@ const ReceiptErrorState: React.FC<ReceiptErrorStateProps> = ({ error, onRetry })
         {React.createElement(getIcon("XCircle"), {
           className: "h-5 w-5 text-red-900",
         })}
-        <p className="font-black text-black text-base">
+        <p className="font-black text-black text-base" data-testid="error-title">
           <span className="text-lg">P</span>ROCESSING <span className="text-lg">F</span>AILED
         </p>
       </div>

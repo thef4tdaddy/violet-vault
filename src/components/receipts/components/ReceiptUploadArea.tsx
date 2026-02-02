@@ -47,7 +47,7 @@ const ReceiptUploadArea = ({
               <span className="text-lg">U</span>PLOAD <span className="text-lg">R</span>ECEIPT{" "}
               <span className="text-lg">I</span>MAGE
             </p>
-            <p className="text-sm text-purple-900 mb-4">
+            <p className="text-sm text-purple-900 mb-4" data-testid="upload-instruction">
               Drag and drop an image here, or click to browse
             </p>
           </div>
