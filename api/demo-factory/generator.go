@@ -64,29 +64,29 @@ var envelopeColors = []string{
 // GenerateMockData generates realistic financial data with balanced math
 func GenerateMockData(targetRecords int) *DemoDataResponse {
 	startTime := time.Now()
-	
+
 	// Use a fixed seed for reproducibility in benchmarks
 	rng := rand.New(rand.NewSource(42))
-	
+
 	// Generate envelopes (aim for ~1/3 of total records)
 	envelopeCount := targetRecords / 30
 	if envelopeCount < 10 {
 		envelopeCount = 10
 	}
-	
+
 	envelopes := generateEnvelopes(rng, envelopeCount)
 	bills := generateBills(rng, 15) // Fixed number of bills
-	
+
 	// Calculate remaining records for transactions
 	transactionCount := targetRecords - len(envelopes) - len(bills)
 	if transactionCount < 100 {
 		transactionCount = 100
 	}
-	
+
 	transactions := generateTransactions(rng, envelopes, bills, transactionCount)
-	
+
 	generationTime := time.Since(startTime).Milliseconds()
-	
+
 	return &DemoDataResponse{
 		Envelopes:        envelopes,
 		Transactions:     transactions,
@@ -100,19 +100,19 @@ func GenerateMockData(targetRecords int) *DemoDataResponse {
 func generateEnvelopes(rng *rand.Rand, count int) []Envelope {
 	envelopes := make([]Envelope, count)
 	now := time.Now().Unix()
-	
+
 	for i := 0; i < count; i++ {
 		category := envelopeCategories[rng.Intn(len(envelopeCategories))]
 		color := envelopeColors[rng.Intn(len(envelopeColors))]
 		balance := float64(rng.Intn(5000)) + rng.Float64()*1000
-		
+
 		var envelopeType string
 		if i%5 == 0 {
 			envelopeType = "goal"
 		} else {
 			envelopeType = "standard"
 		}
-		
+
 		envelope := Envelope{
 			ID:             fmt.Sprintf("env-%d", i+1),
 			Name:           fmt.Sprintf("%s Fund", category),
@@ -125,7 +125,7 @@ func generateEnvelopes(rng *rand.Rand, count int) []Envelope {
 			LastModified:   now * 1000,
 			CreatedAt:      (now - int64(rng.Intn(31536000))) * 1000, // Random time in past year
 		}
-		
+
 		// Add type-specific fields
 		if envelopeType == "standard" {
 			monthlyBudget := float64(rng.Intn(2000)) + 100
@@ -138,34 +138,34 @@ func generateEnvelopes(rng *rand.Rand, count int) []Envelope {
 			isPaused := false
 			isCompleted := false
 			monthlyContrib := float64(rng.Intn(500)) + 50
-			
+
 			envelope.TargetAmount = &targetAmount
 			envelope.Priority = &priority
 			envelope.IsPaused = &isPaused
 			envelope.IsCompleted = &isCompleted
 			envelope.MonthlyContribution = &monthlyContrib
-			
+
 			targetDate := time.Now().AddDate(0, rng.Intn(24)+1, 0)
 			envelope.TargetDate = &targetDate
 		}
-		
+
 		envelopes[i] = envelope
 	}
-	
+
 	return envelopes
 }
 
 func generateBills(rng *rand.Rand, count int) []Envelope {
 	bills := make([]Envelope, count)
 	now := time.Now().Unix()
-	
+
 	billNames := []string{
 		"Rent/Mortgage", "Electric Bill", "Water Bill", "Internet",
 		"Phone Plan", "Car Insurance", "Health Insurance", "Netflix",
 		"Spotify", "Gym Membership", "Car Payment", "Student Loan",
 		"Credit Card Payment", "Home Insurance", "Gas/Heating",
 	}
-	
+
 	for i := 0; i < count; i++ {
 		amount := float64(rng.Intn(500)) + 50
 		dueDate := rng.Intn(28) + 1
@@ -173,47 +173,47 @@ func generateBills(rng *rand.Rand, count int) []Envelope {
 		if i >= 10 { // Some bills have interest (loans, credit cards)
 			interestRate = float64(rng.Intn(20)) + rng.Float64()*5
 		}
-		
+
 		creditor := billNames[i]
 		status := "active"
 		isPaid := false
 		minPayment := amount * 0.15
-		
+
 		bill := Envelope{
-			ID:             fmt.Sprintf("bill-%d", i+1),
-			Name:           billNames[i],
-			Type:           "liability",
-			Category:       "Bills",
-			CurrentBalance: amount,
-			Color:          "#EF4444",
-			AutoAllocate:   true,
-			Archived:       false,
-			LastModified:   now * 1000,
-			CreatedAt:      (now - int64(rng.Intn(31536000))) * 1000,
-			Status:         &status,
-			DueDate:        &dueDate,
-			InterestRate:   &interestRate,
-			MinimumPayment: &minPayment,
-			Creditor:       &creditor,
-			IsPaid:         &isPaid,
+			ID:              fmt.Sprintf("bill-%d", i+1),
+			Name:            billNames[i],
+			Type:            "liability",
+			Category:        "Bills",
+			CurrentBalance:  amount,
+			Color:           "#EF4444",
+			AutoAllocate:    true,
+			Archived:        false,
+			LastModified:    now * 1000,
+			CreatedAt:       (now - int64(rng.Intn(31536000))) * 1000,
+			Status:          &status,
+			DueDate:         &dueDate,
+			InterestRate:    &interestRate,
+			MinimumPayment:  &minPayment,
+			Creditor:        &creditor,
+			IsPaid:          &isPaid,
 			OriginalBalance: &amount,
 		}
-		
+
 		bills[i] = bill
 	}
-	
+
 	return bills
 }
 
 func generateTransactions(rng *rand.Rand, envelopes []Envelope, bills []Envelope, count int) []Transaction {
 	transactions := make([]Transaction, count)
 	now := time.Now()
-	
+
 	// Calculate total income needed to balance expenses
 	totalIncome := 0.0
 	incomeCount := count / 20 // 5% of transactions are income
 	expenseCount := count - incomeCount
-	
+
 	// Generate expenses first to know how much income we need
 	for i := 0; i < expenseCount; i++ {
 		category := envelopeCategories[rng.Intn(len(envelopeCategories))]
@@ -222,19 +222,19 @@ func generateTransactions(rng *rand.Rand, envelopes []Envelope, bills []Envelope
 			category = "Shopping"
 			merchants = merchantData[category]
 		}
-		
+
 		merchant := merchants[rng.Intn(len(merchants))]
 		amount := -(float64(rng.Intn(200)) + rng.Float64()*50) // Negative for expenses
-		
+
 		// Pick random envelope
 		envelopeID := envelopes[rng.Intn(len(envelopes))].ID
-		
+
 		// Random date within last 90 days
 		daysAgo := rng.Intn(90)
 		txDate := now.AddDate(0, 0, -daysAgo)
-		
+
 		description := fmt.Sprintf("Purchase at %s", merchant)
-		
+
 		transactions[i] = Transaction{
 			ID:           fmt.Sprintf("txn-%d", i+1),
 			Date:         txDate.Format("2006-01-02"),
@@ -248,32 +248,32 @@ func generateTransactions(rng *rand.Rand, envelopes []Envelope, bills []Envelope
 			CreatedAt:    txDate.Unix() * 1000,
 			IsScheduled:  false,
 		}
-		
+
 		totalIncome += -amount // Add absolute value to income needed
 	}
-	
+
 	// Add 20% buffer to ensure positive balance
 	totalIncome = totalIncome * 1.2
-	
+
 	// Generate income transactions
 	incomePerTransaction := totalIncome / float64(incomeCount)
 	incomeSources := []string{
 		"Direct Deposit - Salary", "Freelance Payment", "Bonus",
 		"Investment Returns", "Side Hustle Income", "Refund",
 	}
-	
+
 	for i := expenseCount; i < count; i++ {
 		source := incomeSources[rng.Intn(len(incomeSources))]
 		amount := incomePerTransaction + (rng.Float64()-0.5)*200 // Add some variation
-		
+
 		// Pick random envelope for income allocation
 		envelopeID := envelopes[rng.Intn(len(envelopes))].ID
-		
+
 		daysAgo := rng.Intn(90)
 		txDate := now.AddDate(0, 0, -daysAgo)
-		
+
 		description := source
-		
+
 		transactions[i] = Transaction{
 			ID:           fmt.Sprintf("txn-%d", i+1),
 			Date:         txDate.Format("2006-01-02"),
@@ -288,6 +288,6 @@ func generateTransactions(rng *rand.Rand, envelopes []Envelope, bills []Envelope
 			IsScheduled:  false,
 		}
 	}
-	
+
 	return transactions
 }
