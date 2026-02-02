@@ -11,6 +11,7 @@ from api.analytics import EnvelopeIntegrityAuditor
 from api.marketing.status import router as marketing_status_router
 from api.models import AuditSnapshot, IntegrityAuditResult
 from api.sentinel.receipts import router as sentinel_router
+from api.simulator.index import router as simulator_router
 
 
 # Sentry PII Scrubbing
@@ -110,6 +111,7 @@ app.add_middleware(
 
 # Route Mounting
 app.include_router(sentinel_router, prefix="/api")
+app.include_router(simulator_router, prefix="/api")
 app.include_router(marketing_status_router, prefix="/api/marketing")
 
 
