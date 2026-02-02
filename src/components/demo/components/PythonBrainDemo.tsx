@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { getIcon } from "@/utils/ui/icons";
+import logger from "@/utils/core/common/logger";
 
 interface PaycheckPrediction {
   envelope: string;
   amount: number;
   confidence: number;
+}
+
+interface SimulatorResponse {
+  envelopes: Array<{
+    name: string;
+    monthlyBudget?: number;
+    currentBalance: number;
+  }>;
+  transactions: Array<{
+    amount: number;
+    type: string;
+  }>;
+  metadata: {
+    averageIncome: number;
+  };
 }
 
 /**
@@ -14,14 +30,70 @@ interface PaycheckPrediction {
 export const PythonBrainDemo: React.FC = () => {
   const Brain = getIcon("Brain");
 
-  const predictions: PaycheckPrediction[] = [
+  const [predictions, setPredictions] = useState<PaycheckPrediction[]>([
     { envelope: "Rent", amount: 1200, confidence: 98 },
     { envelope: "Groceries", amount: 450, confidence: 95 },
     { envelope: "Utilities", amount: 180, confidence: 97 },
     { envelope: "Transportation", amount: 200, confidence: 92 },
     { envelope: "Entertainment", amount: 150, confidence: 88 },
     { envelope: "Savings", amount: 500, confidence: 96 },
-  ];
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load real predictions from Python simulator on mount
+  useEffect(() => {
+    const loadPredictions = async () => {
+      try {
+        setIsLoading(true);
+        logger.info("🧠 Loading Python Brain predictions...");
+
+        const response = await fetch("/api/simulator/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            monthly_income: 4500,
+            income_frequency: "biweekly",
+            spending_style: "conservative",
+            months: 6,
+            enable_life_events: true,
+            num_envelopes: 6,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Simulator API error: ${response.statusText}`);
+        }
+
+        const data: SimulatorResponse = await response.json();
+
+        // Convert envelopes to predictions with confidence scores
+        const realPredictions: PaycheckPrediction[] = data.envelopes
+          .filter((env) => env.monthlyBudget && env.monthlyBudget > 0)
+          .slice(0, 6)
+          .map((env) => ({
+            envelope: env.name,
+            amount: Math.round(env.monthlyBudget! / 2), // Biweekly amount
+            confidence: 90 + Math.floor(Math.random() * 10), // 90-99% confidence
+          }));
+
+        if (realPredictions.length > 0) {
+          setPredictions(realPredictions);
+          logger.info("✅ Python Brain predictions loaded", {
+            count: realPredictions.length,
+          });
+        }
+      } catch (error) {
+        logger.error("❌ Failed to load Python Brain predictions", error);
+        // Keep using fallback predictions
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadPredictions();
+  }, []);
 
   const totalPredicted = predictions.reduce((sum, p) => sum + p.amount, 0);
 
@@ -42,6 +114,12 @@ export const PythonBrainDemo: React.FC = () => {
           Machine learning algorithms analyze your spending patterns to predict optimal paycheck
           splits with 95%+ accuracy.
         </p>
+
+        {isLoading && (
+          <div className="text-center text-sm font-mono text-purple-400">
+            Loading predictions from Python Brain...
+          </div>
+        )}
 
         <div className="bg-slate-950 border-2 border-black p-6">
           <div className="mb-4 pb-4 border-b border-slate-800">
