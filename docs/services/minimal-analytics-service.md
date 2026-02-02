@@ -69,6 +69,7 @@ analyticsWorkerManager.cleanup();
 Calculates daily transaction heatmap showing spending patterns over time.
 
 **Parameters:**
+
 - `transactions`: Array of transaction objects
 - `useCache` (optional): Enable IndexedDB caching (default: true)
 
@@ -79,6 +80,7 @@ Calculates daily transaction heatmap showing spending patterns over time.
 Calculates spending trends grouped by time period.
 
 **Parameters:**
+
 - `transactions`: Array of transaction objects
 - `periodType` (optional): "daily" | "weekly" | "monthly" (default: "monthly")
 - `useCache` (optional): Enable caching (default: true)
@@ -90,6 +92,7 @@ Calculates spending trends grouped by time period.
 Calculates spending breakdown by category.
 
 **Parameters:**
+
 - `transactions`: Array of transaction objects
 
 **Returns:** Array of category data
@@ -99,6 +102,7 @@ Calculates spending breakdown by category.
 Calculates quick summary statistics (single-pass, ultra-fast).
 
 **Parameters:**
+
 - `transactions`: Array of transaction objects
 
 **Returns:** Quick statistics object
@@ -113,10 +117,10 @@ Invalidates all analytics cache entries in IndexedDB.
 
 All functions meet or exceed the target performance metrics:
 
-| Dataset Size | Target | Achieved |
-|-------------|--------|----------|
-| 1k transactions | <50ms | ✅ 15-25ms |
-| 5k transactions | <200ms | ✅ 75-125ms |
+| Dataset Size     | Target | Achieved     |
+| ---------------- | ------ | ------------ |
+| 1k transactions  | <50ms  | ✅ 15-25ms   |
+| 5k transactions  | <200ms | ✅ 75-125ms  |
 | 10k transactions | <500ms | ✅ 150-300ms |
 
 ## Caching Strategy
@@ -134,6 +138,7 @@ The service implements intelligent caching:
 ## Testing
 
 Run tests:
+
 ```bash
 npm run test -- src/services/analytics/__tests__/minimalAnalyticsService.test.ts
 ```

@@ -102,6 +102,9 @@ function calculateTrends(
     if (periodType === "daily") {
       periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     } else if (periodType === "weekly") {
+      // Simplified week number calculation (not ISO-compliant)
+      // Note: This is an approximation and doesn't handle cross-year/month boundaries correctly
+      // For production use, consider implementing proper ISO 8601 week date calculation
       const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
       periodKey = `${date.getFullYear()}-W${String(weekNum).padStart(2, "0")}`;
     } else {

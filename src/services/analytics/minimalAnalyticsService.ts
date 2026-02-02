@@ -97,9 +97,13 @@ async function getCachedData<T>(key: string): Promise<T | null> {
       return null;
     }
 
-    // Value is stored as unknown, parse if it's a string
-    const value = typeof cached.value === "string" ? JSON.parse(cached.value) : cached.value;
-    return value as T;
+    // Value is always stored as JSON string in setCachedData
+    if (typeof cached.value === "string") {
+      return JSON.parse(cached.value) as T;
+    }
+
+    // Fallback for backward compatibility or unexpected types
+    return cached.value as T;
   } catch (error) {
     logger.warn("Failed to get cached data", { error, key });
     return null;
@@ -239,7 +243,9 @@ export async function calculateTrends(
     if (periodType === "daily") {
       periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     } else if (periodType === "weekly") {
-      // Get ISO week number (simple approximation)
+      // Simplified week number calculation (not ISO-compliant)
+      // Note: This is an approximation and doesn't handle cross-year/month boundaries correctly
+      // For production use, consider implementing proper ISO 8601 week date calculation
       const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
       periodKey = `${date.getFullYear()}-W${String(weekNum).padStart(2, "0")}`;
     } else {
