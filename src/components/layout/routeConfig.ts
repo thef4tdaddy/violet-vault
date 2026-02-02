@@ -6,6 +6,14 @@
 
 export const routeConfig = [
   {
+    path: "/demo",
+    activeView: "dashboard",
+  },
+  {
+    path: "/demo/dashboard",
+    activeView: "dashboard",
+  },
+  {
     path: "/app",
     activeView: "dashboard",
   },
@@ -56,6 +64,8 @@ export const routeConfig = [
 ];
 
 export const pathToViewMap = {
+  "/demo": "dashboard",
+  "/demo/dashboard": "dashboard",
   "/app": "dashboard",
   "/app/dashboard": "dashboard",
   "/app/envelopes": "envelopes",
