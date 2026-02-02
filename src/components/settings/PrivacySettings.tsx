@@ -16,6 +16,23 @@ interface PrivacySettingsProps {
 }
 
 /**
+ * Bundle size progress percentages for each tier
+ * Maps tier ID to progress bar percentage (0-100)
+ */
+const TIER_PROGRESS_PERCENTAGES: Record<AnalyticsTier, number> = {
+  offline: 25,
+  "private-backend": 60,
+  "cloud-sync": 100,
+} as const;
+
+/**
+ * Get progress percentage for a given tier
+ */
+const getTierProgress = (tier: AnalyticsTier): number => {
+  return TIER_PROGRESS_PERCENTAGES[tier];
+};
+
+/**
  * PrivacySettings Component
  * User interface for selecting analytics tier with clear privacy trade-offs
  *
@@ -136,22 +153,10 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
                     <div
                       className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500 rounded-full"
                       style={{
-                        width: `${
-                          analyticsTier === "offline"
-                            ? "25%"
-                            : analyticsTier === "private-backend"
-                              ? "60%"
-                              : "100%"
-                        }`,
+                        width: `${getTierProgress(analyticsTier)}%`,
                       }}
                       role="progressbar"
-                      aria-valuenow={
-                        analyticsTier === "offline"
-                          ? 25
-                          : analyticsTier === "private-backend"
-                            ? 60
-                            : 100
-                      }
+                      aria-valuenow={getTierProgress(analyticsTier)}
                       aria-valuemin={0}
                       aria-valuemax={100}
                       aria-label={`Bundle size: ${currentBundleSize}`}

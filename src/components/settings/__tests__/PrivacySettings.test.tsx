@@ -50,6 +50,13 @@ vi.mock("@/components/privacy/PrivacyExplainerModal", () => ({
     ) : null,
 }));
 
+// Constants for progress percentages (matching component)
+const TIER_PROGRESS_PERCENTAGES = {
+  offline: 25,
+  "private-backend": 60,
+  "cloud-sync": 100,
+};
+
 describe("PrivacySettings", () => {
   beforeEach(() => {
     // Reset store before each test
@@ -88,7 +95,10 @@ describe("PrivacySettings", () => {
 
       const progressBar = screen.getByRole("progressbar");
       expect(progressBar).toBeInTheDocument();
-      expect(progressBar).toHaveAttribute("aria-valuenow", "25");
+      expect(progressBar).toHaveAttribute(
+        "aria-valuenow",
+        TIER_PROGRESS_PERCENTAGES.offline.toString()
+      );
     });
 
     it("should render close button", () => {
@@ -139,7 +149,10 @@ describe("PrivacySettings", () => {
       const progressBar = screen.getByRole("progressbar");
 
       // Initially 25% for offline
-      expect(progressBar).toHaveAttribute("aria-valuenow", "25");
+      expect(progressBar).toHaveAttribute(
+        "aria-valuenow",
+        TIER_PROGRESS_PERCENTAGES.offline.toString()
+      );
 
       // Switch to private-backend
       const backendTierCard = screen.getByTestId("tier-card-private-backend");
@@ -148,7 +161,10 @@ describe("PrivacySettings", () => {
       // Wait for state update and re-render
       await waitFor(() => {
         const updatedProgressBar = screen.getByRole("progressbar");
-        expect(updatedProgressBar).toHaveAttribute("aria-valuenow", "60");
+        expect(updatedProgressBar).toHaveAttribute(
+          "aria-valuenow",
+          TIER_PROGRESS_PERCENTAGES["private-backend"].toString()
+        );
       });
     });
   });
