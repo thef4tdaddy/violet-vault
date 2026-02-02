@@ -65,8 +65,8 @@ var envelopeColors = []string{
 func GenerateMockData(targetRecords int) *DemoDataResponse {
 	startTime := time.Now()
 
-	// Use a fixed seed for reproducibility in benchmarks
-	rng := rand.New(rand.NewSource(42))
+	// Use current time for randomness in demo (tests use fixed seed)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Generate envelopes (aim for ~1/3 of total records)
 	envelopeCount := targetRecords / 30
@@ -83,7 +83,7 @@ func GenerateMockData(targetRecords int) *DemoDataResponse {
 		transactionCount = 100
 	}
 
-	transactions := generateTransactions(rng, envelopes, bills, transactionCount)
+	transactions := generateTransactions(rng, envelopes, transactionCount)
 
 	generationTime := time.Since(startTime).Milliseconds()
 
@@ -174,14 +174,14 @@ func generateBills(rng *rand.Rand, count int) []Envelope {
 			interestRate = float64(rng.Intn(20)) + rng.Float64()*5
 		}
 
-		creditor := billNames[i]
+		creditor := billNames[i%len(billNames)]
 		status := "active"
 		isPaid := false
 		minPayment := amount * 0.15
 
 		bill := Envelope{
 			ID:              fmt.Sprintf("bill-%d", i+1),
-			Name:            billNames[i],
+			Name:            billNames[i%len(billNames)],
 			Type:            "liability",
 			Category:        "Bills",
 			CurrentBalance:  amount,
@@ -205,7 +205,7 @@ func generateBills(rng *rand.Rand, count int) []Envelope {
 	return bills
 }
 
-func generateTransactions(rng *rand.Rand, envelopes []Envelope, bills []Envelope, count int) []Transaction {
+func generateTransactions(rng *rand.Rand, envelopes []Envelope, count int) []Transaction {
 	transactions := make([]Transaction, count)
 	now := time.Now()
 

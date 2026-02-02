@@ -51,8 +51,10 @@ describe("demoDataService", () => {
             lastModified: Date.now(),
           },
         ],
-        unassignedCash: 100,
-        actualBalance: 500,
+        bills: [],
+        generatedAt: new Date().toISOString(),
+        recordCount: 2,
+        generationTimeMs: 5,
       };
 
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -62,10 +64,9 @@ describe("demoDataService", () => {
 
       const dataset = await loadDemoDataset();
 
-      expect(global.fetch).toHaveBeenCalledWith("/test-data/data/violet-vault-budget.json");
+      expect(global.fetch).toHaveBeenCalledWith("/api/demo-factory?count=10000");
       expect(dataset.envelopes).toHaveLength(1);
       expect(dataset.transactions).toHaveLength(1);
-      expect(dataset.unassignedCash).toBe(100);
     });
 
     it("should return fallback data when fetch fails", async () => {

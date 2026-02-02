@@ -5,7 +5,6 @@ import LandingPage from "../marketing/LandingPage";
 import OfflinePage from "../pwa/OfflinePage";
 import ShareTargetHandler from "../pwa/ShareTargetHandler";
 import DevAuthBypass from "../dev/DevAuthBypass";
-import DemoPage from "../demo/DemoPage";
 import { routeConfig } from "./routeConfig";
 
 // Lazy load API Documentation (dev-only)
@@ -35,9 +34,6 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }: Ap
     <Routes>
       {/* Landing page route */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* Demo page route */}
-      <Route path="/demo" element={<DemoPage />} />
 
       {/* Offline fallback route */}
       <Route path="/offline" element={<OfflinePage />} />
