@@ -44,6 +44,7 @@ const DemoPage: React.FC = () => {
             </h1>
             {/* eslint-disable-next-line enforce-ui-library/enforce-ui-library -- Demo page uses custom mono font styling */}
             <button
+              id="ready-to-vault-button"
               onClick={handleSignUpRedirect}
               className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-mono font-bold border-2 border-black rounded-none transition-colors"
             >

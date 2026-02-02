@@ -119,7 +119,7 @@ export const DemoTour: React.FC<DemoTourProps> = ({ onComplete, onSignUpRedirect
       placement: "top",
     },
     {
-      target: "header button",
+      target: "#ready-to-vault-button",
       content: (
         <div className="font-mono">
           <h3 className="text-xl font-black mb-2">🚀 READY TO VAULT?</h3>
