@@ -1,3 +1,9 @@
+## [2.0.0-beta.46-prerelease.1] - 2026-02-02
+
+### Pre-release
+
+- Pre-release for develop branch (commit count: 2837)
+
 # Changelog
 
 ## [2.0.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.10.0...violet-vault-v2.0.0) (2025-11-29)
