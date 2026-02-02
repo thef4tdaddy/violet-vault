@@ -5,7 +5,7 @@ Core logic for generating realistic financial transactions
 
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from faker import Faker
 
@@ -166,11 +166,11 @@ def _generate_envelopes(config: SimulationConfig) -> list[GeneratedEnvelope]:
     # Select categories based on num_envelopes
     all_categories = list(CATEGORY_CONFIGS.keys())
     categories = all_categories[:config.num_envelopes]
-    
+
     # Calculate total budget percentage for selected categories
     selected_configs = [CATEGORY_CONFIGS[cat] for cat in categories]
     total_selected_pct = sum(cfg["budget_pct"] for cfg in selected_configs)
-    
+
     # Normalize to use full income (scale up if needed)
     normalization_factor = 1.0 / total_selected_pct if total_selected_pct > 0 else 1.0
 
@@ -470,7 +470,7 @@ def _calculate_stats(
     net_cash_flow = total_income + total_expenses  # Expenses are negative
 
     # Calculate average daily spending
-    expense_days = len(set(t.date for t in transactions if t.type == "expense"))
+    expense_days = len({t.date for t in transactions if t.type == "expense"})
     avg_daily_spending = abs(total_expenses / expense_days) if expense_days > 0 else 0
 
     return SimulationStats(

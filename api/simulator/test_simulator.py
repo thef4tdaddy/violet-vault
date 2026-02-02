@@ -5,8 +5,6 @@ Validates transaction generation, balance math, and performance
 
 from datetime import date, timedelta
 
-import pytest
-
 from api.simulator.generator import generate_financial_simulation
 from api.simulator.models import (
     IncomeFrequency,
@@ -181,7 +179,7 @@ class TestSimulationGeneration:
 
         result = generate_financial_simulation(config)
 
-        total_income = sum(t.amount for t in result.transactions if t.type == "income")
+        _total_income = sum(t.amount for t in result.transactions if t.type == "income")
         total_expenses = abs(sum(t.amount for t in result.transactions if t.type == "expense"))
         expense_count = len([t for t in result.transactions if t.type == "expense"])
 
@@ -205,14 +203,14 @@ class TestSimulationGeneration:
 
         result = generate_financial_simulation(config)
 
-        total_income = sum(t.amount for t in result.transactions if t.type == "income")
+        _total_income = sum(t.amount for t in result.transactions if t.type == "income")
         total_expenses = abs(sum(t.amount for t in result.transactions if t.type == "expense"))
         expense_txns = [t for t in result.transactions if t.type == "expense"]
 
         # Chaotic has moderate volume with high variance
         assert total_expenses > 0  # Must have expenses
         assert len(expense_txns) > 40  # Moderate-high transaction count (70% probability)
-        
+
         # Check variance - chaotic should have wider range of transaction amounts
         if len(expense_txns) > 1:
             amounts = [abs(t.amount) for t in expense_txns]
@@ -280,7 +278,7 @@ class TestSimulationGeneration:
         result = generate_financial_simulation(config)
 
         # Calculate total balance from transactions
-        total_from_transactions = sum(t.amount for t in result.transactions)
+        _total_from_transactions = sum(t.amount for t in result.transactions)
 
         # Calculate total from envelope balances
         total_from_envelopes = sum(e.currentBalance for e in result.envelopes)

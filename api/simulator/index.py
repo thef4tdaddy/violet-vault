@@ -5,7 +5,7 @@ FastAPI endpoint for generating demo financial data
 
 from datetime import date, datetime, timedelta
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 from ..simulator.generator import generate_financial_simulation

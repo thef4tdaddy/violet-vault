@@ -41,9 +41,7 @@ class SimulationConfig(BaseModel):
     """Configuration for financial simulation"""
 
     # Income configuration
-    monthly_income: float = Field(
-        default=4500.0, gt=0, description="Base monthly income (gross)"
-    )
+    monthly_income: float = Field(default=4500.0, gt=0, description="Base monthly income (gross)")
     income_frequency: IncomeFrequency = Field(
         default=IncomeFrequency.BIWEEKLY, description="How often income is received"
     )
@@ -54,12 +52,8 @@ class SimulationConfig(BaseModel):
     )
 
     # Simulation duration
-    start_date: date = Field(
-        ..., description="Simulation start date"
-    )
-    months: int = Field(
-        default=6, ge=1, le=12, description="Number of months to simulate"
-    )
+    start_date: date = Field(..., description="Simulation start date")
+    months: int = Field(default=6, ge=1, le=12, description="Number of months to simulate")
 
     # Life events
     enable_life_events: bool = Field(

@@ -2,10 +2,8 @@
 """Quick test of the simulator endpoint"""
 
 import asyncio
-import time
-from datetime import date
 
-from api.simulator.index import generate_simulation, SimulationRequest
+from api.simulator.index import SimulationRequest, generate_simulation
 from api.simulator.models import IncomeFrequency, SpendingStyle
 
 
@@ -21,11 +19,9 @@ async def test_endpoint() -> None:
     )
 
     print("Generating simulation...")
-    start = time.time()
     response = await generate_simulation(request)
-    duration = time.time() - start
 
-    print(f"✓ Simulation generated successfully")
+    print("✓ Simulation generated successfully")
     print(f"✓ Performance: {response.performance_ms:.2f}ms")
     print(f"✓ Envelopes: {len(response.data.envelopes) if response.data else 0}")
     print(f"✓ Transactions: {len(response.data.transactions) if response.data else 0}")
