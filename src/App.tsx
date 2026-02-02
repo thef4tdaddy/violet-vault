@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/core/common/queryClient";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -17,9 +17,36 @@ import useUiStore from "./stores/ui/uiStore";
 import { initializeTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
 import { initializeStoreRegistry } from "@/utils/data/stores/storeRegistry";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
+import LandingPage from "./components/marketing/LandingPage";
+import DemoPage from "./components/demo/DemoPage";
 
 // Lazy load monitoring to reduce main bundle size
 const SentryLoader = React.lazy(() => import("./components/monitoring/SentryLoader"));
+
+const AppRouter = () => {
+  const location = useLocation();
+
+  // Check if we're on a public route
+  const isPublicRoute = location.pathname === "/" || location.pathname === "/demo";
+
+  if (isPublicRoute) {
+    return (
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/demo" element={<DemoPage />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <ErrorBoundary context="MainLayout">
+      <MainLayout
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        firebaseSync={syncOrchestrator as any}
+      />
+    </ErrorBoundary>
+  );
+};
 
 const App = () => {
   const uiStoreApiRef = useRef<PWAManagerUiStore | null>(null);
@@ -73,12 +100,7 @@ const App = () => {
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <div className="font-sans">
-              <ErrorBoundary context="MainLayout">
-                <MainLayout
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  firebaseSync={syncOrchestrator as any}
-                />
-              </ErrorBoundary>
+              <AppRouter />
               <ConfirmProvider />
               <PromptProvider />
 

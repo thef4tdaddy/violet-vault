@@ -153,6 +153,7 @@ import {
   Database,
   BarChart3,
   LineChart,
+  Brain,
 
   // Actions
   Copy,
@@ -391,6 +392,8 @@ export const ICON_REGISTRY = {
   Database: Database,
   BarChart3: BarChart3,
   LineChart: LineChart,
+  Brain: Brain,
+  brain: Brain,
 
   // Actions
   Copy: Copy,
