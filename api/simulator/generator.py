@@ -5,7 +5,7 @@ Core logic for generating realistic financial transactions
 
 import random
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from faker import Faker
 
