@@ -7,6 +7,7 @@ import DataManagementSection from "@/components/settings/sections/DataManagement
 import NotificationSettingsSection from "@/components/settings/sections/NotificationSettingsSection";
 import DevToolsSection from "@/components/settings/sections/DevToolsSection";
 import SyncHealthDashboard from "@/components/sync/SyncHealthDashboard";
+import { AnalyticsPrivacyDashboard } from "@/components/privacy/AnalyticsPrivacyDashboard";
 
 // Type definitions for user and security manager
 interface User {
@@ -130,6 +131,9 @@ const useSettingsSectionRenderer = (props: SettingsSectionRendererProps) => {
         return React.createElement(PrivacySettingsSection, {
           onOpenPrivacySettings,
         });
+
+      case "analytics-privacy":
+        return React.createElement(AnalyticsPrivacyDashboard);
 
       case "data":
         return React.createElement(DataManagementSection, {
