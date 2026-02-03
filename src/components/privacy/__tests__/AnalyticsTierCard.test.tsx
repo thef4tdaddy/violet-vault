@@ -189,10 +189,7 @@ describe("AnalyticsTierCard", () => {
       );
 
       const button = container.querySelector("button");
-      expect(button).toHaveAttribute(
-        "aria-label",
-        "100% Offline - All calculations run locally"
-      );
+      expect(button).toHaveAttribute("aria-label", "100% Offline - All calculations run locally");
     });
 
     it("should have role list for features", () => {

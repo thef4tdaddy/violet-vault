@@ -40,23 +40,19 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Build health response
+	region := os.Getenv("VERCEL_REGION")
+	if region == "" {
+		region = "unknown"
+	}
+
 	response := HealthResponse{
 		Status:    "healthy",
 		Version:   "2.1.0-alpha",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Service:   "VioletVault Backend",
-		Region:    getRegion(),
+		Region:    region,
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(response)
-}
-
-func getRegion() string {
-	// Vercel provides VERCEL_REGION env var
-	region := os.Getenv("VERCEL_REGION")
-	if region == "" {
-		return "unknown"
-	}
-	return region
 }
