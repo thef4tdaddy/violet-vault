@@ -6,6 +6,7 @@
  */
 
 import logger from "@/utils/core/common/logger";
+import { auditTrailService } from "@/services/privacy/auditTrailService";
 
 // --- Types ---
 
@@ -47,6 +48,12 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     const { method = "GET", body, headers = {}, timeout = DEFAULT_TIMEOUT, signal } = options;
 
+    // Start timing for audit log
+    const startTime = performance.now();
+    let success = false;
+    let errorMessage: string | undefined;
+    let payloadSize = 0;
+
     // Create abort controller for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -63,15 +70,61 @@ export class ApiClient {
       // Prepare request options
       const requestOptions = this.prepareRequestOptions(method, body, headers, combinedSignal);
 
+      // Calculate payload size for audit log
+      if (requestOptions.body) {
+        if (typeof requestOptions.body === "string") {
+          payloadSize = new Blob([requestOptions.body]).size;
+        } else if (requestOptions.body instanceof FormData) {
+          // Approximate size for FormData. Computing the exact size of a multipart/form-data
+          // payload is non-trivial (depends on generated boundaries, part headers, encoding, etc.).
+          // For audit logging purposes a fixed rough estimate is sufficient here, but if higher
+          // precision is ever required this should be replaced with logic that iterates over
+          // FormData entries and estimates their serialized size.
+          payloadSize = 1024;
+        }
+      }
+
       // Make the request
       const response = await fetch(url, requestOptions);
       clearTimeout(timeoutId);
 
       // Parse and return response
-      return await this.parseResponse<T>(response, method, url);
+      const result = await this.parseResponse<T>(response, method, url);
+      success = result.success;
+      errorMessage = result.error;
+
+      return result;
     } catch (error) {
       clearTimeout(timeoutId);
-      return this.handleRequestError(error, endpoint, timeout);
+      const result = this.handleRequestError(error, endpoint, timeout);
+      success = result.success;
+      errorMessage = result.error;
+      return result;
+    } finally {
+      // Log to audit trail (async, don't wait)
+      const responseTimeMs = Math.round(performance.now() - startTime);
+
+      // Only log analytics API calls, not health checks
+      const analyticsEndpoints = ["/api/prediction", "/api/categorization"];
+      const isAnalyticsEndpoint =
+        endpoint.startsWith("/api/analytics") || analyticsEndpoints.includes(endpoint);
+
+      if (isAnalyticsEndpoint) {
+        auditTrailService
+          .logApiCall({
+            timestamp: Date.now(),
+            endpoint,
+            method: method as "GET" | "POST" | "PUT" | "DELETE",
+            encryptedPayloadSize: payloadSize,
+            responseTimeMs,
+            success,
+            encrypted: true, // All backend calls use encryption
+            errorMessage,
+          })
+          .catch((err) => {
+            logger.error("Failed to log API call to audit trail", err);
+          });
+      }
     }
   }
 

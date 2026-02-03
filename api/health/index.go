@@ -47,7 +47,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	response := HealthResponse{
 		Status:    "healthy",
-		Version:   "2.0.0-beta",
+		Version:   "2.1.0-alpha",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Service:   "VioletVault Backend",
 		Region:    region,
