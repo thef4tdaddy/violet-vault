@@ -11,6 +11,9 @@ const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
 const BillManager = lazy(() => import("../bills/BillManager"));
 const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
 const AnalyticsDashboard = lazy(() => import("../analytics/AnalyticsDashboard"));
+const AllocationAnalyticsDashboard = lazy(
+  () => import("../analytics/allocation/AllocationAnalyticsDashboard")
+);
 const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
 import { isDebtFeatureEnabled } from "@/utils/domain/debts/debtDebugConfig";
 const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
@@ -401,6 +404,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, setActiveView }: ViewRe
       <ErrorBoundary context="AnalyticsDashboard">
         <Suspense fallback={<LoadingSpinner />}>
           <AnalyticsDashboard />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+    "allocation-analytics": (
+      <ErrorBoundary context="AllocationAnalyticsDashboard">
+        <Suspense fallback={<LoadingSpinner />}>
+          <AllocationAnalyticsDashboard />
         </Suspense>
       </ErrorBoundary>
     ),
