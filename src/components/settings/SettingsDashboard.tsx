@@ -18,6 +18,7 @@ const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
+const PrivacySettings = lazy(() => import("./PrivacySettings"));
 const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
 // Type definitions
@@ -43,6 +44,7 @@ const SettingsModals = ({
   showActivityFeed,
   showLocalOnlySettings,
   showSecuritySettings,
+  showPrivacySettings,
   showEnvelopeChecker,
   showLocalDataSecurity,
   activityFeedModalRef,
@@ -52,6 +54,7 @@ const SettingsModals = ({
   onCloseActivityFeed,
   onCloseLocalOnlySettings,
   onCloseSecuritySettings,
+  onClosePrivacySettings,
   onCloseEnvelopeChecker,
   onCloseLocalDataSecurity,
 }: {
@@ -59,6 +62,7 @@ const SettingsModals = ({
   showActivityFeed: boolean;
   showLocalOnlySettings: boolean;
   showSecuritySettings: boolean;
+  showPrivacySettings: boolean;
   showEnvelopeChecker: boolean;
   showLocalDataSecurity: boolean;
   activityFeedModalRef: React.RefObject<HTMLDivElement | null>;
@@ -68,6 +72,7 @@ const SettingsModals = ({
   onCloseActivityFeed: () => void;
   onCloseLocalOnlySettings: () => void;
   onCloseSecuritySettings: () => void;
+  onClosePrivacySettings: () => void;
   onCloseEnvelopeChecker: () => void;
   onCloseLocalDataSecurity: () => void;
 }) => {
@@ -114,6 +119,9 @@ const SettingsModals = ({
       )}
       {showSecuritySettings && securityManager && (
         <SecuritySettings isOpen={showSecuritySettings} onClose={onCloseSecuritySettings} />
+      )}
+      {showPrivacySettings && (
+        <PrivacySettings isOpen={showPrivacySettings} onClose={onClosePrivacySettings} />
       )}
       {showEnvelopeChecker && (
         <EnvelopeIntegrityChecker isOpen={showEnvelopeChecker} onClose={onCloseEnvelopeChecker} />
@@ -168,6 +176,7 @@ const SettingsDashboard = ({
     showActivityFeed,
     showLocalOnlySettings,
     showSecuritySettings,
+    showPrivacySettings,
     showResetConfirm,
     showEnvelopeChecker,
     openPasswordModal,
@@ -178,6 +187,8 @@ const SettingsDashboard = ({
     closeLocalOnlySettings,
     openSecuritySettings,
     closeSecuritySettings,
+    openPrivacySettings,
+    closePrivacySettings,
     openResetConfirm,
     closeResetConfirm,
     openEnvelopeChecker,
@@ -234,6 +245,9 @@ const SettingsDashboard = ({
     onOpenSecuritySettings: openSecuritySettings,
     onShowLocalDataSecurity: handleShowLocalDataSecurity,
 
+    // Privacy Settings Props
+    onOpenPrivacySettings: openPrivacySettings,
+
     // Data Management Props
     onOpenEnvelopeChecker: openEnvelopeChecker,
     onOpenActivityFeed: openActivityFeed,
@@ -270,6 +284,7 @@ const SettingsDashboard = ({
         showActivityFeed={showActivityFeed}
         showLocalOnlySettings={showLocalOnlySettings}
         showSecuritySettings={showSecuritySettings}
+        showPrivacySettings={showPrivacySettings}
         showEnvelopeChecker={showEnvelopeChecker}
         showLocalDataSecurity={showLocalDataSecurity}
         activityFeedModalRef={activityFeedModalRef}
@@ -279,6 +294,7 @@ const SettingsDashboard = ({
         onCloseActivityFeed={closeActivityFeed}
         onCloseLocalOnlySettings={closeLocalOnlySettings}
         onCloseSecuritySettings={closeSecuritySettings}
+        onClosePrivacySettings={closePrivacySettings}
         onCloseEnvelopeChecker={closeEnvelopeChecker}
         onCloseLocalDataSecurity={() => setShowLocalDataSecurity(false)}
       />

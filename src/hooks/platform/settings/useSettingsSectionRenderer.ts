@@ -2,6 +2,7 @@ import React from "react";
 import GeneralSettingsSection from "@/components/settings/sections/GeneralSettingsSection";
 import AccountSettingsSection from "@/components/settings/sections/AccountSettingsSection";
 import SecuritySettingsSection from "@/components/settings/sections/SecuritySettingsSection";
+import PrivacySettingsSection from "@/components/settings/sections/PrivacySettingsSection";
 import DataManagementSection from "@/components/settings/sections/DataManagementSection";
 import NotificationSettingsSection from "@/components/settings/sections/NotificationSettingsSection";
 import DevToolsSection from "@/components/settings/sections/DevToolsSection";
@@ -52,6 +53,9 @@ interface SettingsSectionRendererProps {
   onOpenSecuritySettings: () => void;
   onShowLocalDataSecurity: () => void;
 
+  // Privacy Settings Props
+  onOpenPrivacySettings: () => void;
+
   // Data Management Props
   onOpenActivityFeed: () => void;
   onExport: () => void;
@@ -83,6 +87,7 @@ const useSettingsSectionRenderer = (props: SettingsSectionRendererProps) => {
     securityManager,
     onOpenSecuritySettings,
     onShowLocalDataSecurity,
+    onOpenPrivacySettings,
     onOpenActivityFeed,
     onExport,
     onImport,
@@ -120,6 +125,11 @@ const useSettingsSectionRenderer = (props: SettingsSectionRendererProps) => {
               onShowLocalDataSecurity,
             })
           : null;
+
+      case "privacy":
+        return React.createElement(PrivacySettingsSection, {
+          onOpenPrivacySettings,
+        });
 
       case "data":
         return React.createElement(DataManagementSection, {

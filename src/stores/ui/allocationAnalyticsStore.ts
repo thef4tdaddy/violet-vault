@@ -3,7 +3,7 @@
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
  *
  * Zustand store for managing UI state of the allocation analytics dashboard.
- * Handles filters, active tabs, chart types, and export states.
+ * Handles filters, active tabs, chart types, export states, and tier selection.
  *
  * CRITICAL: This store is for UI STATE ONLY.
  * Server/data state is managed by TanStack Query hooks.
@@ -14,6 +14,26 @@ import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "@/utils/core/common/logger";
 import type { AllocationStrategy, ExportFormat } from "@/types/allocationAnalytics";
+
+/**
+ * Analytics tier types
+ */
+export type AnalyticsTier = "offline" | "private-backend" | "cloud-sync";
+
+/**
+ * Analytics tier metadata for UI display
+ */
+export interface AnalyticsTierInfo {
+  id: AnalyticsTier;
+  title: string;
+  description: string;
+  privacyLevel: "Maximum" | "High" | "Standard";
+  bundleSize: string;
+  features: string[];
+  icon: string;
+  disabled: boolean;
+  comingSoon?: boolean;
+}
 
 /**
  * Active tab in the analytics dashboard
@@ -56,6 +76,9 @@ interface DashboardFilters {
  * Store state interface
  */
 interface AllocationAnalyticsStoreState {
+  // Tier selection
+  analyticsTier: AnalyticsTier;
+
   // Navigation state
   activeTab: AnalyticsDashboardTab;
 
@@ -76,8 +99,13 @@ interface AllocationAnalyticsStoreState {
   isFilterModalOpen: boolean;
   isExportModalOpen: boolean;
 
-  // Actions
+  // Tier selection actions
+  setAnalyticsTier: (tier: AnalyticsTier) => void;
+
+  // Navigation actions
   setActiveTab: (tab: AnalyticsDashboardTab) => void;
+
+  // Filter actions
   setDateRange: (start: string, end: string, preset?: DateRangePreset) => void;
   setDateRangePreset: (preset: DateRangePreset) => void;
   setFrequencies: (frequencies: Array<"weekly" | "biweekly" | "semi-monthly" | "monthly">) => void;
@@ -85,15 +113,21 @@ interface AllocationAnalyticsStoreState {
   setStrategies: (strategies: AllocationStrategy[]) => void;
   setAmountRange: (min: number | null, max: number | null) => void;
   resetFilters: () => void;
+
+  // Chart preference actions
   setTrendChartType: (type: TrendChartType) => void;
   setSelectedEnvelopes: (envelopeIds: string[]) => void;
   toggleEnvelope: (envelopeId: string) => void;
   setShowLegend: (show: boolean) => void;
   setShowGrid: (show: boolean) => void;
+
+  // Modal actions
   openFilterModal: () => void;
   closeFilterModal: () => void;
   openExportModal: () => void;
   closeExportModal: () => void;
+
+  // Export actions
   setExportFormat: (format: ExportFormat) => void;
   startExport: () => void;
   finishExport: () => void;
@@ -117,6 +151,7 @@ const getDefaultDateRange = (): { start: string; end: string } => {
  * Initial state
  */
 const initialState = {
+  analyticsTier: "offline" as AnalyticsTier,
   activeTab: "overview" as AnalyticsDashboardTab,
   filters: {
     dateRange: {
@@ -144,10 +179,11 @@ const initialState = {
  *
  * @example
  * ```tsx
- * const { activeTab, setActiveTab, filters } = useAllocationAnalyticsStore();
+ * const { activeTab, setActiveTab, filters, analyticsTier, setAnalyticsTier } = useAllocationAnalyticsStore();
  *
  * return (
  *   <div>
+ *     <TierSelector tier={analyticsTier} onChange={setAnalyticsTier} />
  *     <Tabs activeTab={activeTab} onChange={setActiveTab} />
  *     <DateRangePicker dateRange={filters.dateRange} />
  *   </div>
@@ -159,6 +195,13 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
     persist(
       immer((set) => ({
         ...initialState,
+
+        // Tier selection actions
+        setAnalyticsTier: (tier: AnalyticsTier) =>
+          set((state) => {
+            state.analyticsTier = tier;
+            logger.info("Analytics tier changed", { tier });
+          }),
 
         // Navigation actions
         setActiveTab: (tab: AnalyticsDashboardTab) =>
@@ -308,6 +351,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
 
         // Only persist user preferences, not transient state
         partialize: (state) => ({
+          analyticsTier: state.analyticsTier,
           trendChartType: state.trendChartType,
           showLegend: state.showLegend,
           showGrid: state.showGrid,
@@ -324,6 +368,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
           const persisted = persistedState as Partial<AllocationAnalyticsStoreState>;
           return {
             ...currentState,
+            analyticsTier: persisted.analyticsTier || currentState.analyticsTier,
             trendChartType: persisted.trendChartType || currentState.trendChartType,
             showLegend: persisted.showLegend ?? currentState.showLegend,
             showGrid: persisted.showGrid ?? currentState.showGrid,
@@ -346,8 +391,57 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
 );
 
 /**
+ * Analytics tier configurations
+ * Used for rendering UI cards and tier selection
+ */
+export const ANALYTICS_TIERS: AnalyticsTierInfo[] = [
+  {
+    id: "offline",
+    title: "100% Offline",
+    description: "All calculations run locally in your browser. Nothing leaves your device.",
+    privacyLevel: "Maximum",
+    bundleSize: "~50 KB",
+    features: [
+      "Zero data transmission",
+      "No server communication",
+      "Complete privacy",
+      "Instant calculations",
+    ],
+    icon: "Shield",
+    disabled: false,
+  },
+  {
+    id: "private-backend",
+    title: "Private Backend",
+    description: "Encrypted payload sent to Vercel for faster processing. Data is ephemeral.",
+    privacyLevel: "High",
+    bundleSize: "~150 KB",
+    features: [
+      "End-to-end encryption",
+      "Ephemeral processing",
+      "Faster computation",
+      "No data retention",
+    ],
+    icon: "Lock",
+    disabled: false,
+  },
+  {
+    id: "cloud-sync",
+    title: "Cloud Sync",
+    description: "Full cloud synchronization for multi-device access and advanced analytics.",
+    privacyLevel: "Standard",
+    bundleSize: "~200 KB",
+    features: ["Multi-device sync", "Advanced analytics", "Cloud backup", "Real-time updates"],
+    icon: "Cloud",
+    disabled: true,
+    comingSoon: true,
+  },
+];
+
+/**
  * Selectors for performance optimization
  */
+export const selectAnalyticsTier = (state: AllocationAnalyticsStoreState) => state.analyticsTier;
 export const selectActiveTab = (state: AllocationAnalyticsStoreState) => state.activeTab;
 export const selectFilters = (state: AllocationAnalyticsStoreState) => state.filters;
 export const selectDateRange = (state: AllocationAnalyticsStoreState) => state.filters.dateRange;

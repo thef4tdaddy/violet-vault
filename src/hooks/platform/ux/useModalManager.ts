@@ -62,6 +62,7 @@ export const useSettingsModals = () => {
     activityFeed: false,
     localOnlySettings: false,
     securitySettings: false,
+    privacySettings: false,
     resetConfirm: false,
     envelopeChecker: false,
   };
@@ -90,6 +91,11 @@ export const useSettingsModals = () => {
     openSecuritySettings: () => modalManager.openModal("securitySettings"),
     closeSecuritySettings: () => modalManager.closeModal("securitySettings"),
     showSecuritySettings: modalManager.isModalOpen("securitySettings"),
+
+    // Privacy Settings
+    openPrivacySettings: () => modalManager.openModal("privacySettings"),
+    closePrivacySettings: () => modalManager.closeModal("privacySettings"),
+    showPrivacySettings: modalManager.isModalOpen("privacySettings"),
 
     // Reset Confirmation
     openResetConfirm: () => modalManager.openModal("resetConfirm"),
