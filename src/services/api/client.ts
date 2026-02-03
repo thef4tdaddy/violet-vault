@@ -101,7 +101,11 @@ export class ApiClient {
       const responseTimeMs = Math.round(performance.now() - startTime);
 
       // Only log analytics API calls, not health checks
-      if (endpoint.startsWith("/api/analytics") || endpoint.includes("prediction") || endpoint.includes("categorization")) {
+      const analyticsEndpoints = ["/api/prediction", "/api/categorization"];
+      const isAnalyticsEndpoint =
+        endpoint.startsWith("/api/analytics") || analyticsEndpoints.includes(endpoint);
+
+      if (isAnalyticsEndpoint) {
         auditTrailService
           .logApiCall({
             timestamp: Date.now(),
