@@ -200,7 +200,9 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
               className="dark:stroke-gray-400"
             />
             <Tooltip
-              formatter={(value: number) => [`$${(value / 100).toFixed(2)}`, "Avg Amount"]}
+              formatter={(value: number | undefined) =>
+                value !== undefined ? [`$${(value / 100).toFixed(2)}`, "Avg Amount"] : ["N/A", "Avg Amount"]
+              }
               contentStyle={{
                 backgroundColor: "#fff",
                 border: "1px solid #e5e7eb",

@@ -11,7 +11,7 @@ import { getIcon } from "@/utils";
 import logger from "@/utils/core/common/logger";
 
 export interface ChartExportButtonProps {
-  chartRef: React.RefObject<HTMLDivElement>;
+  chartRef: React.RefObject<HTMLDivElement | null>;
   filename: string;
   className?: string;
 }

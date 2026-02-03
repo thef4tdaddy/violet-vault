@@ -21,27 +21,28 @@ export interface AllocationDistributionChartProps {
 /**
  * Custom label for pie slices (hide small slices)
  */
-interface CustomLabelProps {
-  cx: number;
-  cy: number;
-  midAngle: number;
-  innerRadius: number;
-  outerRadius: number;
-  percent: number;
-  name: string;
-}
+const renderCustomLabel = (props: {
+  cx?: number;
+  cy?: number;
+  midAngle?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  percent?: number;
+}) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
 
-const renderCustomLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-  name,
-}: CustomLabelProps) => {
-  // Hide labels for slices < 5%
-  if (percent < 0.05) return null;
+  // Hide labels for slices < 5% or if required props are missing
+  if (
+    !percent ||
+    percent < 0.05 ||
+    cx === undefined ||
+    cy === undefined ||
+    midAngle === undefined ||
+    innerRadius === undefined ||
+    outerRadius === undefined
+  ) {
+    return null;
+  }
 
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;

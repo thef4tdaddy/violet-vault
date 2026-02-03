@@ -6,8 +6,6 @@
  * Lazy-loaded only when user enables backend processing
  */
 
-import type { AllocationTransaction } from "@/types/allocation";
-
 /**
  * Heatmap data point for calendar visualization
  */

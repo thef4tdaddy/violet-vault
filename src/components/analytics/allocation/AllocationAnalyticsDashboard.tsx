@@ -6,14 +6,51 @@
  * Displays comprehensive visual analysis of paycheck allocation patterns.
  */
 
+import { lazy, Suspense } from "react";
 import Button from "@/components/ui/buttons/Button";
 import { useAllocationAnalytics } from "@/hooks/platform/analytics/useAllocationAnalytics";
 import {
   useAllocationAnalyticsStore,
   selectActiveTab,
   selectDateRange,
+  selectAnalyticsTier,
 } from "@/stores/ui/allocationAnalyticsStore";
 import logger from "@/utils/core/common/logger";
+
+// Lazy load enhanced components (Tier 2)
+const EnhancedOverviewTab = lazy(() =>
+  import("./enhanced/EnhancedOverviewTab").then((m) => ({ default: m.EnhancedOverviewTab }))
+);
+const InteractiveHeatmapCalendar = lazy(() =>
+  import("./enhanced/InteractiveHeatmapCalendar").then((m) => ({
+    default: m.InteractiveHeatmapCalendar,
+  }))
+);
+const EnvelopeAllocationTrendsChart = lazy(() =>
+  import("./enhanced/EnvelopeAllocationTrendsChart").then((m) => ({
+    default: m.EnvelopeAllocationTrendsChart,
+  }))
+);
+const AllocationDistributionChart = lazy(() =>
+  import("./enhanced/AllocationDistributionChart").then((m) => ({
+    default: m.AllocationDistributionChart,
+  }))
+);
+const StrategyPerformanceTable = lazy(() =>
+  import("./enhanced/StrategyPerformanceTable").then((m) => ({
+    default: m.StrategyPerformanceTable,
+  }))
+);
+const HealthScoreGauge = lazy(() =>
+  import("./enhanced/HealthScoreGauge").then((m) => ({ default: m.HealthScoreGauge }))
+);
+
+// Minimal components always loaded
+import { MinimalOverviewTab } from "./minimal/MinimalOverviewTab";
+import { SimpleHeatmapGrid } from "./minimal/SimpleHeatmapGrid";
+import { BasicTrendsSparkline } from "./minimal/BasicTrendsSparkline";
+import { DistributionTable } from "./minimal/DistributionTable";
+import { MinimalHealthGauge } from "./minimal/MinimalHealthGauge";
 
 /**
  * Loading state component
@@ -191,15 +228,203 @@ const TabNavigation = () => {
 };
 
 /**
- * Placeholder content for tabs (will be replaced with actual components)
+ * Loading fallback for lazy components
  */
-const TabContent = ({ tab }: { tab: string }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
-    <p className="text-gray-600 dark:text-gray-400">
-      {tab.charAt(0).toUpperCase() + tab.slice(1)} content coming soon...
-    </p>
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-3"></div>
+      <p className="text-gray-600 dark:text-gray-400 text-sm">Loading enhanced analytics...</p>
+    </div>
   </div>
 );
+
+/**
+ * Tab content based on analytics tier and active tab
+ */
+interface TabContentProps {
+  tab: string;
+  tier: "offline" | "private-backend" | "cloud-sync";
+  data: ReturnType<typeof useAllocationAnalytics>["data"];
+}
+
+const TabContent = ({ tab, tier, data }: TabContentProps) => {
+  const isEnhanced = tier === "private-backend";
+
+  if (!data) return null;
+
+  // Convert data to format expected by enhanced components
+  const mockMLInsights = [
+    {
+      type: "success" as const,
+      title: "Consistent Allocation Pattern",
+      description: "Your allocation patterns are consistent and predictable.",
+      confidence: 92,
+    },
+  ];
+
+  const mockAnomalies: Array<{ date: string; severity: "high" | "medium" | "low"; description: string }> = [];
+
+  const mockHeatmapData = data.heatmap.dataPoints.map((point) => ({
+    date: point.date,
+    intensity: point.intensity,
+    amount: point.amountCents,
+    count: point.allocationCount,
+  }));
+
+  const mockSimpleHeatmapData = data.heatmap.dataPoints.map((point) => ({
+    date: point.date,
+    amount: point.amountCents,
+    intensity: point.intensity,
+  }));
+
+  const mockTrendData = data.trends.envelopes[0]?.dataPoints.map((point) => ({
+    date: point.date,
+    [data.trends.envelopes[0]!.id]: point.amountCents,
+  })) || [];
+
+  const mockEnvelopeSparklines = data.trends.envelopes.map((env) => ({
+    envelopeId: env.id,
+    envelopeName: env.name,
+    data: env.dataPoints.map((point) => ({
+      value: point.amountCents,
+      label: point.date,
+    })),
+    color: env.color || "#8884d8",
+  }));
+
+  const mockDistributionData = data.distribution.categories.map((cat) => ({
+    name: cat.name,
+    value: cat.totalCents,
+    percentage: cat.percentage,
+    color: cat.color || "#8884d8",
+  }));
+
+  const mockCategoryDistribution = data.distribution.categories.map((cat) => ({
+    category: cat.name,
+    amount: cat.totalCents / 100,
+    percentage: cat.percentage,
+    transactionCount: cat.envelopeIds.length,
+  }));
+
+  const mockStrategyData = data.strategyAnalysis.strategies.map((s) => ({
+    strategy: s.strategy,
+    avgAmount: s.averageCompletionTimeMs,
+    successRate: s.successRate,
+    recommendation: (s.successRate >= 90 ? "good" : s.successRate >= 70 ? "fair" : "poor") as
+      | "good"
+      | "fair"
+      | "poor",
+  }));
+
+  const mockHealthComponents = data.healthScore.components.map((c) => ({
+    component: c.name,
+    score: c.score,
+    weight: c.weight,
+    description: c.description,
+  }));
+
+  const mockHealthTrend = [{ date: "2024-01-01", score: data.healthScore.totalScore }];
+
+  switch (tab) {
+    case "overview":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <EnhancedOverviewTab
+            totalAllocations={data.heatmap.totalAllocations}
+            avgPerPaycheck={data.distribution.averagePerPaycheckCents}
+            healthScore={data.healthScore.totalScore}
+            frequency={data.heatmap.frequency}
+            insights={mockMLInsights}
+            anomalyCount={0}
+          />
+        </Suspense>
+      ) : (
+        <MinimalOverviewTab
+          metrics={{
+            totalAllocations: data.heatmap.totalAllocations,
+            avgPerPaycheck: data.distribution.averagePerPaycheckCents,
+            healthScore: data.healthScore.totalScore,
+            frequency: data.heatmap.frequency,
+          }}
+        />
+      );
+
+    case "heatmap":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <InteractiveHeatmapCalendar
+            data={mockHeatmapData}
+            onDateClick={(date) => logger.info("Date clicked", { date })}
+          />
+        </Suspense>
+      ) : (
+        <SimpleHeatmapGrid data={mockSimpleHeatmapData} />
+      );
+
+    case "trends":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <EnvelopeAllocationTrendsChart
+            data={mockTrendData}
+            selectedEnvelopes={[data.trends.envelopes[0]?.id || ""]}
+            anomalies={mockAnomalies}
+          />
+        </Suspense>
+      ) : (
+        <BasicTrendsSparkline envelopes={mockEnvelopeSparklines} />
+      );
+
+    case "distribution":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <AllocationDistributionChart
+            data={mockDistributionData}
+            viewMode="category"
+            onViewModeChange={(mode) => logger.info("View mode changed", { mode })}
+          />
+        </Suspense>
+      ) : (
+        <DistributionTable data={mockCategoryDistribution} />
+      );
+
+    case "strategy":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <StrategyPerformanceTable strategies={mockStrategyData} />
+        </Suspense>
+      ) : (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            Strategy analysis available in enhanced mode
+          </p>
+        </div>
+      );
+
+    case "health":
+      return isEnhanced ? (
+        <Suspense fallback={<LoadingFallback />}>
+          <HealthScoreGauge
+            score={data.healthScore.totalScore}
+            components={mockHealthComponents}
+            recommendations={mockMLInsights}
+            trendData={mockHealthTrend}
+          />
+        </Suspense>
+      ) : (
+        <MinimalHealthGauge score={data.healthScore.totalScore} />
+      );
+
+    default:
+      return (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            {tab.charAt(0).toUpperCase() + tab.slice(1)} content coming soon...
+          </p>
+        </div>
+      );
+  }
+};
 
 /**
  * Main Allocation Analytics Dashboard Component
@@ -212,6 +437,7 @@ const TabContent = ({ tab }: { tab: string }) => (
 export const AllocationAnalyticsDashboard = () => {
   const activeTab = useAllocationAnalyticsStore(selectActiveTab);
   const dateRange = useAllocationAnalyticsStore(selectDateRange);
+  const analyticsTier = useAllocationAnalyticsStore(selectAnalyticsTier);
 
   // Fetch analytics data
   const { data, isLoading, error, refetch } = useAllocationAnalytics({
@@ -257,14 +483,14 @@ export const AllocationAnalyticsDashboard = () => {
         <TabNavigation />
 
         <div className="mt-6">
-          <TabContent tab={activeTab} />
+          <TabContent tab={activeTab} tier={analyticsTier} data={data} />
         </div>
 
         {/* Debug info in development */}
         {import.meta.env.DEV && (
           <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
             <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-              Debug: {data.heatmap.totalAllocations} allocations, Health:{" "}
+              Debug: Tier={analyticsTier}, {data.heatmap.totalAllocations} allocations, Health:{" "}
               {data.healthScore.totalScore}, Envelopes: {data.trends.envelopes.length}, Strategies:{" "}
               {data.strategyAnalysis.strategies.length}
             </p>
