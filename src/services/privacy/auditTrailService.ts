@@ -141,7 +141,15 @@ class AuditTrailService {
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .map((row) =>
+        row
+          .map((cell) => {
+            const value = cell === null || cell === undefined ? "" : String(cell);
+            const escaped = value.replace(/"/g, '""');
+            return `"${escaped}"`;
+          })
+          .join(","),
+      )
       .join("\n");
 
     return csv;
