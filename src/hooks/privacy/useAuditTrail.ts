@@ -99,14 +99,56 @@ export function useAuditTrail(): UseAuditTrailReturn {
 
   // Load logs on mount and set up auto-refresh
   useEffect(() => {
+    let interval: number | undefined;
+
+    const startInterval = () => {
+      // In non-browser environments, skip setting up the interval
+      if (typeof document !== "undefined" && document.hidden) {
+        return;
+      }
+
+      interval = window.setInterval(() => {
+        loadLogs();
+      }, REFRESH_INTERVAL_MS);
+    };
+
+    const clearCurrentInterval = () => {
+      if (interval !== undefined) {
+        clearInterval(interval);
+        interval = undefined;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (typeof document === "undefined") {
+        return;
+      }
+
+      if (document.hidden) {
+        // Pause auto-refresh when the tab is not visible
+        clearCurrentInterval();
+      } else {
+        // Resume auto-refresh and perform an immediate refresh when visible again
+        clearCurrentInterval();
+        loadLogs();
+        startInterval();
+      }
+    };
+
+    // Initial load and interval start
     loadLogs();
+    startInterval();
 
-    // Refresh every 5 seconds to catch new logs
-    const interval = setInterval(() => {
-      loadLogs();
-    }, REFRESH_INTERVAL_MS);
+    if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
 
-    return () => clearInterval(interval);
+    return () => {
+      clearCurrentInterval();
+      if (typeof document !== "undefined" && typeof document.removeEventListener === "function") {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      }
+    };
   }, [loadLogs]);
 
   return {
