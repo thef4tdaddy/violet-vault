@@ -17,6 +17,7 @@ interface ConnectionTestResponse {
   version: string;
   timestamp: string;
   service: string;
+  region?: string;
 }
 
 /**
