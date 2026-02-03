@@ -82,7 +82,8 @@ describe("PrivacySettings", () => {
     it("should display current tier information", () => {
       render(<PrivacySettings isOpen={true} onClose={vi.fn()} />);
 
-      expect(screen.getByText("100% Offline")).toBeInTheDocument();
+      // Check that current tier is displayed (there are multiple "100% Offline" elements, so check for at least one)
+      expect(screen.getAllByText("100% Offline")[0]).toBeInTheDocument();
       expect(screen.getByText("Maximum")).toBeInTheDocument();
     });
 
