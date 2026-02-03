@@ -225,7 +225,15 @@ function StatusIndicator({ status }: { status: ConnectionStatus }): React.ReactE
     error: "bg-red-500",
   };
 
-  return <div className={`w-3 h-3 rounded-full ${colors[status]}`} />;
+  return (
+    <div
+      className={`w-3 h-3 rounded-full ${colors[status]}`}
+      role="status"
+      aria-live="polite"
+      aria-label={getStatusText(status)}
+      title={getStatusText(status)}
+    />
+  );
 }
 
 /**
