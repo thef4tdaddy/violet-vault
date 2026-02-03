@@ -331,9 +331,10 @@ describe("paycheckDeletionUtils", () => {
       expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
     });
 
-    it("should return 0 when allocations is in legacy format but envelopeAllocations is undefined", async () => {
-      // Note: The actual code checks for envelopeAllocations first, so if it's undefined,
-      // it returns 0 before checking the legacy allocations format
+    it("should return 0 when envelopeAllocations is undefined (legacy allocations format unreachable)", async () => {
+      // This test verifies the early return behavior when envelopeAllocations is undefined.
+      // The check at line 60 (!paycheckToDelete.envelopeAllocations) returns 0 immediately,
+      // making the legacy allocations fallback at lines 64-66 unreachable in this scenario.
       const paycheck: Paycheck = {
         id: "paycheck1",
         amount: 1000,
@@ -356,7 +357,7 @@ describe("paycheckDeletionUtils", () => {
 
       const result = await reverseEnvelopeAllocations(paycheck, budgetDb);
 
-      // Since envelopeAllocations is undefined, function returns 0 early
+      // Function returns 0 early due to undefined envelopeAllocations
       expect(result).toBe(0);
       expect(budgetDb.envelopes.update).not.toHaveBeenCalled();
     });
@@ -448,9 +449,12 @@ describe("paycheckDeletionUtils", () => {
     });
 
     it("should handle null metadata gracefully", async () => {
-      // Note: Negative actualBalance can occur when metadata is null/corrupted
-      // The function calculates the new balance but doesn't validate it -
-      // balance validation should happen at the caller level
+      // This test verifies the function's behavior with null/corrupted metadata.
+      // Negative actualBalance is a valid calculation result representing the mathematical
+      // outcome of deleting a paycheck when metadata is missing (currentActualBalance defaults to 0).
+      // This is intentional behavior - the function performs pure calculation without business
+      // logic validation. The caller is responsible for validating whether negative balances
+      // represent a data corruption scenario that requires special handling or user notification.
       const paycheck: Paycheck = {
         id: "paycheck1",
         amount: 1000,
