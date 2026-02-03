@@ -15,6 +15,7 @@ import {
   selectDateRange,
   selectAnalyticsTier,
 } from "@/stores/ui/allocationAnalyticsStore";
+import { useDatabase } from "@/contexts/DatabaseContext";
 import logger from "@/utils/core/common/logger";
 
 // Lazy load enhanced components (Tier 2)
@@ -51,6 +52,9 @@ import { SimpleHeatmapGrid } from "./minimal/SimpleHeatmapGrid";
 import { BasicTrendsSparkline } from "./minimal/BasicTrendsSparkline";
 import { DistributionTable } from "./minimal/DistributionTable";
 import { MinimalHealthGauge } from "./minimal/MinimalHealthGauge";
+
+// Demo components
+import { PerformanceComparisonWidget } from "./demo/PerformanceComparisonWidget";
 
 /**
  * Loading state component
@@ -141,9 +145,15 @@ interface DashboardHeaderProps {
   totalAllocations: number;
   healthScore: number;
   dateRange: { start: string; end: string };
+  isDemoMode?: boolean;
 }
 
-const DashboardHeader = ({ totalAllocations, healthScore, dateRange }: DashboardHeaderProps) => {
+const DashboardHeader = ({
+  totalAllocations,
+  healthScore,
+  dateRange,
+  isDemoMode = false,
+}: DashboardHeaderProps) => {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
       month: "short",
@@ -156,7 +166,16 @@ const DashboardHeader = ({ totalAllocations, healthScore, dateRange }: Dashboard
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Allocation Analytics</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Allocation Analytics
+            </h1>
+            {isDemoMode && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                🎭 Demo Mode
+              </span>
+            )}
+          </div>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             {formatDate(dateRange.start)} - {formatDate(dateRange.end)}
           </p>
@@ -443,6 +462,7 @@ export const AllocationAnalyticsDashboard = () => {
   const activeTab = useAllocationAnalyticsStore(selectActiveTab);
   const dateRange = useAllocationAnalyticsStore(selectDateRange);
   const analyticsTier = useAllocationAnalyticsStore(selectAnalyticsTier);
+  const { isDemoMode } = useDatabase();
 
   // Fetch analytics data
   const { data, isLoading, error, refetch } = useAllocationAnalytics({
@@ -483,9 +503,17 @@ export const AllocationAnalyticsDashboard = () => {
           totalAllocations={data.heatmap.totalAllocations}
           healthScore={data.healthScore.totalScore}
           dateRange={dateRange}
+          isDemoMode={isDemoMode}
         />
 
         <TabNavigation />
+
+        {/* Demo Mode: Performance Comparison Widget */}
+        {isDemoMode && (
+          <div className="mb-6">
+            <PerformanceComparisonWidget transactionCount={data.heatmap.totalAllocations} />
+          </div>
+        )}
 
         <div className="mt-6">
           <TabContent tab={activeTab} tier={analyticsTier} data={data} />

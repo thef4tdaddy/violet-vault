@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Button from "@/components/ui/buttons/Button";
 import { getIcon } from "@/utils/ui/icons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
@@ -106,12 +107,12 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
                       <strong>Choose your privacy level:</strong> Each tier balances privacy with
                       performance. All tiers keep your financial data encrypted and secure.
                     </p>
-                    <button
+                    <Button
                       onClick={() => setShowExplainer(true)}
                       className="text-sm text-blue-600 font-semibold hover:text-blue-800 underline mt-2"
                     >
                       Learn more about what data is sent where →
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -199,18 +200,18 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
 
             {/* Footer Actions */}
             <div className="mt-6 flex justify-end gap-3">
-              <button
+              <Button
                 onClick={() => setShowExplainer(true)}
                 className="px-4 py-2 bg-white/60 text-gray-900 font-semibold rounded-lg border-2 border-gray-300 hover:bg-white hover:border-gray-400 transition-colors shadow-sm"
               >
                 Learn More
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={onClose}
                 className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg border-2 border-black hover:bg-blue-700 transition-colors shadow-sm"
               >
                 Done
-              </button>
+              </Button>
             </div>
           </div>
         </div>

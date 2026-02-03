@@ -8,6 +8,7 @@
 
 import React, { useState, useRef } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import Button from "@/components/ui/buttons/Button";
 import type { DistributionDataPoint } from "@/types/analyticsEnhanced";
 import { ChartExportButton } from "../shared/ChartExportButton";
 
@@ -133,7 +134,7 @@ export const AllocationDistributionChart: React.FC<AllocationDistributionChartPr
 
       {/* View mode toggle */}
       <div className="flex gap-2 mb-6">
-        <button
+        <Button
           onClick={() => onViewModeChange("category")}
           className={`
             px-4 py-2 rounded-lg text-sm font-medium transition-all
@@ -145,8 +146,8 @@ export const AllocationDistributionChart: React.FC<AllocationDistributionChartPr
           `}
         >
           By Category
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => onViewModeChange("envelope")}
           className={`
             px-4 py-2 rounded-lg text-sm font-medium transition-all
@@ -158,7 +159,7 @@ export const AllocationDistributionChart: React.FC<AllocationDistributionChartPr
           `}
         >
           By Envelope
-        </button>
+        </Button>
       </div>
 
       {data.length === 0 ? (

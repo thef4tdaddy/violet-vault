@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
   ReferenceDot,
 } from "recharts";
+import Button from "@/components/ui/buttons/Button";
 import type { TrendDataPoint, AnomalyMarker } from "@/types/analyticsEnhanced";
 import { ChartExportButton } from "../shared/ChartExportButton";
 
@@ -115,12 +116,12 @@ export const EnvelopeAllocationTrendsChart: React.FC<EnvelopeAllocationTrendsCha
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">Allocation Trends</h3>
         <div className="flex gap-2">
           {onExport && (
-            <button
+            <Button
               onClick={onExport}
               className="px-3 py-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
             >
               View Details
-            </button>
+            </Button>
           )}
           <ChartExportButton chartRef={chartRef} filename="allocation-trends" />
         </div>

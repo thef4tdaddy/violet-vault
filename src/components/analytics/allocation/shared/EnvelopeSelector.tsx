@@ -6,6 +6,7 @@
  */
 
 import React from "react";
+import Button from "@/components/ui/buttons/Button";
 
 export interface EnvelopeSelectorProps {
   envelopes: Array<{ id: string; name: string }>;
@@ -59,12 +60,12 @@ export const EnvelopeSelector: React.FC<EnvelopeSelectorProps> = ({
           Select Envelopes ({selected.length}/{maxSelections})
         </span>
         {selected.length > 0 && (
-          <button
+          <Button
             onClick={() => onChange([])}
             className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400"
           >
             Clear All
-          </button>
+          </Button>
         )}
       </div>
 
@@ -74,7 +75,7 @@ export const EnvelopeSelector: React.FC<EnvelopeSelectorProps> = ({
           const isDisabled = !isSelected && selected.length >= maxSelections;
 
           return (
-            <button
+            <Button
               key={env.id}
               onClick={() => handleToggle(env.id)}
               disabled={isDisabled}
@@ -90,7 +91,7 @@ export const EnvelopeSelector: React.FC<EnvelopeSelectorProps> = ({
               `}
             >
               {env.name}
-            </button>
+            </Button>
           );
         })}
       </div>

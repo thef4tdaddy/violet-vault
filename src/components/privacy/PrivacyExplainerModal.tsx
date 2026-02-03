@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@/components/ui/buttons/Button";
 import { getIcon } from "@/utils/ui/icons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
@@ -241,12 +242,12 @@ const PrivacyExplainerModal: React.FC<PrivacyExplainerModalProps> = ({ isOpen, o
 
           {/* Footer */}
           <div className="mt-6 flex justify-end">
-            <button
+            <Button
               onClick={onClose}
               className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg border-2 border-black hover:bg-blue-700 transition-colors shadow-sm"
             >
               Got it!
-            </button>
+            </Button>
           </div>
         </div>
       </div>

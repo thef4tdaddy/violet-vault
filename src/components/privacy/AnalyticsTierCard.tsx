@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@/components/ui/buttons/Button";
 import { getIcon } from "@/utils/ui/icons";
 import type { AnalyticsTierInfo } from "@/stores/ui/allocationAnalyticsStore";
 
@@ -43,7 +44,7 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
   };
 
   return (
-    <button
+    <Button
       type="button"
       onClick={tier.disabled ? undefined : onSelect}
       disabled={tier.disabled}
@@ -127,7 +128,7 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
           </div>
         </div>
       </div>
-    </button>
+    </Button>
   );
 };
 

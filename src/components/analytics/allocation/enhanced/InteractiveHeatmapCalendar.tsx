@@ -8,6 +8,8 @@
 
 import React, { useState, useMemo } from "react";
 import { ResponsiveContainer } from "recharts";
+import Button from "@/components/ui/buttons/Button";
+import Select from "@/components/ui/forms/Select";
 import type { HeatmapDataPoint } from "@/types/analyticsEnhanced";
 
 export interface InteractiveHeatmapCalendarProps {
@@ -129,9 +131,11 @@ export const InteractiveHeatmapCalendar: React.FC<InteractiveHeatmapCalendarProp
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">Allocation Calendar</h3>
         <div className="flex gap-2">
-          <select
+          <Select
             value={selectedMonth}
-            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setSelectedMonth(Number(e.target.value))
+            }
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             aria-label="Select month"
           >
@@ -140,10 +144,12 @@ export const InteractiveHeatmapCalendar: React.FC<InteractiveHeatmapCalendarProp
                 {month}
               </option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setSelectedYear(Number(e.target.value))
+            }
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             aria-label="Select year"
           >
@@ -152,7 +158,7 @@ export const InteractiveHeatmapCalendar: React.FC<InteractiveHeatmapCalendarProp
                 {year}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -184,7 +190,7 @@ export const InteractiveHeatmapCalendar: React.FC<InteractiveHeatmapCalendarProp
                   const hasData = cell.count > 0;
 
                   return (
-                    <button
+                    <Button
                       key={cell.date}
                       onClick={() => hasData && onDateClick(cell.date)}
                       className={`
@@ -215,7 +221,7 @@ export const InteractiveHeatmapCalendar: React.FC<InteractiveHeatmapCalendarProp
                           </div>
                         </div>
                       )}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
