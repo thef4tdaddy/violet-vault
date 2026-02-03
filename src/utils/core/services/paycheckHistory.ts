@@ -200,6 +200,7 @@ export class PaycheckHistoryService {
   static clear(): void {
     try {
       localStorage.removeItem(this.STORAGE_KEY);
+      localStorage.removeItem(this.ALLOCATION_HISTORY_KEY);
       logger.info("Cleared paycheck history");
     } catch (error) {
       logger.error("Failed to clear paycheck history", {
@@ -223,5 +224,159 @@ export class PaycheckHistoryService {
       });
       throw error;
     }
+  }
+
+  // ==================== ALLOCATION HISTORY ====================
+  // Store full allocation history for comparison view
+
+  private static ALLOCATION_HISTORY_KEY = "violet-vault-allocation-history";
+  private static MAX_ALLOCATION_HISTORY = 20; // Keep last 20 paychecks
+
+  /**
+   * Save allocation history entry
+   * @param entry - Allocation history entry with full allocation breakdown
+   */
+  static saveAllocationHistory(entry: {
+    paycheckAmountCents: number;
+    payerName?: string | null;
+    allocations: ReadonlyArray<{ envelopeId: string; amountCents: number }>;
+    strategy?: string | null;
+  }): void {
+    try {
+      const history = this.getAllocationHistory();
+
+      // Validate that allocations sum to paycheck amount
+      const allocationTotal = entry.allocations.reduce((sum, a) => sum + a.amountCents, 0);
+      if (allocationTotal !== entry.paycheckAmountCents) {
+        logger.warn("Allocation total does not match paycheck amount", {
+          paycheckAmount: entry.paycheckAmountCents,
+          allocationTotal,
+          difference: entry.paycheckAmountCents - allocationTotal,
+        });
+      }
+
+      // Validate and filter strategy to known types
+      let validatedStrategy: "even_split" | "last_split" | "target_first" | "manual" | undefined;
+      if (
+        entry.strategy &&
+        ["even_split", "last_split", "target_first", "manual"].includes(entry.strategy)
+      ) {
+        validatedStrategy = entry.strategy as
+          | "even_split"
+          | "last_split"
+          | "target_first"
+          | "manual";
+      } else if (entry.strategy) {
+        logger.warn("Unrecognized allocation strategy, storing as undefined", {
+          strategy: entry.strategy,
+        });
+      }
+
+      const newEntry = {
+        id: `alloc_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        date: new Date().toISOString(),
+        paycheckAmountCents: entry.paycheckAmountCents,
+        payerName: entry.payerName || undefined,
+        allocations: entry.allocations.map((a) => ({
+          envelopeId: a.envelopeId,
+          amountCents: a.amountCents,
+        })),
+        strategy: validatedStrategy,
+      };
+
+      // Insert newest entry first and enforce max entries (keep most recent)
+      const updatedHistory = [newEntry, ...history].slice(0, this.MAX_ALLOCATION_HISTORY);
+
+      // NOTE: Allocation history is currently stored in plaintext in localStorage.
+      // This is intentionally limited to client-side use only (never synced) and
+      // functions as a convenience cache rather than a canonical financial record.
+      // TODO: When integrating with the app-wide encrypted envelope budgeting
+      // pipeline, migrate this to use the same client-side encryption/decryption
+      // mechanism as other sensitive financial data before persisting.
+      localStorage.setItem(this.ALLOCATION_HISTORY_KEY, JSON.stringify(updatedHistory));
+
+      logger.info("Saved allocation history", {
+        entryId: newEntry.id,
+        totalEntries: updatedHistory.length,
+      });
+    } catch (error) {
+      logger.error("Failed to save allocation history", {
+        reason: "save_error",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  /**
+   * Get all allocation history entries
+   * @returns Array of allocation history entries, sorted by date (newest first)
+   */
+  static getAllocationHistory(): Array<{
+    id: string;
+    date: string;
+    paycheckAmountCents: number;
+    payerName?: string;
+    allocations: Array<{ envelopeId: string; amountCents: number }>;
+    strategy?: "even_split" | "last_split" | "target_first" | "manual";
+  }> {
+    try {
+      const stored = localStorage.getItem(this.ALLOCATION_HISTORY_KEY);
+      if (!stored) return [];
+
+      const parsed = JSON.parse(stored) as Array<{
+        id: string;
+        date: string;
+        paycheckAmountCents: number;
+        payerName?: string;
+        allocations: Array<{ envelopeId: string; amountCents: number }>;
+        strategy?: "even_split" | "last_split" | "target_first" | "manual";
+      }>;
+
+      // Sort by date (newest first)
+      return parsed.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } catch (error) {
+      logger.error("Failed to get allocation history", {
+        reason: "parse_error",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Get most recent allocation history entry
+   * @returns Most recent entry or null
+   */
+  static getMostRecentAllocation(): {
+    id: string;
+    date: string;
+    paycheckAmountCents: number;
+    payerName?: string;
+    allocations: Array<{ envelopeId: string; amountCents: number }>;
+    strategy?: "even_split" | "last_split" | "target_first" | "manual";
+  } | null {
+    const history = this.getAllocationHistory();
+    return history[0] || null;
+  }
+
+  /**
+   * Get allocation history for specific payer
+   * @param payerName - Payer name to filter by
+   * @returns Array of allocation history entries for that payer
+   */
+  static getAllocationHistoryByPayer(payerName: string): Array<{
+    id: string;
+    date: string;
+    paycheckAmountCents: number;
+    payerName?: string;
+    allocations: Array<{ envelopeId: string; amountCents: number }>;
+    strategy?: "even_split" | "last_split" | "target_first" | "manual";
+  }> {
+    if (!payerName || payerName.trim() === "") return [];
+
+    const history = this.getAllocationHistory();
+    const normalized = payerName.trim().toLowerCase();
+
+    return history.filter((entry) => entry.payerName?.toLowerCase() === normalized);
   }
 }

@@ -11,6 +11,7 @@
 import { VioletVaultDB } from "@/db/budgetDb";
 import { Envelope, Transaction } from "@/db/types";
 import logger from "@/utils/core/common/logger";
+import { isDemoMode } from "@/utils/platform/demo/demoModeDetection";
 
 interface DemoDataResponse {
   envelopes: Envelope[];
@@ -89,6 +90,16 @@ export const loadDemoDataset = async (): Promise<DemoDataset> => {
  */
 export const seedDemoData = async (db: VioletVaultDB): Promise<void> => {
   try {
+    // 🛡️ Walled Garden: Guard against accidental execution
+    // Only allow if explicitly in demo mode or running tests
+    const isTest = process.env.NODE_ENV === "test";
+    if (!isDemoMode() && !isTest) {
+      logger.error(
+        "🛑 GUARD: Attempted to seed demo data outside of Demo Mode. Operation blocked."
+      );
+      return;
+    }
+
     logger.info("🌱 Seeding demo data into in-memory database...");
 
     // Load demo dataset

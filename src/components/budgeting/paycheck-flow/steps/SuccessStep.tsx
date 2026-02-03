@@ -2,10 +2,15 @@
  * Success Step - Celebration and summary (Step 3)
  * Full implementation for Issue #161
  * Part of Epic #156: Polyglot Human-Centered Paycheck Flow v2.1
+ * Enhanced with Historical Comparison Insights
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
+import { PaycheckHistoryService } from "@/utils/core/services/paycheckHistory";
+import { AllocationComparisonService } from "@/services/budgeting/allocationComparisonService";
+import { AllocationInsightsService } from "@/services/budgeting/allocationInsightsService";
+import AllocationInsights from "@/components/budgeting/paycheck-flow/AllocationInsights";
 import Button from "@/components/ui/buttons/Button";
 
 interface SuccessStepProps {
@@ -40,6 +45,44 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
   const topAllocations = sortedAllocations.slice(0, 5); // Show top 5
 
   const envelopesFunded = allocations.length;
+
+  // Generate insights from comparison with previous allocation
+  const insights = useMemo(() => {
+    if (!paycheckAmountCents || allocations.length === 0) {
+      return [];
+    }
+
+    const allocationHistory = PaycheckHistoryService.getAllocationHistory();
+
+    // NOTE: We assume `allocationHistory` is ordered with the most recent allocation at index 0.
+    // The ReviewStep saves the new allocation to history *before* navigating to this SuccessStep,
+    // so `allocationHistory[0]` is expected to be the allocation just created in this flow run,
+    // and `allocationHistory[1]` is treated as the "previous" allocation used for comparison.
+    // If the save order, history ordering, or persistence timing ever changes, this logic must be
+    // revisited, as the "previous" allocation may no longer be at index 1.
+    const previousAllocation = allocationHistory[1];
+
+    if (!previousAllocation) {
+      return [];
+    }
+
+    const currentSnapshot = AllocationComparisonService.createCurrentSnapshot(
+      paycheckAmountCents,
+      allocations,
+      payerName
+    );
+
+    const previousSnapshot =
+      AllocationComparisonService.createSnapshotFromHistory(previousAllocation);
+
+    const comparison = AllocationComparisonService.getComparison(currentSnapshot, previousSnapshot);
+
+    return AllocationInsightsService.generateInsights(
+      comparison.changes,
+      currentSnapshot,
+      previousSnapshot
+    );
+  }, [paycheckAmountCents, allocations, payerName]);
 
   // Handle finish - reset wizard state and close
   const handleFinish = () => {
@@ -112,6 +155,13 @@ const SuccessStep: React.FC<SuccessStepProps> = ({ onFinish }) => {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Insights Section */}
+      {insights.length > 0 && (
+        <div className="bg-white hard-border rounded-lg p-6 mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <AllocationInsights insights={insights} />
         </div>
       )}
 
