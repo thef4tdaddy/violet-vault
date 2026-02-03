@@ -8,6 +8,8 @@ import { useAuditTrail } from "@/hooks/privacy/useAuditTrail";
 import { EncryptedPayloadInspector } from "./EncryptedPayloadInspector";
 import Button from "@/components/ui/buttons/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ConfirmModal from "@/components/ui/modals/ConfirmModal";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import logger from "@/utils/core/common/logger";
 
 type ConnectionStatus = "idle" | "testing" | "success" | "error";
@@ -26,7 +28,9 @@ interface ConnectionTestResponse {
  */
 export function AnalyticsPrivacyDashboard(): React.ReactElement {
   const { logs, isLoading, clearLogs, exportLogs, count } = useAuditTrail();
+  const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [showInspector, setShowInspector] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("idle");
   const [connectionDetails, setConnectionDetails] = useState<string>("");
 
@@ -54,7 +58,9 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
 
       const data = (await response.json()) as ConnectionTestResponse;
       setConnectionStatus("success");
-      setConnectionDetails(`Connected to ${data.service} (v${data.version}) - Latency: ${latency}ms`);
+      setConnectionDetails(
+        `Connected to ${data.service} (v${data.version}) - Latency: ${latency}ms`
+      );
       logger.info("✅ Backend connection test successful", { latency, data });
     } catch (error) {
       setConnectionStatus("error");
@@ -67,18 +73,21 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
   /**
    * Handle clear logs with confirmation
    */
-  const handleClearLogs = useCallback(async () => {
-    if (!window.confirm("Are you sure you want to clear all audit logs?")) {
-      return;
-    }
+  const handleClearLogsClick = useCallback(() => {
+    setShowClearConfirm(true);
+  }, []);
 
+  const handleClearLogsConfirm = useCallback(async () => {
     try {
       await clearLogs();
+      setShowClearConfirm(false);
+      showSuccessToast("Audit logs cleared successfully");
     } catch (error) {
       logger.error("Failed to clear logs", error);
-      alert("Failed to clear logs. Please try again.");
+      showErrorToast("Failed to clear logs. Please try again.");
+      setShowClearConfirm(false);
     }
-  }, [clearLogs]);
+  }, [clearLogs, showSuccessToast, showErrorToast]);
 
   /**
    * Handle export logs
@@ -86,11 +95,12 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
   const handleExportLogs = useCallback(async () => {
     try {
       await exportLogs();
+      showSuccessToast("Audit logs exported successfully");
     } catch (error) {
       logger.error("Failed to export logs", error);
-      alert("Failed to export logs. Please try again.");
+      showErrorToast("Failed to export logs. Please try again.");
     }
-  }, [exportLogs]);
+  }, [exportLogs, showSuccessToast, showErrorToast]);
 
   return (
     <div className="space-y-6 p-4">
@@ -123,10 +133,10 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
         <div className="flex items-center gap-3">
           <StatusIndicator status={connectionStatus} />
           <div className="flex-1">
-            <span className="text-sm font-medium text-gray-900">{getStatusText(connectionStatus)}</span>
-            {connectionDetails && (
-              <p className="text-xs text-gray-600 mt-1">{connectionDetails}</p>
-            )}
+            <span className="text-sm font-medium text-gray-900">
+              {getStatusText(connectionStatus)}
+            </span>
+            {connectionDetails && <p className="text-xs text-gray-600 mt-1">{connectionDetails}</p>}
           </div>
         </div>
       </div>
@@ -144,14 +154,36 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleExportLogs} variant="outline" size="sm" disabled={logs.length === 0}>
+            <Button
+              onClick={handleExportLogs}
+              variant="outline"
+              size="sm"
+              disabled={logs.length === 0}
+            >
               Export CSV
             </Button>
-            <Button onClick={handleClearLogs} variant="destructive" size="sm" disabled={logs.length === 0}>
+            <Button
+              onClick={handleClearLogsClick}
+              variant="destructive"
+              size="sm"
+              disabled={logs.length === 0}
+            >
               Clear Log
             </Button>
           </div>
         </div>
+
+        {/* Clear Logs Confirmation Modal */}
+        <ConfirmModal
+          isOpen={showClearConfirm}
+          title="Clear Audit Logs"
+          message={`Are you sure you want to clear all ${count} audit log${count !== 1 ? "s" : ""}? This action cannot be undone.`}
+          confirmLabel="Clear All"
+          cancelLabel="Cancel"
+          destructive={true}
+          onConfirm={handleClearLogsConfirm}
+          onCancel={() => setShowClearConfirm(false)}
+        />
 
         <div className="overflow-x-auto">
           {isLoading ? (
@@ -161,7 +193,9 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
           ) : logs.length === 0 ? (
             <div className="text-center p-8 text-gray-500">
               <p className="text-sm">No API calls logged yet.</p>
-              <p className="text-xs mt-1">API calls will appear here once you use analytics features.</p>
+              <p className="text-xs mt-1">
+                API calls will appear here once you use analytics features.
+              </p>
             </div>
           ) : (
             <table className="w-full text-sm">

@@ -10,7 +10,6 @@ import logger from "@/utils/core/common/logger";
 
 const DB_NAME = "privacy-audit";
 const DB_VERSION = 1;
-const STORE_NAME = "auditLogs";
 const MAX_ENTRIES = 1000;
 
 /**
@@ -148,7 +147,7 @@ class AuditTrailService {
             const escaped = value.replace(/"/g, '""');
             return `"${escaped}"`;
           })
-          .join(","),
+          .join(",")
       )
       .join("\n");
 

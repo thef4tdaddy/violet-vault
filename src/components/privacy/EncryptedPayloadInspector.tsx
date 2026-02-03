@@ -129,14 +129,25 @@ async function generateSamplePayload(): Promise<EncryptedPayloadData> {
 
   const startTime = performance.now();
 
-  // Simple base64 encoding for demo (in production, use actual encryption)
+  // DEMO ONLY: Simple base64 encoding for visualization purposes.
+  // This is NOT actual encryption - just a demonstration of what the payload looks like.
+  // Real API calls use AES-256-GCM encryption (see src/utils/security/encryption.ts).
+  // Using btoa() here is intentional for demo simplicity (no Unicode in sample data).
   const encryptedData = btoa(JSON.stringify(originalData));
 
   const encryptionTime = performance.now() - startTime;
 
   // Generate sample IV and auth tag
-  const iv = Array.from({ length: 16 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, "0")).join("");
-  const authTag = Array.from({ length: 16 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, "0")).join("");
+  const iv = Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 256)
+      .toString(16)
+      .padStart(2, "0")
+  ).join("");
+  const authTag = Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 256)
+      .toString(16)
+      .padStart(2, "0")
+  ).join("");
 
   return {
     originalData,
