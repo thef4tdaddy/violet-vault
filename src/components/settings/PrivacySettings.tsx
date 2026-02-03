@@ -130,9 +130,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
                       <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
                         Privacy Level
                       </p>
-                      <p className="text-sm font-bold text-gray-900">
-                        {currentTier?.privacyLevel}
-                      </p>
+                      <p className="text-sm font-bold text-gray-900">{currentTier?.privacyLevel}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">

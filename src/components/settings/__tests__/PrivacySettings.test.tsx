@@ -31,11 +31,7 @@ vi.mock("@/components/privacy/AnalyticsTierCard", () => ({
     isSelected: boolean;
     onSelect: () => void;
   }) => (
-    <button
-      data-testid={`tier-card-${tier.id}`}
-      onClick={onSelect}
-      aria-pressed={isSelected}
-    >
+    <button data-testid={`tier-card-${tier.id}`} onClick={onSelect} aria-pressed={isSelected}>
       {tier.title}
     </button>
   ),

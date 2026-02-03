@@ -133,7 +133,11 @@ export const EnvelopeAllocationTrendsChart: React.FC<EnvelopeAllocationTrendsCha
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              className="dark:stroke-gray-700"
+            />
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
@@ -182,9 +186,7 @@ export const EnvelopeAllocationTrendsChart: React.FC<EnvelopeAllocationTrendsCha
                   key={`anomaly-${idx}`}
                   x={anomaly.date}
                   y={
-                    selectedEnvelopes.length > 0
-                      ? (dataPoint[selectedEnvelopes[0]!] as number)
-                      : 0
+                    selectedEnvelopes.length > 0 ? (dataPoint[selectedEnvelopes[0]!] as number) : 0
                   }
                   r={8}
                   fill={severityColor[anomaly.severity]}

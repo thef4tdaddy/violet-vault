@@ -263,7 +263,11 @@ const TabContent = ({ tab, tier, data }: TabContentProps) => {
     },
   ];
 
-  const mockAnomalies: Array<{ date: string; severity: "high" | "medium" | "low"; description: string }> = [];
+  const mockAnomalies: Array<{
+    date: string;
+    severity: "high" | "medium" | "low";
+    description: string;
+  }> = [];
 
   const mockHeatmapData = data.heatmap.dataPoints.map((point) => ({
     date: point.date,
@@ -278,10 +282,11 @@ const TabContent = ({ tab, tier, data }: TabContentProps) => {
     intensity: point.intensity,
   }));
 
-  const mockTrendData = data.trends.envelopes[0]?.dataPoints.map((point) => ({
-    date: point.date,
-    [data.trends.envelopes[0]!.id]: point.amountCents,
-  })) || [];
+  const mockTrendData =
+    data.trends.envelopes[0]?.dataPoints.map((point) => ({
+      date: point.date,
+      [data.trends.envelopes[0]!.id]: point.amountCents,
+    })) || [];
 
   const mockEnvelopeSparklines = data.trends.envelopes.map((env) => ({
     envelopeId: env.id,

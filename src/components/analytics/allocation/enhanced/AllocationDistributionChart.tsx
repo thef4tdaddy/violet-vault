@@ -125,9 +125,7 @@ export const AllocationDistributionChart: React.FC<AllocationDistributionChartPr
   return (
     <div ref={chartRef} className={`bg-white dark:bg-gray-800 rounded-lg p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-          Allocation Distribution
-        </h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Allocation Distribution</h3>
         <div className="flex gap-2">
           <ChartExportButton chartRef={chartRef} filename="allocation-distribution" />
         </div>
@@ -214,9 +212,7 @@ export const AllocationDistributionChart: React.FC<AllocationDistributionChartPr
               style={{ backgroundColor: data[activeIndex]!.color }}
             />
             <div className="flex-1">
-              <h4 className="font-bold text-gray-900 dark:text-white">
-                {data[activeIndex]!.name}
-              </h4>
+              <h4 className="font-bold text-gray-900 dark:text-white">{data[activeIndex]!.name}</h4>
               <div className="flex items-center gap-4 mt-1 text-sm text-gray-700 dark:text-gray-300">
                 <span>${(data[activeIndex]!.value / 100).toFixed(2)}</span>
                 <span>•</span>

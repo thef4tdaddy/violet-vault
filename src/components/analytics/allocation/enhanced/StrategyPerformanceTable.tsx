@@ -187,12 +187,14 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
 
       {/* Bar chart comparison */}
       <div className="mt-6">
-        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
-          Visual Comparison
-        </h4>
+        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Visual Comparison</h4>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={sorted}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              className="dark:stroke-gray-700"
+            />
             <XAxis dataKey="strategy" stroke="#6b7280" className="dark:stroke-gray-400" />
             <YAxis
               tickFormatter={(value: number) => `$${(value / 100).toFixed(0)}`}
@@ -201,7 +203,9 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
             />
             <Tooltip
               formatter={(value: number | undefined) =>
-                value !== undefined ? [`$${(value / 100).toFixed(2)}`, "Avg Amount"] : ["N/A", "Avg Amount"]
+                value !== undefined
+                  ? [`$${(value / 100).toFixed(2)}`, "Avg Amount"]
+                  : ["N/A", "Avg Amount"]
               }
               contentStyle={{
                 backgroundColor: "#fff",
@@ -232,14 +236,18 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
               {strategies.filter((s) => s.recommendation === "good").length > 0 && (
                 <p>
                   • {strategies.filter((s) => s.recommendation === "good").length} strateg
-                  {strategies.filter((s) => s.recommendation === "good").length === 1 ? "y" : "ies"}{" "}
+                  {strategies.filter((s) => s.recommendation === "good").length === 1
+                    ? "y"
+                    : "ies"}{" "}
                   rated as <strong>good</strong>.
                 </p>
               )}
               {strategies.filter((s) => s.recommendation === "poor").length > 0 && (
                 <p className="text-amber-700 dark:text-amber-400">
                   ⚠ {strategies.filter((s) => s.recommendation === "poor").length} strateg
-                  {strategies.filter((s) => s.recommendation === "poor").length === 1 ? "y" : "ies"}{" "}
+                  {strategies.filter((s) => s.recommendation === "poor").length === 1
+                    ? "y"
+                    : "ies"}{" "}
                   needs improvement.
                 </p>
               )}

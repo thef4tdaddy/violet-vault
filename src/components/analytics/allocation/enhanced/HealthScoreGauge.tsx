@@ -52,9 +52,7 @@ const ComponentProgress: React.FC<ComponentProgressProps> = ({ component }) => {
           <span className="text-sm font-bold text-gray-900 dark:text-white">
             {formatComponentName(component.component)}
           </span>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {component.description}
-          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{component.description}</p>
         </div>
         <span className="text-sm font-bold text-gray-900 dark:text-white">
           {component.score}/100

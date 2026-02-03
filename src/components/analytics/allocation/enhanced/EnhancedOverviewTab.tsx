@@ -179,7 +179,8 @@ export const EnhancedOverviewTab: React.FC<EnhancedOverviewTabProps> = ({
         ) : (
           <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <p className="text-gray-500 dark:text-gray-400">
-              No insights available yet. Process more paychecks to unlock AI-powered recommendations.
+              No insights available yet. Process more paychecks to unlock AI-powered
+              recommendations.
             </p>
           </div>
         )}
