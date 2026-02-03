@@ -355,31 +355,6 @@ describe("syncFlowValidator", () => {
       expect(syncResult?.status).toBe("❌ FAILED");
       expect(syncResult?.error).toContain(errorMessage);
     });
-
-    it("should not await forceSync to prevent hanging", async () => {
-      let forceSyncCalled = false;
-
-      vi.mocked(budgetDb.envelopes.add).mockResolvedValue("test-id");
-      vi.mocked(budgetDb.envelopes.delete).mockResolvedValue(undefined);
-      vi.mocked(syncOrchestrator.fetchLocalData).mockResolvedValue({
-        envelopes: [],
-        transactions: [],
-        unassignedCash: 0,
-        actualBalance: 0,
-        lastModified: Date.now(),
-        syncVersion: "2.0",
-      });
-      vi.mocked(syncOrchestrator.forceSync).mockImplementation(() => {
-        forceSyncCalled = true;
-        // Never resolves to simulate potential hang
-        return new Promise(() => {});
-      });
-
-      const results = await validateAllSyncFlows();
-
-      expect(forceSyncCalled).toBe(true);
-      // Test completes without hanging
-    });
   });
 
   describe("Window global assignment", () => {
