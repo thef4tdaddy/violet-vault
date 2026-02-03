@@ -1,7 +1,7 @@
 /**
  * Allocation Analytics Dashboard Types
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
- * 
+ *
  * Provides comprehensive types for analyzing paycheck allocation patterns,
  * trends, and financial health metrics over time.
  */
@@ -9,7 +9,7 @@
 /**
  * Allocation strategy types used during paycheck processing
  */
-export type AllocationStrategy = 'even_split' | 'last_split' | 'target_first';
+export type AllocationStrategy = "even_split" | "last_split" | "target_first";
 
 /**
  * Single allocation to an envelope from a paycheck
@@ -59,7 +59,7 @@ export interface HeatmapData {
   maxAmount: number;
   totalAllocations: number;
   missedPaychecks: string[]; // Dates of expected but missing paychecks
-  frequency: 'weekly' | 'biweekly' | 'semi-monthly' | 'monthly' | 'irregular';
+  frequency: "weekly" | "biweekly" | "semi-monthly" | "monthly" | "irregular";
 }
 
 /**
@@ -87,7 +87,7 @@ export interface TrendData {
     averageCents: number;
     minCents: number;
     maxCents: number;
-    trend: 'increasing' | 'decreasing' | 'stable';
+    trend: "increasing" | "decreasing" | "stable";
   }[];
   dateRange: {
     start: string;
@@ -114,7 +114,7 @@ export interface DistributionData {
   totalCents: number;
   averagePerPaycheckCents: number;
   budgetingRuleComparison?: {
-    rule: '50/30/20' | '60/20/20' | '70/20/10';
+    rule: "50/30/20" | "60/20/20" | "70/20/10";
     userActual: {
       essentials: number;
       discretionary: number;
@@ -172,10 +172,10 @@ export interface StrategyAnalysis {
  * Financial health score component
  */
 export interface HealthScoreComponent {
-  name: 'consistency' | 'billCoverage' | 'savingsRate' | 'emergencyFund' | 'discretionary';
+  name: "consistency" | "billCoverage" | "savingsRate" | "emergencyFund" | "discretionary";
   score: number; // 0-100
   weight: number; // 0-1
-  status: 'excellent' | 'good' | 'fair' | 'poor';
+  status: "excellent" | "good" | "fair" | "poor";
   description: string;
 }
 
@@ -184,7 +184,7 @@ export interface HealthScoreComponent {
  */
 export interface HealthRecommendation {
   id: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   title: string;
   description: string;
   actionable: string;
@@ -198,8 +198,8 @@ export interface FinancialHealthScore {
   totalScore: number; // 0-100
   components: HealthScoreComponent[];
   recommendations: HealthRecommendation[];
-  status: 'excellent' | 'good' | 'fair' | 'poor';
-  trend: 'improving' | 'declining' | 'stable';
+  status: "excellent" | "good" | "fair" | "poor";
+  trend: "improving" | "declining" | "stable";
   lastUpdated: string; // ISO datetime
 }
 
@@ -210,9 +210,9 @@ export interface AllocationAnalyticsFilters {
   dateRange: {
     start: string; // ISO date
     end: string; // ISO date
-    preset?: 'last30days' | 'last3months' | 'last6months' | 'lastYear' | 'custom';
+    preset?: "last30days" | "last3months" | "last6months" | "lastYear" | "custom";
   };
-  frequencies?: Array<'weekly' | 'biweekly' | 'semi-monthly' | 'monthly'>;
+  frequencies?: Array<"weekly" | "biweekly" | "semi-monthly" | "monthly">;
   payers?: string[];
   strategies?: AllocationStrategy[];
   minAmount?: number;
@@ -258,14 +258,14 @@ export interface ChartDataPoint {
 /**
  * Export format options
  */
-export type ExportFormat = 'csv' | 'pdf' | 'png' | 'json';
+export type ExportFormat = "csv" | "pdf" | "png" | "json";
 
 /**
  * Export request parameters
  */
 export interface ExportRequest {
   format: ExportFormat;
-  sections: Array<'heatmap' | 'trends' | 'distribution' | 'strategy' | 'health'>;
+  sections: Array<"heatmap" | "trends" | "distribution" | "strategy" | "health">;
   dateRange: {
     start: string;
     end: string;

@@ -1,19 +1,19 @@
 /**
  * Allocation Analytics Dashboard
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
- * 
+ *
  * Main container component for the allocation analytics dashboard.
  * Displays comprehensive visual analysis of paycheck allocation patterns.
  */
 
-import { useState } from 'react';
-import { useAllocationAnalytics } from '@/hooks/platform/analytics/useAllocationAnalytics';
+import Button from "@/components/ui/buttons/Button";
+import { useAllocationAnalytics } from "@/hooks/platform/analytics/useAllocationAnalytics";
 import {
   useAllocationAnalyticsStore,
   selectActiveTab,
   selectDateRange,
-} from '@/stores/ui/allocationAnalyticsStore';
-import logger from '@/utils/core/common/logger';
+} from "@/stores/ui/allocationAnalyticsStore";
+import logger from "@/utils/core/common/logger";
 
 /**
  * Loading state component
@@ -39,12 +39,7 @@ const ErrorState = ({ error, onRetry }: ErrorStateProps) => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="text-center max-w-md">
       <div className="text-red-500 mb-4">
-        <svg
-          className="w-16 h-16 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -57,12 +52,12 @@ const ErrorState = ({ error, onRetry }: ErrorStateProps) => (
         Failed to Load Analytics
       </h2>
       <p className="text-gray-600 dark:text-gray-400 mb-6">{error.message}</p>
-      <button
+      <Button
         onClick={onRetry}
         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
       >
         Try Again
-      </button>
+      </Button>
     </div>
   </div>
 );
@@ -74,12 +69,7 @@ const EmptyState = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="text-center max-w-md">
       <div className="text-gray-400 mb-4">
-        <svg
-          className="w-16 h-16 mx-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -94,15 +84,15 @@ const EmptyState = () => (
       <p className="text-gray-600 dark:text-gray-400 mb-6">
         Start by processing your first paycheck to see allocation analytics and trends.
       </p>
-      <button
+      <Button
         onClick={() => {
           // Navigate to paycheck processing
-          logger.info('Navigate to paycheck processing');
+          logger.info("Navigate to paycheck processing");
         }}
         className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
       >
         Process Paycheck
-      </button>
+      </Button>
     </div>
   </div>
 );
@@ -118,10 +108,10 @@ interface DashboardHeaderProps {
 
 const DashboardHeader = ({ totalAllocations, healthScore, dateRange }: DashboardHeaderProps) => {
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -129,9 +119,7 @@ const DashboardHeader = ({ totalAllocations, healthScore, dateRange }: Dashboard
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Allocation Analytics
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Allocation Analytics</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             {formatDate(dateRange.start)} - {formatDate(dateRange.end)}
           </p>
@@ -146,10 +134,10 @@ const DashboardHeader = ({ totalAllocations, healthScore, dateRange }: Dashboard
             <p
               className={`text-2xl font-bold ${
                 healthScore >= 80
-                  ? 'text-green-600'
+                  ? "text-green-600"
                   : healthScore >= 60
-                    ? 'text-yellow-600'
-                    : 'text-red-600'
+                    ? "text-yellow-600"
+                    : "text-red-600"
               }`}
             >
               {healthScore}/100
@@ -169,33 +157,33 @@ const TabNavigation = () => {
   const setActiveTab = useAllocationAnalyticsStore((state) => state.setActiveTab);
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'heatmap', label: 'Calendar', icon: '📅' },
-    { id: 'trends', label: 'Trends', icon: '📈' },
-    { id: 'distribution', label: 'Distribution', icon: '🥧' },
-    { id: 'strategy', label: 'Strategy', icon: '🎯' },
-    { id: 'health', label: 'Health', icon: '💚' },
+    { id: "overview", label: "Overview", icon: "📊" },
+    { id: "heatmap", label: "Calendar", icon: "📅" },
+    { id: "trends", label: "Trends", icon: "📈" },
+    { id: "distribution", label: "Distribution", icon: "🥧" },
+    { id: "strategy", label: "Strategy", icon: "🎯" },
+    { id: "health", label: "Health", icon: "💚" },
   ] as const;
 
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
       <nav className="flex space-x-8">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`
               py-4 px-1 border-b-2 font-medium text-sm transition-colors
               ${
                 activeTab === tab.id
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? "border-purple-600 text-purple-600 dark:text-purple-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }
             `}
           >
             <span className="mr-2">{tab.icon}</span>
             {tab.label}
-          </button>
+          </Button>
         ))}
       </nav>
     </div>
@@ -215,7 +203,7 @@ const TabContent = ({ tab }: { tab: string }) => (
 
 /**
  * Main Allocation Analytics Dashboard Component
- * 
+ *
  * @example
  * ```tsx
  * <AllocationAnalyticsDashboard />
@@ -224,7 +212,6 @@ const TabContent = ({ tab }: { tab: string }) => (
 export const AllocationAnalyticsDashboard = () => {
   const activeTab = useAllocationAnalyticsStore(selectActiveTab);
   const dateRange = useAllocationAnalyticsStore(selectDateRange);
-  const [retryCount, setRetryCount] = useState(0);
 
   // Fetch analytics data
   const { data, isLoading, error, refetch } = useAllocationAnalytics({
@@ -239,7 +226,6 @@ export const AllocationAnalyticsDashboard = () => {
 
   // Handle retry
   const handleRetry = () => {
-    setRetryCount((prev) => prev + 1);
     refetch();
   };
 
@@ -278,8 +264,9 @@ export const AllocationAnalyticsDashboard = () => {
         {import.meta.env.DEV && (
           <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
             <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-              Debug: {data.heatmap.totalAllocations} allocations, Health: {data.healthScore.totalScore}
-              , Envelopes: {data.trends.envelopes.length}, Strategies: {data.strategyAnalysis.strategies.length}
+              Debug: {data.heatmap.totalAllocations} allocations, Health:{" "}
+              {data.healthScore.totalScore}, Envelopes: {data.trends.envelopes.length}, Strategies:{" "}
+              {data.strategyAnalysis.strategies.length}
             </p>
           </div>
         )}

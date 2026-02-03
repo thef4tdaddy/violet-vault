@@ -11,7 +11,7 @@ The Allocation Analytics Dashboard provides comprehensive visualization and anal
 ### 📊 Core Analytics
 
 1. **Allocation Heatmap** - Calendar view showing paycheck allocation activity with intensity-based coloring
-2. **Envelope Trend Lines** - Multi-series charts tracking allocation to specific envelopes over time  
+2. **Envelope Trend Lines** - Multi-series charts tracking allocation to specific envelopes over time
 3. **Allocation Distribution** - Pie/donut charts showing proportional allocation across categories
 4. **Strategy Performance** - Analysis comparing EVEN_SPLIT, LAST_SPLIT, and TARGET_FIRST strategies
 5. **Financial Health Score** - Composite score (0-100) based on allocation patterns
@@ -31,6 +31,7 @@ The Allocation Analytics Dashboard provides comprehensive visualization and anal
 **Location**: `/src/types/allocationAnalytics.ts`
 
 Comprehensive TypeScript types for all analytics data structures:
+
 - `AllocationAnalytics` - Complete analytics data
 - `HeatmapData` - Calendar heatmap visualization data
 - `TrendData` - Envelope trend analysis
@@ -43,6 +44,7 @@ Comprehensive TypeScript types for all analytics data structures:
 **Location**: `/src/domain/schemas/allocationAnalytics.ts`
 
 Zod schemas for runtime validation:
+
 - Input validation for API params
 - Output validation for service responses
 - Type inference from schemas
@@ -56,18 +58,25 @@ Business logic for analytics calculations:
 
 ```typescript
 class AllocationAnalyticsService {
-  static async getAnalytics(params: AllocationAnalyticsParams): Promise<AllocationAnalytics>
-  
+  static async getAnalytics(params: AllocationAnalyticsParams): Promise<AllocationAnalytics>;
+
   // Private methods for specific calculations
-  private static async generateHeatmap(records: PaycheckAllocationRecord[]): Promise<HeatmapData>
-  private static async calculateTrends(records: PaycheckAllocationRecord[]): Promise<TrendData>
-  private static async calculateDistribution(records: PaycheckAllocationRecord[]): Promise<DistributionData>
-  private static async analyzeStrategies(records: PaycheckAllocationRecord[]): Promise<StrategyAnalysis>
-  private static async calculateHealthScore(records: PaycheckAllocationRecord[]): Promise<FinancialHealthScore>
+  private static async generateHeatmap(records: PaycheckAllocationRecord[]): Promise<HeatmapData>;
+  private static async calculateTrends(records: PaycheckAllocationRecord[]): Promise<TrendData>;
+  private static async calculateDistribution(
+    records: PaycheckAllocationRecord[]
+  ): Promise<DistributionData>;
+  private static async analyzeStrategies(
+    records: PaycheckAllocationRecord[]
+  ): Promise<StrategyAnalysis>;
+  private static async calculateHealthScore(
+    records: PaycheckAllocationRecord[]
+  ): Promise<FinancialHealthScore>;
 }
 ```
 
 **Key Features**:
+
 - Paycheck frequency detection (weekly, biweekly, monthly)
 - Missed paycheck identification
 - Trend analysis with direction detection
@@ -93,6 +102,7 @@ useAllocationHealthScore(startDate: string, endDate: string)
 ```
 
 **Features**:
+
 - 5-minute stale time (configurable)
 - 10-minute cache time (configurable)
 - Automatic retry with exponential backoff
@@ -108,30 +118,31 @@ UI state management store:
 ```typescript
 interface AllocationAnalyticsStoreState {
   // Navigation
-  activeTab: AnalyticsDashboardTab
-  
+  activeTab: AnalyticsDashboardTab;
+
   // Filters
-  filters: DashboardFilters
-  
+  filters: DashboardFilters;
+
   // Chart preferences
-  trendChartType: TrendChartType
-  selectedEnvelopes: string[]
-  showLegend: boolean
-  showGrid: boolean
-  
+  trendChartType: TrendChartType;
+  selectedEnvelopes: string[];
+  showLegend: boolean;
+  showGrid: boolean;
+
   // Export state
-  isExporting: boolean
-  exportFormat: ExportFormat | null
-  
+  isExporting: boolean;
+  exportFormat: ExportFormat | null;
+
   // Actions
-  setActiveTab(tab: AnalyticsDashboardTab): void
-  setDateRange(start: string, end: string, preset?: DateRangePreset): void
-  setTrendChartType(type: TrendChartType): void
+  setActiveTab(tab: AnalyticsDashboardTab): void;
+  setDateRange(start: string, end: string, preset?: DateRangePreset): void;
+  setTrendChartType(type: TrendChartType): void;
   // ... more actions
 }
 ```
 
 **Features**:
+
 - Persisted user preferences (chart type, legend, grid)
 - Date range presets (last 30 days, 3 months, 6 months, year)
 - Filter management (payers, strategies, frequencies)
@@ -145,22 +156,16 @@ Main dashboard component:
 
 ```tsx
 <AllocationAnalyticsDashboard>
-  <DashboardHeader 
-    totalAllocations={number}
-    healthScore={number}
-    dateRange={DateRange}
-  />
-  
-  <TabNavigation 
-    activeTab={AnalyticsDashboardTab}
-    onChange={Function}
-  />
-  
+  <DashboardHeader totalAllocations={number} healthScore={number} dateRange={DateRange} />
+
+  <TabNavigation activeTab={AnalyticsDashboardTab} onChange={Function} />
+
   <TabContent tab={string} />
 </AllocationAnalyticsDashboard>
 ```
 
 **States**:
+
 - Loading state with spinner
 - Error state with retry button
 - Empty state with CTA to process paycheck
@@ -171,7 +176,7 @@ Main dashboard component:
 ### Basic Usage
 
 ```tsx
-import { AllocationAnalyticsDashboard } from '@/components/analytics/allocation/AllocationAnalyticsDashboard';
+import { AllocationAnalyticsDashboard } from "@/components/analytics/allocation/AllocationAnalyticsDashboard";
 
 function App() {
   return <AllocationAnalyticsDashboard />;
@@ -181,27 +186,27 @@ function App() {
 ### Custom Date Range
 
 ```tsx
-import { useAllocationAnalyticsStore } from '@/stores/ui/allocationAnalyticsStore';
+import { useAllocationAnalyticsStore } from "@/stores/ui/allocationAnalyticsStore";
 
 function MyComponent() {
-  const setDateRange = useAllocationAnalyticsStore(state => state.setDateRange);
-  
+  const setDateRange = useAllocationAnalyticsStore((state) => state.setDateRange);
+
   // Set last 6 months
-  setDateRange('2025-07-01', '2026-01-01', 'last6months');
+  setDateRange("2025-07-01", "2026-01-01", "last6months");
 }
 ```
 
 ### Fetching Specific Analytics
 
 ```tsx
-import { useAllocationHeatmap } from '@/hooks/platform/analytics/useAllocationAnalytics';
+import { useAllocationHeatmap } from "@/hooks/platform/analytics/useAllocationAnalytics";
 
 function HeatmapComponent() {
-  const { data, isLoading, error } = useAllocationHeatmap('2026-01-01', '2026-01-31');
-  
+  const { data, isLoading, error } = useAllocationHeatmap("2026-01-01", "2026-01-31");
+
   if (isLoading) return <Loading />;
   if (error) return <Error error={error} />;
-  
+
   return <Heatmap data={data.heatmap} />;
 }
 ```
@@ -214,15 +219,15 @@ function HeatmapComponent() {
 Navigate to the dashboard:
 
 ```tsx
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function MyComponent() {
   const navigate = useNavigate();
-  
+
   const goToAnalytics = () => {
-    navigate('/app/analytics/allocations');
+    navigate("/app/analytics/allocations");
   };
-  
+
   return <button onClick={goToAnalytics}>View Analytics</button>;
 }
 ```
@@ -240,6 +245,7 @@ npm run test
 ```
 
 **Test Coverage**:
+
 - ✅ Analytics data structure validation
 - ✅ Empty state handling
 - ✅ Parameter handling (include flags)
@@ -307,7 +313,7 @@ Component Renders (Dashboard UI)
 ### Total Score
 
 ```typescript
-totalScore = sum(component.score * component.weight)
+totalScore = sum(component.score * component.weight);
 ```
 
 ### Status Thresholds

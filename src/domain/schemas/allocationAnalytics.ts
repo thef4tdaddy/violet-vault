@@ -1,17 +1,17 @@
 /**
  * Allocation Analytics Zod Schemas
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
- * 
+ *
  * Runtime validation schemas for allocation analytics data structures.
  * Provides type safety for API responses, cache data, and user inputs.
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Allocation strategy schema
  */
-export const AllocationStrategySchema = z.enum(['even_split', 'last_split', 'target_first']);
+export const AllocationStrategySchema = z.enum(["even_split", "last_split", "target_first"]);
 
 /**
  * Single allocation item schema
@@ -61,7 +61,7 @@ export const HeatmapDataSchema = z.object({
   maxAmount: z.number(),
   totalAllocations: z.number().int().nonnegative(),
   missedPaychecks: z.array(z.string()),
-  frequency: z.enum(['weekly', 'biweekly', 'semi-monthly', 'monthly', 'irregular']),
+  frequency: z.enum(["weekly", "biweekly", "semi-monthly", "monthly", "irregular"]),
 });
 
 /**
@@ -92,7 +92,7 @@ export const TrendDataSchema = z.object({
       averageCents: z.number(),
       minCents: z.number(),
       maxCents: z.number(),
-      trend: z.enum(['increasing', 'decreasing', 'stable']),
+      trend: z.enum(["increasing", "decreasing", "stable"]),
     })
   ),
   dateRange: z.object({
@@ -121,7 +121,7 @@ export const DistributionDataSchema = z.object({
   averagePerPaycheckCents: z.number(),
   budgetingRuleComparison: z
     .object({
-      rule: z.enum(['50/30/20', '60/20/20', '70/20/10']),
+      rule: z.enum(["50/30/20", "60/20/20", "70/20/10"]),
       userActual: z.object({
         essentials: z.number().min(0).max(100),
         discretionary: z.number().min(0).max(100),
@@ -169,10 +169,10 @@ export const StrategyAnalysisSchema = z.object({
  * Health score component schema
  */
 export const HealthScoreComponentSchema = z.object({
-  name: z.enum(['consistency', 'billCoverage', 'savingsRate', 'emergencyFund', 'discretionary']),
+  name: z.enum(["consistency", "billCoverage", "savingsRate", "emergencyFund", "discretionary"]),
   score: z.number().min(0).max(100),
   weight: z.number().min(0).max(1),
-  status: z.enum(['excellent', 'good', 'fair', 'poor']),
+  status: z.enum(["excellent", "good", "fair", "poor"]),
   description: z.string(),
 });
 
@@ -181,7 +181,7 @@ export const HealthScoreComponentSchema = z.object({
  */
 export const HealthRecommendationSchema = z.object({
   id: z.string(),
-  priority: z.enum(['high', 'medium', 'low']),
+  priority: z.enum(["high", "medium", "low"]),
   title: z.string(),
   description: z.string(),
   actionable: z.string(),
@@ -195,8 +195,8 @@ export const FinancialHealthScoreSchema = z.object({
   totalScore: z.number().min(0).max(100),
   components: z.array(HealthScoreComponentSchema),
   recommendations: z.array(HealthRecommendationSchema),
-  status: z.enum(['excellent', 'good', 'fair', 'poor']),
-  trend: z.enum(['improving', 'declining', 'stable']),
+  status: z.enum(["excellent", "good", "fair", "poor"]),
+  trend: z.enum(["improving", "declining", "stable"]),
   lastUpdated: z.string().datetime(),
 });
 
@@ -207,11 +207,9 @@ export const AllocationAnalyticsFiltersSchema = z.object({
   dateRange: z.object({
     start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    preset: z.enum(['last30days', 'last3months', 'last6months', 'lastYear', 'custom']).optional(),
+    preset: z.enum(["last30days", "last3months", "last6months", "lastYear", "custom"]).optional(),
   }),
-  frequencies: z
-    .array(z.enum(['weekly', 'biweekly', 'semi-monthly', 'monthly']))
-    .optional(),
+  frequencies: z.array(z.enum(["weekly", "biweekly", "semi-monthly", "monthly"])).optional(),
   payers: z.array(z.string()).optional(),
   strategies: z.array(AllocationStrategySchema).optional(),
   minAmount: z.number().optional(),
@@ -250,8 +248,8 @@ export const AllocationAnalyticsParamsSchema = z.object({
  * Export request schema
  */
 export const ExportRequestSchema = z.object({
-  format: z.enum(['csv', 'pdf', 'png', 'json']),
-  sections: z.array(z.enum(['heatmap', 'trends', 'distribution', 'strategy', 'health'])),
+  format: z.enum(["csv", "pdf", "png", "json"]),
+  sections: z.array(z.enum(["heatmap", "trends", "distribution", "strategy", "health"])),
   dateRange: z.object({
     start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

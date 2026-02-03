@@ -5,7 +5,8 @@ Core logic for generating realistic financial transactions
 
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from typing import Any, cast
 
 from faker import Faker
 
@@ -26,7 +27,7 @@ fake = Faker()
 
 
 # Category mappings for realistic spending
-CATEGORY_CONFIGS = {
+CATEGORY_CONFIGS: dict[str, dict[str, Any]] = {
     "Groceries": {
         "budget_pct": 0.15,
         "variance": 0.3,
@@ -109,26 +110,20 @@ def generate_financial_simulation(config: SimulationConfig) -> SimulationResult:
 
     while current_date < end_date:
         # Generate income transactions
-        income_txns = _generate_income_transactions(
-            current_date, config, envelopes
-        )
+        income_txns = _generate_income_transactions(current_date, config, envelopes)
         transactions.extend(income_txns)
         total_balance += sum(t.amount for t in income_txns)
 
         # Check for life events
         if config.enable_life_events and random.random() < config.life_event_probability / 30:
-            event, event_txns = _generate_life_event(
-                current_date, config, envelopes
-            )
+            event, event_txns = _generate_life_event(current_date, config, envelopes)
             if event:
                 life_events.append(event)
                 transactions.extend(event_txns)
                 total_balance += sum(t.amount for t in event_txns)
 
         # Generate daily expenses
-        expense_txns = _generate_daily_expenses(
-            current_date, config, envelopes
-        )
+        expense_txns = _generate_daily_expenses(current_date, config, envelopes)
         transactions.extend(expense_txns)
         total_balance += sum(t.amount for t in expense_txns)  # Amounts are negative
 
@@ -165,11 +160,11 @@ def _generate_envelopes(config: SimulationConfig) -> list[GeneratedEnvelope]:
 
     # Select categories based on num_envelopes
     all_categories = list(CATEGORY_CONFIGS.keys())
-    categories = all_categories[:config.num_envelopes]
+    categories = all_categories[: config.num_envelopes]
 
     # Calculate total budget percentage for selected categories
     selected_configs = [CATEGORY_CONFIGS[cat] for cat in categories]
-    total_selected_pct = sum(cfg["budget_pct"] for cfg in selected_configs)
+    total_selected_pct = sum(cast(float, cfg["budget_pct"]) for cfg in selected_configs)
 
     # Normalize to use full income (scale up if needed)
     normalization_factor = 1.0 / total_selected_pct if total_selected_pct > 0 else 1.0
@@ -177,7 +172,11 @@ def _generate_envelopes(config: SimulationConfig) -> list[GeneratedEnvelope]:
     for i, category in enumerate(categories):
         category_config = CATEGORY_CONFIGS[category]
         # Normalize budget allocation to use full income
-        monthly_budget = config.monthly_income * category_config["budget_pct"] * normalization_factor
+        monthly_budget = (
+            config.monthly_income
+            * cast(float, category_config["budget_pct"])
+            * normalization_factor
+        )
 
         envelope = GeneratedEnvelope(
             id=f"env-{uuid.uuid4().hex[:8]}",
@@ -197,7 +196,7 @@ def _generate_envelopes(config: SimulationConfig) -> list[GeneratedEnvelope]:
 
 
 def _generate_income_transactions(
-    income_date: datetime.date,
+    income_date: date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> list[GeneratedTransaction]:
@@ -238,7 +237,9 @@ def _generate_income_transactions(
                 category="Income",
                 type="income",
                 lastModified=int(datetime.now().timestamp() * 1000),
-                createdAt=int(datetime.combine(income_date, datetime.min.time()).timestamp() * 1000),
+                createdAt=int(
+                    datetime.combine(income_date, datetime.min.time()).timestamp() * 1000
+                ),
                 description="Paycheck",
                 merchant="Employer",
                 isScheduled=False,
@@ -249,7 +250,7 @@ def _generate_income_transactions(
 
 
 def _generate_life_event(
-    event_date: datetime.date,
+    event_date: date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> tuple[LifeEvent | None, list[GeneratedTransaction]]:
@@ -280,32 +281,38 @@ def _generate_life_event(
 
     if event_type == LifeEventType.CAR_REPAIR:
         amount = -random.uniform(300, 1500)
-        description = random.choice([
-            "Transmission repair",
-            "Brake replacement",
-            "Engine diagnostics",
-            "Tire replacement",
-        ])
+        description = random.choice(
+            [
+                "Transmission repair",
+                "Brake replacement",
+                "Engine diagnostics",
+                "Tire replacement",
+            ]
+        )
         merchant = fake.company() + " Auto Repair"
         category = "Transportation"
     elif event_type == LifeEventType.MEDICAL_EMERGENCY:
         amount = -random.uniform(200, 2000)
-        description = random.choice([
-            "Emergency room visit",
-            "Urgent care",
-            "Dental emergency",
-            "Prescription medication",
-        ])
+        description = random.choice(
+            [
+                "Emergency room visit",
+                "Urgent care",
+                "Dental emergency",
+                "Prescription medication",
+            ]
+        )
         merchant = fake.company() + " Medical Center"
         category = "Healthcare"
     elif event_type == LifeEventType.HOME_REPAIR:
         amount = -random.uniform(400, 2500)
-        description = random.choice([
-            "Plumbing repair",
-            "HVAC maintenance",
-            "Roof repair",
-            "Appliance replacement",
-        ])
+        description = random.choice(
+            [
+                "Plumbing repair",
+                "HVAC maintenance",
+                "Roof repair",
+                "Appliance replacement",
+            ]
+        )
         merchant = fake.company() + " Home Services"
         category = "Miscellaneous"
     elif event_type == LifeEventType.BONUS:
@@ -361,7 +368,7 @@ def _generate_life_event(
 
 
 def _generate_daily_expenses(
-    expense_date: datetime.date,
+    expense_date: date,
     config: SimulationConfig,
     envelopes: list[GeneratedEnvelope],
 ) -> list[GeneratedTransaction]:
@@ -397,8 +404,7 @@ def _generate_daily_expenses(
     for _ in range(num_txns):
         # Select random expense category
         expense_categories = [
-            cat for cat in CATEGORY_CONFIGS.keys()
-            if cat not in ["Savings", "Income"]
+            cat for cat in CATEGORY_CONFIGS.keys() if cat not in ["Savings", "Income"]
         ]
         category = random.choice(expense_categories)
         cat_config = CATEGORY_CONFIGS[category]
@@ -413,14 +419,14 @@ def _generate_daily_expenses(
 
         # Calculate transaction amount
         daily_budget = (envelope.monthlyBudget / 30) * style["budget_utilization"]
-        variance = cat_config["variance"] * style["variance_multiplier"]
+        variance = cast(float, cat_config["variance"]) * style["variance_multiplier"]
 
         base_amount = daily_budget * random.uniform(0.5, 1.8)
         variance_factor = random.uniform(1 - variance, 1 + variance)
         amount = -(base_amount * variance_factor)
 
         # Generate merchant name
-        merchant_types = cat_config["merchant_types"]
+        merchant_types = cast(list[str], cat_config["merchant_types"])
         if merchant_types:
             merchant = fake.company() + " " + random.choice(merchant_types)
         else:
@@ -436,9 +442,7 @@ def _generate_daily_expenses(
             "Shopping": ["Clothing", "Electronics", "Home goods"],
             "Healthcare": ["Prescription", "Co-pay", "Medical supplies"],
         }
-        description = random.choice(
-            descriptions.get(category, ["Purchase"])
-        )
+        description = random.choice(descriptions.get(category, ["Purchase"]))
 
         txn = GeneratedTransaction(
             id=f"txn-{uuid.uuid4().hex[:12]}",

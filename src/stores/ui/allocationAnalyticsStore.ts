@@ -1,40 +1,40 @@
 /**
  * Allocation Analytics Dashboard UI Store
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
- * 
+ *
  * Zustand store for managing UI state of the allocation analytics dashboard.
  * Handles filters, active tabs, chart types, and export states.
- * 
+ *
  * CRITICAL: This store is for UI STATE ONLY.
  * Server/data state is managed by TanStack Query hooks.
  */
 
-import { create } from 'zustand';
-import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import logger from '@/utils/core/common/logger';
-import type { AllocationStrategy, ExportFormat } from '@/types/allocationAnalytics';
+import { create } from "zustand";
+import { devtools, persist, createJSONStorage } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import logger from "@/utils/core/common/logger";
+import type { AllocationStrategy, ExportFormat } from "@/types/allocationAnalytics";
 
 /**
  * Active tab in the analytics dashboard
  */
 export type AnalyticsDashboardTab =
-  | 'overview'
-  | 'heatmap'
-  | 'trends'
-  | 'distribution'
-  | 'strategy'
-  | 'health';
+  | "overview"
+  | "heatmap"
+  | "trends"
+  | "distribution"
+  | "strategy"
+  | "health";
 
 /**
  * Date range preset options
  */
-export type DateRangePreset = 'last30days' | 'last3months' | 'last6months' | 'lastYear' | 'custom';
+export type DateRangePreset = "last30days" | "last3months" | "last6months" | "lastYear" | "custom";
 
 /**
  * Chart type for trend visualization
  */
-export type TrendChartType = 'line' | 'area' | 'bar';
+export type TrendChartType = "line" | "area" | "bar";
 
 /**
  * Dashboard filters
@@ -45,7 +45,7 @@ interface DashboardFilters {
     end: string; // ISO date
     preset: DateRangePreset;
   };
-  frequencies: Array<'weekly' | 'biweekly' | 'semi-monthly' | 'monthly'>;
+  frequencies: Array<"weekly" | "biweekly" | "semi-monthly" | "monthly">;
   payers: string[];
   strategies: AllocationStrategy[];
   minAmount: number | null;
@@ -80,7 +80,7 @@ interface AllocationAnalyticsStoreState {
   setActiveTab: (tab: AnalyticsDashboardTab) => void;
   setDateRange: (start: string, end: string, preset?: DateRangePreset) => void;
   setDateRangePreset: (preset: DateRangePreset) => void;
-  setFrequencies: (frequencies: Array<'weekly' | 'biweekly' | 'semi-monthly' | 'monthly'>) => void;
+  setFrequencies: (frequencies: Array<"weekly" | "biweekly" | "semi-monthly" | "monthly">) => void;
   setPayers: (payers: string[]) => void;
   setStrategies: (strategies: AllocationStrategy[]) => void;
   setAmountRange: (min: number | null, max: number | null) => void;
@@ -108,8 +108,8 @@ const getDefaultDateRange = (): { start: string; end: string } => {
   startDate.setMonth(startDate.getMonth() - 3);
 
   return {
-    start: startDate.toISOString().split('T')[0]!,
-    end: endDate.toISOString().split('T')[0]!,
+    start: startDate.toISOString().split("T")[0]!,
+    end: endDate.toISOString().split("T")[0]!,
   };
 };
 
@@ -117,19 +117,19 @@ const getDefaultDateRange = (): { start: string; end: string } => {
  * Initial state
  */
 const initialState = {
-  activeTab: 'overview' as AnalyticsDashboardTab,
+  activeTab: "overview" as AnalyticsDashboardTab,
   filters: {
     dateRange: {
       ...getDefaultDateRange(),
-      preset: 'last3months' as DateRangePreset,
+      preset: "last3months" as DateRangePreset,
     },
-    frequencies: [] as Array<'weekly' | 'biweekly' | 'semi-monthly' | 'monthly'>,
+    frequencies: [] as Array<"weekly" | "biweekly" | "semi-monthly" | "monthly">,
     payers: [] as string[],
     strategies: [] as AllocationStrategy[],
     minAmount: null,
     maxAmount: null,
   },
-  trendChartType: 'line' as TrendChartType,
+  trendChartType: "line" as TrendChartType,
   selectedEnvelopes: [] as string[],
   showLegend: true,
   showGrid: true,
@@ -141,11 +141,11 @@ const initialState = {
 
 /**
  * Allocation Analytics Dashboard Store
- * 
+ *
  * @example
  * ```tsx
  * const { activeTab, setActiveTab, filters } = useAllocationAnalyticsStore();
- * 
+ *
  * return (
  *   <div>
  *     <Tabs activeTab={activeTab} onChange={setActiveTab} />
@@ -164,7 +164,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
         setActiveTab: (tab: AnalyticsDashboardTab) =>
           set((state) => {
             state.activeTab = tab;
-            logger.info('Analytics tab changed', { tab });
+            logger.info("Analytics tab changed", { tab });
           }),
 
         // Filter actions
@@ -172,7 +172,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
           set((state) => {
             state.filters.dateRange.start = start;
             state.filters.dateRange.end = end;
-            state.filters.dateRange.preset = preset || 'custom';
+            state.filters.dateRange.preset = preset || "custom";
           }),
 
         setDateRangePreset: (preset: DateRangePreset) =>
@@ -181,25 +181,25 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
             const startDate = new Date();
 
             switch (preset) {
-              case 'last30days':
+              case "last30days":
                 startDate.setDate(today.getDate() - 30);
                 break;
-              case 'last3months':
+              case "last3months":
                 startDate.setMonth(today.getMonth() - 3);
                 break;
-              case 'last6months':
+              case "last6months":
                 startDate.setMonth(today.getMonth() - 6);
                 break;
-              case 'lastYear':
+              case "lastYear":
                 startDate.setFullYear(today.getFullYear() - 1);
                 break;
-              case 'custom':
+              case "custom":
                 // Keep current dates for custom
                 return;
             }
 
-            state.filters.dateRange.start = startDate.toISOString().split('T')[0]!;
-            state.filters.dateRange.end = today.toISOString().split('T')[0]!;
+            state.filters.dateRange.start = startDate.toISOString().split("T")[0]!;
+            state.filters.dateRange.end = today.toISOString().split("T")[0]!;
             state.filters.dateRange.preset = preset;
           }),
 
@@ -227,7 +227,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
         resetFilters: () =>
           set((state) => {
             state.filters = { ...initialState.filters };
-            logger.info('Analytics filters reset');
+            logger.info("Analytics filters reset");
           }),
 
         // Chart preference actions
@@ -291,18 +291,18 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
         startExport: () =>
           set((state) => {
             state.isExporting = true;
-            logger.info('Export started', { format: state.exportFormat });
+            logger.info("Export started", { format: state.exportFormat });
           }),
 
         finishExport: () =>
           set((state) => {
             state.isExporting = false;
             state.isExportModalOpen = false;
-            logger.info('Export completed');
+            logger.info("Export completed");
           }),
       })),
       {
-        name: 'allocation-analytics-storage',
+        name: "allocation-analytics-storage",
         storage: createJSONStorage(() => localStorage),
         version: 1,
 
@@ -331,7 +331,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
               ...currentState.filters,
               dateRange: {
                 ...getDefaultDateRange(),
-                preset: persisted.filters?.dateRange?.preset || 'last3months',
+                preset: persisted.filters?.dateRange?.preset || "last3months",
               },
             },
           };
@@ -339,7 +339,7 @@ export const useAllocationAnalyticsStore = create<AllocationAnalyticsStoreState>
       }
     ),
     {
-      name: 'AllocationAnalyticsStore',
+      name: "AllocationAnalyticsStore",
       enabled: import.meta.env.DEV,
     }
   )

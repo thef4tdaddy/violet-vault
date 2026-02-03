@@ -1,14 +1,14 @@
 /**
  * Allocation Analytics Service
  * Created for Issue: Allocation Analytics Dashboard - Visual Trends & Heatmaps
- * 
+ *
  * Business logic for calculating allocation analytics, trends, and health scores.
  * This service aggregates paycheck allocation data and generates insights.
  */
 
-import { db } from '@/db/budgetDb';
-import logger from '@/utils/core/common/logger';
-import type { Transaction } from '@/db/types';
+import { budgetDb as db } from "@/db/budgetDb";
+import logger from "@/utils/core/common/logger";
+import type { Transaction } from "@/db/types";
 import type {
   AllocationAnalytics,
   AllocationAnalyticsParams,
@@ -22,7 +22,7 @@ import type {
   HeatmapDataPoint,
   HealthScoreComponent,
   HealthRecommendation,
-} from '@/types/allocationAnalytics';
+} from "@/types/allocationAnalytics";
 
 /**
  * Allocation Analytics Service
@@ -34,7 +34,7 @@ export class AllocationAnalyticsService {
    */
   static async getAnalytics(params: AllocationAnalyticsParams): Promise<AllocationAnalytics> {
     try {
-      logger.info('Calculating allocation analytics', {
+      logger.info("Calculating allocation analytics", {
         userId: params.userId,
         dateRange: `${params.startDate} to ${params.endDate}`,
       });
@@ -88,14 +88,14 @@ export class AllocationAnalyticsService {
         cacheKey: this.generateCacheKey(params),
       };
 
-      logger.info('Analytics calculation complete', {
+      logger.info("Analytics calculation complete", {
         totalPaychecks: paycheckRecords.length,
         healthScore: healthScore.totalScore,
       });
 
       return analytics;
     } catch (error) {
-      logger.error('Failed to calculate analytics', error);
+      logger.error("Failed to calculate analytics", error);
       throw error;
     }
   }
@@ -104,51 +104,59 @@ export class AllocationAnalyticsService {
    * Fetch paycheck transaction records from database
    */
   private static async fetchPaycheckRecords(
-    userId: string,
+    _userId: string,
     startDate: string,
     endDate: string
   ): Promise<PaycheckAllocationRecord[]> {
     try {
       // Query transactions of type 'income' (paychecks)
       const transactions = await db.transactions
-        .where('date')
+        .where("date")
         .between(startDate, endDate, true, true)
-        .filter((txn) => txn.type === 'income' && txn.category === 'paycheck')
+        .filter((txn) => txn.type === "income" && txn.category === "paycheck")
         .toArray();
 
       // Transform transactions to PaycheckAllocationRecord format
-      const records: PaycheckAllocationRecord[] = transactions.map((txn) => {
+      const records: PaycheckAllocationRecord[] = transactions.map((txnBase) => {
+        // Cast to include metadata which might be dynamic or generic in Dexie
+        const txn = txnBase as Transaction & { metadata?: Record<string, unknown> };
         // Extract allocation metadata if available
         const metadata = (txn.metadata as Record<string, unknown>) || {};
-        const allocations = (metadata.allocations as Array<{
-          envelopeId: string;
-          envelopeName?: string;
-          amountCents: number;
-        }>) || [];
+        const allocations =
+          (metadata.allocations as Array<{
+            envelopeId: string;
+            envelopeName?: string;
+            amountCents: number;
+          }>) || [];
 
         return {
           id: String(txn.id),
-          date: txn.date,
+          date: new Date(txn.date).toISOString().split("T")[0]!, // Ensure date is string YYYY-MM-DD
           paycheckAmountCents: Math.abs(txn.amount * 100), // Convert to cents
-          payerName: metadata.payerName as string || 'Unknown',
-          strategy: (metadata.strategy as AllocationStrategy) || 'even_split',
+          payerName: (metadata.payerName as string) || "Unknown",
+          strategy: (metadata.strategy as AllocationStrategy) || "even_split",
           allocations: allocations.map((alloc) => ({
             envelopeId: alloc.envelopeId,
-            envelopeName: alloc.envelopeName || 'Unknown',
+            envelopeName: alloc.envelopeName || "Unknown",
             amountCents: alloc.amountCents,
-            strategy: (metadata.strategy as AllocationStrategy) || 'even_split',
-            timestamp: txn.createdAt || new Date().toISOString(),
+            strategy: (metadata.strategy as AllocationStrategy) || "even_split",
+            timestamp: txn.createdAt
+              ? new Date(txn.createdAt).toISOString()
+              : new Date().toISOString(),
           })),
-          processedAt: txn.createdAt || new Date().toISOString(),
+          processedAt: txn.createdAt
+            ? new Date(txn.createdAt).toISOString()
+            : new Date().toISOString(),
           totalAllocatedCents: allocations.reduce((sum, a) => sum + a.amountCents, 0),
-          remainingCents: Math.abs(txn.amount * 100) - allocations.reduce((sum, a) => sum + a.amountCents, 0),
+          remainingCents:
+            Math.abs(txn.amount * 100) - allocations.reduce((sum, a) => sum + a.amountCents, 0),
           completionTimeMs: metadata.completionTimeMs as number | undefined,
         };
       });
 
       return records;
     } catch (error) {
-      logger.error('Failed to fetch paycheck records', error);
+      logger.error("Failed to fetch paycheck records", error);
       return [];
     }
   }
@@ -182,7 +190,10 @@ export class AllocationAnalyticsService {
     const frequency = this.detectPaycheckFrequency(records.map((r) => r.date));
 
     // Detect missed paychecks based on frequency
-    const missedPaychecks = this.detectMissedPaychecks(records.map((r) => r.date), frequency);
+    const missedPaychecks = this.detectMissedPaychecks(
+      records.map((r) => r.date),
+      frequency
+    );
 
     return {
       dataPoints,
@@ -197,7 +208,10 @@ export class AllocationAnalyticsService {
   /**
    * Calculate intensity for heatmap coloring (0-100)
    */
-  private static calculateIntensity(amount: number, allRecords: PaycheckAllocationRecord[]): number {
+  private static calculateIntensity(
+    amount: number,
+    allRecords: PaycheckAllocationRecord[]
+  ): number {
     const amounts = allRecords.map((r) => r.paycheckAmountCents);
     const min = Math.min(...amounts);
     const max = Math.max(...amounts);
@@ -213,8 +227,8 @@ export class AllocationAnalyticsService {
    */
   private static detectPaycheckFrequency(
     dates: string[]
-  ): 'weekly' | 'biweekly' | 'semi-monthly' | 'monthly' | 'irregular' {
-    if (dates.length < 2) return 'irregular';
+  ): "weekly" | "biweekly" | "semi-monthly" | "monthly" | "irregular" {
+    if (dates.length < 2) return "irregular";
 
     const sortedDates = [...dates].sort();
     const gaps: number[] = [];
@@ -229,12 +243,12 @@ export class AllocationAnalyticsService {
     const avgGap = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
 
     // Detect frequency based on average gap
-    if (avgGap >= 6 && avgGap <= 8) return 'weekly';
-    if (avgGap >= 13 && avgGap <= 15) return 'biweekly';
-    if (avgGap >= 14 && avgGap <= 16) return 'semi-monthly';
-    if (avgGap >= 28 && avgGap <= 32) return 'monthly';
+    if (avgGap >= 6 && avgGap <= 8) return "weekly";
+    if (avgGap >= 13 && avgGap <= 15) return "biweekly";
+    if (avgGap >= 14 && avgGap <= 16) return "semi-monthly";
+    if (avgGap >= 28 && avgGap <= 32) return "monthly";
 
-    return 'irregular';
+    return "irregular";
   }
 
   /**
@@ -242,9 +256,9 @@ export class AllocationAnalyticsService {
    */
   private static detectMissedPaychecks(
     dates: string[],
-    frequency: 'weekly' | 'biweekly' | 'semi-monthly' | 'monthly' | 'irregular'
+    frequency: "weekly" | "biweekly" | "semi-monthly" | "monthly" | "irregular"
   ): string[] {
-    if (dates.length === 0 || frequency === 'irregular') return [];
+    if (dates.length === 0 || frequency === "irregular") return [];
 
     const sortedDates = [...dates].sort();
     const missedPaychecks: string[] = [];
@@ -253,7 +267,7 @@ export class AllocationAnalyticsService {
     const expectedGaps: Record<string, number> = {
       weekly: 7,
       biweekly: 14,
-      'semi-monthly': 15,
+      "semi-monthly": 15,
       monthly: 30,
       irregular: 0,
     };
@@ -271,7 +285,7 @@ export class AllocationAnalyticsService {
         const missedCount = Math.floor(daysDiff / expectedGap) - 1;
         for (let j = 1; j <= missedCount; j++) {
           const missedDate = new Date(date1.getTime() + j * expectedGap * 24 * 60 * 60 * 1000);
-          missedPaychecks.push(missedDate.toISOString().split('T')[0]!);
+          missedPaychecks.push(missedDate.toISOString().split("T")[0]!);
         }
       }
     }
@@ -320,16 +334,15 @@ export class AllocationAnalyticsService {
       const secondAvg =
         secondHalf.reduce((sum, dp) => sum + dp.amountCents, 0) / (secondHalf.length || 1);
 
-      let trend: 'increasing' | 'decreasing' | 'stable' = 'stable';
+      let trend: "increasing" | "decreasing" | "stable" = "stable";
       const changePercent = ((secondAvg - firstAvg) / firstAvg) * 100;
-      if (changePercent > 10) trend = 'increasing';
-      else if (changePercent < -10) trend = 'decreasing';
+      if (changePercent > 10) trend = "increasing";
+      else if (changePercent < -10) trend = "decreasing";
 
       // Get envelope name from first allocation
       const envelopeName =
-        records
-          .flatMap((r) => r.allocations)
-          .find((a) => a.envelopeId === envelopeId)?.envelopeName || 'Unknown';
+        records.flatMap((r) => r.allocations).find((a) => a.envelopeId === envelopeId)
+          ?.envelopeName || "Unknown";
 
       return {
         id: envelopeId,
@@ -443,13 +456,15 @@ export class AllocationAnalyticsService {
     }));
 
     // Find most used and most effective strategies
-    const mostUsed =
-      strategies.reduce((max, s) => (s.usageCount > max.usageCount ? s : max), strategies[0]!)
-        .strategy;
+    const mostUsed = strategies.reduce(
+      (max, s) => (s.usageCount > max.usageCount ? s : max),
+      strategies[0]!
+    ).strategy;
 
-    const mostEffective =
-      strategies.reduce((max, s) => (s.savingsRate > max.savingsRate ? s : max), strategies[0]!)
-        .strategy;
+    const mostEffective = strategies.reduce(
+      (max, s) => (s.savingsRate > max.savingsRate ? s : max),
+      strategies[0]!
+    ).strategy;
 
     const insights = this.generateStrategyInsights(strategies);
 
@@ -517,14 +532,14 @@ export class AllocationAnalyticsService {
     const totalScore = components.reduce((sum, comp) => sum + comp.score * comp.weight, 0);
 
     // Determine overall status
-    let status: 'excellent' | 'good' | 'fair' | 'poor';
-    if (totalScore >= 85) status = 'excellent';
-    else if (totalScore >= 70) status = 'good';
-    else if (totalScore >= 50) status = 'fair';
-    else status = 'poor';
+    let status: "excellent" | "good" | "fair" | "poor";
+    if (totalScore >= 85) status = "excellent";
+    else if (totalScore >= 70) status = "good";
+    else if (totalScore >= 50) status = "fair";
+    else status = "poor";
 
     // Determine trend (simplified - would compare to previous period)
-    const trend: 'improving' | 'declining' | 'stable' = 'stable';
+    const trend: "improving" | "declining" | "stable" = "stable";
 
     // Generate recommendations
     const recommendations = this.generateHealthRecommendations(components, totalScore);
@@ -548,18 +563,18 @@ export class AllocationAnalyticsService {
     // Calculate based on regularity of allocations
     const score = records.length >= 10 ? 90 : Math.min(90, records.length * 9);
 
-    let status: 'excellent' | 'good' | 'fair' | 'poor';
-    if (score >= 85) status = 'excellent';
-    else if (score >= 70) status = 'good';
-    else if (score >= 50) status = 'fair';
-    else status = 'poor';
+    let status: "excellent" | "good" | "fair" | "poor";
+    if (score >= 85) status = "excellent";
+    else if (score >= 70) status = "good";
+    else if (score >= 50) status = "fair";
+    else status = "poor";
 
     return {
-      name: 'consistency',
+      name: "consistency",
       score,
       weight: 0.15,
       status,
-      description: 'Regular paycheck allocation without gaps',
+      description: "Regular paycheck allocation without gaps",
     };
   }
 
@@ -567,17 +582,17 @@ export class AllocationAnalyticsService {
    * Calculate bill coverage score
    */
   private static calculateBillCoverageScore(
-    records: PaycheckAllocationRecord[]
+    _records: PaycheckAllocationRecord[]
   ): HealthScoreComponent {
     // Placeholder - would check if bills are fully funded
     const score = 95;
 
     return {
-      name: 'billCoverage',
+      name: "billCoverage",
       score,
       weight: 0.3,
-      status: 'excellent',
-      description: 'Bills and essential expenses are fully covered',
+      status: "excellent",
+      description: "Bills and essential expenses are fully covered",
     };
   }
 
@@ -593,7 +608,7 @@ export class AllocationAnalyticsService {
       return (
         sum +
         r.allocations
-          .filter((a) => a.envelopeName.toLowerCase().includes('saving'))
+          .filter((a) => a.envelopeName.toLowerCase().includes("saving"))
           .reduce((s, a) => s + a.amountCents, 0)
       );
     }, 0);
@@ -604,14 +619,14 @@ export class AllocationAnalyticsService {
     let score = Math.min(100, (savingsRate / targetRate) * 100);
     score = Math.max(0, score);
 
-    let status: 'excellent' | 'good' | 'fair' | 'poor';
-    if (score >= 85) status = 'excellent';
-    else if (score >= 70) status = 'good';
-    else if (score >= 50) status = 'fair';
-    else status = 'poor';
+    let status: "excellent" | "good" | "fair" | "poor";
+    if (score >= 85) status = "excellent";
+    else if (score >= 70) status = "good";
+    else if (score >= 50) status = "fair";
+    else status = "poor";
 
     return {
-      name: 'savingsRate',
+      name: "savingsRate",
       score: Math.round(score),
       weight: 0.25,
       status,
@@ -627,11 +642,11 @@ export class AllocationAnalyticsService {
     const score = 85;
 
     return {
-      name: 'emergencyFund',
+      name: "emergencyFund",
       score,
       weight: 0.2,
-      status: 'good',
-      description: 'Emergency fund covers 5-6 months of expenses',
+      status: "good",
+      description: "Emergency fund covers 5-6 months of expenses",
     };
   }
 
@@ -639,17 +654,17 @@ export class AllocationAnalyticsService {
    * Calculate discretionary spending score
    */
   private static calculateDiscretionaryScore(
-    records: PaycheckAllocationRecord[]
+    _records: PaycheckAllocationRecord[]
   ): HealthScoreComponent {
     // Placeholder - would analyze discretionary spending patterns
     const score = 75;
 
     return {
-      name: 'discretionary',
+      name: "discretionary",
       score,
       weight: 0.1,
-      status: 'good',
-      description: 'Discretionary spending is within healthy limits',
+      status: "good",
+      description: "Discretionary spending is within healthy limits",
     };
   }
 
@@ -667,7 +682,7 @@ export class AllocationAnalyticsService {
       if (comp.score < 70) {
         recommendations.push({
           id: `improve-${comp.name}`,
-          priority: comp.score < 50 ? 'high' : 'medium',
+          priority: comp.score < 50 ? "high" : "medium",
           title: `Improve ${comp.name}`,
           description: `Your ${comp.name} score is ${comp.score}/100`,
           actionable: this.getActionableForComponent(comp.name),
@@ -679,11 +694,11 @@ export class AllocationAnalyticsService {
     // If overall score is good, add optimization suggestions
     if (totalScore >= 70 && recommendations.length === 0) {
       recommendations.push({
-        id: 'optimize-savings',
-        priority: 'low',
-        title: 'Optimize savings allocation',
-        description: 'You\'re doing well! Consider increasing savings by 2-3%.',
-        actionable: 'Review discretionary spending to find $50-100 to redirect to savings.',
+        id: "optimize-savings",
+        priority: "low",
+        title: "Optimize savings allocation",
+        description: "You're doing well! Consider increasing savings by 2-3%.",
+        actionable: "Review discretionary spending to find $50-100 to redirect to savings.",
         impactScore: 5,
       });
     }
@@ -696,14 +711,14 @@ export class AllocationAnalyticsService {
    */
   private static getActionableForComponent(componentName: string): string {
     const actions: Record<string, string> = {
-      consistency: 'Set up automatic paycheck processing to ensure regular allocations.',
-      billCoverage: 'Review unpaid bills and allocate more to essential envelopes.',
-      savingsRate: 'Increase savings allocation by 5% per paycheck ($125 for $2,500 paycheck).',
-      emergencyFund: 'Build emergency fund to 6 months of expenses.',
-      discretionary: 'Reduce discretionary spending by $50/paycheck.',
+      consistency: "Set up automatic paycheck processing to ensure regular allocations.",
+      billCoverage: "Review unpaid bills and allocate more to essential envelopes.",
+      savingsRate: "Increase savings allocation by 5% per paycheck ($125 for $2,500 paycheck).",
+      emergencyFund: "Build emergency fund to 6 months of expenses.",
+      discretionary: "Reduce discretionary spending by $50/paycheck.",
     };
 
-    return actions[componentName] || 'Review your budget and adjust allocations.';
+    return actions[componentName] || "Review your budget and adjust allocations.";
   }
 
   /**
@@ -723,7 +738,7 @@ export class AllocationAnalyticsService {
       maxAmount: 0,
       totalAllocations: 0,
       missedPaychecks: [],
-      frequency: 'irregular',
+      frequency: "irregular",
     };
   }
 
@@ -748,8 +763,8 @@ export class AllocationAnalyticsService {
   private static getEmptyStrategyAnalysis(startDate: string, endDate: string): StrategyAnalysis {
     return {
       strategies: [],
-      mostUsed: 'even_split',
-      mostEffective: 'even_split',
+      mostUsed: "even_split",
+      mostEffective: "even_split",
       insights: [],
       dateRange: {
         start: startDate,
@@ -763,8 +778,8 @@ export class AllocationAnalyticsService {
       totalScore: 0,
       components: [],
       recommendations: [],
-      status: 'poor',
-      trend: 'stable',
+      status: "poor",
+      trend: "stable",
       lastUpdated: new Date().toISOString(),
     };
   }

@@ -11,7 +11,9 @@ const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
 const BillManager = lazy(() => import("../bills/BillManager"));
 const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
 const AnalyticsDashboard = lazy(() => import("../analytics/AnalyticsDashboard"));
-const AllocationAnalyticsDashboard = lazy(() => import("../analytics/allocation/AllocationAnalyticsDashboard"));
+const AllocationAnalyticsDashboard = lazy(
+  () => import("../analytics/allocation/AllocationAnalyticsDashboard")
+);
 const DebtDashboard = lazy(() => import("../debt/DebtDashboard"));
 import { isDebtFeatureEnabled } from "@/utils/domain/debts/debtDebugConfig";
 const AutoFundingView = lazy(() => import("../automation/AutoFundingView"));
