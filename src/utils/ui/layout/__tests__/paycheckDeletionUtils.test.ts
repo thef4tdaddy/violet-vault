@@ -45,7 +45,7 @@ describe("paycheckDeletionUtils", () => {
           id: "paycheck1",
           amount: 1000,
           mode: "allocate",
-          date: "2026-01-01",
+          date: "2020-01-01",
           userId: "user1",
           budgetId: "budget1",
           unassignedCashBefore: 0,
