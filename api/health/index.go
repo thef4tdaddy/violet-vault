@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type HealthResponse struct {
 	Version   string `json:"version"`
 	Timestamp string `json:"timestamp"`
 	Service   string `json:"service"`
+	Region    string `json:"region"`
 }
 
 // Handler is the Vercel serverless function entry point for health checks
@@ -38,11 +40,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Build health response
+	region := os.Getenv("VERCEL_REGION")
+	if region == "" {
+		region = "unknown"
+	}
+
 	response := HealthResponse{
 		Status:    "healthy",
 		Version:   "2.0.0-beta",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Service:   "VioletVault Backend",
+		Region:    region,
 	}
 
 	w.WriteHeader(http.StatusOK)
