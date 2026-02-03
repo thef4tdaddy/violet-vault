@@ -2,7 +2,7 @@
  * Audit Trail Service Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { auditTrailService } from "../auditTrailService";
 import type { AuditLogEntry } from "@/types/privacyAudit";
 
