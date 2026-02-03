@@ -448,6 +448,9 @@ describe("paycheckDeletionUtils", () => {
     });
 
     it("should handle null metadata gracefully", async () => {
+      // Note: Negative actualBalance can occur when metadata is null/corrupted
+      // The function calculates the new balance but doesn't validate it -
+      // balance validation should happen at the caller level
       const paycheck: Paycheck = {
         id: "paycheck1",
         amount: 1000,
@@ -474,7 +477,7 @@ describe("paycheckDeletionUtils", () => {
       expect(result).toEqual({
         currentActualBalance: 0,
         currentUnassignedCash: 0,
-        newActualBalance: -1000, // 0 - 1000
+        newActualBalance: -1000, // 0 - 1000 (negative allowed for calculation)
         newUnassignedCash: 0, // Math.max(0, 0 - 1000)
       });
     });
