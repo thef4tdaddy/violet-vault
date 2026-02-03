@@ -10,7 +10,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { VioletVaultDB, budgetDb } from "@/db/budgetDb";
 import { createInMemoryDB } from "@/db/inMemoryDb";
-import { initializeDemoDatabase } from "@/services/demo/demoDataService";
 import { getDemoModeConfig } from "@/utils/platform/demo/demoModeDetection";
 import logger from "@/utils/core/common/logger";
 
@@ -49,6 +48,7 @@ export const DatabaseProvider = ({ children }: DatabaseProviderProps) => {
           const inMemoryDb = createInMemoryDB();
 
           // Seed with demo data
+          const { initializeDemoDatabase } = await import("@/services/demo/demoDataService");
           await initializeDemoDatabase(inMemoryDb);
 
           setDb(inMemoryDb);

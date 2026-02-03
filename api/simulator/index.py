@@ -24,24 +24,16 @@ logger = logging.getLogger(__name__)
 class SimulationRequest(BaseModel):
     """Request for financial simulation"""
 
-    monthly_income: float = Field(
-        default=4500.0, gt=0, description="Monthly income amount"
-    )
+    monthly_income: float = Field(default=4500.0, gt=0, description="Monthly income amount")
     income_frequency: IncomeFrequency = Field(
         default=IncomeFrequency.BIWEEKLY, description="Income payment frequency"
     )
     spending_style: SpendingStyle = Field(
         default=SpendingStyle.CONSERVATIVE, description="Spending behavior pattern"
     )
-    months: int = Field(
-        default=6, ge=1, le=12, description="Number of months to simulate"
-    )
-    enable_life_events: bool = Field(
-        default=True, description="Include random life events"
-    )
-    num_envelopes: int = Field(
-        default=8, ge=4, le=20, description="Number of budget envelopes"
-    )
+    months: int = Field(default=6, ge=1, le=12, description="Number of months to simulate")
+    enable_life_events: bool = Field(default=True, description="Include random life events")
+    num_envelopes: int = Field(default=8, ge=4, le=20, description="Number of budget envelopes")
 
 
 class SimulationResponse(BaseModel):

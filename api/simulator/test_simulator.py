@@ -64,9 +64,7 @@ class TestSimulationGeneration:
             assert envelope.currentBalance >= 0
 
         # Check budget allocation
-        total_budget = sum(
-            e.monthlyBudget for e in result.envelopes if e.monthlyBudget is not None
-        )
+        total_budget = sum(e.monthlyBudget for e in result.envelopes if e.monthlyBudget is not None)
         assert total_budget > 0
         # Should allocate most of income to envelopes
         assert total_budget >= config.monthly_income * 0.7
@@ -187,7 +185,9 @@ class TestSimulationGeneration:
         assert total_expenses > 0  # Must have expenses
         assert expense_count > 50  # High transaction volume (80% probability daily)
         # Aggressive spender behavior verification
-        assert expense_count > len([t for t in result.transactions if t.type == "income"])  # More expenses than income transactions
+        assert expense_count > len(
+            [t for t in result.transactions if t.type == "income"]
+        )  # More expenses than income transactions
 
     def test_spending_style_chaotic(self) -> None:
         """Test chaotic spending has high variance"""
@@ -215,6 +215,7 @@ class TestSimulationGeneration:
         if len(expense_txns) > 1:
             amounts = [abs(t.amount) for t in expense_txns]
             import statistics
+
             std_dev = statistics.stdev(amounts)
             mean = statistics.mean(amounts)
             # Coefficient of variation should be higher for chaotic

@@ -76,6 +76,16 @@
   },
   "rewrites": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "demo.violetvault.app"
+        }
+      ],
+      "destination": "/index.html?demo=true"
+    },
+    {
       "source": "/api/marketing/blog",
       "destination": "/api/marketing/blog.go"
     },

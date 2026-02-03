@@ -273,7 +273,10 @@ export default [
   },
   {
     // Analytics orchestration components - coordinate multiple data sources and charts
-    files: ["src/components/analytics/AnalyticsDashboard.tsx"],
+    files: [
+      "src/components/analytics/AnalyticsDashboard.tsx",
+      "src/services/analytics/allocationAnalyticsService.ts",
+    ],
     rules: {
       "max-lines-per-function": "off",
       "max-lines": "off",

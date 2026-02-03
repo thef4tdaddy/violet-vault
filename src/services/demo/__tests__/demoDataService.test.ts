@@ -113,9 +113,10 @@ describe("demoDataService", () => {
 
       const mockData = {
         envelopes: [{ id: "env-1", name: "Test" }],
-        transactions: [{ id: "txn-1", amount: 100 }],
-        unassignedCash: 50,
-        actualBalance: 200,
+        transactions: [{ id: "txn-1", amount: 200, type: "income" }],
+        bills: [],
+        unassignedCash: 50, // Ignored by service
+        actualBalance: 200, // Ignored by service (recalculated)
       };
 
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -130,7 +131,7 @@ describe("demoDataService", () => {
       expect(mockDb.budget.put).toHaveBeenCalledWith(
         expect.objectContaining({
           id: "metadata",
-          unassignedCash: 50,
+          unassignedCash: 0,
           actualBalance: 200,
         })
       );

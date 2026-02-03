@@ -2,12 +2,16 @@
  * Review Step - Review and confirm allocations (Step 2)
  * Full implementation for Issue #1838
  * Part of Epic #156: Polyglot Human-Centered Paycheck Flow v2.1
+ * Enhanced with Historical Comparison View
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { usePaycheckFlowStore } from "@/stores/ui/paycheckFlowStore";
 import { PaycheckHistoryService } from "@/utils/core/services/paycheckHistory";
 import { createPaycheckTransaction } from "@/utils/core/validation/paycheckWizardValidation";
+import { AllocationComparisonService } from "@/services/budgeting/allocationComparisonService";
+import { AllocationInsightsService } from "@/services/budgeting/allocationInsightsService";
+import AllocationComparisonCard from "@/components/budgeting/paycheck-flow/AllocationComparisonCard";
 import logger from "@/utils/core/common/logger";
 import Button from "@/components/ui/buttons/Button";
 
@@ -140,6 +144,44 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
   const isFullyAllocated = totalAllocatedCents === (paycheckAmountCents || 0);
   const remainingCents = (paycheckAmountCents || 0) - totalAllocatedCents;
 
+  // Generate comparison with previous allocation
+  const comparison = useMemo(() => {
+    if (!paycheckAmountCents || allocations.length === 0) {
+      return null;
+    }
+
+    const previousAllocation = PaycheckHistoryService.getMostRecentAllocation();
+    if (!previousAllocation) {
+      return null;
+    }
+
+    const currentSnapshot = AllocationComparisonService.createCurrentSnapshot(
+      paycheckAmountCents,
+      allocations,
+      payerName
+    );
+
+    const previousSnapshot =
+      AllocationComparisonService.createSnapshotFromHistory(previousAllocation);
+
+    const comparisonResult = AllocationComparisonService.getComparison(
+      currentSnapshot,
+      previousSnapshot
+    );
+
+    // Generate insights
+    const insights = AllocationInsightsService.generateInsights(
+      comparisonResult.changes,
+      currentSnapshot,
+      previousSnapshot
+    );
+
+    return {
+      ...comparisonResult,
+      insights,
+    };
+  }, [paycheckAmountCents, allocations, payerName]);
+
   const handleConfirm = async () => {
     if (!paycheckAmountCents) {
       setError("Paycheck amount is required");
@@ -180,6 +222,7 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
 
       logger.info("Paycheck transaction created", { transactionId: transaction.id });
 
+      // Save to paycheck history (for autocomplete)
       if (payerName) {
         PaycheckHistoryService.addOrUpdate({
           payerName,
@@ -187,6 +230,14 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
           date: new Date().toISOString().split("T")[0]!,
         });
       }
+
+      // Save to allocation history (for comparison)
+      PaycheckHistoryService.saveAllocationHistory({
+        paycheckAmountCents,
+        payerName,
+        allocations,
+        strategy: selectedStrategy || undefined,
+      });
 
       onNext();
     } catch (err) {
@@ -210,6 +261,9 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ onNext }) => {
         />
 
         <AllocationList allocations={allocations} paycheckAmountCents={paycheckAmountCents} />
+
+        {/* Historical Comparison View */}
+        <AllocationComparisonCard comparison={comparison} isLoading={false} />
 
         {error && (
           <div className="bg-red-50 hard-border border-red-500 rounded-lg p-4 mb-6">
