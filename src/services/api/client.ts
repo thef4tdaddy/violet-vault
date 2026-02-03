@@ -75,8 +75,12 @@ export class ApiClient {
         if (typeof requestOptions.body === "string") {
           payloadSize = new Blob([requestOptions.body]).size;
         } else if (requestOptions.body instanceof FormData) {
-          // Approximate size for FormData
-          payloadSize = 1024; // Placeholder
+          // Approximate size for FormData. Computing the exact size of a multipart/form-data
+          // payload is non-trivial (depends on generated boundaries, part headers, encoding, etc.).
+          // For audit logging purposes a fixed rough estimate is sufficient here, but if higher
+          // precision is ever required this should be replaced with logic that iterates over
+          // FormData entries and estimates their serialized size.
+          payloadSize = 1024;
         }
       }
 
