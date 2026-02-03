@@ -162,7 +162,7 @@ describe("csvImageExportUtils", () => {
       };
 
       const result = convertToCSV(analyticsData);
-      const lines = result.split("\\n");
+      const lines = result.split("\n");
 
       expect(lines).toHaveLength(4); // 1 header + 3 data rows
       expect(lines[0]).toBe("Date,Description,Amount,Category,Envelope");

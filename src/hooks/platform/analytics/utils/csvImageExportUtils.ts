@@ -46,7 +46,7 @@ export const convertToCSV = (analyticsData: AnalyticsData): string => {
         .map((field) => (typeof field === "string" && field.includes(",") ? `"${field}"` : field))
         .join(",")
     )
-    .join("\\n");
+    .join("\n");
 };
 
 /**
