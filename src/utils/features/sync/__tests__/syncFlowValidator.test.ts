@@ -6,7 +6,6 @@ import { validateAllSyncFlows, type ValidationResult } from "../syncFlowValidato
 import { budgetDb } from "@/db/budgetDb";
 import { syncOrchestrator } from "@/services/sync/syncOrchestrator";
 import logger from "@/utils/core/common/logger";
-import type { Envelope } from "@/db/types";
 
 // Mock dependencies
 vi.mock("@/db/budgetDb", () => ({
