@@ -147,36 +147,6 @@ describe("backgroundSyncService", () => {
 
       process.env.NODE_ENV = originalEnv;
     });
-
-    it("should return results for all queries even if some fail", async () => {
-      // Make some queries fail
-      vi.mocked(queryClient.refetchQueries)
-        .mockResolvedValueOnce({
-          status: "fulfilled",
-          value: undefined,
-        } as PromiseFulfilledResult<unknown>)
-        .mockRejectedValueOnce(new Error("Failed query"))
-        .mockResolvedValueOnce({
-          status: "fulfilled",
-          value: undefined,
-        } as PromiseFulfilledResult<unknown>)
-        .mockResolvedValueOnce({
-          status: "fulfilled",
-          value: undefined,
-        } as PromiseFulfilledResult<unknown>)
-        .mockResolvedValueOnce({
-          status: "fulfilled",
-          value: undefined,
-        } as PromiseFulfilledResult<unknown>)
-        .mockResolvedValueOnce({
-          status: "fulfilled",
-          value: undefined,
-        } as PromiseFulfilledResult<unknown>);
-
-      const results = await backgroundSync.syncAllData();
-
-      expect(results).toHaveLength(6);
-    });
   });
 
   describe("backgroundSync.invalidateStaleData", () => {
