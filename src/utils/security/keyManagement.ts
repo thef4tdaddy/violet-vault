@@ -54,10 +54,10 @@ class KeyCache {
 
   clear() {
     if (this.passphrase) {
-      // Overwrite passphrase in memory
+      // Overwrite passphrase in memory before clearing
       this.passphrase = "*".repeat(this.passphrase.length);
-      this.passphrase = null;
     }
+    this.passphrase = null;
     this.key = null;
 
     clearSensitiveData({});

@@ -2,7 +2,7 @@
  * Audit Trail Service Tests
  */
 
-import { describe, it, expect, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { auditTrailService } from "../auditTrailService";
 import type { AuditLogEntry } from "@/types/privacyAudit";
 // Mock fake-indexeddb for testing

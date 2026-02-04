@@ -304,6 +304,7 @@ def infer_possible_causes(
         elif month in [6, 7, 8]:
             causes.append("Vacation season")
     except Exception:
+        # If date parsing fails, we skip seasonal causes and continue with existing ones
         pass
 
     return causes[:3]  # Return top 3 causes
