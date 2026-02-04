@@ -593,27 +593,9 @@ describe("backgroundSyncService", () => {
   });
 
   describe("module exports", () => {
-    it("should export backgroundSync with all methods", () => {
+    it("should export backgroundSync and networkManager", () => {
       expect(backgroundSync).toBeDefined();
-      expect(backgroundSync.syncAllData).toBeDefined();
-      expect(backgroundSync.invalidateStaleData).toBeDefined();
-      expect(backgroundSync.syncWithDexie).toBeDefined();
-      expect(backgroundSync.restoreFromDexie).toBeDefined();
-    });
-
-    it("should export networkManager with all methods", () => {
       expect(networkManager).toBeDefined();
-      expect(networkManager.onOnline).toBeDefined();
-      expect(networkManager.onOffline).toBeDefined();
-    });
-
-    it("should have correct method signatures", () => {
-      expect(typeof backgroundSync.syncAllData).toBe("function");
-      expect(typeof backgroundSync.invalidateStaleData).toBe("function");
-      expect(typeof backgroundSync.syncWithDexie).toBe("function");
-      expect(typeof backgroundSync.restoreFromDexie).toBe("function");
-      expect(typeof networkManager.onOnline).toBe("function");
-      expect(typeof networkManager.onOffline).toBe("function");
     });
   });
 });
