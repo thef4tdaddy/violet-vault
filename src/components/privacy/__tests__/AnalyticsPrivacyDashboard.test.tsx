@@ -8,7 +8,6 @@ import { AnalyticsPrivacyDashboard } from "../AnalyticsPrivacyDashboard";
 import { auditTrailService } from "@/services/privacy/auditTrailService";
 
 // Mock fake-indexeddb for testing
-import "fake-indexeddb/auto";
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -120,7 +119,16 @@ describe("AnalyticsPrivacyDashboard", () => {
       download: "",
       click: vi.fn(),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(mockLink as unknown as HTMLAnchorElement);
+
+    // Proper spy that delegates to original implementation for non-anchor tags
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+      if (tagName === "a") {
+        return mockLink as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName, options);
+    });
+
     vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-url");
     vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
 
@@ -150,9 +158,6 @@ describe("AnalyticsPrivacyDashboard", () => {
   });
 
   it("should clear logs with confirmation", async () => {
-    // Mock window.confirm
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-
     // Add test log
     await auditTrailService.logApiCall({
       timestamp: Date.now(),
@@ -172,6 +177,14 @@ describe("AnalyticsPrivacyDashboard", () => {
 
     const clearButton = screen.getByText("Clear Log");
     fireEvent.click(clearButton);
+
+    // Wait for modal and click confirm
+    await waitFor(() => {
+      expect(screen.getByText("Clear Audit Logs")).toBeInTheDocument();
+    });
+
+    const confirmButton = screen.getByText("Clear All");
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(screen.getByText("No API calls logged yet.")).toBeInTheDocument();
@@ -179,9 +192,6 @@ describe("AnalyticsPrivacyDashboard", () => {
   });
 
   it("should not clear logs if user cancels confirmation", async () => {
-    // Mock window.confirm to return false
-    vi.spyOn(window, "confirm").mockReturnValue(false);
-
     // Add test log
     await auditTrailService.logApiCall({
       timestamp: Date.now(),
@@ -202,7 +212,19 @@ describe("AnalyticsPrivacyDashboard", () => {
     const clearButton = screen.getByText("Clear Log");
     fireEvent.click(clearButton);
 
-    // Log should still be there
+    // Wait for modal and click cancel
+    await waitFor(() => {
+      expect(screen.getByText("Clear Audit Logs")).toBeInTheDocument();
+    });
+
+    const cancelButton = screen.getByText("Cancel");
+    fireEvent.click(cancelButton);
+
+    // Modal should close and log should still be there
+    await waitFor(() => {
+      expect(screen.queryByText("Clear Audit Logs")).not.toBeInTheDocument();
+    });
+
     expect(screen.getByText("/api/test")).toBeInTheDocument();
   });
 });

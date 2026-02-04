@@ -84,7 +84,7 @@ describe("PrivacySettings", () => {
 
       // Check that current tier is displayed (there are multiple "100% Offline" elements, so check for at least one)
       expect(screen.getAllByText("100% Offline")[0]).toBeInTheDocument();
-      expect(screen.getByText("Maximum")).toBeInTheDocument();
+      expect(screen.getAllByText("Maximum").length).toBeGreaterThan(0);
     });
 
     it("should show bundle size progress bar", () => {

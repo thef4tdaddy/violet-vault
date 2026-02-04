@@ -8,13 +8,16 @@ import { useAuditTrail } from "../useAuditTrail";
 import { auditTrailService } from "@/services/privacy/auditTrailService";
 
 // Mock fake-indexeddb for testing
-import "fake-indexeddb/auto";
 
 describe("useAuditTrail", () => {
   beforeEach(async () => {
     // Clear logs before each test
     await auditTrailService.clearLogs();
     vi.clearAllTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("should load logs on mount", async () => {
@@ -77,7 +80,13 @@ describe("useAuditTrail", () => {
       download: "",
       click: vi.fn(),
     };
-    vi.spyOn(document, "createElement").mockReturnValue(mockLink as unknown as HTMLAnchorElement);
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName, options) => {
+      if (tagName === "a") {
+        return mockLink as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName, options);
+    });
     vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-url");
     vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
 
@@ -95,7 +104,7 @@ describe("useAuditTrail", () => {
     const { result } = renderHook(() => useAuditTrail());
 
     await waitFor(() => {
-      expect(result.current.logs).toHaveLength(1);
+      expect(result.current.logs?.length).toBe(1);
     });
 
     // Export logs

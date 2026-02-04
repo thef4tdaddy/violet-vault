@@ -55,6 +55,7 @@ import { MinimalHealthGauge } from "./minimal/MinimalHealthGauge";
 
 // Demo components
 import { PerformanceComparisonWidget } from "./demo/PerformanceComparisonWidget";
+import { transformAnalyticsData } from "./utils/analyticsDataTransformers";
 
 /**
  * Loading state component
@@ -267,178 +268,162 @@ interface TabContentProps {
   data: ReturnType<typeof useAllocationAnalytics>["data"];
 }
 
+type AnalyticsData = NonNullable<ReturnType<typeof useAllocationAnalytics>["data"]>;
+type TransformedAnalyticsData = NonNullable<ReturnType<typeof transformAnalyticsData>>;
+
+const OverviewContent = ({
+  isEnhanced,
+  data,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  data: AnalyticsData;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <EnhancedOverviewTab
+        totalAllocations={data.heatmap.totalAllocations}
+        avgPerPaycheck={data.distribution.averagePerPaycheckCents}
+        healthScore={data.healthScore.totalScore}
+        frequency={data.heatmap.frequency}
+        insights={transformed.mockMLInsights}
+        anomalyCount={0}
+      />
+    </Suspense>
+  ) : (
+    <MinimalOverviewTab
+      metrics={{
+        totalAllocations: data.heatmap.totalAllocations,
+        avgPerPaycheck: data.distribution.averagePerPaycheckCents,
+        healthScore: data.healthScore.totalScore,
+        frequency: data.heatmap.frequency,
+      }}
+    />
+  );
+
+const HeatmapContent = ({
+  isEnhanced,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <InteractiveHeatmapCalendar
+        data={transformed.mockHeatmapData}
+        onDateClick={(date) => logger.info("Date clicked", { date })}
+      />
+    </Suspense>
+  ) : (
+    <SimpleHeatmapGrid data={transformed.mockSimpleHeatmapData} />
+  );
+
+const TrendsContent = ({
+  isEnhanced,
+  data,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  data: AnalyticsData;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <EnvelopeAllocationTrendsChart
+        data={transformed.mockTrendData}
+        selectedEnvelopes={[data.trends.envelopes[0]?.id || ""]}
+        anomalies={transformed.mockAnomalies}
+      />
+    </Suspense>
+  ) : (
+    <BasicTrendsSparkline envelopes={transformed.mockEnvelopeSparklines} />
+  );
+
+const DistributionContent = ({
+  isEnhanced,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <AllocationDistributionChart
+        data={transformed.mockDistributionData}
+        viewMode="category"
+        onViewModeChange={(mode) => logger.info("View mode changed", { mode })}
+      />
+    </Suspense>
+  ) : (
+    <DistributionTable data={transformed.mockCategoryDistribution} />
+  );
+
+const StrategyContent = ({
+  isEnhanced,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <StrategyPerformanceTable strategies={transformed.mockStrategyData} />
+    </Suspense>
+  ) : (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
+      <p className="text-gray-600 dark:text-gray-400">
+        Strategy analysis available in enhanced mode
+      </p>
+    </div>
+  );
+
+const HealthContent = ({
+  isEnhanced,
+  data,
+  transformed,
+}: {
+  isEnhanced: boolean;
+  data: AnalyticsData;
+  transformed: TransformedAnalyticsData;
+}) =>
+  isEnhanced ? (
+    <Suspense fallback={<LoadingFallback />}>
+      <HealthScoreGauge
+        score={data.healthScore.totalScore}
+        components={transformed.mockHealthComponents}
+        recommendations={transformed.mockMLInsights}
+        trendData={transformed.mockHealthTrend}
+      />
+    </Suspense>
+  ) : (
+    <MinimalHealthGauge score={data.healthScore.totalScore} />
+  );
+
 const TabContent = ({ tab, tier, data }: TabContentProps) => {
   const isEnhanced = tier === "private-backend";
 
   if (!data) return null;
 
   // Convert data to format expected by enhanced components
-  const mockMLInsights = [
-    {
-      type: "success" as const,
-      title: "Consistent Allocation Pattern",
-      description: "Your allocation patterns are consistent and predictable.",
-      confidence: 92,
-    },
-  ];
+  const transformed = transformAnalyticsData(data);
 
-  const mockAnomalies: Array<{
-    date: string;
-    severity: "high" | "medium" | "low";
-    description: string;
-  }> = [];
-
-  const mockHeatmapData = data.heatmap.dataPoints.map((point) => ({
-    date: point.date,
-    intensity: point.intensity,
-    amount: point.amountCents,
-    count: point.allocationCount,
-  }));
-
-  const mockSimpleHeatmapData = data.heatmap.dataPoints.map((point) => ({
-    date: point.date,
-    amount: point.amountCents,
-    intensity: point.intensity,
-  }));
-
-  const mockTrendData =
-    data.trends.envelopes[0]?.dataPoints.map((point) => ({
-      date: point.date,
-      [data.trends.envelopes[0]!.id]: point.amountCents,
-    })) || [];
-
-  const mockEnvelopeSparklines = data.trends.envelopes.map((env) => ({
-    envelopeId: env.id,
-    envelopeName: env.name,
-    data: env.dataPoints.map((point) => ({
-      value: point.amountCents,
-      label: point.date,
-    })),
-    color: env.color || "#8884d8",
-  }));
-
-  const mockDistributionData = data.distribution.categories.map((cat) => ({
-    name: cat.name,
-    value: cat.totalCents,
-    percentage: cat.percentage,
-    color: cat.color || "#8884d8",
-  }));
-
-  const mockCategoryDistribution = data.distribution.categories.map((cat) => ({
-    category: cat.name,
-    amount: cat.totalCents / 100,
-    percentage: cat.percentage,
-    transactionCount: cat.envelopeIds.length,
-  }));
-
-  const mockStrategyData = data.strategyAnalysis.strategies.map((s) => ({
-    strategy: s.strategy,
-    avgAmount: s.averageCompletionTimeMs,
-    successRate: s.successRate,
-    recommendation: (s.successRate >= 90 ? "good" : s.successRate >= 70 ? "fair" : "poor") as
-      | "good"
-      | "fair"
-      | "poor",
-  }));
-
-  const mockHealthComponents = data.healthScore.components.map((c) => ({
-    component: c.name,
-    score: c.score,
-    weight: c.weight,
-    description: c.description,
-  }));
-
-  const mockHealthTrend = [{ date: "2024-01-01", score: data.healthScore.totalScore }];
+  if (!transformed) return null;
 
   switch (tab) {
     case "overview":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <EnhancedOverviewTab
-            totalAllocations={data.heatmap.totalAllocations}
-            avgPerPaycheck={data.distribution.averagePerPaycheckCents}
-            healthScore={data.healthScore.totalScore}
-            frequency={data.heatmap.frequency}
-            insights={mockMLInsights}
-            anomalyCount={0}
-          />
-        </Suspense>
-      ) : (
-        <MinimalOverviewTab
-          metrics={{
-            totalAllocations: data.heatmap.totalAllocations,
-            avgPerPaycheck: data.distribution.averagePerPaycheckCents,
-            healthScore: data.healthScore.totalScore,
-            frequency: data.heatmap.frequency,
-          }}
-        />
-      );
-
+      return <OverviewContent isEnhanced={isEnhanced} data={data} transformed={transformed} />;
     case "heatmap":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <InteractiveHeatmapCalendar
-            data={mockHeatmapData}
-            onDateClick={(date) => logger.info("Date clicked", { date })}
-          />
-        </Suspense>
-      ) : (
-        <SimpleHeatmapGrid data={mockSimpleHeatmapData} />
-      );
-
+      return <HeatmapContent isEnhanced={isEnhanced} transformed={transformed} />;
     case "trends":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <EnvelopeAllocationTrendsChart
-            data={mockTrendData}
-            selectedEnvelopes={[data.trends.envelopes[0]?.id || ""]}
-            anomalies={mockAnomalies}
-          />
-        </Suspense>
-      ) : (
-        <BasicTrendsSparkline envelopes={mockEnvelopeSparklines} />
-      );
-
+      return <TrendsContent isEnhanced={isEnhanced} data={data} transformed={transformed} />;
     case "distribution":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <AllocationDistributionChart
-            data={mockDistributionData}
-            viewMode="category"
-            onViewModeChange={(mode) => logger.info("View mode changed", { mode })}
-          />
-        </Suspense>
-      ) : (
-        <DistributionTable data={mockCategoryDistribution} />
-      );
-
+      return <DistributionContent isEnhanced={isEnhanced} transformed={transformed} />;
     case "strategy":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <StrategyPerformanceTable strategies={mockStrategyData} />
-        </Suspense>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
-            Strategy analysis available in enhanced mode
-          </p>
-        </div>
-      );
-
+      return <StrategyContent isEnhanced={isEnhanced} transformed={transformed} />;
     case "health":
-      return isEnhanced ? (
-        <Suspense fallback={<LoadingFallback />}>
-          <HealthScoreGauge
-            score={data.healthScore.totalScore}
-            components={mockHealthComponents}
-            recommendations={mockMLInsights}
-            trendData={mockHealthTrend}
-          />
-        </Suspense>
-      ) : (
-        <MinimalHealthGauge score={data.healthScore.totalScore} />
-      );
-
+      return <HealthContent isEnhanced={isEnhanced} data={data} transformed={transformed} />;
     default:
       return (
         <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">

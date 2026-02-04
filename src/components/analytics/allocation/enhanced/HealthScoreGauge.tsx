@@ -86,6 +86,68 @@ const ComponentProgress: React.FC<ComponentProgressProps> = ({ component }) => {
  * />
  * ```
  */
+interface GaugeChartProps {
+  score: number;
+  color: string;
+  circumference: number;
+  progress: number;
+}
+
+const GaugeChart: React.FC<GaugeChartProps> = ({ score, color, circumference, progress }) => (
+  <svg width="220" height="220" className="mb-4">
+    {/* Background circle */}
+    <circle
+      cx="110"
+      cy="110"
+      r="80"
+      fill="none"
+      stroke="#e5e7eb"
+      strokeWidth="12"
+      className="dark:stroke-gray-700"
+    />
+
+    {/* Progress circle */}
+    <circle
+      cx="110"
+      cy="110"
+      r="80"
+      fill="none"
+      stroke={color}
+      strokeWidth="12"
+      strokeDasharray={circumference}
+      strokeDashoffset={circumference - progress}
+      transform="rotate(-90 110 110)"
+      strokeLinecap="round"
+      className="transition-all duration-1000"
+    />
+
+    {/* Score text */}
+    <text
+      x="110"
+      y="110"
+      textAnchor="middle"
+      fontSize="48"
+      fontWeight="bold"
+      fill={color}
+      className="dark:fill-current"
+    >
+      {score}
+    </text>
+
+    {/* Label */}
+    <text
+      x="110"
+      y="140"
+      textAnchor="middle"
+      fontSize="14"
+      fill="#6b7280"
+      className="dark:fill-gray-400"
+    >
+      out of 100
+    </text>
+  </svg>
+);
+
 export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({
   score,
   components,
@@ -109,58 +171,12 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({
         {/* Gauge and Sparkline */}
         <div className="flex flex-col items-center">
           {/* Circular Gauge */}
-          <svg width="220" height="220" className="mb-4">
-            {/* Background circle */}
-            <circle
-              cx="110"
-              cy="110"
-              r="80"
-              fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="12"
-              className="dark:stroke-gray-700"
-            />
-
-            {/* Progress circle */}
-            <circle
-              cx="110"
-              cy="110"
-              r="80"
-              fill="none"
-              stroke={color}
-              strokeWidth="12"
-              strokeDasharray={circumference}
-              strokeDashoffset={circumference - progress}
-              transform="rotate(-90 110 110)"
-              strokeLinecap="round"
-              className="transition-all duration-1000"
-            />
-
-            {/* Score text */}
-            <text
-              x="110"
-              y="110"
-              textAnchor="middle"
-              fontSize="48"
-              fontWeight="bold"
-              fill={color}
-              className="dark:fill-current"
-            >
-              {score}
-            </text>
-
-            {/* Label */}
-            <text
-              x="110"
-              y="140"
-              textAnchor="middle"
-              fontSize="14"
-              fill="#6b7280"
-              className="dark:fill-gray-400"
-            >
-              out of 100
-            </text>
-          </svg>
+          <GaugeChart
+            score={score}
+            color={color}
+            circumference={circumference}
+            progress={progress}
+          />
 
           {/* Status badge */}
           <div
@@ -253,5 +269,3 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({
     </div>
   );
 };
-
-export default HealthScoreGauge;

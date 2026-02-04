@@ -10,12 +10,12 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 import numpy as np
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest  # type: ignore
+from sklearn.preprocessing import StandardScaler  # type: ignore
 
 # Add parent directory to path for utils import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import utils
+import utils  # type: ignore
 
 
 class Handler(BaseHTTPRequestHandler):

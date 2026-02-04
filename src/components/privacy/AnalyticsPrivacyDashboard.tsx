@@ -6,13 +6,13 @@
 import React, { useState, useCallback } from "react";
 import { useAuditTrail } from "@/hooks/privacy/useAuditTrail";
 import { EncryptedPayloadInspector } from "./EncryptedPayloadInspector";
+import { AuditTrailTable } from "./AuditTrailTable";
+import { ConnectionStatusCard, ConnectionStatus } from "./ConnectionStatusCard";
 import Button from "@/components/ui/buttons/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ConfirmModal from "@/components/ui/modals/ConfirmModal";
 import { useToastHelpers } from "@/utils/core/common/toastHelpers";
 import logger from "@/utils/core/common/logger";
-
-type ConnectionStatus = "idle" | "testing" | "success" | "error";
 
 interface ConnectionTestResponse {
   status: string;
@@ -128,18 +128,7 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
       </div>
 
       {/* Connection Status */}
-      <div className="border rounded-lg p-4 bg-white/50 backdrop-blur-sm">
-        <h3 className="font-semibold text-gray-900 mb-3">Connection Status</h3>
-        <div className="flex items-center gap-3">
-          <StatusIndicator status={connectionStatus} />
-          <div className="flex-1">
-            <span className="text-sm font-medium text-gray-900">
-              {getStatusText(connectionStatus)}
-            </span>
-            {connectionDetails && <p className="text-xs text-gray-600 mt-1">{connectionDetails}</p>}
-          </div>
-        </div>
-      </div>
+      <ConnectionStatusCard status={connectionStatus} details={connectionDetails} />
 
       {/* Data Inspector (conditional) */}
       {showInspector && <EncryptedPayloadInspector />}
@@ -198,97 +187,10 @@ export function AnalyticsPrivacyDashboard(): React.ReactElement {
               </p>
             </div>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b">
-                <tr>
-                  <th className="p-3 text-left font-semibold text-gray-700">Timestamp</th>
-                  <th className="p-3 text-left font-semibold text-gray-700">Endpoint</th>
-                  <th className="p-3 text-left font-semibold text-gray-700">Encrypted</th>
-                  <th className="p-3 text-left font-semibold text-gray-700">Payload Size</th>
-                  <th className="p-3 text-left font-semibold text-gray-700">Response Time</th>
-                  <th className="p-3 text-left font-semibold text-gray-700">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.slice(0, 50).map((log) => (
-                  <tr key={log.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="p-3 text-gray-700">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
-                    <td className="p-3 text-gray-700 font-mono text-xs">{log.endpoint}</td>
-                    <td className="p-3">
-                      {log.encrypted ? (
-                        <span className="text-green-600 font-semibold flex items-center gap-1">
-                          ✓ Encrypted
-                        </span>
-                      ) : (
-                        <span className="text-red-600 font-semibold flex items-center gap-1">
-                          ✗ Not Encrypted
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3 text-gray-700">{formatBytes(log.encryptedPayloadSize)}</td>
-                    <td className="p-3 text-gray-700">{log.responseTimeMs}ms</td>
-                    <td className="p-3">
-                      {log.success ? (
-                        <span className="text-green-600 font-semibold">Success</span>
-                      ) : (
-                        <span className="text-red-600 font-semibold" title={log.errorMessage}>
-                          Error
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <AuditTrailTable logs={logs} />
           )}
         </div>
       </div>
     </div>
   );
-}
-
-/**
- * Status indicator component
- */
-function StatusIndicator({ status }: { status: ConnectionStatus }): React.ReactElement {
-  const colors: Record<ConnectionStatus, string> = {
-    idle: "bg-gray-400",
-    testing: "bg-yellow-400 animate-pulse",
-    success: "bg-green-500",
-    error: "bg-red-500",
-  };
-
-  return (
-    <div
-      className={`w-3 h-3 rounded-full ${colors[status]}`}
-      role="status"
-      aria-live="polite"
-      aria-label={getStatusText(status)}
-      title={getStatusText(status)}
-    />
-  );
-}
-
-/**
- * Get status text for connection status
- */
-function getStatusText(status: ConnectionStatus): string {
-  const texts: Record<ConnectionStatus, string> = {
-    idle: "Not tested",
-    testing: "Testing connection...",
-    success: "Connected",
-    error: "Connection failed",
-  };
-  return texts[status];
-}
-
-/**
- * Format bytes to human-readable format
- */
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

@@ -174,7 +174,7 @@ export async function calculateHeatmap(
     if (txn.amount >= 0) continue;
 
     const date = new Date(txn.date);
-    const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const dateKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
 
     const existing = dateMap.get(dateKey);
     if (existing) {
@@ -211,6 +211,57 @@ export async function calculateHeatmap(
 }
 
 /**
+ * Get period key for trend aggregation
+ */
+function getTrendPeriodKey(date: Date, periodType: "daily" | "weekly" | "monthly"): string {
+  if (periodType === "daily") {
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+  } else if (periodType === "weekly") {
+    // Simplified week number calculation (not ISO-compliant)
+    const weekNum = Math.ceil((date.getUTCDate() + 6 - date.getUTCDay()) / 7);
+    return `${date.getUTCFullYear()}-W${String(weekNum).padStart(2, "0")}`;
+  } else {
+    // monthly
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+  }
+}
+
+/**
+ * Calculate spending trends by period
+ * Uses native Date methods only
+ */
+/**
+ * Process a single transaction for trends
+ */
+function processTransactionForTrend(
+  txn: Transaction,
+  periodMap: Map<string, { income: number; expenses: number; count: number }>,
+  periodType: "daily" | "weekly" | "monthly"
+): void {
+  const date = new Date(txn.date);
+  const periodKey = getTrendPeriodKey(date, periodType);
+
+  const existing = periodMap.get(periodKey);
+  const isIncome = txn.amount > 0;
+  const amount = Math.abs(txn.amount);
+
+  if (existing) {
+    if (isIncome) {
+      existing.income += amount;
+    } else {
+      existing.expenses += amount;
+    }
+    existing.count++;
+  } else {
+    periodMap.set(periodKey, {
+      income: isIncome ? amount : 0,
+      expenses: isIncome ? 0 : amount,
+      count: 1,
+    });
+  }
+}
+
+/**
  * Calculate spending trends by period
  * Uses native Date methods only
  */
@@ -237,40 +288,7 @@ export async function calculateTrends(
   const periodMap = new Map<string, { income: number; expenses: number; count: number }>();
 
   for (const txn of transactions) {
-    const date = new Date(txn.date);
-    let periodKey: string;
-
-    if (periodType === "daily") {
-      periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    } else if (periodType === "weekly") {
-      // Simplified week number calculation (not ISO-compliant)
-      // Note: This is an approximation and doesn't handle cross-year/month boundaries correctly
-      // For production use, consider implementing proper ISO 8601 week date calculation
-      const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
-      periodKey = `${date.getFullYear()}-W${String(weekNum).padStart(2, "0")}`;
-    } else {
-      // monthly
-      periodKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    }
-
-    const existing = periodMap.get(periodKey);
-    const isIncome = txn.amount > 0;
-    const amount = Math.abs(txn.amount);
-
-    if (existing) {
-      if (isIncome) {
-        existing.income += amount;
-      } else {
-        existing.expenses += amount;
-      }
-      existing.count++;
-    } else {
-      periodMap.set(periodKey, {
-        income: isIncome ? amount : 0,
-        expenses: isIncome ? 0 : amount,
-        count: 1,
-      });
-    }
+    processTransactionForTrend(txn, periodMap, periodType);
   }
 
   // Convert to array and calculate net
@@ -395,12 +413,18 @@ export function isWebWorkerSupported(): boolean {
   return typeof Worker !== "undefined";
 }
 
-/**
- * Export for Web Worker usage
- */
 export const workerFunctions = {
   calculateHeatmap,
   calculateTrends,
   calculateCategoryBreakdown,
   getQuickStats,
+};
+
+export const minimalAnalyticsService = {
+  calculateHeatmap,
+  calculateTrends,
+  calculateCategoryBreakdown,
+  getQuickStats,
+  invalidateAnalyticsCache,
+  isWebWorkerSupported,
 };

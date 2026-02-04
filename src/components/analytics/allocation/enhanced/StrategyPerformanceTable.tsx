@@ -45,6 +45,9 @@ const Badge: React.FC<BadgeProps> = ({ variant, children }) => {
   );
 };
 
+const ChevronUpIcon = getIcon("ChevronUp");
+const ChevronDownIcon = getIcon("ChevronDown");
+
 /**
  * StrategyPerformanceTable Component
  *
@@ -67,9 +70,6 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
   const [sortBy, setSortBy] = useState<SortField>("strategy");
   const [sortDir, setSortDir] = useState<SortDirection>("asc");
   const chartRef = useRef<HTMLDivElement>(null);
-
-  const ChevronUpIcon = getIcon("ChevronUp");
-  const ChevronDownIcon = getIcon("ChevronDown");
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -186,77 +186,84 @@ export const StrategyPerformanceTable: React.FC<StrategyPerformanceTableProps> =
       </div>
 
       {/* Bar chart comparison */}
-      <div className="mt-6">
-        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Visual Comparison</h4>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={sorted}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#e5e7eb"
-              className="dark:stroke-gray-700"
-            />
-            <XAxis dataKey="strategy" stroke="#6b7280" className="dark:stroke-gray-400" />
-            <YAxis
-              tickFormatter={(value: number) => `$${(value / 100).toFixed(0)}`}
-              stroke="#6b7280"
-              className="dark:stroke-gray-400"
-            />
-            <Tooltip
-              formatter={(value: number | undefined) =>
-                value !== undefined
-                  ? [`$${(value / 100).toFixed(2)}`, "Avg Amount"]
-                  : ["N/A", "Avg Amount"]
-              }
-              contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-              }}
-            />
-            <Bar dataKey="avgAmount" fill="#8884d8" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <StrategyPerformanceChart data={sorted} />
 
       {/* Insights panel */}
-      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Insights</h4>
-        <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-          {sorted.length > 0 && (
-            <>
-              <p>
-                • <strong>{sorted[0]!.strategy}</strong> has the{" "}
-                {sortBy === "avgAmount" && sortDir === "desc"
-                  ? "highest"
-                  : sortBy === "successRate" && sortDir === "desc"
-                    ? "best"
-                    : "top"}{" "}
-                performance in the selected metric.
-              </p>
-              {strategies.filter((s) => s.recommendation === "good").length > 0 && (
-                <p>
-                  • {strategies.filter((s) => s.recommendation === "good").length} strateg
-                  {strategies.filter((s) => s.recommendation === "good").length === 1
-                    ? "y"
-                    : "ies"}{" "}
-                  rated as <strong>good</strong>.
-                </p>
-              )}
-              {strategies.filter((s) => s.recommendation === "poor").length > 0 && (
-                <p className="text-amber-700 dark:text-amber-400">
-                  ⚠ {strategies.filter((s) => s.recommendation === "poor").length} strateg
-                  {strategies.filter((s) => s.recommendation === "poor").length === 1
-                    ? "y"
-                    : "ies"}{" "}
-                  needs improvement.
-                </p>
-              )}
-            </>
-          )}
-        </div>
+      <InsightsPanel strategies={strategies} sorted={sorted} sortBy={sortBy} sortDir={sortDir} />
+    </div>
+  );
+};
+
+interface InsightsPanelProps {
+  strategies: StrategyData[];
+  sorted: StrategyData[];
+  sortBy: SortField;
+  sortDir: SortDirection;
+}
+
+const InsightsPanel: React.FC<InsightsPanelProps> = ({ strategies, sorted, sortBy, sortDir }) => {
+  if (sorted.length === 0) return null;
+
+  return (
+    <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Insights</h4>
+      <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+        <p>
+          • <strong>{sorted[0]!.strategy}</strong> has the{" "}
+          {sortBy === "avgAmount" && sortDir === "desc"
+            ? "highest"
+            : sortBy === "successRate" && sortDir === "desc"
+              ? "best"
+              : "top"}{" "}
+          performance in the selected metric.
+        </p>
+        {strategies.filter((s) => s.recommendation === "good").length > 0 && (
+          <p>
+            • {strategies.filter((s) => s.recommendation === "good").length} strateg
+            {strategies.filter((s) => s.recommendation === "good").length === 1 ? "y" : "ies"} rated
+            as <strong>good</strong>.
+          </p>
+        )}
+        {strategies.filter((s) => s.recommendation === "poor").length > 0 && (
+          <p className="text-amber-700 dark:text-amber-400">
+            ⚠ {strategies.filter((s) => s.recommendation === "poor").length} strateg
+            {strategies.filter((s) => s.recommendation === "poor").length === 1 ? "y" : "ies"} needs
+            improvement.
+          </p>
+        )}
       </div>
     </div>
   );
 };
+
+const StrategyPerformanceChart = ({ data }: { data: StrategyData[] }) => (
+  <div className="mt-6">
+    <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Visual Comparison</h4>
+    <ResponsiveContainer width="100%" height={200}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+        <XAxis dataKey="strategy" stroke="#6b7280" className="dark:stroke-gray-400" />
+        <YAxis
+          tickFormatter={(value: number) => `$${(value / 100).toFixed(0)}`}
+          stroke="#6b7280"
+          className="dark:stroke-gray-400"
+        />
+        <Tooltip
+          formatter={(value: number | undefined) =>
+            value !== undefined
+              ? [`$${(value / 100).toFixed(2)}`, "Avg Amount"]
+              : ["N/A", "Avg Amount"]
+          }
+          contentStyle={{
+            backgroundColor: "#fff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px",
+          }}
+        />
+        <Bar dataKey="avgAmount" fill="#8884d8" radius={[8, 8, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+);
 
 export default StrategyPerformanceTable;

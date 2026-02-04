@@ -11,17 +11,17 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 import numpy as np
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor  # type: ignore
 
 # Add parent directory to path for utils import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import utils
+import utils  # type: ignore
 
 
 class Handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler for allocation predictions"""
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         """Handle POST request for allocation predictions"""
         try:
             # Parse request body
@@ -65,7 +65,7 @@ class Handler(BaseHTTPRequestHandler):
             # Cleanup sensitive data
             utils.cleanup_memory()
 
-    def do_OPTIONS(self):
+    def do_OPTIONS(self) -> None:
         """Handle CORS preflight"""
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")

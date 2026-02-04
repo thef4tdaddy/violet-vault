@@ -59,7 +59,7 @@ export function useAuditTrail(): UseAuditTrailReturn {
         auditTrailService.getLogs(),
         auditTrailService.getCount(),
       ]);
-      setLogs(allLogs);
+      setLogs(allLogs || []);
       setCount(logCount);
     } catch (error) {
       logger.error("Failed to load audit logs in hook", error);
@@ -149,7 +149,8 @@ export function useAuditTrail(): UseAuditTrailReturn {
         document.removeEventListener("visibilitychange", handleVisibilityChange);
       }
     };
-  }, [loadLogs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     logs,

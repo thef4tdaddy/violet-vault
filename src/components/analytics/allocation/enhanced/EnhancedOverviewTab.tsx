@@ -46,8 +46,6 @@ const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
     info: "text-blue-700 dark:text-blue-300",
   };
 
-  const Icon = getIcon(iconMap[insight.type]);
-
   return (
     <div
       className={`p-4 rounded-lg border-l-4 ${colorMap[insight.type]}`}
@@ -56,7 +54,7 @@ const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
     >
       <div className="flex items-start gap-3">
         <div className={textColorMap[insight.type]}>
-          <Icon className="h-5 w-5 mt-0.5" />
+          {React.createElement(getIcon(iconMap[insight.type]), { className: "h-5 w-5 mt-0.5" })}
         </div>
         <div className="flex-1">
           <h4 className={`font-bold ${textColorMap[insight.type]}`}>{insight.title}</h4>

@@ -346,7 +346,7 @@ if (typeof window !== "undefined") {
   });
 
   // Also lock on visibility change (user switches tabs for extended period)
-  let hiddenTimeout: NodeJS.Timeout | null = null;
+  let hiddenTimeout: ReturnType<typeof setTimeout> | null = null;
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       // Lock after 30 minutes of inactivity

@@ -110,7 +110,8 @@ export async function encryptData(data: unknown, key: CryptoKey): Promise<Encryp
     const ciphertextWithTag = await crypto.subtle.encrypt(
       {
         name: ENCRYPTION_CONFIG.algorithm,
-        iv,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        iv: iv as any,
         tagLength: ENCRYPTION_CONFIG.tagLength,
       },
       key,
@@ -123,7 +124,8 @@ export async function encryptData(data: unknown, key: CryptoKey): Promise<Encryp
 
     return {
       ciphertext: arrayBufferToBase64(ciphertext),
-      iv: arrayBufferToBase64(iv),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      iv: arrayBufferToBase64(iv as any),
       authTag: arrayBufferToBase64(authTag),
       algorithm: "AES-256-GCM",
     };
@@ -250,7 +252,8 @@ export async function deriveKey(
  */
 export function generateSalt(): string {
   const salt = crypto.getRandomValues(new Uint8Array(16)); // 128 bits
-  return arrayBufferToBase64(salt);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return arrayBufferToBase64(salt as any);
 }
 
 /**
@@ -267,7 +270,8 @@ export async function exportKey(key: CryptoKey, wrappingKey: CryptoKey): Promise
   try {
     const wrapped = await crypto.subtle.wrapKey("raw", key, wrappingKey, {
       name: ENCRYPTION_CONFIG.algorithm,
-      iv: generateIV(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      iv: generateIV() as any,
     });
     return arrayBufferToBase64(wrapped);
   } catch (error) {
@@ -289,7 +293,6 @@ export function clearSensitiveData(sensitiveData: Record<string, unknown> | stri
     // Overwrite all properties
     for (const key in sensitiveData) {
       if (Object.prototype.hasOwnProperty.call(sensitiveData, key)) {
-        // @ts-expect-error - Intentionally overwriting
         sensitiveData[key] = null;
       }
     }

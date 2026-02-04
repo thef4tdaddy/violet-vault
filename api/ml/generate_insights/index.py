@@ -15,13 +15,13 @@ import numpy as np
 
 # Add parent directory to path for utils import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import utils
+import utils  # type: ignore
 
 
 class Handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler for insights generation"""
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         """Handle POST request for insights generation"""
         try:
             # Parse request body
@@ -63,7 +63,7 @@ class Handler(BaseHTTPRequestHandler):
             # Cleanup sensitive data
             utils.cleanup_memory()
 
-    def do_OPTIONS(self):
+    def do_OPTIONS(self) -> None:
         """Handle CORS preflight"""
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -92,7 +92,7 @@ def generate_insights(transactions: list[dict[str, Any]]) -> list[utils.MLInsigh
     if len(transactions) < 5:
         return []
 
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Detect various patterns
     insights.extend(detect_savings_trends(transactions))
@@ -115,7 +115,7 @@ def generate_insights(transactions: list[dict[str, Any]]) -> list[utils.MLInsigh
 
 def detect_savings_trends(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Detect trends in savings allocations"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Filter savings transactions
     savings_txs = [
@@ -170,7 +170,7 @@ def detect_savings_trends(transactions: list[dict[str, Any]]) -> list[utils.MLIn
 
 def detect_lifestyle_creep(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Detect lifestyle creep (increasing discretionary spending)"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Filter discretionary transactions
     discretionary_categories = ["entertainment", "dining", "shopping", "hobbies", "personal"]
@@ -215,7 +215,7 @@ def detect_lifestyle_creep(transactions: list[dict[str, Any]]) -> list[utils.MLI
 
 def detect_seasonal_patterns(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Detect seasonal spending patterns"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Group by month of year
     monthly_totals = defaultdict(list)
@@ -261,7 +261,7 @@ def detect_seasonal_patterns(transactions: list[dict[str, Any]]) -> list[utils.M
 
 def detect_goal_progress(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Detect progress toward financial goals"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Check emergency fund progress
     emergency_txs = [tx for tx in transactions if "emergency" in tx.get("category", "").lower()]
@@ -301,7 +301,7 @@ def detect_goal_progress(transactions: list[dict[str, Any]]) -> list[utils.MLIns
 
 def detect_consistency_patterns(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Detect allocation consistency patterns"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Group by date to find allocation frequency
     dates = set()
@@ -342,10 +342,10 @@ def detect_consistency_patterns(transactions: list[dict[str, Any]]) -> list[util
 
 def generate_recommendations(transactions: list[dict[str, Any]]) -> list[utils.MLInsight]:
     """Generate actionable recommendations"""
-    insights = []
+    insights: list[utils.MLInsight] = []
 
     # Calculate allocation distribution
-    category_totals = defaultdict(float)
+    category_totals: dict[str, float] = defaultdict(float)
     total_allocated = 0
 
     for tx in transactions:
@@ -395,7 +395,7 @@ def generate_recommendations(transactions: list[dict[str, Any]]) -> list[utils.M
 
 def group_by_month(transactions: list[dict[str, Any]]) -> dict[str, float]:
     """Group transactions by month and sum amounts"""
-    monthly = defaultdict(float)
+    monthly: dict[str, float] = defaultdict(float)
 
     for tx in transactions:
         date_str = tx.get("date", "")

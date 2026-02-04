@@ -18,7 +18,7 @@
 import { encryptData, decryptData } from "@/utils/security/encryption";
 import { keyManagement } from "@/utils/security/keyManagement";
 import logger from "@/utils/core/common/logger";
-import type { EncryptedData, EncryptedPayload } from "@/utils/security/encryption";
+import type { EncryptedPayload } from "@/utils/security/encryption";
 import type { AllocationTransaction } from "@/types/allocation";
 
 /**
@@ -31,9 +31,9 @@ const ENDPOINTS = {
   HEALTH: "/api/analytics/health-calculator",
 
   // Python ML endpoints
-  PREDICT: "/api/ml/predict-allocations",
-  ANOMALIES: "/api/ml/detect-anomalies",
-  INSIGHTS: "/api/ml/generate-insights",
+  PREDICT: "/api/ml/predict_allocations",
+  ANOMALIES: "/api/ml/detect_anomalies",
+  INSIGHTS: "/api/ml/generate_insights",
 } as const;
 
 /**
@@ -77,7 +77,7 @@ function sleep(ms: number): Promise<void> {
  */
 async function fetchWithTimeout(
   url: string,
-  options: RequestInit,
+  options: globalThis.RequestInit,
   timeout: number
 ): Promise<Response> {
   const controller = new AbortController();
@@ -97,76 +97,74 @@ async function fetchWithTimeout(
 /**
  * Make encrypted API call with retry logic
  */
+async function performEncryptedRequest<T>(endpoint: string, payload: unknown): Promise<T> {
+  // Get encryption key
+  const key = keyManagement.getKey();
+  if (!key) {
+    throw new Error("Encryption not unlocked. Please unlock Tier 2 analytics first.");
+  }
+
+  // Encrypt payload
+  const encryptedPayload = await encryptData(payload, key);
+  logger.debug("Making encrypted API call", {
+    endpoint,
+    payloadSize: new Blob([JSON.stringify(encryptedPayload)]).size,
+  });
+
+  // Make API call
+  const response = await fetchWithTimeout(
+    endpoint,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ encrypted: encryptedPayload }),
+    },
+    REQUEST_TIMEOUT
+  );
+
+  // Handle non-OK responses
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new ApiError(`API call failed: ${errorText}`, response.status, endpoint);
+  }
+
+  // Parse response
+  const data = await response.json();
+
+  // Decrypt response if encrypted
+  if (data.encrypted) {
+    const decrypted = await decryptData<T>(data.encrypted as EncryptedPayload, key);
+    logger.debug("API call successful (encrypted response)", { endpoint });
+    return decrypted;
+  }
+
+  // Return unencrypted response (for health checks, etc.)
+  logger.debug("API call successful (plain response)", { endpoint });
+  return data as T;
+}
+
+/**
+ * Make encrypted API call with retry logic
+ */
 async function callApiWithRetry<T>(
   endpoint: string,
   payload: unknown,
   retries: number = RETRY_CONFIG.maxRetries
 ): Promise<T> {
   let lastError: Error | null = null;
-  let delay = RETRY_CONFIG.initialDelay;
+  let delay: number = RETRY_CONFIG.initialDelay;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      // Get encryption key
-      const key = keyManagement.getKey();
-      if (!key) {
-        throw new Error("Encryption not unlocked. Please unlock Tier 2 analytics first.");
-      }
-
-      // Encrypt payload
-      const encryptedPayload = await encryptData(payload, key);
-
-      logger.debug("Making encrypted API call", {
-        endpoint,
-        attempt: attempt + 1,
-        payloadSize: new Blob([JSON.stringify(encryptedPayload)]).size,
-      });
-
-      // Make API call
-      const response = await fetchWithTimeout(
-        endpoint,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ encrypted: encryptedPayload }),
-        },
-        REQUEST_TIMEOUT
-      );
-
-      // Handle non-OK responses
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new ApiError(`API call failed: ${errorText}`, response.status, endpoint);
-      }
-
-      // Parse response
-      const data = await response.json();
-
-      // Decrypt response if encrypted
-      if (data.encrypted) {
-        const decrypted = await decryptData<T>(data.encrypted as EncryptedPayload, key);
-        logger.debug("API call successful (encrypted response)", { endpoint });
-        return decrypted;
-      }
-
-      // Return unencrypted response (for health checks, etc.)
-      logger.debug("API call successful (plain response)", { endpoint });
-      return data as T;
+      return await performEncryptedRequest<T>(endpoint, payload);
     } catch (error) {
       lastError = error as Error;
 
       // Don't retry on certain errors
-      if (error instanceof ApiError) {
-        if (error.statusCode === 401 || error.statusCode === 403) {
-          // Authentication errors shouldn't retry
-          throw error;
-        }
-      }
-
-      // Don't retry encryption errors
-      if (error instanceof Error && error.message.includes("encryption")) {
+      if (
+        (error instanceof ApiError && (error.statusCode === 401 || error.statusCode === 403)) ||
+        (error instanceof Error && error.message.includes("encryption"))
+      ) {
         throw error;
       }
 

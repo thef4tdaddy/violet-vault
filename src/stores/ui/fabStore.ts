@@ -271,13 +271,6 @@ export const useFABStore = create<FABState>()(
       }),
       {
         name: "fab-store",
-        // Only store non-function values in devtools
-        serialize: {
-          options: {
-            map: false, // Don't serialize Maps
-            function: false, // Don't serialize functions
-          },
-        },
       }
     )
   )

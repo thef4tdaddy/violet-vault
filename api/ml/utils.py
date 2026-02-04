@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 from typing import Any, TypedDict
 
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM  # type: ignore
 
 # Type Definitions (matching TypeScript/Go types)
 

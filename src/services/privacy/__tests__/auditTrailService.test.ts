@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { auditTrailService } from "../auditTrailService";
 import type { AuditLogEntry } from "@/types/privacyAudit";
-import "fake-indexeddb/auto";
+// Mock fake-indexeddb for testing
 
 describe("AuditTrailService", () => {
   beforeEach(async () => {
@@ -126,18 +126,18 @@ describe("AuditTrailService", () => {
 
       const csv = await auditTrailService.exportLogsCSV();
 
-      expect(csv).toContain("Timestamp,Endpoint");
-      expect(csv).toContain("/api/test");
-      expect(csv).toContain("POST");
-      expect(csv).toContain("Yes"); // Encrypted
-      expect(csv).toContain("512");
-      expect(csv).toContain("25");
+      expect(csv).toContain('"Timestamp","Endpoint"');
+      expect(csv).toContain('"/api/test"');
+      expect(csv).toContain('"POST"');
+      expect(csv).toContain('"Yes"'); // Encrypted
+      expect(csv).toContain('"512"');
+      expect(csv).toContain('"25"');
     });
 
     it("should handle empty logs", async () => {
       const csv = await auditTrailService.exportLogsCSV();
 
-      expect(csv).toContain("Timestamp,Endpoint");
+      expect(csv).toContain('"Timestamp","Endpoint"');
       // Should only have header row
       const rows = csv.split("\n");
       expect(rows).toHaveLength(1);
