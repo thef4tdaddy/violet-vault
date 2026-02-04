@@ -11,24 +11,6 @@ vi.mock("@/utils", () => ({
   )),
 }));
 
-// Mock performance utils
-vi.mock("@/utils/performanceUtils", () => ({
-  getRecommendationIconType: vi.fn((type) => {
-    switch (type) {
-      case "saving":
-        return { name: "CheckCircle", color: "text-green-500" };
-      case "spending":
-        return { name: "AlertTriangle", color: "text-yellow-500" };
-      case "investment":
-        return { name: "TrendingUp", color: "text-blue-500" };
-      case "tip":
-        return { name: "Zap", color: "text-purple-500" };
-      default:
-        return { name: "CheckCircle", color: "text-green-500" };
-    }
-  }),
-}));
-
 describe("PerformanceRecommendationsTab", () => {
   describe("Empty State", () => {
     it("renders empty state when no recommendations provided", () => {
