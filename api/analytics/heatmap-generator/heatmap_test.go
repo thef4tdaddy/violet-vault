@@ -1,6 +1,11 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -120,6 +125,86 @@ func TestGenerateHeatmap(t *testing.T) {
 		_, err = generateHeatmap(reqInvalid2)
 		if err == nil {
 			t.Error("Expected error for invalid end date")
+		}
+	})
+}
+
+func TestHandler(t *testing.T) {
+	// Setup test key
+	key := []byte("12345678901234567890123456789012")
+	keyHex := hex.EncodeToString(key)
+	t.Setenv("ANALYTICS_ENCRYPTION_KEY", keyHex)
+	t.Setenv("VERCEL_ENV", "development")
+
+	t.Run("OPTIONS Request", func(t *testing.T) {
+		req, _ := http.NewRequest("OPTIONS", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusOK)
+		}
+	})
+
+	t.Run("Method Not Allowed", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusMethodNotAllowed {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusMethodNotAllowed)
+		}
+	})
+
+	t.Run("Successful Processing", func(t *testing.T) {
+		now := time.Now().UTC()
+		data := utils.HeatmapRequest{
+			Transactions: []utils.AllocationTransaction{
+				{Date: now, Amount: 100, EnvelopeID: "env1"},
+			},
+			DateRange: utils.DateRange{
+				Start: now.AddDate(0, 0, -1).Format("2006-01-02"),
+				End:   now.AddDate(0, 0, 1).Format("2006-01-02"),
+			},
+		}
+		encrypted, _ := utils.EncryptData(data, key)
+		reqBody, _ := json.Marshal(utils.EncryptedRequest{Encrypted: encrypted})
+
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(reqBody))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusOK)
+		}
+
+		var resp utils.EncryptedResponse
+		json.NewDecoder(rr.Body).Decode(&resp)
+
+		heatmap, err := utils.DecryptRequest[[]utils.HeatmapDataPoint](utils.EncryptedRequest{Encrypted: resp.Encrypted}, key)
+		if err != nil {
+			t.Fatalf("Failed to decrypt: %v", err)
+		}
+
+		if len(heatmap) == 0 {
+			t.Error("Expected heatmap data")
+		}
+	})
+
+	t.Run("Encryption Key Failure", func(t *testing.T) {
+		t.Setenv("ANALYTICS_ENCRYPTION_KEY", "invalid")
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("{}"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusInternalServerError)
+		}
+	})
+
+	t.Run("Invalid JSON Body", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("invalid"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusBadRequest)
 		}
 	})
 }

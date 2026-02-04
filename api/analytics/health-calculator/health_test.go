@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"math"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"sync"
 	"testing"
@@ -312,4 +317,108 @@ func TestCalculateDiscretionary(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHandler(t *testing.T) {
+	// Setup test key (32 bytes hex)
+	key := []byte("12345678901234567890123456789012")
+	keyHex := hex.EncodeToString(key)
+	t.Setenv("ANALYTICS_ENCRYPTION_KEY", keyHex)
+	t.Setenv("VERCEL_ENV", "development") // Avoid production key requirement
+
+	t.Run("OPTIONS Request", func(t *testing.T) {
+		req, _ := http.NewRequest("OPTIONS", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+		if rr.Header().Get("Access-Control-Allow-Origin") != "*" {
+			t.Error("CORS header not set")
+		}
+	})
+
+	t.Run("Method Not Allowed", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusMethodNotAllowed {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusMethodNotAllowed)
+		}
+	})
+
+	t.Run("Invalid JSON Body", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("invalid json"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
+		}
+	})
+
+	t.Run("Decryption Failure", func(t *testing.T) {
+		payload := utils.EncryptedRequest{
+			Encrypted: utils.EncryptedPayload{
+				Ciphertext: "dG9vLXNob3J0",     // "too-short" in base64
+				IV:         "MTIzNDU2Nzg5MDEy", // 12 bytes in base64
+				AuthTag:    "MTIzNDU2Nzg5MDEyMzQ1Ng==",
+				Algorithm:  "AES-256-GCM",
+			},
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(body))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
+		}
+	})
+
+	t.Run("Successful Processing", func(t *testing.T) {
+		data := utils.HealthRequest{
+			Transactions: []utils.AllocationTransaction{
+				{Date: time.Now(), Category: "Rent", Amount: 1000},
+			},
+		}
+		encrypted, _ := utils.EncryptData(data, key)
+		reqBody, _ := json.Marshal(utils.EncryptedRequest{Encrypted: encrypted})
+
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(reqBody))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+
+		var resp utils.EncryptedResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("Failed to decode response: %v", err)
+		}
+
+		// Use DecryptRequest convenience helper
+		healthResp, err := utils.DecryptRequest[utils.HealthResponse](utils.EncryptedRequest{Encrypted: resp.Encrypted}, key)
+		if err != nil {
+			t.Fatalf("Failed to decrypt response: %v", err)
+		}
+
+		if len(healthResp.Components) == 0 {
+			t.Error("Expected health components in response")
+		}
+	})
+
+	t.Run("Encryption Key Failure", func(t *testing.T) {
+		t.Setenv("ANALYTICS_ENCRYPTION_KEY", "invalid")
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("{}"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusInternalServerError)
+		}
+	})
 }

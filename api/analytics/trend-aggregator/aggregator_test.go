@@ -1,6 +1,11 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -127,4 +132,109 @@ func TestGenerateTrends(t *testing.T) {
 	if _, ok := resp.Metadata["env1"]; !ok {
 		t.Error("Missing metadata for env1")
 	}
+}
+
+func TestHandler(t *testing.T) {
+	// Setup test key
+	key := []byte("12345678901234567890123456789012")
+	keyHex := hex.EncodeToString(key)
+	t.Setenv("ANALYTICS_ENCRYPTION_KEY", keyHex)
+	t.Setenv("VERCEL_ENV", "development")
+
+	t.Run("OPTIONS Request", func(t *testing.T) {
+		req, _ := http.NewRequest("OPTIONS", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusOK)
+		}
+	})
+
+	t.Run("Method Not Allowed", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/", nil)
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusMethodNotAllowed {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusMethodNotAllowed)
+		}
+	})
+
+	t.Run("Successful Processing", func(t *testing.T) {
+		now := time.Now().UTC()
+		data := utils.TrendRequest{
+			Transactions: []utils.AllocationTransaction{
+				{Date: now, Amount: 100, EnvelopeID: "env1"},
+			},
+			EnvelopeIDs: []string{"env1"},
+			Granularity: "daily",
+		}
+		encrypted, _ := utils.EncryptData(data, key)
+		reqBody, _ := json.Marshal(utils.EncryptedRequest{Encrypted: encrypted})
+
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(reqBody))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusOK)
+		}
+
+		var resp utils.EncryptedResponse
+		json.NewDecoder(rr.Body).Decode(&resp)
+
+		trendResp, err := utils.DecryptRequest[utils.TrendResponse](utils.EncryptedRequest{Encrypted: resp.Encrypted}, key)
+		if err != nil {
+			t.Fatalf("Failed to decrypt: %v", err)
+		}
+
+		if len(trendResp.Data) == 0 {
+			t.Error("Expected trend data")
+		}
+	})
+
+	t.Run("Encryption Key Failure", func(t *testing.T) {
+		t.Setenv("ANALYTICS_ENCRYPTION_KEY", "invalid")
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("{}"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusInternalServerError)
+		}
+	})
+
+	t.Run("Decryption Failure", func(t *testing.T) {
+		payload := utils.EncryptedRequest{
+			Encrypted: utils.EncryptedPayload{
+				Ciphertext: "invalid",
+				IV:         "MTIzNDU2Nzg5MDEy",
+				AuthTag:    "MTIzNDU2Nzg5MDEyMzQ1Ng==",
+				Algorithm:  "AES-256-GCM",
+			},
+		}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(body))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusBadRequest)
+		}
+	})
+
+	t.Run("Invalid JSON", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/", bytes.NewBufferString("invalid"))
+		rr := httptest.NewRecorder()
+		Handler(rr, req)
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("wrong status: got %v want %v", status, http.StatusBadRequest)
+		}
+	})
+}
+
+func TestLinearRegressionEdgeCases(t *testing.T) {
+	t.Run("Single Point", func(t *testing.T) {
+		slope, intercept, r2 := linearRegression([]float64{1}, []float64{10})
+		if slope != 0 || intercept != 10 || r2 != 0 {
+			t.Errorf("Expected zeros for single point with meanY intercept, got %v, %v, %v", slope, intercept, r2)
+		}
+	})
 }
