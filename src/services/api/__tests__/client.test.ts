@@ -680,5 +680,57 @@ describe("ApiClient", () => {
       const fetchCall = (global.fetch as any).mock.calls[0];
       expect(fetchCall[1].signal).toBeInstanceOf(AbortSignal);
     });
+
+    it("should log audit trail for analytics endpoints", async () => {
+      const { auditTrailService } = await import("@/services/privacy/auditTrailService");
+      const logSpy = vi.spyOn(auditTrailService, "logApiCall").mockResolvedValue();
+
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue("application/json"),
+        },
+        json: vi.fn().mockResolvedValue({ success: true }),
+      });
+
+      // Test with object body
+      await ApiClient.request("/api/analytics/test", {
+        method: "POST",
+        body: { foo: "bar" },
+      });
+      expect(logSpy).toHaveBeenCalled();
+      expect(logSpy).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          endpoint: "/api/analytics/test",
+          encryptedPayloadSize: expect.any(Number),
+        })
+      );
+
+      // Test with string body
+      await ApiClient.request("/api/prediction", {
+        method: "POST",
+        body: JSON.stringify({ foo: "bar" }),
+      });
+      expect(logSpy).toHaveBeenCalledTimes(2);
+
+      // Test with FormData body
+      const formData = new FormData();
+      formData.append("file", "test");
+      await ApiClient.request("/api/categorization", {
+        method: "POST",
+        body: formData,
+      });
+      expect(logSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it("should catch unexpected errors in healthCheck", async () => {
+      // Mock get to throw instead of returning failed response
+      const getSpy = vi.spyOn(ApiClient, "get").mockRejectedValueOnce(new Error("Uncaught error"));
+
+      const result = await ApiClient.healthCheck();
+
+      expect(result).toBe(false);
+      expect(getSpy).toHaveBeenCalled();
+    });
   });
 });

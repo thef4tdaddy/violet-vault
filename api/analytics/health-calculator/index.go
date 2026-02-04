@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -122,6 +123,11 @@ func calculateConsistency(result *utils.HealthComponentScore, transactions []uti
 		date, _ := time.Parse("2006-01-02", dateStr)
 		dates = append(dates, date)
 	}
+
+	// Sort dates
+	sort.Slice(dates, func(i, j int) bool {
+		return dates[i].Before(dates[j])
+	})
 
 	if len(dates) < 2 {
 		result.Score = 0
