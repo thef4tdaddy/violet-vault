@@ -516,9 +516,10 @@ describe("backgroundSyncService", () => {
 
       vi.mocked(budgetDb.cache.toArray).mockResolvedValue(mockCacheEntries);
 
-      // Mock setQueryData to throw a string
+      // Intentionally throw a string to test handling of non-Error objects
+      // This can happen in JavaScript when libraries throw non-standard error types
       vi.mocked(queryClient.setQueryData).mockImplementationOnce(() => {
-        throw "String error";
+        throw "String error"; // eslint-disable-line no-throw-literal
       });
 
       await backgroundSync.restoreFromDexie();
