@@ -221,7 +221,7 @@ const PrivacyProgress = ({
       </div>
       <div className="w-full h-3 bg-gray-200 rounded-full border border-gray-300 overflow-hidden">
         <div
-          className="h-full bg-linear-to-r from-green-400 to-blue-500 transition-all duration-500 rounded-full"
+          className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500 rounded-full"
           style={{
             width: `${getTierProgress(analyticsTier)}%`,
           }}
