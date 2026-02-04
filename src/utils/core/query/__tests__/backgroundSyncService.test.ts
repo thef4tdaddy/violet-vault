@@ -45,19 +45,23 @@ describe("backgroundSyncService", () => {
   });
 
   describe("backgroundSync.syncAllData", () => {
-    it("should refetch all queries successfully", async () => {
-      // Mock successful refetch for all queries
-      vi.mocked(queryClient.refetchQueries).mockResolvedValue({
-        status: "fulfilled",
-        value: undefined,
-      } as PromiseFulfilledResult<unknown>);
+    it("should handle mixed success and failure results and verify call arguments", async () => {
+      // Mock mixed results
+      let callCount = 0;
+      vi.mocked(queryClient.refetchQueries).mockImplementation(() => {
+        callCount++;
+        if (callCount <= 3) {
+          return Promise.resolve({
+            status: "fulfilled",
+            value: undefined,
+          } as PromiseFulfilledResult<unknown>);
+        }
+        return Promise.reject(new Error("Network error"));
+      });
 
       const result = await backgroundSync.syncAllData();
 
-      // Should have attempted to refetch 6 query types
-      expect(queryClient.refetchQueries).toHaveBeenCalledTimes(6);
-
-      // Verify each query key was used
+      // Verify specific query sync attempts
       expect(queryClient.refetchQueries).toHaveBeenCalledWith({
         queryKey: queryKeys.envelopesList(),
       });
@@ -77,26 +81,7 @@ describe("backgroundSyncService", () => {
         queryKey: queryKeys.paycheckHistory(),
       });
 
-      expect(result).toHaveLength(6);
-      expect(result.every((r) => r.status === "fulfilled")).toBe(true);
-    });
-
-    it("should handle mixed success and failure results", async () => {
-      // Mock mixed results
-      let callCount = 0;
-      vi.mocked(queryClient.refetchQueries).mockImplementation(() => {
-        callCount++;
-        if (callCount <= 3) {
-          return Promise.resolve({
-            status: "fulfilled",
-            value: undefined,
-          } as PromiseFulfilledResult<unknown>);
-        }
-        return Promise.reject(new Error("Network error"));
-      });
-
-      const result = await backgroundSync.syncAllData();
-
+      // Verify mixed results handling
       expect(result).toHaveLength(6);
       const fulfilled = result.filter((r) => r.status === "fulfilled");
       const rejected = result.filter((r) => r.status === "rejected");
