@@ -456,21 +456,75 @@ class SalvoRunner:
                     # Smart Summary
                     errors = []
                     if "TypeScript" in check.name:
-                        errors = [line for line in lines if "error TS" in line]
+                        # Capture standard tsc error lines: "src/file.ts:1:1 - error TS..."
+                        errors = [line.strip() for line in lines if "error TS" in line]
+
                     elif "ESLint" in check.name:
+                        # Capture ESLint error lines
                         errors = [
-                            line for line in lines if "error" in line and "warning" not in line
+                            line.strip()
+                            for line in lines
+                            if "error" in line and "warning" not in line and "/" in line
                         ]
+
                     elif "Vitest" in check.name:
-                        errors = [line for line in lines if "FAIL" in line or "Error:" in line]
+                        # Capture Vitest file indicators and errors
+                        # We want lines with "❯" (location) and "×" or "FAIL" or "Error:"
+                        errors = [
+                            line.strip()
+                            for line in lines
+                            if "❯" in line
+                            or "Error:" in line
+                            or "FAIL" in line
+                            or "×" in line
+                            or "❌" in line
+                        ]
+
+                    elif "Vite Build" in check.name:
+                        # Capture Vite/Rollup errors
+                        errors = [
+                            line.strip()
+                            for line in lines
+                            if "error" in line.lower() or "failed" in line.lower()
+                        ]
+
+                    # Fallback for generic checks
+                    elif not errors:
+                        errors = [
+                            line.strip()
+                            for line in lines
+                            if "error" in line.lower() or "fail" in line.lower()
+                        ]
 
                     if errors:
                         print(f"{Colors.YELLOW}  Summary of errors:{Colors.NC}")
-                        for err in errors[:5]:
-                            display_err = (err[:100] + "...") if len(err) > 100 else err
-                            print(f"  {Colors.RED}•{Colors.NC} {display_err.strip()}")
-                        if len(errors) > 5:
-                            print(f"  ... and {len(errors)-5} more.")
+                        # Deduplicate while preserving order
+                        seen = set()
+                        unique_errors = []
+                        for e in errors:
+                            if e not in seen:
+                                unique_errors.append(e)
+                                seen.add(e)
+
+                        for err in unique_errors[:15]:
+                            # Colorize keywords
+                            display_err = err
+                            if "❯" in display_err:
+                                display_err = f"{Colors.CYAN}{display_err}{Colors.NC}"
+                            elif "Error" in display_err or "FAIL" in display_err:
+                                display_err = f"{Colors.RED}{display_err}{Colors.NC}"
+
+                            display_err = (
+                                (display_err[:120] + "...")
+                                if len(display_err) > 120
+                                else display_err
+                            )
+                            print(f"  • {display_err}")
+
+                        if len(unique_errors) > 15:
+                            print(
+                                f"  {Colors.GRAY}... and {len(unique_errors)-15} more lines.{Colors.NC}"
+                            )
                         print("")
 
                     # Log Dump

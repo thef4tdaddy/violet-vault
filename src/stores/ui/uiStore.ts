@@ -74,39 +74,9 @@ export interface UiStore {
   setDebts: () => void;
 }
 
-interface StoreState {
-  biweeklyAllocation: number;
-  isUnassignedCashModalOpen: boolean;
-  paycheckHistory: Array<{
-    id: string;
-    amount: number;
-    date: string;
-    payerName?: string;
-    notes?: string;
-  }>;
-  isActualBalanceManual: boolean;
-  isOnline: boolean;
-  dataLoaded: boolean;
-  cloudSyncEnabled: boolean;
-  updateAvailable: boolean;
-  isUpdating: boolean;
-  showInstallPrompt: boolean;
-  installPromptEvent: BeforeInstallPromptEvent | null;
-  showPatchNotes: boolean;
-  patchNotesData: {
-    version: string;
-    notes: string[];
-    fromVersion?: string;
-    toVersion?: string;
-    isUpdate?: boolean;
-  } | null;
-  loadingPatchNotes: boolean;
-  [key: string]: unknown;
-}
-
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
+const storeInitializer = (set: ImmerSet<UiStore>, _get: () => UiStore) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -139,6 +109,12 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
 
   // Patch Notes Management actions
   ...createPatchNotesActions(set),
+
+  // Placeholders for actions injected after store creation
+  updateApp: async () => {},
+  installApp: async () => false,
+  manualInstall: async () => ({ success: false, reason: "Not initialized" }),
+  dismissInstallPrompt: () => {},
 
   // Load and show patch notes for version update
   async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
@@ -190,7 +166,7 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
   resetAllData() {
     logger.info("Resetting UI state");
-    set((state: StoreState) => {
+    set((state: UiStore) => {
       // Reset UI state
       state.biweeklyAllocation = 0;
       state.isActualBalanceManual = false;

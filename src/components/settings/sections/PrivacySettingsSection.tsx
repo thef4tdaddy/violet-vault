@@ -16,14 +16,14 @@ interface PrivacySettingsSectionProps {
  * - Button to open full privacy settings modal
  * - Quick summary of current privacy level
  */
+const EyeIcon = getIcon("Eye");
+const ShieldIcon = getIcon("Shield");
+
 const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
   onOpenPrivacySettings,
 }) => {
-  const { analyticsTier } = useAllocationAnalyticsStore();
+  const analyticsTier = useAllocationAnalyticsStore((state) => state.analyticsTier);
   const currentTier = ANALYTICS_TIERS.find((t) => t.id === analyticsTier);
-
-  const EyeIcon = getIcon("Eye");
-  const ShieldIcon = getIcon("Shield");
 
   return (
     <div className="space-y-6">
@@ -71,7 +71,7 @@ const PrivacySettingsSection: React.FC<PrivacySettingsSectionProps> = ({
       {/* Privacy Info */}
       <div className="glassmorphism rounded-2xl p-4 bg-green-50/80 border-2 border-green-400">
         <div className="flex items-start gap-3">
-          <ShieldIcon className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+          <ShieldIcon className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-gray-900 mb-1">Privacy First</p>
             <p className="text-xs text-gray-700">

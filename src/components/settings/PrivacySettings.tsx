@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Button from "@/components/ui/buttons/Button";
 import { getIcon } from "@/utils/ui/icons";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
@@ -51,13 +52,14 @@ const getTierProgress = (tier: AnalyticsTier): number => {
  *   onClose={() => setShowPrivacySettings(false)}
  * />
  */
+const ShieldIcon = getIcon("Shield");
+const HelpCircleIcon = getIcon("HelpCircle");
+
 const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) => {
   const modalRef = useModalAutoScroll(isOpen);
-  const { analyticsTier, setAnalyticsTier } = useAllocationAnalyticsStore();
+  const analyticsTier = useAllocationAnalyticsStore((state) => state.analyticsTier);
+  const setAnalyticsTier = useAllocationAnalyticsStore((state) => state.setAnalyticsTier);
   const [showExplainer, setShowExplainer] = useState(false);
-
-  const ShieldIcon = getIcon("Shield");
-  const HelpCircleIcon = getIcon("HelpCircle");
 
   const handleTierSelect = (tier: AnalyticsTier) => {
     setAnalyticsTier(tier);
@@ -100,74 +102,28 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
               {/* Info Banner */}
               <div className="glassmorphism rounded-2xl p-4 bg-blue-50/80 border-2 border-blue-400">
                 <div className="flex items-start gap-3">
-                  <HelpCircleIcon className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <HelpCircleIcon className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-700">
                       <strong>Choose your privacy level:</strong> Each tier balances privacy with
                       performance. All tiers keep your financial data encrypted and secure.
                     </p>
-                    <button
+                    <Button
                       onClick={() => setShowExplainer(true)}
                       className="text-sm text-blue-600 font-semibold hover:text-blue-800 underline mt-2"
                     >
                       Learn more about what data is sent where →
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
 
               {/* Current Selection Summary */}
-              <div className="glassmorphism rounded-2xl p-4 bg-white/60 border-2 border-gray-300">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
-                      Current Selection
-                    </p>
-                    <p className="text-lg font-bold text-gray-900">{currentTier?.title}</p>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
-                        Privacy Level
-                      </p>
-                      <p className="text-sm font-bold text-gray-900">
-                        {currentTier?.privacyLevel}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
-                        Bundle Size
-                      </p>
-                      <p className="text-sm font-bold text-gray-900">{currentBundleSize}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bundle Size Progress Bar */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                    <span>Download Size</span>
-                    <span className="font-semibold">{currentBundleSize}</span>
-                  </div>
-                  <div className="w-full h-3 bg-gray-200 rounded-full border border-gray-300 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500 rounded-full"
-                      style={{
-                        width: `${getTierProgress(analyticsTier)}%`,
-                      }}
-                      role="progressbar"
-                      aria-valuenow={getTierProgress(analyticsTier)}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label={`Bundle size: ${currentBundleSize}`}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Minimal</span>
-                    <span>Maximum</span>
-                  </div>
-                </div>
-              </div>
+              <PrivacyProgress
+                currentTier={currentTier}
+                analyticsTier={analyticsTier}
+                currentBundleSize={currentBundleSize}
+              />
 
               {/* Analytics Tier Cards */}
               <div className="space-y-4">
@@ -187,7 +143,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
               {/* Privacy Note */}
               <div className="glassmorphism rounded-2xl p-4 bg-green-50/80 border-2 border-green-400">
                 <div className="flex items-start gap-3">
-                  <ShieldIcon className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <ShieldIcon className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-700">
                       <strong>Privacy First:</strong> Your financial data always stays encrypted.
@@ -201,18 +157,18 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
 
             {/* Footer Actions */}
             <div className="mt-6 flex justify-end gap-3">
-              <button
+              <Button
                 onClick={() => setShowExplainer(true)}
                 className="px-4 py-2 bg-white/60 text-gray-900 font-semibold rounded-lg border-2 border-gray-300 hover:bg-white hover:border-gray-400 transition-colors shadow-sm"
               >
                 Learn More
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={onClose}
                 className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg border-2 border-black hover:bg-blue-700 transition-colors shadow-sm"
               >
                 Done
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -223,5 +179,65 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ isOpen, onClose }) =>
     </>
   );
 };
+
+const PrivacyProgress = ({
+  currentTier,
+  analyticsTier,
+  currentBundleSize,
+}: {
+  currentTier: (typeof ANALYTICS_TIERS)[number] | undefined;
+  analyticsTier: AnalyticsTier;
+  currentBundleSize: string;
+}) => (
+  <div className="glassmorphism rounded-2xl p-4 bg-white/60 border-2 border-gray-300">
+    <div className="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
+          Current Selection
+        </p>
+        <p className="text-lg font-bold text-gray-900">{currentTier?.title}</p>
+      </div>
+      <div className="flex gap-4">
+        <div className="text-right">
+          <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
+            Privacy Level
+          </p>
+          <p className="text-sm font-bold text-gray-900">{currentTier?.privacyLevel}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-gray-600 font-medium uppercase tracking-wide mb-1">
+            Bundle Size
+          </p>
+          <p className="text-sm font-bold text-gray-900">{currentBundleSize}</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Bundle Size Progress Bar */}
+    <div className="mt-4">
+      <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+        <span>Download Size</span>
+        <span className="font-semibold">{currentBundleSize}</span>
+      </div>
+      <div className="w-full h-3 bg-gray-200 rounded-full border border-gray-300 overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500 rounded-full"
+          style={{
+            width: `${getTierProgress(analyticsTier)}%`,
+          }}
+          role="progressbar"
+          aria-valuenow={getTierProgress(analyticsTier)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Bundle size: ${currentBundleSize}`}
+        />
+      </div>
+      <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <span>Minimal</span>
+        <span>Maximum</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default PrivacySettings;

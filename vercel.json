@@ -71,7 +71,7 @@
     "minimumCacheTTL": 60,
     "formats": ["image/avif", "image/webp"],
     "dangerouslyAllowSVG": true,
-    "contentSecurityPolicy": "default-src 'self'; img-src 'self' data: https://media.dev.to https://avatars.githubusercontent.com https://res.cloudinary.com; connect-src 'self' https://api.github.com https://dev.to; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+    "contentSecurityPolicy": "default-src 'self'; img-src 'self' data: https://media.dev.to https://avatars.githubusercontent.com https://res.cloudinary.com; connect-src 'self' https://api.github.com https://dev.to; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
     "remotePatterns": []
   },
   "rewrites": [

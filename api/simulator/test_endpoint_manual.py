@@ -29,9 +29,9 @@ async def test_endpoint() -> None:
 
     if response.data:
         stats = response.data.metadata.get("stats", {})
-        print(f'✓ Total Income: ${stats.get("total_income", 0):.2f}')
-        print(f'✓ Total Expenses: ${abs(stats.get("total_expenses", 0)):.2f}')
-        print(f'✓ Net Cash Flow: ${stats.get("net_cash_flow", 0):.2f}')
+        print(f"✓ Total Income: ${stats.get('total_income', 0):.2f}")
+        print(f"✓ Total Expenses: ${abs(stats.get('total_expenses', 0)):.2f}")
+        print(f"✓ Net Cash Flow: ${stats.get('net_cash_flow', 0):.2f}")
 
 
 if __name__ == "__main__":

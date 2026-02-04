@@ -1,8 +1,5 @@
-import "@testing-library/jest-dom";
-import * as matchers from "@testing-library/jest-dom/matchers";
-import { expect, vi } from "vitest";
-
-expect.extend(matchers);
+import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
 import {
   indexedDB,
   IDBKeyRange,

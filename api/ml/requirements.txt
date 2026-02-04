@@ -1,0 +1,13 @@
+# Core ML libraries
+numpy==1.26.4
+scikit-learn==1.4.1
+pandas==2.2.1
+
+# Encryption
+cryptography==42.0.5
+
+# HTTP and JSON
+requests==2.31.0
+
+# For insights generation (lightweight NLP)
+textblob==0.18.0

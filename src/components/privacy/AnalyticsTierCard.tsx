@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@/components/ui/buttons/Button";
 import { getIcon } from "@/utils/ui/icons";
 import type { AnalyticsTierInfo } from "@/stores/ui/allocationAnalyticsStore";
 
@@ -28,8 +29,6 @@ interface AnalyticsTierCardProps {
  * />
  */
 const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected, onSelect }) => {
-  const Icon = getIcon(tier.icon);
-
   const privacyColors = {
     Maximum: "text-green-600 bg-green-100",
     High: "text-blue-600 bg-blue-100",
@@ -43,7 +42,7 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
   };
 
   return (
-    <button
+    <Button
       type="button"
       onClick={tier.disabled ? undefined : onSelect}
       disabled={tier.disabled}
@@ -64,11 +63,14 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
         {/* Icon */}
         <div
           className={`
-          flex-shrink-0 p-3 rounded-xl border-2 border-black
+          shrink-0 p-3 rounded-xl border-2 border-black
           ${isSelected ? privacyColors[tier.privacyLevel] : "bg-gray-100 text-gray-600"}
         `}
         >
-          <Icon className="h-6 w-6" aria-hidden="true" />
+          {React.createElement(getIcon(tier.icon), {
+            className: "h-6 w-6",
+            "aria-hidden": "true",
+          })}
         </div>
 
         {/* Content */}
@@ -115,7 +117,7 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
         </div>
 
         {/* Radio Indicator */}
-        <div className="flex-shrink-0 mt-1">
+        <div className="shrink-0 mt-1">
           <div
             className={`
             w-5 h-5 rounded-full border-2 flex items-center justify-center
@@ -127,7 +129,7 @@ const AnalyticsTierCard: React.FC<AnalyticsTierCardProps> = ({ tier, isSelected,
           </div>
         </div>
       </div>
-    </button>
+    </Button>
   );
 };
 

@@ -31,11 +31,7 @@ vi.mock("@/components/privacy/AnalyticsTierCard", () => ({
     isSelected: boolean;
     onSelect: () => void;
   }) => (
-    <button
-      data-testid={`tier-card-${tier.id}`}
-      onClick={onSelect}
-      aria-pressed={isSelected}
-    >
+    <button data-testid={`tier-card-${tier.id}`} onClick={onSelect} aria-pressed={isSelected}>
       {tier.title}
     </button>
   ),
@@ -86,8 +82,9 @@ describe("PrivacySettings", () => {
     it("should display current tier information", () => {
       render(<PrivacySettings isOpen={true} onClose={vi.fn()} />);
 
-      expect(screen.getByText("100% Offline")).toBeInTheDocument();
-      expect(screen.getByText("Maximum")).toBeInTheDocument();
+      // Check that current tier is displayed (there are multiple "100% Offline" elements, so check for at least one)
+      expect(screen.getAllByText("100% Offline")[0]).toBeInTheDocument();
+      expect(screen.getAllByText("Maximum").length).toBeGreaterThan(0);
     });
 
     it("should show bundle size progress bar", () => {

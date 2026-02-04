@@ -6,6 +6,7 @@
  */
 
 import logger from "@/utils/core/common/logger";
+import { auditTrailService } from "@/services/privacy/auditTrailService";
 
 // --- Types ---
 
@@ -45,36 +46,87 @@ export class ApiClient {
     endpoint: string,
     options: ApiRequestOptions = {}
   ): Promise<ApiResponse<T>> {
-    const { method = "GET", body, headers = {}, timeout = DEFAULT_TIMEOUT, signal } = options;
+    const { method = "GET", timeout = DEFAULT_TIMEOUT, signal } = options;
+    const startTime = performance.now();
 
     // Create abort controller for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    // Use combined signal only if custom signal provided
+    // Use combined signal
     const combinedSignal = signal
       ? this.combineAbortSignals([signal, controller.signal])
       : controller.signal;
 
     try {
-      const url = `${API_BASE_URL}${endpoint}`;
-      logger.info(`API Request: ${method} ${url}`);
-
-      // Prepare request options
-      const requestOptions = this.prepareRequestOptions(method, body, headers, combinedSignal);
-
-      // Make the request
-      const response = await fetch(url, requestOptions);
-      clearTimeout(timeoutId);
-
-      // Parse and return response
-      return await this.parseResponse<T>(response, method, url);
+      return await this.executeRequest<T>(endpoint, options, combinedSignal);
     } catch (error) {
-      clearTimeout(timeoutId);
       return this.handleRequestError(error, endpoint, timeout);
+    } finally {
+      clearTimeout(timeoutId);
+      this.logAudit(endpoint, method, startTime, options.body);
     }
   }
 
+  private static async executeRequest<T>(
+    endpoint: string,
+    options: ApiRequestOptions,
+    signal: AbortSignal
+  ): Promise<ApiResponse<T>> {
+    const { method = "GET", body, headers = {} } = options;
+    const url = `${API_BASE_URL}${endpoint}`;
+    logger.info(`API Request: ${method} ${url}`);
+
+    const requestOptions = this.prepareRequestOptions(method, body, headers, signal);
+    const response = await fetch(url, requestOptions);
+
+    const result = await this.parseResponse<T>(response, method, url);
+    if (!result.success && result.error === "Unknown error") {
+      throw new Error(result.error);
+    }
+    return result;
+  }
+
+  private static logAudit(
+    endpoint: string,
+    method: string,
+    startTime: number,
+    body: unknown
+  ): void {
+    const duration = Math.round(performance.now() - startTime);
+    // Only log analytics API calls
+    const analyticsEndpoints = ["/api/prediction", "/api/categorization"];
+    const isAnalyticsEndpoint =
+      endpoint.startsWith("/api/analytics") || analyticsEndpoints.includes(endpoint);
+
+    if (isAnalyticsEndpoint) {
+      let payloadSize = 0;
+      if (typeof body === "string") {
+        payloadSize = new Blob([body]).size;
+      } else if (body instanceof FormData) {
+        payloadSize = 1024; // Rough estimate
+      } else if (body) {
+        payloadSize = new Blob([JSON.stringify(body)]).size;
+      }
+
+      auditTrailService
+        .logApiCall({
+          timestamp: Date.now(),
+          endpoint,
+          method: method as "GET" | "POST" | "PUT" | "DELETE",
+          encryptedPayloadSize: payloadSize,
+          responseTimeMs: duration,
+          success: true, // Simplified for async logging
+          encrypted: true,
+          errorMessage: undefined,
+        })
+        .catch((err) => logger.error("Failed to log API call", err));
+    }
+  }
+
+  /**
+   * Prepare fetch request options
+   */
   /**
    * Prepare fetch request options
    */
@@ -84,27 +136,39 @@ export class ApiClient {
     headers: Record<string, string>,
     signal: AbortSignal
   ): globalThis.RequestInit {
-    const requestOptions: globalThis.RequestInit = {
+    const requestOptions = this.createBaseRequestOptions(method, headers, signal);
+    this.addRequestBody(requestOptions, method, body);
+    return requestOptions;
+  }
+
+  private static createBaseRequestOptions(
+    method: string,
+    headers: Record<string, string>,
+    signal: AbortSignal
+  ): globalThis.RequestInit {
+    return {
       method,
       signal,
       headers: { ...headers },
     };
+  }
 
-    // Add body for POST/PUT requests
+  private static addRequestBody(
+    options: globalThis.RequestInit,
+    method: string,
+    body: Record<string, unknown> | FormData | undefined
+  ): void {
     if (body && (method === "POST" || method === "PUT")) {
       if (body instanceof FormData) {
-        requestOptions.body = body;
-        // Let browser set Content-Type for FormData
+        options.body = body;
       } else {
-        requestOptions.headers = {
-          ...requestOptions.headers,
+        options.headers = {
+          ...options.headers,
           "Content-Type": "application/json",
         };
-        requestOptions.body = JSON.stringify(body);
+        options.body = JSON.stringify(body);
       }
     }
-
-    return requestOptions;
   }
 
   /**

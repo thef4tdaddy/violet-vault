@@ -26,7 +26,7 @@ from http.server import BaseHTTPRequestHandler
 # Add parent directory to path to import shared models
 sys.path.insert(0, os.path.dirname(__file__))
 
-from api.analytics.paycheck_prediction import (
+from paycheck_prediction import (  # type: ignore
     FrequencyDetectionRequest,
     detect_frequency_from_amount,
 )
