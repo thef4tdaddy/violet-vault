@@ -147,9 +147,12 @@ func bucketDate(date time.Time, granularity string) string {
 	case "daily":
 		return date.Format("2006-01-02")
 	case "weekly":
-		// ISO week format
-		year, week := date.ISOWeek()
-		return time.Date(year, 0, (week-1)*7+1, 0, 0, 0, 0, time.UTC).Format("2006-01-02")
+		// Get Monday of the current week
+		// weekday: Sun=0, Mon=1, ... Sat=6
+		// We want Mon=0, ... Sun=6
+		daysSinceMonday := (int(date.Weekday()) + 6) % 7
+		monday := date.AddDate(0, 0, -daysSinceMonday)
+		return monday.Format("2006-01-02")
 	case "monthly":
 		return date.Format("2006-01")
 	default:
