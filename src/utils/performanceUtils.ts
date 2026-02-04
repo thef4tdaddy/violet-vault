@@ -66,10 +66,13 @@ export const getAlertIconType = (type: string): IconType => {
 export const getRecommendationIconType = (type: string): IconType => {
   switch (type) {
     case "success":
+    case "saving":
       return { name: "CheckCircle", color: "text-green-500" };
     case "info":
+    case "investment":
       return { name: "TrendingUp", color: "text-blue-500" };
     case "warning":
+    case "spending":
       return { name: "AlertTriangle", color: "text-yellow-500" };
     case "tip":
       return { name: "Zap", color: "text-purple-500" };
