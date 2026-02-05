@@ -209,6 +209,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     // Both should match (either 200 or 300 depending on implementation)
     expect(goalAfterA).toBeTruthy();
     expect(goalAfterB).toBeTruthy();
+    expect(goalAfterA).toEqual(goalAfterB);
     console.log("✓ Both browsers converged to same state");
 
     // Cleanup
