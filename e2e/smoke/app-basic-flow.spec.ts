@@ -70,8 +70,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     await submitButton.click();
 
     // 1g. Wait for envelope to appear in list
-    await page.waitForTimeout(2000); // Wait for creation to complete
-    await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 10000 });
     console.log('✓ Envelope "Test Groceries" created');
 
     // STEP 2: Add a transaction to the envelope
@@ -90,7 +89,6 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       // Alternative: Click on the envelope card to expand it
       const envelopeCard = page.locator("text=Test Groceries").first();
       await envelopeCard.click();
-      await page.waitForTimeout(1000);
 
       // Look for add transaction button within envelope details
       const addTransactionInEnvelope = page
@@ -100,10 +98,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       await addTransactionInEnvelope.click();
     }
 
-    // 2b. Wait for transaction modal to appear
-    await page.waitForTimeout(1000);
-
-    // 2c. Fill in transaction details
+    // 2b. Fill in transaction details
     // Look for transaction form inputs
     const descInput = page
       .locator('input[placeholder*="description"], input[name="description"], input[type="text"]')
@@ -134,8 +129,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       .last();
     await transactionSubmitButton.click();
 
-    // 2g. Wait for transaction to appear
-    await page.waitForTimeout(2000);
+    // 2g. Transaction submitted
     console.log("✓ Transaction submitted");
 
     // STEP 3: Verify envelope balance was updated
@@ -186,8 +180,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     await submitButton.click();
 
     // STEP 2: Verify envelope was created
-    await page.waitForTimeout(2000);
-    await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 10000 });
     console.log("✓ Test envelope created before reload");
 
     // STEP 3: Perform page reload
@@ -195,7 +188,6 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
 
     // STEP 4: Wait for page to fully load after reload
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000); // Extra time for IndexedDB sync
 
     // STEP 5: Verify session persisted
     // Budget ID should be the same
