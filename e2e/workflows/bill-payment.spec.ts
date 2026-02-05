@@ -27,6 +27,11 @@ import { seedEnvelopes, seedBills } from "../fixtures/budget.fixture";
  * - Overdue bills may not have UI indicator (gracefully handled)
  * - Payment history section may not be visible without prior payments
  * - Bill list navigation varies by app structure (flexible selectors)
+ *
+ * SELECTOR RECOMMENDATIONS:
+ * - Current: Multi-fallback selectors (role-based, data-testid, text patterns)
+ * - Future optimization: Encourage app to use data-testid attributes for stable element identification
+ *   Examples: [data-testid="bill-card"], [data-testid="bill-form"], [data-testid="payment-button"]
  */
 
 test.describe("Bill Payment Workflow", () => {
