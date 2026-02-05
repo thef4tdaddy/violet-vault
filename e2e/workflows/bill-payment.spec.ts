@@ -6,7 +6,27 @@ import { seedEnvelopes, seedBills } from "../fixtures/budget.fixture";
  * Phase 2.4: Tests bill payment functionality including creating recurring bills,
  * processing payments, tracking due dates, and marking bills as paid.
  *
- * Note: Bills are implemented as scheduled transactions (isScheduled: true, type: 'expense')
+ * TEST SCENARIOS:
+ * - Test 1: Create bill and verify in bill list
+ * - Test 2: Process payment and verify envelope balance updates
+ * - Test 3: Recurring bill frequency validation (monthly, quarterly, annual)
+ * - Test 4: Overdue indicators for past-due bills
+ * - Test 5: Payment history tracking and visibility
+ *
+ * ARCHITECTURE:
+ * - Bills are implemented as scheduled transactions (isScheduled: true, type: 'expense')
+ * - Bill categories mapped via BILL_CATEGORY_MAP constant for consistency
+ * - Frequency rules: once, monthly, quarterly, annual (via frequencyMap)
+ *
+ * TEST DATA:
+ * - Envelopes seeded via fixture for consistent setup
+ * - Bills created with past, present, and future due dates
+ * - Payment history verified via database assertions
+ *
+ * EDGE CASES HANDLED:
+ * - Overdue bills may not have UI indicator (gracefully handled)
+ * - Payment history section may not be visible without prior payments
+ * - Bill list navigation varies by app structure (flexible selectors)
  */
 
 test.describe("Bill Payment Workflow", () => {
