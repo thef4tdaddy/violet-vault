@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page } from "@playwright/test";
 
 /**
  * Budget Seeding Fixture for Playwright E2E Tests
@@ -42,7 +42,7 @@ export async function seedEnvelopes(
         const db = (window as any).budgetDb;
 
         if (!db) {
-          reject(new Error('window.budgetDb not found - demo mode may not be enabled'));
+          reject(new Error("window.budgetDb not found - demo mode may not be enabled"));
           return;
         }
 
@@ -102,7 +102,7 @@ export async function seedTransactions(
           const db = (window as any).budgetDb;
 
           if (!db) {
-            reject(new Error('window.budgetDb not found'));
+            reject(new Error("window.budgetDb not found"));
             return;
           }
 
@@ -115,11 +115,11 @@ export async function seedTransactions(
               envelopeId: envId,
               description: trans.description,
               amount: trans.amount,
-              date: trans.date || new Date().toISOString().split('T')[0],
-              category: trans.category || 'other',
+              date: trans.date || new Date().toISOString().split("T")[0],
+              category: trans.category || "other",
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
-              syncStatus: 'synced', // Mark as already synced
+              syncStatus: "synced", // Mark as already synced
             };
 
             // Add to Dexie database
@@ -153,6 +153,7 @@ export async function seedTransactions(
 
 /**
  * Create test bills programmatically via IndexedDB
+ * Phase 2 Migration: Bills are now scheduled expense transactions
  *
  * @param page - Playwright page object
  * @param bills - Array of bill definitions
@@ -164,7 +165,7 @@ export async function seedBills(
     name: string;
     amount: number;
     dueDate: string;
-    frequency?: 'once' | 'monthly' | 'quarterly' | 'annual';
+    frequency?: "once" | "monthly" | "quarterly" | "annual";
     envelope?: string;
   }>
 ) {
@@ -174,27 +175,35 @@ export async function seedBills(
         const db = (window as any).budgetDb;
 
         if (!db) {
-          reject(new Error('window.budgetDb not found'));
+          reject(new Error("window.budgetDb not found"));
           return;
         }
 
         const created = [];
 
         for (const bill of billData) {
-          const billObject = {
+          // Create bill as a scheduled expense transaction
+          const billTransaction = {
             id: crypto.randomUUID(),
-            name: bill.name,
-            amount: bill.amount,
-            dueDate: bill.dueDate,
-            frequency: bill.frequency || 'monthly',
-            envelopeId: bill.envelope || null,
-            status: 'unpaid',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            description: bill.name,
+            date: bill.dueDate, // Due date maps to transaction date
+            amount: -Math.abs(bill.amount), // Negative for expense
+            envelopeId: bill.envelope || "unassigned",
+            category: "Bills & Utilities",
+            type: "expense",
+            isScheduled: true, // Mark as scheduled transaction (bill)
+            recurrenceRule: bill.frequency === "monthly" ? "FREQ=MONTHLY;INTERVAL=1" : null,
+            lastModified: Date.now(),
+            createdAt: Date.now(),
+            notes: `Frequency: ${bill.frequency || "once"}`,
           };
 
-          await db.bills.add(billObject);
-          created.push(billObject);
+          await db.transactions.add(billTransaction);
+          created.push({
+            ...billTransaction,
+            name: bill.name, // Add name for backward compatibility
+            dueDate: bill.dueDate,
+          });
 
           console.log(`✓ Seeded bill: ${bill.name} (due: ${bill.dueDate})`);
         }
@@ -220,16 +229,16 @@ export async function clearAllTestData(page: Page) {
     const db = (window as any).budgetDb;
 
     if (!db) {
-      console.warn('window.budgetDb not found');
+      console.warn("window.budgetDb not found");
       return;
     }
 
     // Clear all stores
+    // Note: Bills are now part of transactions table (isScheduled: true)
     await db.envelopes.clear();
     await db.transactions.clear();
-    await db.bills.clear();
 
-    console.log('✓ All test data cleared');
+    console.log("✓ All test data cleared");
   });
 }
 
@@ -250,7 +259,8 @@ export async function getBudgetState(page: Page) {
 
     const envelopes = await db.envelopes.toArray();
     const transactions = await db.transactions.toArray();
-    const bills = await db.bills.toArray();
+    // Bills are now scheduled transactions (isScheduled: true, type: 'expense')
+    const bills = transactions.filter((t: any) => t.isScheduled === true && t.type === "expense");
     const budgetId = db.budgetId;
 
     return {

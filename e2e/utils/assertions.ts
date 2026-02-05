@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Page } from "@playwright/test";
 
 /**
  * Custom Assertions for Violet Vault E2E Tests
@@ -25,11 +25,13 @@ export async function assertEnvelopeBalanceDecreased(
   await expect(envelopeLocator).toBeVisible();
 
   const balanceText = await page
-    .locator(`div:has(text="${envelopeName}") [data-testid="balance"], div:has(text="${envelopeName}") text=/\$[0-9,.]+/`)
+    .locator(
+      `div:has(text="${envelopeName}") [data-testid="balance"], div:has(text="${envelopeName}") text=/\$[0-9,.]+/`
+    )
     .first()
     .textContent();
 
-  const newBalance = parseFloat(balanceText?.replace(/[^0-9.]/g, '') || '0');
+  const newBalance = parseFloat(balanceText?.replace(/[^0-9.]/g, "") || "0");
   const expectedNewBalance = previousBalance - expectedDecrease;
 
   expect(newBalance).toBeCloseTo(expectedNewBalance, 2);
@@ -50,11 +52,13 @@ export async function assertEnvelopeBalanceIncreased(
   expectedIncrease: number
 ) {
   const balanceText = await page
-    .locator(`div:has(text="${envelopeName}") [data-testid="balance"], div:has(text="${envelopeName}") text=/\$[0-9,.]+/`)
+    .locator(
+      `div:has(text="${envelopeName}") [data-testid="balance"], div:has(text="${envelopeName}") text=/\$[0-9,.]+/`
+    )
     .first()
     .textContent();
 
-  const newBalance = parseFloat(balanceText?.replace(/[^0-9.]/g, '') || '0');
+  const newBalance = parseFloat(balanceText?.replace(/[^0-9.]/g, "") || "0");
   const expectedNewBalance = previousBalance + expectedIncrease;
 
   expect(newBalance).toBeCloseTo(expectedNewBalance, 2);
@@ -81,7 +85,9 @@ export async function assertTransactionVisible(page: Page, description: string, 
  * @param page - Playwright page object
  */
 export async function assertOfflineStatusVisible(page: Page) {
-  const offlineIndicator = page.locator('[data-testid*="offline"], text=/OFFLINE|Offline|pending/i').first();
+  const offlineIndicator = page
+    .locator('[data-testid*="offline"], text=/OFFLINE|Offline|pending/i')
+    .first();
   await expect(offlineIndicator).toBeVisible();
 }
 
@@ -118,7 +124,7 @@ export async function assertTransactionNotVisible(page: Page, description: strin
 export function parseCurrencyValue(text: string): number {
   const match = text.match(/[\d,]+\.?\d*/);
   if (!match) return 0;
-  return parseFloat(match[0].replace(/,/g, ''));
+  return parseFloat(match[0].replace(/,/g, ""));
 }
 
 /**
@@ -128,7 +134,11 @@ export function parseCurrencyValue(text: string): number {
  * @param expected - Expected value
  * @param tolerance - Tolerance for comparison (default 0.01 for $0.01)
  */
-export function assertValueWithinTolerance(actual: number, expected: number, tolerance: number = 0.01) {
+export function assertValueWithinTolerance(
+  actual: number,
+  expected: number,
+  tolerance: number = 0.01
+) {
   expect(actual).toBeGreaterThanOrEqual(expected - tolerance);
   expect(actual).toBeLessThanOrEqual(expected + tolerance);
 }

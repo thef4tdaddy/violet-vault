@@ -73,7 +73,7 @@ export async function unblockURL(page: Page, pattern: string) {
 export async function mockURL(
   page: Page,
   pattern: string,
-  _response: {
+  response: {
     status?: number;
     body?: string | Record<string, any>;
     headers?: Record<string, string>;
@@ -111,7 +111,7 @@ export async function slowNetwork(
       latency: latency,
     });
     console.log(`✓ Network throttled: ${downloadSpeed}KB/s, latency ${latency}ms`);
-  } catch {
+  } catch (error) {
     console.warn("⚠ Could not enable network throttling (requires Chrome/CDP)");
   }
 }
@@ -131,7 +131,7 @@ export async function normalNetwork(page: Page) {
       latency: 0,
     });
     console.log("✓ Network restored to normal");
-  } catch {
+  } catch (error) {
     console.warn("⚠ Could not restore network conditions");
   }
 }
