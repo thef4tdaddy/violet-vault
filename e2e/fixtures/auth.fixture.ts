@@ -22,7 +22,7 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  authenticatedPage: async ({ page }, useFixture) => {
+  authenticatedPage: async ({ page }, runTest) => {
     // Step 1: Set VITE_DEMO_MODE environment variable
     // This is handled by playwright.config.ts webServer command: VITE_DEMO_MODE=true npx vite
 
@@ -85,7 +85,7 @@ export const test = base.extend<AuthFixtures>({
     }
 
     // Pass the authenticated page to the test
-    await useFixture(page);
+    await runTest(page);
 
     // Cleanup (optional)
     // localStorage and IndexedDB will persist but Firebase session will end
