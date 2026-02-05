@@ -35,7 +35,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     console.log("✓ Browser B Budget ID:", budgetIdB);
 
     // STEP 3: Browser A creates envelope
-    const addBtnA = pageA.locator('button:has-text("Add Envelope")').first();
+    const addBtnA = pageA.locator('[data-testid="add-envelope-button"]').first();
     await addBtnA.click();
 
     const dialogA = pageA.locator('[role="dialog"]').first();
