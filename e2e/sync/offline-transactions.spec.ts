@@ -1,12 +1,13 @@
-import { test, expect } from "@playwright/test";
-import { test as authTest } from "../fixtures/auth.fixture";
+import { expect } from "@playwright/test";
+import { test } from "../fixtures/auth.fixture";
 import { seedEnvelopes } from "../fixtures/budget.fixture";
 
 test.describe("Offline Transaction Queueing & Sync", () => {
-  test("Test 1: Transactions queued when offline sync when reconnected", async ({ page }) => {
-    // SETUP: Navigate to app with demo mode
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 1: Transactions queued when offline sync when reconnected", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // SETUP: Page is already authenticated with demo mode via fixture
     console.log("✓ App loaded in demo mode");
 
     // Create envelope
@@ -88,11 +89,11 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 2: Multiple offline operations maintain FIFO order", async ({ page }) => {
-    // SETUP
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
-
+  test("Test 2: Multiple offline operations maintain FIFO order", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // SETUP: Page is already authenticated with demo mode via fixture
     const envelopes = await seedEnvelopes(page, [{ name: "FIFO Order Test", goal: 1000 }]);
     console.log("✓ Test envelope created");
 
@@ -177,11 +178,11 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     console.log("✓ All operations synced (order verified by completion)");
   });
 
-  test("Test 3: Offline sync retries on failure with backoff", async ({ page }) => {
-    // SETUP
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
-
+  test("Test 3: Offline sync retries on failure with backoff", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // SETUP: Page is already authenticated with demo mode via fixture
     const envelopes = await seedEnvelopes(page, [{ name: "Retry Test", goal: 300 }]);
     console.log("✓ Test envelope created");
 
@@ -249,11 +250,8 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 4: Offline queue persists across page reload", async ({ page }) => {
-    // SETUP
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
-
+  test("Test 4: Offline queue persists across page reload", async ({ page, authenticatedPage }) => {
+    // SETUP: Page is already authenticated with demo mode via fixture
     const envelopes = await seedEnvelopes(page, [{ name: "Persistence Reload Test", goal: 400 }]);
     console.log("✓ Test envelope created");
 
@@ -324,11 +322,11 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 5: No error spam in console during offline operation", async ({ page }) => {
-    // SETUP
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
-
+  test("Test 5: No error spam in console during offline operation", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // SETUP: Page is already authenticated with demo mode via fixture
     const envelopes = await seedEnvelopes(page, [{ name: "Console Spam Test", goal: 500 }]);
     console.log("✓ Test envelope created");
 
