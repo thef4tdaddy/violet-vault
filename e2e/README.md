@@ -282,12 +282,26 @@ VITE_DEMO_MODE=true npx vite
 
 ## 📚 Full Documentation
 
-See `docs/testing/playwright-setup.md` for comprehensive guide:
-- Setup and configuration
-- All fixture usage
-- Debugging techniques
-- CI/CD integration
-- Troubleshooting
+### For Developers
+- **[Quick Start Guide](../docs/testing/e2e-quick-start.md)** - Get started quickly
+  - Running tests locally
+  - Interactive development
+  - Common workflows
+  - Troubleshooting
+
+- **[Comprehensive Setup](../docs/testing/playwright-setup.md)** - Full configuration details
+  - Setup and configuration
+  - All fixture usage
+  - Debugging techniques
+  - CI/CD integration
+  - Performance optimization
+
+### Project Management
+- **[Phase 1 Completion](../docs/testing/phase1-checklist.md)** - Infrastructure status
+  - All Phase 1 tasks completed
+  - Test capabilities enabled
+  - Performance targets
+  - Next steps for Phase 2-4
 
 ## 🔗 Resources
 
