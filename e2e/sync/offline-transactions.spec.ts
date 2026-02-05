@@ -5,9 +5,9 @@ import { seedEnvelopes } from "../fixtures/budget.fixture";
 test.describe("Offline Transaction Queueing & Sync", () => {
   test("Test 1: Transactions queued when offline sync when reconnected", async ({
     page,
-    authenticatedPage,
   }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
+    console.log("✓ App loaded in demo mode");
     console.log("✓ App loaded in demo mode");
 
     // Create envelope
