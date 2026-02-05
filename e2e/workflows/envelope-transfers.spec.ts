@@ -2,6 +2,34 @@ import { test, expect } from "../fixtures/auth.fixture";
 import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
 /**
+ * Envelope Transfers & Allocations E2E Tests
+ *
+ * Tests envelope money transfer and bulk allocation workflows:
+ * - Test 1: Transfer between envelopes with atomic balance updates
+ * - Test 2: Insufficient funds validation (prevents invalid transfers)
+ * - Test 3: Bulk allocation from unallocated income
+ * - Test 4: Self-transfer prevention (UI disabled)
+ * - Test 5: Transfer history visibility (bidirectional)
+ *
+ * TEST DATA:
+ * - Source envelope: $500 (via transaction seeding)
+ * - Destination envelope: $300 (via transaction seeding)
+ * - Test 1 transfer: $150 from source to destination
+ * - Test 3 allocations: $1000 to env1, $400 to env2, $200 to env3
+ * - Test 5 transfer: $75 recorded in both source and destination history
+ *
+ * ASSERTIONS:
+ * - Balance changes verified with toBeCloseTo() for precision
+ * - Transfer amounts exact: $150, $1000, $400, $200, $75
+ * - Insufficient funds blocks transfers (isDisabled = true)
+ * - Self-transfer button disabled
+ * - Transfer history shows correct amounts and directions
+ *
+ * HELPER FUNCTION:
+ * - parseCurrency(): Extracts numeric values from UI currency text ($XXX.XX)
+ */
+
+/**
  * Helper: Parse currency value from text
  */
 const parseCurrency = (value: string | null): number => {
