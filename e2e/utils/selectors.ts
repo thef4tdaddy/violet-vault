@@ -50,7 +50,8 @@ export const SELECTORS = {
   // Dialogs/Modals
   DIALOGS: {
     ENVELOPE_CREATE: '[data-testid="envelope-create-dialog"], [role="dialog"]:has-text("Envelope")',
-    TRANSACTION_CREATE: '[data-testid="transaction-create-dialog"], [role="dialog"]:has-text("transaction")',
+    TRANSACTION_CREATE:
+      '[data-testid="transaction-create-dialog"], [role="dialog"]:has-text("transaction")',
     TRANSACTION_EDIT: '[data-testid="transaction-edit-dialog"], [role="dialog"]',
     BILL_CREATE: '[data-testid="bill-create-dialog"], [role="dialog"]',
     TRANSFER: '[data-testid="transfer-dialog"], [role="dialog"]',
@@ -119,7 +120,7 @@ export const SELECTORS = {
  * @returns Complete selector string
  */
 export function createSelector(template: string, value: string): string {
-  return template.replace('{value}', value);
+  return template.replace("{value}", value);
 }
 
 /**
@@ -142,7 +143,7 @@ export const COMMON_SELECTORS = {
   LOADING: '[data-testid*="loading"], text=/Loading|loading/',
 
   // Empty state
-  EMPTY_STATE: 'text=/No items|empty|Create/',
+  EMPTY_STATE: "text=/No items|empty|Create/",
 
   // Help/Info text
   HELP_TEXT: '[role="tooltip"], [data-testid*="help"]',

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page } from "@playwright/test";
 
 /**
  * Budget Seeding Fixture for Playwright E2E Tests
@@ -42,7 +42,7 @@ export async function seedEnvelopes(
         const db = (window as any).budgetDb;
 
         if (!db) {
-          reject(new Error('window.budgetDb not found - demo mode may not be enabled'));
+          reject(new Error("window.budgetDb not found - demo mode may not be enabled"));
           return;
         }
 
@@ -102,7 +102,7 @@ export async function seedTransactions(
           const db = (window as any).budgetDb;
 
           if (!db) {
-            reject(new Error('window.budgetDb not found'));
+            reject(new Error("window.budgetDb not found"));
             return;
           }
 
@@ -115,11 +115,11 @@ export async function seedTransactions(
               envelopeId: envId,
               description: trans.description,
               amount: trans.amount,
-              date: trans.date || new Date().toISOString().split('T')[0],
-              category: trans.category || 'other',
+              date: trans.date || new Date().toISOString().split("T")[0],
+              category: trans.category || "other",
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
-              syncStatus: 'synced', // Mark as already synced
+              syncStatus: "synced", // Mark as already synced
             };
 
             // Add to Dexie database
@@ -164,7 +164,7 @@ export async function seedBills(
     name: string;
     amount: number;
     dueDate: string;
-    frequency?: 'once' | 'monthly' | 'quarterly' | 'annual';
+    frequency?: "once" | "monthly" | "quarterly" | "annual";
     envelope?: string;
   }>
 ) {
@@ -174,7 +174,7 @@ export async function seedBills(
         const db = (window as any).budgetDb;
 
         if (!db) {
-          reject(new Error('window.budgetDb not found'));
+          reject(new Error("window.budgetDb not found"));
           return;
         }
 
@@ -186,9 +186,9 @@ export async function seedBills(
             name: bill.name,
             amount: bill.amount,
             dueDate: bill.dueDate,
-            frequency: bill.frequency || 'monthly',
+            frequency: bill.frequency || "monthly",
             envelopeId: bill.envelope || null,
-            status: 'unpaid',
+            status: "unpaid",
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           };
@@ -220,7 +220,7 @@ export async function clearAllTestData(page: Page) {
     const db = (window as any).budgetDb;
 
     if (!db) {
-      console.warn('window.budgetDb not found');
+      console.warn("window.budgetDb not found");
       return;
     }
 
@@ -229,7 +229,7 @@ export async function clearAllTestData(page: Page) {
     await db.transactions.clear();
     await db.bills.clear();
 
-    console.log('✓ All test data cleared');
+    console.log("✓ All test data cleared");
   });
 }
 
