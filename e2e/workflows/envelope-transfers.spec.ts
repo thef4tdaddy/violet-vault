@@ -27,6 +27,13 @@ import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
  *
  * HELPER FUNCTION:
  * - parseCurrency(): Extracts numeric values from UI currency text ($XXX.XX)
+ *
+ * SELECTOR STRATEGY:
+ * - Multi-fallback selectors ensure tests work with various app layouts
+ * - Current approach: role-based and text pattern matching
+ * - OPTIMIZATION OPPORTUNITY: Use data-testid for stable element identification
+ *   Recommended attributes: [data-testid="transfer-form"], [data-testid="submit-transfer"],
+ *   [data-testid="source-balance"], [data-testid="destination-balance"]
  */
 
 /**
