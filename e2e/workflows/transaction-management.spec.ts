@@ -9,13 +9,10 @@ test.describe("Transaction Management Workflow", () => {
     console.log("✓ App loaded with demo mode");
 
     // SETUP: Create test envelope
-    const envelopes = await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
+    await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
     console.log("✓ Test envelope created");
 
-    // Wait for envelope to appear in UI
-    await page.waitForTimeout(2000);
-
-    // STEP 1: Navigate to envelope
+    // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Test Groceries").first();
     await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
@@ -81,28 +78,34 @@ test.describe("Transaction Management Workflow", () => {
     await submitButton.click();
     console.log("✓ Submitted transaction");
 
-    // STEP 6: Wait for update
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
-
-    // STEP 7: Verify transaction appears in list
+    // STEP 6: Wait for transaction to appear in list
     const transactionItem = page.locator("text=/milk.*bread|Milk.*bread/i").first();
-    await expect(transactionItem).toBeVisible({ timeout: 5000 });
+    await expect(transactionItem).toBeVisible({ timeout: 10000 });
     console.log("✓ Transaction appears in list");
 
-    // STEP 8: Verify balance decreased
+    // STEP 7: Verify transaction shows in transaction list with correct amount
+    const amountInList = await page.locator("text=/45\\.75|$45.75/").first();
+    await expect(amountInList).toBeVisible({ timeout: 5000 });
+    console.log("✓ Transaction amount visible in list: $45.75");
+
+    // STEP 8: Verify balance decreased by exactly $45.75
+    const parseCurrency = (value: string | null): number => {
+      if (!value) return 0;
+      const match = value.match(/\$?([\d,]+(?:\.\d+)?)/);
+      if (!match) {
+        throw new Error(`Unable to parse currency value from: ${value}`);
+      }
+      return parseFloat(match[1].replace(/,/g, ""));
+    };
+
     const updatedBalanceText = await page
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    // Balance should have decreased by 45.75
-    expect(updatedBalanceText).toBeTruthy();
-    console.log("✓ Updated balance:", updatedBalanceText);
-
-    // STEP 9: Verify transaction shows in transaction list with correct amount
-    const amountInList = await page.locator("text=/45\\.75|$45.75/").first().textContent();
-    expect(amountInList).toContain("45.75");
-    console.log("✓ Transaction amount visible in list: $45.75");
+    const initialBalance = parseCurrency(initialBalanceText);
+    const updatedBalance = parseCurrency(updatedBalanceText);
+    expect(initialBalance - updatedBalance).toBeCloseTo(45.75, 2);
+    console.log("✓ Balance decreased by $45.75:", updatedBalanceText);
   });
 
   test("Test 2: Edit transaction and verify balance recalculated correctly", async ({
@@ -113,16 +116,14 @@ test.describe("Transaction Management Workflow", () => {
 
     // SETUP: Create envelope with transaction
     const envelopes = await seedEnvelopes(page, [{ name: "Edit Test Groceries", goal: 500 }]);
-    const transactions = await seedTransactions(page, envelopes[0].id, [
+    await seedTransactions(page, envelopes[0].id, [
       { description: "Original purchase", amount: 30 },
     ]);
     console.log("✓ Envelope and transaction created");
 
-    // Wait for data to appear in UI
-    await page.waitForTimeout(2000);
-
-    // STEP 1: Navigate to envelope
+    // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Edit Test Groceries").first();
+    await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
     await page.waitForLoadState("networkidle");
     console.log("✓ Opened envelope");
@@ -173,18 +174,12 @@ test.describe("Transaction Management Workflow", () => {
     await saveButton.click();
     console.log("✓ Saved changes");
 
-    // STEP 8: Wait for update
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
-
-    // STEP 9: Verify amount in list updated
-    // Should show $50, not $30
+    // STEP 8: Wait for amount to update in list
     const newAmount = page.locator("text=$50").first();
-
-    await expect(newAmount).toBeVisible({ timeout: 5000 });
+    await expect(newAmount).toBeVisible({ timeout: 10000 });
     console.log("✓ Transaction amount updated in list: $50");
 
-    // STEP 10: Verify description updated
+    // STEP 9: Verify description updated
     const updatedDesc = page.locator("text=Updated purchase description").first();
     await expect(updatedDesc).toBeVisible({ timeout: 5000 });
     console.log("✓ Transaction description updated");
@@ -198,16 +193,12 @@ test.describe("Transaction Management Workflow", () => {
 
     // SETUP: Create envelope with transaction
     const envelopes = await seedEnvelopes(page, [{ name: "Delete Test Groceries", goal: 500 }]);
-    const transactions = await seedTransactions(page, envelopes[0].id, [
-      { description: "To be deleted", amount: 25 },
-    ]);
+    await seedTransactions(page, envelopes[0].id, [{ description: "To be deleted", amount: 25 }]);
     console.log("✓ Envelope with transaction created");
 
-    // Wait for data to appear in UI
-    await page.waitForTimeout(2000);
-
-    // STEP 1: Navigate to envelope
+    // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Delete Test Groceries").first();
+    await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
     await page.waitForLoadState("networkidle");
     console.log("✓ Opened envelope");
@@ -240,23 +231,29 @@ test.describe("Transaction Management Workflow", () => {
       console.log("✓ Confirmed deletion");
     }
 
-    // STEP 6: Wait for update
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
-
-    // STEP 7: Verify transaction removed from list
+    // STEP 6: Verify transaction removed from list
     const deletedTransaction = page.locator("text=To be deleted").first();
-    expect(await deletedTransaction.isVisible().catch(() => false)).toBe(false);
+    await expect(deletedTransaction).not.toBeVisible({ timeout: 10000 });
     console.log("✓ Transaction removed from list");
 
-    // STEP 8: Verify balance increased (money refunded)
+    // STEP 7: Verify balance increased by exactly $25 (refunded)
+    const parseCurrency = (value: string | null): number => {
+      if (!value) return 0;
+      const match = value.match(/\$?([\d,]+(?:\.\d+)?)/);
+      if (!match) {
+        throw new Error(`Unable to parse currency value from: ${value}`);
+      }
+      return parseFloat(match[1].replace(/,/g, ""));
+    };
+
     const balanceAfter = await page
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    console.log("✓ Balance after delete:", balanceAfter);
-    // Balance should have increased by $25
-    expect(balanceAfter).toBeTruthy();
+    const beforeAmount = parseCurrency(balanceBefore);
+    const afterAmount = parseCurrency(balanceAfter);
+    expect(afterAmount - beforeAmount).toBeCloseTo(25, 2);
+    console.log("✓ Balance increased by $25:", balanceAfter);
   });
 
   test("Test 4: Search/filter transactions by description", async ({ authenticatedPage: page }) => {
@@ -265,23 +262,23 @@ test.describe("Transaction Management Workflow", () => {
 
     // SETUP: Create envelope with multiple transactions
     const envelopes = await seedEnvelopes(page, [{ name: "Search Test Envelope", goal: 1000 }]);
-    const transactions = await seedTransactions(page, envelopes[0].id, [
+    await seedTransactions(page, envelopes[0].id, [
       { description: "Milk purchase", amount: 5 },
       { description: "Bread purchase", amount: 3 },
       { description: "Cheese purchase", amount: 8 },
     ]);
     console.log("✓ Envelope with 3 transactions created");
 
-    // Wait for data to appear in UI
-    await page.waitForTimeout(2000);
-
-    // STEP 1: Navigate to envelope
+    // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Search Test Envelope").first();
+    await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
     await page.waitForLoadState("networkidle");
     console.log("✓ Opened envelope");
 
     // STEP 2: Verify all 3 transactions visible
+    const milkTransaction = page.locator("text=/Milk/i").first();
+    await expect(milkTransaction).toBeVisible({ timeout: 10000 });
     const allTransactions = page.locator("text=/Milk|Bread|Cheese/");
     let count = await allTransactions.count();
     expect(count).toBeGreaterThanOrEqual(3);
@@ -294,15 +291,12 @@ test.describe("Transaction Management Workflow", () => {
       )
       .first();
     if (await searchInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-      // STEP 4: Type search term
+      // STEP 4: Type search term and wait for filtering
       await searchInput.fill("milk");
-      await page.waitForTimeout(500);
+      await expect(milkTransaction).toBeVisible({ timeout: 5000 });
       console.log('✓ Searched for "milk"');
 
       // STEP 5: Verify filtered results
-      const milkTransaction = page.locator("text=/Milk/i").first();
-      await expect(milkTransaction).toBeVisible();
-
       const breadTransaction = page.locator("text=/Bread/i").first();
       const isBreadHidden = !(await breadTransaction.isVisible().catch(() => false));
 
@@ -312,9 +306,10 @@ test.describe("Transaction Management Workflow", () => {
         console.log("✓ Search returned results containing milk");
       }
 
-      // STEP 6: Clear search
+      // STEP 6: Clear search and wait for all transactions to reappear
       await searchInput.clear();
-      await page.waitForTimeout(500);
+      const breadTransactionReappear = page.locator("text=/Bread/i").first();
+      await expect(breadTransactionReappear).toBeVisible({ timeout: 5000 });
 
       // STEP 7: Verify all transactions visible again
       const allAgain = page.locator("text=/Milk|Bread|Cheese/");
@@ -337,20 +332,20 @@ test.describe("Transaction Management Workflow", () => {
     const yesterday = new Date(today.getTime() - 86400000);
     const threeDaysAgo = new Date(today.getTime() - 3 * 86400000);
 
-    const transactions = await seedTransactions(page, envelopes[0].id, [
+    await seedTransactions(page, envelopes[0].id, [
       { description: "Today purchase", amount: 10, date: today.toISOString() },
       { description: "Yesterday purchase", amount: 15, date: yesterday.toISOString() },
       { description: "Old purchase", amount: 20, date: threeDaysAgo.toISOString() },
     ]);
     console.log("✓ Envelope with transactions on different dates created");
 
-    // Wait for data to appear in UI
-    await page.waitForTimeout(2000);
-
-    // STEP 1: Navigate to envelope
+    // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Date Filter Test").first();
+    await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
-    await page.waitForLoadState("networkidle");
+    // Wait for transactions to render in the envelope view
+    const todayItem = page.locator("text=Today purchase").first();
+    await expect(todayItem).toBeVisible({ timeout: 10000 });
     console.log("✓ Opened envelope");
 
     // STEP 2: Find date filter controls
@@ -361,18 +356,15 @@ test.describe("Transaction Management Workflow", () => {
       // STEP 3: Set filter to last 2 days (should exclude 3-day-old transaction)
       const startDate = yesterday.toISOString().split("T")[0];
       await startDateInput.fill(startDate);
-      await page.waitForTimeout(500);
       console.log("✓ Set start date filter to:", startDate);
 
-      // STEP 4: Verify filtered transactions
-      const todayItem = page.locator("text=Today purchase").first();
+      // STEP 4: Wait for filtering to apply and verify filtered transactions
       const yesterdayItem = page.locator("text=Yesterday purchase").first();
-      const oldItem = page.locator("text=Old purchase").first();
-
-      await expect(todayItem).toBeVisible();
-      await expect(yesterdayItem).toBeVisible();
+      await expect(todayItem).toBeVisible({ timeout: 5000 });
+      await expect(yesterdayItem).toBeVisible({ timeout: 5000 });
       console.log("✓ Today and yesterday transactions visible");
 
+      const oldItem = page.locator("text=Old purchase").first();
       const isOldHidden = !(await oldItem.isVisible().catch(() => false));
       if (isOldHidden) {
         console.log("✓ Old transaction filtered out correctly");
