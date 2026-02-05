@@ -196,14 +196,15 @@ describe("UserSetupStep", () => {
 
     it("should call setShowPassword when eye icon is clicked", async () => {
       const user = userEvent.setup();
-      render(<UserSetupStep {...defaultProps} />);
+      const initialShowPassword = false;
+      render(<UserSetupStep {...defaultProps} showPassword={initialShowPassword} />);
 
       const eyeButton = screen.getByTestId("icon-Eye").parentElement;
       expect(eyeButton).toBeInTheDocument();
 
       if (eyeButton) {
         await user.click(eyeButton);
-        expect(mockSetShowPassword).toHaveBeenCalledWith(true);
+        expect(mockSetShowPassword).toHaveBeenCalledWith(!initialShowPassword);
       }
     });
 
