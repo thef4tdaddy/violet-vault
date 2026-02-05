@@ -1,5 +1,16 @@
-#!/usr/bin/env sh
+#!/bin/bash
 . "$(dirname -- "$0")/_/husky.sh"
+
+# Check for --playwright flag in git options
+# Note: We can't directly access git push arguments in husky,
+# so we check environment or git config instead
+PLAYWRIGHT_FLAG="${PLAYWRIGHT_E2E:-}"
+
+# Also check git config for temporary flag
+if git config --get-regexp "^push\.e2e" 2>/dev/null | grep -q "true"; then
+  PLAYWRIGHT_FLAG="true"
+  git config --unset push.e2e
+fi
 
 echo "🔍 Running full ESLint check before push..."
 
@@ -14,3 +25,22 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ ESLint passed! Push proceeding..."
+
+# Check if E2E tests should run
+if [ "$PLAYWRIGHT_FLAG" = "true" ]; then
+  echo ""
+  echo "🎭 Running E2E smoke tests (--playwright flag detected)..."
+  echo ""
+
+  # Run E2E smoke tests
+  npm run test:e2e:smoke
+
+  if [ $? -ne 0 ]; then
+    echo "❌ E2E smoke tests failed! Push aborted."
+    echo "💡 Fix E2E test failures before pushing."
+    echo "🎬 Run: npm run test:e2e:ui for interactive debugging"
+    exit 2
+  fi
+
+  echo "✅ E2E smoke tests passed! Push proceeding..."
+fi
