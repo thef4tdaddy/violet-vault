@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Cross-Browser Sync & Conflict Resolution", () => {
-  test("Test 1: Data created in Browser A appears in Browser B", async ({ browser, context }) => {
+  test("Test 1: Data created in Browser A appears in Browser B", async ({ browser }) => {
     // This test uses multiple browser contexts to simulate two different devices/tabs
     // SETUP: Create two browser contexts (both with demo mode)
     const contextA = await browser.newContext({
