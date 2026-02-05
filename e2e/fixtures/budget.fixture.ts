@@ -274,12 +274,11 @@ export async function getBudgetState(page: Page) {
       return null;
     }
 
-    // Check if tables exist
-    if (!db.envelopes || !db.transactions || !db.bills) {
+    // Check if tables exist (v2.0 schema - bills table was dropped)
+    if (!db.envelopes || !db.transactions) {
       console.warn("❌ Database tables not found", {
         hasEnvelopes: !!db.envelopes,
         hasTransactions: !!db.transactions,
-        hasBills: !!db.bills,
         dbKeys: Object.keys(db),
       });
       return null;
@@ -287,7 +286,7 @@ export async function getBudgetState(page: Page) {
 
     const envelopes = await db.envelopes.toArray();
     const transactions = await db.transactions.toArray();
-    const bills = await db.bills.toArray();
+    const bills = db.bills ? await db.bills.toArray() : [];
     const budgetId = db.budgetId;
 
     return {

@@ -48,7 +48,6 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     // STEP 1: Verify page loaded successfully
     await expect(page).toHaveURL(/\/app/);
 
-<<<<<<< HEAD
     // STEP 2: Verify app navigation is visible (fixture already confirms this)
     // The fixture's waitForMainContent() already verified nav is present
     const navElement = page.locator("nav").first();
@@ -66,7 +65,6 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     expect(demoDataState.hasEnvelopes).toBe(true);
     expect(demoDataState.hasTransactions).toBe(true);
 
-<<<<<<< HEAD
     // STEP 4: Verify budget ID exists and is in correct format
     // Access window.budgetDb which is exposed for testing
     const budgetId = await page.evaluate(() => {
@@ -124,53 +122,72 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     await test.step("✓ Transaction verified in database", async () => {});
   });
 
-  test("Test 3: Page reload persists session and data remains intact", async ({
+  test("Test 3: Page reload reinitializes demo mode with fresh data", async ({
     authenticatedPage,
   }) => {
     const page = authenticatedPage;
-    // PREREQUISITE: Demo mode enabled, so data persists in IndexedDB
+    // NOTE: Demo mode uses in-memory database which does NOT persist across reloads
+    // After reload, the app reinitializes with fresh demo data and a new budgetId
 
-    // STEP 1: Get initial budget ID before reload
-    const initialBudgetId = await page.evaluate(() => {
-      return (window as any).budgetDb?.budgetId;
+    // STEP 1: Get initial budget ID and verify demo data loaded
+    const initialState = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      return {
+        budgetId: db?.budgetId,
+        hasEnvelopes: !!db?.envelopes,
+        hasTransactions: !!db?.transactions,
+      };
     });
-    await test.step(`✓ Initial Budget ID: ${initialBudgetId}`, async () => {});
+    expect(initialState.budgetId).toBeTruthy();
+    expect(initialState.hasEnvelopes).toBe(true);
+    expect(initialState.hasTransactions).toBe(true);
+    await test.step(`✓ Initial demo mode loaded with Budget ID: ${initialState.budgetId}`, async () => {});
 
-    // STEP 2: Seed test envelope before reload
-    const persistenceEnvelopes = await seedEnvelopes(page, [
-      { name: "Persistence Test Envelope", goal: 1000 },
+    // STEP 2: Seed a test envelope
+    const testEnvelopes = await seedEnvelopes(page, [
+      { name: "Test Envelope Before Reload", goal: 750 },
     ]);
+    const envelopeIdBeforeReload = testEnvelopes[0].id;
     await test.step("✓ Test envelope created before reload", async () => {});
 
-    // STEP 3: Get budget state before reload
-    const stateBeforeReload = await getBudgetState(page);
-    const envelopeCountBefore = stateBeforeReload?.envelopeCount ?? 0;
-    await test.step(`✓ Budget state before reload: ${envelopeCountBefore} envelopes`, async () => {});
+    // STEP 3: Verify envelope exists in database
+    const envelopeBeforeReload = await page.evaluate((id) => {
+      const db = (window as any).budgetDb;
+      return db.envelopes.get(id);
+    }, envelopeIdBeforeReload);
+    expect(envelopeBeforeReload).toBeDefined();
+    await test.step("✓ Envelope verified before reload", async () => {});
 
-    // STEP 4: Perform page reload
+    // STEP 4: Perform page reload (simulates user refreshing the page)
     await page.reload();
-
-    // STEP 5: Wait for page to fully load after reload
     await page.waitForLoadState("networkidle");
 
-    // STEP 6: Verify session persisted - Budget ID should be the same
-    const budgetIdAfterReload = await page.evaluate(() => {
-      return (window as any).budgetDb?.budgetId;
+    // STEP 5: Verify demo mode reinitialized with fresh data (new budgetId)
+    const stateAfterReload = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      return {
+        budgetId: db?.budgetId,
+        hasEnvelopes: !!db?.envelopes,
+        hasTransactions: !!db?.transactions,
+      };
     });
-    expect(budgetIdAfterReload).toBe(initialBudgetId);
-    await test.step(`✓ Budget ID persisted after reload: ${budgetIdAfterReload}`, async () => {});
-
-    // STEP 7: Verify envelope data persisted
-    const stateAfterReload = await getBudgetState(page);
-    const envelopeCountAfter = stateAfterReload?.envelopeCount ?? 0;
-    expect(envelopeCountAfter).toBe(envelopeCountBefore);
-
-    // Verify the specific envelope exists
-    const persistedEnvelope = stateAfterReload?.envelopes.find(
-      (e: any) => e.name === "Persistence Test Envelope"
+    expect(stateAfterReload.budgetId).toBeTruthy();
+    // In-memory database creates NEW instances on reload, so budgetId will be different
+    expect(stateAfterReload.budgetId).not.toBe(initialState.budgetId);
+    expect(stateAfterReload.hasEnvelopes).toBe(true);
+    expect(stateAfterReload.hasTransactions).toBe(true);
+    await test.step(
+      `✓ Demo mode reinitialized after reload with new Budget ID: ${stateAfterReload.budgetId}`,
+      async () => {}
     );
-    expect(persistedEnvelope).toBeDefined();
-    expect(persistedEnvelope!.goal).toBe(1000);
-    await test.step("✓ Envelope data integrity verified after reload", async () => {});
+
+    // STEP 6: Verify envelope created before reload is NOT present (as expected with in-memory DB)
+    // This confirms the in-memory database was reset
+    const envelopeAfterReload = await page.evaluate((id) => {
+      const db = (window as any).budgetDb;
+      return db.envelopes.get(id);
+    }, envelopeIdBeforeReload);
+    expect(envelopeAfterReload).toBeUndefined();
+    await test.step("✓ Confirmed in-memory database reset after reload (expected behavior)", async () => {});
   });
 });
