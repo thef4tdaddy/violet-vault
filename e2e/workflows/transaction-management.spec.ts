@@ -320,6 +320,7 @@ test.describe("Transaction Management Workflow", () => {
 
   test("Test 5: Filter transactions by date range", async ({ authenticatedPage: page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
+    // Edge cases: Handles missing date filter gracefully, tests with past/present dates
     await test.step("✓ App loaded with demo mode", async () => {});
 
     // SETUP: Create envelope with transactions on different dates
@@ -353,7 +354,7 @@ test.describe("Transaction Management Workflow", () => {
       // STEP 3: Set filter to last 2 days (should exclude 3-day-old transaction)
       const startDate = yesterday.toISOString().split("T")[0];
       await startDateInput.fill(startDate);
-      await test.step("✓ Set start date filter to:", startDate, async () => {});
+      await test.step(`✓ Set start date filter to: ${startDate}`, async () => {});
 
       // STEP 4: Wait for filtering to apply and verify filtered transactions
       const yesterdayItem = page.locator("text=Yesterday purchase").first();
