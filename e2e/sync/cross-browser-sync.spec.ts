@@ -19,12 +19,12 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     const pageB = await contextB.newPage();
 
     // STEP 1a: Load app in Browser A
-    await pageA.goto("http://localhost:5173", { waitUntil: "networkidle" });
+    await pageA.goto("/", { waitUntil: "networkidle" });
     await pageA.waitForTimeout(2000); // Wait for auth
     console.log("✓ Browser A: App loaded and authenticated");
 
     // STEP 1b: Load app in Browser B
-    await pageB.goto("http://localhost:5173", { waitUntil: "networkidle" });
+    await pageB.goto("/", { waitUntil: "networkidle" });
     await pageB.waitForTimeout(2000); // Wait for auth
     console.log("✓ Browser B: App loaded and authenticated");
 
