@@ -67,6 +67,12 @@ api/coverage.out
 .coverage
 coverage.out
 
+# Playwright test artifacts
+test-results/
+playwright-report/
+blob-report/
+blob-report.zip
+
 # Go build artifacts
 api/*.test
 api/*.exe
