@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useUserSetup } from "@/hooks/auth/useUserSetup";
 import type { UserSetupPayload } from "@/hooks/auth/useUserSetup";
 import UserSetupLayout from "./components/UserSetupLayout";
@@ -32,15 +32,17 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
     const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
     if (isDemoMode && onSetupComplete) {
       logger.debug("🎭 E2E Demo Mode: Auto-completing user setup for testing");
-      // Auto-complete with demo user data
-      const demoSetup = {
-        password: "test-password-123",
-        userName: "Demo User",
-        userColor: "#a855f7",
-        shareCode: "",
-      };
-      onSetupComplete(demoSetup).catch((error) => {
-        logger.error("E2E Demo Mode: Auto-setup failed", error);
+      // Generate shareCode for budgetId creation
+      import("@/utils/platform/security/shareCodeUtils").then(({ shareCodeUtils }) => {
+        const demoSetup = {
+          password: "test-password-123",
+          userName: "Demo User",
+          userColor: "#a855f7",
+          shareCode: shareCodeUtils.generateShareCode(),
+        };
+        onSetupComplete(demoSetup).catch((error) => {
+          logger.error("E2E Demo Mode: Auto-setup failed", error);
+        });
       });
     }
   }, [onSetupComplete]);

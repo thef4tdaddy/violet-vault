@@ -91,6 +91,14 @@ export const createSetAuthenticated =
         error: null,
       })
     );
+
+    // Expose budgetId on window.budgetDb for E2E tests in demo mode
+    if (typeof window !== "undefined" && userData.budgetId) {
+      const db = (window as any).budgetDb;
+      if (db) {
+        db.budgetId = userData.budgetId;
+      }
+    }
   };
 
 export const createClearAuth = (setAuthState: SetAuthState) => (): void => {
