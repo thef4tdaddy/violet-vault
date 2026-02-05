@@ -63,11 +63,11 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     console.log("✓ Browser B: Envelope visible after sync");
 
     // STEP 7: Verify goal amount matches exactly
-    const goalB = await pageB
-      .locator('div:has(text="Sync Test Envelope") text=/\$[0-9,.]+/')
-      .first()
-      .textContent();
+    const envelopeContainerB = pageB.locator("div", { hasText: "Sync Test Envelope" }).first();
+    const goalB = await envelopeContainerB.getByText(/\$[0-9,.]+/).first().textContent();
+    
     expect(goalB).toContain("500");
+    console.log("✓ Browser B: Goal amount matches ($500)");
     console.log("✓ Browser B: Goal amount matches ($500)");
 
     // STEP 8: Verify metadata (created date) if shown
