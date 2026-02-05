@@ -181,12 +181,19 @@ export async function seedBills(
         const created = [];
 
         for (const bill of billData) {
+          // Map recurrence rules: once, monthly, quarterly, annual
+          const frequencyMap: Record<string, string> = {
+            once: "once",
+            monthly: "monthly",
+            quarterly: "quarterly",
+            annual: "annual",
+          };
           const billObject = {
             id: crypto.randomUUID(),
             name: bill.name,
             amount: bill.amount,
             dueDate: bill.dueDate,
-            frequency: bill.frequency || "monthly",
+            frequency: frequencyMap[bill.frequency || "monthly"] || "monthly",
             envelopeId: bill.envelope || null,
             status: "unpaid",
             createdAt: new Date().toISOString(),
