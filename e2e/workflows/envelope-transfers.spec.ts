@@ -23,7 +23,7 @@ test.describe("Envelope Transfers & Allocations", () => {
     await seedTransactions(page, envelopes[0].id, [
       { description: "Starting balance", amount: 500 },
     ]);
-    console.log("✓ Two envelopes created with $500 starting balance");
+    await test.step("✓ Two envelopes created with $500 starting balance", async () => {});
 
     // STEP 1: Navigate to dashboard or envelopes view
     const envelopesView = page.locator("text=/Envelopes|envelopes|Dashboard/i").first();
@@ -31,21 +31,21 @@ test.describe("Envelope Transfers & Allocations", () => {
       await envelopesView.click();
       await page.waitForLoadState("networkidle");
     }
-    console.log("✓ In envelopes view");
+    await test.step("✓ In envelopes view", async () => {});
 
     // STEP 2: Open source envelope
     const sourceEnvelope = page.locator("text=Source Envelope").first();
     await expect(sourceEnvelope).toBeVisible({ timeout: 5000 });
     await sourceEnvelope.click();
     await page.waitForLoadState("networkidle");
-    console.log("✓ Opened source envelope");
+    await test.step("✓ Opened source envelope", async () => {});
 
     // STEP 3: Get current balance
     const beforeBalance = await page
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    console.log("✓ Source balance before transfer:", beforeBalance);
+    await test.step("✓ Source balance before transfer:", beforeBalance, async () => {});
 
     // STEP 4: Look for transfer option
     // May be: "Transfer", "Move", "Send", menu, etc.
@@ -64,7 +64,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .first();
     await expect(transferButton).toBeVisible({ timeout: 5000 });
     await transferButton.click();
-    console.log("✓ Opened transfer dialog");
+    await test.step("✓ Opened transfer dialog", async () => {});
 
     // STEP 5: Fill transfer form
     // 5a. Select destination envelope
@@ -75,20 +75,20 @@ test.describe("Envelope Transfers & Allocations", () => {
         .locator('option:has-text("Destination Envelope"), [role="option"]')
         .first()
         .click();
-      console.log("✓ Selected destination envelope");
+      await test.step("✓ Selected destination envelope", async () => {});
     }
 
     // 5b. Enter transfer amount
     const amountInput = page.locator('input[type="number"], input[placeholder*="amount"]').first();
     await amountInput.fill("150");
-    console.log("✓ Entered transfer amount: $150");
+    await test.step("✓ Entered transfer amount: $150", async () => {});
 
     // STEP 6: Submit transfer
     const confirmButton = page
       .locator('button:has-text("Confirm"), button:has-text("Transfer"), button:has-text("Send")')
       .last();
     await confirmButton.click();
-    console.log("✓ Submitted transfer");
+    await test.step("✓ Submitted transfer", async () => {});
 
     // STEP 7: Wait for processing
     await page.waitForLoadState("networkidle");
@@ -99,13 +99,13 @@ test.describe("Envelope Transfers & Allocations", () => {
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    console.log("✓ Source balance after transfer:", afterBalance);
+    await test.step("✓ Source balance after transfer:", afterBalance, async () => {});
 
     const beforeAmount = parseCurrency(beforeBalance);
     const afterAmount = parseCurrency(afterBalance);
     const decrease = beforeAmount - afterAmount;
     expect(decrease).toBeCloseTo(150, 2);
-    console.log(`✓ Source balance decreased by $${decrease.toFixed(2)} (expected $150)`);
+    await test.step(`✓ Source balance decreased by $${decrease.toFixed(2)} (expected $150)`, async () => {});
 
     // STEP 9: Navigate to destination to verify
     const backButton = page
@@ -125,14 +125,14 @@ test.describe("Envelope Transfers & Allocations", () => {
         .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
         .first()
         .textContent();
-      console.log("✓ Destination balance after transfer:", destBalance);
+      await test.step("✓ Destination balance after transfer:", destBalance, async () => {});
 
       // Verify destination increased by exactly $150
       const destAmount = parseCurrency(destBalance);
       // Destination started at $300, so should be around $450
       expect(destAmount).toBeGreaterThanOrEqual(450);
       expect(destAmount).toBeLessThanOrEqual(451);
-      console.log(`✓ Destination balance increased to $${destAmount.toFixed(2)} (expected ~$450)`);
+      await test.step(`✓ Destination balance increased to $${destAmount.toFixed(2)} (expected ~$450)`, async () => {});
     }
   });
 
@@ -142,14 +142,14 @@ test.describe("Envelope Transfers & Allocations", () => {
       { name: "Limited Funds Envelope", goal: 100 },
       { name: "Receiving Envelope", goal: 500 },
     ]);
-    console.log("✓ Envelopes created (limited funds $100)");
+    await test.step("✓ Envelopes created (limited funds $100)", async () => {});
 
     // STEP 1: Navigate to limited funds envelope
     const limitedEnv = page.locator("text=Limited Funds Envelope").first();
     await expect(limitedEnv).toBeVisible({ timeout: 5000 });
     await limitedEnv.click();
     await page.waitForLoadState("networkidle");
-    console.log("✓ Opened limited funds envelope");
+    await test.step("✓ Opened limited funds envelope", async () => {});
 
     // STEP 2: Attempt transfer > balance
     const moreMenu = page.locator('button[aria-label*="menu"]').first();
@@ -160,12 +160,12 @@ test.describe("Envelope Transfers & Allocations", () => {
     const transferButton = page.locator('button:has-text("Transfer")').first();
     await transferButton.click();
     await page.waitForTimeout(500);
-    console.log("✓ Opened transfer dialog");
+    await test.step("✓ Opened transfer dialog", async () => {});
 
     // STEP 3: Enter transfer amount > balance
     const amountInput = page.locator('input[type="number"]').first();
     await amountInput.fill("150"); // More than $100 balance
-    console.log("✓ Entered transfer amount: $150 (exceeds $100 balance)");
+    await test.step("✓ Entered transfer amount: $150 (exceeds $100 balance)", async () => {});
 
     // STEP 4: Try to confirm - verify prevention works
     const confirmButton = page
@@ -176,7 +176,7 @@ test.describe("Envelope Transfers & Allocations", () => {
     const isDisabled = await confirmButton.isDisabled().catch(() => false);
 
     if (isDisabled) {
-      console.log("✓ Transfer button is disabled (prevents insufficient fund transfer)");
+      await test.step("✓ Transfer button is disabled (prevents insufficient fund transfer)", async () => {});
       expect(isDisabled).toBe(true);
     } else {
       // Click and expect error message
@@ -189,7 +189,7 @@ test.describe("Envelope Transfers & Allocations", () => {
 
       if (errorVisible) {
         const errorText = await errorMsg.textContent();
-        console.log("✓ Error message shown:", errorText);
+        await test.step("✓ Error message shown:", errorText, async () => {});
       }
     }
   });
@@ -204,7 +204,7 @@ test.describe("Envelope Transfers & Allocations", () => {
 
     // Add unallocated income (from failed/partial paycheck)
     // Typically this is done via seedTransactions or seedPaycheck with unallocated
-    console.log("✓ Envelopes created for bulk allocation");
+    await test.step("✓ Envelopes created for bulk allocation", async () => {});
 
     // STEP 1: Navigate to allocation view
     // Usually under "Income", "Allocate", or "Unallocated Income"
@@ -214,9 +214,9 @@ test.describe("Envelope Transfers & Allocations", () => {
     if (await allocateLink.isVisible({ timeout: 3000 }).catch(() => false)) {
       await allocateLink.click();
       await page.waitForLoadState("networkidle");
-      console.log("✓ Opened allocation view");
+      await test.step("✓ Opened allocation view", async () => {});
     } else {
-      console.log("⚠ Allocation view not found - may need different approach");
+      await test.step("⚠ Allocation view not found - may need different approach", async () => {});
       return;
     }
 
@@ -228,7 +228,12 @@ test.describe("Envelope Transfers & Allocations", () => {
     if (await unallocatedAmount.isVisible().catch(() => false)) {
       const amount = await unallocatedAmount.textContent();
       unallocatedBefore = parseCurrency(amount);
-      console.log("✓ Unallocated amount shown:", amount, `($${unallocatedBefore.toFixed(2)})`);
+      await test.step(
+        "✓ Unallocated amount shown:",
+        amount,
+        `($${unallocatedBefore.toFixed(2)})`,
+        async () => {}
+      );
     }
 
     // STEP 3: Allocate to first envelope (Rent)
@@ -239,7 +244,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .first();
     if (await rentInput.isVisible().catch(() => false)) {
       await rentInput.fill("1000");
-      console.log("✓ Allocated $1000 to Rent");
+      await test.step("✓ Allocated $1000 to Rent", async () => {});
     }
 
     // STEP 4: Allocate to second envelope (Groceries)
@@ -248,7 +253,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .first();
     if (await groceriesInput.isVisible().catch(() => false)) {
       await groceriesInput.fill("400");
-      console.log("✓ Allocated $400 to Groceries");
+      await test.step("✓ Allocated $400 to Groceries", async () => {});
     }
 
     // STEP 5: Allocate to third envelope (Utilities)
@@ -257,7 +262,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .first();
     if (await utilitiesInput.isVisible().catch(() => false)) {
       await utilitiesInput.fill("200");
-      console.log("✓ Allocated $200 to Utilities");
+      await test.step("✓ Allocated $200 to Utilities", async () => {});
     }
 
     // STEP 6: Submit allocations
@@ -265,7 +270,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .locator('button:has-text("Confirm"), button:has-text("Allocate"), button:has-text("Save")')
       .last();
     await submitButton.click();
-    console.log("✓ Submitted bulk allocation");
+    await test.step("✓ Submitted bulk allocation", async () => {});
 
     // STEP 7: Wait for processing
     await page.waitForLoadState("networkidle");
@@ -279,8 +284,13 @@ test.describe("Envelope Transfers & Allocations", () => {
       const newAmount = await updatedUnallocated.textContent();
       const unallocatedAfter = parseCurrency(newAmount);
       const unallocatedUsed = unallocatedBefore - unallocatedAfter;
-      console.log("✓ Updated unallocated amount:", newAmount, `($${unallocatedAfter.toFixed(2)})`);
-      console.log(`✓ Allocated $${unallocatedUsed.toFixed(2)} to envelopes (expected $1600)`);
+      await test.step(
+        "✓ Updated unallocated amount:",
+        newAmount,
+        `($${unallocatedAfter.toFixed(2)})`,
+        async () => {}
+      );
+      await test.step(`✓ Allocated $${unallocatedUsed.toFixed(2)} to envelopes (expected $1600)`, async () => {});
       expect(unallocatedUsed).toBeCloseTo(1600, 2);
     }
 
@@ -297,19 +307,19 @@ test.describe("Envelope Transfers & Allocations", () => {
       if (await rentEnv.isVisible().catch(() => false)) {
         const rentText = await rentEnv.textContent();
         expect(rentText).toContain("Rent Bulk");
-        console.log("✓ Rent Bulk envelope showing allocated amount");
+        await test.step("✓ Rent Bulk envelope showing allocated amount", async () => {});
       }
 
       const groceriesEnv = page.locator("text=Groceries Bulk").first();
       if (await groceriesEnv.isVisible().catch(() => false)) {
         expect(groceriesEnv).toBeVisible();
-        console.log("✓ Groceries Bulk envelope showing allocated amount");
+        await test.step("✓ Groceries Bulk envelope showing allocated amount", async () => {});
       }
 
       const utilitiesEnv = page.locator("text=Utilities Bulk").first();
       if (await utilitiesEnv.isVisible().catch(() => false)) {
         expect(utilitiesEnv).toBeVisible();
-        console.log("✓ Utilities Bulk envelope showing allocated amount");
+        await test.step("✓ Utilities Bulk envelope showing allocated amount", async () => {});
       }
     }
   });
@@ -317,13 +327,13 @@ test.describe("Envelope Transfers & Allocations", () => {
   test("Test 4: Transfer to same envelope is not allowed", async ({ page }) => {
     // SETUP: Create single envelope
     const envelopes = await seedEnvelopes(page, [{ name: "Self Transfer Test", goal: 500 }]);
-    console.log("✓ Envelope created");
+    await test.step("✓ Envelope created", async () => {});
 
     // STEP 1: Open envelope
     const envelope = page.locator("text=Self Transfer Test").first();
     await envelope.click();
     await page.waitForLoadState("networkidle");
-    console.log("✓ Opened envelope");
+    await test.step("✓ Opened envelope", async () => {});
 
     // STEP 2: Open transfer dialog
     const moreMenu = page.locator('button[aria-label*="menu"]').first();
@@ -334,7 +344,7 @@ test.describe("Envelope Transfers & Allocations", () => {
     const transferButton = page.locator('button:has-text("Transfer")').first();
     await transferButton.click();
     await page.waitForTimeout(500);
-    console.log("✓ Transfer dialog open");
+    await test.step("✓ Transfer dialog open", async () => {});
 
     // STEP 3: Attempt to select same envelope
     const destSelect = page.locator('select, [data-testid="transfer-destination"]').first();
@@ -351,9 +361,9 @@ test.describe("Envelope Transfers & Allocations", () => {
 
       expect(isDisabled).toBe(true);
       if (isDisabled) {
-        console.log("✓ Self-transfer option is disabled (prevents self-transfers)");
+        await test.step("✓ Self-transfer option is disabled (prevents self-transfers)", async () => {});
       } else {
-        console.log("⚠ Self-transfer not prevented at option level");
+        await test.step("⚠ Self-transfer not prevented at option level", async () => {});
       }
     }
   });
@@ -364,7 +374,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       { name: "History From", goal: 300 },
       { name: "History To", goal: 200 },
     ]);
-    console.log("✓ Envelopes created");
+    await test.step("✓ Envelopes created", async () => {});
 
     // STEP 1: Perform a transfer
     const fromEnv = page.locator("text=History From").first();
@@ -390,7 +400,7 @@ test.describe("Envelope Transfers & Allocations", () => {
 
     const confirmBtn = page.locator('button:has-text("Confirm")').last();
     await confirmBtn.click();
-    console.log("✓ Transfer completed: $75 from History From to History To");
+    await test.step("✓ Transfer completed: $75 from History From to History To", async () => {});
 
     // STEP 2: Wait and navigate
     await page.waitForLoadState("networkidle");
@@ -403,7 +413,7 @@ test.describe("Envelope Transfers & Allocations", () => {
     if (await historySection.isVisible({ timeout: 3000 }).catch(() => false)) {
       const transferRecord = page.locator("text=/transferred|transfer|75/i").first();
       await expect(transferRecord).toBeVisible({ timeout: 5000 });
-      console.log("✓ Transfer shown in source envelope history");
+      await test.step("✓ Transfer shown in source envelope history", async () => {});
     }
 
     // STEP 4: Navigate to destination and check history
@@ -427,7 +437,7 @@ test.describe("Envelope Transfers & Allocations", () => {
           .locator("text=/transferred|transfer|75|History From/i")
           .first();
         await expect(destTransferRecord).toBeVisible({ timeout: 5000 });
-        console.log("✓ Transfer history showing in destination envelope with $75 amount");
+        await test.step("✓ Transfer history showing in destination envelope with $75 amount", async () => {});
       }
     }
   });

@@ -349,9 +349,7 @@ test.describe("Bill Payment Workflow", () => {
         await test.step("⚠ No payment records found (may require first payment)", async () => {});
       }
     } else {
-      console.log(
-        "⚠ Payment history section not found (may not be implemented or requires payment first)"
-      );
+      await test.step("⚠ Payment history section not found (may not be implemented or requires payment first)", async () => {});
     }
   });
 });
