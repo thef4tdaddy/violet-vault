@@ -208,7 +208,7 @@ npm run test:e2e:headed
 ## Current State Summary
 
 ### Ready for Use ✅
-- All 5 E2E test specs are integrated and ready to run
+- All 6 E2E test specs are integrated and ready to run (1 smoke + 4 workflow + infrastructure)
 - Auth bug fixed - tests can now complete automatically under VITE_DEMO_MODE
 - Full_salvo.py has E2E 30-min debounce integration
 - Tests can be run locally with `npm run test:e2e:smoke` or `npm run test:e2e`
@@ -221,12 +221,13 @@ npm run test:e2e:headed
 
 ## PR Closure Checklist
 
-All 5 PRs can now be safely closed:
+All 6 PRs can now be safely closed:
 
 - [ ] PR #1935: Smoke Tests - **MERGED** via git merge, auth bug fixed in UserSetup.tsx
 - [ ] PR #1936: Phase 1 Infrastructure - **MERGED**, infrastructure already integrated
 - [ ] PR #1937: Transaction Tests - **MERGED** (review feedback TODO for later optimization)
 - [ ] PR #1938: Bill Payment Tests - **MERGED**, fixture migrations included
+- [ ] PR #1939: Paycheck Processing Tests - **MERGED**, all 3 test scenarios included
 - [ ] PR #1940: Envelope Transfer Tests - **MERGED**, all 5 transfer scenarios included
 
 **Comment Template for PR Closure**:
