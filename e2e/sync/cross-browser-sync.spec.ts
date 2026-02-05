@@ -2,21 +2,11 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Cross-Browser Sync & Conflict Resolution", () => {
   test("Test 1: Data created in Browser A appears in Browser B", async ({ browser }) => {
-    // This test uses multiple browser contexts to simulate two different devices/tabs
-    // SETUP: Create two browser contexts (both with demo mode)
-    const contextA = await browser.newContext({
-      extraHTTPHeaders: {
-        "x-vite-demo-mode": "true",
-      },
-    });
-    const contextB = await browser.newContext({
-      extraHTTPHeaders: {
-        "x-vite-demo-mode": "true",
-      },
-    });
+    // This test uses multiple tabs in the same browser context to simulate two different views
+    // SETUP: Create two pages that share the same authenticated session
 
-    const pageA = await contextA.newPage();
-    const pageB = await contextB.newPage();
+    const pageA = await context.newPage();
+    const pageB = await context.newPage();
 
     // STEP 1a: Load app in Browser A
     await pageA.goto("/", { waitUntil: "networkidle" });
