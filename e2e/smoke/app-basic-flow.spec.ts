@@ -9,7 +9,7 @@ test.describe('Smoke Tests - Critical Path Validation', () => {
 
   test('Test 1: App loads with demo mode and generates unique budget ID', async ({ page }) => {
     // STEP 1: Verify page loaded successfully
-    await expect(page).toHaveURL(/localhost:5173/);
+    await expect(page).toHaveURL(/\/demo\/dashboard/);
     
     // STEP 2: Verify dashboard main container is visible
     // Look for the main dashboard container - adjust selector based on actual app structure
