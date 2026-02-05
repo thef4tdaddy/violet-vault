@@ -1,32 +1,39 @@
 import { test, expect } from "@playwright/test";
+import { blockFirebase, unblockFirebase } from "../fixtures/network.fixture";
 
 test.describe("Backend Fallback & Recovery", () => {
+  // Cleanup after each test to ensure isolation
+  test.afterEach(async ({ page }) => {
+    await unblockFirebase(page);
+  });
+
   test("Test 1: App initializes in offline-only mode when backend unavailable", async ({
     page,
   }) => {
-    // STEP 1: Block Firebase completely before page load
-    await page.context().route("**/firebase**", (route) => route.abort());
-    await page.context().route("**/firebaseapp.com/**", (route) => route.abort());
-    console.log("✓ Firebase blocked before app load");
+    // STEP 1: Set up console error monitoring before any navigation
+    const errorLogs: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        errorLogs.push(msg.text());
+      }
+    });
 
-    // STEP 2: Navigate to app
-    await page.goto("http://localhost:5173", { waitUntil: "domcontentloaded" });
+    // STEP 2: Block Firebase completely before page load
+    await blockFirebase(page);
+
+    // STEP 3: Navigate to app
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(3000); // Wait for auth attempt timeout
     console.log("✓ App loaded with Firebase unavailable");
 
-    // STEP 3: Verify dashboard loads (offline-only mode)
+    // STEP 4: Verify dashboard loads (offline-only mode)
     const dashboard = page
       .locator('[data-testid="dashboard-container"], main, [role="main"]')
       .first();
-    const isDashboardVisible = await dashboard.isVisible({ timeout: 10000 }).catch(() => false);
+    await expect(dashboard).toBeVisible({ timeout: 10000 });
+    console.log("✓ Dashboard loaded in offline-only mode");
 
-    if (isDashboardVisible) {
-      console.log("✓ Dashboard loaded in offline-only mode");
-    } else {
-      console.log("⚠ Dashboard may not be loaded");
-    }
-
-    // STEP 4: Look for offline-only indicator
+    // STEP 5: Look for offline-only indicator (optional - may not be implemented)
     const offlineIndicator = page
       .locator('[data-testid*="offline"], text=/OFFLINE|Offline|No sync/, [aria-label*="offline"]')
       .first();
@@ -39,67 +46,50 @@ test.describe("Backend Fallback & Recovery", () => {
       console.log("⚠ Offline indicator not found (may not be implemented)");
     }
 
-    // STEP 5: Verify app is functional (can interact)
+    // STEP 6: Verify app is functional (can interact)
     const addButton = page
       .locator('button:has-text("Add Envelope"), button:has-text("Add")')
       .first();
-    const isClickable = await addButton.isEnabled({ timeout: 2000 }).catch(() => false);
+    await expect(addButton).toBeEnabled({ timeout: 2000 });
+    console.log("✓ App is interactive in offline-only mode");
 
-    if (isClickable) {
-      console.log("✓ App is interactive in offline-only mode");
-    }
-
-    // STEP 6: Verify no error spam in console
-    const errorLogs: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "error") {
-        errorLogs.push(msg.text());
-      }
-    });
-
+    // STEP 7: Verify no error spam in console
     await page.waitForTimeout(2000);
 
     const criticalErrors = errorLogs.filter(
       (err) => !err.includes("firebase") && !err.includes("network") && !err.includes("abort")
     ).length;
 
-    if (criticalErrors === 0) {
-      console.log("✓ No critical errors in console");
-    } else {
-      console.log("⚠ Found", criticalErrors, "critical errors");
-    }
+    expect(criticalErrors).toBe(0);
+    console.log("✓ No critical errors in console");
   });
 
   test("Test 2: Create and view data works offline-only", async ({ page }) => {
-    // STEP 1: Block Firebase
-    await page.context().route("**/firebase**", (route) => route.abort());
-    await page.context().route("**/firebaseapp.com/**", (route) => route.abort());
-    console.log("✓ Firebase blocked");
+    // STEP 1: Block Firebase before navigation
+    await blockFirebase(page);
 
     // STEP 2: Load app
-    await page.goto("http://localhost:5173", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(2500);
     console.log("✓ App loaded offline");
 
     // STEP 3: Create envelope
     const addBtn = page.locator('button:has-text("Add Envelope")').first();
-    if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await addBtn.click();
+    await expect(addBtn).toBeVisible({ timeout: 3000 });
+    await addBtn.click();
 
-      const dialog = page.locator('[role="dialog"]').first();
-      await expect(dialog).toBeVisible({ timeout: 5000 });
+    const dialog = page.locator('[role="dialog"]').first();
+    await expect(dialog).toBeVisible({ timeout: 5000 });
 
-      const nameInput = page.locator('input[placeholder*="name"]').first();
-      await nameInput.fill("Offline Test Envelope");
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await nameInput.fill("Offline Test Envelope");
 
-      const amountInput = page.locator('input[type="number"]').first();
-      await amountInput.fill("300");
+    const amountInput = page.locator('input[type="number"]').first();
+    await amountInput.fill("300");
 
-      const submitBtn = page.locator('button:has-text("Create")').last();
-      await submitBtn.click();
-
-      console.log("✓ Envelope created in offline-only mode");
-    }
+    const submitBtn = page.locator('button:has-text("Create")').last();
+    await submitBtn.click();
+    console.log("✓ Envelope created in offline-only mode");
 
     // STEP 4: Verify envelope visible
     const envelope = page.locator("text=Offline Test Envelope").first();
@@ -111,20 +101,18 @@ test.describe("Backend Fallback & Recovery", () => {
     await page.waitForTimeout(500);
 
     const addTransBtn = page.locator('button:has-text("Add Transaction")').first();
-    if (await addTransBtn.isVisible().catch(() => false)) {
-      await addTransBtn.click();
+    await expect(addTransBtn).toBeVisible({ timeout: 3000 });
+    await addTransBtn.click();
 
-      const descInput = page.locator('input[placeholder*="description"]').first();
-      await descInput.fill("Offline transaction");
+    const descInput = page.locator('input[placeholder*="description"]').first();
+    await descInput.fill("Offline transaction");
 
-      const amtInput = page.locator('input[type="number"]').first();
-      await amtInput.fill("45");
+    const amtInput = page.locator('input[type="number"]').first();
+    await amtInput.fill("45");
 
-      const submitBtn = page.locator('button:has-text("Add")').last();
-      await submitBtn.click();
-
-      console.log("✓ Transaction created offline");
-    }
+    const submitBtn2 = page.locator('button:has-text("Add")').last();
+    await submitBtn2.click();
+    console.log("✓ Transaction created offline");
 
     // STEP 6: Verify transaction visible
     const transaction = page.locator("text=Offline transaction").first();
@@ -134,40 +122,35 @@ test.describe("Backend Fallback & Recovery", () => {
 
   test("Test 3: Sync resumes automatically when backend recovers", async ({ page }) => {
     // STEP 1: Block Firebase initially
-    await page.context().route("**/firebase**", (route) => route.abort());
-    console.log("✓ Firebase initially blocked");
+    await blockFirebase(page);
 
     // STEP 2: Load app offline
-    await page.goto("http://localhost:5173", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(2500);
     console.log("✓ App loaded (Firebase blocked)");
 
     // STEP 3: Create data offline
     const addBtn = page.locator('button:has-text("Add Envelope")').first();
-    if (await addBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await addBtn.click();
+    await expect(addBtn).toBeVisible({ timeout: 3000 });
+    await addBtn.click();
 
-      const nameInput = page.locator('input[placeholder*="name"]').first();
-      await nameInput.fill("Recovery Test");
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await nameInput.fill("Recovery Test");
 
-      const amountInput = page.locator('input[type="number"]').first();
-      await amountInput.fill("500");
+    const amountInput = page.locator('input[type="number"]').first();
+    await amountInput.fill("500");
 
-      const submitBtn = page.locator('button:has-text("Create")').last();
-      await submitBtn.click();
-
-      console.log("✓ Data created while offline");
-    }
+    const submitBtn = page.locator('button:has-text("Create")').last();
+    await submitBtn.click();
+    console.log("✓ Data created while offline");
 
     // STEP 4: Unblock Firebase (recovery)
-    await page.context().unroute("**/firebase**");
-    await page.context().unroute("**/firebaseapp.com/**");
-    console.log("✓ Firebase UNBLOCKED (recovery)");
+    await unblockFirebase(page);
 
     // STEP 5: Wait for sync to trigger
     await page.waitForTimeout(2000);
 
-    // STEP 6: Check for sync status indicators
+    // STEP 6: Check for sync status indicators (optional - may not be implemented)
     const syncingIndicator = page
       .locator('[data-testid*="syncing"], [data-testid*="sync"], text=/Syncing|Synced|SYNCED/')
       .first();
@@ -176,7 +159,7 @@ test.describe("Backend Fallback & Recovery", () => {
       console.log("✓ Sync status visible:", status);
     }
 
-    // STEP 7: Verify offline indicator disappears
+    // STEP 7: Verify offline indicator disappears (optional - may not be implemented)
     await page.waitForTimeout(2000);
     const offlineIndicator = page.locator('[data-testid*="offline"], text=/OFFLINE/').first();
     const isOfflineGone = !(await offlineIndicator.isVisible({ timeout: 2000 }).catch(() => false));
@@ -190,16 +173,13 @@ test.describe("Backend Fallback & Recovery", () => {
     await page.waitForLoadState("networkidle");
 
     const recoveryEnvelope = page.locator("text=Recovery Test").first();
-    const isPersisted = await recoveryEnvelope.isVisible({ timeout: 5000 }).catch(() => false);
-
-    if (isPersisted) {
-      console.log("✓ Data persisted to backend after recovery");
-    }
+    await expect(recoveryEnvelope).toBeVisible({ timeout: 5000 });
+    console.log("✓ Data persisted to backend after recovery");
   });
 
   test("Test 4: No data corruption during backend outage", async ({ page }) => {
     // Setup: Seed data with Firebase first
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
     console.log("✓ App loaded with Firebase available");
 
@@ -227,8 +207,7 @@ test.describe("Backend Fallback & Recovery", () => {
     console.log("✓ Initial balance:", initialBalance);
 
     // Block Firebase
-    await page.context().route("**/firebase**", (route) => route.abort());
-    console.log("✓ Firebase blocked");
+    await blockFirebase(page);
 
     // Add transaction while offline
     const envelope = page.locator("text=Corruption Test Envelope").first();
@@ -257,9 +236,7 @@ test.describe("Backend Fallback & Recovery", () => {
     console.log("✓ Balance while offline:", balanceOffline);
 
     // Unblock Firebase
-    await page.context().unroute("**/firebase**");
-    await page.context().unroute("**/firebaseapp.com/**");
-    console.log("✓ Firebase unblocked");
+    await unblockFirebase(page);
 
     // Wait for sync
     await page.waitForTimeout(2500);
@@ -282,15 +259,12 @@ test.describe("Backend Fallback & Recovery", () => {
 
     // Verify transaction still there
     const transaction = page.locator("text=Corruption test transaction").first();
-    const isTransactionPresent = await transaction.isVisible({ timeout: 3000 }).catch(() => false);
-
-    if (isTransactionPresent) {
-      console.log("✓ Transaction persisted (no data loss/corruption)");
-    }
+    await expect(transaction).toBeVisible({ timeout: 3000 });
+    console.log("✓ Transaction persisted (no data loss/corruption)");
   });
 
   test("Test 5: No error spam when retrying failed sync", async ({ page }) => {
-    // STEP 1: Collect error logs
+    // STEP 1: Collect error logs (register listener before navigation)
     const errorLogs: string[] = [];
     page.on("console", (msg) => {
       if (msg.type() === "error") {
@@ -298,40 +272,38 @@ test.describe("Backend Fallback & Recovery", () => {
       }
     });
 
-    // STEP 2: Load app and block Firebase intermittently
-    await page.goto("http://localhost:5173", { waitUntil: "domcontentloaded" });
+    // STEP 2: Block Firebase before navigation
+    await blockFirebase(page);
 
-    // Block during load
-    await page.context().route("**/firebase**", (route) => route.abort());
-
+    // STEP 3: Load app
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(2500);
     console.log("✓ App loaded (Firebase blocked)");
 
-    // STEP 3: Create data
+    // STEP 4: Create data
     const addBtn = page.locator('button:has-text("Add Envelope")').first();
-    if (await addBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await addBtn.click();
+    await expect(addBtn).toBeVisible({ timeout: 2000 });
+    await addBtn.click();
 
-      const nameInput = page.locator('input[placeholder*="name"]').first();
-      await nameInput.fill("Retry Spam Test");
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await nameInput.fill("Retry Spam Test");
 
-      const amountInput = page.locator('input[type="number"]').first();
-      await amountInput.fill("400");
+    const amountInput = page.locator('input[type="number"]').first();
+    await amountInput.fill("400");
 
-      const submitBtn = page.locator('button:has-text("Create")').last();
-      await submitBtn.click();
-    }
+    const submitBtn = page.locator('button:has-text("Create")').last();
+    await submitBtn.click();
 
-    // STEP 4: Wait for retry attempts
+    // STEP 5: Wait for retry attempts
     await page.waitForTimeout(3000);
 
-    // STEP 5: Unblock Firebase
-    await page.context().unroute("**/firebase**");
+    // STEP 6: Unblock Firebase
+    await unblockFirebase(page);
 
-    // STEP 6: Wait and collect more logs
+    // STEP 7: Wait and collect more logs
     await page.waitForTimeout(2000);
 
-    // STEP 7: Analyze error logs
+    // STEP 8: Analyze error logs
     const criticalErrors = errorLogs.filter(
       (err) => err.includes("firebase") || err.includes("firebaseapp")
     ).length;
@@ -342,10 +314,7 @@ test.describe("Backend Fallback & Recovery", () => {
     console.log("✓ Firebase-related errors:", criticalErrors);
 
     // Should be reasonable number (not > 20)
-    if (criticalErrors < 20) {
-      console.log("✓ Error count reasonable (no spam)");
-    } else {
-      console.log("⚠ High error count (possible spam):", criticalErrors);
-    }
+    expect(criticalErrors).toBeLessThan(20);
+    console.log("✓ Error count reasonable (no spam)");
   });
 });
