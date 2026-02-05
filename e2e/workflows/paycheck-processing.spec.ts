@@ -6,6 +6,25 @@
  * - Auto-funding rules execution
  *
  * Part of Phase 2.2: Paycheck Processing Workflow Tests
+ *
+ * TEST SCENARIOS:
+ * - Test 1: Auto-allocation proportionally distributes paycheck to envelopes
+ * - Test 2: Manual allocation allows custom distribution percentages
+ * - Test 3: Auto-funding rules execute automatically on paycheck
+ *
+ * TEST DATA & ALLOCATION LOGIC:
+ * - Test 1 envelopes: Rent ($1500), Groceries ($500), Utilities ($300)
+ * - Test 1 paycheck: $3000 (distributed proportionally based on goals)
+ * - Test 2 envelopes: Manual Rent ($1000), Manual Groceries ($500), Manual Savings ($0)
+ * - Test 2 paycheck: $2000 (manual: $1200 rent, $600 groceries, $200 savings)
+ * - Test 3 envelope: Auto-Fund Rent ($1500 auto-fund amount)
+ * - Test 3 paycheck: $5000 (auto-funding triggers to fill envelope to target)
+ *
+ * VERIFICATION:
+ * - Paycheck recorded in paycheckHistory via database assertion
+ * - Total balance increased after allocation
+ * - Specific envelopes funded to expected levels (toBeGreaterThan assertions)
+ * - Auto-funding rule applies correctly when configured
  */
 
 import type { Page } from "@playwright/test";
