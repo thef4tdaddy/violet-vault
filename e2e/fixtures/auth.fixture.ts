@@ -41,7 +41,9 @@ export const test = base.extend<AuthFixtures>({
     });
 
     if (!budgetId) {
-      console.warn("⚠ Budget ID not found - auth may not have completed");
+      throw new Error(
+        "Budget ID not found after authentication - demo mode setup may have failed. Check if VITE_DEMO_MODE=true is set in web server."
+      );
     } else {
       console.log("✓ Authentication complete. Budget ID:", budgetId);
     }

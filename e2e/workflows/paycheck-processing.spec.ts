@@ -80,9 +80,6 @@ test.describe("Paycheck Processing Workflow", () => {
       await paycheckButton.click();
     }
 
-    await page.waitForTimeout(500);
-    console.log("✓ Paycheck wizard opened");
-
     // STEP 3: Verify wizard modal is visible
     const wizardTitle = page.locator(
       '#paycheck-wizard-title, h1:has-text("Enter Paycheck Amount")'
@@ -126,8 +123,6 @@ test.describe("Paycheck Processing Workflow", () => {
       console.log("✓ Auto-allocation is default (no selection needed)");
     }
 
-    await page.waitForTimeout(500);
-
     // STEP 9: Proceed to review step
     const nextButton2 = page.locator('button:has-text("Next"), button:has-text("Review")').first();
     const hasNextButton = await nextButton2.isVisible().catch(() => false);
@@ -135,8 +130,6 @@ test.describe("Paycheck Processing Workflow", () => {
       await nextButton2.click();
       console.log("✓ Proceeded to review step");
     }
-
-    await page.waitForTimeout(500);
 
     // STEP 10: Confirm/submit the paycheck
     const confirmButton = page.locator(
@@ -148,7 +141,6 @@ test.describe("Paycheck Processing Workflow", () => {
 
     // STEP 11: Wait for allocation to complete
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
 
     // STEP 12: Verify wizard closed or shows success
     const successMessage = page.locator('text=/success|complete/i, [data-testid="success-step"]');
@@ -163,14 +155,12 @@ test.describe("Paycheck Processing Workflow", () => {
       const hasClose = await closeButton.isVisible().catch(() => false);
       if (hasClose) {
         await closeButton.click();
-        await page.waitForTimeout(500);
       }
     }
 
     // STEP 13: Navigate back to dashboard to verify balances
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
     console.log("✓ Navigated to dashboard to verify balances");
 
     // STEP 14: Verify envelope balances were updated
@@ -250,7 +240,6 @@ test.describe("Paycheck Processing Workflow", () => {
       await paycheckButton.click();
     }
 
-    await page.waitForTimeout(500);
     console.log("✓ Paycheck entry screen opened");
 
     // STEP 3: Enter paycheck amount
@@ -263,7 +252,6 @@ test.describe("Paycheck Processing Workflow", () => {
     const nextButton = page.locator('button:has-text("Next"), button:has-text("Continue")').first();
     await expect(nextButton).toBeVisible({ timeout: 5000 });
     await nextButton.click();
-    await page.waitForTimeout(500);
     console.log("✓ Proceeded to allocation step");
 
     // STEP 5: Select manual allocation strategy
@@ -274,7 +262,6 @@ test.describe("Paycheck Processing Workflow", () => {
     if (hasManualButton) {
       await manualAllocateButton.click();
       console.log("✓ Selected manual allocation strategy");
-      await page.waitForTimeout(500);
     }
 
     // STEP 6: Look for manual allocation inputs
@@ -325,7 +312,6 @@ test.describe("Paycheck Processing Workflow", () => {
     const hasNextButton = await nextButton2.isVisible().catch(() => false);
     if (hasNextButton) {
       await nextButton2.click();
-      await page.waitForTimeout(500);
     }
 
     // STEP 8: Submit manual allocation
@@ -338,12 +324,10 @@ test.describe("Paycheck Processing Workflow", () => {
 
     // STEP 9: Wait for processing
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
 
     // STEP 10: Navigate to dashboard to verify
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
 
     // STEP 11: Verify allocations were applied
     const rentCard = page.locator("text=Manual Rent").first();
@@ -413,7 +397,6 @@ test.describe("Paycheck Processing Workflow", () => {
       await paycheckButton.click();
     }
 
-    await page.waitForTimeout(500);
     console.log("✓ Paycheck entry opened");
 
     // STEP 3: Enter paycheck
@@ -426,14 +409,12 @@ test.describe("Paycheck Processing Workflow", () => {
     const nextButton = page.locator('button:has-text("Next"), button:has-text("Continue")').first();
     await expect(nextButton).toBeVisible({ timeout: 5000 });
     await nextButton.click();
-    await page.waitForTimeout(500);
 
     // May need to click through allocation strategy step
     const nextButton2 = page.locator('button:has-text("Next"), button:has-text("Review")').first();
     const hasNextButton = await nextButton2.isVisible().catch(() => false);
     if (hasNextButton) {
       await nextButton2.click();
-      await page.waitForTimeout(500);
     }
 
     // STEP 5: Confirm paycheck
@@ -446,12 +427,10 @@ test.describe("Paycheck Processing Workflow", () => {
 
     // STEP 6: Wait for processing
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
 
     // STEP 7: Navigate to dashboard
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
 
     // STEP 8: Verify auto-funding executed
     const rentCard = page.locator("text=Auto-Fund Rent").first();
