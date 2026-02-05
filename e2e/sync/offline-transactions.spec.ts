@@ -3,15 +3,12 @@ import { test } from "../fixtures/auth.fixture";
 import { seedEnvelopes } from "../fixtures/budget.fixture";
 
 test.describe("Offline Transaction Queueing & Sync", () => {
-  test("Test 1: Transactions queued when offline sync when reconnected", async ({
-    page,
-  }) => {
+  test("Test 1: Transactions queued when offline sync when reconnected", async ({ page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    console.log("✓ App loaded in demo mode");
     console.log("✓ App loaded in demo mode");
 
     // Create envelope
-    const envelopes = await seedEnvelopes(page, [{ name: "Offline Queue Test", goal: 500 }]);
+    await seedEnvelopes(page, [{ name: "Offline Queue Test", goal: 500 }]);
     console.log("✓ Test envelope created");
 
     // STEP 1: Navigate to envelope
@@ -89,12 +86,9 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 2: Multiple offline operations maintain FIFO order", async ({
-    page,
-    authenticatedPage,
-  }) => {
+  test("Test 2: Multiple offline operations maintain FIFO order", async ({ page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    const envelopes = await seedEnvelopes(page, [{ name: "FIFO Order Test", goal: 1000 }]);
+    await seedEnvelopes(page, [{ name: "FIFO Order Test", goal: 1000 }]);
     console.log("✓ Test envelope created");
 
     // STEP 1: Navigate to envelope
@@ -138,15 +132,6 @@ test.describe("Offline Transaction Queueing & Sync", () => {
       }
     };
 
-    // Operation 3: Transfer (if supported)
-    const operation3 = async () => {
-      const transferBtn = page.locator('button:has-text("Transfer")').first();
-      if (await transferBtn.isVisible().catch(() => false)) {
-        await transferBtn.click();
-        console.log("✓ Operation 3: Transfer initiated offline");
-      }
-    };
-
     await operation1().catch(() => null);
     await page.waitForTimeout(300);
     await operation2().catch(() => null);
@@ -178,12 +163,9 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     console.log("✓ All operations synced (order verified by completion)");
   });
 
-  test("Test 3: Offline sync retries on failure with backoff", async ({
-    page,
-    authenticatedPage,
-  }) => {
+  test("Test 3: Offline sync retries on failure with backoff", async ({ page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    const envelopes = await seedEnvelopes(page, [{ name: "Retry Test", goal: 300 }]);
+    await seedEnvelopes(page, [{ name: "Retry Test", goal: 300 }]);
     console.log("✓ Test envelope created");
 
     // STEP 1: Navigate to envelope
@@ -250,9 +232,9 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 4: Offline queue persists across page reload", async ({ page, authenticatedPage }) => {
+  test("Test 4: Offline queue persists across page reload", async ({ page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    const envelopes = await seedEnvelopes(page, [{ name: "Persistence Reload Test", goal: 400 }]);
+    await seedEnvelopes(page, [{ name: "Persistence Reload Test", goal: 400 }]);
     console.log("✓ Test envelope created");
 
     // STEP 1: Navigate to envelope
@@ -277,8 +259,6 @@ test.describe("Offline Transaction Queueing & Sync", () => {
 
     // STEP 3: Verify it shows as pending
     await page.waitForTimeout(500);
-    const pendingBefore = page.locator('[data-testid*="pending"], text=/Pending/').first();
-    const wasShowing = await pendingBefore.isVisible({ timeout: 2000 }).catch(() => false);
 
     // STEP 4: Reload page while still offline
     await page.reload();
@@ -322,12 +302,9 @@ test.describe("Offline Transaction Queueing & Sync", () => {
     }
   });
 
-  test("Test 5: No error spam in console during offline operation", async ({
-    page,
-    authenticatedPage,
-  }) => {
+  test("Test 5: No error spam in console during offline operation", async ({ page }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    const envelopes = await seedEnvelopes(page, [{ name: "Console Spam Test", goal: 500 }]);
+    await seedEnvelopes(page, [{ name: "Console Spam Test", goal: 500 }]);
     console.log("✓ Test envelope created");
 
     // STEP 1: Collect console errors
@@ -369,10 +346,8 @@ test.describe("Offline Transaction Queueing & Sync", () => {
         !err.includes("favicon") // ignore favicon 404s
     ).length;
 
-    if (errorCount === 0) {
-      console.log("✓ No error spam during offline/online transition");
-    } else {
-      console.log("⚠ Found", errorCount, "console errors:", consoleErrors.slice(0, 3));
-    }
+    // Assert that there are no unexpected console errors
+    expect(errorCount).toBe(0);
+    console.log("✓ No error spam during offline/online transition");
   });
 });
