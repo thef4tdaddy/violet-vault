@@ -152,6 +152,23 @@ export async function seedTransactions(
 }
 
 /**
+ * Bill category mapping for consistent bill categorization across tests
+ * Maps bill names/types to their corresponding categories
+ */
+const BILL_CATEGORY_MAP: Record<string, string> = {
+  utilities: "utilities",
+  electric: "utilities",
+  water: "utilities",
+  gas: "utilities",
+  rent: "housing",
+  mortgage: "housing",
+  insurance: "insurance",
+  health: "insurance",
+  subscription: "subscription",
+  other: "other",
+};
+
+/**
  * Create test bills programmatically via IndexedDB
  *
  * @param page - Playwright page object
