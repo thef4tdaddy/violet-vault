@@ -36,10 +36,30 @@ export async function seedEnvelopes(
     autoFundAmount?: number;
   }>
 ) {
+  // Pre-check: verify window.budgetDb exists in the current page context
+  const preCheckState = await page.evaluate(() => {
+    const db = (window as any).budgetDb;
+    return {
+      dbExists: !!db,
+      dbType: typeof db,
+      dbKeys: db ? Object.keys(db).length : 0,
+      hasEnvelopes: db?.envelopes ? true : false,
+      hasTransactions: db?.transactions ? true : false,
+    };
+  });
+  console.log("[seedEnvelopes] Pre-check state:", preCheckState);
+
   const created = await page.evaluate((envData) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const db = (window as any).budgetDb;
+        // Wait for window.budgetDb to be available (with timeout)
+        let db = (window as any).budgetDb;
+        let attempts = 0;
+        while (!db && attempts < 50) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          db = (window as any).budgetDb;
+          attempts++;
+        }
 
         if (!db) {
           reject(new Error("window.budgetDb not found - demo mode may not be enabled"));

@@ -37,7 +37,6 @@
 
 import type { Page } from "@playwright/test";
 import { test, expect } from "../fixtures/auth.fixture";
-import { seedEnvelopes } from "../fixtures/budget.fixture";
 
 /**
  * Helper function to wait for window.budgetDb to be available
@@ -64,13 +63,7 @@ test.describe("Paycheck Processing Workflow", () => {
     await waitForBudgetDb(page);
     await test.step("✓ budgetDb available", async () => {});
 
-    // SETUP: Create envelopes with specific goals for testing allocation
-    await seedEnvelopes(page, [
-      { name: "Rent", goal: 1500 },
-      { name: "Groceries", goal: 500 },
-      { name: "Utilities", goal: 300 },
-    ]);
-    await test.step("✓ Test envelopes created via fixture", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to dashboard where paycheck CTA is located
     await page.goto("/dashboard");
@@ -237,13 +230,7 @@ test.describe("Paycheck Processing Workflow", () => {
     await waitForBudgetDb(page);
     await test.step("✓ budgetDb available", async () => {});
 
-    // SETUP: Create envelopes
-    await seedEnvelopes(page, [
-      { name: "Manual Rent", goal: 1000 },
-      { name: "Manual Groceries", goal: 500 },
-      { name: "Manual Savings", goal: 0 },
-    ]);
-    await test.step("✓ Test envelopes created for manual allocation test", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to dashboard
     await page.goto("/dashboard");
@@ -398,9 +385,7 @@ test.describe("Paycheck Processing Workflow", () => {
     await waitForBudgetDb(page);
     await test.step("✓ budgetDb available", async () => {});
 
-    // SETUP: Create envelope with auto-funding rule
-    await seedEnvelopes(page, [{ name: "Auto-Fund Rent", goal: 1500, autoFundAmount: 1500 }]);
-    await test.step("✓ Envelope with auto-funding rule created", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to dashboard
     await page.goto("/dashboard");

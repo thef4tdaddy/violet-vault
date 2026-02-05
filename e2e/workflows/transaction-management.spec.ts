@@ -1,5 +1,4 @@
 import { test, expect } from "../fixtures/auth.fixture";
-import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
 /**
  * Transaction Management Workflow E2E Tests
@@ -44,11 +43,8 @@ test.describe("Transaction Management Workflow", () => {
     authenticatedPage: page,
   }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    await test.step("App loaded with demo mode", async () => {});
-
-    // SETUP: Create test envelope
-    await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
-    await test.step("Test envelope created", async () => {});
+    // Test data already loaded from fixture
+    await test.step("App loaded with demo mode and test data", async () => {});
 
     // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Test Groceries").first();
@@ -141,14 +137,8 @@ test.describe("Transaction Management Workflow", () => {
     authenticatedPage: page,
   }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    await test.step("✓ App loaded with demo mode", async () => {});
-
-    // SETUP: Create envelope with transaction
-    const envelopes = await seedEnvelopes(page, [{ name: "Edit Test Groceries", goal: 500 }]);
-    await seedTransactions(page, envelopes[0].id, [
-      { description: "Original purchase", amount: 30 },
-    ]);
-    await test.step("✓ Envelope and transaction created", async () => {});
+    // Test data already loaded from fixture
+    await test.step("✓ App loaded with demo mode and test data", async () => {});
 
     // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Edit Test Groceries").first();

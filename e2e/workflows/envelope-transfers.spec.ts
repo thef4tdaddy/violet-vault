@@ -1,5 +1,4 @@
 import { test, expect } from "../fixtures/auth.fixture";
-import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
 /**
  * Envelope Transfers & Allocations E2E Tests
@@ -48,17 +47,7 @@ const parseCurrency = (value: string | null): number => {
 
 test.describe("Envelope Transfers & Allocations", () => {
   test("Test 1: Transfer money between two envelopes", async ({ page }) => {
-    // SETUP: Create two envelopes with funds
-    const envelopes = await seedEnvelopes(page, [
-      { name: "Source Envelope", goal: 500 },
-      { name: "Destination Envelope", goal: 300 },
-    ]);
-
-    // Seed source envelope with $500 balance
-    await seedTransactions(page, envelopes[0].id, [
-      { description: "Starting balance", amount: 500 },
-    ]);
-    await test.step("✓ Two envelopes created with $500 starting balance", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to dashboard or envelopes view
     const envelopesView = page.locator("text=/Envelopes|envelopes|Dashboard/i").first();
@@ -80,7 +69,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    await test.step("✓ Source balance before transfer:", beforeBalance, async () => {});
+    await test.step(`✓ Source balance before transfer: ${beforeBalance}`, async () => {});
 
     // STEP 4: Look for transfer option
     // May be: "Transfer", "Move", "Send", menu, etc.
@@ -134,7 +123,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
       .textContent();
-    await test.step("✓ Source balance after transfer:", afterBalance, async () => {});
+    await test.step(`✓ Source balance after transfer: ${afterBalance}`, async () => {});
 
     const beforeAmount = parseCurrency(beforeBalance);
     const afterAmount = parseCurrency(afterBalance);
@@ -160,7 +149,7 @@ test.describe("Envelope Transfers & Allocations", () => {
         .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
         .first()
         .textContent();
-      await test.step("✓ Destination balance after transfer:", destBalance, async () => {});
+      await test.step(`✓ Destination balance after transfer: ${destBalance}`, async () => {});
 
       // Verify destination increased by exactly $150
       const destAmount = parseCurrency(destBalance);
@@ -172,12 +161,7 @@ test.describe("Envelope Transfers & Allocations", () => {
   });
 
   test("Test 2: Cannot transfer more than envelope balance", async ({ page }) => {
-    // SETUP: Create envelope with limited funds
-    const envelopes = await seedEnvelopes(page, [
-      { name: "Limited Funds Envelope", goal: 100 },
-      { name: "Receiving Envelope", goal: 500 },
-    ]);
-    await test.step("✓ Envelopes created (limited funds $100)", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to limited funds envelope
     const limitedEnv = page.locator("text=Limited Funds Envelope").first();
@@ -224,22 +208,13 @@ test.describe("Envelope Transfers & Allocations", () => {
 
       if (errorVisible) {
         const errorText = await errorMsg.textContent();
-        await test.step("✓ Error message shown:", errorText, async () => {});
+        await test.step(`✓ Error message shown: ${errorText}`, async () => {});
       }
     }
   });
 
   test("Test 3: Bulk allocate unallocated income to multiple envelopes", async ({ page }) => {
-    // SETUP: Create multiple envelopes and add unallocated income
-    const envelopes = await seedEnvelopes(page, [
-      { name: "Rent Bulk", goal: 1500 },
-      { name: "Groceries Bulk", goal: 400 },
-      { name: "Utilities Bulk", goal: 200 },
-    ]);
-
-    // Add unallocated income (from failed/partial paycheck)
-    // Typically this is done via seedTransactions or seedPaycheck with unallocated
-    await test.step("✓ Envelopes created for bulk allocation", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Navigate to allocation view
     // Usually under "Income", "Allocate", or "Unallocated Income"
@@ -263,12 +238,7 @@ test.describe("Envelope Transfers & Allocations", () => {
     if (await unallocatedAmount.isVisible().catch(() => false)) {
       const amount = await unallocatedAmount.textContent();
       unallocatedBefore = parseCurrency(amount);
-      await test.step(
-        "✓ Unallocated amount shown:",
-        amount,
-        `($${unallocatedBefore.toFixed(2)})`,
-        async () => {}
-      );
+      await test.step(`✓ Unallocated amount shown: ${amount} ($${unallocatedBefore.toFixed(2)})`, async () => {});
     }
 
     // STEP 3: Allocate to first envelope (Rent)
@@ -319,12 +289,7 @@ test.describe("Envelope Transfers & Allocations", () => {
       const newAmount = await updatedUnallocated.textContent();
       const unallocatedAfter = parseCurrency(newAmount);
       const unallocatedUsed = unallocatedBefore - unallocatedAfter;
-      await test.step(
-        "✓ Updated unallocated amount:",
-        newAmount,
-        `($${unallocatedAfter.toFixed(2)})`,
-        async () => {}
-      );
+      await test.step(`✓ Updated unallocated amount: ${newAmount} ($${unallocatedAfter.toFixed(2)})`, async () => {});
       await test.step(`✓ Allocated $${unallocatedUsed.toFixed(2)} to envelopes (expected $1600)`, async () => {});
       expect(unallocatedUsed).toBeCloseTo(1600, 2);
     }
@@ -360,9 +325,7 @@ test.describe("Envelope Transfers & Allocations", () => {
   });
 
   test("Test 4: Transfer to same envelope is not allowed", async ({ page }) => {
-    // SETUP: Create single envelope
-    const envelopes = await seedEnvelopes(page, [{ name: "Self Transfer Test", goal: 500 }]);
-    await test.step("✓ Envelope created", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Open envelope
     const envelope = page.locator("text=Self Transfer Test").first();
@@ -404,12 +367,7 @@ test.describe("Envelope Transfers & Allocations", () => {
   });
 
   test("Test 5: Transfer history shows in both envelopes", async ({ page }) => {
-    // SETUP: Create envelopes and perform transfer
-    const envelopes = await seedEnvelopes(page, [
-      { name: "History From", goal: 300 },
-      { name: "History To", goal: 200 },
-    ]);
-    await test.step("✓ Envelopes created", async () => {});
+    // SETUP: Test data already loaded via fixture
 
     // STEP 1: Perform a transfer
     const fromEnv = page.locator("text=History From").first();
