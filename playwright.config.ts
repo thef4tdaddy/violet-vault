@@ -75,7 +75,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'VITE_DEMO_MODE=true npx vite',
+    command: 'VITE_DEMO_MODE=true npx vite --config configs/build/vite.config.ts --mode development',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
