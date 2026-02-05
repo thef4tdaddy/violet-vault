@@ -22,7 +22,7 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  authenticatedPage: async ({ page, context }, use) => {
+  authenticatedPage: async ({ page, _context }, use) => {
     // Step 1: Set VITE_DEMO_MODE environment variable
     // This is handled by playwright.config.ts webServer command: VITE_DEMO_MODE=true npx vite
 

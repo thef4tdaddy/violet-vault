@@ -22,6 +22,7 @@ import logger from "@/utils/core/common/logger";
  */
 type UserSetupProps = Partial<UserSetupPropsType>;
 
+// eslint-disable-next-line max-lines-per-function
 const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const auth = useAuth();

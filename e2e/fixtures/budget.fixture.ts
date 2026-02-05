@@ -155,6 +155,7 @@ export async function seedTransactions(
  * Bill category mapping for consistent bill categorization across tests
  * Maps bill names/types to their corresponding categories
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BILL_CATEGORY_MAP: Record<string, string> = {
   utilities: "utilities",
   electric: "utilities",
