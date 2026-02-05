@@ -1,6 +1,16 @@
 import { test, expect } from "../fixtures/auth.fixture";
 import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
+/**
+ * Helper: Parse currency value from text
+ */
+const parseCurrency = (value: string | null): number => {
+  if (!value) return 0;
+  const match = value.match(/\$?([0-9,]+(?:\.[0-9]+)?)/);
+  if (!match) return 0;
+  return parseFloat(match[1].replace(/,/g, ""));
+};
+
 test.describe("Transaction Management Workflow", () => {
   test("Test 1: Create transaction in envelope and verify balance updates", async ({
     authenticatedPage: page,
