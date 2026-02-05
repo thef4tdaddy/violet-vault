@@ -1,12 +1,23 @@
 import { test, expect } from "@playwright/test";
+import { clearAllTestData } from "../fixtures/budget.fixture";
 
 test.describe("Cross-Browser Sync & Conflict Resolution", () => {
   test("Test 1: Data created in Browser A appears in Browser B", async ({ browser }) => {
-    // This test uses multiple tabs in the same browser context to simulate two different views
-    // SETUP: Create two pages that share the same authenticated session
+    // This test uses multiple browser contexts to simulate two different devices/tabs
+    // SETUP: Create two browser contexts (both with demo mode)
+    const contextA = await browser.newContext({
+      extraHTTPHeaders: {
+        "x-vite-demo-mode": "true",
+      },
+    });
+    const contextB = await browser.newContext({
+      extraHTTPHeaders: {
+        "x-vite-demo-mode": "true",
+      },
+    });
 
-    const pageA = await context.newPage();
-    const pageB = await context.newPage();
+    const pageA = await contextA.newPage();
+    const pageB = await contextB.newPage();
 
     // STEP 1a: Load app in Browser A
     await pageA.goto("/", { waitUntil: "networkidle" });
@@ -64,8 +75,11 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
 
     // STEP 7: Verify goal amount matches exactly
     const envelopeContainerB = pageB.locator("div", { hasText: "Sync Test Envelope" }).first();
-    const goalB = await envelopeContainerB.getByText(/\$[0-9,.]+/).first().textContent();
-    
+    const goalB = await envelopeContainerB
+      .getByText(/\$[0-9,.]+/)
+      .first()
+      .textContent();
+
     expect(goalB).toContain("500");
     console.log("✓ Browser B: Goal amount matches ($500)");
     console.log("✓ Browser B: Goal amount matches ($500)");
@@ -82,6 +96,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     }
 
     // Cleanup
+    await clearAllTestData(pageA);
     await pageA.close();
     await pageB.close();
     await contextA.close();
@@ -144,15 +159,14 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     await pageA.waitForTimeout(300);
 
     const editBtnA = pageA.locator('button:has-text("Edit"), [data-testid*="edit"]').first();
-    if (await editBtnA.isVisible().catch(() => false)) {
-      await editBtnA.click();
-      const goalFieldA = pageA.locator('input[type="number"]').first();
-      await goalFieldA.clear();
-      await goalFieldA.fill("200");
-      const saveA = pageA.locator('button:has-text("Save")').last();
-      await saveA.click();
-      console.log("✓ Browser A: Changed goal to $200 (offline)");
-    }
+    await expect(editBtnA).toBeVisible({ timeout: 5000 });
+    await editBtnA.click();
+    const goalFieldA = pageA.locator('input[type="number"]').first();
+    await goalFieldA.clear();
+    await goalFieldA.fill("200");
+    const saveA = pageA.locator('button:has-text("Save")').last();
+    await saveA.click();
+    console.log("✓ Browser A: Changed goal to $200 (offline)");
 
     // Browser B changes goal to $300 (concurrent, different value)
     const envelopeBCard = pageB.locator("text=Conflict Test").first();
@@ -160,15 +174,14 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     await pageB.waitForTimeout(300);
 
     const editBtnB = pageB.locator('button:has-text("Edit")').first();
-    if (await editBtnB.isVisible().catch(() => false)) {
-      await editBtnB.click();
-      const goalFieldB = pageB.locator('input[type="number"]').first();
-      await goalFieldB.clear();
-      await goalFieldB.fill("300");
-      const saveB = pageB.locator('button:has-text("Save")').last();
-      await saveB.click();
-      console.log("✓ Browser B: Changed goal to $300 (offline)");
-    }
+    await expect(editBtnB).toBeVisible({ timeout: 5000 });
+    await editBtnB.click();
+    const goalFieldB = pageB.locator('input[type="number"]').first();
+    await goalFieldB.clear();
+    await goalFieldB.fill("300");
+    const saveB = pageB.locator('button:has-text("Save")').last();
+    await saveB.click();
+    console.log("✓ Browser B: Changed goal to $300 (offline)");
 
     // STEP 6: Take both back online (sync conflicts)
     await pageA.context().setOffline(false);
@@ -203,6 +216,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     console.log("✓ Both browsers converged to same state");
 
     // Cleanup
+    await clearAllTestData(pageA);
     await pageA.close();
     await pageB.close();
     await contextA.close();
@@ -284,6 +298,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     console.log("✓ Browser B: Amount correct ($50)");
 
     // Cleanup
+    await clearAllTestData(pageA);
     await pageA.close();
     await pageB.close();
     await contextA.close();
@@ -388,10 +403,14 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     const envB2 = pageB.locator("text=No Loss Test").first();
     await envB2.click();
 
-    // STEP 9: Verify original transaction still there
-    const original = pageA.locator("text=Original Transaction").first();
-    await expect(original).toBeVisible({ timeout: 3000 });
-    console.log("✓ Original transaction still exists");
+    // STEP 9: Verify original transaction still there in both browsers
+    const originalA = pageA.locator("text=Original Transaction").first();
+    await expect(originalA).toBeVisible({ timeout: 3000 });
+    console.log("✓ Original transaction still exists in Browser A");
+
+    const originalB = pageB.locator("text=Original Transaction").first();
+    await expect(originalB).toBeVisible({ timeout: 3000 });
+    console.log("✓ Original transaction still exists in Browser B");
 
     // STEP 10: Verify both concurrent transactions present
     const transactionA = pageA.locator("text=A Transaction").first();
@@ -410,6 +429,7 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     }
 
     // Cleanup
+    await clearAllTestData(pageA);
     await pageA.close();
     await pageB.close();
     await contextA.close();
