@@ -15,6 +15,7 @@ import ShareCodeDisplay from "./components/ShareCodeDisplay";
 import JoinBudgetSection from "./components/JoinBudgetSection";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
 import logger from "@/utils/core/common/logger";
+import { isDemoMode } from "@/utils/platform/demo/demoModeDetection";
 
 /**
  * User Setup Component (Refactored)
@@ -28,11 +29,11 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const auth = useAuth();
   const { joinBudget } = auth;
 
-  // E2E Demo Mode Bypass: Skip multi-step auth for E2E tests
+  // Demo Mode Bypass: Skip multi-step auth for demo/testing
   useEffect(() => {
-    const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
-    if (isDemoMode && onSetupComplete) {
-      logger.debug("🎭 E2E Demo Mode: Auto-completing user setup for testing");
+    const inDemoMode = isDemoMode();
+    if (inDemoMode && onSetupComplete) {
+      logger.debug("🎭 Demo Mode: Auto-completing user setup");
       // Generate shareCode for budgetId creation
       import("@/utils/platform/security/shareCodeUtils").then(({ shareCodeUtils }) => {
         const demoSetup = {
@@ -41,8 +42,8 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
           userColor: "#a855f7",
           shareCode: shareCodeUtils.generateShareCode(),
         };
-        onSetupComplete(demoSetup).catch((error) => {
-          logger.error("E2E Demo Mode: Auto-setup failed", error);
+        Promise.resolve(onSetupComplete(demoSetup)).catch((error: unknown) => {
+          logger.error("Demo Mode: Auto-setup failed", error);
         });
       });
     }

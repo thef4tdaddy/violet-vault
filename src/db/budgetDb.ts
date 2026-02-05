@@ -668,15 +668,19 @@ export class VioletVaultDB extends Dexie {
 export const budgetDb = new VioletVaultDB();
 
 // Expose to window for debugging (development/demo/staging only)
-if (
-  typeof window !== "undefined" &&
-  (import.meta.env.MODE === "development" ||
-    import.meta.env.VITE_DEMO_MODE === "true" ||
+if (typeof window !== "undefined") {
+  const isDemoParam = new URLSearchParams(window.location.search).get("demo") === "true";
+  const isDemoEnv = import.meta.env.VITE_DEMO_MODE === "true";
+  const isDemoHost = window.location.hostname.includes("demo.violetvault.app");
+  const isDevEnv = import.meta.env.MODE === "development";
+  const isStagingHost =
     window.location.hostname.includes("staging.violetvault.app") ||
     window.location.hostname.includes("violetvault.app") ||
-    window.location.hostname.includes("vercel.app"))
-) {
-  (window as { budgetDb?: VioletVaultDB }).budgetDb = budgetDb;
+    window.location.hostname.includes("vercel.app");
+
+  if (isDevEnv || isDemoEnv || isDemoParam || isDemoHost || isStagingHost) {
+    (window as { budgetDb?: VioletVaultDB }).budgetDb = budgetDb;
+  }
 }
 
 // Utility functions

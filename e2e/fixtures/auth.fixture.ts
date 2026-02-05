@@ -22,13 +22,13 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  authenticatedPage: async ({ page, _context }, use) => {
-    // Step 1: Set VITE_DEMO_MODE environment variable
-    // This is handled by playwright.config.ts webServer command: VITE_DEMO_MODE=true npx vite
+  authenticatedPage: async ({ page }, use) => {
+    // Step 1: VITE_DEMO_MODE is set in playwright.config.ts webServer
+    // Step 1.5: Demo mode is detected via ?demo=true query parameter in navigation
 
-    // Step 2: Navigate directly to /app
-    // With VITE_DEMO_MODE=true, UserSetup.tsx will auto-complete auth
-    await page.goto("http://localhost:5173/app", { waitUntil: "networkidle" });
+    // Step 2: Navigate to /app with demo=true query parameter
+    // This triggers isDemoMode() check and enables demo mode across the app
+    await page.goto("http://localhost:5173/app?demo=true", { waitUntil: "networkidle" });
     console.log("✓ Navigated to /app with demo mode enabled");
 
     // Step 3: Wait for demo auth bypass to complete and app to initialize
@@ -47,7 +47,16 @@ export const test = base.extend<AuthFixtures>({
       console.log("✓ Authentication complete. Budget ID:", budgetId);
     }
 
-    // Step 5: Wait for app to be fully ready
+    // Step 5: Dismiss the LOCAL DATA SECURITY NOTICE modal if it appears
+    try {
+      const securityNoticeButton = page.locator('button:has-text("I UNDERSTAND")');
+      await securityNoticeButton.click({ timeout: 5000 });
+      console.log("✓ Dismissed security notice modal");
+    } catch {
+      console.warn("⚠ Security notice modal did not appear (might already be dismissed)");
+    }
+
+    // Step 6: Wait for app to be fully ready
     // Look for main content to load
     const mainContent = page.locator('main, [role="main"], [data-testid="dashboard"]');
     try {

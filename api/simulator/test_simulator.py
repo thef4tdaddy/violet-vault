@@ -450,6 +450,6 @@ class TestSimulationGeneration:
         envelope_ids = {e.id for e in result.envelopes}
 
         for txn in result.transactions:
-            assert txn.envelopeId in envelope_ids, (
-                f"Transaction {txn.id} references invalid envelope {txn.envelopeId}"
-            )
+            assert (
+                txn.envelopeId in envelope_ids
+            ), f"Transaction {txn.id} references invalid envelope {txn.envelopeId}"

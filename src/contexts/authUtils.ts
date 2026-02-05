@@ -94,7 +94,7 @@ export const createSetAuthenticated =
 
     // Expose budgetId on window.budgetDb for E2E tests in demo mode
     if (typeof window !== "undefined" && userData.budgetId) {
-      const db = (window as Record<string, { budgetId?: string }>).budgetDb;
+      const db = (window as unknown as Record<string, { budgetId?: string }>).budgetDb;
       if (db) {
         db.budgetId = userData.budgetId;
       }
