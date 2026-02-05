@@ -51,8 +51,8 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     await submitA.click();
     console.log('✓ Browser A: Created envelope "Sync Test Envelope" with goal $500');
 
-    // STEP 4: Wait for sync to Firebase
-    await pageA.waitForTimeout(2000);
+    // STEP 4: Wait for dialog to close (creation flow complete) instead of fixed timeout
+    await expect(dialogA).toBeHidden({ timeout: 5000 });
 
     // STEP 5: Browser B refreshes or waits for real-time update
     // If using Firebase real-time listeners, this should auto-update
