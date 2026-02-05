@@ -26,6 +26,25 @@ const UserSetup = ({ onSetupComplete }: UserSetupProps) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const auth = useAuth();
   const { joinBudget } = auth;
+
+  // E2E Demo Mode Bypass: Skip multi-step auth for E2E tests
+  useEffect(() => {
+    const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
+    if (isDemoMode && onSetupComplete) {
+      logger.debug("🎭 E2E Demo Mode: Auto-completing user setup for testing");
+      // Auto-complete with demo user data
+      const demoSetup = {
+        password: "test-password-123",
+        userName: "Demo User",
+        userColor: "#a855f7",
+        shareCode: "",
+      };
+      onSetupComplete(demoSetup).catch((error) => {
+        logger.error("E2E Demo Mode: Auto-setup failed", error);
+      });
+    }
+  }, [onSetupComplete]);
+
   const handleSetupComplete = useCallback(
     async (payload: UserSetupPayload) => {
       if (!onSetupComplete) {
