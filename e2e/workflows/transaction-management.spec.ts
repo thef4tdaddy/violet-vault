@@ -2,6 +2,32 @@ import { test, expect } from "../fixtures/auth.fixture";
 import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
 /**
+ * Transaction Management Workflow E2E Tests
+ *
+ * Tests core transaction operations:
+ * - Test 1: Create transaction and verify balance updates
+ * - Test 2: Edit transaction and verify persistence
+ * - Test 3: Delete transaction and verify removal
+ * - Test 4: Search transactions with filtering
+ * - Test 5: Date range filtering
+ *
+ * TEST DATA APPROACH:
+ * - Envelopes created via fixture (seedEnvelopes) for consistent setup
+ * - Transactions created via UI interactions or fixture seeding
+ * - Balances verified through parseCurrency utility
+ *
+ * SELECTOR STRATEGY:
+ * - Flexible multi-fallback selectors for UI variations
+ * - Handles both data-testid and text-based locators
+ * - Defensive error handling with .catch(() => false) for optional elements
+ *
+ * EDGE CASES HANDLED:
+ * - Search input may not be available (gracefully skipped)
+ * - Date filters optional (conditional verification)
+ * - Transaction delete may show confirmation dialogs
+ */
+
+/**
  * Helper: Parse currency value from text
  */
 const parseCurrency = (value: string | null): number => {
