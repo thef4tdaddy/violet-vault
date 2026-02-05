@@ -8,13 +8,14 @@
  * Part of Phase 2.2: Paycheck Processing Workflow Tests
  */
 
+import type { Page } from "@playwright/test";
 import { test, expect } from "../fixtures/auth.fixture";
 import { seedEnvelopes } from "../fixtures/budget.fixture";
 
 /**
  * Helper function to wait for window.budgetDb to be available
  */
-async function waitForBudgetDb(page: any, timeout = 10000) {
+async function waitForBudgetDb(page: Page, timeout = 10000) {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
     const hasDb = await page.evaluate(() => {
@@ -37,7 +38,7 @@ test.describe("Paycheck Processing Workflow", () => {
     console.log("✓ budgetDb available");
 
     // SETUP: Create envelopes with specific goals for testing allocation
-    const envelopes = await seedEnvelopes(page, [
+    await seedEnvelopes(page, [
       { name: "Rent", goal: 1500 },
       { name: "Groceries", goal: 500 },
       { name: "Utilities", goal: 300 },
@@ -220,7 +221,7 @@ test.describe("Paycheck Processing Workflow", () => {
     console.log("✓ budgetDb available");
 
     // SETUP: Create envelopes
-    const envelopes = await seedEnvelopes(page, [
+    await seedEnvelopes(page, [
       { name: "Manual Rent", goal: 1000 },
       { name: "Manual Groceries", goal: 500 },
       { name: "Manual Savings", goal: 0 },
@@ -387,9 +388,7 @@ test.describe("Paycheck Processing Workflow", () => {
     console.log("✓ budgetDb available");
 
     // SETUP: Create envelope with auto-funding rule
-    const envelopes = await seedEnvelopes(page, [
-      { name: "Auto-Fund Rent", goal: 1500, autoFundAmount: 1500 },
-    ]);
+    await seedEnvelopes(page, [{ name: "Auto-Fund Rent", goal: 1500, autoFundAmount: 1500 }]);
     console.log("✓ Envelope with auto-funding rule created");
 
     // STEP 1: Navigate to dashboard
