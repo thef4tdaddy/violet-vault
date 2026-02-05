@@ -1,6 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { authenticatedPage } from "../fixtures/auth.fixture";
-import { seedEnvelopes } from "../fixtures/budget.fixture";
 
 test.describe("Cross-Browser Sync & Conflict Resolution", () => {
   test("Test 1: Data created in Browser A appears in Browser B", async ({ browser, context }) => {
