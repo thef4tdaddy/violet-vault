@@ -41,23 +41,10 @@ describe("PerformanceHeader", () => {
   });
 
   describe("Rendering", () => {
-    it("should render the component", () => {
+    it("should render the component with all essential elements", () => {
       render(<PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />);
       expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
-    });
-
-    it("should render the title", () => {
-      render(<PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />);
-      expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
-    });
-
-    it("should render the subtitle", () => {
-      render(<PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />);
       expect(screen.getByText("Real-time financial health tracking")).toBeInTheDocument();
-    });
-
-    it("should render Live indicator", () => {
-      render(<PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />);
       expect(screen.getByText("Live")).toBeInTheDocument();
     });
   });
@@ -362,23 +349,19 @@ describe("PerformanceHeader", () => {
   });
 
   describe("Component Integration", () => {
-    it("should maintain state consistency between renders", () => {
+    it("should preserve all elements across multiple state changes", () => {
       const { rerender } = render(
         <PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />
       );
       expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
-
-      rerender(<PerformanceHeader alertsEnabled={true} setAlertsEnabled={mockSetAlertsEnabled} />);
-      expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
-    });
-
-    it("should preserve all elements on prop changes", () => {
-      const { rerender } = render(
-        <PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />
-      );
       expect(screen.getByText("Live")).toBeInTheDocument();
 
       rerender(<PerformanceHeader alertsEnabled={true} setAlertsEnabled={mockSetAlertsEnabled} />);
+      expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
+      expect(screen.getByText("Live")).toBeInTheDocument();
+
+      rerender(<PerformanceHeader alertsEnabled={false} setAlertsEnabled={mockSetAlertsEnabled} />);
+      expect(screen.getByText("Performance Monitor")).toBeInTheDocument();
       expect(screen.getByText("Live")).toBeInTheDocument();
     });
   });
