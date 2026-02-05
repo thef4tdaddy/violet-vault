@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { test as authTest } from "../fixtures/auth.fixture";
+import { test, expect } from "../fixtures/auth.fixture";
 import { seedEnvelopes, seedBills } from "../fixtures/budget.fixture";
 
 /**
@@ -11,10 +10,11 @@ import { seedEnvelopes, seedBills } from "../fixtures/budget.fixture";
  */
 
 test.describe("Bill Payment Workflow", () => {
-  test("Test 1: Create bill with due date and verify in bill list", async ({ page }) => {
-    // SETUP: Navigate to app and authenticate
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 1: Create bill with due date and verify in bill list", async ({
+    page: authenticatedPage,
+  }) => {
+    const page = authenticatedPage;
+    // SETUP: Page is already authenticated via fixture
 
     // Create envelope for bill payment
     const envelopes = await seedEnvelopes(page, [{ name: "Utilities", goal: 200 }]);
@@ -102,10 +102,11 @@ test.describe("Bill Payment Workflow", () => {
     console.log("✓ Bill shows amount: $150");
   });
 
-  test("Test 2: Mark bill as paid and verify envelope balance decreases", async ({ page }) => {
-    // SETUP: Navigate to app and authenticate
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 2: Mark bill as paid and verify envelope balance decreases", async ({
+    page: authenticatedPage,
+  }) => {
+    const page = authenticatedPage;
+    // SETUP: Page is already authenticated via fixture
 
     // Create envelope and bill
     const envelopes = await seedEnvelopes(page, [{ name: "Rent Envelope", goal: 2000 }]);
@@ -180,10 +181,9 @@ test.describe("Bill Payment Workflow", () => {
     console.log("✓ Bill payment test completed");
   });
 
-  test("Test 3: Recurring bill creates next payment date", async ({ page }) => {
-    // SETUP: Navigate to app and authenticate
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 3: Recurring bill creates next payment date", async ({ page: authenticatedPage }) => {
+    const page = authenticatedPage;
+    // SETUP: Page is already authenticated via fixture
 
     // Create recurring bill
     const envelopes = await seedEnvelopes(page, [{ name: "Internet Envelope", goal: 500 }]);
@@ -223,10 +223,9 @@ test.describe("Bill Payment Workflow", () => {
     }
   });
 
-  test("Test 4: Overdue bill displays warning indicator", async ({ page }) => {
-    // SETUP: Navigate to app and authenticate
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 4: Overdue bill displays warning indicator", async ({ page: authenticatedPage }) => {
+    const page = authenticatedPage;
+    // SETUP: Page is already authenticated via fixture
 
     // Create bill with past due date
     const envelopes = await seedEnvelopes(page, [{ name: "Overdue Bill Envelope", goal: 500 }]);
@@ -273,10 +272,11 @@ test.describe("Bill Payment Workflow", () => {
     }
   });
 
-  test("Test 5: Bill payment history shows all previous payments", async ({ page }) => {
-    // SETUP: Navigate to app and authenticate
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
+  test("Test 5: Bill payment history shows all previous payments", async ({
+    page: authenticatedPage,
+  }) => {
+    const page = authenticatedPage;
+    // SETUP: Page is already authenticated via fixture
 
     // Create bill
     const envelopes = await seedEnvelopes(page, [{ name: "History Test Envelope", goal: 1000 }]);
