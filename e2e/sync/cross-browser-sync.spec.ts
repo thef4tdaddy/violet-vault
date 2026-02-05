@@ -413,6 +413,8 @@ test.describe("Cross-Browser Sync & Conflict Resolution", () => {
     console.log("✓ Browser A transaction present:", hasA);
     console.log("✓ Browser B transaction present:", hasB);
 
+    expect(hasA).toBe(true);
+    expect(hasB).toBe(true);
     if (hasA && hasB) {
       console.log("✓ Both concurrent transactions preserved (no data loss)");
     }
