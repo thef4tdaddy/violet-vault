@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page } from "@playwright/test";
 
 /**
  * Network Fixture for Playwright E2E Tests
@@ -23,10 +23,10 @@ import { Page } from '@playwright/test';
  * @param page - Playwright page object
  */
 export async function blockFirebase(page: Page) {
-  await page.context().route('**/firebase**', (route) => route.abort());
-  await page.context().route('**/firebaseapp.com/**', (route) => route.abort());
-  await page.context().route('**/firestore.googleapis.com/**', (route) => route.abort());
-  console.log('✓ Firebase blocked');
+  await page.context().route("**/firebase**", (route) => route.abort());
+  await page.context().route("**/firebaseapp.com/**", (route) => route.abort());
+  await page.context().route("**/firestore.googleapis.com/**", (route) => route.abort());
+  console.log("✓ Firebase blocked");
 }
 
 /**
@@ -35,10 +35,10 @@ export async function blockFirebase(page: Page) {
  * @param page - Playwright page object
  */
 export async function unblockFirebase(page: Page) {
-  await page.context().unroute('**/firebase**');
-  await page.context().unroute('**/firebaseapp.com/**');
-  await page.context().unroute('**/firestore.googleapis.com/**');
-  console.log('✓ Firebase unblocked');
+  await page.context().unroute("**/firebase**");
+  await page.context().unroute("**/firebaseapp.com/**");
+  await page.context().unroute("**/firestore.googleapis.com/**");
+  console.log("✓ Firebase unblocked");
 }
 
 /**
@@ -73,14 +73,14 @@ export async function unblockURL(page: Page, pattern: string) {
 export async function mockURL(
   page: Page,
   pattern: string,
-  response: {
+  _response: {
     status?: number;
     body?: string | Record<string, any>;
     headers?: Record<string, string>;
   }
 ) {
   await page.context().route(pattern, (route) => {
-    route.abort('failed');
+    route.abort("failed");
   });
 
   console.log(`✓ Mocked URL pattern: ${pattern}`);
@@ -104,15 +104,15 @@ export async function slowNetwork(
   // This requires Chrome/Chromium with CDP enabled
   try {
     const client = await page.context().newCDPSession(page);
-    await client.send('Network.emulateNetworkConditions', {
+    await client.send("Network.emulateNetworkConditions", {
       offline: false,
-      downloadThroughput: downloadSpeed * 1024 / 8, // Convert KB/s to bytes/s
-      uploadThroughput: uploadSpeed * 1024 / 8,
+      downloadThroughput: (downloadSpeed * 1024) / 8, // Convert KB/s to bytes/s
+      uploadThroughput: (uploadSpeed * 1024) / 8,
       latency: latency,
     });
     console.log(`✓ Network throttled: ${downloadSpeed}KB/s, latency ${latency}ms`);
-  } catch (error) {
-    console.warn('⚠ Could not enable network throttling (requires Chrome/CDP)');
+  } catch {
+    console.warn("⚠ Could not enable network throttling (requires Chrome/CDP)");
   }
 }
 
@@ -124,15 +124,15 @@ export async function slowNetwork(
 export async function normalNetwork(page: Page) {
   try {
     const client = await page.context().newCDPSession(page);
-    await client.send('Network.emulateNetworkConditions', {
+    await client.send("Network.emulateNetworkConditions", {
       offline: false,
       downloadThroughput: -1,
       uploadThroughput: -1,
       latency: 0,
     });
-    console.log('✓ Network restored to normal');
-  } catch (error) {
-    console.warn('⚠ Could not restore network conditions');
+    console.log("✓ Network restored to normal");
+  } catch {
+    console.warn("⚠ Could not restore network conditions");
   }
 }
 
@@ -143,7 +143,7 @@ export async function normalNetwork(page: Page) {
  */
 export async function goOffline(page: Page) {
   await page.context().setOffline(true);
-  console.log('✓ Network: OFFLINE');
+  console.log("✓ Network: OFFLINE");
 }
 
 /**
@@ -153,7 +153,7 @@ export async function goOffline(page: Page) {
  */
 export async function goOnline(page: Page) {
   await page.context().setOffline(false);
-  console.log('✓ Network: ONLINE');
+  console.log("✓ Network: ONLINE");
 }
 
 /**
