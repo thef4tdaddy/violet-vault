@@ -95,3 +95,9 @@ ENV/
 pip-log.txt
 pip-delete-this-directory.txt
 .tsbuildinfo
+test-results/
+playwright-report/
+blob-report.zip
+test-results/
+playwright-report/
+blob-report.zip

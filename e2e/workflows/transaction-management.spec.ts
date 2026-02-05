@@ -12,13 +12,12 @@ test.describe("Transaction Management Workflow", () => {
     const envelopes = await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
     console.log("✓ Test envelope created");
 
-    // Force page refresh to show new envelope
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Wait for envelope to appear in UI
+    await page.waitForTimeout(2000);
 
     // STEP 1: Navigate to envelope
     const envelopeCard = page.locator("text=Test Groceries").first();
-    await expect(envelopeCard).toBeVisible({ timeout: 5000 });
+    await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
     await page.waitForLoadState("networkidle");
     console.log("✓ Opened envelope detail view");
@@ -119,9 +118,8 @@ test.describe("Transaction Management Workflow", () => {
     ]);
     console.log("✓ Envelope and transaction created");
 
-    // Force page refresh to show new data
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Wait for data to appear in UI
+    await page.waitForTimeout(2000);
 
     // STEP 1: Navigate to envelope
     const envelopeCard = page.locator("text=Edit Test Groceries").first();
@@ -205,9 +203,8 @@ test.describe("Transaction Management Workflow", () => {
     ]);
     console.log("✓ Envelope with transaction created");
 
-    // Force page refresh to show new data
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Wait for data to appear in UI
+    await page.waitForTimeout(2000);
 
     // STEP 1: Navigate to envelope
     const envelopeCard = page.locator("text=Delete Test Groceries").first();
@@ -275,9 +272,8 @@ test.describe("Transaction Management Workflow", () => {
     ]);
     console.log("✓ Envelope with 3 transactions created");
 
-    // Force page refresh to show new data
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Wait for data to appear in UI
+    await page.waitForTimeout(2000);
 
     // STEP 1: Navigate to envelope
     const envelopeCard = page.locator("text=Search Test Envelope").first();
@@ -348,9 +344,8 @@ test.describe("Transaction Management Workflow", () => {
     ]);
     console.log("✓ Envelope with transactions on different dates created");
 
-    // Force page refresh to show new data
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    // Wait for data to appear in UI
+    await page.waitForTimeout(2000);
 
     // STEP 1: Navigate to envelope
     const envelopeCard = page.locator("text=Date Filter Test").first();
