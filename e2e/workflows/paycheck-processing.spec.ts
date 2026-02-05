@@ -20,6 +20,14 @@
  * - Test 3 envelope: Auto-Fund Rent ($1500 auto-fund amount)
  * - Test 3 paycheck: $5000 (auto-funding triggers to fill envelope to target)
  *
+ * SELECTOR STRATEGY:
+ * - Primary: data-testid attributes (e.g., [data-testid="got-paid-cta"])
+ * - Secondary: role-based selectors (role="button", aria-label patterns)
+ * - Tertiary: text pattern matching as fallback for robustness
+ * - All selectors include .catch(() => false) for graceful degradation
+ * - Future optimization: Encourage app to use data-testid for paycheck wizard elements
+ *   Examples: [data-testid="paycheck-wizard"], [data-testid="allocation-strategy"], [data-testid="manual-allocate"]
+ *
  * VERIFICATION:
  * - Paycheck recorded in paycheckHistory via database assertion
  * - Total balance increased after allocation

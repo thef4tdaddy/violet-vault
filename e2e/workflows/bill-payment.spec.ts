@@ -25,8 +25,9 @@ import { seedEnvelopes, seedBills } from "../fixtures/budget.fixture";
  *
  * EDGE CASES HANDLED:
  * - Overdue bills may not have UI indicator (gracefully handled)
- * - Payment history section may not be visible without prior payments
+ * - Payment history section may not be visible without prior payments (Test 5 seeds multiple payment records to verify history)
  * - Bill list navigation varies by app structure (flexible selectors)
+ * - Payment history requires seeding multiple bill payments to demonstrate full history functionality
  *
  * SELECTOR RECOMMENDATIONS:
  * - Current: Multi-fallback selectors (role-based, data-testid, text patterns)
