@@ -58,6 +58,11 @@
     "test:run": "vitest run --config vitest.config.ts",
     "test:ci": "vitest run --coverage --config vitest.config.ts",
     "test:manual": "echo 'Run manual testing checklist'",
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test e2e/smoke",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
     "backup:data": "node scripts/backup-data.js"
   },
   "dependencies": {
@@ -96,6 +101,7 @@
     "@codecov/vite-plugin": "^1.9.1",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@playwright/test": "^1.58.1",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@testing-library/dom": "^10.4.1",
