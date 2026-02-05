@@ -153,7 +153,6 @@ export async function seedTransactions(
 
 /**
  * Create test bills programmatically via IndexedDB
- * Phase 2 Migration: Bills are now scheduled expense transactions
  *
  * @param page - Playwright page object
  * @param bills - Array of bill definitions
@@ -182,28 +181,20 @@ export async function seedBills(
         const created = [];
 
         for (const bill of billData) {
-          // Create bill as a scheduled expense transaction
-          const billTransaction = {
+          const billObject = {
             id: crypto.randomUUID(),
-            description: bill.name,
-            date: bill.dueDate, // Due date maps to transaction date
-            amount: -Math.abs(bill.amount), // Negative for expense
-            envelopeId: bill.envelope || "unassigned",
-            category: "Bills & Utilities",
-            type: "expense",
-            isScheduled: true, // Mark as scheduled transaction (bill)
-            recurrenceRule: bill.frequency === "monthly" ? "FREQ=MONTHLY;INTERVAL=1" : null,
-            lastModified: Date.now(),
-            createdAt: Date.now(),
-            notes: `Frequency: ${bill.frequency || "once"}`,
+            name: bill.name,
+            amount: bill.amount,
+            dueDate: bill.dueDate,
+            frequency: bill.frequency || "monthly",
+            envelopeId: bill.envelope || null,
+            status: "unpaid",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           };
 
-          await db.transactions.add(billTransaction);
-          created.push({
-            ...billTransaction,
-            name: bill.name, // Add name for backward compatibility
-            dueDate: bill.dueDate,
-          });
+          await db.bills.add(billObject);
+          created.push(billObject);
 
           console.log(`✓ Seeded bill: ${bill.name} (due: ${bill.dueDate})`);
         }
@@ -234,9 +225,9 @@ export async function clearAllTestData(page: Page) {
     }
 
     // Clear all stores
-    // Note: Bills are now part of transactions table (isScheduled: true)
     await db.envelopes.clear();
     await db.transactions.clear();
+    await db.bills.clear();
 
     console.log("✓ All test data cleared");
   });
@@ -259,8 +250,7 @@ export async function getBudgetState(page: Page) {
 
     const envelopes = await db.envelopes.toArray();
     const transactions = await db.transactions.toArray();
-    // Bills are now scheduled transactions (isScheduled: true, type: 'expense')
-    const bills = transactions.filter((t: any) => t.isScheduled === true && t.type === "expense");
+    const bills = await db.bills.toArray();
     const budgetId = db.budgetId;
 
     return {
