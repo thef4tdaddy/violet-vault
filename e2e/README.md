@@ -65,13 +65,13 @@ e2e/
 ### Basic Test Template
 
 ```typescript
-import { test, expect } from '../fixtures/auth.fixture';
+import { test, expect } from "../fixtures/auth.fixture";
 
-test('example test', async ({ page }) => {
+test("example test", async ({ page }) => {
   // page is already authenticated with demo mode enabled
 
   // Navigate to app
-  await page.goto('/dashboard');
+  await page.goto("/dashboard");
 
   // Find element
   const button = page.locator('button:has-text("Add")');
@@ -80,40 +80,38 @@ test('example test', async ({ page }) => {
   await button.click();
 
   // Assert
-  await expect(page.locator('text=Created')).toBeVisible();
+  await expect(page.locator("text=Created")).toBeVisible();
 });
 ```
 
 ### Using Test Data Fixtures
 
 ```typescript
-import { test } from '../fixtures/auth.fixture';
-import { seedEnvelopes, seedTransactions } from '../fixtures/budget.fixture';
+import { test } from "../fixtures/auth.fixture";
+import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
-test('with test data', async ({ page }) => {
+test("with test data", async ({ page }) => {
   // Create envelopes programmatically
-  const envelopes = await seedEnvelopes(page, [
-    { name: 'Groceries', goal: 500 }
-  ]);
+  const envelopes = await seedEnvelopes(page, [{ name: "Groceries", goal: 500 }]);
 
   // Create transactions
   const transactions = await seedTransactions(page, envelopes[0].id, [
-    { description: 'Store', amount: 50 }
+    { description: "Store", amount: 50 },
   ]);
 
   // Test using the created data
-  await page.goto('/dashboard');
-  await expect(page.locator('text=Groceries')).toBeVisible();
+  await page.goto("/dashboard");
+  await expect(page.locator("text=Groceries")).toBeVisible();
 });
 ```
 
 ### Using Network Simulation
 
 ```typescript
-import { test } from '../fixtures/auth.fixture';
-import { goOffline, goOnline } from '../fixtures/network.fixture';
+import { test } from "../fixtures/auth.fixture";
+import { goOffline, goOnline } from "../fixtures/network.fixture";
 
-test('offline functionality', async ({ page }) => {
+test("offline functionality", async ({ page }) => {
   // Go offline
   await goOffline(page);
 
@@ -129,20 +127,21 @@ test('offline functionality', async ({ page }) => {
 ### Using Selectors Utility
 
 ```typescript
-import { SELECTORS } from '../utils/selectors';
+import { SELECTORS } from "../utils/selectors";
 
-test('using centralized selectors', async ({ page }) => {
+test("using centralized selectors", async ({ page }) => {
   // Use centralized selectors for consistency
   await page.locator(SELECTORS.BUTTONS.ADD_ENVELOPE).click();
 
   const envelopeInput = page.locator(SELECTORS.INPUTS.ENVELOPE_NAME);
-  await envelopeInput.fill('My Envelope');
+  await envelopeInput.fill("My Envelope");
 });
 ```
 
 ## 🎯 Test Categories
 
 ### Smoke Tests (`e2e/smoke/`)
+
 - ✅ App loads
 - ✅ Authentication works
 - ✅ Basic CRUD operations
@@ -151,6 +150,7 @@ test('using centralized selectors', async ({ page }) => {
 **Run:** `npm run test:e2e:smoke`
 
 ### Workflow Tests (`e2e/workflows/`)
+
 - ✅ Paycheck processing (auto/manual allocation)
 - ✅ Transaction CRUD (create, edit, delete, search, filter)
 - ✅ Bill payment (creation, payment, recurring, overdue)
@@ -159,14 +159,23 @@ test('using centralized selectors', async ({ page }) => {
 **Run:** `npx playwright test e2e/workflows`
 
 ### Sync Tests (`e2e/sync/`)
-- ✅ Offline transaction queuing
+
+- ✅ **Offline transaction queuing** (`offline-transactions.spec.ts`)
+  - Transactions queue when offline, sync when reconnected
+  - Multiple offline operations maintain FIFO order
+  - Retry logic with exponential backoff on sync failures
+  - Offline queue persists across page reload
+  - No console error spam during offline operations
 - ✅ Cross-browser synchronization
 - ✅ Backend fallback/recovery
 - ✅ Conflict resolution
 
 **Run:** `npx playwright test e2e/sync`
 
+**Run Offline Tests Only:** `npx playwright test e2e/sync/offline-transactions.spec.ts`
+
 ### Data Integrity Tests (`e2e/data-integrity/`)
+
 - ✅ CSV import/export
 - ✅ Backup/restore
 - ✅ Large dataset handling (1000+ transactions)
@@ -185,29 +194,37 @@ All tests run with `VITE_DEMO_MODE=true` which provides:
 ## 🔍 Debugging
 
 ### Interactive UI Mode
+
 ```bash
 npm run test:e2e:ui
 ```
+
 Visual test browser - select tests to run, see live updates.
 
 ### Debug Mode (Step Through)
+
 ```bash
 npm run test:e2e:debug
 ```
+
 Opens Playwright Inspector - pause, step, inspect variables.
 
 ### View Failures
+
 ```bash
 open playwright-report/index.html
 ```
+
 View screenshots, videos, and traces of failed tests.
 
 ### Single Test File
+
 ```bash
 npx playwright test e2e/smoke/app-basic-flow.spec.ts
 ```
 
 ### Matching Pattern
+
 ```bash
 npx playwright test -g "paycheck"
 ```
@@ -215,30 +232,35 @@ npx playwright test -g "paycheck"
 ## ✅ Best Practices
 
 1. **Use Fixtures for Setup** - Don't create data via UI clicks
+
    ```typescript
    const envelopes = await seedEnvelopes(page, [...]);
    ```
 
 2. **Use Selectors Utility** - Centralize element selection
+
    ```typescript
-   page.locator(SELECTORS.BUTTONS.ADD_ENVELOPE)
+   page.locator(SELECTORS.BUTTONS.ADD_ENVELOPE);
    ```
 
 3. **Name Tests Clearly** - Describe what is being tested
+
    ```typescript
    test('processes paycheck and allocates to envelopes', ...)
    ```
 
 4. **One Assertion Per Concept** - But multiple related assertions OK
+
    ```typescript
    await expect(envelopeBalance).toBe(450);
    await expect(envelopeElement).toBeVisible();
    ```
 
 5. **Use Demo Mode** - All tests should use demo mode
+
    ```typescript
    // Built-in to auth.fixture
-   import { test } from '../fixtures/auth.fixture';
+   import { test } from "../fixtures/auth.fixture";
    ```
 
 6. **Test Workflows, Not UI** - Test user journeys, not implementation
@@ -258,24 +280,31 @@ npx playwright test -g "paycheck"
 ## 🆘 Common Issues
 
 ### Element not found
+
 ```typescript
 // Add timeout or check selector
 await page.locator(selector).waitFor({ timeout: 10000 });
 ```
 
 ### Timeout during dev server startup
+
 Increase timeout in `playwright.config.ts`:
+
 ```typescript
-webServer: { timeout: 180 * 1000 }
+webServer: {
+  timeout: 180 * 1000;
+}
 ```
 
 ### Demo mode not loading
+
 ```bash
 # Make sure dev server has demo mode enabled
 VITE_DEMO_MODE=true npx vite
 ```
 
 ### Tests fail in CI but pass locally
+
 - Increase timeout for CI (network slower)
 - Use retries in CI configuration
 - Check for race conditions (wait for element explicitly)
@@ -283,6 +312,7 @@ VITE_DEMO_MODE=true npx vite
 ## 📚 Full Documentation
 
 ### For Developers
+
 - **[Quick Start Guide](../docs/testing/e2e-quick-start.md)** - Get started quickly
   - Running tests locally
   - Interactive development
@@ -297,6 +327,7 @@ VITE_DEMO_MODE=true npx vite
   - Performance optimization
 
 ### Project Management
+
 - **[Phase 1 Completion](../docs/testing/phase1-checklist.md)** - Infrastructure status
   - All Phase 1 tasks completed
   - Test capabilities enabled
