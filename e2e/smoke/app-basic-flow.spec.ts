@@ -12,6 +12,8 @@ import { test, expect } from "../fixtures/auth.fixture";
  * - Uses authenticatedPage fixture for automatic demo mode setup
  * - All tests start with authenticated session ready
  * - Data seeding via UI interactions (envelope creation, transaction entry)
+ * - NOTE: UI interactions chosen over fixture-based seeding to test actual user workflows
+ *   and ensure critical paths work end-to-end including form submission and state updates
  *
  * SELECTOR STRATEGY:
  * - Flexible multi-fallback selectors for robustness
@@ -24,6 +26,12 @@ import { test, expect } from "../fixtures/auth.fixture";
  * - Envelope: "Test Groceries" ($500 goal)
  * - Transaction: "Bought milk and bread" ($45.50)
  * - Persistence test: "Persistence Test Envelope" ($1000 goal)
+ *
+ * TEST ISOLATION:
+ * - Each test creates independent data (separate envelope names, unique transaction amounts)
+ * - Demo mode IndexedDB resets between test runs due to page reload
+ * - No data duplication between tests as each uses distinct envelope names
+ * - Tests are safe to run in parallel as they use isolated data models
  */
 test.describe("Smoke Tests - Critical Path Validation", () => {
   // All smoke tests use authenticatedPage fixture which:
