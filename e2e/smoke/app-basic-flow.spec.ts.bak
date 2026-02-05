@@ -31,7 +31,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     });
     // UUID format: 8-4-4-4-12 hex characters
     expect(budgetId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-    await test.step(`✓ Budget ID generated: ${budgetId}`, async () => {});
+    console.log(`✓ Budget ID generated: ${budgetId}`);
   });
 
   test("Test 2: User can complete basic budgeting flow (create envelope → add transaction → verify update)", async ({
@@ -71,7 +71,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
 
     // 1g. Wait for envelope to appear in list
     await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 10000 });
-    await test.step('✓ Envelope "Test Groceries" created', async () => {});
+    console.log('✓ Envelope "Test Groceries" created');
 
     // STEP 2: Add a transaction to the envelope
     // 2a. Click on the envelope to open details or find add transaction
@@ -130,13 +130,13 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     await transactionSubmitButton.click();
 
     // 2g. Transaction submitted
-    await test.step("✓ Transaction submitted", async () => {});
+    console.log("✓ Transaction submitted");
 
     // STEP 3: Verify envelope balance was updated
     // Note: In the actual app, the balance calculation depends on the data model
     // We'll verify that the envelope still exists and shows data
     await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 5000 });
-    await test.step("✓ Envelope still visible after transaction", async () => {});
+    console.log("✓ Envelope still visible after transaction");
 
     // STEP 4: Verify transaction appears in transaction history
     // The transaction should be visible somewhere in the UI
@@ -145,9 +145,9 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       .isVisible()
       .catch(() => false);
     if (transactionExists) {
-      await test.step("✓ Transaction visible in history", async () => {});
+      console.log("✓ Transaction visible in history");
     } else {
-      await test.step("⚠ Transaction may not be immediately visible (this is acceptable)", async () => {});
+      console.log("⚠ Transaction may not be immediately visible (this is acceptable)");
     }
   });
 
@@ -181,7 +181,7 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
 
     // STEP 2: Verify envelope was created
     await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 10000 });
-    await test.step("✓ Test envelope created before reload", async () => {});
+    console.log("✓ Test envelope created before reload");
 
     // STEP 3: Perform page reload
     await page.reload();
@@ -195,15 +195,15 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       return (window as any).budgetDb?.budgetId;
     });
     expect(budgetIdAfterReload).toBeTruthy();
-    await test.step(`✓ Budget ID persisted: ${budgetIdAfterReload}`, async () => {});
+    console.log(`✓ Budget ID persisted: ${budgetIdAfterReload}`);
 
     // STEP 6: Verify envelope data intact
     await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 10000 });
-    await test.step("✓ Test envelope still visible after reload", async () => {});
+    console.log("✓ Test envelope still visible after reload");
 
     // STEP 7: Verify envelope data contains expected value
     const envelopeCard = page.locator("text=Persistence Test Envelope").first();
     await expect(envelopeCard).toBeVisible();
-    await test.step("✓ Envelope data integrity verified after reload", async () => {});
+    console.log("✓ Envelope data integrity verified after reload");
   });
 });

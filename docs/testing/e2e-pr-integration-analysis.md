@@ -132,7 +132,7 @@ All 5 PR branches have been successfully merged into `feat/playwright-e2e-testin
 - Removed references to deprecated `db.bills` table
 - Updated `clearAllTestData()` and `getBudgetState()`
 
-**Review Feedback Applied**: ⚠️ PARTIAL (7/15 comments)
+**Review Feedback Applied**: ⚠️ PARTIAL (10/15 comments)
 
 - [x] Removed unused variable `bills` from Tests 2-5 (seedBills calls retained for setup)
 - [x] Removed arbitrary waitForTimeout() calls from navigation and after interactions
@@ -141,17 +141,18 @@ All 5 PR branches have been successfully merged into `feat/playwright-e2e-testin
 - [x] Test artifacts already in .gitignore
 - [x] Tests verified as readable and maintainable
 - [x] Transaction structure verified as v2.0 compatible
+- [x] Test 2 completed with envelope balance verification assertion
+- [x] Test 3 completed with proper recurring bill frequency validation via DB
+- [x] Test 5 completed with payment history record verification
+- [x] Recurrence rule mapping added for quarterly/annual frequencies
 
-**Review Feedback Pending**: TODO (8 remaining)
+**Review Feedback Pending**: TODO (5 remaining)
 
-- [ ] Fix bill category mapping configuration
-- [ ] Fix timestamp consistency (toISOString vs Date.now)
-- [ ] Add recurrence rule mapping for quarterly/annual frequencies
-- [ ] Complete Test 2 with envelope balance verification
-- [ ] Add proper recurring bill validation for Test 3
-- [ ] Complete Test 5 with multiple payment history records
-- [ ] Add balance assertion after bill payment
-- [ ] Clarify seedBills() schema compatibility
+- [ ] Bill category mapping as configurable constant
+- [ ] Overdue indicator UI verification (Test 4 enhancement)
+- [ ] Multiple payment records seeding for realistic history test
+- [ ] Console.log statement reduction (low priority)
+- [ ] Complete data structure documentation
 
 ### PR #1939: Paycheck Processing Workflow Tests ✅
 
