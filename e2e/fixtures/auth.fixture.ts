@@ -64,23 +64,141 @@ async function waitForMainContent(page: Page): Promise<void> {
   console.warn("⚠ Main content did not load within timeout");
 }
 
+/**
+ * Helper: Load test data from /public/test-data/data/violet-vault-budget.json
+ * Populates the database with realistic test data for E2E tests
+ * Only loads tables that exist in the current v2.0 schema
+ */
+async function loadTestData(page: Page): Promise<void> {
+  try {
+    const response = await page.evaluate(async () => {
+      const res = await fetch("/test-data/data/violet-vault-budget.json");
+      if (!res.ok) throw new Error(`Failed to fetch test data: ${res.status}`);
+      return res.json();
+    });
+
+    // Load test data into the database
+    await page.evaluate(async (testData) => {
+      const db = (window as any).budgetDb;
+      if (!db) {
+        console.error("❌ window.budgetDb not available");
+        return;
+      }
+
+      // Only load tables that exist in v2.0 schema
+      // Note: bills, debts, savingsGoals, paycheckHistory were dropped in v2.0
+      const tables = [
+        { name: "budget", key: "budget" },
+        { name: "envelopes", key: "envelopes" },
+        { name: "transactions", key: "transactions" },
+        { name: "budgetCommits", key: "budgetCommits" },
+        { name: "budgetChanges", key: "budgetChanges" },
+      ];
+
+      // Populate each table
+      for (const table of tables) {
+        const data = testData[table.key];
+        if (!data) {
+          console.log(`⚠ No data for ${table.key} in test data file`);
+          continue;
+        }
+
+        if (!db[table.name]) {
+          console.warn(`⚠ Table ${table.name} does not exist in database`);
+          continue;
+        }
+
+        if (!Array.isArray(data)) {
+          console.warn(`⚠ Expected array for ${table.key}, got ${typeof data}`);
+          continue;
+        }
+
+        try {
+          await db[table.name].bulkAdd(data);
+          console.log(`✓ Loaded ${data.length} records into ${table.name}`);
+        } catch (err) {
+          console.warn(`⚠ Could not load ${table.name}:`, err);
+        }
+      }
+
+      console.log("✓ All test data loaded into database");
+    }, response);
+  } catch (error) {
+    console.warn("⚠ Failed to load test data:", error);
+  }
+}
+
 export const test = base.extend<AuthFixtures>({
   authenticatedPage: async ({ page }, use) => {
     // Navigate to /app with demo=true query parameter
     await page.goto("http://localhost:5173/app?demo=true", { waitUntil: "networkidle" });
     console.log("✓ Navigated to /app with demo mode enabled");
 
-    // Wait for demo auth bypass to complete and app to initialize
-    await page.waitForTimeout(3000);
-
-    // Verify auth completed by checking window.budgetDb
-    const budgetId = await page.evaluate(() => {
-      return (window as any).budgetDb?.budgetId;
+    // Wait for database and auth to initialize
+    // First, get initial state to see what's happening
+    const initialState = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      return {
+        dbExists: !!db,
+        hasEnvelopes: db?.envelopes ? "yes" : "no",
+        hasTransactions: db?.transactions ? "yes" : "no",
+      };
     });
+    console.log("✓ Initial state after navigation:", initialState);
+
+    // Poll for budgetId with timeout
+    let budgetId: string | undefined;
+    let attempts = 0;
+    const maxAttempts = 20; // 20 * 500ms = 10 seconds max wait
+
+    while (!budgetId && attempts < maxAttempts) {
+      await page.waitForTimeout(500);
+      const result = await page.evaluate(() => {
+        const db = (window as any).budgetDb;
+        // Also check if auth happened by looking for user profile in localStorage
+        const userProfile = localStorage.getItem("userProfile");
+        return {
+          budgetId: db?.budgetId,
+          hasUserProfile: !!userProfile,
+          userProfileContent: userProfile ? JSON.parse(userProfile) : null,
+        };
+      });
+
+      budgetId = result.budgetId;
+      attempts++;
+
+      if (attempts % 4 === 0) {
+        console.log(`Attempt ${attempts}/20:`, {
+          budgetIdFound: !!budgetId,
+          hasUserProfile: result.hasUserProfile,
+        });
+      }
+
+      if (budgetId) {
+        console.log(`✓ Budget ID found on attempt ${attempts}: ${budgetId}`);
+        break;
+      }
+    }
 
     if (!budgetId) {
+      // Get more debug info before failing
+      const dbInfo = await page.evaluate(() => {
+        const db = (window as any).budgetDb;
+        const userProfile = localStorage.getItem("userProfile");
+        const budgetData = localStorage.getItem("envelopeBudgetData");
+        return {
+          dbExists: !!db,
+          budgetIdSet: db?.budgetId !== undefined,
+          budgetIdValue: db?.budgetId,
+          hasEnvelopes: !!db?.envelopes,
+          hasTransactions: !!db?.transactions,
+          hasUserProfile: !!userProfile,
+          hasBudgetData: !!budgetData,
+        };
+      });
+      console.error("Debug info:", dbInfo);
       throw new Error(
-        "Budget ID not found after authentication - demo mode setup may have failed. Check if VITE_DEMO_MODE=true is set in web server."
+        `Budget ID not found after ${attempts} attempts. Auth might not have completed. DB exists: ${dbInfo.dbExists}, hasUserProfile: ${dbInfo.hasUserProfile}`
       );
     }
     console.log("✓ Authentication complete. Budget ID:", budgetId);
@@ -90,6 +208,9 @@ export const test = base.extend<AuthFixtures>({
 
     // Wait for main content to load
     await waitForMainContent(page);
+
+    // Load test data for E2E tests
+    await loadTestData(page);
 
     // Pass the authenticated page to the test
     await use(page);

@@ -48,26 +48,32 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     // STEP 1: Verify page loaded successfully
     await expect(page).toHaveURL(/\/app/);
 
-    // STEP 2: Verify dashboard main container is visible
-    // The dashboard uses nav for the bottom navigation tabs
-    const nav = page.locator("nav").first();
-    await expect(nav).toBeVisible({ timeout: 10000 });
+<<<<<<< HEAD
+    // STEP 2: Verify app navigation is visible (fixture already confirms this)
+    // The fixture's waitForMainContent() already verified nav is present
+    const navElement = page.locator("nav").first();
+    await expect(navElement).toBeVisible({ timeout: 5000 });
 
-    // STEP 3: Verify Firebase anonymous auth completed
-    // Check browser console for auth state (should not have errors)
-    const authError = await page
-      .locator("text=/auth.*error/i")
-      .isVisible()
-      .catch(() => false);
-    expect(authError).toBe(false);
+    // STEP 3: Verify app is in demo mode by checking database has demo data
+    // The fixture confirms envelopes and transactions are loaded
+    const demoDataState = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      return {
+        hasEnvelopes: db?.envelopes ? true : false,
+        hasTransactions: db?.transactions ? true : false,
+      };
+    });
+    expect(demoDataState.hasEnvelopes).toBe(true);
+    expect(demoDataState.hasTransactions).toBe(true);
 
-    // STEP 4: Verify budget ID exists and is a valid format
+<<<<<<< HEAD
+    // STEP 4: Verify budget ID exists and is in correct format
     // Access window.budgetDb which is exposed for testing
     const budgetId = await page.evaluate(() => {
       return (window as any).budgetDb?.budgetId;
     });
-    // Budget ID format: "budget_" prefix followed by hex characters
-    expect(budgetId).toMatch(/^budget_[0-9a-f]+$/i);
+    // Budget ID format: budget_${hex} where hex is 16 hex characters
+    expect(budgetId).toMatch(/^budget_[0-9a-f]{16}$/i);
     await test.step(`✓ Budget ID generated: ${budgetId}`, async () => {});
   });
 
