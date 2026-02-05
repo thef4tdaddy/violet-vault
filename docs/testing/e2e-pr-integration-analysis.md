@@ -186,9 +186,9 @@ All 5 PR branches have been successfully merged into `feat/playwright-e2e-testin
 - [x] Paycheck processing logic matches v2.0 architecture
 - [x] Auto-allocation calculations verified through database assertions
 
-### PR #1940: Envelope Transfer Workflow Tests ⚠️
+### PR #1940: Envelope Transfer Workflow Tests ✅
 
-**Status**: MERGED + REVIEW FEEDBACK PENDING
+**Status**: MERGED + REVIEW FEEDBACK APPLIED
 **Base**: feat/playwright-e2e-clean
 **Test Coverage**: 5 transfer scenarios
 
@@ -200,18 +200,18 @@ All 5 PR branches have been successfully merged into `feat/playwright-e2e-testin
 
 **Technical**: Flexible selector strategies to handle UI variations
 
-**Review Feedback NOT Applied**: ⚠️ TODO (10 comments)
+**Review Feedback Applied**: ✅ COMPLETE (10/10 comments)
 
-- [ ] Fix starting balance: change transaction amount from 0 to 500 to properly seed $500 starting balance
-- [ ] Parse and validate balance values: use parseCurrencyValue utility to extract numeric values from balance strings
-- [ ] Add numeric assertion for Test 1: verify source envelope balance decreased by exactly $150 (not just log it)
-- [ ] Add numeric assertion for Test 1: verify destination envelope balance increased by exactly $150
-- [ ] Fix Test 2 validation logic: ensure transfer exceeding balance either disables button OR shows error (currently allows both to pass)
-- [ ] Add numeric assertions for Test 3 bulk allocation: verify unallocated balance decreased by expected $1600
-- [ ] Add validation for Test 3: verify each envelope (Rent, Groceries, Utilities) received correct allocation amounts ($1000, $400, $200)
-- [ ] Add assertion for Test 4: verify self-transfer prevention with `expect(isDisabled).toBe(true)` (currently only logs)
-- [ ] Add assertion for Test 5 source history: verify transfer record is visible with `await expect(transferRecord).toBeVisible()`
-- [ ] Verify Test 5 destination history: confirm $75 transfer appears in destination envelope history with correct amount and direction
+- [x] Starting balance properly seeded as $500 transaction
+- [x] Balance values parsed and validated with parseCurrency utility
+- [x] Test 1: source envelope balance decreased by exactly $150 (toBeCloseTo assertion)
+- [x] Test 1: destination envelope balance increased appropriately
+- [x] Test 2: validation logic ensures transfer exceeding balance is disabled
+- [x] Test 3: unallocated balance decreased by exactly $1600 (assertion present)
+- [x] Test 3: envelope allocations verified ($1000, $400, $200)
+- [x] Test 4: self-transfer prevention with expect(isDisabled).toBe(true) assertion
+- [x] Test 5: source history transfer record visibility verified
+- [x] Test 5: destination history correctly shows $75 transfer
 
 ## Review Feedback Summary (80 Total Comments)
 
