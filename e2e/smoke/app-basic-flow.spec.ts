@@ -60,13 +60,13 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
       .catch(() => false);
     expect(authError).toBe(false);
 
-    // STEP 4: Verify budget ID exists and is a valid UUID format
+    // STEP 4: Verify budget ID exists and is a valid format
     // Access window.budgetDb which is exposed for testing
     const budgetId = await page.evaluate(() => {
       return (window as any).budgetDb?.budgetId;
     });
-    // UUID format: 8-4-4-4-12 hex characters
-    expect(budgetId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    // Budget ID format: "budget_" prefix followed by hex characters
+    expect(budgetId).toMatch(/^budget_[0-9a-f]+$/i);
     await test.step(`✓ Budget ID generated: ${budgetId}`, async () => {});
   });
 
