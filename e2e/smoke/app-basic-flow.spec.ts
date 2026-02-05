@@ -48,9 +48,9 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     await expect(page).toHaveURL(/\/app/);
 
     // STEP 2: Verify dashboard main container is visible
-    // Look for the main dashboard container - adjust selector based on actual app structure
-    const mainContent = page.locator('main, [role="main"], [data-testid="dashboard"]').first();
-    await expect(mainContent).toBeVisible({ timeout: 10000 });
+    // The dashboard uses nav for the bottom navigation tabs
+    const nav = page.locator("nav").first();
+    await expect(nav).toBeVisible({ timeout: 10000 });
 
     // STEP 3: Verify Firebase anonymous auth completed
     // Check browser console for auth state (should not have errors)
