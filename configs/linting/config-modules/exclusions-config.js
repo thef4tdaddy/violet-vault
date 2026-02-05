@@ -447,6 +447,17 @@ export default [
     },
   },
   {
+    // Playwright E2E test fixtures and utilities - necessary testing patterns
+    files: ["e2e/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "no-console": "off", // Console logging necessary for test output and debugging
+      "no-async-promise-executor": "off", // Async operations in promise executors needed for test setup in fixtures
+      "@typescript-eslint/no-explicit-any": "off", // Any types necessary for window object and test utilities
+      "no-useless-escape": "off", // Some escape sequences needed in test regex patterns
+      "react-hooks/rules-of-hooks": "off", // Playwright fixture patterns use 'use' which looks like a React hook but isn't
+    },
+  },
+  {
     // Test files - relax rules to allow for common testing patterns and legacy code
     files: ["**/*.test.{js,jsx,ts,tsx}", "**/__tests__/**/*.{js,jsx,ts,tsx}"],
     rules: {
