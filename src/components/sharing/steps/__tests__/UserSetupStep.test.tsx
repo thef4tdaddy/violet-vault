@@ -312,17 +312,6 @@ describe("UserSetupStep", () => {
 
       expect(mockOnJoin).toHaveBeenCalledTimes(1);
     });
-
-    it("should prevent default on join button click", async () => {
-      const user = userEvent.setup();
-      render(<UserSetupStep {...defaultProps} password="pass123" userName="John" />);
-
-      const joinButton = screen.getByText("Join Budget");
-      await user.click(joinButton);
-
-      // The click handler calls e.preventDefault(), so we just verify onJoin was called
-      expect(mockOnJoin).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe("Loading State", () => {
