@@ -1,5 +1,30 @@
 import { test, expect } from "../fixtures/auth.fixture";
 
+/**
+ * Smoke Tests - Critical Path Validation
+ *
+ * Tests the most critical paths through the application:
+ * 1. App initialization with demo mode
+ * 2. Basic budgeting workflow (create → transaction → verify)
+ * 3. Data persistence across page reloads
+ *
+ * FIXTURE APPROACH:
+ * - Uses authenticatedPage fixture for automatic demo mode setup
+ * - All tests start with authenticated session ready
+ * - Data seeding via UI interactions (envelope creation, transaction entry)
+ *
+ * SELECTOR STRATEGY:
+ * - Flexible multi-fallback selectors for robustness
+ * - Primary: role-based selectors (role="main", role="dialog")
+ * - Secondary: data-testid attributes where available
+ * - Tertiary: text pattern matching as fallback
+ * - All selectors include timeout handling (.catch(() => false))
+ *
+ * TEST DATA:
+ * - Envelope: "Test Groceries" ($500 goal)
+ * - Transaction: "Bought milk and bread" ($45.50)
+ * - Persistence test: "Persistence Test Envelope" ($1000 goal)
+ */
 test.describe("Smoke Tests - Critical Path Validation", () => {
   // All smoke tests use authenticatedPage fixture which:
   // 1. Sets VITE_DEMO_MODE=true in browser context
