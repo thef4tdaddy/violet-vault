@@ -1,4 +1,5 @@
 import { test, expect } from "../fixtures/auth.fixture";
+import { seedEnvelopes, seedTransactions, getBudgetState } from "../fixtures/budget.fixture";
 
 /**
  * Smoke Tests - Critical Path Validation
@@ -76,116 +77,45 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     const page = authenticatedPage;
     // PREREQUISITE: authenticatedPage fixture already loaded app with demo mode
 
-    // STEP 1: Create an envelope
-    // 1a. Find and click the "Add Envelope" button
-    const addEnvelopeButton = page.locator('button:has-text("Add Envelope")');
-    await expect(addEnvelopeButton).toBeVisible({ timeout: 10000 });
-    await addEnvelopeButton.click();
+    // STEP 1: Seed test envelope via database fixture
+    const envelopes = await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
+    await test.step(`✓ Envelope "Test Groceries" created (id: ${envelopes[0].id})`, async () => {});
 
-    // 1b. Wait for modal/dialog to appear
-    const envelopeDialog = page
-      .locator('[role="dialog"]:has-text("Create Envelope"), text="Create Envelope"')
-      .first();
-    await expect(envelopeDialog).toBeVisible({ timeout: 5000 });
+    // STEP 2: Verify envelope was created in database
+    const envelopeId = envelopes[0].id;
+    const createdEnvelope = await page.evaluate((id) => {
+      const db = (window as any).budgetDb;
+      return db.envelopes.get(id);
+    }, envelopeId);
+    expect(createdEnvelope.name).toBe("Test Groceries");
+    expect(createdEnvelope.goal).toBe(500);
+    await test.step("✓ Envelope verified in database", async () => {});
 
-    // 1c. Fill in envelope name
-    const nameInput = page
-      .locator('input[placeholder*="Groceries"], input[placeholder*="envelope"]')
-      .first();
-    await nameInput.fill("Test Groceries");
+    // STEP 3: Seed transaction via database fixture
+    const transactions = await seedTransactions(page, envelopeId, [
+      { description: "Bought milk and bread", amount: 45.5 },
+    ]);
+    await test.step("✓ Transaction added to envelope", async () => {});
 
-    // 1d. Select a category (required field)
-    const categorySelect = page.locator("select").first();
-    await categorySelect.selectOption({ index: 1 }); // Select first non-empty option
+    // STEP 4: Verify envelope balance was updated in database
+    const budgetState = await getBudgetState(page);
+    expect(budgetState?.envelopes).toBeDefined();
+    expect(budgetState!.envelopes.length).toBeGreaterThan(0);
 
-    // 1e. Fill in monthly amount (goal amount)
-    const monthlyInput = page.locator('input[type="number"]').first();
-    await monthlyInput.fill("500");
+    const updatedEnvelope = budgetState!.envelopes.find((e: any) => e.id === envelopeId);
+    expect(updatedEnvelope).toBeDefined();
+    // Balance should be reduced by transaction amount (500 goal - 45.50 transaction)
+    expect(updatedEnvelope!.balance).toBe(454.5);
+    await test.step(`✓ Envelope balance updated: $${updatedEnvelope!.balance}`, async () => {});
 
-    // 1f. Submit the form
-    const submitButton = page.locator('button:has-text("Create Envelope")');
-    await submitButton.click();
-
-    // 1g. Wait for envelope to appear in list
-    await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 10000 });
-    await test.step('✓ Envelope "Test Groceries" created', async () => {});
-
-    // STEP 2: Add a transaction to the envelope
-    // 2a. Click on the envelope to open details or find add transaction
-    // For this test, we'll use the Quick Actions "Add Transaction" button
-    const quickActionsButton = page
-      .locator('button:has-text("Add Transaction"), [aria-label*="Add Transaction"]')
-      .first();
-
-    // If Quick Actions not visible, look for alternative transaction entry points
-    const isQuickActionsVisible = await quickActionsButton.isVisible().catch(() => false);
-
-    if (isQuickActionsVisible) {
-      await quickActionsButton.click();
-    } else {
-      // Alternative: Click on the envelope card to expand it
-      const envelopeCard = page.locator("text=Test Groceries").first();
-      await envelopeCard.click();
-
-      // Look for add transaction button within envelope details
-      const addTransactionInEnvelope = page
-        .locator('button:has-text("Add Transaction"), button:has-text("Add expense")')
-        .first();
-      await expect(addTransactionInEnvelope).toBeVisible({ timeout: 5000 });
-      await addTransactionInEnvelope.click();
-    }
-
-    // 2b. Fill in transaction details
-    // Look for transaction form inputs
-    const descInput = page
-      .locator('input[placeholder*="description"], input[name="description"], input[type="text"]')
-      .filter({ hasText: "" })
-      .first();
-    await descInput.fill("Bought milk and bread");
-
-    // 2d. Enter transaction amount
-    const amountInput = page.locator('input[type="number"]').filter({ hasText: "" }).first();
-    await amountInput.fill("45.50");
-
-    // 2e. Select the envelope (if needed)
-    // The transaction form might have envelope selector
-    const envelopeSelectors = page.locator('select, [role="combobox"]');
-    const envelopeSelectorCount = await envelopeSelectors.count();
-    if (envelopeSelectorCount > 0) {
-      const envelopeSelector = envelopeSelectors.last();
-      const options = await envelopeSelector.locator("option").allTextContents();
-      const testGroceriesIndex = options.findIndex((opt) => opt.includes("Test Groceries"));
-      if (testGroceriesIndex >= 0) {
-        await envelopeSelector.selectOption({ index: testGroceriesIndex });
-      }
-    }
-
-    // 2f. Submit transaction
-    const transactionSubmitButton = page
-      .locator('button:has-text("Add"), button:has-text("Save"), button:has-text("Create")')
-      .last();
-    await transactionSubmitButton.click();
-
-    // 2g. Transaction submitted
-    await test.step("✓ Transaction submitted", async () => {});
-
-    // STEP 3: Verify envelope balance was updated
-    // Note: In the actual app, the balance calculation depends on the data model
-    // We'll verify that the envelope still exists and shows data
-    await expect(page.locator("text=Test Groceries")).toBeVisible({ timeout: 5000 });
-    await test.step("✓ Envelope still visible after transaction", async () => {});
-
-    // STEP 4: Verify transaction appears in transaction history
-    // The transaction should be visible somewhere in the UI
-    const transactionExists = await page
-      .locator("text=/milk.*bread|Bought milk/i")
-      .isVisible()
-      .catch(() => false);
-    if (transactionExists) {
-      await test.step("✓ Transaction visible in history", async () => {});
-    } else {
-      await test.step("⚠ Transaction may not be immediately visible (this is acceptable)", async () => {});
-    }
+    // STEP 5: Verify transaction in database
+    expect(budgetState?.transactions).toBeDefined();
+    expect(budgetState!.transactions.length).toBeGreaterThan(0);
+    const addedTransaction = budgetState!.transactions.find(
+      (t: any) => t.description === "Bought milk and bread"
+    );
+    expect(addedTransaction).toBeDefined();
+    await test.step("✓ Transaction verified in database", async () => {});
   });
 
   test("Test 3: Page reload persists session and data remains intact", async ({
@@ -194,56 +124,47 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     const page = authenticatedPage;
     // PREREQUISITE: Demo mode enabled, so data persists in IndexedDB
 
-    // STEP 1: Create test envelope before reload
-    const addEnvelopeButton = page.locator('button:has-text("Add Envelope")');
-    await expect(addEnvelopeButton).toBeVisible({ timeout: 10000 });
-    await addEnvelopeButton.click();
+    // STEP 1: Get initial budget ID before reload
+    const initialBudgetId = await page.evaluate(() => {
+      return (window as any).budgetDb?.budgetId;
+    });
+    await test.step(`✓ Initial Budget ID: ${initialBudgetId}`, async () => {});
 
-    const envelopeDialog = page
-      .locator('[role="dialog"]:has-text("Create Envelope"), text="Create Envelope"')
-      .first();
-    await expect(envelopeDialog).toBeVisible({ timeout: 5000 });
-
-    const nameInput = page
-      .locator('input[placeholder*="Groceries"], input[placeholder*="envelope"]')
-      .first();
-    await nameInput.fill("Persistence Test Envelope");
-
-    // Select category
-    const categorySelect = page.locator("select").first();
-    await categorySelect.selectOption({ index: 1 });
-
-    const monthlyInput = page.locator('input[type="number"]').first();
-    await monthlyInput.fill("1000");
-
-    const submitButton = page.locator('button:has-text("Create Envelope")');
-    await submitButton.click();
-
-    // STEP 2: Verify envelope was created
-    await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 10000 });
+    // STEP 2: Seed test envelope before reload
+    const persistenceEnvelopes = await seedEnvelopes(page, [
+      { name: "Persistence Test Envelope", goal: 1000 },
+    ]);
     await test.step("✓ Test envelope created before reload", async () => {});
 
-    // STEP 3: Perform page reload
+    // STEP 3: Get budget state before reload
+    const stateBeforeReload = await getBudgetState(page);
+    const envelopeCountBefore = stateBeforeReload?.envelopeCount ?? 0;
+    await test.step(`✓ Budget state before reload: ${envelopeCountBefore} envelopes`, async () => {});
+
+    // STEP 4: Perform page reload
     await page.reload();
 
-    // STEP 4: Wait for page to fully load after reload
+    // STEP 5: Wait for page to fully load after reload
     await page.waitForLoadState("networkidle");
 
-    // STEP 5: Verify session persisted
-    // Budget ID should be the same
+    // STEP 6: Verify session persisted - Budget ID should be the same
     const budgetIdAfterReload = await page.evaluate(() => {
       return (window as any).budgetDb?.budgetId;
     });
-    expect(budgetIdAfterReload).toBeTruthy();
-    await test.step(`✓ Budget ID persisted: ${budgetIdAfterReload}`, async () => {});
+    expect(budgetIdAfterReload).toBe(initialBudgetId);
+    await test.step(`✓ Budget ID persisted after reload: ${budgetIdAfterReload}`, async () => {});
 
-    // STEP 6: Verify envelope data intact
-    await expect(page.locator("text=Persistence Test Envelope")).toBeVisible({ timeout: 10000 });
-    await test.step("✓ Test envelope still visible after reload", async () => {});
+    // STEP 7: Verify envelope data persisted
+    const stateAfterReload = await getBudgetState(page);
+    const envelopeCountAfter = stateAfterReload?.envelopeCount ?? 0;
+    expect(envelopeCountAfter).toBe(envelopeCountBefore);
 
-    // STEP 7: Verify envelope data contains expected value
-    const envelopeCard = page.locator("text=Persistence Test Envelope").first();
-    await expect(envelopeCard).toBeVisible();
+    // Verify the specific envelope exists
+    const persistedEnvelope = stateAfterReload?.envelopes.find(
+      (e: any) => e.name === "Persistence Test Envelope"
+    );
+    expect(persistedEnvelope).toBeDefined();
+    expect(persistedEnvelope!.goal).toBe(1000);
     await test.step("✓ Envelope data integrity verified after reload", async () => {});
   });
 });

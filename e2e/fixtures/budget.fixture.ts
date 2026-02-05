@@ -270,6 +270,18 @@ export async function getBudgetState(page: Page) {
     const db = (window as any).budgetDb;
 
     if (!db) {
+      console.warn("❌ budgetDb not found on window");
+      return null;
+    }
+
+    // Check if tables exist
+    if (!db.envelopes || !db.transactions || !db.bills) {
+      console.warn("❌ Database tables not found", {
+        hasEnvelopes: !!db.envelopes,
+        hasTransactions: !!db.transactions,
+        hasBills: !!db.bills,
+        dbKeys: Object.keys(db),
+      });
       return null;
     }
 
