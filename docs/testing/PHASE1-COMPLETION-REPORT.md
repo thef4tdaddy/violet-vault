@@ -149,11 +149,11 @@ All Phase 1 infrastructure requirements for Playwright E2E testing have been suc
 
 **New Directories:**
 
-- `e2e/smoke/` - Smoke tests
-- `e2e/workflows/` - Workflow tests
-- `e2e/sync/` - Sync tests
-- `e2e/auth/` - Auth tests
-- `e2e/data-integrity/` - Data integrity tests
+- `e2e/smoke/` - Smoke tests (created)
+- `e2e/fixtures/` - Test fixtures (pre-existing, verified)
+- `e2e/utils/` - Test utilities (pre-existing, verified)
+
+**Note:** Additional test directories (`e2e/workflows/`, `e2e/sync/`, `e2e/auth/`, `e2e/data-integrity/`) will be created as needed in Phase 2-4 when tests are implemented.
 
 **Modified Files:**
 
@@ -342,10 +342,10 @@ npm run test:e2e:headed
 
 ## 📚 Documentation Links
 
-- [Comprehensive Setup Guide](../docs/testing/playwright-setup.md)
-- [Quick Start Guide](../docs/testing/e2e-quick-start.md)
-- [Test Reference](./README.md)
-- [Phase 1 Checklist](../docs/testing/phase1-checklist.md)
+- [Comprehensive Setup Guide](./playwright-setup.md)
+- [Quick Start Guide](./e2e-quick-start.md)
+- [Test Reference](../../e2e/README.md)
+- [Phase 1 Checklist](./phase1-checklist.md)
 - [Playwright Official Docs](https://playwright.dev)
 
 ---
