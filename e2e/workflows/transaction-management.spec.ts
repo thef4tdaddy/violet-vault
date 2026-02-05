@@ -20,11 +20,13 @@ import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
  * - Flexible multi-fallback selectors for UI variations
  * - Handles both data-testid and text-based locators
  * - Defensive error handling with .catch(() => false) for optional elements
+ * - FUTURE OPTIMIZATION: Consider migrating to data-testid attributes for improved selector stability
  *
  * EDGE CASES HANDLED:
  * - Search input may not be available (gracefully skipped)
  * - Date filters optional (conditional verification)
  * - Transaction delete may show confirmation dialogs
+ * - Transaction edit form may have varying layouts based on app structure
  */
 
 /**
