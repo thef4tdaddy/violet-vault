@@ -65,6 +65,62 @@ async function waitForMainContent(page: Page): Promise<void> {
 }
 
 /**
+ * Helper: Wait for budgetId to be set with polling and timeout
+ */
+async function waitForBudgetId(page: Page): Promise<string> {
+  let budgetId: string | undefined;
+  let attempts = 0;
+  const maxAttempts = 20; // 20 * 500ms = 10 seconds max wait
+
+  while (!budgetId && attempts < maxAttempts) {
+    await page.waitForTimeout(500);
+    const result = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      const userProfile = localStorage.getItem("userProfile");
+      return {
+        budgetId: db?.budgetId,
+        hasUserProfile: !!userProfile,
+      };
+    });
+
+    budgetId = result.budgetId;
+    attempts++;
+
+    if (attempts % 4 === 0) {
+      console.log(`Attempt ${attempts}/20:`, {
+        budgetIdFound: !!budgetId,
+        hasUserProfile: result.hasUserProfile,
+      });
+    }
+
+    if (budgetId) {
+      console.log(`✓ Budget ID found on attempt ${attempts}: ${budgetId}`);
+      break;
+    }
+  }
+
+  if (!budgetId) {
+    const dbInfo = await page.evaluate(() => {
+      const db = (window as any).budgetDb;
+      const userProfile = localStorage.getItem("userProfile");
+      const budgetData = localStorage.getItem("envelopeBudgetData");
+      return {
+        dbExists: !!db,
+        budgetIdSet: db?.budgetId !== undefined,
+        hasUserProfile: !!userProfile,
+        hasBudgetData: !!budgetData,
+      };
+    });
+    console.error("Debug info:", dbInfo);
+    throw new Error(
+      `Budget ID not found after ${attempts} attempts. DB exists: ${dbInfo.dbExists}, hasUserProfile: ${dbInfo.hasUserProfile}`
+    );
+  }
+
+  return budgetId;
+}
+
+/**
  * Helper: Load test data from /public/test-data/data/violet-vault-budget.json
  * Populates the database with realistic test data for E2E tests
  * Only loads tables that exist in the current v2.0 schema
@@ -134,8 +190,7 @@ export const test = base.extend<AuthFixtures>({
     await page.goto("http://localhost:5173/app?demo=true", { waitUntil: "networkidle" });
     console.log("✓ Navigated to /app with demo mode enabled");
 
-    // Wait for database and auth to initialize
-    // First, get initial state to see what's happening
+    // Verify initial state
     const initialState = await page.evaluate(() => {
       const db = (window as any).budgetDb;
       return {
@@ -146,61 +201,8 @@ export const test = base.extend<AuthFixtures>({
     });
     console.log("✓ Initial state after navigation:", initialState);
 
-    // Poll for budgetId with timeout
-    let budgetId: string | undefined;
-    let attempts = 0;
-    const maxAttempts = 20; // 20 * 500ms = 10 seconds max wait
-
-    while (!budgetId && attempts < maxAttempts) {
-      await page.waitForTimeout(500);
-      const result = await page.evaluate(() => {
-        const db = (window as any).budgetDb;
-        // Also check if auth happened by looking for user profile in localStorage
-        const userProfile = localStorage.getItem("userProfile");
-        return {
-          budgetId: db?.budgetId,
-          hasUserProfile: !!userProfile,
-          userProfileContent: userProfile ? JSON.parse(userProfile) : null,
-        };
-      });
-
-      budgetId = result.budgetId;
-      attempts++;
-
-      if (attempts % 4 === 0) {
-        console.log(`Attempt ${attempts}/20:`, {
-          budgetIdFound: !!budgetId,
-          hasUserProfile: result.hasUserProfile,
-        });
-      }
-
-      if (budgetId) {
-        console.log(`✓ Budget ID found on attempt ${attempts}: ${budgetId}`);
-        break;
-      }
-    }
-
-    if (!budgetId) {
-      // Get more debug info before failing
-      const dbInfo = await page.evaluate(() => {
-        const db = (window as any).budgetDb;
-        const userProfile = localStorage.getItem("userProfile");
-        const budgetData = localStorage.getItem("envelopeBudgetData");
-        return {
-          dbExists: !!db,
-          budgetIdSet: db?.budgetId !== undefined,
-          budgetIdValue: db?.budgetId,
-          hasEnvelopes: !!db?.envelopes,
-          hasTransactions: !!db?.transactions,
-          hasUserProfile: !!userProfile,
-          hasBudgetData: !!budgetData,
-        };
-      });
-      console.error("Debug info:", dbInfo);
-      throw new Error(
-        `Budget ID not found after ${attempts} attempts. Auth might not have completed. DB exists: ${dbInfo.dbExists}, hasUserProfile: ${dbInfo.hasUserProfile}`
-      );
-    }
+    // Wait for budgetId to be set by auth flow
+    const budgetId = await waitForBudgetId(page);
     console.log("✓ Authentication complete. Budget ID:", budgetId);
 
     // Dismiss security notice modal
@@ -214,8 +216,6 @@ export const test = base.extend<AuthFixtures>({
 
     // Pass the authenticated page to the test
     await use(page);
-
-    // Cleanup (optional) - localStorage and IndexedDB will persist
   },
 });
 

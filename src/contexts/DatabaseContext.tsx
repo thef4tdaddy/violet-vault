@@ -38,7 +38,6 @@ export const DatabaseProvider = ({ children }: DatabaseProviderProps) => {
 
   useEffect(() => {
     const initializeDatabase = async () => {
-      let currentDb: VioletVaultDB = budgetDb;
       try {
         setIsLoading(true);
 
@@ -47,13 +46,12 @@ export const DatabaseProvider = ({ children }: DatabaseProviderProps) => {
 
           // Create in-memory database
           const inMemoryDb = createInMemoryDB();
-          currentDb = inMemoryDb;
 
           // CRITICAL: Expose window.budgetDb BEFORE auth flow completes
           // This prevents race condition where setAuthenticated tries to set budgetId
           // but window.budgetDb hasn't been exposed yet
           if (typeof window !== "undefined") {
-            (window as any).budgetDb = inMemoryDb;
+            (window as unknown as Record<string, VioletVaultDB>).budgetDb = inMemoryDb;
             logger.info("✓ Exposed in-memory database to window.budgetDb");
           }
 
@@ -66,7 +64,7 @@ export const DatabaseProvider = ({ children }: DatabaseProviderProps) => {
           logger.info("📚 Using persistent database");
           // Expose persistent database to window
           if (typeof window !== "undefined") {
-            (window as any).budgetDb = budgetDb;
+            (window as unknown as Record<string, VioletVaultDB>).budgetDb = budgetDb;
           }
           setDb(budgetDb);
         }
@@ -78,7 +76,7 @@ export const DatabaseProvider = ({ children }: DatabaseProviderProps) => {
         setDb(budgetDb);
         // Expose fallback database to window
         if (typeof window !== "undefined") {
-          (window as any).budgetDb = budgetDb;
+          (window as unknown as Record<string, VioletVaultDB>).budgetDb = budgetDb;
         }
         setIsInitialized(true);
       } finally {
