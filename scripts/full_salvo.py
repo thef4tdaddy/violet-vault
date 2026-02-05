@@ -548,6 +548,9 @@ def main() -> None:
     parser.add_argument("--retry-failed", action="store_true", help="Retry only failed checks")
     parser.add_argument("--upload", action="store_true", help="Upload coverage to Codecov")
     parser.add_argument("--all", action="store_true", help="Force full run (ignore smart retry)")
+    parser.add_argument(
+        "--e2e", action="store_true", help="Include E2E smoke tests (30-min debounce)"
+    )
     args = parser.parse_args()
 
     # Implicit Retry Logic
@@ -710,6 +713,33 @@ def main() -> None:
             runner.add_check(
                 Check("Codecov Upload", "npx --yes codecov", concurrency_group="network")
             )
+
+    # 5. E2E Testing (Debounced)
+    # E2E tests if --e2e OR (> 30 mins since last E2E run)
+    should_run_e2e = args.e2e
+
+    if not should_run_e2e:
+        # Check last E2E run time
+        last_e2e_ts = runner.stats.get("last_e2e_ts", 0)
+        if now - last_e2e_ts > 1800:  # 30 mins
+            should_run_e2e = True
+            print(
+                f"{Colors.CYAN}🎭 E2E Smoke Tests: Last run was >30m ago. Running tests...{Colors.NC}"
+            )
+        else:
+            # Calculate remaining debounce time
+            remaining = int(1800 - (now - last_e2e_ts))
+            remaining_min = remaining // 60
+            print(
+                f"{Colors.GRAY}⏳ E2E Tests debounced (run again in ~{remaining_min}m or use --e2e to force){Colors.NC}"
+            )
+
+    if should_run_e2e:
+        # Mark E2E test start time
+        runner.stats["last_e2e_ts"] = now
+        runner.add_check(
+            Check("E2E Smoke Tests", "npm run test:e2e:smoke", concurrency_group="e2e")
+        )
 
     # 6. Execute checks
     success = runner.execute()
