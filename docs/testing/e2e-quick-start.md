@@ -61,6 +61,7 @@ npm run test:e2e:ui
 ```
 
 Launch interactive test browser:
+
 - Select tests to run
 - See live test execution
 - Inspect DOM elements
@@ -73,6 +74,7 @@ npm run test:e2e:debug
 ```
 
 Opens Playwright Inspector:
+
 - Pause test execution
 - Step through test code
 - Inspect variables and DOM
@@ -95,6 +97,7 @@ open playwright-report/index.html
 ```
 
 Reports show:
+
 - ✅ Passed/failed tests
 - 📸 Screenshots of failures
 - 🎥 Videos of failed test runs
@@ -105,6 +108,7 @@ Reports show:
 ### Writing a New Test
 
 1. Create test file in appropriate directory:
+
    ```bash
    # e2e/workflows/my-new-feature.spec.ts
    # e2e/smoke/my-smoke-test.spec.ts
@@ -113,29 +117,29 @@ Reports show:
    ```
 
 2. Use the test template:
-   ```typescript
-   import { test, expect } from '../fixtures/auth.fixture';
-   import { seedEnvelopes } from '../fixtures/budget.fixture';
-   import { SELECTORS } from '../utils/selectors';
 
-   test('should do something', async ({ page }) => {
+   ```typescript
+   import { test, expect } from "../fixtures/auth.fixture";
+   import { seedEnvelopes } from "../fixtures/budget.fixture";
+   import { SELECTORS } from "../utils/selectors";
+
+   test("should do something", async ({ page }) => {
      // Setup test data programmatically
-     const envelopes = await seedEnvelopes(page, [
-       { name: 'Groceries', goal: 500 }
-     ]);
+     const envelopes = await seedEnvelopes(page, [{ name: "Groceries", goal: 500 }]);
 
      // Navigate
-     await page.goto('/dashboard');
+     await page.goto("/dashboard");
 
      // Interact
      await page.locator(SELECTORS.BUTTONS.ADD_ENVELOPE).click();
 
      // Assert
-     await expect(page.locator('text=Groceries')).toBeVisible();
+     await expect(page.locator("text=Groceries")).toBeVisible();
    });
    ```
 
 3. Run your test:
+
    ```bash
    npx playwright test e2e/workflows/my-new-feature.spec.ts
    ```
@@ -148,11 +152,11 @@ Reports show:
 ### Testing Offline Functionality
 
 ```typescript
-import { test } from '../fixtures/auth.fixture';
-import { goOffline, goOnline } from '../fixtures/network.fixture';
+import { test } from "../fixtures/auth.fixture";
+import { goOffline, goOnline } from "../fixtures/network.fixture";
 
-test('should sync when coming back online', async ({ page }) => {
-  await page.goto('/dashboard');
+test("should sync when coming back online", async ({ page }) => {
+  await page.goto("/dashboard");
 
   // Go offline and do something
   await goOffline(page);
@@ -172,26 +176,26 @@ test('should sync when coming back online', async ({ page }) => {
 ### Testing with Seeded Data
 
 ```typescript
-import { test } from '../fixtures/auth.fixture';
-import { seedEnvelopes, seedTransactions } from '../fixtures/budget.fixture';
+import { test } from "../fixtures/auth.fixture";
+import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
-test('should show transactions', async ({ page }) => {
+test("should show transactions", async ({ page }) => {
   // Create test data directly in IndexedDB
   const envelopes = await seedEnvelopes(page, [
-    { name: 'Groceries', goal: 500 },
-    { name: 'Gas', goal: 200 }
+    { name: "Groceries", goal: 500 },
+    { name: "Gas", goal: 200 },
   ]);
 
   // Add transactions
   const transactions = await seedTransactions(page, envelopes[0].id, [
-    { description: 'Whole Foods', amount: 85.50 },
-    { description: 'Target', amount: 42.99 }
+    { description: "Whole Foods", amount: 85.5 },
+    { description: "Target", amount: 42.99 },
   ]);
 
   // Navigate and verify
-  await page.goto('/dashboard');
-  await expect(page.locator('text=Whole Foods')).toBeVisible();
-  await expect(page.locator('text=Target')).toBeVisible();
+  await page.goto("/dashboard");
+  await expect(page.locator("text=Whole Foods")).toBeVisible();
+  await expect(page.locator("text=Target")).toBeVisible();
 });
 ```
 
@@ -200,11 +204,13 @@ test('should show transactions', async ({ page }) => {
 ### Tests are Slow
 
 **Possible causes:**
+
 - Vite dev server not cached
 - Browser not cached
 - Network issues
 
 **Solutions:**
+
 ```bash
 # Ensure browser cache is warm
 npx playwright install
@@ -219,11 +225,13 @@ npm run test:e2e
 ### Tests Timeout
 
 **Possible causes:**
+
 - Dev server not starting
 - Demo mode not enabled
 - Network connectivity
 
 **Solutions:**
+
 ```bash
 # Check demo mode is enabled
 echo $VITE_DEMO_MODE  # Should be "true"
@@ -238,11 +246,13 @@ VITE_DEMO_MODE=true npx vite
 ### Element Not Found
 
 **Common issues:**
+
 - Selector is stale/outdated
 - Element hasn't rendered yet
 - Demo mode not enabling authentication
 
 **Solutions:**
+
 ```typescript
 // Add explicit wait
 await page.locator(selector).waitFor({ timeout: 10000 });
@@ -258,6 +268,7 @@ npm run test:e2e:debug
 ### Demo Mode Not Working
 
 **Check:**
+
 ```bash
 # Verify .env.test exists
 ls -la .env.test
@@ -273,11 +284,13 @@ npm run test:e2e:debug
 ### Test Fails in CI but Passes Locally
 
 **Common causes:**
+
 - Network timing differences
 - Concurrency/race conditions
 - Missing demo mode setup
 
 **Solutions:**
+
 - Add explicit waits: `await page.waitForLoadState('networkidle')`
 - Increase timeout for CI: Edit `playwright.config.ts` timeout
 - Check CI logs: GitHub Actions → your workflow → E2E Tests job

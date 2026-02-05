@@ -5,6 +5,7 @@
 Violet Vault uses Playwright for end-to-end testing of critical user workflows. Tests run against a real browser with demo mode enabled for automatic test data seeding.
 
 **Key Benefits:**
+
 - 🚀 Tests run fast (fixtures handle data setup)
 - 🎯 Tests are reliable (no UI-based test data creation)
 - 🌐 Multi-browser support (Chromium, Firefox, WebKit)
@@ -61,16 +62,16 @@ Located in project root. Key configuration:
 
 ```typescript
 export default defineConfig({
-  testDir: './e2e',                    // Test file location
-  fullyParallel: true,                 // Run tests in parallel
-  forbidOnly: !!process.env.CI,        // Fail if test.only in CI
-  retries: process.env.CI ? 2 : 0,    // Retry failed tests in CI
-  workers: process.env.CI ? 1 : 4,    // Worker configuration
-  timeout: 60 * 1000,                  // 60 second test timeout
-  expect: { timeout: 5 * 1000 },      // 5 second assertion timeout
+  testDir: "./e2e", // Test file location
+  fullyParallel: true, // Run tests in parallel
+  forbidOnly: !!process.env.CI, // Fail if test.only in CI
+  retries: process.env.CI ? 2 : 0, // Retry failed tests in CI
+  workers: process.env.CI ? 1 : 4, // Worker configuration
+  timeout: 60 * 1000, // 60 second test timeout
+  expect: { timeout: 5 * 1000 }, // 5 second assertion timeout
   webServer: {
-    command: 'VITE_DEMO_MODE=true npx vite',  // Start dev server with demo mode
-    url: 'http://localhost:5173',
+    command: "VITE_DEMO_MODE=true npx vite", // Start dev server with demo mode
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },
 });
@@ -123,11 +124,11 @@ e2e/
 All tests automatically authenticate with demo mode:
 
 ```typescript
-import { test, expect } from '../fixtures/auth.fixture';
+import { test, expect } from "../fixtures/auth.fixture";
 
-test('example test', async ({ page }) => {
+test("example test", async ({ page }) => {
   // page is already authenticated with demo mode
-  await page.goto('/dashboard');
+  await page.goto("/dashboard");
   await expect(page).toHaveURL(/dashboard/);
 });
 ```
@@ -137,17 +138,17 @@ test('example test', async ({ page }) => {
 Create test data programmatically:
 
 ```typescript
-import { seedEnvelopes, seedTransactions } from '../fixtures/budget.fixture';
+import { seedEnvelopes, seedTransactions } from "../fixtures/budget.fixture";
 
-test('test with data', async ({ page }) => {
+test("test with data", async ({ page }) => {
   const envelopes = await seedEnvelopes(page, [
-    { name: 'Groceries', goal: 500 },
-    { name: 'Gas', goal: 200 }
+    { name: "Groceries", goal: 500 },
+    { name: "Gas", goal: 200 },
   ]);
 
   const transactions = await seedTransactions(page, envelopes[0].id, [
-    { description: 'Store', amount: 50 },
-    { description: 'Farmer Market', amount: 35 }
+    { description: "Store", amount: 50 },
+    { description: "Farmer Market", amount: 35 },
   ]);
 
   // Test with real data
@@ -159,9 +160,9 @@ test('test with data', async ({ page }) => {
 Simulate offline/online scenarios:
 
 ```typescript
-import { goOffline, goOnline, blockFirebase } from '../fixtures/network.fixture';
+import { goOffline, goOnline, blockFirebase } from "../fixtures/network.fixture";
 
-test('offline functionality', async ({ page }) => {
+test("offline functionality", async ({ page }) => {
   await goOffline(page);
   // ... test offline behavior
 
@@ -177,7 +178,9 @@ test('offline functionality', async ({ page }) => {
 ✅ **Good:** Use fixtures to create test data
 
 ```typescript
-const envelopes = await seedEnvelopes(page, [/* ... */]);
+const envelopes = await seedEnvelopes(page, [
+  /* ... */
+]);
 ```
 
 ❌ **Avoid:** Creating data via UI clicks
@@ -192,7 +195,7 @@ await page.click('button:has-text("Add")');
 ✅ **Good:** Centralized selectors
 
 ```typescript
-import { SELECTORS } from '../utils/selectors';
+import { SELECTORS } from "../utils/selectors";
 await page.locator(SELECTORS.BUTTONS.ADD_ENVELOPE).click();
 ```
 
@@ -205,6 +208,7 @@ await page.click('button:has-text("Add Envelope")');
 ### 3. Use Demo Mode
 
 Tests run with `VITE_DEMO_MODE=true` which:
+
 - Seeds initial budget data automatically
 - Skips real authentication (uses anonymous demo auth)
 - Enables `window.budgetDb` access for direct DB testing
@@ -214,24 +218,26 @@ Tests run with `VITE_DEMO_MODE=true` which:
 
 ```typescript
 // Good: reasonable timeout
-await page.locator('text=Envelope').waitFor({ timeout: 5000 });
+await page.locator("text=Envelope").waitFor({ timeout: 5000 });
 
 // Avoid: too short (flaky)
-await page.locator('text=Envelope').waitFor({ timeout: 500 });
+await page.locator("text=Envelope").waitFor({ timeout: 500 });
 
 // Avoid: too long (slow tests)
-await page.locator('text=Envelope').waitFor({ timeout: 60000 });
+await page.locator("text=Envelope").waitFor({ timeout: 60000 });
 ```
 
 ### 5. Test Critical Paths Only
 
 Focus on:
+
 - ✅ Core user workflows (paycheck, transactions, bills)
 - ✅ Offline/sync functionality
 - ✅ Data integrity
 - ✅ Performance with large datasets
 
 Don't test:
+
 - ❌ Third-party library behavior
 - ❌ UI animation details
 - ❌ Browser-specific quirks
@@ -277,6 +283,7 @@ View traces in Playwright Inspector for debugging.
 ### Screenshots and Videos
 
 Tests automatically capture:
+
 - 📸 Screenshots on failure (in `test-results/`)
 - 🎥 Videos on failure (in `test-results/`)
 
@@ -296,6 +303,7 @@ E2E tests run in CI with:
 ```
 
 CI Configuration:
+
 - Runs on every PR
 - Runs smoke tests on every commit
 - Runs full test suite on main branch
@@ -304,13 +312,13 @@ CI Configuration:
 
 ### Local vs CI Differences
 
-| Setting | Local | CI |
-|---------|-------|-----|
-| Workers | 50% of cores | 1 |
-| Retries | None | 2 |
-| Timeout | 60s | 60s |
-| Browsers | Chromium (default) | Chromium, Firefox, WebKit |
-| Demo Mode | ✅ Yes | ✅ Yes |
+| Setting   | Local              | CI                        |
+| --------- | ------------------ | ------------------------- |
+| Workers   | 50% of cores       | 1                         |
+| Retries   | None               | 2                         |
+| Timeout   | 60s                | 60s                       |
+| Browsers  | Chromium (default) | Chromium, Firefox, WebKit |
+| Demo Mode | ✅ Yes             | ✅ Yes                    |
 
 ## Troubleshooting
 
@@ -341,6 +349,7 @@ VITE_DEMO_MODE=true npx vite
 **Issue:** Locator timeouts
 
 **Solution:**
+
 1. Increase timeout: `.waitFor({ timeout: 10000 })`
 2. Check selector with Playwright Inspector
 3. Verify element actually exists in app
@@ -350,6 +359,7 @@ VITE_DEMO_MODE=true npx vite
 **Issue:** Authentication or Firestore errors
 
 **Solution:**
+
 - Tests should use demo mode (VITE_DEMO_MODE=true)
 - If using real Firebase, verify credentials in `.env.test`
 - Check Firebase test project exists and is configured correctly
