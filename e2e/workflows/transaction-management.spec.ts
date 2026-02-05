@@ -16,18 +16,18 @@ test.describe("Transaction Management Workflow", () => {
     authenticatedPage: page,
   }) => {
     // SETUP: Page is already authenticated with demo mode via fixture
-    console.log("✓ App loaded with demo mode");
+    await test.step("App loaded with demo mode", async () => {});
 
     // SETUP: Create test envelope
     await seedEnvelopes(page, [{ name: "Test Groceries", goal: 500 }]);
-    console.log("✓ Test envelope created");
+    await test.step("Test envelope created", async () => {});
 
     // STEP 1: Navigate to envelope (wait for it to appear in UI)
     const envelopeCard = page.locator("text=Test Groceries").first();
     await expect(envelopeCard).toBeVisible({ timeout: 10000 });
     await envelopeCard.click();
     await page.waitForLoadState("networkidle");
-    console.log("✓ Opened envelope detail view");
+    await test.step("Opened envelope detail view", async () => {});
 
     // STEP 2: Get initial balance
     const initialBalanceText = await page
@@ -99,15 +99,6 @@ test.describe("Transaction Management Workflow", () => {
     console.log("✓ Transaction amount visible in list: $45.75");
 
     // STEP 8: Verify balance decreased by exactly $45.75
-    const parseCurrency = (value: string | null): number => {
-      if (!value) return 0;
-      const match = value.match(/\$?([\d,]+(?:\.\d+)?)/);
-      if (!match) {
-        throw new Error(`Unable to parse currency value from: ${value}`);
-      }
-      return parseFloat(match[1].replace(/,/g, ""));
-    };
-
     const updatedBalanceText = await page
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
@@ -247,15 +238,6 @@ test.describe("Transaction Management Workflow", () => {
     console.log("✓ Transaction removed from list");
 
     // STEP 7: Verify balance increased by exactly $25 (refunded)
-    const parseCurrency = (value: string | null): number => {
-      if (!value) return 0;
-      const match = value.match(/\$?([\d,]+(?:\.\d+)?)/);
-      if (!match) {
-        throw new Error(`Unable to parse currency value from: ${value}`);
-      }
-      return parseFloat(match[1].replace(/,/g, ""));
-    };
-
     const balanceAfter = await page
       .locator('[data-testid="envelope-balance"], text=/\\$[0-9,.]+/')
       .first()
