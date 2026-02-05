@@ -23,7 +23,6 @@ test.describe("Bill Payment Workflow", () => {
     // STEP 1: Navigate to Bills section
     // Look for Bills in navigation menu or sidebar
     await page.goto("http://localhost:5173/app/bills", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
     console.log("✓ Navigated to Bills section");
 
     // STEP 2: Click "Add Bill" button
@@ -37,9 +36,6 @@ test.describe("Bill Payment Workflow", () => {
     console.log("✓ Opened add bill dialog");
 
     // STEP 3: Fill bill form
-    // Wait for modal/form to be visible
-    await page.waitForTimeout(500);
-
     // 3a. Bill name
     const nameInput = page
       .locator(
@@ -89,7 +85,6 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 5: Wait for update
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1500);
 
     // STEP 6: Verify bill appears in list
     const billRow = page.locator('text="Electric Bill"').first();
@@ -111,7 +106,7 @@ test.describe("Bill Payment Workflow", () => {
     // Create envelope and bill
     const envelopes = await seedEnvelopes(page, [{ name: "Rent Envelope", goal: 2000 }]);
     const today = new Date().toISOString().split("T")[0];
-    const bills = await seedBills(page, [
+    await seedBills(page, [
       {
         name: "Rent Payment",
         amount: 1500,
@@ -123,7 +118,6 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 1: Navigate to Bills section
     await page.goto("http://localhost:5173/app/bills", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
     console.log("✓ Opened Bills section");
 
     // STEP 2: Find the bill
@@ -145,7 +139,6 @@ test.describe("Bill Payment Workflow", () => {
     } else {
       // Try clicking the bill row itself to open details
       await billRow.click();
-      await page.waitForTimeout(500);
       const payButtonInDetail = page
         .locator(
           'button:has-text("Pay"), button:has-text("Confirm Payment"), button:has-text("Mark Paid")'
@@ -168,7 +161,6 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 5: Wait for update
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
 
     // STEP 6: Verify bill marked as paid (UI change)
     const paidStatus = page.locator("text=/Paid|PAID|✓|paid/i").first();
@@ -191,7 +183,7 @@ test.describe("Bill Payment Workflow", () => {
     const today = new Date();
     const currentMonth = today.toISOString().split("T")[0];
 
-    const bills = await seedBills(page, [
+    await seedBills(page, [
       {
         name: "Internet Bill",
         amount: 80,
@@ -204,7 +196,6 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 1: Navigate to bills
     await page.goto("http://localhost:5173/app/bills", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
     console.log("✓ Opened Bills section");
 
     // STEP 2: Verify bill exists
@@ -234,7 +225,7 @@ test.describe("Bill Payment Workflow", () => {
     pastDate.setDate(pastDate.getDate() - 5); // 5 days ago
     const overdueDate = pastDate.toISOString().split("T")[0];
 
-    const bills = await seedBills(page, [
+    await seedBills(page, [
       {
         name: "Overdue Electric",
         amount: 120,
@@ -246,7 +237,6 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 1: Navigate to bills
     await page.goto("http://localhost:5173/app/bills", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
     console.log("✓ Opened Bills section");
 
     // STEP 2: Find overdue bill
@@ -281,7 +271,7 @@ test.describe("Bill Payment Workflow", () => {
     // Create bill
     const envelopes = await seedEnvelopes(page, [{ name: "History Test Envelope", goal: 1000 }]);
 
-    const bills = await seedBills(page, [
+    await seedBills(page, [
       {
         name: "History Test Bill",
         amount: 100,
@@ -293,14 +283,12 @@ test.describe("Bill Payment Workflow", () => {
 
     // STEP 1: Navigate to bills
     await page.goto("http://localhost:5173/app/bills", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
     console.log("✓ Opened Bills section");
 
     // STEP 2: Click on bill to view details/history
     const bill = page.locator('text="History Test Bill"').first();
     await expect(bill).toBeVisible({ timeout: 10000 });
     await bill.click();
-    await page.waitForTimeout(1000);
     console.log("✓ Opened bill details");
 
     // STEP 3: Look for payment history section
