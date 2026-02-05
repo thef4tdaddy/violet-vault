@@ -1,5 +1,5 @@
-import { test as base, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import { test as base, expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 /**
  * Authentication Fixture for Playwright E2E Tests
@@ -28,8 +28,8 @@ export const test = base.extend<AuthFixtures>({
 
     // Step 2: Navigate to app
     // The app will auto-seed demo data and trigger Firebase anonymous auth
-    await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
-    console.log('✓ Navigated to app with demo mode enabled');
+    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
+    console.log("✓ Navigated to app with demo mode enabled");
 
     // Step 3: Wait for Firebase anonymous auth to complete
     // The app should auto-authenticate and set up the budget
@@ -41,9 +41,9 @@ export const test = base.extend<AuthFixtures>({
     });
 
     if (!budgetId) {
-      console.warn('⚠ Budget ID not found - auth may not have completed');
+      console.warn("⚠ Budget ID not found - auth may not have completed");
     } else {
-      console.log('✓ Authentication complete. Budget ID:', budgetId);
+      console.log("✓ Authentication complete. Budget ID:", budgetId);
     }
 
     // Step 5: Wait for app to be fully ready
@@ -51,9 +51,9 @@ export const test = base.extend<AuthFixtures>({
     const mainContent = page.locator('main, [role="main"], [data-testid="dashboard"]');
     try {
       await mainContent.waitFor({ timeout: 10000 });
-      console.log('✓ App main content loaded');
+      console.log("✓ App main content loaded");
     } catch {
-      console.warn('⚠ Main content did not load within timeout');
+      console.warn("⚠ Main content did not load within timeout");
     }
 
     // Pass the authenticated page to the test
