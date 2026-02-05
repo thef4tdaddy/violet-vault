@@ -26,14 +26,13 @@ export const test = base.extend<AuthFixtures>({
     // Step 1: Set VITE_DEMO_MODE environment variable
     // This is handled by playwright.config.ts webServer command: VITE_DEMO_MODE=true npx vite
 
-    // Step 2: Navigate to app
-    // The app will auto-seed demo data and trigger Firebase anonymous auth
-    await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
-    console.log("✓ Navigated to app with demo mode enabled");
+    // Step 2: Navigate directly to /app
+    // With VITE_DEMO_MODE=true, UserSetup.tsx will auto-complete auth
+    await page.goto("http://localhost:5173/app", { waitUntil: "networkidle" });
+    console.log("✓ Navigated to /app with demo mode enabled");
 
-    // Step 3: Wait for Firebase anonymous auth to complete
-    // The app should auto-authenticate and set up the budget
-    await page.waitForTimeout(2000);
+    // Step 3: Wait for demo auth bypass to complete and app to initialize
+    await page.waitForTimeout(3000);
 
     // Step 4: Verify auth completed by checking window.budgetDb
     const budgetId = await page.evaluate(() => {

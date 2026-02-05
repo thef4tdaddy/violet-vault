@@ -40,9 +40,12 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
   // 3. Waits for Firebase auth to complete
   // 4. Returns a page object ready for testing
 
-  test("Test 1: App loads with demo mode and generates unique budget ID", async ({ page }) => {
+  test("Test 1: App loads with demo mode and generates unique budget ID", async ({
+    authenticatedPage,
+  }) => {
+    const page = authenticatedPage;
     // STEP 1: Verify page loaded successfully
-    await expect(page).toHaveURL(/\/demo\/dashboard/);
+    await expect(page).toHaveURL(/\/app/);
 
     // STEP 2: Verify dashboard main container is visible
     // Look for the main dashboard container - adjust selector based on actual app structure
@@ -68,8 +71,9 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
   });
 
   test("Test 2: User can complete basic budgeting flow (create envelope → add transaction → verify update)", async ({
-    page,
+    authenticatedPage,
   }) => {
+    const page = authenticatedPage;
     // PREREQUISITE: authenticatedPage fixture already loaded app with demo mode
 
     // STEP 1: Create an envelope
@@ -184,7 +188,10 @@ test.describe("Smoke Tests - Critical Path Validation", () => {
     }
   });
 
-  test("Test 3: Page reload persists session and data remains intact", async ({ page }) => {
+  test("Test 3: Page reload persists session and data remains intact", async ({
+    authenticatedPage,
+  }) => {
+    const page = authenticatedPage;
     // PREREQUISITE: Demo mode enabled, so data persists in IndexedDB
 
     // STEP 1: Create test envelope before reload
