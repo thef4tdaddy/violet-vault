@@ -268,6 +268,65 @@ describe("useBudgetMetadata", () => {
       expect(result.current.formatBalance).toBe(firstRender.formatBalance);
       expect(result.current.validateBalanceInput).toBe(firstRender.validateBalanceInput);
     });
+
+    it("should update state values when underlying hooks return different data", () => {
+      const { result, rerender } = renderHook(() => useBudgetMetadata());
+
+      // Initial state
+      expect(result.current.unassignedCash).toBe(1000);
+      expect(result.current.actualBalance).toBe(5000);
+
+      // Update the mock to return different values
+      (useBudgetMetadataQuery as Mock).mockReturnValue({
+        metadata: { ...mockMetadata, unassignedCash: 2000, actualBalance: 6000 },
+        unassignedCash: 2000,
+        actualBalance: 6000,
+        isActualBalanceManual: true,
+        biweeklyAllocation: 2000,
+        supplementalAccounts: [],
+        isLoading: false,
+        error: null,
+        refetch: mockRefetch,
+      });
+
+      rerender();
+
+      // Verify state updates
+      expect(result.current.unassignedCash).toBe(2000);
+      expect(result.current.actualBalance).toBe(6000);
+    });
+
+    it("should update loading states when underlying hooks change state", () => {
+      const { result, rerender } = renderHook(() => useBudgetMetadata());
+
+      // Initial state - not loading
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isUpdating).toBe(false);
+
+      // Update mocks to simulate loading state
+      (useBudgetMetadataQuery as Mock).mockReturnValue({
+        metadata: mockMetadata,
+        unassignedCash: 1000,
+        actualBalance: 5000,
+        isActualBalanceManual: true,
+        biweeklyAllocation: 2000,
+        supplementalAccounts: [],
+        isLoading: true,
+        error: null,
+        refetch: mockRefetch,
+      });
+
+      (useBudgetMetadataMutation as Mock).mockReturnValue({
+        updateMetadata: mockUpdateMetadata,
+        isUpdating: true,
+      });
+
+      rerender();
+
+      // Verify loading states update
+      expect(result.current.isLoading).toBe(true);
+      expect(result.current.isUpdating).toBe(true);
+    });
   });
 
   describe("Edge Cases", () => {
