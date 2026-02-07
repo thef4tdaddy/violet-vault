@@ -56,6 +56,7 @@ describe("usePaydayPrediction", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe("initialization and basic behavior", () => {
@@ -359,8 +360,12 @@ describe("usePaydayPrediction", () => {
 
       renderHook(() => usePaydayPrediction(paycheckHistory, true));
 
-      // Should still attempt to show notification despite localStorage error
-      expect(logger.error).toHaveBeenCalled();
+      // When localStorage throws, the entire checkPayday try-catch exits and logs the error
+      expect(logger.error).toHaveBeenCalledWith(
+        "Error checking payday prediction:",
+        expect.any(Error)
+      );
+      expect(mockShowPayday).not.toHaveBeenCalled();
     });
   });
 
@@ -509,7 +514,7 @@ describe("usePaydayPrediction", () => {
       expect(predictNextPayday).toHaveBeenCalledWith(paycheckHistory);
     });
 
-    it("should handle pattern as null in notification message", () => {
+    it("should handle custom pattern in notification message", () => {
       const paycheckHistory = [
         { date: "2023-01-01", amount: 2000 },
         { date: "2023-01-15", amount: 2000 },
