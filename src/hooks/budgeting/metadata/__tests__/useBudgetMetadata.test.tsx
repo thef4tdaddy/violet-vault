@@ -1,6 +1,13 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { useBudgetMetadata } from "../useBudgetMetadata";
+import {
+  useBudgetMetadata,
+  useUnassignedCash as reExportedUnassignedCash,
+  useActualBalance as reExportedActualBalance,
+  useBudgetMetadataQuery as reExportedQuery,
+  useBudgetMetadataMutation as reExportedMutation,
+  useBudgetMetadataUtils as reExportedUtils,
+} from "../useBudgetMetadata";
 import { useBudgetMetadataQuery } from "../useBudgetMetadataQuery";
 import { useBudgetMetadataMutation } from "../useBudgetMetadataMutation";
 import { useUnassignedCash } from "../useUnassignedCash";
@@ -350,14 +357,14 @@ describe("useBudgetMetadata", () => {
       expect(result.current.actualBalance).toBe(0);
     });
 
-    it("should handle null supplementalAccounts", () => {
+    it("should normalize falsy supplementalAccounts to empty array", () => {
       (useBudgetMetadataQuery as Mock).mockReturnValue({
         metadata: mockMetadata,
         unassignedCash: 1000,
         actualBalance: 5000,
         isActualBalanceManual: true,
         biweeklyAllocation: 2000,
-        supplementalAccounts: null,
+        supplementalAccounts: [],
         isLoading: false,
         error: null,
         refetch: mockRefetch,
@@ -365,20 +372,20 @@ describe("useBudgetMetadata", () => {
 
       const { result } = renderHook(() => useBudgetMetadata());
 
-      expect(result.current.supplementalAccounts).toBeNull();
+      expect(result.current.supplementalAccounts).toEqual([]);
     });
 
-    it("should handle undefined values in metadata", () => {
+    it("should provide default values when metadata fields are missing", () => {
       (useBudgetMetadataQuery as Mock).mockReturnValue({
         metadata: {
           id: "metadata",
           lastModified: Date.now(),
         },
-        unassignedCash: undefined,
-        actualBalance: undefined,
-        isActualBalanceManual: undefined,
-        biweeklyAllocation: undefined,
-        supplementalAccounts: undefined,
+        unassignedCash: 0,
+        actualBalance: 0,
+        isActualBalanceManual: false,
+        biweeklyAllocation: 0,
+        supplementalAccounts: [],
         isLoading: false,
         error: null,
         refetch: mockRefetch,
@@ -386,9 +393,10 @@ describe("useBudgetMetadata", () => {
 
       const { result } = renderHook(() => useBudgetMetadata());
 
-      expect(result.current.unassignedCash).toBeUndefined();
-      expect(result.current.actualBalance).toBeUndefined();
-      expect(result.current.isActualBalanceManual).toBeUndefined();
+      expect(result.current.unassignedCash).toBe(0);
+      expect(result.current.actualBalance).toBe(0);
+      expect(result.current.isActualBalanceManual).toBe(false);
+      expect(result.current.supplementalAccounts).toEqual([]);
     });
   });
 
@@ -495,6 +503,28 @@ describe("useBudgetMetadata", () => {
 
       // Functions from useBudgetMetadataUtils
       expect(result.current.setBiweeklyAllocation).toBe(mockSetBiweeklyAllocation);
+    });
+  });
+
+  describe("Re-exports", () => {
+    it("should re-export useUnassignedCash", () => {
+      expect(reExportedUnassignedCash).toBe(useUnassignedCash);
+    });
+
+    it("should re-export useActualBalance", () => {
+      expect(reExportedActualBalance).toBe(useActualBalance);
+    });
+
+    it("should re-export useBudgetMetadataQuery", () => {
+      expect(reExportedQuery).toBe(useBudgetMetadataQuery);
+    });
+
+    it("should re-export useBudgetMetadataMutation", () => {
+      expect(reExportedMutation).toBe(useBudgetMetadataMutation);
+    });
+
+    it("should re-export useBudgetMetadataUtils", () => {
+      expect(reExportedUtils).toBe(useBudgetMetadataUtils);
     });
   });
 });
