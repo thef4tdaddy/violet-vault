@@ -318,7 +318,15 @@ const matchesAttributeFilters = (
  */
 export const filterSavingsGoals = (
   goals: ProcessedSavingsGoal[],
-  filters: { status?: string; includeCompleted?: boolean } = {}
+  filters: {
+    status?: string;
+    includeCompleted?: boolean;
+    category?: string;
+    priority?: string;
+    urgency?: string;
+    minAmount?: string;
+    maxAmount?: string;
+  } = {}
 ) => {
   const { status = "all", includeCompleted = true } = filters;
 
