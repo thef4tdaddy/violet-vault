@@ -39,8 +39,8 @@ fi
 
 
 # 4. Auto-bump beta version
-echo "🔖 Auto-bumping beta version..."
-npm version prerelease --preid=beta --no-git-tag-version
+ # echo "🔖 Auto-bumping beta version..."
+# npm version prerelease --preid=beta --no-git-tag-version
 git add package.json
 
 echo "✅ Quality checks passed! Proceeding with commit."
