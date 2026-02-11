@@ -30,11 +30,13 @@ rules:
   # State Management
   - name: "State Management Rules"
     rules:
-      - "TanStack Query (@tanstack/react-query): ALL server state, Firebase data, API calls, caching"
-      - "Zustand (@zustand): UI STATE ONLY (modals, forms, user preferences, loading states)"
-      - "React Context: Auth state and app-level state only"
+      - "TanStack Query (@tanstack/react-query): ALL server state, Firebase data, API calls, caching, auth operations"
+      - "React Context: Auth state (user, session, auth status) - NOT Zustand (v2.0+)"
+      - "Auth Operations: TanStack Query mutations/queries (login, logout, session management)"
+      - "Zustand (@zustand): UI STATE ONLY (modals, forms, user preferences, loading states, temporary interactions)"
       - "CRITICAL: Never put server/Firebase data in Zustand - use TanStack Query"
       - "CRITICAL: Never use Context for UI state - use Zustand"
+      - "CRITICAL: Auth state is in React Context, not Zustand (v2.0+)"
       - "Pattern: useQuery for reads, useMutation for writes"
 
   # Directory Structure (v2.0)
@@ -105,13 +107,13 @@ rules:
   # Testing
   - name: "Testing Standards"
     rules:
-      - "Use Vitest for unit tests"
-      - "Test files: `component/__tests__/Component.test.tsx`"
-      - "Test files: `service/__tests__/serviceName.test.ts`"
+      - "Use Vitest for unit tests (Frontend) and pytest/go test (Backend)"
+      - "Test files: `component/__tests__/Component.test.tsx` or `module.test.ts` / `file_test.go`"
       - "Mock Firebase calls using vi.mock() in tests"
       - "Use Mock type from vitest for proper typing: `vi.fn() as Mock<...>`"
       - "Test files should have zero 'any' types"
-      - "Aim for >80% code coverage on critical paths"
+      - "CRITICAL: All new code (Frontend & Backend) must have >80% code coverage"
+      - "Every new file created MUST be accompanied by a corresponding test file"
       - "Run tests: `npm run test` or `npm run test:run` for CI"
       - "Focus on error handling and edge cases, not just happy paths"
       - "Test critical operations: import/export, backup/restore, cloud sync, CRUD mutations"
@@ -264,6 +266,7 @@ common_patterns:
       import React, { useCallback } from 'react';
       import { useUsers } from '@/hooks/api/useUsers';
       import { useModalStore } from '@/stores/ui/modalStore';
+      import { useAuth } from '@/contexts/AuthContext'; // Auth from Context, not Zustand
 
       interface UserListProps {
         onSelect: (userId: string) => void;
@@ -272,11 +275,13 @@ common_patterns:
       export const UserList: React.FC<UserListProps> = ({ onSelect }) => {
         const { data: users, isLoading } = useUsers();
         const { isOpen } = useModalStore();
+        const { user, isAuthenticated } = useAuth(); // Auth state from Context
 
         const handleUserClick = useCallback((userId: string) => {
           onSelect(userId);
         }, [onSelect]);
 
+        if (!isAuthenticated) return <div>Please log in</div>;
         if (isLoading) return <div>Loading...</div>;
 
         return (
@@ -322,13 +327,31 @@ command_patterns:
 prohibited:
   - "🚫 NO 'any' types - EVER - use proper types or Zod schemas"
   - "🚫 NO relative imports - ALWAYS use '@' path aliases"
+  - "🚫 NO PRs without >80% test coverage for new files (Frontend & Backend)"
+  - "🚫 NO inline eslint-disable comments - ALL disables must be in configs/linting/config-modules/exclusions-config.js with approval and explanation"
   - "No console.log() - use logger utility"
   - "No business logic in components"
   - "No direct Firebase calls in components"
   - "No API calls from components"
   - "No server data in Zustand stores"
   - "No UI state in Context (use Zustand)"
-  - "No eslint-disable comments without justification"
   - "No unused imports or variables"
   - "No hardcoded values (use constants)"
   - "No mixing concerns (keep separation of concerns)"
+
+eslint_disable_policy: |
+  CRITICAL: All ESLint rule disables must be:
+  1. Added to configs/linting/config-modules/exclusions-config.js
+  2. Include a clear explanation of WHY the disable is needed
+  3. Marked with "APPROVED:" comment if user-approved
+  4. NEVER use inline eslint-disable comments in source files
+
+  Example format in exclusions-config.js:
+  {
+    // Clear explanation of why this exclusion is needed
+    // APPROVED: Brief approval note if user-approved
+    files: ["path/to/file.ts"],
+    rules: {
+      "rule-name": "off", // Specific reason for this disable
+    },
+  }

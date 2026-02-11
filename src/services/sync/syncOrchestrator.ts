@@ -1,0 +1,345 @@
+import { encryptionManager } from "../security/encryptionManager";
+import logger from "@/utils/core/common/logger";
+import { syncHealthMonitor } from "@/utils/features/sync/syncHealthMonitor";
+import { autoBackupService } from "@/utils/features/sync/autoBackupService";
+import { offlineRequestQueueService } from "./offlineRequestQueueService";
+import { websocketSignalingService } from "./websocketSignalingService";
+import { syncManager } from "./SyncManager";
+import { captureError } from "@/utils/core/common/sentry";
+import type { SafeUnknown, TypedResponse } from "@/types/firebase";
+import type { WebSocketSignalMessage } from "@/types/sync";
+
+/**
+ * Sync version constant
+ */
+const SYNC_VERSION = "2.0";
+
+/**
+ * Snapshot of local Dexie data for sync.
+ */
+export interface DexieData extends Record<string, unknown> {
+  envelopes: unknown[];
+  transactions: unknown[];
+  unassignedCash: number;
+  actualBalance: number;
+  lastModified: number;
+  syncVersion: string;
+}
+
+/**
+ * Sync Provider Interface
+ * Defines the protocol for backend synchronization.
+ */
+export interface SyncProvider {
+  name: string;
+  initialize(budgetId: string, key: CryptoKey): Promise<void>;
+  save<T extends SafeUnknown>(
+    data: T,
+    metadata?: Record<string, unknown>
+  ): Promise<TypedResponse<boolean>>;
+  load<T extends SafeUnknown>(): Promise<TypedResponse<T | null>>;
+  ensureAuthenticated?(): Promise<boolean>;
+}
+
+/**
+ * SyncOrchestrator Service
+ * Handles high-level sync orchestration, scheduling, and health monitoring.
+ * Delegates actual transport to a SyncProvider.
+ */
+export class SyncOrchestrator {
+  private static instance: SyncOrchestrator;
+  private provider: SyncProvider | null = null;
+  private budgetId: string | null = null;
+  public isRunning: boolean = false;
+  public isSyncInProgress: boolean = false;
+  private wsUnsubscribe: (() => void) | null = null;
+
+  private constructor() {}
+
+  public static getInstance(): SyncOrchestrator {
+    if (!SyncOrchestrator.instance) {
+      SyncOrchestrator.instance = new SyncOrchestrator();
+    }
+    return SyncOrchestrator.instance;
+  }
+
+  /**
+   * Initialize and start the sync service
+   */
+  public async start(config: {
+    budgetId: string;
+    encryptionKey: string | CryptoKey;
+    provider: SyncProvider;
+  }): Promise<void> {
+    if (this.isRunning) return;
+
+    this.budgetId = config.budgetId;
+    this.provider = config.provider;
+
+    // Resolve key if it's a password string
+    let key: CryptoKey;
+    if (typeof config.encryptionKey === "string") {
+      const derived = await encryptionManager.deriveKey(config.encryptionKey);
+      key = derived.key;
+    } else {
+      key = config.encryptionKey;
+    }
+
+    // Initialize EncryptionManager
+    encryptionManager.setKey(key);
+
+    // Initialize Provider
+    await this.provider.initialize(this.budgetId, key);
+
+    // Initialize offline request queue
+    await offlineRequestQueueService.initialize();
+
+    this.isRunning = true;
+    logger.production("SyncOrchestrator: Started", {
+      budgetId: this.budgetId.substring(0, 8),
+      provider: this.provider.name,
+    });
+
+    // Setup WebSocket signaling for real-time sync notifications
+    this.setupWebSocketSignaling();
+
+    // Initial sync
+    this.scheduleSync("high");
+  }
+
+  /**
+   * Stop the sync service
+   */
+  public stop(): void {
+    // Cleanup WebSocket signaling
+    if (this.wsUnsubscribe) {
+      this.wsUnsubscribe();
+      this.wsUnsubscribe = null;
+    }
+    websocketSignalingService.disconnect();
+
+    this.isRunning = false;
+    this.isSyncInProgress = false;
+    this.provider = null;
+    this.budgetId = null;
+
+    // Stop offline queue processing
+    offlineRequestQueueService.stopProcessingInterval();
+
+    // Clear sync manager queue
+    syncManager.clearQueue();
+
+    logger.production("SyncOrchestrator: Stopped");
+  }
+
+  /**
+   * Schedule a sync operation with debouncing
+   * Now delegates to SyncManager for unified queue management
+   */
+  public scheduleSync(priority: "normal" | "high" = "normal"): void {
+    if (!this.isRunning) return;
+
+    logger.debug(`SyncOrchestrator: Scheduling sync with priority: ${priority}`);
+
+    // Use SyncManager to handle queueing and debouncing
+    // Fire-and-forget pattern - errors are logged within syncManager
+    syncManager
+      .executeSync(
+        async () => {
+          return await this.performSync();
+        },
+        "scheduled-sync",
+        { priority, skipQueue: priority === "high" }
+      )
+      .catch((error) => {
+        logger.error("SyncOrchestrator: Scheduled sync failed", {
+          error: error instanceof Error ? error.message : String(error),
+          priority,
+        });
+        captureError(error instanceof Error ? error : new Error(String(error)), {
+          source: "SyncOrchestrator",
+          priority,
+        });
+      });
+  }
+
+  /**
+   * Force an immediate sync
+   * Now delegates to SyncManager for unified execution
+   */
+  public async forceSync(): Promise<TypedResponse<boolean>> {
+    if (!this.isRunning || !this.provider) {
+      return {
+        success: false,
+        timestamp: Date.now(),
+        error: {
+          code: "NOT_RUNNING",
+          message: "Sync not running",
+          category: "unknown",
+          timestamp: Date.now(),
+        },
+      };
+    }
+
+    logger.info("SyncOrchestrator: Force sync requested");
+
+    // Use SyncManager to force immediate sync with mutex protection
+    return await syncManager.forceSync(async () => {
+      return await this.performSync();
+    }, "force-sync");
+  }
+
+  /**
+   * Internal method to perform the actual sync operation
+   * Extracted to be used by both scheduleSync and forceSync
+   * @private
+   */
+  private async performSync(): Promise<TypedResponse<boolean>> {
+    if (!this.provider) {
+      return {
+        success: false,
+        timestamp: Date.now(),
+        error: {
+          code: "NO_PROVIDER",
+          message: "No sync provider configured",
+          category: "unknown",
+          timestamp: Date.now(),
+        },
+      };
+    }
+
+    if (this.isSyncInProgress) {
+      logger.debug("SyncOrchestrator: Sync already in progress, skipping");
+      return { success: false, timestamp: Date.now() };
+    }
+
+    this.isSyncInProgress = true;
+    const syncId = syncHealthMonitor.recordSyncStart(this.provider.name);
+
+    try {
+      // 1. Pre-sync backup
+      await autoBackupService.createPreSyncBackup("sync_orchestrator");
+
+      // 2. Fetch local data from Dexie
+      const { budgetDb } = await import("@/db/budgetDb");
+      const localData = await this.fetchLocalData(budgetDb);
+
+      // 3. Perform Sync
+      const result = await this.provider.save(localData);
+
+      if (result.success) {
+        syncHealthMonitor.recordSyncSuccess(syncId);
+        logger.info("SyncOrchestrator: Sync successful");
+
+        // Send WebSocket signal to notify other clients (SIGNALING ONLY - NO DATA)
+        websocketSignalingService.sendSignal("data_changed", {
+          version: SYNC_VERSION,
+        });
+      } else {
+        syncHealthMonitor.recordSyncFailure(
+          syncId,
+          new Error(result.error?.message || "Sync failed")
+        );
+      }
+
+      return result;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const err = error instanceof Error ? error : new Error(errorMessage);
+      syncHealthMonitor.recordSyncFailure(syncId, err);
+      logger.error("SyncOrchestrator: Unexpected error", { error: errorMessage });
+      captureError(err, { source: "SyncOrchestrator", syncId });
+      return {
+        success: false,
+        timestamp: Date.now(),
+        error: {
+          code: "UNEXPECTED",
+          message: errorMessage,
+          category: "unknown",
+          timestamp: Date.now(),
+        },
+      };
+    } finally {
+      this.isSyncInProgress = false;
+    }
+  }
+
+  /**
+   * Fetch all relevant data from local Dexie database.
+   * Publicly accessible for diagnostics and testing.
+   */
+  public async fetchLocalData(db: {
+    envelopes: { toArray: () => Promise<unknown[]> };
+    transactions: { toArray: () => Promise<unknown[]> };
+    budget: { get: (key: string) => Promise<unknown> };
+  }): Promise<DexieData> {
+    const [envelopes, transactions, metadata] = await Promise.all([
+      db.envelopes.toArray(),
+      db.transactions.toArray(),
+      db.budget.get("metadata") as Promise<Record<string, unknown>>,
+    ]);
+
+    const meta = metadata as Record<string, unknown>;
+
+    return {
+      envelopes,
+      transactions,
+      unassignedCash: Number(meta?.unassignedCash || 0),
+      actualBalance: Number(meta?.actualBalance || 0),
+      lastModified: Date.now(),
+      syncVersion: SYNC_VERSION,
+    };
+  }
+
+  /**
+   * Setup WebSocket signaling for real-time sync notifications
+   * PRIVACY: Only signals are transmitted, no data
+   */
+  private setupWebSocketSignaling(): void {
+    if (!this.budgetId) {
+      return;
+    }
+
+    // Clean up existing WebSocket subscription if any
+    if (this.wsUnsubscribe) {
+      this.wsUnsubscribe();
+      this.wsUnsubscribe = null;
+    }
+
+    // Check if WebSocket is enabled
+    const wsEnabled = import.meta.env.VITE_WEBSOCKET_ENABLED === "true";
+    if (!wsEnabled) {
+      logger.debug("WebSocket signaling is disabled");
+      return;
+    }
+
+    const wsUrl = import.meta.env.VITE_WEBSOCKET_URL;
+    if (!wsUrl) {
+      logger.debug("VITE_WEBSOCKET_URL not configured");
+      return;
+    }
+
+    // Connect to WebSocket signaling service
+    websocketSignalingService.connect({
+      url: wsUrl,
+      budgetId: this.budgetId,
+    });
+
+    // Listen for sync signals from other clients
+    this.wsUnsubscribe = websocketSignalingService.onSignal((signal: WebSocketSignalMessage) => {
+      logger.debug("WebSocket signal received", { type: signal.type });
+
+      // Handle sync-related signals
+      if (signal.type === "data_changed" || signal.type === "sync_required") {
+        // Trigger a sync when another client has made changes
+        // This ensures all clients stay in sync without transmitting data via WebSocket
+        logger.info("Remote data change detected, scheduling sync");
+        this.scheduleSync("high");
+      }
+    });
+
+    logger.info("WebSocket signaling setup complete", { budgetId: this.budgetId.substring(0, 8) });
+  }
+}
+
+export const syncOrchestrator = SyncOrchestrator.getInstance();

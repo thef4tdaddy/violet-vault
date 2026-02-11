@@ -38,7 +38,7 @@ jobs:
           script: |
             console.log(`🤖 Auto-approving workflows for Copilot PR #${context.issue.number}`);
             console.log(`Actor: ${context.actor}`);
-            
+
             // Get pending workflow runs for this PR
             const { data: workflowRuns } = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
@@ -47,14 +47,14 @@ jobs:
               status: 'waiting',
               per_page: 100
             });
-            
+
             // Filter runs for this PR
             const prRuns = workflowRuns.workflow_runs.filter(run => {
               return run.pull_requests && run.pull_requests.some(pr => pr.number === context.issue.number);
             });
-            
+
             console.log(`Found ${prRuns.length} workflow runs waiting for approval`);
-            
+
             // Approve each waiting run
             for (const run of prRuns) {
               try {
@@ -68,8 +68,7 @@ jobs:
                 console.log(`⚠️ Could not approve workflow ${run.id}: ${error.message}`);
               }
             }
-            
+
             if (prRuns.length > 0) {
               console.log('✅ All Copilot PR workflows approved automatically');
             }
-

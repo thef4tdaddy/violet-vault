@@ -1,8 +1,8 @@
 # Contributing to VioletVault
 
-## Development Workflow
+## 🚀 Development Workflow
 
-This project uses conventional commits, automated testing, and release automation to maintain code quality.
+This project uses native **TypeScript**, automated testing, and release automation.
 
 ### Commit Message Format
 
@@ -15,95 +15,72 @@ Format: `<type>(<scope>): <description>`
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
+- `style`: Code style (formatting, glassmorphism)
+- `refactor`: Refactoring code
+- `perf`: Performance
 - `test`: Adding or updating tests
-- `build`: Build system changes
 - `ci`: CI/CD changes
-- `chore`: Other changes
 
 #### Examples:
 
 ```bash
-feat: add dark mode toggle to settings
-fix: resolve infinite loop in envelope calculations
-docs: update API documentation
-refactor: extract envelope operations to custom hook
+feat: add glassmorphic card for envelopes
+fix: resolve dexie sync race condition
+docs: update V2 architecture overview
+test: add 80%+ coverage for TransactionService
 ```
 
-### Development Commands
+### 🛠️ Development Commands
 
 ```bash
 # Start development server
 npm run dev
 
-# Run linting
-npm run lint
+# Run full audit (Lint + Typecheck + Coverage)
+npm run audit:full
+
+# Fix linting issues
 npm run lint:fix
+
+# Run tests
+npm run test:run
 
 # Build for production
 npm run build
-
-# Preview production build
-npm run preview
-
-# Check commit message format
-npm run check-commit
 ```
 
-### Git Hooks
+### 🧬 TypeScript Standards
 
-This project uses Husky for Git hooks:
+VioletVault v2.0 is **100% strict TypeScript**. Follow these guidelines:
 
-- **pre-commit**: Runs linting and build validation
-- **commit-msg**: Validates commit message format using commitlint
+- **No `any`**: Use proper interfaces or `unknown` with type guards.
+- **Strict Interfaces**: Define all component props and hook return types.
+- **Zod Validation**: All external data (API/Dexie) must be validated with Zod schemas.
+- **Path Aliases**: Always use `@/` for imports (e.g., `@/components/Button`).
 
-### Release Process
+### 📦 Code Quality Gates
 
-Releases are automated using Release Please:
+Before submitting a Pull Request:
 
-1. Make commits following conventional commit format
-2. Push to `main` branch
-3. Release Please will automatically:
-   - Create a release PR with changelog
-   - Update version numbers
-   - Create GitHub releases when PR is merged
+1. **Linting**: Must pass `npm run lint` with zero errors.
+2. **Typecheck**: Must pass `npm run typecheck` with no errors.
+3. **Coverage**: New code **MUST** have 80%+ test coverage.
+4. **Build**: Build must complete successfully (`npm run build`).
 
-### Code Quality
+### 🎨 UI & Aesthetics
 
-Before committing:
+- **Glassmorphism**: Follow the v2 design system using backdrop-filters and subtle borders.
+- **Shared Components**: Never reinvent the wheel. Use components from `src/components/shared`.
+- **Responsive**: Ensure all UI elements work on mobile (375px+) and desktop.
 
-1. Code must pass ESLint with no warnings
-2. Build must complete successfully
-3. Commit messages must follow conventional format
-4. Use standardized UI components (see [Shared UI Components](docs/Shared-UI-Components.md))
+---
 
-The pre-commit hook will automatically check these requirements.
+## 🏗️ Release Process
 
-### UI Component Standards
+1. Merge approved PRs into `milestone-X.Y` or `develop`.
+2. Releases are tagged and artifacts generated automatically via GitHub Actions.
+3. Changelogs are derived from conventional commits.
 
-**Always use shared UI components** instead of creating custom implementations:
+---
 
-- **EditLockIndicator**: For multi-user edit conflict prevention
-- **ConfirmModal**: For all confirmation dialogs (via `useConfirm()` hook)
-- **UniversalConnectionManager**: For entity connection management
-- **Toast System**: For notifications and alerts
-
-See the **[Shared UI Components Guide](docs/Shared-UI-Components.md)** for complete documentation of available components, usage guidelines, and design patterns.
-
-### Getting Started
-
-1. Install dependencies: `npm install`
-2. Start development: `npm run dev`
-3. Make changes following the guidelines above
-4. Commit using conventional format: `git commit -m "feat: your feature description"`
-
-### Release Please Integration
-
-- Conventional commits automatically trigger version bumps:
-  - `feat`: minor version bump
-  - `fix`: patch version bump
-  - `feat!` or `fix!` (breaking): major version bump
-- Changelog is automatically generated from commit messages
-- GitHub releases include build artifacts
+_Last Updated: January 18, 2026_

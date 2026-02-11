@@ -1,22 +1,8 @@
 {
-  "ignoreBuildCommand": "bash scripts/vercel-ignore-build.sh",
-  "build": {
-    "env": {
-      "GENERATE_SOURCEMAP": "true"
-    }
-  },
   "git": {
     "deploymentEnabled": {
       "main": true,
       "develop": true
-    }
-  },
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.12"
-    },
-    "api/**/*.go": {
-      "runtime": "go1.x"
     }
   },
   "installCommand": "npm ci",

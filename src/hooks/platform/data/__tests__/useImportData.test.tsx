@@ -1,0 +1,149 @@
+import { renderHook, act } from "@testing-library/react";
+import { useImportData } from "../useImportData";
+import { useAuth } from "../../../../hooks/auth/useAuth";
+import { useToastHelpers } from "@/utils/core/common/toastHelpers";
+import { useConfirm } from "../../../../hooks/platform/ux/useConfirm";
+import { validateImportedData } from "@/utils/data/dataManagement/validationUtils";
+import { budgetDb } from "../../../../db/budgetDb";
+import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
+import { trackImport } from "@/utils/platform/monitoring/performanceMonitor";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+// Mock dependencies with explicit factories
+vi.mock("../../../../hooks/auth/useAuth", () => ({
+  useAuth: vi.fn(),
+  default: vi.fn(),
+}));
+
+vi.mock("@/utils/core/common/toastHelpers", () => ({
+  useToastHelpers: vi.fn(),
+}));
+
+vi.mock("../../../../hooks/platform/ux/useConfirm", () => ({
+  useConfirm: vi.fn(),
+}));
+
+vi.mock("@/utils/data/dataManagement/validationUtils", () => ({
+  validateImportedData: vi.fn(),
+}));
+
+vi.mock("@/utils/platform/monitoring/performanceMonitor", () => ({
+  trackImport: vi.fn(),
+}));
+
+vi.mock("../../../../db/budgetDb", () => ({
+  budgetDb: {
+    transaction: vi.fn((type, ...args) => {
+      const cb = args[args.length - 1];
+      return cb();
+    }),
+    envelopes: { clear: vi.fn(), bulkAdd: vi.fn() },
+    transactions: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budget: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budgetCommits: { clear: vi.fn(), bulkAdd: vi.fn() },
+    budgetChanges: { clear: vi.fn(), bulkAdd: vi.fn() },
+    tables: [],
+  },
+  clearData: vi.fn(),
+}));
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
+
+describe("useImportData", () => {
+  const mockUser = { userName: "testuser", budgetId: "123" };
+  const mockData = {
+    envelopes: [{ id: "1", name: "Groceries", type: "standard" }],
+    allTransactions: [{ id: "t1", amount: -10, type: "expense" }],
+    budget: [{ id: "metadata", unassignedCash: 100 }],
+    budgetCommits: [{ hash: "abc", message: "test" }],
+    budgetChanges: [{ id: 1, commitHash: "abc", entityType: "envelope" }],
+  };
+
+  const mockShowSuccess = vi.fn();
+  const mockShowError = vi.fn();
+  const mockShowWarning = vi.fn();
+  const mockConfirm = vi.fn().mockResolvedValue(true);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    vi.mocked(useAuth).mockReturnValue({ user: mockUser } as any);
+
+    vi.mocked(useToastHelpers).mockReturnValue({
+      showSuccessToast: mockShowSuccess,
+      showErrorToast: mockShowError,
+      showWarningToast: mockShowWarning,
+    } as any);
+
+    vi.mocked(useConfirm).mockReturnValue(mockConfirm);
+
+    vi.mocked(validateImportedData).mockReturnValue({
+      validatedData: mockData,
+      hasBudgetIdMismatch: false,
+      validationWarnings: [],
+    } as any);
+
+    vi.mocked(trackImport).mockImplementation(async (fn: any) => fn());
+  });
+
+  it("should import data successfully", async () => {
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.executeImport(mockData);
+    });
+
+    const { clearData } = await import("../../../../db/budgetDb");
+    expect(clearData).toHaveBeenCalled();
+    expect(budgetDb.envelopes.bulkAdd).toHaveBeenCalledWith(mockData.envelopes);
+    expect(mockShowSuccess).toHaveBeenCalledWith("Data imported successfully");
+  });
+
+  it("should handle validation warnings", async () => {
+    vi.mocked(validateImportedData).mockReturnValue({
+      validatedData: mockData,
+      hasBudgetIdMismatch: false,
+      validationWarnings: ["Warning 1"],
+    } as any);
+
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.executeImport(mockData);
+    });
+
+    expect(mockShowWarning).toHaveBeenCalledWith(
+      expect.stringContaining("validation warning"),
+      "Import Warnings"
+    );
+  });
+
+  it("should handle errors during import", async () => {
+    const { clearData } = await import("../../../../db/budgetDb");
+    vi.mocked(clearData).mockRejectedValue(new Error("DB error"));
+
+    const { result } = renderHook(() => useImportData(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.executeImport(mockData);
+    });
+
+    expect(mockShowError).toHaveBeenCalledWith("DB error");
+  });
+});

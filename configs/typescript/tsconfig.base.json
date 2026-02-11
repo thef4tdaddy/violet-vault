@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "allowJs": false,
+    "checkJs": false,
+
+    /* Module resolution */
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type checking - strict mode enabled (0/0/0 achieved) */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+
+    /* Test types - globals loaded via vitest config */
+    "types": ["@testing-library/jest-dom"],
+
+    /* Path mapping for imports */
+    "baseUrl": "../../",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/stores/*": ["./src/stores/*"],
+      "@/types/*": ["./src/types/*"]
+    }
+  },
+  "include": ["../../src"],
+  "exclude": [
+    "../../node_modules",
+    "../../dist",
+    "../../build",
+    "../../original-app",
+    "../../**/*.test.ts",
+    "../../**/*.test.tsx",
+    "../../**/test/**"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

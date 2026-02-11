@@ -1,72 +1,100 @@
 # Changelog
 
-## [1.10.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.9.0...violet-vault-v1.10.0) (2025-09-15)
+## [2.0.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.10.0...violet-vault-v2.0.0) (2025-11-29)
 
+### 🎉 Major Release: TypeScript Conversion & Data Model Simplification
 
-### Features
+This is a major release with significant architectural improvements, type safety enhancements, and data model simplification.
 
-* add GitHub Action to sync lint tracker between branches ([b961675](https://github.com/thef4tdaddy/violet-vault/commit/b9616758382523d6a39d0d7254021ea26e2a5a06))
-* setup automated daily releases for patch versions only ([60480f9](https://github.com/thef4tdaddy/violet-vault/commit/60480f90c983333c4c48ebef772efafeb108f162))
+### ⚠️ BREAKING CHANGES
 
+#### TypeScript Conversion
+- **All code converted to TypeScript** - JavaScript files migrated to `.ts`/`.tsx`
+- **Stricter type checking** - TypeScript strict mode enabled
+- **Import paths standardized** - All imports must use `@` alias (e.g., `@/utils/foo`)
+- **No `any` types** - All types must be properly defined
 
-### Bug Fixes
+#### Data Model Simplification
+- **Savings Goals → Envelopes** - Savings goals are now envelopes with `envelopeType: "savings"`
+- **Supplemental Accounts → Envelopes** - Supplemental accounts are now envelopes with `envelopeType: "supplemental"`
+- **Simplified relationships** - Two-entity system: Envelopes and Transactions
+- **Single source of truth** - All money lives in envelopes
 
-* add disconnect button to edit envelope bill connections ([052c575](https://github.com/thef4tdaddy/violet-vault/commit/052c57595b2dfe6310d002eeebf0c7858a90633f))
-* add envelope integrity checker to detect and fix corrupted envelopes ([edb3bb2](https://github.com/thef4tdaddy/violet-vault/commit/edb3bb29d7e285f34b27d395c1d7a9e359e8402c))
-* add fallback password validation with both key derivation methods ([7e49531](https://github.com/thef4tdaddy/violet-vault/commit/7e495313f4a4c0657b5bb7ec0c2bb7027dea860c))
-* add missing lint-warnings comment template and enhance sync action ([3dcd9a7](https://github.com/thef4tdaddy/violet-vault/commit/3dcd9a79660346d991d0ac8179511c5dedb5ec22))
-* add proper EditLockIndicator with green banner and live countdown ([8dc7941](https://github.com/thef4tdaddy/violet-vault/commit/8dc7941cb355134c7442fa0c658f8d58699d12fc))
-* add temporary workaround for safety lock OperationError ([fdd37e3](https://github.com/thef4tdaddy/violet-vault/commit/fdd37e392cd7a58ccbb382ca69b6971947fca7f4))
-* add utility to repair auto-allocate undefined values ([aab29cf](https://github.com/thef4tdaddy/violet-vault/commit/aab29cf1b3bbd71bc2a67f4ab6d20557ce4962e5))
-* add visible debug info for paycheck auto-allocate in production ([5a91913](https://github.com/thef4tdaddy/violet-vault/commit/5a91913ea86c0e6c810c9266713b82b6ddf54391))
-* align password validation with deterministic key derivation ([19c9eac](https://github.com/thef4tdaddy/violet-vault/commit/19c9eac632ddffa5d43df73dcb4e9483f55a1365))
-* **ci:** hide previous automation comments in lint warnings tracker ([d5c5cf0](https://github.com/thef4tdaddy/violet-vault/commit/d5c5cf09f0f99f1e05342e02e49fe52912ce7f71))
-* **ci:** hide previous automation comments in lint warnings tracker ([2191503](https://github.com/thef4tdaddy/violet-vault/commit/219150361b3af5c3b31dd40ee72054fc1c8ff0f1))
-* clean up UI and enhance lock debugging ([740e38d](https://github.com/thef4tdaddy/violet-vault/commit/740e38df3cc44fd06b8c04f4f7a5e70b7c2a1528))
-* correct debt connection mutation parameters ([d23e281](https://github.com/thef4tdaddy/violet-vault/commit/d23e281133e35b9795a5f4529c47cab05926527a))
-* correct optimistic update data corruption in bill payments ([06fe9b8](https://github.com/thef4tdaddy/violet-vault/commit/06fe9b8d93c738bbc71e54b8698bd5fd4dc59677))
-* correct release-please to create PRs instead of issues for major/minor ([dcf7fce](https://github.com/thef4tdaddy/violet-vault/commit/dcf7fce83cb04d89f2daba64e0dca50c5abb5471))
-* correct useConnectionManager imports to use TanStack Query hooks ([c7de4d5](https://github.com/thef4tdaddy/violet-vault/commit/c7de4d5461ef50251753d3bc73e83a48778c0505))
-* correct virtual balance calculation during paycheck processing ([a404889](https://github.com/thef4tdaddy/violet-vault/commit/a40488957cf753d1eb382d384dac4e4a37d2d117))
-* correct YAML syntax in lint warnings tracker template literal ([e7c72ae](https://github.com/thef4tdaddy/violet-vault/commit/e7c72ae1d229e71107b57c26ffbf511250cc1b18))
-* correct YAML syntax in sync workflow commit message ([5cc1747](https://github.com/thef4tdaddy/violet-vault/commit/5cc17473af70445b089a1e53f8a04bfc6ae4ea64))
-* correct YAML syntax in sync workflow commit message ([2968a85](https://github.com/thef4tdaddy/violet-vault/commit/2968a850903f3fe5260ed9e7d9f1dfdd66b74cb1))
-* critical safety lock validation - missing IV parameter in decrypt calls ([682526d](https://github.com/thef4tdaddy/violet-vault/commit/682526ddf33ba4ab79a318f8c2b2526595ec5f72))
-* enhance bug report tool and paycheck form UX ([4b72d0e](https://github.com/thef4tdaddy/violet-vault/commit/4b72d0e7baac27217ea99f6c4b4ec0b57568badd))
-* enhance UI consistency and logging for purple-themed modals ([8b59e75](https://github.com/thef4tdaddy/violet-vault/commit/8b59e7515de7e31285e06b71e8b6dacd8e5cf902))
-* improve bill connection UI and remove debug panel ([c1633f5](https://github.com/thef4tdaddy/violet-vault/commit/c1633f5c7f835e205ee4471aacd553ccb8803278))
-* limit GitHub Actions prettier/lint to hourly cron runs ([4a9b62d](https://github.com/thef4tdaddy/violet-vault/commit/4a9b62d8e147bb9a36612b70bcdc34a10583db00))
-* prevent PaycheckProcessor form reset when adding new person ([881bfc1](https://github.com/thef4tdaddy/violet-vault/commit/881bfc13a5a02532696278f01a5651443dd55429))
-* rebase develop with main branch fixes ([#548](https://github.com/thef4tdaddy/violet-vault/issues/548)) ([bb3ed4b](https://github.com/thef4tdaddy/violet-vault/commit/bb3ed4bc65be8e0346d55dc3378f5df924c44d78))
-* remove debug logging - confirmed envelope data issue resolved ([2638871](https://github.com/thef4tdaddy/violet-vault/commit/26388713c5788ff1041fb4d899689002be59e429))
-* remove duplicate connection displays and improve modal scrolling ([610b03c](https://github.com/thef4tdaddy/violet-vault/commit/610b03c4af56e959d4628080e607ef4bfba10f34))
-* remove exit 1 from lint warnings workflow threshold check ([c98b4b2](https://github.com/thef4tdaddy/violet-vault/commit/c98b4b2e670980174da0a8c2f9f04d2b988916cc))
-* replace lint warnings tracker with complete version from develop branch ([4960f4d](https://github.com/thef4tdaddy/violet-vault/commit/4960f4dbb24d84075d73da64cd60ad4e70499b5c))
-* resolve auto-lock password validation failing with empty error ([5ca8153](https://github.com/thef4tdaddy/violet-vault/commit/5ca81531c120750d3f6a39c7f6c09ff1bbc2cc81))
-* resolve bill payment UI corruption and envelope integrity issues ([a631532](https://github.com/thef4tdaddy/violet-vault/commit/a63153264e3d221de2f378588ae688f05077f7cf))
-* resolve critical production bugs - white screen error and paycheck form UX ([8e2426d](https://github.com/thef4tdaddy/violet-vault/commit/8e2426d9ec00d4e59c2ab7e1e74d664d9702e0ed))
-* resolve critical production issues with password validation and Firebase permissions ([f28d971](https://github.com/thef4tdaddy/violet-vault/commit/f28d971d2a12cfd47389f734500cbaae5ce2e49d))
-* resolve edit lock and auto-allocate issues comprehensively ([066bf20](https://github.com/thef4tdaddy/violet-vault/commit/066bf2005e73f4133e0db06472123c9815f39d07))
-* resolve edit lock countdown timer and self-locking issues ([be1d44f](https://github.com/thef4tdaddy/violet-vault/commit/be1d44fcb157a3f8bf8f6b5510a5a791b4bb9af8))
-* resolve edit lock ownership detection with consistent user ID generation ([dee6f0c](https://github.com/thef4tdaddy/violet-vault/commit/dee6f0cb728ebd0e5819faa8bc9c84139ea153ca))
-* resolve footer date and paycheck processor issues (Issue [#459](https://github.com/thef4tdaddy/violet-vault/issues/459)) ([058a85b](https://github.com/thef4tdaddy/violet-vault/commit/058a85b757a9680a4a77bfb591a9de9b282d9da4))
-* resolve merge conflict in PaycheckProcessor debug logging ([ace4605](https://github.com/thef4tdaddy/violet-vault/commit/ace4605ecd613d7043803536f6d317bd92688554))
-* resolve merge conflict in ViewRenderer ([d2531cf](https://github.com/thef4tdaddy/violet-vault/commit/d2531cfc6252e42a48a61ac30bab13986ddcfd00))
-* resolve PaycheckProcessor envelope data issue ([c8f39a6](https://github.com/thef4tdaddy/violet-vault/commit/c8f39a6a7e72254083b959c462c14ac8b171adea))
-* resolve setSelectedBillId reference error in EditEnvelopeModal ([8f6d98c](https://github.com/thef4tdaddy/violet-vault/commit/8f6d98c4b2117c589d1b42252aba6148f9e610b1))
-* resolve YAML syntax error in lint warnings tracker workflow ([d0d95bb](https://github.com/thef4tdaddy/violet-vault/commit/d0d95bb9608627a2b7141376acbf52cbfc2d8e22))
-* resolve YAML syntax error in sync-lint-tracker workflow ([286e3e3](https://github.com/thef4tdaddy/violet-vault/commit/286e3e3e990fb1182b1fef382cb0415d54b7e7b4))
-* sync workflow git diff check for staged changes ([5018a09](https://github.com/thef4tdaddy/violet-vault/commit/5018a09cb9d4c37bbfed5334509bb57a41e42240))
-* update lint tracking schedule and add lock debugging ([9d60b88](https://github.com/thef4tdaddy/violet-vault/commit/9d60b88a1420c5569ba793a7d55b438a8637b373))
-* update sync-lint-tracker workflow to resolve validation errors ([b0940ce](https://github.com/thef4tdaddy/violet-vault/commit/b0940cea189dbc1c739531d6e3762255b38ec796))
-* use correct savingsGoalsQuery variable name ([5bc486a](https://github.com/thef4tdaddy/violet-vault/commit/5bc486a288dd9f211919987f54dadbc34ccf8ab2))
-* **workflow:** improve lint tracker delta calculation reliability ([4c5ba06](https://github.com/thef4tdaddy/violet-vault/commit/4c5ba069ce03dc18346a3ac65a00387e5917ec1f))
+#### Auth Architecture
+- **React Context for auth** - Auth state moved from Zustand to React Context
+- **TanStack Query for auth operations** - Auth mutations/queries use TanStack Query
+- **Zustand for UI only** - Zustand now only used for UI state (modals, forms)
 
+#### Validation Changes
+- **Zod schema validation** - All data validated with Zod schemas
+- **Stricter validation** - Invalid data will be rejected
+- **Runtime type checking** - Type safety at runtime
 
-### Code Refactoring
+### ✨ Features
 
-* implement universal connection management system ([819a2b0](https://github.com/thef4tdaddy/violet-vault/commit/819a2b0b2274f2f66b5426620c5efa5e0a1bca8a))
-* move bill connection UI to shared component ([b90ea8c](https://github.com/thef4tdaddy/violet-vault/commit/b90ea8cdd91c292742940680375d0e5a6ee009cd))
+#### Type Safety & Developer Experience
+- Full TypeScript coverage across entire codebase
+- Comprehensive Zod schema validation for all data
+- Better IDE autocomplete and error detection
+- Improved code organization and architecture patterns
+
+#### Data Validation
+- All forms validate with Zod schemas
+- Better error messages and validation feedback
+- Consistent validation patterns across the app
+- Type-safe data operations
+
+#### Performance & Monitoring
+- Sentry integration for error tracking
+- Performance monitoring for critical operations
+- Release tracking for better debugging
+- Pre-release versioning for develop branch
+
+#### Testing & Quality
+- Comprehensive CRUD validation tests
+- Enhanced test coverage for transactions, bills, and debts
+- Improved test utilities and factories
+- Better error handling and edge case coverage
+
+### 🔧 Improvements
+
+- Enhanced error handling with global error boundaries
+- Improved build optimizations (Gzip/Brotli compression, code splitting)
+- Better code splitting for Firebase, charts, and UI libraries
+- Optimized bundle size and load performance
+- Improved transaction table UI (fixed button overlap issues)
+
+### 📚 Documentation
+
+- Created comprehensive v2.0 migration guide
+- Updated architecture documentation
+- Enhanced developer onboarding guides
+- Improved API documentation
+
+### 🐛 Bug Fixes
+
+- Fixed validation errors in envelope and transaction forms
+- Resolved `TypeError: Cannot read properties of undefined` in validation helpers
+- Fixed transaction table button overlap on desktop
+- Improved error handling for Zod validation failures
+- Fixed React 19 compatibility issues with recharts
+
+### 🔄 Migration
+
+**Automatic migration**: Your data will be automatically migrated on first load. No manual steps required.
+
+**For detailed migration instructions**, see [v2.0 Migration Guide](./migration/v2.0-migration-guide.md).
+
+### 📦 Dependencies
+
+- Updated to React 19
+- Updated to TypeScript 5.9
+- Updated to Vite 7
+- Updated to TanStack Query 5
+- Updated to Tailwind CSS 4
+- Updated to Zustand 5
+
+---
 
 ## [1.9.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.8.0...violet-vault-v1.9.0) (2025-08-27)
 

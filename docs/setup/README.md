@@ -8,6 +8,7 @@ This directory contains setup and installation documentation for VioletVault.
 
 - **`Firebase-Setup-Guide.md`** - Complete Firebase project setup
 - **`Firebase-Auth-Domain-Setup.md`** - Firebase authentication domain configuration
+- **`Firebase-Cloud-Messaging-Setup.md`** - FCM push notifications setup and VAPID key configuration
 - **`FIREBASE_RULES_UPDATE.md`** - Firebase security rules configuration
 
 ### **Development Setup**

@@ -1,46 +1,46 @@
-set -u
 
-# Get staged files (added/changed/moved)
-STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACM)"
+echo "🛡️  VioletVault Pre-commit Quality Gate"
 
-# Nothing staged? exit successfully
-if [ -z "$STAGED_FILES" ]; then
-  echo "✅ No files staged for commit, skipping hooks"
-  exit 0
+# 1. Run lint-staged for fast, file-level formatting and linting
+echo "🔍 Running lint-staged..."
+npx lint-staged || exit 1
+
+# 2. Check for recent Full Salvo run (last 10 minutes)
+# Bypass if only non-core files (infra/docs) are staged
+if git diff --cached --name-only | grep -E '^(api/|src/|configs/|scripts/|tsconfig\.json|vitest\.config\.ts)' > /dev/null; then
+    SALVO_TOKEN=".git/FULL_SALVO_SUCCESS"
+    if [ -f "$SALVO_TOKEN" ]; then
+        # Get file modification time
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            LAST_RUN=$(stat -f %m "$SALVO_TOKEN")
+        else
+            LAST_RUN=$(stat -c %Y "$SALVO_TOKEN" 2>/dev/null || date +%s)
+        fi
+        
+        NOW=$(date +%s)
+        DIFF=$((NOW - LAST_RUN))
+        
+        if [ $DIFF -gt 600 ]; then
+            echo "❌ Full Salvo outdated (last run: ${DIFF}s ago)."
+            echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
+            exit 1
+        else
+            echo "✅ Full Salvo verified (${DIFF}s ago)."
+        fi
+    else
+        echo "❌ Full Salvo never run."
+        echo "Please run './scripts/full_salvo.sh' to verify project integrity before committing."
+        exit 1
+    fi
+else
+    echo "ℹ️  Non-core changes detected (infra/docs). Bypassing Full Salvo requirement."
 fi
 
-# If all staged files are docs/config only, skip linting
-# (matches: docs/, any .md, README.md, CHANGELOG.md, LICENSE, .husky/)
-DOCS_ONLY_PATTERNS='^\(docs/\|README\.md$\|.*\.md$\|CHANGELOG\.md$\|LICENSE$\|\.husky/\)'
-NON_DOCS="$(printf '%s\n' "$STAGED_FILES" | grep -Ev "$DOCS_ONLY_PATTERNS" || true)"
 
-if [ -z "$NON_DOCS" ]; then
-  echo "📝 Documentation-only commit detected, skipping ESLint"
-  printf '📄 Files:\n%s\n' "$STAGED_FILES"
-  exit 0
-fi
 
-# Collect JS/TS files to lint
-CODE_FILES="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx)$' || true)"
+# 4. Auto-bump beta version
+echo "🔖 Auto-bumping beta version..."
+npm version prerelease --preid=beta --no-git-tag-version
+git add package.json
 
-if [ -z "$CODE_FILES" ]; then
-  echo "✅ No JS/TS files staged for commit, skipping ESLint"
-  exit 0
-fi
-
-echo "🔍 Running ESLint on staged files..."
-printf 'Linting:\n%s\n' "$CODE_FILES"
-
-# Run ESLint on just the staged JS/TS files
-# (xargs handles spaces/newlines safely)
-printf '%s\n' "$CODE_FILES" | xargs npx eslint --config ./configs/eslint.config.js --max-warnings 500 --
-ESLINT_STATUS=$?
-
-if [ $ESLINT_STATUS -ne 0 ]; then
-  echo "❌ ESLint found issues in staged files"
-  echo "💡 Run 'npm run lint:fix' to auto-fix issues, then re-stage files"
-  exit 1
-fi
-
-echo "✅ ESLint passed for staged files"
-exit 0
+echo "✅ Quality checks passed! Proceeding with commit."

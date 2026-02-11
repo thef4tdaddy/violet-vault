@@ -222,7 +222,7 @@ jobs:
     outputs:
       should-auto-deploy: ${{ steps.check.outputs.should-auto-deploy }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -274,7 +274,7 @@ jobs:
       (needs.develop-prerelease.outputs.release_created == 'true')
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

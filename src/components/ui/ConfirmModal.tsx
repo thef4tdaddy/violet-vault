@@ -1,0 +1,281 @@
+import React, { useEffect, useRef, ComponentType } from "react";
+import { getIcon } from "@/utils";
+import { useTouchFeedback } from "@/utils/ui/feedback/touchFeedback";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useModalAutoScroll } from "@/hooks/platform/ux/useModalAutoScroll";
+
+type IconComponentType = ComponentType<{ className?: string }>;
+
+/**
+ * Get appropriate icon for modal type
+ */
+const getModalIcon = (icon: unknown, destructive: boolean): IconComponentType => {
+  if (icon && typeof icon === "function") return icon as IconComponentType;
+  if (destructive) return getIcon("Trash2") as IconComponentType;
+  return getIcon("AlertTriangle") as IconComponentType;
+};
+
+/**
+ * Get color scheme for modal buttons
+ */
+const getColorScheme = (destructive: boolean) => {
+  return destructive
+    ? {
+        iconBg: "bg-red-100",
+        iconColor: "text-red-600",
+        confirmBtn: "bg-red-600 hover:bg-red-700 focus:ring-red-500",
+        confirmBtnDisabled: "bg-red-300",
+      }
+    : {
+        iconBg: "bg-blue-100",
+        iconColor: "text-blue-600",
+        confirmBtn: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
+        confirmBtnDisabled: "bg-blue-300",
+      };
+};
+
+/**
+ * Modal header component
+ */
+const ModalHeader = ({
+  icon,
+  destructive,
+  title,
+}: {
+  icon: unknown;
+  destructive: boolean;
+  title: string;
+}) => {
+  const Icon = getModalIcon(icon, destructive);
+  const colorScheme = getColorScheme(destructive);
+
+  return (
+    <div className="flex items-center mb-4">
+      <div
+        className={`w-12 h-12 ${colorScheme.iconBg} rounded-full flex items-center justify-center mr-4`}
+      >
+        {React.createElement(Icon, {
+          className: `h-6 w-6 ${colorScheme.iconColor}`,
+        })}
+      </div>
+      <div className="flex-1">
+        <h3 id="confirm-modal-title" className="font-black text-black text-base">
+          {title}
+        </h3>
+        {destructive && <p className="text-sm text-red-600">This action cannot be undone</p>}
+      </div>
+    </div>
+  );
+};
+
+interface ModalActionsProps {
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
+  cancelLabel: string;
+  confirmLabel: string;
+  destructive: boolean;
+  isLoading: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+/**
+ * Modal action buttons component
+ */
+const ModalActions = ({
+  cancelButtonRef,
+  confirmButtonRef,
+  cancelLabel,
+  confirmLabel,
+  destructive,
+  isLoading,
+  onCancel,
+  onConfirm,
+}: ModalActionsProps) => {
+  const colorScheme = getColorScheme(destructive);
+  const cancelTouchFeedback = useTouchFeedback("tap", "secondary");
+  const confirmTouchFeedback = useTouchFeedback(
+    destructive ? "warning" : "confirm",
+    destructive ? "destructive" : "success"
+  );
+
+  return (
+    <div className="flex gap-3 justify-end">
+      <button
+        ref={cancelButtonRef}
+        type="button"
+        onClick={cancelTouchFeedback.onClick(onCancel)}
+        onTouchStart={cancelTouchFeedback.onTouchStart}
+        disabled={isLoading}
+        className={`px-4 py-2 text-gray-700 border-2 border-black rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${cancelTouchFeedback.className}`}
+      >
+        {cancelLabel}
+      </button>
+      <button
+        ref={confirmButtonRef}
+        type="button"
+        onClick={confirmTouchFeedback.onClick(onConfirm)}
+        onTouchStart={confirmTouchFeedback.onTouchStart}
+        disabled={isLoading}
+        className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed ${confirmTouchFeedback.className} ${
+          isLoading ? colorScheme.confirmBtnDisabled : `${colorScheme.confirmBtn}`
+        }`}
+      >
+        {isLoading ? (
+          <div className="flex items-center">
+            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+            Processing...
+          </div>
+        ) : (
+          confirmLabel
+        )}
+      </button>
+    </div>
+  );
+};
+
+interface KeyboardHandlingProps {
+  isOpen: boolean;
+  isLoading: boolean;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  cancelButtonRef: React.RefObject<HTMLButtonElement | null>;
+  confirmButtonRef: React.RefObject<HTMLButtonElement | null>;
+}
+
+/**
+ * Custom hook for keyboard handling
+ */
+const useKeyboardHandling = ({
+  isOpen,
+  isLoading,
+  onCancel,
+  onConfirm,
+  cancelButtonRef,
+  confirmButtonRef,
+}: KeyboardHandlingProps) => {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isLoading) {
+        onCancel?.();
+      }
+      if (e.key === "Enter" && e.target === cancelButtonRef.current) {
+        onCancel?.();
+      }
+      if (e.key === "Enter" && e.target === confirmButtonRef.current) {
+        onConfirm?.();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isLoading, onCancel, onConfirm, cancelButtonRef, confirmButtonRef]);
+};
+
+interface ConfirmModalProps {
+  isOpen?: boolean;
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  destructive?: boolean;
+  isLoading?: boolean;
+  icon?: React.ComponentType<{ className?: string }> | null;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  children?: React.ReactNode;
+}
+
+/**
+ * Reusable ConfirmModal Component
+ * Replaces window.confirm() with a custom modal for better UX and accessibility
+ *
+ * Part of Epic #501 - Replace Browser Dialogs with Modals & Standardize Notifications to Toasts
+ * Addresses Issue #502 - Replace Confirms with ConfirmModal
+ * Enhanced with Issue #159 - Touch Feedback and Animations
+ */
+const ConfirmModal = ({
+  isOpen = false,
+  title = "Confirm Action",
+  message = "Are you sure you want to continue?",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  destructive = false,
+  isLoading = false,
+  icon = null,
+  onConfirm,
+  onCancel,
+  children,
+}: ConfirmModalProps) => {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useModalAutoScroll(isOpen);
+
+  // Focus management - focus cancel button by default for safety
+  useEffect(() => {
+    if (isOpen && cancelButtonRef.current) {
+      cancelButtonRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Keyboard handling
+  useKeyboardHandling({
+    isOpen,
+    isLoading,
+    onCancel: onCancel || (() => {}),
+    onConfirm: onConfirm || (() => {}),
+    cancelButtonRef,
+    confirmButtonRef,
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-10000 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-modal-title"
+      aria-describedby="confirm-modal-description"
+    >
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl w-full max-w-md shadow-2xl border-2 border-black my-auto"
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            {/* Header */}
+            <div className="flex-1">
+              <ModalHeader icon={icon} destructive={destructive} title={title} />
+            </div>
+            <ModalCloseButton onClick={onCancel || (() => {})} />
+          </div>
+
+          {/* Content */}
+          <div className="mb-6">
+            <p id="confirm-modal-description" className="text-gray-700 mb-4">
+              {message}
+            </p>
+            {children}
+          </div>
+
+          {/* Actions */}
+          <ModalActions
+            cancelButtonRef={cancelButtonRef}
+            confirmButtonRef={confirmButtonRef}
+            cancelLabel={cancelLabel}
+            confirmLabel={confirmLabel}
+            destructive={destructive}
+            isLoading={isLoading}
+            onCancel={onCancel || (() => {})}
+            onConfirm={onConfirm || (() => {})}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConfirmModal;

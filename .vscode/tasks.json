@@ -2,349 +2,53 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🎨 Format Code",
+      "label": "TypeScript: Check All Files",
       "type": "shell",
-      "command": "npm",
-      "args": ["run", "format"],
-      "group": "build",
+      "command": "npm run typecheck",
+      "problemMatcher": "$tsc",
       "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
+        "reveal": "never",
+        "panel": "dedicated",
+        "showReuseMessage": false
       },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔍 Lint Code",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "lint"],
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$eslint-stylish"]
-    },
-    {
-      "label": "🔧 Lint Fix",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "lint:fix"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$eslint-stylish"]
-    },
-    {
-      "label": "🔨 Build",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "build"],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": ["$tsc"]
-    },
-    {
-      "label": "🚀 Dev Server",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "dev"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "vite",
-        "fileLocation": "relative",
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "message": 5
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "\\s*vite",
-          "endsPattern": "Local:\\s+http://localhost:\\d+"
-        }
-      }
-    },
-    {
-      "label": "👀 Preview Build",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "preview"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "dependsOn": "🔨 Build",
-      "isBackground": true
-    },
-    {
-      "label": "🧹 Clean Build",
-      "type": "shell",
-      "command": "rm",
-      "args": ["-rf", "dist"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🌿 Create Branch",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/create-branch.sh",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔄 Rebase Branch",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/rebase-super-script",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧹 Clean Branches",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/clean-branches",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧪 Deploy Staging",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/deploy-staging.sh",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🚀 Deploy Production",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/deploy-production.sh",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "💾 Backup Data",
-      "type": "shell",
-      "command": "node",
-      "args": ["${workspaceFolder}/scripts/backup-data.js"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🎯 Deploy Manager",
-      "type": "shell",
-      "command": "node",
-      "args": [
-        "${workspaceFolder}/scripts/deploy.js",
-        "${input:deployEnvironment}"
-      ],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🔄 Rollback Manager",
-      "type": "shell",
-      "command": "node",
-      "args": [
-        "${workspaceFolder}/scripts/rollback.js",
-        "${input:rollbackTarget}"
-      ],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "📋 Git Status",
-      "type": "shell",
-      "command": "git",
-      "args": ["status", "--short"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🌳 Git Branch Info",
-      "type": "shell",
-      "command": "git",
-      "args": ["branch", "-vv"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "📊 Git Log",
-      "type": "shell",
-      "command": "git",
-      "args": ["log", "--oneline", "-10"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "✨ Format & Lint",
-      "dependsOrder": "sequence",
-      "dependsOn": ["🎨 Format Code", "🔍 Lint Code"],
       "group": {
         "kind": "build",
         "isDefault": false
+      }
+    },
+    {
+      "label": "ESLint: Check All Files",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": "$eslint-stylish",
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated",
+        "showReuseMessage": false
       },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🚢 Full Deploy Staging",
-      "dependsOrder": "sequence",
-      "dependsOn": ["✨ Format & Lint", "🔨 Build", "🧪 Deploy Staging"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "🎯 Full Deploy Production",
-      "dependsOrder": "sequence",
-      "dependsOn": ["✨ Format & Lint", "🔨 Build", "🚀 Deploy Production"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "🔧 Pre-commit Checks",
-      "dependsOrder": "sequence",
-      "dependsOn": ["🎨 Format Code", "🔧 Lint Fix", "🔨 Build"],
       "group": {
         "kind": "test",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "isDefault": false
       }
-    }
-  ],
-  "inputs": [
-    {
-      "id": "deployEnvironment",
-      "description": "Deployment Environment",
-      "type": "pickString",
-      "options": ["development", "staging", "production"],
-      "default": "staging"
     },
     {
-      "id": "rollbackTarget",
-      "description": "Rollback Target",
-      "type": "pickString",
-      "options": ["commit", "tag", "backup"],
-      "default": "commit"
+      "label": "Check All (TypeScript + ESLint)",
+      "dependsOn": ["TypeScript: Check All Files", "ESLint: Check All Files"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "TypeScript: Restart TS Server",
+      "type": "shell",
+      "command": "echo 'Restart TypeScript server by running: Command Palette → TypeScript: Restart TS Server'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
     }
   ]
 }

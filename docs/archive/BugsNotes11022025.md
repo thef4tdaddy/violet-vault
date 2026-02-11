@@ -1,0 +1,117 @@
+# VioletVault - Testing Feedback
+
+- **Date:** 11/2/2025
+- **Device:** iPad mini
+
+---
+
+## Onboarding
+
+- [x] **Security Warning:** Condense the first-load security warning to fit on a single, non-scrollable page.
+
+## Envelope
+
+- [x] **Layout (Mobile):** Stack "Smart suggestion" and "auto funding" elements vertically on mobile screens, as they currently don't fit. _(Fixed: 53894d3c)_
+
+## Savings
+
+- [x] **Bug:** Add the summary cards for savings goals back to the page (they were removed during a duplicate cleanup). _(Fixed: 53894d3c)_
+- [x] **Theme:** Update the Savings page to the new, standardized color scheme.
+
+## Debts
+
+- [x] **Tabs:**
+  - [x] Remove the white background from the tabs.
+  - [x] Place a hard border _below_ the tabs (above the main content area) to make them look like physical tabs.
+- [x] **"Your Debt" Section:**
+  - [x] Add a hard black border around this section.
+  - [x] Fix the letter-spacing in the "Your Debt" header.
+- [x] **Buttons:** Change the "Filters" and "Sorting" expansion buttons to the light purple color.
+
+## Transactions
+
+- [x] **Header:**
+  - [x] Increase the size of the transaction ledger header.
+  - [x] Adjust header spacing.
+  - [x] **Task:** Define and apply a standard header size across all pages for consistency.
+    - **Standard:** `font-black text-black text-xl flex items-center tracking-wide` with `StylizedButtonText firstLetterClassName="text-2xl" restClassName="text-xl"` - already applied to all 5 major pages.
+- [x] **Filters:** Implement the expandable filter UI from the "Debts" page.
+- [x] **Buttons (Mobile):** Address button text visibility on smaller screens.
+- [x] **Button Layout:**
+  - [x] Move "Import File" and "Add Transaction" buttons to be right-justified.
+  - [x] Layout (Large Screen): Place buttons side-by-side.
+  - [x] Layout (Small Screen): Stack buttons vertically.
+
+## Bill Manager
+
+- [x] **Header:** Update the header text and icon.
+- [x] **Filters:** Implement the standard collapsible filter UI.
+  - **Note:** Already implemented via `StandardFilters` component in `BillViewTabs.tsx`.
+- [x] **Task:** Investigate the purpose of the blue dot in the second section.
+  - **Answer:** The "blue dot" is the select-all checkbox icon (CheckSquare) in the table header that appears blue when bills are selected. It's functional - indicates selection state for bulk operations.
+- [x] **Bug:** Remove debug info from empty state (or make it development-only).
+
+## Paycheck Processor
+
+- [x] **Header:** Move the "Add Paycheck" header outside of the main white content area.
+- [x] **Header:** Spread out the text of the header (adjust letter-spacing or padding).
+
+## Analytics
+
+- [x] **Header:** Update the header text.
+- [x] **Text:** Update the subtext to use the standardized text style.
+- [x] **Layout:** Add the standard white sub-section area.
+- [x] **Export Button:** Update the "Export" button to use the standard button style.
+- [x] **Filters:** Convert the "Last Month / Filter" UI into the standardized expandable filter.
+
+## Header (App-wide)
+
+- [x] **"Sync Healthy" Button:**
+  - [x] **Task:** Re-evaluate the header menu structure, as this button's behavior (opening Security Settings) is confusing.
+  - [x] **Suggestion:** Move the green sync status dot to be a permanent part of the header.
+  - [x] **Suggestion:** Remove the "Sync Healthy" button and merge its options into the main "Settings" menu.
+  - **Implementation:** Made sync indicator passive (non-clickable) status display. Sync tools available in Settings → Dev Tools.
+- [x] **Profile Dropdown (Bug):** Fix the z-index so the dropdown appears _in front_ of the main navigation menu.
+- [x] **Profile Dropdown (Bug):** Fix the positioning so the modal appears in the center of the screen, not in the header.
+
+## Summary Cards
+
+- [x] **Sizing:** Fix inconsistent sizing between cards ("Total Cash" & "Unassigned Cash" vs. "Savings Total" & "Biweekly").
+- [x] **Text Layout:** Move the "Click to distribute" text to its own line/row on both cards.
+- [x] **Task:** Investigate and verify the calculation being used for the "Total Allocation" value.
+  - **Verified:** Shows `envelopeSummary.totalBiweeklyNeed` calculated from `calculateEnvelopeTotals()` - sums all envelope biweekly allocations (bills + variable budgets). Calculation is correct.
+
+## Settings Menu
+
+- [x] **Modal:** Remove the extra grey border around the outside of the modal.
+- [x] **Buttons:**
+  - [x] Change sub-menu buttons from grey to light purple for better visibility.
+  - [x] Standardize the "Close" (X) button (e.g., make it red for a "close" action).
+
+- [x] **General Settings:**
+  - [x] Change the "Cloud Sync" button text from faded to a dark color.
+  - [x] **Bug:** Fix the sync status switch where the "On" text appears outside the switch boundary.
+
+- [x] **Account Settings:**
+  - [x] **Suggestion:** Move "Profile Settings" into this section.
+  - [x] Standardize all buttons in this section (uniform size, black border, non-grey text).
+
+- [x] **Security Settings:**
+  - [x] **Task:** Merge settings from the "Sync Healthy" button's menu here.
+    - **Implementation:** Sync debug tools moved to Dev Tools section (already done in previous commit).
+  - [x] **Bug:** Fix the "Local Data Security" button modal (it flashes and disappears instantly).
+  - [x] Standardize all buttons in this section.
+
+- [x] **Data:**
+  - [x] Standardize all buttons in this section.
+  - [x] **Suggestion:** Remove the "Dev Tools" button (it's redundant with the main "Dev Tools" menu).
+
+- [x] **Notifications:**
+  - [x] **Task:** Add a notice stating that notifications are not yet implemented.
+  - [x] **Bug:** Fix the "Advanced Debug Info" button (it leads to a blank white screen).
+
+- [x] **Dev Tools:**
+  - [x] **Task:** Ensure this menu is _not_ available in production builds (unless an admin mode is active).
+  - [x] **Task:** Ensure this menu _is_ available in development builds.
+  - [x] Standardize all buttons in this section.
+  - **Note:** Already implemented via `isDevelopmentMode()` check in `useSettingsSections` hook.

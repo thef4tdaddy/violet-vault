@@ -8,12 +8,12 @@
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
 const DEV_AUTH_SECRET = process.env.DEV_AUTH_SECRET;
 
 if (!DEV_AUTH_SECRET) {
-  console.error('❌ DEV_AUTH_SECRET environment variable is required');
+  console.error("❌ DEV_AUTH_SECRET environment variable is required");
   process.exit(1);
 }
 
@@ -24,11 +24,7 @@ const generateToken = (secret) => {
   const payload = `dev-auth-${timestamp}`;
 
   // Create a simple hash-based token
-  const hash = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex')
-    .substring(0, 32); // Truncate to 32 chars for simplicity
+  const hash = crypto.createHmac("sha256", secret).update(payload).digest("hex").substring(0, 32); // Truncate to 32 chars for simplicity
 
   return `${timestamp}.${hash}`;
 };
@@ -36,12 +32,12 @@ const generateToken = (secret) => {
 try {
   const token = generateToken(DEV_AUTH_SECRET);
 
-  console.log('🔗 Token:');
+  console.log("🔗 Token:");
   console.log(token);
 
   // Exit successfully
   process.exit(0);
 } catch (error) {
-  console.error('❌ Error generating token:', error.message);
+  console.error("❌ Error generating token:", error.message);
   process.exit(1);
 }

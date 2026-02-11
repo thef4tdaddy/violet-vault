@@ -1,0 +1,162 @@
+import React from "react";
+import { getStatusStyle } from "@/utils/domain/budgeting";
+import { getButtonClasses } from "@/utils/ui/feedback/touchFeedback";
+import { useEnvelopeSwipeGestures } from "@/hooks/platform/mobile/useEnvelopeSwipeGestures";
+import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";
+import EnvelopeActivitySummary from "./EnvelopeActivitySummary";
+import { useEnvelopeDisplayData } from "./hooks/useEnvelopeDisplayData";
+import { EnvelopeStatusBadge } from "./EnvelopeStatusBadge";
+import { EnvelopeFinancialSummary } from "./EnvelopeFinancialSummary";
+import { EnvelopeProgressBar } from "./EnvelopeProgressBar";
+import { EnvelopeHeader } from "./EnvelopeHeader";
+import { BillEnvelopeStatus } from "./BillEnvelopeStatus";
+import type { Envelope as DbEnvelope, Bill as DbBill } from "@/db/types";
+
+type Envelope = DbEnvelope & {
+  color?: string;
+  status: string;
+  utilizationRate: number;
+  available: number;
+};
+
+type Bill = DbBill;
+
+interface EnvelopeItemProps {
+  envelope: Envelope;
+  onSelect?: (envelopeId: string) => void;
+  onEdit?: (envelope: Envelope) => void;
+  onViewHistory?: (envelope: Envelope) => void;
+  onQuickFund?: (envelopeId: string) => void;
+  isSelected?: boolean;
+  bills?: Bill[];
+  unassignedCash?: number;
+  viewMode?: string; // "overview" or "detailed"
+}
+
+/**
+ * Envelope item component - memoized to prevent unnecessary re-renders
+ * Only re-renders when envelope data or selection state changes
+ */
+const EnvelopeItem: React.FC<EnvelopeItemProps> = React.memo(
+  ({
+    envelope,
+    onSelect,
+    onEdit,
+    onViewHistory,
+    onQuickFund,
+    isSelected = false,
+    bills = [],
+    unassignedCash = 0,
+    viewMode = "overview",
+  }) => {
+    // viewMode controls display: overview = simplified/collapsed, detailed = full/expanded
+    const isCollapsed = viewMode === "overview";
+
+    // Enhanced swipe gesture handling
+    const { swipeState, swipeHandlers, swipeStyles } = useEnvelopeSwipeGestures({
+      envelopeId: envelope.id,
+      unassignedCash,
+      onQuickFund,
+      onViewHistory: onViewHistory ? (_envelopeId: string) => onViewHistory(envelope) : undefined,
+    });
+
+    // Extract all display data logic
+    const {
+      statusIcon,
+      utilizationColorClass,
+      financialSummary,
+      showProgressBar,
+      progressBarColor,
+    } = useEnvelopeDisplayData(envelope, bills);
+
+    return (
+      <div
+        {...swipeHandlers}
+        onClick={(e) => {
+          // Prevent click if clicking swipe actions or buttons
+          if (
+            (e.target as HTMLElement).closest("button") ||
+            (e.target as HTMLElement).closest(".swipe-action")
+          ) {
+            return;
+          }
+          onSelect?.(envelope.id);
+        }}
+        className={getButtonClasses(
+          `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope as never)} ${
+            isSelected ? "ring-2 ring-purple-500" : ""
+          } ${swipeState.isSwipeActive ? "select-none" : ""}`,
+          "card"
+        )}
+        style={swipeStyles}
+      >
+        {/* Header - Always visible */}
+        <EnvelopeHeader
+          envelope={envelope}
+          isCollapsed={isCollapsed}
+          onSelect={onSelect}
+          // Hide action buttons in overview mode
+          onEdit={
+            isCollapsed
+              ? undefined
+              : (onEdit as
+                  | ((envelope: {
+                      id: string;
+                      name: string;
+                      category: string;
+                      color?: string;
+                    }) => void)
+                  | undefined)
+          }
+          onViewHistory={
+            isCollapsed
+              ? undefined
+              : (onViewHistory as
+                  | ((envelope: {
+                      id: string;
+                      name: string;
+                      category: string;
+                      color?: string;
+                    }) => void)
+                  | undefined)
+          }
+          onToggleCollapse={() => {}} // Disabled when viewMode controls collapse
+        />
+
+        <div className="flex items-center gap-2 ml-4">
+          <EnvelopeStatusBadge
+            status={envelope.status}
+            utilizationRate={envelope.utilizationRate}
+            statusIcon={statusIcon}
+            utilizationColorClass={utilizationColorClass}
+          />
+        </div>
+
+        {/* Collapsible Content - Controlled by viewMode */}
+        <div className={`${isCollapsed ? "hidden" : "block"}`}>
+          <EnvelopeFinancialSummary financialSummary={financialSummary} />
+
+          {/* Activity Summary - Different display for Variable vs Bill envelopes */}
+          <EnvelopeActivitySummary envelope={envelope} />
+
+          <BillEnvelopeStatus envelope={envelope} bills={bills} />
+
+          {/* Progress Bar */}
+          {showProgressBar && (
+            <EnvelopeProgressBar
+              utilizationRate={envelope.utilizationRate}
+              progressBarColor={progressBarColor}
+            />
+          )}
+        </div>
+
+        {/* Enhanced Swipe Indicator Overlays */}
+        <SwipeIndicatorOverlay swipeState={swipeState} unassignedCash={unassignedCash} />
+      </div>
+    );
+  }
+);
+
+EnvelopeItem.displayName = "EnvelopeItem";
+
+export default EnvelopeItem;

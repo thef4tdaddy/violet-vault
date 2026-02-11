@@ -5,6 +5,7 @@
 ${{ branchInfo }}
 
 ### 📈 Progress Analysis
+
 ${{ statusMessage }}
 
 ${{ detailedInfo }}
@@ -20,9 +21,10 @@ ${{ detailedInfo }}
 
 ## 🔗 Related Resources
 
-- **Full lint data**: [.github/data/lint-warnings.json](.github/data/lint-warnings.json)  
+- **Full lint data**: [.github/data/lint-warnings.json](.github/data/lint-warnings.json)
 - **Parsing script**: [scripts/parse-eslint-warnings.js](scripts/parse-eslint-warnings.js)
 - **Workflow config**: [.github/workflows/lint-warnings-tracker.yml](.github/workflows/lint-warnings-tracker.yml)
 
 ---
-*🤖 Automated tracking via GitHub Actions*
+
+_🤖 Automated tracking via GitHub Actions_

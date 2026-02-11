@@ -1,6 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Audit reports: Use 'ours' strategy to avoid merge conflicts
-# audit-report.md is tracked (main report), other files are ignored
+# Audit reports: Auto-generated file - conflicts resolved via GitHub Actions
+# For local merges: always use theirs (develop) version
+# For GitHub UI: workflow automatically resolves conflicts
 docs/audits/audit-report.md merge=ours
+package.json merge=ours

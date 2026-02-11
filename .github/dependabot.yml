@@ -23,8 +23,6 @@ updates:
       prefix: "deps"
       prefix-development: "deps(dev)"
       include: "scope"
-    pull-request-branch-name:
-      separator: "/"
     groups:
       # Security-critical dependencies - prioritize security patches
       security:
@@ -176,4 +174,3 @@ updates:
     commit-message:
       prefix: "ci"
       include: "scope"
-

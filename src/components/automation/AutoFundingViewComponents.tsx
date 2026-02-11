@@ -1,0 +1,144 @@
+import React from "react";
+import { Button } from "@/components/ui";
+import type { AutoFundingRule } from "@/utils/domain/budgeting/autofunding/rules";
+import type { ExecutionRecord } from "@/db/types";
+
+interface ViewHeaderProps {
+  rules: AutoFundingRule[];
+}
+
+interface ViewTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  rules: AutoFundingRule[];
+  displayHistory: ExecutionRecord[];
+}
+
+interface ViewContentProps {
+  activeTab: string;
+  rules: AutoFundingRule[];
+  displayHistory: ExecutionRecord[];
+  showExecutionDetails: string | null;
+  setShowExecutionDetails: (show: string | null) => void;
+  handleCreateRule: () => void;
+  handleEditRule: (rule: AutoFundingRule) => void;
+  handleDeleteRule: (ruleId: string) => void;
+  handleToggleRule: (ruleId: string) => void;
+  handleExecuteRules: () => void;
+  isExecuting: boolean;
+  RulesTabComponent: React.ComponentType<{
+    rules: AutoFundingRule[];
+    onCreateRule: () => void;
+    onEditRule: (rule: AutoFundingRule) => void;
+    onDeleteRule: (ruleId: string) => void;
+    onToggleRule: (ruleId: string) => void;
+    onExecuteRules: () => void;
+    isExecuting: boolean;
+  }>;
+  HistoryTabComponent: React.ComponentType<{
+    executionHistory: ExecutionRecord[];
+    showExecutionDetails: string | null;
+    onToggleDetails: (show: string | null) => void;
+  }>;
+}
+
+/**
+ * View header component
+ */
+export const ViewHeader = ({ rules }: ViewHeaderProps) => {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Auto-Funding</h1>
+          <p className="text-gray-600 mt-1">
+            Automate your envelope funding with custom rules and triggers
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+            {rules.filter((r) => r.enabled).length} Active Rules
+          </span>
+          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+            {rules.length} Total Rules
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * View tabs component
+ */
+export const ViewTabs = ({ activeTab, setActiveTab, rules, displayHistory }: ViewTabsProps) => {
+  return (
+    <div className="flex space-x-8 mt-6 border-b border-gray-200">
+      <Button
+        onClick={() => setActiveTab("rules")}
+        className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+          activeTab === "rules"
+            ? "border-blue-500 text-blue-600"
+            : "border-transparent text-gray-500 hover:text-gray-700"
+        }`}
+      >
+        Rules ({rules.length})
+      </Button>
+      <Button
+        onClick={() => setActiveTab("history")}
+        className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+          activeTab === "history"
+            ? "border-blue-500 text-blue-600"
+            : "border-transparent text-gray-500 hover:text-gray-700"
+        }`}
+      >
+        History ({displayHistory.length})
+      </Button>
+    </div>
+  );
+};
+
+/**
+ * View content component
+ */
+export const ViewContent = ({
+  activeTab,
+  rules,
+  displayHistory,
+  showExecutionDetails,
+  setShowExecutionDetails,
+  handleCreateRule,
+  handleEditRule,
+  handleDeleteRule,
+  handleToggleRule,
+  handleExecuteRules,
+  isExecuting,
+  RulesTabComponent,
+  HistoryTabComponent,
+}: ViewContentProps) => {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200">
+      <div className="p-6">
+        {activeTab === "rules" && (
+          <RulesTabComponent
+            rules={rules}
+            onCreateRule={handleCreateRule}
+            onEditRule={handleEditRule}
+            onDeleteRule={handleDeleteRule}
+            onToggleRule={handleToggleRule}
+            onExecuteRules={handleExecuteRules}
+            isExecuting={isExecuting}
+          />
+        )}
+
+        {activeTab === "history" && (
+          <HistoryTabComponent
+            executionHistory={displayHistory}
+            showExecutionDetails={showExecutionDetails}
+            onToggleDetails={setShowExecutionDetails}
+          />
+        )}
+      </div>
+    </div>
+  );
+};

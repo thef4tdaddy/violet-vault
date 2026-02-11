@@ -1,0 +1,3 @@
+# Fix Rollup native binary issues in CI/CD
+# Ensure optional dependencies are handled correctly
+# optional=false
