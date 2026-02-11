@@ -16,7 +16,7 @@ updates:
       - "dependencies"
       - "dependabot"
       - "🟡 Medium" # Default priority for dependency updates
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     allow:
       - dependency-type: "all"
     commit-message:
@@ -170,7 +170,27 @@ updates:
       - "ci"
       - "dependabot"
       - "⚪ Low" # Lower priority for GH Actions updates
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "ci"
+      include: "scope"
+
+  # Python Dependencies - Regular updates to dependabot branch
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    target-branch: "dependabot"
+    assignees:
+      - "thef4tdaddy"
+    labels:
+      - "dependencies"
+      - "python"
+      - "dependabot"
+      - "🟡 Medium"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps(py)"
       include: "scope"
