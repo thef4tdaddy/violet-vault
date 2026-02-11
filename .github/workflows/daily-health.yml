@@ -24,12 +24,16 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [develop, main]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ (github.event_name == 'schedule' || github.event.inputs.context == 'alpha' || github.event.inputs.context == 'beta') && 'develop' || github.ref }}
+          ref: ${{ matrix.branch }}
 
       # --- Setup Environments ---
       - name: Setup Node.js
@@ -86,41 +90,6 @@ jobs:
           cd api
           go mod download
           cd ..
-
-      # --- Housekeeping ---
-      - name: Stale Branch Cleanup
-        id: cleanup
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "🧹 Housekeeping: Stale Branch Cleanup"
-
-          # Protected: main, develop, feat/*, archive/*, dependabot/*, lighthouse-reports
-          PROTECTED_REGEX="^(main|develop|feat/|archive/|dependabot/|lighthouse-reports)"
-          CUTOFF_DATE=$(date -d "72 hours ago" +%s)
-
-          DELETED_BRANCHES=""
-
-          # Get all remote branches
-          ALL_BRANCHES=$(git branch -r | sed 's/origin\///' | tr -d ' ' | grep -v "HEAD")
-
-          for BRANCH in $ALL_BRANCHES; do
-            if [[ $BRANCH =~ $PROTECTED_REGEX ]]; then
-              continue
-            fi
-            
-            LAST_COMMIT_DATE=$(git log -1 --format=%ct "origin/$BRANCH" 2>/dev/null || echo "0")
-            if [ "$LAST_COMMIT_DATE" -lt "$CUTOFF_DATE" ] && [ "$LAST_COMMIT_DATE" -ne "0" ]; then
-              echo "🗑️ Deleting stale branch: $BRANCH"
-              if git push origin --delete "$BRANCH" --no-verify; then
-                DELETED_BRANCHES="$DELETED_BRANCHES $BRANCH"
-              else
-                echo "   ⚠️ Failed to delete $BRANCH"
-              fi
-            fi
-          done
-
-          echo "deleted_branches=$DELETED_BRANCHES" >> $GITHUB_OUTPUT
 
       # --- Build ---
       - name: Build Frontend & Bundle Analysis
@@ -205,63 +174,164 @@ jobs:
           echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
           if [ $exit_code -eq 0 ]; then echo "status=success" >> $GITHUB_OUTPUT; else echo "status=failure" >> $GITHUB_OUTPUT; fi
 
-      # --- Reporting ---
-      - name: Health Report & Tasks
+      # --- Upload Codecov ---
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info,./api/coverage.out,./coverage.json
+          flags: daily-health
+          name: daily-health-check
+          fail_ci_if_error: false
+
+      # --- Prep & Upload Artifacts ---
+      - name: Generate Health Metrics JSON
+        id: metrics
+        run: |
+          cat <<EOF > report.json
+          {
+            "branch": "${{ matrix.branch }}",
+            "buildStatus": "${{ steps.build.outcome }}",
+            "feStatus": "${{ steps.test_frontend.outputs.status || 'skipped' }}",
+            "goStatus": "${{ steps.test_go.outputs.status || 'skipped' }}",
+            "pyStatus": "${{ steps.test_python.outputs.status || 'skipped' }}",
+            "feCoverage": ${{ steps.test_frontend.outputs.coverage || 0 }},
+            "goCoverage": ${{ steps.test_go.outputs.coverage || 0 }},
+            "pyCoverage": ${{ steps.test_python.outputs.coverage || 0 }},
+            "securityVulns": "${{ steps.security_audit.outputs.vulns || '0' }}",
+            "runId": "${{ github.run_id }}"
+          }
+          EOF
+
+      - name: Upload Health Metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-metrics-${{ matrix.branch }}
+          path: report.json
+          retention-days: 1
+
+      - name: Upload Logs
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.branch }}
+          path: |
+            coverage/
+            *.txt
+            api/coverage.out
+            api/coverage.html
+            api/htmlcov/
+            coverage.json
+          retention-days: 7
+
+  report:
+    name: Consolidate Report
+    needs: health-check
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # --- Stale Branch Cleanup (Singleton) ---
+      - name: Stale Branch Cleanup
+        id: cleanup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🧹 Housekeeping: Stale Branch Cleanup"
+          PROTECTED_REGEX="^(main|develop|feat/|archive/|dependabot/|lighthouse-reports)"
+          CUTOFF_DATE=$(date -d "72 hours ago" +%s)
+          DELETED_BRANCHES=""
+          ALL_BRANCHES=$(git branch -r | sed 's/origin\///' | tr -d ' ' | grep -v "HEAD")
+
+          for BRANCH in $ALL_BRANCHES; do
+            if [[ $BRANCH =~ $PROTECTED_REGEX ]]; then continue; fi
+            LAST_COMMIT_DATE=$(git log -1 --format=%ct "origin/$BRANCH" 2>/dev/null || echo "0")
+            if [ "$LAST_COMMIT_DATE" -lt "$CUTOFF_DATE" ] && [ "$LAST_COMMIT_DATE" -ne "0" ]; then
+              echo "🗑️ Deleting stale branch: $BRANCH"
+              if git push origin --delete "$BRANCH" --no-verify; then
+                DELETED_BRANCHES="$DELETED_BRANCHES $BRANCH"
+              else
+                echo "   ⚠️ Failed to delete $BRANCH"
+              fi
+            fi
+          done
+          echo "deleted_branches=$DELETED_BRANCHES" >> $GITHUB_OUTPUT
+
+      # --- Download All Metrics ---
+      - name: Download Metrics
+        uses: actions/download-artifact@v4
+        with:
+          pattern: health-metrics-*
+          path: metrics
+          merge-multiple: true
+
+      # --- Generate & Post Report ---
+      - name: Generate Combined Report
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          ACTUAL_BRANCH: ${{ (github.event_name == 'schedule' || github.event.inputs.context == 'alpha' || github.event.inputs.context == 'beta') && 'develop' || '' }}
+          DELETED_BRANCHES: ${{ steps.cleanup.outputs.deleted_branches }}
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
+            const path = require('path');
 
-            // Gather Statuses
-            const contextName = '${{ inputs.context || 'scheduled' }}';
-            const branchName = process.env.ACTUAL_BRANCH || context.ref.replace('refs/heads/', '');
-            const buildStatus = '${{ steps.build.outcome }}';
-            const feStatus = '${{ steps.test_frontend.outputs.status }}' || 'skipped';
-            const goStatus = '${{ steps.test_go.outputs.status }}' || 'skipped';
-            const pyStatus = '${{ steps.test_python.outputs.status }}' || 'skipped';
-            const deletedBranches = '${{ steps.cleanup.outputs.deleted_branches }}'.trim();
-            const securityVulns = '${{ steps.security_audit.outputs.vulns }}' || '0';
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            // 1. Read Metrics
+            const metricsDir = 'metrics';
+            const metrics = [];
+            if (fs.existsSync(metricsDir)) {
+              fs.readdirSync(metricsDir).forEach(file => {
+                if (file.endsWith('.json')) {
+                   try {
+                     const data = JSON.parse(fs.readFileSync(path.join(metricsDir, file), 'utf8'));
+                     metrics.push(data);
+                   } catch (e) { console.error('Error parsing JSON', file, e); }
+                }
+              });
+            }
 
-            // Get coverage percentages from local run (ACTUAL branch)
-            const frontendCoverage = parseFloat('${{ steps.test_frontend.outputs.coverage }}') || 0;
-            const pythonCoverage = parseFloat('${{ steps.test_python.outputs.coverage }}') || 0;
-            const goCoverage = parseFloat('${{ steps.test_go.outputs.coverage }}') || 0;
-
-            const isHealthy = buildStatus === 'success' && 
-                             (feStatus !== 'failure') && 
-                             (goStatus !== 'failure') && 
-                             (pyStatus !== 'failure');
-            const emoji = isHealthy ? '✅' : '❌';
+            // Global Status Logic
             const dateStr = new Date().toISOString().split('T')[0];
-            const title = `Daily Health: ${dateStr} - ${emoji}`;
+            let allHealthy = true;
+            metrics.forEach(m => {
+               if (m.buildStatus !== 'success') allHealthy = false;
+               if (m.feStatus === 'failure') allHealthy = false;
+               if (m.goStatus === 'failure') allHealthy = false;
+               if (m.pyStatus === 'failure') allHealthy = false;
+            });
+            const emoji = allHealthy ? '✅' : '❌';
 
             let body = `## ${emoji} Daily Health Check: ${dateStr}\n\n`;
-            body += `**Analyzed Branch**: \`${branchName}\`\n`;
-            body += `**Workflow Run**: [View Logs](${runUrl})\n\n`;
+            body += `**Workflow Run**: [View Logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
 
-            // 1. Context Coverage (Current Run)
-            body += `## 📊 ${branchName} Health Metrics\n\n`;
-            body += `| Suite | Coverage | Status |\n`;
-            body += `|-------|----------|--------|\n`;
-            body += `| Frontend (TypeScript) | ${frontendCoverage.toFixed(1)}% | ${frontendCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-            body += `| Backend (Python) | ${pythonCoverage.toFixed(1)}% | ${pythonCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-            body += `| Backend (Go) | ${goCoverage.toFixed(1)}% | ${goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
-            body += `\n**Detailed Analysis**: [Codecov Dashboard](https://app.codecov.io/gh/${context.repo.owner}/${context.repo.repo})\n\n`;
+            // 2. Per-Branch Metrics Table
+            body += `## 📊 Branch Status\n\n`;
+            metrics.forEach(m => {
+               const branchEmoji = (m.buildStatus === 'success' && m.feStatus !== 'failure' && m.goStatus !== 'failure' && m.pyStatus !== 'failure') ? '✅' : '❌';
+               body += `### ${branchEmoji} ${m.branch}\n`;
+               body += `| Suite | Coverage | Status |\n`;
+               body += `|-------|----------|--------|\n`;
+               body += `| Frontend | ${m.feCoverage.toFixed(1)}% | ${m.feCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+               body += `| Backend (Go) | ${m.goCoverage.toFixed(1)}% | ${m.goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+               body += `| Backend (Python) | ${m.pyCoverage.toFixed(1)}% | ${m.pyCoverage >= 80 ? '✅' : '⚠️'} |\n`;
+               body += `**Security**: ${m.securityVulns} High Vulns\n\n`;
+            });
 
-            // 2. Multi-Branch Coverage (Issue #1817)
+            // 3. Ecosystem Coverage (FIXED with Error Handling)
             try {
                 body += `## 🌐 Ecosystem Coverage (Active Branches)\n\n`;
                 body += `| Branch | Latest Coverage | Status |\n`;
                 body += `|--------|-----------------|--------|\n`;
 
                 const token = process.env.CODECOV_TOKEN;
-                const branchesToChecks = ['develop'];
+                const branchesToChecks = []; // We will fill this dynamically
                 
+                // Always check main and develop
+                if (!branchesToChecks.includes('main')) branchesToChecks.push('main');
+                if (!branchesToChecks.includes('develop')) branchesToChecks.push('develop');
+
                 // Get feat/* branches from GitHub
                 const branches = await github.rest.repos.listBranches({
                     owner: context.repo.owner,
@@ -279,126 +349,40 @@ jobs:
                         const response = await fetch(`https://api.codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
                             headers: { 'Authorization': `bearer ${token}` }
                         });
-                        if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+                        
+                        if (response.status === 404) {
+                            body += `| \`${b}\` | No Report | ⚪ |\n`;
+                            continue;
+                        }
+
+                        if (!response.ok) throw new Error(`Status ${response.status}`);
                         const data = await response.json();
                         const coverage = data.head_commit?.totals?.coverage;
+                        
                         if (coverage !== undefined) {
-
                             body += `| \`${b}\` | ${parseFloat(coverage).toFixed(1)}% | ${coverage >= 80 ? '✅' : '⚠️'} |\n`;
                         } else {
-                            body += `| \`${b}\` | No Data | ❓ |\n`;
+                            body += `| \`${b}\` | Processing | ⏳ |\n`;
                         }
                     } catch (e) {
-                        body += `| \`${b}\` | Error | ❌ |\n`;
+                        console.error(`Codecov fetch failed for ${b}:`, e);
+                        body += `| \`${b}\` | ${e.message} | ❌ |\n`;
                     }
                 }
                 body += `\n`;
             } catch (e) { console.error("Multi-branch fetch failed", e); }
 
-            body += `### Infrastructure Status\n`;
-            body += `- **Build**: ${buildStatus === 'success' ? '✅ Pass' : '❌ FAIL'}\n`;
-            body += `- **Security Audit**: ${securityVulns === '0' ? '✅ 0 High Vulns' : `⚠️ ${securityVulns} High Vulns`}\n`;
-            body += `- **Stale Branches Removed**: ${deletedBranches ? `🧹 \`${deletedBranches}\`` : '✅ None'}\n\n`;
-
-            // Path cleaning helper for Issue #1817
-            const cleanPath = (p) => {
-                let path = p.replace('/home/runner/work/violet-vault/violet-vault/', '');
-                path = path.replace(/^api\//, ''); // Strip leading api/ for backend
-                return path;
-            };
-
-            // Combined Worst Offenders (across all languages)
-            const allOffenders = [];
-
-            // 1. Frontend Offenders
-            if (fs.existsSync('coverage/coverage-summary.json')) {
-               try {
-                   const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
-                   for (const [filepath, metrics] of Object.entries(coverage)) {
-                       if (filepath === 'total' || filepath.includes('config') || filepath.includes('.d.ts')) continue;
-                       if (metrics.lines.pct < 80) {
-                           allOffenders.push({ file: cleanPath(filepath), pct: metrics.lines.pct, lang: 'TypeScript' });
-                       }
-                   }
-               } catch (e) { console.error("FE parse error", e); }
-            }
-
-            // 2. Python Offenders
-            if (fs.existsSync('coverage.json')) {
-               try {
-                   const coverage = JSON.parse(fs.readFileSync('coverage.json', 'utf8'));
-                   for (const [filepath, metrics] of Object.entries(coverage.files)) {
-                       const pct = metrics.summary.percent_covered;
-                       if (pct < 80) {
-                           allOffenders.push({ file: cleanPath(filepath), pct: pct, lang: 'Python' });
-                       }
-                   }
-               } catch (e) { console.error("PY parse error", e); }
-            }
-
-            // Select Top 3 Worst Offenders
-            allOffenders.sort((a, b) => a.pct - b.pct);
-            const top3 = allOffenders.slice(0, 3);
-
-            if (top3.length > 0) {
-                body += `### 📉 Coverage Gap: Top 3 Offenders\n\n`;
-                for (const item of top3) {
-                    body += `- \`${item.file}\` (${item.lang}): **${item.pct.toFixed(2)}%**\n`;
-                }
-
-                // Issue creation (Only on develop)
-                if (branchName === 'develop') {
-                    for (const item of top3) {
-                        const parts = item.file.split('/');
-                        const basename = parts[parts.length - 1];
-                        const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
-                        
-                        const existing = await github.rest.search.issuesAndPullRequests({
-                            q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${issueTitle}"`
-                        });
-                        
-                        if (existing.data.total_count === 0) {
-                            await github.rest.issues.create({
-                                owner: context.repo.owner,
-                                repo: context.repo.repo,
-                                title: issueTitle,
-                                body: `Automated Coverage Task\n\nFile: \`${item.file}\` (${item.lang})\nCurrent Coverage: **${item.pct.toFixed(2)}%**\n\nPlease add tests.`,
-                                labels: ['coverage-gap', 'help-wanted', 'automated']
-                            });
-                        }
-                    }
-                }
-            }
-
+            // 4. Infrastructure
+            const deletedBranches = process.env.DELETED_BRANCHES || '';
+            body += `### Infrastructure\n`;
+            body += `- **Stale Branches Removed**: ${deletedBranches ? `🧹 \`${deletedBranches}\`` : '✅ None'}\n`;
             body += `\n---\n*VioletVault Sentinel Health Bot*`;
 
+            // 5. Create Issue
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: title,
+              title: `Daily Health: ${dateStr} - ${emoji}`,
               body: body,
               labels: ['daily-health']
             });
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info,./api/coverage.out,./coverage.json
-          flags: daily-health
-          name: daily-health-check
-          fail_ci_if_error: false
-
-      - name: Upload Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: health-logs
-          path: |
-            coverage/
-            *.txt
-            api/coverage.out
-            api/coverage.html
-            api/htmlcov/
-            coverage.json
-          retention-days: 7
