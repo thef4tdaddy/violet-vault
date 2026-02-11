@@ -106,7 +106,7 @@ interface StoreState {
 
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
+const storeInitializer = (set: ImmerSet<UiStore>, _get: () => UiStore) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -139,6 +139,12 @@ const storeInitializer = (set: ImmerSet<UiStore>, _get: () => StoreState) => ({
 
   // Patch Notes Management actions
   ...createPatchNotesActions(set),
+
+  // Placeholder actions (overwritten by Object.assign below)
+  updateApp: async () => {},
+  installApp: async () => false,
+  manualInstall: async () => ({ success: false, reason: "Not initialized" }),
+  dismissInstallPrompt: () => {},
 
   // Load and show patch notes for version update
   async loadPatchNotesForUpdate(fromVersion: string, toVersion: string) {
