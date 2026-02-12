@@ -148,8 +148,9 @@ def test_generate_curl_command() -> None:
     with patch("builtins.print") as mock_print:
         generate_curl_command()
 
-        # Verify that print was called with expected content
-        assert mock_print.call_count >= 4, "Should print multiple lines"
+        # Verify that print was called multiple times for output
+        # Expected: header, empty line, curl line, headers, data, closing
+        assert mock_print.call_count >= 4, "Should print at least 4 lines of output"
 
         # Check that key elements are printed
         call_args = [str(call) for call in mock_print.call_args_list]
@@ -162,9 +163,11 @@ def test_generate_curl_command() -> None:
 
 
 @pytest.fixture(autouse=True)
-def ensure_path_for_imports():
-    """Fixture to ensure api module can be imported in tests"""
-    path_to_add = "."
+def setup_import_path():
+    """Fixture to manage sys.path for module imports during tests"""
+    import os
+
+    path_to_add = os.getcwd()
     added = False
     if path_to_add not in sys.path:
         sys.path.insert(0, path_to_add)
@@ -175,7 +178,7 @@ def ensure_path_for_imports():
         try:
             sys.path.remove(path_to_add)
         except ValueError:
-            pass  # Already removed
+            pass  # Already removed, no action needed
 
 
 def test_api_locally_error_handling() -> None:
