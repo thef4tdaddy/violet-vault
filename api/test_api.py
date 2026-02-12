@@ -167,16 +167,20 @@ def setup_import_path():
     """Fixture to manage sys.path for module imports during tests"""
     import os
 
-    path_to_add = os.getcwd()
+    # Get the parent directory of this test file (the api/ directory)
+    test_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # Get the project root (parent of api/)
+    project_root = os.path.dirname(test_file_dir)
+
     added = False
-    if path_to_add not in sys.path:
-        sys.path.insert(0, path_to_add)
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
         added = True
     yield
     # Cleanup: remove the path if we added it
     if added:
         try:
-            sys.path.remove(path_to_add)
+            sys.path.remove(project_root)
         except ValueError:
             pass  # Already removed, no action needed
 
