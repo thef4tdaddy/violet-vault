@@ -196,7 +196,7 @@ class TestCategorizationHandler(unittest.TestCase):
 
     def test_do_POST_empty_transactions(self) -> None:
         """Test POST with empty transactions array"""
-        payload = {"transactions": []}
+        payload: dict[str, Any] = {"transactions": []}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
@@ -305,7 +305,7 @@ class TestCategorizationHandler(unittest.TestCase):
     def test_send_error(self) -> None:
         """Test _send_error method sends proper error response"""
         # Trigger an error by sending empty transactions
-        payload = {"transactions": []}
+        payload: dict[str, Any] = {"transactions": []}
         body = json.dumps(payload).encode("utf-8")
         response_bytes = self._run_request(method="POST", body=body)
 
