@@ -64,14 +64,12 @@ const EnvelopeTypeSelector = ({
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      isSelected
-                        ? `${config.borderColor.replace("border-", "border-")} ${config.bgColor.replace("bg-", "bg-")}`
-                        : "border-gray-300"
+                      isSelected ? `${config.borderColor} ${config.bgColor}` : "border-gray-300"
                     }`}
                   >
                     {isSelected && (
                       <div
-                        className={`w-3 h-3 rounded-full ${config.bgColor.replace("bg-", "bg-").replace("-50", "-600")}`}
+                        className={`w-3 h-3 rounded-full ${config.bgColor.replace("-50", "-600")}`}
                       />
                     )}
                   </div>

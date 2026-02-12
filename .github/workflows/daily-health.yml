@@ -185,29 +185,92 @@ jobs:
           fail_ci_if_error: false
 
       # --- Prep & Upload Artifacts ---
-      - name: Generate Health Metrics JSON
+      # --- Prep & Upload Artifacts ---
+      - name: Analyze Coverage & Generate Metrics
         id: metrics
-        run: |
-          cat <<EOF > report.json
-          {
-            "branch": "${{ matrix.branch }}",
-            "buildStatus": "${{ steps.build.outcome }}",
-            "feStatus": "${{ steps.test_frontend.outputs.status || 'skipped' }}",
-            "goStatus": "${{ steps.test_go.outputs.status || 'skipped' }}",
-            "pyStatus": "${{ steps.test_python.outputs.status || 'skipped' }}",
-            "feCoverage": ${{ steps.test_frontend.outputs.coverage || 0 }},
-            "goCoverage": ${{ steps.test_go.outputs.coverage || 0 }},
-            "pyCoverage": ${{ steps.test_python.outputs.coverage || 0 }},
-            "securityVulns": "${{ steps.security_audit.outputs.vulns || '0' }}",
-            "runId": "${{ github.run_id }}"
-          }
-          EOF
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          BRANCH_NAME: ${{ matrix.branch }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          FE_STATUS: ${{ steps.test_frontend.outputs.status || 'skipped' }}
+          GO_STATUS: ${{ steps.test_go.outputs.status || 'skipped' }}
+          PY_STATUS: ${{ steps.test_python.outputs.status || 'skipped' }}
+          FE_COVERAGE: ${{ steps.test_frontend.outputs.coverage || 0 }}
+          GO_COVERAGE: ${{ steps.test_go.outputs.coverage || 0 }}
+          PY_COVERAGE: ${{ steps.test_python.outputs.coverage || 0 }}
+          VULNS: ${{ steps.security_audit.outputs.vulns || '0' }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // --- 1. Identify Lowest Test Targets ---
+            const allOffenders = [];
+            const cleanPath = (p) => {
+                let path = p.replace('/home/runner/work/violet-vault/violet-vault/', '');
+                path = path.replace(/^api\//, '');
+                return path;
+            };
+
+            // Frontend
+            if (fs.existsSync('coverage/coverage-summary.json')) {
+               try {
+                   const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+                   for (const [filepath, metrics] of Object.entries(coverage)) {
+                       if (filepath === 'total' || filepath.includes('config') || filepath.includes('.d.ts')) continue;
+                       if (metrics.lines.pct < 80) {
+                           allOffenders.push({ file: cleanPath(filepath), pct: metrics.lines.pct, lang: 'TypeScript' });
+                       }
+                   }
+               } catch (e) { console.error("FE parse error", e); }
+            }
+
+            // Python
+            if (fs.existsSync('coverage.json')) {
+               try {
+                   const coverage = JSON.parse(fs.readFileSync('coverage.json', 'utf8'));
+                   // Coverage.py JSON format: { "files": { "path/to/file": { "summary": { "percent_covered": 85.5 } } } }
+                   const files = coverage.files || {};
+                   for (const [filepath, metrics] of Object.entries(files)) {
+                       const pct = metrics.summary.percent_covered;
+                       if (pct < 80) {
+                           allOffenders.push({ file: cleanPath(filepath), pct: pct, lang: 'Python' });
+                       }
+                   }
+               } catch (e) { console.error("PY parse error", e); }
+            }
+
+            // Sort & Pick Top 5
+            allOffenders.sort((a, b) => a.pct - b.pct);
+            const top5 = allOffenders.slice(0, 5);
+
+            // --- 2. Construct Payload ---
+            const payload = {
+              branch: process.env.BRANCH_NAME,
+              buildStatus: process.env.BUILD_OUTCOME,
+              feStatus: process.env.FE_STATUS,
+              goStatus: process.env.GO_STATUS,
+              pyStatus: process.env.PY_STATUS,
+              feCoverage: parseFloat(process.env.FE_COVERAGE),
+              goCoverage: parseFloat(process.env.GO_COVERAGE),
+              pyCoverage: parseFloat(process.env.PY_COVERAGE),
+              securityVulns: process.env.VULNS,
+              runId: context.runId,
+              lowestTargets: top5
+            };
+
+            // Write to unique file to avoid overwrite during merge-multiple download
+            const filename = `report-${process.env.BRANCH_NAME.replace(/\//g, '-')}.json`; 
+            fs.writeFileSync(filename, JSON.stringify(payload, null, 2));
+            console.log(`Generated ${filename}`);
 
       - name: Upload Health Metrics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: health-metrics-${{ matrix.branch }}
-          path: report.json
+          path: report-*.json
           retention-days: 1
 
       - name: Upload Logs
@@ -306,6 +369,7 @@ jobs:
             let body = `## ${emoji} Daily Health Check: ${dateStr}\n\n`;
             body += `**Workflow Run**: [View Logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
 
+
             // 2. Per-Branch Metrics Table
             body += `## 📊 Branch Status\n\n`;
             metrics.forEach(m => {
@@ -317,6 +381,17 @@ jobs:
                body += `| Backend (Go) | ${m.goCoverage.toFixed(1)}% | ${m.goCoverage >= 80 ? '✅' : '⚠️'} |\n`;
                body += `| Backend (Python) | ${m.pyCoverage.toFixed(1)}% | ${m.pyCoverage >= 80 ? '✅' : '⚠️'} |\n`;
                body += `**Security**: ${m.securityVulns} High Vulns\n\n`;
+
+               // Test Targets Table
+               if (m.lowestTargets && m.lowestTargets.length > 0) {
+                   body += `#### 🎯 Lowest Test Targets (Top 5)\n`;
+                   body += `| File | Lang | Coverage |\n`;
+                   body += `|------|------|----------|\n`;
+                   m.lowestTargets.forEach(t => {
+                       body += `| \`${t.file}\` | ${t.lang} | **${t.pct.toFixed(1)}%** |\n`;
+                   });
+                   body += `\n`;
+               }
             });
 
             // 3. Ecosystem Coverage (FIXED with Error Handling)
