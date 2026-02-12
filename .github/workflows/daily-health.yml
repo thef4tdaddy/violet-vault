@@ -341,7 +341,7 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // 1. Read Metrics
+            // 1. Read Metrics & Sort (Main First)
             const metricsDir = 'metrics';
             const metrics = [];
             if (fs.existsSync(metricsDir)) {
@@ -354,6 +354,8 @@ jobs:
                 }
               });
             }
+            // Sort: main first, then everything else
+            metrics.sort((a, b) => (a.branch === 'main' ? -1 : 1));
 
             // Global Status Logic
             const dateStr = new Date().toISOString().split('T')[0];
@@ -367,12 +369,13 @@ jobs:
             const emoji = allHealthy ? '✅' : '❌';
 
             let body = `## ${emoji} Daily Health Check: ${dateStr}\n\n`;
-            body += `**Workflow Run**: [View Logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n`;
-
+            body += `**Workflow Run**: [View Logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n`;
+            body += `**Codecov Dashboard**: [View Dashboard](https://app.codecov.io/gh/${context.repo.owner}/${context.repo.repo})\n\n`;
 
             // 2. Per-Branch Metrics Table
             body += `## 📊 Branch Status\n\n`;
-            metrics.forEach(m => {
+
+            for (const m of metrics) {
                const branchEmoji = (m.buildStatus === 'success' && m.feStatus !== 'failure' && m.goStatus !== 'failure' && m.pyStatus !== 'failure') ? '✅' : '❌';
                body += `### ${branchEmoji} ${m.branch}\n`;
                body += `| Suite | Coverage | Status |\n`;
@@ -382,32 +385,56 @@ jobs:
                body += `| Backend (Python) | ${m.pyCoverage.toFixed(1)}% | ${m.pyCoverage >= 80 ? '✅' : '⚠️'} |\n`;
                body += `**Security**: ${m.securityVulns} High Vulns\n\n`;
 
-               // Test Targets Table
+               // Test Targets Table & Issue Creation
                if (m.lowestTargets && m.lowestTargets.length > 0) {
                    body += `#### 🎯 Lowest Test Targets (Top 5)\n`;
                    body += `| File | Lang | Coverage |\n`;
                    body += `|------|------|----------|\n`;
-                   m.lowestTargets.forEach(t => {
+                   
+                   for (const t of m.lowestTargets) {
                        body += `| \`${t.file}\` | ${t.lang} | **${t.pct.toFixed(1)}%** |\n`;
-                   });
+
+                       // Create individual issues for gaps (Only on develop, to avoid noise)
+                       if (m.branch === 'develop' && t.pct < 80) {
+                           try {
+                               const parts = t.file.split('/');
+                               const basename = parts[parts.length - 1];
+                               const issueTitle = `test(${basename}): Improve coverage for ${basename}`;
+                               
+                               const existing = await github.rest.search.issuesAndPullRequests({
+                                   q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${issueTitle}"`
+                               });
+                               
+                               if (existing.data.total_count === 0) {
+                                   await github.rest.issues.create({
+                                       owner: context.repo.owner,
+                                       repo: context.repo.repo,
+                                       title: issueTitle,
+                                       body: `Automated Coverage Task\n\nFile: \`${t.file}\` (${t.lang})\nCurrent Coverage: **${t.pct.toFixed(1)}%**\n\nPlease add tests to reach >80%.`,
+                                       labels: ['coverage-gap', 'help-wanted', 'automated']
+                                   });
+                                   console.log(`Created issue for ${basename}`);
+                               }
+                           } catch (err) { console.error(`Issue creation failed for ${t.file}`, err); }
+                       }
+                   }
                    body += `\n`;
                }
-            });
+            }
 
-            // 3. Ecosystem Coverage (FIXED with Error Handling)
+            // 3. Ecosystem Coverage (Fixing Auth & Links)
             try {
                 body += `## 🌐 Ecosystem Coverage (Active Branches)\n\n`;
                 body += `| Branch | Latest Coverage | Status |\n`;
                 body += `|--------|-----------------|--------|\n`;
 
                 const token = process.env.CODECOV_TOKEN;
-                const branchesToChecks = []; // We will fill this dynamically
+                const branchesToChecks = []; 
                 
-                // Always check main and develop
+                // Sort Priority: Main, Develop, then Feat
                 if (!branchesToChecks.includes('main')) branchesToChecks.push('main');
                 if (!branchesToChecks.includes('develop')) branchesToChecks.push('develop');
 
-                // Get feat/* branches from GitHub
                 const branches = await github.rest.repos.listBranches({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -421,12 +448,19 @@ jobs:
 
                 for (const b of branchesToChecks) {
                     try {
+                        // Use Bearer (Capitalized generic standard)
                         const response = await fetch(`https://api.codecov.io/api/v2/github/${context.repo.owner}/repos/${context.repo.repo}/branches/${encodeURIComponent(b)}/`, {
-                            headers: { 'Authorization': `bearer ${token}` }
+                            headers: { 'Authorization': `Bearer ${token}` }
                         });
                         
                         if (response.status === 404) {
                             body += `| \`${b}\` | No Report | ⚪ |\n`;
+                            continue;
+                        }
+                        
+                         if (response.status === 401) {
+                            body += `| \`${b}\` | Auth Error (401) | 🔒 |\n`;
+                            console.error(`401 for ${b}: Token likely invalid or scopes missing.`);
                             continue;
                         }
 

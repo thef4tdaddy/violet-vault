@@ -33,7 +33,8 @@ updates:
           - "bcrypt"
           - "jsonwebtoken"
         update-types:
-          - "security" # Security patches only for this group
+          - "patch"
+          - "minor"
 
       # React ecosystem - block major versions during migration
       react:
