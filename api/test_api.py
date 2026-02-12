@@ -164,9 +164,14 @@ def test_generate_curl_command() -> None:
 @pytest.fixture(autouse=True)
 def ensure_path_for_imports():
     """Fixture to ensure api module can be imported in tests"""
+    added = False
     if "." not in sys.path:
         sys.path.insert(0, ".")
+        added = True
     yield
+    # Cleanup: remove the path if we added it
+    if added and "." in sys.path:
+        sys.path.remove(".")
 
 
 def test_api_locally_error_handling() -> None:
@@ -184,11 +189,9 @@ def test_api_locally_error_handling() -> None:
         assert "Test error message" in str(exc_info.value)
 
 
-def test_main_block_success() -> None:
-    """Test the main block execution with successful test"""
-    # Test the logic that would be in the main block
-    # We can't easily mock exec(), so we test the component functions
-    # This test verifies the happy path works
+def test_component_functions_work() -> None:
+    """Test that component functions can be called successfully"""
+    # Verify generate_test_payload returns valid data
     payload = generate_test_payload()
     assert payload is not None, "Should generate valid payload"
 
