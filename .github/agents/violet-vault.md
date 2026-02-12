@@ -1,6 +1,9 @@
-# Violet Vault Development Agent Instructions
+---
+name: Violet Vault Development Agent
+description: GitHub Copilot Agent for Violet Vault - Secure encrypted envelope budgeting application
+---
 
-**Description**: GitHub Copilot Agent for Violet Vault - Secure encrypted envelope budgeting application.
+# Violet Vault Development Agent Instructions
 
 ## 🏗️ Architecture: v2.0 Hybrid Polyglot
 
