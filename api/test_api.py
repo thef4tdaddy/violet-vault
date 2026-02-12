@@ -9,6 +9,8 @@ import sys
 from datetime import UTC, datetime
 from unittest.mock import patch
 
+import pytest
+
 
 def generate_test_payload() -> dict:
     """Generate a test payload for the autofunding API"""
@@ -168,12 +170,12 @@ def test_api_locally_error_handling() -> None:
         mock_simulate.return_value = {"success": False, "error": "Test error message"}
 
         # Should raise AssertionError on failure
-        try:
+        with pytest.raises(AssertionError) as exc_info:
             test_api_locally()
-            raise AssertionError("Should have raised AssertionError")
-        except AssertionError as e:
-            assert "Simulation failed" in str(e), "Should mention simulation failure"
-            assert "Test error message" in str(e), "Should include the error message"
+
+        # Verify the error message contains expected content
+        assert "Simulation failed" in str(exc_info.value)
+        assert "Test error message" in str(exc_info.value)
 
 
 def test_main_block_success() -> None:
@@ -191,18 +193,17 @@ def test_main_block_success() -> None:
 
 def test_main_block_error() -> None:
     """Test the main block execution with error"""
-    # Test error handling path by mocking simulate_rule_execution to fail
     sys.path.insert(0, ".")
 
     with patch("api.autofunding.simulate_rule_execution") as mock_simulate:
         mock_simulate.return_value = {"success": False, "error": "Test failure"}
 
         # This should raise AssertionError
-        try:
+        with pytest.raises(AssertionError) as exc_info:
             test_api_locally()
-            raise AssertionError("Should have raised AssertionError")
-        except AssertionError:
-            pass  # Expected behavior
+
+        # Verify error message
+        assert "Simulation failed" in str(exc_info.value)
 
 
 def test_generate_test_payload() -> None:
