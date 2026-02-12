@@ -7,6 +7,9 @@ Can be used to test locally or against deployed API
 import json
 import sys
 from datetime import UTC, datetime
+from unittest.mock import patch
+
+import pytest
 
 
 def generate_test_payload() -> dict:
@@ -138,6 +141,87 @@ def generate_curl_command() -> None:
     print("  -H 'Content-Type: application/json' \\")
     print("  -d '" + json_payload.replace("'", "'\\''") + "'")
     print("\n")
+
+
+def test_generate_curl_command() -> None:
+    """Test the generate_curl_command function output"""
+    with patch("builtins.print") as mock_print:
+        generate_curl_command()
+
+        # Verify that print was called multiple times for the curl command output
+        # Minimum expected: header line, empty line, curl command, headers, data start
+        assert mock_print.call_count >= 4, "Should print at least 4 lines of output"
+
+        # Check that key elements are printed
+        call_args = [str(call) for call in mock_print.call_args_list]
+        output_text = " ".join(call_args)
+
+        assert "curl" in output_text.lower(), "Should contain curl command"
+        assert "POST" in output_text, "Should specify POST method"
+        assert "Content-Type" in output_text, "Should include Content-Type header"
+        assert "rules" in output_text, "Should include rules in payload"
+
+
+@pytest.fixture(autouse=True)
+def setup_import_path():
+    """Fixture to manage sys.path for module imports during tests"""
+    import os
+
+    # Get the parent directory of this test file (the api/ directory)
+    test_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # Get the project root (parent of api/)
+    project_root = os.path.dirname(test_file_dir)
+
+    added = False
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+        added = True
+    yield
+    # Cleanup: remove the path if we added it
+    if added:
+        try:
+            sys.path.remove(project_root)
+        except ValueError:
+            pass  # Already removed, no action needed
+
+
+def test_api_locally_error_handling() -> None:
+    """Test error handling in test_api_locally when simulation fails"""
+    with patch("api.autofunding.simulate_rule_execution") as mock_simulate:
+        # Mock a failed simulation
+        mock_simulate.return_value = {"success": False, "error": "Test error message"}
+
+        # Should raise AssertionError on failure
+        with pytest.raises(AssertionError) as exc_info:
+            test_api_locally()
+
+        # Verify the error message contains expected content
+        assert "Simulation failed" in str(exc_info.value)
+        assert "Test error message" in str(exc_info.value)
+
+
+def test_generate_test_payload() -> None:
+    """Test that generate_test_payload creates valid structure"""
+    payload = generate_test_payload()
+
+    # Verify structure
+    assert "rules" in payload, "Should have rules"
+    assert "context" in payload, "Should have context"
+    assert isinstance(payload["rules"], list), "Rules should be a list"
+    assert len(payload["rules"]) == 2, "Should have 2 test rules"
+
+    # Verify rule structure
+    rule1 = payload["rules"][0]
+    assert rule1["id"] == "rule1", "First rule should have correct ID"
+    assert rule1["type"] == "fixed_amount", "Should have correct type"
+    assert rule1["config"]["amount"] == 200.0, "Should have correct amount"
+
+    # Verify context structure
+    context = payload["context"]
+    assert "data" in context, "Context should have data"
+    assert "trigger" in context, "Context should have trigger"
+    assert "currentDate" in context, "Context should have currentDate"
+    assert context["data"]["unassignedCash"] == 1000.0, "Should have unassigned cash"
 
 
 if __name__ == "__main__":
