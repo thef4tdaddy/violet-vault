@@ -164,14 +164,18 @@ def test_generate_curl_command() -> None:
 @pytest.fixture(autouse=True)
 def ensure_path_for_imports():
     """Fixture to ensure api module can be imported in tests"""
+    path_to_add = "."
     added = False
-    if "." not in sys.path:
-        sys.path.insert(0, ".")
+    if path_to_add not in sys.path:
+        sys.path.insert(0, path_to_add)
         added = True
     yield
     # Cleanup: remove the path if we added it
-    if added and "." in sys.path:
-        sys.path.remove(".")
+    if added:
+        try:
+            sys.path.remove(path_to_add)
+        except ValueError:
+            pass  # Already removed
 
 
 def test_api_locally_error_handling() -> None:
@@ -187,17 +191,6 @@ def test_api_locally_error_handling() -> None:
         # Verify the error message contains expected content
         assert "Simulation failed" in str(exc_info.value)
         assert "Test error message" in str(exc_info.value)
-
-
-def test_component_functions_work() -> None:
-    """Test that component functions can be called successfully"""
-    # Verify generate_test_payload returns valid data
-    payload = generate_test_payload()
-    assert payload is not None, "Should generate valid payload"
-
-    # Verify generate_curl_command doesn't crash
-    with patch("builtins.print"):
-        generate_curl_command()
 
 
 def test_generate_test_payload() -> None:
