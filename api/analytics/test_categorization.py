@@ -89,17 +89,28 @@ class MockCategorizationHandler(handler):
     """Mock handler for testing HTTP endpoints"""
 
     def __init__(self, rfile: BytesIO, wfile: BytesIO, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize mock handler with custom IO streams for testing.
+
+        Args:
+            rfile: Input stream for reading request data
+            wfile: Output stream for writing response data
+            *args: Additional positional arguments for BaseHTTPRequestHandler
+            **kwargs: Additional keyword arguments for BaseHTTPRequestHandler
+        """
         self.test_rfile = rfile
         self.test_wfile = wfile
         # BaseHTTPRequestHandler __init__ calls setup(), handle(), finish()
         super().__init__(*args, **kwargs)
 
     def setup(self) -> None:
+        """Override setup to bypass socket initialization and inject test streams."""
         # Bypass socket setup and inject our streams
         self.rfile = self.test_rfile
         self.wfile = self.test_wfile
 
     def finish(self) -> None:
+        """Override finish to flush without closing streams for test inspection."""
         # Flush but do not close, so we can read the output in tests
         self.wfile.flush()
 
@@ -112,7 +123,17 @@ class TestCategorizationHandler(unittest.TestCase):
         self.mock_server = MagicMock()
 
     def _run_request(self, method: str, body: bytes | None = None) -> bytes:
-        """Helper to run a request by simulating the socket connection"""
+        """
+        Helper to run an HTTP request by simulating the socket connection.
+
+        Args:
+            method: HTTP method (e.g., "GET", "POST", "OPTIONS")
+            body: Optional request body bytes for POST requests
+
+        Returns:
+            Raw HTTP response bytes including status line, headers, and body
+            in the format: "HTTP/1.0 STATUS\\r\\nHeader: value\\r\\n\\r\\nbody"
+        """
         request_line = f"{method} / HTTP/1.1\r\n".encode("iso-8859-1")
         headers = b""
         if body is not None:
@@ -132,17 +153,27 @@ class TestCategorizationHandler(unittest.TestCase):
                 input_file, output_file, MagicMock(), self.mock_client_address, self.mock_server
             )
         except Exception:
-            # If handler crashes, we still want to see what was written if any
+            # If handler crashes during processing, we still want to see partial output
+            # This allows tests to verify error responses were sent before the crash
             pass
 
         return output_file.getvalue()
 
     def _parse_response(self, response_bytes: bytes) -> dict[str, Any]:
-        """Extract JSON body from HTTP response"""
+        """
+        Extract JSON body from HTTP response.
+
+        Args:
+            response_bytes: Raw HTTP response bytes
+
+        Returns:
+            Parsed JSON response as a dictionary, or empty dict if parsing fails
+        """
         try:
             _, body = response_bytes.split(b"\r\n\r\n", 1)
             return cast(dict[str, Any], json.loads(body))
-        except ValueError:
+        except (ValueError, json.JSONDecodeError):
+            # Return empty dict for malformed responses - tests will fail on assertions
             return {}
 
     def test_do_GET_health_check(self) -> None:
