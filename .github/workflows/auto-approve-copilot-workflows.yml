@@ -33,7 +33,7 @@ jobs:
           echo "PR State: ${{ github.event.pull_request.state }}"
 
       - name: Auto-approve workflow runs for Copilot PRs
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             console.log(`🤖 Auto-approving workflows for Copilot PR #${context.issue.number}`);

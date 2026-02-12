@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Auto-label issues by keywords
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
@@ -224,7 +224,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add triage label to new issues
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Flag issues needing more information
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
@@ -266,7 +266,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign issue to lowest numbered open milestone
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             // Only assign milestone to newly opened issues
