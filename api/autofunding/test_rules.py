@@ -477,9 +477,6 @@ def test_get_base_amount_for_percentage_income_none() -> None:
     print("✓ test_get_base_amount_for_percentage_income_none passed")
 
 
-
-
-
 def test_calculate_priority_fill_amount_success() -> None:
     """Test priority fill with valid target envelope"""
     envelope = EnvelopeData(
