@@ -161,10 +161,16 @@ def test_generate_curl_command() -> None:
         assert "rules" in output_text, "Should include rules in payload"
 
 
+@pytest.fixture(autouse=True)
+def ensure_path_for_imports():
+    """Fixture to ensure api module can be imported in tests"""
+    if "." not in sys.path:
+        sys.path.insert(0, ".")
+    yield
+
+
 def test_api_locally_error_handling() -> None:
     """Test error handling in test_api_locally when simulation fails"""
-    sys.path.insert(0, ".")
-
     with patch("api.autofunding.simulate_rule_execution") as mock_simulate:
         # Mock a failed simulation
         mock_simulate.return_value = {"success": False, "error": "Test error message"}
@@ -189,21 +195,6 @@ def test_main_block_success() -> None:
     # Verify generate_curl_command doesn't crash
     with patch("builtins.print"):
         generate_curl_command()
-
-
-def test_main_block_error() -> None:
-    """Test the main block execution with error"""
-    sys.path.insert(0, ".")
-
-    with patch("api.autofunding.simulate_rule_execution") as mock_simulate:
-        mock_simulate.return_value = {"success": False, "error": "Test failure"}
-
-        # This should raise AssertionError
-        with pytest.raises(AssertionError) as exc_info:
-            test_api_locally()
-
-        # Verify error message
-        assert "Simulation failed" in str(exc_info.value)
 
 
 def test_generate_test_payload() -> None:
