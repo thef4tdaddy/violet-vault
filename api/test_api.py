@@ -148,8 +148,8 @@ def test_generate_curl_command() -> None:
     with patch("builtins.print") as mock_print:
         generate_curl_command()
 
-        # Verify that print was called multiple times for output
-        # Expected: header, empty line, curl line, headers, data, closing
+        # Verify that print was called multiple times for the curl command output
+        # Minimum expected: header line, empty line, curl command, headers, data start
         assert mock_print.call_count >= 4, "Should print at least 4 lines of output"
 
         # Check that key elements are printed
