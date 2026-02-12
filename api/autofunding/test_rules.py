@@ -32,8 +32,8 @@ def test_calculate_funding_amount_fixed_amount() -> None:
         id="rule1",
         name="Fixed Amount Rule",
         description="Test fixed amount",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -65,8 +65,8 @@ def test_calculate_funding_amount_fixed_amount_limited_by_cash() -> None:
         id="rule1",
         name="Fixed Amount Rule",
         description="Test fixed amount",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -98,8 +98,8 @@ def test_calculate_funding_amount_percentage() -> None:
         id="rule2",
         name="Percentage Rule",
         description="Test percentage",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -138,8 +138,8 @@ def test_calculate_funding_amount_priority_fill() -> None:
         id="rule3",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -170,8 +170,8 @@ def test_calculate_funding_amount_split_remainder() -> None:
         id="rule4",
         name="Split Remainder Rule",
         description="Test split remainder",
-        type=RULE_TYPES["SPLIT_REMAINDER"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["SPLIT_REMAINDER"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -202,8 +202,8 @@ def test_calculate_funding_amount_conditional_type() -> None:
         id="rule5",
         name="Conditional Rule",
         description="Test conditional type",
-        type=RULE_TYPES["CONDITIONAL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["CONDITIONAL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -234,8 +234,8 @@ def test_get_base_amount_for_percentage_unassigned() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -274,8 +274,8 @@ def test_get_base_amount_for_percentage_envelope() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -308,8 +308,8 @@ def test_get_base_amount_for_percentage_envelope_not_found() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -342,8 +342,8 @@ def test_get_base_amount_for_percentage_envelope_no_source_id() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -383,8 +383,8 @@ def test_get_base_amount_for_percentage_envelope_none_balance() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -417,8 +417,8 @@ def test_get_base_amount_for_percentage_income() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -450,8 +450,8 @@ def test_get_base_amount_for_percentage_income_none() -> None:
         id="rule1",
         name="Test Rule",
         description="Test",
-        type=RULE_TYPES["PERCENTAGE"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PERCENTAGE"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -493,8 +493,8 @@ def test_calculate_priority_fill_amount_success() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -525,8 +525,8 @@ def test_calculate_priority_fill_amount_no_target_id() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -557,8 +557,8 @@ def test_calculate_priority_fill_amount_envelope_not_found() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -596,8 +596,8 @@ def test_calculate_priority_fill_amount_limited_by_cash() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -635,8 +635,8 @@ def test_calculate_priority_fill_amount_already_full() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -674,8 +674,8 @@ def test_calculate_priority_fill_amount_overfunded() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -713,8 +713,8 @@ def test_calculate_priority_fill_amount_none_monthly_amount() -> None:
         id="rule1",
         name="Priority Fill Rule",
         description="Test priority fill",
-        type=RULE_TYPES["PRIORITY_FILL"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["PRIORITY_FILL"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -745,8 +745,8 @@ def test_sort_rules_by_priority_basic() -> None:
         id="rule1",
         name="Low Priority",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=3,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -757,8 +757,8 @@ def test_sort_rules_by_priority_basic() -> None:
         id="rule2",
         name="High Priority",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-02T00:00:00.000Z",
@@ -769,8 +769,8 @@ def test_sort_rules_by_priority_basic() -> None:
         id="rule3",
         name="Medium Priority",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=2,
         enabled=True,
         createdAt="2024-01-03T00:00:00.000Z",
@@ -790,8 +790,8 @@ def test_sort_rules_by_priority_with_high_priority() -> None:
         id="rule1",
         name="Very Low Priority",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=100,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -802,8 +802,8 @@ def test_sort_rules_by_priority_with_high_priority() -> None:
         id="rule2",
         name="High Priority",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-02T00:00:00.000Z",
@@ -822,8 +822,8 @@ def test_sort_rules_by_priority_same_priority_uses_created_at() -> None:
         id="rule1",
         name="Newer Rule",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-03T00:00:00.000Z",
@@ -834,8 +834,8 @@ def test_sort_rules_by_priority_same_priority_uses_created_at() -> None:
         id="rule2",
         name="Older Rule",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -861,8 +861,8 @@ def test_sort_rules_by_priority_single_rule() -> None:
         id="rule1",
         name="Only Rule",
         description="Test",
-        type=RULE_TYPES["FIXED_AMOUNT"],  # type: ignore
-        trigger=TRIGGER_TYPES["MANUAL"],  # type: ignore
+        type=RULE_TYPES["FIXED_AMOUNT"],
+        trigger=TRIGGER_TYPES["MANUAL"],
         priority=1,
         enabled=True,
         createdAt="2024-01-01T00:00:00.000Z",
@@ -877,7 +877,7 @@ def test_sort_rules_by_priority_single_rule() -> None:
 
 if __name__ == "__main__":
     print("\nRunning Rules Utility Tests...\n")
-    
+
     # calculate_funding_amount tests
     test_calculate_funding_amount_fixed_amount()
     test_calculate_funding_amount_fixed_amount_limited_by_cash()
@@ -885,7 +885,7 @@ if __name__ == "__main__":
     test_calculate_funding_amount_priority_fill()
     test_calculate_funding_amount_split_remainder()
     test_calculate_funding_amount_conditional_type()
-    
+
     # get_base_amount_for_percentage tests
     test_get_base_amount_for_percentage_unassigned()
     test_get_base_amount_for_percentage_envelope()
@@ -894,7 +894,7 @@ if __name__ == "__main__":
     test_get_base_amount_for_percentage_envelope_none_balance()
     test_get_base_amount_for_percentage_income()
     test_get_base_amount_for_percentage_income_none()
-    
+
     # calculate_priority_fill_amount tests
     test_calculate_priority_fill_amount_success()
     test_calculate_priority_fill_amount_no_target_id()
@@ -903,12 +903,12 @@ if __name__ == "__main__":
     test_calculate_priority_fill_amount_already_full()
     test_calculate_priority_fill_amount_overfunded()
     test_calculate_priority_fill_amount_none_monthly_amount()
-    
+
     # sort_rules_by_priority tests
     test_sort_rules_by_priority_basic()
     test_sort_rules_by_priority_with_high_priority()
     test_sort_rules_by_priority_same_priority_uses_created_at()
     test_sort_rules_by_priority_empty_list()
     test_sort_rules_by_priority_single_rule()
-    
+
     print("\n✅ All rules utility tests passed!\n")
