@@ -224,7 +224,7 @@ def test_calculate_funding_amount_conditional_type() -> None:
     )
 
     amount = calculate_funding_amount(rule, context)
-    assert amount == 0.0  # Conditional type not yet implemented in calculate_funding_amount
+    assert amount == 0.0  # Rule type not implemented, returns default 0.0
     print("✓ test_calculate_funding_amount_conditional_type passed")
 
 
