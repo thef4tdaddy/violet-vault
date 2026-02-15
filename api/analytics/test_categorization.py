@@ -321,7 +321,7 @@ class TestCategorizationHandler(unittest.TestCase):
         self.assertIn("error", response)
         # The error message should contain information about JSON parsing error
         self.assertIsInstance(response["error"], str)
-        self.assertTrue(len(response["error"]) > 0)
+        self.assertGreater(len(response["error"]), 0)
 
     def test_set_headers(self) -> None:
         """Test _set_headers method sets correct headers"""
