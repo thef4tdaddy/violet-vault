@@ -95,7 +95,6 @@ def test_api_locally() -> None:
     """Test the API using the local Python modules"""
     print("Testing API locally using Python modules...\n")
 
-    sys.path.insert(0, ".")
     from api.autofunding import AutoFundingRequest, simulate_rule_execution
 
     payload = generate_test_payload()
@@ -228,6 +227,14 @@ def test_generate_test_payload() -> None:
 
 
 if __name__ == "__main__":
+    # Add project root to sys.path for standalone script execution
+    import os
+    
+    test_file_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(test_file_dir)
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+    
     try:
         test_api_locally()  # No return value check needed, it raises assert
         generate_curl_command()
