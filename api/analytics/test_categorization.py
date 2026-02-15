@@ -172,7 +172,7 @@ class TestCategorizationHandler(unittest.TestCase):
         try:
             _, body = response_bytes.split(b"\r\n\r\n", 1)
             return cast(dict[str, Any], json.loads(body))
-        except (ValueError, json.JSONDecodeError):
+        except ValueError:
             # Return empty dict for malformed responses - tests will fail on assertions
             return {}
 
