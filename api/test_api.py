@@ -152,9 +152,12 @@ def test_generate_curl_command() -> None:
         # Minimum expected: header line, empty line, curl command, headers, data start
         assert mock_print.call_count >= 4, "Should print at least 4 lines of output"
 
-        # Check that key elements are printed
-        call_args = [str(call) for call in mock_print.call_args_list]
-        output_text = " ".join(call_args)
+        # Build output text from the actual arguments passed to print
+        printed_lines = [
+            " ".join(str(arg) for arg in call.args)
+            for call in mock_print.call_args_list
+        ]
+        output_text = " ".join(printed_lines)
 
         assert "curl" in output_text.lower(), "Should contain curl command"
         assert "POST" in output_text, "Should specify POST method"
